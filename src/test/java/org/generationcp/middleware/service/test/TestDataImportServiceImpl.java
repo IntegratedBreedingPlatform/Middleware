@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import junit.framework.Assert;
 
@@ -276,13 +277,36 @@ public class TestDataImportServiceImpl {
 
     }
     
-    @SuppressWarnings("deprecation")
     @Test
 	public void testValidateProjectOntology() throws MiddlewareQueryException {
         Workbook workbook = TestWorkbookUtil.getTestWorkbookWithErrors();
         workbook.print(0);
         Map<String,List<Message>> errors = dataImportService.validateProjectOntology(workbook);
-        Assert.assertNotNull(errors);
+        assertNotNull(errors);
+        if(errors!=null) {
+        	Debug.println(0, "Errors Identified: ");
+        	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
+        		Debug.println(3, e.getKey());
+        		for(Message m: e.getValue()) {
+        			if(m.getMessageParams()!=null) {
+        				Debug.println(5, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
+        			} else {
+        				Debug.println(5, "Key: " + m.getMessageKey());
+        			}
+        		}
+        	}
+        }
+    }
+    
+    @Test
+	public void testValidateProjectData() throws MiddlewareQueryException {
+    	String studyName = "validateProjectData_" + new Random().nextInt(10000);
+    	int trialNo = 1;
+    	Workbook workbook = TestWorkbookUtil.getTestWorkbookForWizard(studyName,trialNo);
+        workbook.print(0);
+        dataImportService.saveDataset(workbook,true);
+        Map<String,List<Message>> errors = dataImportService.validateProjectData(workbook);
+        assertNotNull(errors);
         if(errors!=null) {
         	Debug.println(0, "Errors Identified: ");
         	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {

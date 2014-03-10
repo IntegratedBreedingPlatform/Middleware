@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -537,12 +538,63 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public Map<String, List<Message>> validateProjectData(Workbook importData) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<String, List<Message>> validateProjectData(Workbook workbook) throws MiddlewareQueryException {
+		Map<String,List<Message>> errors = new HashMap<String, List<Message>>();
+    	OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
+                getSessionProviderForLocal(), getSessionProviderForCentral());
+    	checkForExistingTrialInstance(ontology, workbook, errors);
+		return errors;
 	}
-    
-    
+	
+	private void checkForExistingTrialInstance(
+			OntologyDataManager ontology, Workbook workbook, Map<String,List<Message>> errors)
+            throws MiddlewareQueryException {
 
+        String studyName = workbook.getStudyDetails().getStudyName();
+        String trialInstanceNumber = null;
+        if (workbook.isNursery()) {
+        	trialInstanceNumber = "1";
+        	Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+            if (locationId != null) {//same location and study
+            	initializeIfNull(errors,Constants.GLOBAL);
+            	errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",trialInstanceNumber));
+            }
+        } else {
+        	//get local variable name of the trial instance number
+        	String trialInstanceHeader = null;
+        	List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
+            for (MeasurementVariable mvar : trialFactors) {
+            	PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
+                Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
+                if (varId != null) {
+                    StandardVariable svar = ontology.getStandardVariable(varId);
+                    if (svar.getStoredIn() != null) {
+                        if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+                        	trialInstanceHeader = mvar.getName();
+                        	break;
+                        }
+                    }
+                }
+            }
+            //get and check if trialInstanceNumber already exists
+        	Set<String> locationIds = new LinkedHashSet<String>();
+        	int maxNumOfIterations = 100000;//TODO MODIFY THIS IF NECESSARY
+        	int observationCount = workbook.getObservations().size();
+        	if(observationCount<maxNumOfIterations) {
+        		maxNumOfIterations = observationCount;
+        	}
+        	for(int i=0;i<maxNumOfIterations;i++) {
+        		MeasurementRow row = workbook.getObservations().get(i);
+        		trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader); 
+        		if(locationIds.add(trialInstanceNumber)) {
+        			Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+                    if (locationId != null) {//same location and study
+                    	initializeIfNull(errors,Constants.GLOBAL);
+                    	errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",trialInstanceNumber));
+                    }
+        		}
+        	}
+        }   
+    }
 
 }

@@ -116,8 +116,7 @@ public interface DataImportService {
 	 */
     int saveProjectData(Workbook workbook) throws MiddlewareQueryException;
 
-	Map<String, List<Message>> validateProjectData(
-			org.generationcp.middleware.domain.etl.Workbook importData) throws MiddlewareQueryException;
+	Map<String, List<Message>> validateProjectData(Workbook importData) throws MiddlewareQueryException;
 	
 	
 }

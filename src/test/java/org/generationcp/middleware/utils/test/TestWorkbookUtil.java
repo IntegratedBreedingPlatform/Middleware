@@ -120,6 +120,10 @@ public class TestWorkbookUtil {
 	public static Workbook getTestWorkbookWithErrors(){
 		return createTestWorkbookWithErrors();
 	}
+	
+	public static Workbook getTestWorkbookForWizard(String studyName,int trialNo) {
+		return createTestWorkbookForWizard(studyName,trialNo);
+	}
 
 	public static List<Workbook> getTestWorkbooks(int noOfTrial){
 		if (workbooks == null){
@@ -137,8 +141,8 @@ public class TestWorkbookUtil {
 		
 		String studyName = "pheno_t7" + new Random().nextInt(10000);
 		createStudyDetails(studyName, workbook);
-		createConditions(workbook, 1);
-		createFactors(workbook);
+		createConditions(workbook,true,1);
+		createFactors(workbook,true,false,1);
 		createConstants(workbook);
 		createVariates(workbook);
 		createObservations(workbook);
@@ -148,11 +152,24 @@ public class TestWorkbookUtil {
 		Workbook wbook = new Workbook();
 		
 		createStudyDetails(studyName, wbook);
-		createConditions(wbook, trialNo);
-		createFactors(wbook);
+		createConditions(wbook,true,trialNo);
+		createFactors(wbook,true,false,trialNo);
 		createConstants(wbook);
 		createVariates(wbook);
 		createObservations(wbook);
+		
+		return wbook;
+	}
+	
+	public static Workbook createTestWorkbookForWizard(String studyName, int trialNo){
+		Workbook wbook = new Workbook();
+		
+		createStudyDetails(studyName, wbook);
+		createConditions(wbook, false, trialNo);
+		createFactors(wbook,true,true,trialNo);
+		createConstants(wbook);
+		createVariates(wbook);
+		createObservations(wbook,true,trialNo);
 		
 		return wbook;
 	}
@@ -162,8 +179,8 @@ public class TestWorkbookUtil {
 		
 		String studyName = "workbookWithErrors" + new Random().nextInt(10000);
 		createStudyDetails(studyName, workbook);
-		createConditionsWithNoTrial(workbook, 1);
-		createFactorsWithNoEntryAndTrial(workbook);
+		createConditions(workbook,false,1);
+		createFactors(workbook,false,false,1);
 		createConstants(workbook);
 		createVariatesWithDuplicatePSM(workbook);
 		createObservations(workbook);
@@ -186,28 +203,7 @@ public class TestWorkbookUtil {
 		workbook.setStudyDetails(details);
 	}
 	
-	private static void createConditionsWithNoTrial(Workbook workbook, int trialNo){
-		List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
-		
-		conditions.add(new MeasurementVariable("PI Name", "Name of Principal Investigator", 
-				DBCV, ASSIGNED, PERSON, CHAR, "PI Name Value", STUDY));		
-		
-		conditions.add(new MeasurementVariable("PI ID", "ID of Principal Investigator", 
-				DBID, ASSIGNED, PERSON, NUMERIC, "PI ID Value", STUDY));
-		
-		conditions.add(new MeasurementVariable("SITE", "TRIAL SITE NAME", 
-				DBCV, ASSIGNED, LOCATION, CHAR, "SITE " + trialNo, TRIAL));		
-		
-		conditions.add(new MeasurementVariable("SITE ID", "TRIAL SITE ID", 
-				DBID, ASSIGNED, LOCATION, NUMERIC, String.valueOf(trialNo), TRIAL));		
-		
-		conditions.add(new MeasurementVariable("DESIGN", "EXPERIMENTAL DESIGN", 
-				TYPE, ASSIGNED, EXPERIMENTAL_DESIGN, CHAR, "", TRIAL));
-		
-		workbook.setConditions(conditions);
-	}
-	
-	private static void createConditions(Workbook workbook, int trialNo){
+	private static void createConditions(Workbook workbook, boolean withTrial, int trialNo){
 		List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
 		
 		conditions.add(new MeasurementVariable("PI Name", "Name of Principal Investigator", 
@@ -216,9 +212,10 @@ public class TestWorkbookUtil {
 		conditions.add(new MeasurementVariable("PI ID", "ID of Principal Investigator", 
 				DBID, ASSIGNED, PERSON, NUMERIC, "PI ID Value", STUDY));		
 		
-		conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
+		if(withTrial) {
+			conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
 				NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, String.valueOf(trialNo), TRIAL));
-		
+		}
 //		conditions.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", 
 //				DBCV, CONDUCTED, PERSON, CHAR, "", TRIAL));		
 //		
@@ -237,39 +234,18 @@ public class TestWorkbookUtil {
 		workbook.setConditions(conditions);
 	}
 	
-	private static void createFactorsWithNoEntryAndTrial(Workbook workbook){
+	private static void createFactors(Workbook workbook, boolean withEntry, boolean withTrial, int trialNo){
 		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+		
+		if(withTrial) {
+			factors.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
+					NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, String.valueOf(trialNo), TRIAL));
+		}
 		// Entry Factors
-		factors.add(new MeasurementVariable(GID, "The GID of the germplasm", 
-				DBID, ASSIGNED, GERMPLASM_ID, NUMERIC, STUDY, ENTRY));		
-		
-		factors.add(new MeasurementVariable(DESIG, "The name of the germplasm", 
-				DBCV, ASSIGNED, GERMPLASM_ID, CHAR, STUDY, ENTRY));		
-		
-		factors.add(new MeasurementVariable(CROSS, "The pedigree string of the germplasm", 
-				PEDIGREE_STRING, ASSIGNED, CROSS_HISTORY, CHAR, STUDY, ENTRY));		
-		
-		factors.add(new MeasurementVariable(SEED_SOURCE, "The seed source of the germplasm", 
-				NAME, SELECTED, SEED_SOURCE, CHAR, STUDY, ENTRY));		
-		
-		factors.add(new MeasurementVariable(PLOT, "Plot number ", 
-				NESTED_NUMBER, ENUMERATED, FIELD_PLOT, NUMERIC, STUDY, PLOT));		
-		
-		//Plot Factors
-		factors.add(new MeasurementVariable(BLOCK, "INCOMPLETE BLOCK", 
-				NUMBER, ENUMERATED, BLOCKING_FACTOR, NUMERIC, STUDY, PLOT));	
-		
-		factors.add(new MeasurementVariable(REP, REPLICATION, 
-				NUMBER, ENUMERATED, REPLICATION_FACTOR, NUMERIC, STUDY, PLOT));
-		
-		workbook.setFactors(factors);
-	}	
-	private static void createFactors(Workbook workbook){
-		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-		// Entry Factors
-		factors.add(new MeasurementVariable(ENTRY, "The germplasm entry number", 
+		if(withEntry) {
+			factors.add(new MeasurementVariable(ENTRY, "The germplasm entry number", 
 				NUMBER, ENUMERATED, GERMPLASM_ENTRY, NUMERIC, STUDY, ENTRY));		
-		
+		}
 		factors.add(new MeasurementVariable(GID, "The GID of the germplasm", 
 				DBID, ASSIGNED, GERMPLASM_ID, NUMERIC, STUDY, ENTRY));		
 		
@@ -370,6 +346,10 @@ public class TestWorkbookUtil {
 	
 	
 	private static void createObservations(Workbook workbook){
+		createObservations(workbook, false, 1);
+	}
+	
+	private static void createObservations(Workbook workbook,boolean withTrial,int trialNo){
 		List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 		
 		MeasurementRow row;
@@ -380,7 +360,9 @@ public class TestWorkbookUtil {
 		for(int i=1; i<21; i++){
 			row = new MeasurementRow();
 			dataList = new ArrayList<MeasurementData>();
-			
+			if(withTrial) {
+				dataList.add(new MeasurementData(TRIAL, String.valueOf(trialNo)));//test data for etl wizard
+			}
 			dataList.add(new MeasurementData(ENTRY, String.valueOf(i)));
 			dataList.add(new MeasurementData(GID, computeGID(i)));
 			dataList.add(new MeasurementData(DESIG, G_NAMES[i-1]));
