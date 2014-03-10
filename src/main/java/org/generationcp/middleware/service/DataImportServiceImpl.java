@@ -282,8 +282,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             if (!psmMap.containsKey(temp)) {
                 psmMap.put(temp, measurementVariable.getName());
             } else {
-            	initializeIfNull(errors,measurementVariable.getName());
-            	errors.get(psmMap.get(temp)+"|"+measurementVariable.getName()).add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
+            	initializeIfNull(errors,measurementVariable.getName()+ ":" + measurementVariable.getTermId());
+            	errors.get(measurementVariable.getName()+ ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
             }
         }
     }
