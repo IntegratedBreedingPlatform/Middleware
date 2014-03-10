@@ -50,7 +50,7 @@ public class Workbook {
 	
 	private boolean isCheckFactorAddedOnly;
 	
-	private Map<String, MeasurementVariable> measurementDatasetVariablesMap;
+	private Map<String, MeasurementVariable> measurementDatasetVariablesMap; //added for optimization
 	
 	public void reset() {
 		trialHeaders = null;
