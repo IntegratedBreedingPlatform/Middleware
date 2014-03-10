@@ -12,7 +12,9 @@
 package org.generationcp.middleware.domain.etl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
@@ -47,6 +49,8 @@ public class Workbook {
 	private List<MeasurementVariable> trialConstants;
 	
 	private boolean isCheckFactorAddedOnly;
+	
+	private Map<String, MeasurementVariable> measurementDatasetVariablesMap;
 	
 	public void reset() {
 		trialHeaders = null;
@@ -137,10 +141,26 @@ public class Workbook {
 			measurementDatasetVariables = new ArrayList<MeasurementVariable>();
 			
 			measurementDatasetVariables.addAll(getNonTrialFactors());
-			measurementDatasetVariables.addAll(variates);
+			measurementDatasetVariables.addAll(variates);						
 		}
 		return measurementDatasetVariables;
 	}
+	
+	
+
+	public Map<String, MeasurementVariable> getMeasurementDatasetVariablesMap() {
+		//we set the id to the map
+		if(measurementDatasetVariablesMap == null){
+			measurementDatasetVariablesMap = new HashMap();
+			this.getMeasurementDatasetVariables();
+			for(MeasurementVariable var: measurementDatasetVariables){
+				measurementDatasetVariablesMap.put(Integer.toString(var.getTermId()), var);
+			}
+		}
+		return measurementDatasetVariablesMap;
+	}
+
+	
 
 	public List<MeasurementVariable> getNonTrialFactors() {
 		if(nonTrialFactors==null) {
