@@ -69,6 +69,26 @@ public class AlleleValues implements Serializable{
                 "AND gdms_allele_values.gid IN (:gidList) " +
                 "AND gdms_allele_values.marker_id IN (:markerIdList) " +
             "ORDER BY gdms_allele_values.gid DESC, gdms_marker.marker_name";
+    
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS = 
+            "SELECT DISTINCT " +
+                "gdms_allele_values.gid, " +
+                "CONCAT(gdms_allele_values.allele_bin_value, ''), " +
+                "gdms_allele_values.peak_height " +
+            "FROM gdms_allele_values " +
+            "WHERE  gdms_allele_values.gid IN (:gidList) " +
+                "AND gdms_allele_values.marker_id IN (:markerIdList) " +
+            "ORDER BY gdms_allele_values.gid DESC";
+
+    public static final String GET_ALLELIC_VALUES_BY_GID_LOCAL = 
+            "SELECT DISTINCT " +
+                "gdms_allele_values.gid, " +
+                "gdms_allele_values.marker_id, " +
+                "CONCAT(gdms_allele_values.allele_bin_value, ''), " +
+                "gdms_allele_values.peak_height " +
+            "FROM gdms_allele_values " +
+            "WHERE  gdms_allele_values.gid IN (:gidList) " +
+            "ORDER BY gdms_allele_values.gid ASC";
 
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 

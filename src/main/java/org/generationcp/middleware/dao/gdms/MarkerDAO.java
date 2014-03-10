@@ -14,7 +14,9 @@ package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -317,9 +319,28 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             if (result != null) {
                 Integer gid = (Integer) result[0];
                 String data = (String) result[1];
-                String markerName = (String) result[2];
+                Integer peakHeight = (Integer) result[2];
+                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, null, peakHeight);
+                values.add(allelicValueElement);
+            }
+        }
+
+        return values;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private List<AllelicValueElement> getAllelicValueElementsFromListLocal(List results) {
+        List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
+
+        for (Object o : results) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+                Integer gid = (Integer) result[0];
+                Integer markerId = (Integer) result[1];
+                String data = (String) result[2];
                 Integer peakHeight = (Integer) result[3];
-                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, markerName, peakHeight);
+                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, null, peakHeight);
+                allelicValueElement.setMarkerId(markerId);
                 values.add(allelicValueElement);
             }
         }
@@ -355,21 +376,21 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         try {
 
             //retrieve allelic values from allele_values
-            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES);
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             List results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromList(results));
 
             //retrieve allelic values from char_values
-            query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES);
+            query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromList(results));
 
             //retrieve allelic values from mapping_pop_values
-            query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES);
+            query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             results = query.list();
@@ -382,6 +403,45 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
         return allelicValues;
     }
+    
+    
+    @SuppressWarnings("rawtypes")
+    public List<AllelicValueElement> getAllelicValuesFromLocal(List<Integer> gids) throws MiddlewareQueryException {
+
+        List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
+
+        if (gids == null || gids.isEmpty()) {
+            return allelicValues;
+        }
+
+
+        try {
+
+            //retrieve allelic values from allele_values
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_GID_LOCAL);
+            query.setParameterList("gidList", gids);
+            List results = query.list();
+            allelicValues.addAll(getAllelicValueElementsFromListLocal(results));
+
+            //retrieve allelic values from char_values
+            query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_GID_LOCAL);
+            query.setParameterList("gidList", gids);
+            results = query.list();
+            allelicValues.addAll(getAllelicValueElementsFromListLocal(results));
+
+            //retrieve allelic values from mapping_pop_values
+            query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_GID_LOCAL);
+            query.setParameterList("gidList", gids);
+            results = query.list();
+            allelicValues.addAll(getAllelicValueElementsFromListLocal(results));
+
+            return allelicValues;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAllelicValuesFromLocal() query from Marker: " + e.getMessage(), e);
+        }
+        return allelicValues;
+    }
+    
 
     /**
      * Get list of marker names by marker ids.
@@ -415,12 +475,40 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
 
             return dataValues;
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getNamesByIds(markerIds" + ids + ") query from Marker: "
+            logAndThrowException("Error with getNamesByIds(markerIds" + ids + ") query from Marker: "
                     + e.getMessage(), e);
         }
         return new ArrayList<MarkerIdMarkerNameElement>();
     }
     
+    public Map<Integer, String> getNamesByIdsMap(List<Integer> ids) throws MiddlewareQueryException {
+        Map<Integer, String> dataValues = new HashMap<Integer, String>();
+        if (ids == null || ids.isEmpty()) {
+            return dataValues;
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_NAMES_BY_IDS);
+            query.setParameterList("markerIdList", ids);
+
+            List<Object> results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer id = (Integer) result[0];
+                    String name = (String) result[1];
+                    dataValues.put(id, name);
+                }
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getNamesByIdsMap(markerIds" + ids + ") query from Marker: "
+                    + e.getMessage(), e);
+        }
+        return dataValues;
+    }
+
     public String getNameById(Integer markerId) throws MiddlewareQueryException {
         String name = null;
 
