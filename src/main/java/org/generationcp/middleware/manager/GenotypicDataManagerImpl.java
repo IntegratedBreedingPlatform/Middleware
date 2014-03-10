@@ -329,21 +329,25 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 "getAllelicValuesFromLocal", new Object[]{gids}, new Class[]{List.class});
         
         // Get marker names by marker ids
-        List<Integer> markerIdsLocal = new ArrayList<Integer>();
+        List<Integer> markerIdsInLocal = new ArrayList<Integer>();
         for(AllelicValueElement allelicValue : allelicValuesLocal){
-            markerIdsLocal.add(allelicValue.getMarkerId());
+            markerIdsInLocal.add(allelicValue.getMarkerId());
         }
-        java.util.Map<Integer, String> markerNamesLocal = new HashMap<Integer, String>();
+        java.util.Map<Integer, String> markerNamesInLocal = new HashMap<Integer, String>();
         setWorkingDatabase(Database.CENTRAL);
-        markerNamesLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsLocal));
+        markerNamesInLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsInLocal));
         setWorkingDatabase(Database.LOCAL);
-        markerNamesLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsLocal));
+        markerNamesInLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsInLocal));
+        
 
-        for(AllelicValueElement allelicValue : allelicValuesLocal){            
-            allelicValue.setMarkerName(markerNamesLocal.get(allelicValue.getMarkerId()));
+        for(AllelicValueElement allelicValue : allelicValuesLocal){  
+            String markerNameInLocal = markerNamesInLocal.get(allelicValue.getMarkerId());
+            if (markerNames.contains(markerNameInLocal)){
+                allelicValue.setMarkerName(markerNameInLocal);
+                allelicValues.add(allelicValue);
+            }
         }
         
-        allelicValues.addAll(allelicValuesLocal);
         return allelicValues;
     }
 
