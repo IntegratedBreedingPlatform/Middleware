@@ -67,6 +67,26 @@ public class CharValues implements Serializable{
                 "AND gdms_char_values.marker_id IN (:markerIdList) " +
             "ORDER BY gdms_char_values.gid DESC, gdms_marker.marker_name";
     
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS =
+            "SELECT DISTINCT " +
+                "gdms_char_values.gid, " +
+                "CONCAT(gdms_char_values.char_value, ''), " +
+                "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
+            "FROM gdms_char_values " +
+            "WHERE gdms_char_values.gid IN (:gidList) " +
+                "AND gdms_char_values.marker_id IN (:markerIdList) " +
+            "ORDER BY gdms_char_values.gid DESC ";
+    
+    public static final String GET_ALLELIC_VALUES_BY_GID_LOCAL = 
+            "SELECT DISTINCT " +
+                    "gdms_char_values.gid, " +
+                    "gdms_char_values.marker_id, " +
+                    "CONCAT(gdms_char_values.char_value, ''), " +
+                    "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
+            "FROM gdms_char_values " +
+            "WHERE gdms_char_values.gid IN (:gidList) " +
+            "ORDER BY gdms_char_values.gid ASC ";
+
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
             "SELECT gid, marker_id,  CONCAT(char_value, '') " +

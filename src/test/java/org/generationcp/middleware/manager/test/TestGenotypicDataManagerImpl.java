@@ -323,18 +323,16 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetAllelicValuesByGidsAndMarkerNamesForGDMS() throws Exception {
-//        List<String> markerNames = Arrays.asList("IPAHM117", "IPAHM130");
-//        List<Integer> gids = Arrays.asList(7, 956);
+
+        List<String> markerNames = Arrays.asList("TC03A12", "Seq19E09", "TC7E04", "SeqTEST"); //marker id = 3295, 3296, 1044;
+        List<Integer> gids = Arrays.asList(1434, 1435, 1);
         
-        //TODO
-        List<String> markerNames = Arrays.asList("TC5H11");
-        List<Integer> gids = Arrays.asList(1, 1920);
+        // Local test data 
+        testAddGDMSMarker(); // add Marker with markerName = "SeqTEST" 
         
-        
-        /* Results will vary depending on the database connected to.
-         * As of the moment, we have no data that contains test values in all 3 source tables */
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
-        Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNamesForGDMS(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
+        Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNamesForGDMS(" + gids + ", " + markerNames + ") RESULTS: ");
+        Debug.printFormattedObjects(INDENT, allelicValues);
     }
 
     @Test

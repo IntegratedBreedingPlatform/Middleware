@@ -31,6 +31,8 @@ public class AllelicValueElement implements Serializable{
     
     private String data;
     
+    private Integer markerId;
+
     private String markerName;
     
     private Integer datasetId;
@@ -103,6 +105,16 @@ public class AllelicValueElement implements Serializable{
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    
+    public Integer getMarkerId() {
+        return markerId;
+    }
+
+    
+    public void setMarkerId(Integer markerId) {
+        this.markerId = markerId;
     }
 
     public String getMarkerName() {

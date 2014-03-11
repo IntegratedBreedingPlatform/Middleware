@@ -55,18 +55,39 @@ public class MappingPopValues implements Serializable{
     
     // For getAllelicValues by gid and marker names
     public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
-        "SELECT DISTINCT " +
-            "gdms_mapping_pop_values.gid, " +
-            "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
-            "CONCAT(gdms_marker.marker_name, ''), " +
-            "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
-        "FROM gdms_mapping_pop_values, " +
-            "gdms_marker " +
-        "WHERE gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
-            "AND gdms_mapping_pop_values.gid IN (:gidList) " +
-            "AND gdms_mapping_pop_values.marker_id IN (:markerIdList) " +
-        "ORDER BY gdms_mapping_pop_values.gid DESC, gdms_marker.marker_name";
+            "SELECT DISTINCT " +
+                "gdms_mapping_pop_values.gid, " +
+                "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
+                "CONCAT(gdms_marker.marker_name, ''), " +
+                "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
+            "FROM gdms_mapping_pop_values, " +
+                "gdms_marker " +
+            "WHERE gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
+                "AND gdms_mapping_pop_values.gid IN (:gidList) " +
+                "AND gdms_mapping_pop_values.marker_id IN (:markerIdList) " +
+            "ORDER BY gdms_mapping_pop_values.gid DESC, gdms_marker.marker_name";
 
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS =
+            "SELECT DISTINCT " +
+                "gdms_mapping_pop_values.gid, " +
+                "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
+                "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
+            "FROM gdms_mapping_pop_values " +
+            "WHERE gdms_mapping_pop_values.gid IN (:gidList) " +
+                "AND gdms_mapping_pop_values.marker_id IN (:markerIdList) " +
+            "ORDER BY gdms_mapping_pop_values.gid DESC ";
+
+
+    public static final String GET_ALLELIC_VALUES_BY_GID_LOCAL =
+            "SELECT DISTINCT " +
+                "gdms_mapping_pop_values.gid, " +
+                "gdms_mapping_pop_values.marker_id, " +
+                "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
+                "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
+            "FROM gdms_mapping_pop_values " +
+            "WHERE gdms_mapping_pop_values.gid IN (:gidList) " +
+            "ORDER BY gdms_mapping_pop_values.gid ASC ";
+    
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
             "SELECT gid, marker_id, CONCAT(map_char_value, '') " +

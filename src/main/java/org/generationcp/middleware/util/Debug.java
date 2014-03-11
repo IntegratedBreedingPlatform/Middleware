@@ -87,7 +87,7 @@ public class Debug {
 
     
     /**
-     * Prints the formatted object. The class name, and each field is on one line.
+     * Prints the formatted object - one line for each field.
      *
      * @param indent the indent
      * @param obj the object to print

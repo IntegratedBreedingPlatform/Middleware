@@ -318,8 +318,37 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
             throws MiddlewareQueryException {
-        return super.getFromInstanceByIdAndMethod(getMarkerDao(), gids.get(0), 
-                "getAllelicValuesByGidsAndMarkerNames", new Object[]{gids, markerNames}, new Class[]{List.class, List.class});
+        List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
+        
+        // Get from CENTRAL
+        allelicValues.addAll( super.getFromInstanceByMethod(getMarkerDao(), Database.CENTRAL, 
+                "getAllelicValuesByGidsAndMarkerNames", new Object[]{gids, markerNames}, new Class[]{List.class, List.class}));
+        
+        // Get from LOCAL
+        List<AllelicValueElement> allelicValuesLocal = super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, 
+                "getAllelicValuesFromLocal", new Object[]{gids}, new Class[]{List.class});
+        
+        // Get marker names by marker ids
+        List<Integer> markerIdsInLocal = new ArrayList<Integer>();
+        for(AllelicValueElement allelicValue : allelicValuesLocal){
+            markerIdsInLocal.add(allelicValue.getMarkerId());
+        }
+        java.util.Map<Integer, String> markerNamesInLocal = new HashMap<Integer, String>();
+        setWorkingDatabase(Database.CENTRAL);
+        markerNamesInLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsInLocal));
+        setWorkingDatabase(Database.LOCAL);
+        markerNamesInLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsInLocal));
+        
+
+        for(AllelicValueElement allelicValue : allelicValuesLocal){  
+            String markerNameInLocal = markerNamesInLocal.get(allelicValue.getMarkerId());
+            if (markerNames.contains(markerNameInLocal)){
+                allelicValue.setMarkerName(markerNameInLocal);
+                allelicValues.add(allelicValue);
+            }
+        }
+        
+        return allelicValues;
     }
 
     @Override
