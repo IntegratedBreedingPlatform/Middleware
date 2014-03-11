@@ -11,9 +11,19 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.Constants;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -33,9 +43,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.*;
 
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -169,7 +176,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         //GCP-6253
         checkForDuplicateVariableNames(ontology, workbook, messages);
 
-        // temporarily disabled
         checkForDuplicatePSMCombo(workbook, messages);
 
         checkForInvalidLabel(workbook, messages);
@@ -267,6 +273,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
     }
 
+    private void checkForDuplicatePSMCombo(Workbook workbook, Map<String,List<Message>> errors) {
+        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
+        Map<String, String> psmMap = new HashMap<String, String>();
+
+        for (MeasurementVariable measurementVariable : workbookVariables) {
+            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
+            if (!psmMap.containsKey(temp)) {
+                psmMap.put(temp, measurementVariable.getName());
+            } else {
+            	initializeIfNull(errors,measurementVariable.getName()+ ":" + measurementVariable.getTermId());
+            	errors.get(measurementVariable.getName()+ ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
+            }
+        }
+    }
+    
     private void checkForInvalidLabel(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
         variableList.addAll(workbook.getFactors());
@@ -437,6 +458,143 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
         return locationId;
     }
+    
+    @Override
+	public Map<String,List<Message>> validateProjectOntology(Workbook workbook) throws MiddlewareQueryException {
+    	Map<String,List<Message>> errors = new HashMap<String, List<Message>>();
+    	
+    	OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
+                getSessionProviderForLocal(), getSessionProviderForCentral());
 
+    	if (!isEntryExists(ontology, workbook.getFactors())) {
+    		initializeIfNull(errors,Constants.GLOBAL);
+        	errors.get(Constants.GLOBAL).add(new Message("error.entry.doesnt.exist.wizard"));
+        }
+
+        if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
+        	initializeIfNull(errors,Constants.GLOBAL);
+        	errors.get(Constants.GLOBAL).add(new Message("error.missing.trial.condition"));
+        }
+
+        checkForDuplicatePSMCombo(workbook, errors);
+    	
+        return errors;
+    }
+
+	private <T> void initializeIfNull(Map<String,List<T>> errors, String key) {
+		if(errors.get(key)==null) {
+			errors.put(key, new ArrayList<T>());
+		}
+	}
+
+	@Override
+	public int saveProjectOntology(Workbook workbook)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)", LOG);
+        int studyId = 0;
+        
+        try {
+
+            trans = session.beginTransaction();
+            studyId = getWorkbookSaver().saveProjectOntology(workbook);
+            trans.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+
+        } finally {
+            timerWatch.stop();
+        }
+
+		return studyId;
+	}
+	
+	@Override
+	public int saveProjectData(Workbook workbook) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)", LOG);
+        
+        try {
+
+            trans = session.beginTransaction();
+            getWorkbookSaver().saveProjectData(workbook);
+            trans.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            return 0;
+        } finally {
+            timerWatch.stop();
+        }
+
+		return 1;
+	}
+
+	@Override
+	public Map<String, List<Message>> validateProjectData(Workbook workbook) throws MiddlewareQueryException {
+		Map<String,List<Message>> errors = new HashMap<String, List<Message>>();
+    	OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
+                getSessionProviderForLocal(), getSessionProviderForCentral());
+    	checkForExistingTrialInstance(ontology, workbook, errors);
+		return errors;
+	}
+	
+	private void checkForExistingTrialInstance(
+			OntologyDataManager ontology, Workbook workbook, Map<String,List<Message>> errors)
+            throws MiddlewareQueryException {
+
+        String studyName = workbook.getStudyDetails().getStudyName();
+        String trialInstanceNumber = null;
+        if (workbook.isNursery()) {
+        	trialInstanceNumber = "1";
+        	Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+            if (locationId != null) {//same location and study
+            	initializeIfNull(errors,Constants.GLOBAL);
+            	errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",trialInstanceNumber));
+            }
+        } else {
+        	//get local variable name of the trial instance number
+        	String trialInstanceHeader = null;
+        	List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
+            for (MeasurementVariable mvar : trialFactors) {
+            	PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
+                Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
+                if (varId != null) {
+                    StandardVariable svar = ontology.getStandardVariable(varId);
+                    if (svar.getStoredIn() != null) {
+                        if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+                        	trialInstanceHeader = mvar.getName();
+                        	break;
+                        }
+                    }
+                }
+            }
+            //get and check if trialInstanceNumber already exists
+        	Set<String> locationIds = new LinkedHashSet<String>();
+        	int maxNumOfIterations = 100000;//TODO MODIFY THIS IF NECESSARY
+        	int observationCount = workbook.getObservations().size();
+        	if(observationCount<maxNumOfIterations) {
+        		maxNumOfIterations = observationCount;
+        	}
+        	for(int i=0;i<maxNumOfIterations;i++) {
+        		MeasurementRow row = workbook.getObservations().get(i);
+        		trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader); 
+        		if(locationIds.add(trialInstanceNumber)) {
+        			Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+                    if (locationId != null) {//same location and study
+                    	initializeIfNull(errors,Constants.GLOBAL);
+                    	errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",trialInstanceNumber));
+                    }
+        		}
+        	}
+        }   
+    }
 
 }

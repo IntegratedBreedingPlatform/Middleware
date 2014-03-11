@@ -67,14 +67,16 @@ public class StudyVariableBuilder extends Builder {
 			variable.setValue(getPropertyValue(variableType.getId(), project.getProperties()));//revert - it needs to set the cvterm_id always 
 		}
 		else {
-			Variable factor = experiment.getFactors().findById(variableType.getId());
-			if (factor != null) {
-				variable.setValue(factor.getValue());
-			}
-			else {
-				Variable variate = experiment.getVariates().findById(variableType.getId());
-				if (variate != null) {
-					variable.setValue(variate.getValue());
+			if(experiment!=null) {
+				Variable factor = experiment.getFactors().findById(variableType.getId());
+				if (factor != null) {
+					variable.setValue(factor.getValue());
+				}
+				else {
+					Variable variate = experiment.getVariates().findById(variableType.getId());
+					if (variate != null) {
+						variable.setValue(variate.getValue());
+					}
 				}
 			}
 		}
@@ -99,14 +101,16 @@ public class StudyVariableBuilder extends Builder {
 			variable.setValue(getPropertyValue(variableType.getId(), project.getProperties()));//revert - it needs to set the cvterm_id always 
 		}
 		else {
-			Variable factor = experiment.getFactors().findById(variableType.getId());
-			if (factor != null) {
-				variable.setValue(factor.getValue());
-			}
-			else {
-				Variable variate = experiment.getVariates().findById(variableType.getId());
-				if (variate != null) {
-					variable.setValue(variate.getValue());
+			if(experiment!=null) {
+				Variable factor = experiment.getFactors().findById(variableType.getId());
+				if (factor != null) {
+					variable.setValue(factor.getValue());
+				}
+				else {
+					Variable variate = experiment.getVariates().findById(variableType.getId());
+					if (variate != null) {
+						variable.setValue(variate.getValue());
+					}
 				}
 			}
 		}

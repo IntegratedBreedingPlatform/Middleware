@@ -13,7 +13,13 @@ package org.generationcp.middleware.service.test;
 
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import junit.framework.Assert;
 
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -247,5 +253,72 @@ public class TestDataImportServiceImpl {
         Debug.println(0, "Name: " + name);
 		Integer locationId = dataImportService.getLocationIdByProjectNameAndDescription(name,"1");
 		assertEquals(locationId.longValue(),1L);        
+    }
+    
+    @Test
+    public void testSaveProjectOntology() throws MiddlewareQueryException {
+        Workbook workbook = TestWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        int id = dataImportService.saveProjectOntology(workbook);
+        Debug.println(0, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+
+    }
+    
+    @Test
+    public void testSaveProjectData() throws MiddlewareQueryException {
+        Workbook workbook = TestWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        int studyId = dataImportService.saveProjectOntology(workbook);
+        workbook.setStudyId(studyId);
+        workbook.setTrialDatasetId(studyId-1);
+        workbook.setMeasurementDatesetId(studyId-2); 
+        dataImportService.saveProjectData(workbook);
+        Debug.println(0, "Saved project data:" + studyId + ", name = " + workbook.getStudyDetails().getStudyName());
+
+    }
+    
+    @Test
+	public void testValidateProjectOntology() throws MiddlewareQueryException {
+        Workbook workbook = TestWorkbookUtil.getTestWorkbookWithErrors();
+        workbook.print(0);
+        Map<String,List<Message>> errors = dataImportService.validateProjectOntology(workbook);
+        assertNotNull(errors);
+        if(errors!=null) {
+        	Debug.println(0, "Errors Identified: ");
+        	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
+        		Debug.println(3, e.getKey());
+        		for(Message m: e.getValue()) {
+        			if(m.getMessageParams()!=null) {
+        				Debug.println(5, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
+        			} else {
+        				Debug.println(5, "Key: " + m.getMessageKey());
+        			}
+        		}
+        	}
+        }
+    }
+    
+    @Test
+	public void testValidateProjectData() throws MiddlewareQueryException {
+    	String studyName = "validateProjectData_" + new Random().nextInt(10000);
+    	int trialNo = 1;
+    	Workbook workbook = TestWorkbookUtil.getTestWorkbookForWizard(studyName,trialNo);
+        workbook.print(0);
+        dataImportService.saveDataset(workbook,true);
+        Map<String,List<Message>> errors = dataImportService.validateProjectData(workbook);
+        assertNotNull(errors);
+        if(errors!=null) {
+        	Debug.println(0, "Errors Identified: ");
+        	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
+        		Debug.println(3, e.getKey());
+        		for(Message m: e.getValue()) {
+        			if(m.getMessageParams()!=null) {
+        				Debug.println(5, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
+        			} else {
+        				Debug.println(5, "Key: " + m.getMessageKey());
+        			}
+        		}
+        	}
+        }
     }
 }
