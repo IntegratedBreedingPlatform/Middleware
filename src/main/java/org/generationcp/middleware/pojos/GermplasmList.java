@@ -101,21 +101,33 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) OR desig LIKE :q OR listname LIKE :q )";
-    
+            "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+		    "      OR desig = :q OR listname = :q " +
+		    "      OR REPLACE(desig,' ','') = :qNoSpaces OR REPLACE(listname,' ','') = :qNoSpaces " +
+		    "      OR desig = :qStandardized OR listname = :qStandardized " +
+		    ")";
+		    
     public static String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE =
     		"SELECT DISTINCT listnms.* " +
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND (listdata.gid LIKE :gid OR desig LIKE :q OR listname LIKE :q) ";
+            "WHERE liststatus!=9 AND (listdata.gid LIKE :gid " +
+            "      OR desig LIKE :q OR listname LIKE :q" +
+            "      OR REPLACE(desig,' ','') LIKE :qNoSpaces OR REPLACE(listname,' ','') LIKE :qNoSpaces" +
+            "      OR desig LIKE :qStandardized OR listname LIKE :qStandardized" +
+            ")";
     
     public static String SEARCH_FOR_GERMPLASM_LIST_EQUAL =
     		"SELECT DISTINCT listnms.* " +
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) OR desig = :q OR listname = :q )";
+            "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+            "      OR desig = :q OR listname = :q " +
+            "      OR REPLACE(desig,' ','') = :qNoSpaces OR REPLACE(listname,' ','') = :qNoSpaces " +
+            "      OR desig = :qStandardized OR listname = :qStandardized " +
+            ")";
     
     //public static String SEARCH_FOR_GERMPLASM_LIST_EQUAL_GID_LIKE =
     //		"SELECT DISTINCT listnms.* " +

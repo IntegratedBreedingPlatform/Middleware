@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -941,9 +942,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             if(o.equals(Operation.EQUAL)) {
                     p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
                     p2_query1.setParameter("q", q);
+                    p2_query1.setParameter("qNoSpaces", q.replace(" ", ""));
+                    p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
             } else {
                     p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
                     p2_query1.setParameter("q", q+"%");
+                    p2_query1.setParameter("qNoSpaces", q.replace(" ", "")+"%");
+                    p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
             }
             p2_query1.setParameter("deletedStatus", STATUS_DELETED);
             List p2_result1 = p2_query1.list();
@@ -953,9 +958,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                 if(o.equals(Operation.EQUAL)) {
                         p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
                         p2_query2.setParameter("q", q);
+                        p2_query2.setParameter("qNoSpaces", q.replace(" ", ""));
+                        p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
                 } else {
                         p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
                         p2_query2.setParameter("q", q+"%");
+                        p2_query2.setParameter("qNoSpaces", q.replace(" ", "")+"%");
+                        p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
                 }
                 p2_query2.setParameter("deletedStatus", STATUS_DELETED);
                 p2_result1.addAll(p2_query2.list());

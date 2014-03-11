@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -338,6 +340,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
            		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL);
            		query.setParameter("gidLength", q.length());
             	query.setParameter("q", q);
+            	query.setParameter("qNoSpaces", q.replace(" ", ""));
+            	query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
             } else {
             	if(q.contains("%") || q.contains("_")){
             		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE);
@@ -346,6 +350,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             		query.setParameter("gidLength", q.length());
             	}
             	query.setParameter("q", "%"+q+"%");
+            	query.setParameter("qNoSpaces", "%"+q.replace(" ", "")+"%");
+            	query.setParameter("qStandardized", "%"+GermplasmDataManagerUtil.standardizeName(q)+"%");
             }
         	query.setParameter("gid", q);
         	

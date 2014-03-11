@@ -339,13 +339,13 @@ public class Germplasm implements Serializable{
     		"SELECT DISTINCT names.gid AS gid " +
     		"FROM names " +
     		"LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-    		"WHERE nstat!=:deletedStatus AND nval LIKE :q " +
+    		"WHERE nstat!=:deletedStatus AND (nval LIKE :q OR nval LIKE :qStandardized OR REPLACE(nval,' ','') LIKE :qNoSpaces) " +
     		"LIMIT 5000";
     public static final String SEARCH_GID_BY_GERMPLASM_NAME_EQUAL = 
     		"SELECT DISTINCT names.gid AS gid " +
     		"FROM names " +
     		"LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-    		"WHERE nstat!=:deletedStatus AND nval = :q " +
+    		"WHERE nstat!=:deletedStatus AND (nval = :q OR nval = :qStandardized OR REPLACE(nval,' ','') = :qNoSpaces) " +
     		"LIMIT 5000";
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
     		"SELECT listid " +
