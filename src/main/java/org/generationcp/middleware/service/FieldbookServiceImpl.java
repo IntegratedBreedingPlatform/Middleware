@@ -520,4 +520,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         Workbook workbook = getWorkbookBuilder().createNurseryVariableSettings(id);                        
         return workbook;
     }
+
+	@Override
+	public List<Germplasm> getGermplasms(List<Integer> gids)
+			throws MiddlewareQueryException {
+		return getGermplasmDataManager().getGermplasms(gids);
+	}
+    
+    
 }

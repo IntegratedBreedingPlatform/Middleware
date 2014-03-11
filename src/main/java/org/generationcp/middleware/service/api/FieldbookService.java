@@ -328,4 +328,6 @@ public interface FieldbookService {
     List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) throws MiddlewareQueryException;
     
     Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException;
+    
+    List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
 }

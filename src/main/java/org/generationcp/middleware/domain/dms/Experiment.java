@@ -11,6 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.generationcp.middleware.util.Debug;
 
 /** 
@@ -23,6 +26,8 @@ public class Experiment {
 	private VariableList factors;
 	
 	private VariableList variates;
+	
+	private Map<String, Variable> variatesMap;
 
 	public int getId() {
 		return id;
@@ -46,6 +51,22 @@ public class Experiment {
 
 	public void setVariates(VariableList variates) {
 		this.variates = variates;
+		if(variatesMap == null){
+			variatesMap = new HashMap();
+			if(variates != null){
+				
+				for(Variable var : variates.getVariables()){
+					if(var != null && var.getVariableType() != null)
+						variatesMap.put(Integer.toString(var.getVariableType().getId()), var);
+				}
+			}
+		}		
+	}
+	
+	
+
+	public Map<String, Variable> getVariatesMap() {
+		return variatesMap;
 	}
 
 	public void print(int indent) {

@@ -12,7 +12,9 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -35,7 +37,9 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 
 public class WorkbookBuilder extends Builder {
-
+	
+	private Map<String, String> labelMap = new HashMap();
+	
 	public WorkbookBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                   HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
@@ -137,7 +141,7 @@ public class WorkbookBuilder extends Builder {
 	
 	private List<MeasurementRow> buildObservations(List<Experiment> experiments, VariableTypeList variateTypes) {
 	    List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
-	    
+	   
 	    for (Experiment experiment : experiments) {
 	        int experimentId = experiment.getId();
 	        VariableList factors = experiment.getFactors();
@@ -145,6 +149,7 @@ public class WorkbookBuilder extends Builder {
 	        List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
 	        
 	        for (Variable variable : factors.getVariables()) {
+	        	
 	            if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
                         MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                                 variable.getValue(), false, 
@@ -181,7 +186,17 @@ public class WorkbookBuilder extends Builder {
 	}
 	
 	private String getLabelOfStoredIn(int storedIn) {
-            return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
+		String key = Integer.toString(storedIn);
+    	String label = "";
+    	
+    	if(labelMap.containsKey(key)){
+    		label = labelMap.get(key);
+    	}else{
+    		label = PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
+    		labelMap.put(key, label);
+    	}
+    	
+         return label;   
         }
 	
 	private List<MeasurementVariable> buildStudyMeasurementVariables(VariableList variableList, boolean isFactor) {
@@ -242,12 +257,21 @@ public class WorkbookBuilder extends Builder {
 		
 		for (VariableType vType : variateTypes.getVariableTypes()) {
 			boolean found = false;
+			/*
 			for (Variable v : experiment.getVariates().getVariables()) {
 				if (v.getVariableType().getId() == vType.getId()) {
 					vlist.add(v);
 					found = true;
 					break;
 				}
+			}
+			*/
+			//added for optimization
+			String key = Integer.toString(vType.getId());
+			Variable var = experiment.getVariatesMap().get(key);
+			if(var != null){
+				vlist.add(var);
+				found = true;
 			}
 			if (!found) {
 				vlist.add(new Variable(vType, (String) null));
