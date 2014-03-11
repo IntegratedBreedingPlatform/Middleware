@@ -69,13 +69,14 @@ public class MappingPopValues implements Serializable{
 
     public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS =
             "SELECT DISTINCT " +
-                "gdms_mapping_pop_values.gid, " +
-                "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
+                "gmpv.gid, " +
+                "gmpv.marker_id, " +
+                "CONCAT(gmpv.map_char_value, ''), " +
                 "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
-            "FROM gdms_mapping_pop_values " +
-            "WHERE gdms_mapping_pop_values.gid IN (:gidList) " +
-                "AND gdms_mapping_pop_values.marker_id IN (:markerIdList) " +
-            "ORDER BY gdms_mapping_pop_values.gid DESC ";
+            "FROM gdms_mapping_pop_values gmpv " +
+            "WHERE gmpv.gid IN (:gidList) " +
+                "AND gmpv.marker_id IN (:markerIdList) " +
+            "ORDER BY gmpv.gid DESC ";
 
 
     public static final String GET_ALLELIC_VALUES_BY_GID_LOCAL =

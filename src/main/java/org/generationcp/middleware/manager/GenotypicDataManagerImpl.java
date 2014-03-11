@@ -320,34 +320,25 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             throws MiddlewareQueryException {
         List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
         
+        //Get marker_ids by marker_names
+        setWorkingDatabase(Database.CENTRAL);
+        java.util.Map<Integer, String> markerIdName = getMarkerDao().getFirstMarkerIdByMarkerName(markerNames, Database.CENTRAL);
+        setWorkingDatabase(Database.LOCAL);
+        markerIdName.putAll(getMarkerDao().getFirstMarkerIdByMarkerName(markerNames, Database.LOCAL));
+        List<Integer> markerIds = new ArrayList<Integer>(markerIdName.keySet());
+        
         // Get from CENTRAL
         allelicValues.addAll( super.getFromInstanceByMethod(getMarkerDao(), Database.CENTRAL, 
-                "getAllelicValuesByGidsAndMarkerNames", new Object[]{gids, markerNames}, new Class[]{List.class, List.class}));
+                "getAllelicValuesByGidsAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class}));
         
         // Get from LOCAL
-        List<AllelicValueElement> allelicValuesLocal = super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, 
-                "getAllelicValuesFromLocal", new Object[]{gids}, new Class[]{List.class});
+        allelicValues.addAll( super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, 
+                "getAllelicValuesByGidsAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class}));
         
-        // Get marker names by marker ids
-        List<Integer> markerIdsInLocal = new ArrayList<Integer>();
-        for(AllelicValueElement allelicValue : allelicValuesLocal){
-            markerIdsInLocal.add(allelicValue.getMarkerId());
+        for (AllelicValueElement allelicValue : allelicValues){
+            allelicValue.setMarkerName(markerIdName.get(allelicValue.getMarkerId()));
         }
-        java.util.Map<Integer, String> markerNamesInLocal = new HashMap<Integer, String>();
-        setWorkingDatabase(Database.CENTRAL);
-        markerNamesInLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsInLocal));
-        setWorkingDatabase(Database.LOCAL);
-        markerNamesInLocal.putAll(getMarkerDao().getNamesByIdsMap(markerIdsInLocal));
-        
 
-        for(AllelicValueElement allelicValue : allelicValuesLocal){  
-            String markerNameInLocal = markerNamesInLocal.get(allelicValue.getMarkerId());
-            if (markerNames.contains(markerNameInLocal)){
-                allelicValue.setMarkerName(markerNameInLocal);
-                allelicValues.add(allelicValue);
-            }
-        }
-        
         return allelicValues;
     }
 

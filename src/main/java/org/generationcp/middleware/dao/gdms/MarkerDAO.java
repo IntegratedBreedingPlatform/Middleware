@@ -22,6 +22,7 @@ import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
@@ -69,6 +70,46 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         	logAndThrowException("Error with getIdsByNames(names=" + names + ") query from Marker: " + e.getMessage(), e);
         }
         return new ArrayList<Integer>();
+    }
+    
+    /**
+     * Gets the marker_id of the first occurence of the marker_name
+     * @param names
+     * @return
+     * @throws MiddlewareQueryException
+     */
+     public Map<Integer, String> getFirstMarkerIdByMarkerName(List<String> names, Database instance) throws MiddlewareQueryException{
+        Map<Integer, String> toReturn = new HashMap<Integer, String>();
+        if (names == null || names.isEmpty()) {
+            return toReturn;
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_ID_AND_NAME_BY_NAMES);
+            if (instance == Database.LOCAL){
+                query = getSession().createSQLQuery(Marker.GET_ID_AND_NAME_BY_NAMES + "DESC");
+            }
+            query.setParameterList("markerNameList", names);
+            List<Object> results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer id = (Integer) result[0];
+                    String name = (String) result[1];
+
+                    // Add to map if it doesn't contain the name yet. Ignore the case.
+                    if (!toReturn.containsValue(name.toUpperCase())){
+                        toReturn.put(id, name.toUpperCase());
+                    }
+                }
+            }
+            
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getIdAndNameByNames(names=" + names + ") query from Marker: " + e.getMessage(), e);
+        }
+        return toReturn;
+        
     }
 
     /**
@@ -318,9 +359,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             Object[] result = (Object[]) o;
             if (result != null) {
                 Integer gid = (Integer) result[0];
-                String data = (String) result[1];
-                Integer peakHeight = (Integer) result[2];
-                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, null, peakHeight);
+                Integer markerId = (Integer) result[1];
+                String data = (String) result[2];
+                Integer peakHeight = (Integer) result[3];
+                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, markerId, null, peakHeight);
                 values.add(allelicValueElement);
             }
         }
@@ -356,7 +398,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
      * @return the allelic values by gids and marker names
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
             throws MiddlewareQueryException {
 
@@ -367,9 +408,31 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
 
         //Get marker_ids by marker_names
-        List<Integer> markerIds = getIdsByNames(markerNames, 0, Long.valueOf(countAll()).intValue());
+        List<Integer> markerIds = this.getIdsByNames(markerNames, 0, Integer.MAX_VALUE);
 
         if (markerIds == null || markerIds.isEmpty()) {
+            return allelicValues;
+        }
+
+        return getAllelicValuesByGidsAndMarkerIds(gids, markerIds);
+    }
+    
+
+    /**
+     * Gets the allelic values by gids and marker ids.
+     *
+     * @param gids the gids
+     * @param markerIds the marker ids
+     * @return the allelic values by gids and marker ids
+     * @throws MiddlewareQueryException the MiddlewareQueryException
+     */
+    @SuppressWarnings("rawtypes")
+    public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerIds(List<Integer> gids, List<Integer> markerIds)
+            throws MiddlewareQueryException {
+
+        List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
+
+        if (gids == null || gids.isEmpty() || markerIds == null || markerIds.isEmpty()) {
             return allelicValues;
         }
 
@@ -398,8 +461,8 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
 
             return allelicValues;
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getAllelicValuesByGidsAndMarkerNames(gIds=" + gids + ", markerNames="
-                    + markerNames + ")  query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllelicValuesByGidsAndMarkerIds(gIds=" + gids + ", markerIds="
+                    + markerIds + ")  query from Marker: " + e.getMessage(), e);
         }
         return allelicValues;
     }

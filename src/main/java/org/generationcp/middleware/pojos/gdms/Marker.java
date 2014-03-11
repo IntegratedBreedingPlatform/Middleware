@@ -64,11 +64,12 @@ public class Marker implements Serializable{
             "SELECT marker_id " +
             "FROM gdms_marker " +
             "WHERE marker_name IN (:markerNameList)";
-    
+
     public static final String GET_ID_AND_NAME_BY_NAMES = 
-            "SELECT marker_id, marker_name " +
+            "SELECT marker_id, CONCAT(marker_name,'') " +
             "FROM gdms_marker " +
-            "WHERE marker_name IN (:markerNameList)";
+            "WHERE marker_name IN (:markerNameList) " +
+            "ORDER BY marker_id ";
     
     public static final String GET_NAMES_BY_IDS = 
             "SELECT marker_id, CONCAT(marker_name, '') AS marker_name " +
