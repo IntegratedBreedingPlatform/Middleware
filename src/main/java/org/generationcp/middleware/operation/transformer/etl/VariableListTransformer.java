@@ -166,74 +166,51 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 	
-	public VariableList transformStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException {
+	public VariableList transformStudyDetails(StudyDetails studyDetails, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		
 		VariableList variables = new VariableList();
-		String localName = null;
-		String localDescription = null;
-		String value = null;
-		int stdVariableId = 0;
+		
 		if (studyDetails != null) {
-			for (int rank=1;rank<=7;rank++) {
-				//variables to be used later
-				//only get STUDY_NAME, STUDY_TITLE, PM_KEY, STUDY_OBJECTIVE, STUDY_TYPE, START_DATE, END_DATE
-				switch(rank) {
-					case 1: stdVariableId = TermId.STUDY_NAME.getId();
-							localName = "STUDY_NAME";
-							localDescription = "Study name";
-						    value = studyDetails.getStudyName();					     
-						    break;					    
-					case 2: stdVariableId = TermId.STUDY_TITLE.getId();
-							localName = "STUDY_TITLE";
-							localDescription = "Study title";
-						    value = studyDetails.getTitle();					     
-				    		break;
-					case 3: stdVariableId = TermId.PM_KEY.getId();
-							localName = "PM_KEY";
-							localDescription = "Project Management Key";
-				    		value = studyDetails.getPmKey();					     
-				    		break; 	
-					case 4: stdVariableId = TermId.STUDY_OBJECTIVE.getId();
-							localName = "STUDY_OBJECTIVE";
-							localDescription = "Study objective";
-		    				value = studyDetails.getObjective();					     
-		    				break; 	
-					case 5: stdVariableId = TermId.STUDY_TYPE.getId();
-							localName = "TYPE";
-							localDescription = "Study type";
-							value = studyDetails.getStudyType()!=null?
-									Integer.toString(studyDetails.getStudyType().getId()):null;					     
-							break; 	 	
-					case 6: stdVariableId = TermId.START_DATE.getId();
-							localName = "START";
-							localDescription = "Start date";
-							value = studyDetails.getStartDate();					     
-							break; 	 	
-					case 7: stdVariableId = TermId.END_DATE.getId();
-							localName = "END";
-							localDescription = "End date";
-							value = studyDetails.getEndDate();					     
-							break; 	 	
-				}
-				//for standardVariable
-				StandardVariable standardVariable = getStandardVariableBuilder().create(stdVariableId);
-				
-				//for variableType
-				VariableType variableType = new VariableType();
-				variableType.setLocalName(localName);
-				variableType.setLocalDescription(localDescription);
-				variableType.setRank(rank);
-				variableType.setStandardVariable(standardVariable);
-				
-				//for variable
-				Variable variable = new Variable();
-				variable.setVariableType(variableType);
-				variable.setValue(value);
-			    
-				//add variable
-				variables.add(variable);
-			}
+
+			int rank = 1;
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name", studyDetails.getStudyName(), rank);
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TITLE, "STUDY_TITLE", "Study title", studyDetails.getTitle(), rank);
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name", studyDetails.getStudyName(), rank);
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.PM_KEY, "PM_KEY", "Project Management Key", studyDetails.getPmKey(), rank);
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective", studyDetails.getObjective(), rank);
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TYPE, "STUDY_TYPE", "Study type", 
+					(studyDetails.getStudyType()!=null?Integer.toString(studyDetails.getStudyType().getId()):null), rank);
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.START_DATE, "START_DATE", "Start date", studyDetails.getStartDate(), rank);
+			rank = addVariableIfNecessary(variables, variableTypeList, TermId.END_DATE, "END_DATE", "End date", studyDetails.getEndDate(), rank);
 		}
 		return variables.sort();
+	}
+	
+	
+	private int addVariableIfNecessary(VariableList variables, VariableTypeList variableTypeList, TermId termId, String localName, String localDescription, String value, int rank)
+	throws MiddlewareQueryException {
+		
+		Variable variable = null;
+		
+		if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
+			boolean found = true;
+			for (VariableType variableType : variableTypeList.getVariableTypes()) {
+    			if (variableType.getStandardVariable() != null) {
+    				StandardVariable standardVariable = variableType.getStandardVariable();
+    				if (standardVariable.getId() == termId.getId()) {
+    					found = true;
+    					break;
+    				}
+    			}
+			}
+			if (!found) {
+				StandardVariable standardVariable = getStandardVariableBuilder().create(termId.getId());
+				VariableType variableType = new VariableType(localName, localDescription, standardVariable, rank);
+				variable = new Variable(variableType, value);
+				variables.add(variable);
+				return rank++;
+			}
+		}
+		return rank;
 	}
 }
