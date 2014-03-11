@@ -140,7 +140,7 @@ public class TestVariableListTransformer {
 		Debug.println(0, "Input studyDetails");
 		studyDetails.print(1);
 		
-		VariableList variables = transformer.transformStudyDetails(studyDetails);
+		VariableList variables = transformer.transformStudyDetails(studyDetails, null);
 		
 		Assert.assertNotNull(variables);
 		

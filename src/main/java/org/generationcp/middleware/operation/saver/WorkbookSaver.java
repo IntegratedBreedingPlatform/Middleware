@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Values;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
@@ -30,6 +31,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -175,7 +177,7 @@ public class WorkbookSaver extends Saver {
         }
 		//GCP-6091 end
 		
-		int studyId = createStudyIfNecessary(workbook, studyLocationId); 
+		int studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
    		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
    		
    		if(trialVariableTypeList!=null) {//multi-location
@@ -318,7 +320,10 @@ public class WorkbookSaver extends Saver {
 		return null;
 	}
 	
-	private String generateTrialDatasetName(String studyName) {
+	private String generateTrialDatasetName(String studyName, StudyType studyType) {
+		if(studyType == StudyType.N) {
+			return "NURSERY_" + studyName;
+		}
 		return "TRIAL_" + studyName;
 	}
 	
@@ -333,7 +338,7 @@ public class WorkbookSaver extends Saver {
 		return value;
 	}
 	
-	private int createStudyIfNecessary(Workbook workbook, int studyLocationId) throws Exception {
+	private int createStudyIfNecessary(Workbook workbook, int studyLocationId, boolean saveStudyExperiment) throws Exception {
 		TimerWatch watch = new TimerWatch("find study", LOG);
 		Integer studyId = getStudyId(workbook.getStudyDetails().getStudyName());
 
@@ -352,7 +357,7 @@ public class WorkbookSaver extends Saver {
 			StudyValues studyValues = getStudyValuesTransformer().transform(null, studyLocationId, workbook.getStudyDetails(), studyMV, studyVariables);
 			
 			watch.restart("save study");
-	   		DmsProject study = getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues);
+	   		DmsProject study = getStudySaver().saveStudy((int) workbook.getStudyDetails().getParentFolderId(), studyVariables, studyValues, saveStudyExperiment);
 	   		studyId = study.getProjectId();
 		}   		
    		watch.stop();
@@ -366,9 +371,9 @@ public class WorkbookSaver extends Saver {
 		TimerWatch watch = new TimerWatch("find trial dataset", LOG);
 		String trialName = workbook.getStudyDetails().getTrialDatasetName();
  		if(trialName == null || trialName.equals("") ){
- 			trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
+ 			trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
  		}
-		Integer trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName()));
+		Integer trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
 		
 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
@@ -545,5 +550,107 @@ public class WorkbookSaver extends Saver {
 			id = getDmsProjectDao().getProjectIdByName(name, relationship);
 		}
 		return id;
+	}
+	
+	/**
+     * Saves project ontology creating entries in the following tables:
+     * project, projectprop and project_relationship
+     * @param Workbook
+     * @return study id
+     * @throws Exception
+     */
+	@SuppressWarnings("unchecked")
+	public int saveProjectOntology(Workbook workbook) throws Exception {
+		
+		final Map<String, ?> variableMap = saveVariables(workbook);
+		workbook.setVariableMap(variableMap);
+		
+		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
+		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+		Map<String, List<MeasurementVariable>> measurementVariableMap = (Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
+
+		// unpack maps
+		VariableTypeList trialVariables = new VariableTypeList();
+		trialVariables.addAll(variableTypeMap.get("trialVariables"));//addAll instead of assigning directly to avoid changing the state of the object
+		VariableTypeList effectVariables = new VariableTypeList();
+		effectVariables.addAll(variableTypeMap.get("effectVariables"));//addAll instead of assigning directly to avoid changing the state of the object
+		List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
+		List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
+		
+		int studyId = createStudyIfNecessary(workbook, 0, false);//locationId and experiment are not yet needed here
+		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
+		int measurementDatasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
+		
+		workbook.populateStudyAndDatasetIds(studyId, trialDatasetId, measurementDatasetId);
+		
+		if (LOG.isDebugEnabled()){
+			LOG.debug("studyId = "+studyId);
+            LOG.debug("trialDatasetId = "+trialDatasetId);
+            LOG.debug("measurementDatasetId = "+measurementDatasetId);
+        }
+		
+		return studyId;
+	}
+	
+	/**
+     * Saves experiments creating entries in the following tables:
+     * nd_geolocation, nd_geolocationprop, nd_experiment, nd_experiment_project, nd_experimentprop
+     * nd_experiment_stock, stock, stockprop, nd_experiment_phenotype and phenotype
+     * @param Workbook
+     * @return 
+     * @throws Exception
+     */
+	@SuppressWarnings("unchecked")
+	public void saveProjectData(Workbook workbook) throws Exception {
+		
+		int studyId = workbook.getStudyId();
+		int trialDatasetId = workbook.getTrialDatasetId();
+		int measurementDatasetId = workbook.getMeasurementDatesetId();
+		
+		Map<String, ?> variableMap = workbook.getVariableMap();
+		if(variableMap==null || variableMap.isEmpty()) {
+			variableMap = saveVariables(workbook);
+		}
+		
+		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
+		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+		Map<String, List<MeasurementVariable>> measurementVariableMap = (Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
+
+		// unpack maps
+		List<String> trialHeaders = headerMap.get("trialHeaders");
+		VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
+		VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
+		VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+		List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
+		
+		//create locations (entries to nd_geolocation) and associate to observations
+        int studyLocationId = DEFAULT_GEOLOCATION_ID;
+        List<Integer> locationIds = new ArrayList<Integer>();
+        Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
+        if(trialVariableTypeList!=null) {//multi-location
+   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap);
+        } else {
+        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap);
+        }
+		
+        //create stock and stockprops and associate to observations
+        createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
+        
+		//create experiments
+        //1. study experiment
+        StudyValues values = new StudyValues();
+        values.setLocationId(studyLocationId);
+        getStudySaver().saveStudyExperiment(studyId, values);
+        //2. trial experiments
+        if(trialVariableTypeList!=null) {//multi-location
+   			for(Integer locationId : locationIds) {
+   				createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
+   			}
+   		} else {
+   			createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
+   		}
+        //3. measurement experiments
+        createMeasurementEffectExperiments(measurementDatasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
 	}
 }

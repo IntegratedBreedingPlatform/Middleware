@@ -42,27 +42,13 @@ public class ExperimentModelSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public void addExperiment(int projectId, StudyValues values) throws MiddlewareQueryException {
-		addExperiment(projectId, null, values);
-	}
-	
 	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
-		TermId myExperimentType = null;
-		if (values instanceof StudyValues) {
-			myExperimentType = TermId.STUDY_EXPERIMENT;
-		} else {
-			myExperimentType = mapExperimentType(experimentType);
-		}
+		TermId myExperimentType = mapExperimentType(experimentType);
 		ExperimentModel experimentModel = create(projectId, values, myExperimentType);
 		getExperimentDao().save(experimentModel);
 		addExperimentProject(experimentModel, projectId);
 		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
-		
-		//dataset projectprop values are already saved during addDataSet
-		if (values instanceof StudyValues) {
-			getProjectPropertySaver().saveProjectPropValues(projectId, values.getVariableList());
-		}
 	}
 	
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
@@ -101,21 +87,17 @@ public class ExperimentModelSaver extends Saver {
 			getExperimentDao().save(experimentModel);
 			addExperimentProject(experimentModel, projectId);
 			getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
-			
-			//dataset projectprop values are already saved during addDataSet
-			if (values instanceof StudyValues) {
-				getProjectPropertySaver().saveProjectPropValues(projectId, values.getVariableList());
-			}
 		}
 	}
 	
 	
 	private TermId mapExperimentType(ExperimentType experimentType) {
 		switch (experimentType) {
-		case PLOT: return TermId.PLOT_EXPERIMENT;
-		case AVERAGE: return TermId.AVERAGE_EXPERIMENT;
-		case SUMMARY: return TermId.SUMMARY_EXPERIMENT;
-		case SAMPLE: return TermId.SAMPLE_EXPERIMENT;
+			case PLOT: return TermId.PLOT_EXPERIMENT;
+			case AVERAGE: return TermId.AVERAGE_EXPERIMENT;
+			case SUMMARY: return TermId.SUMMARY_EXPERIMENT;
+			case SAMPLE: return TermId.SAMPLE_EXPERIMENT;
+			case STUDY_INFORMATION: return TermId.STUDY_INFORMATION;
 		}
 		return null;
 	}

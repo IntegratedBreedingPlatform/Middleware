@@ -47,11 +47,16 @@ public class Workbook {
 	private List<MeasurementVariable> studyConstants;
 	private List<MeasurementVariable> trialConditions;
 	private List<MeasurementVariable> trialConstants;
+	private Map<String, ?> variableMap;
 	
 	private boolean isCheckFactorAddedOnly;
 	
 	private Map<String, MeasurementVariable> measurementDatasetVariablesMap; //added for optimization
 	
+	private Integer studyId;
+	private Integer trialDatasetId;
+	private Integer measurementDatesetId;
+
 	public void reset() {
 		trialHeaders = null;
 		trialVariables = null;
@@ -293,10 +298,10 @@ public class Workbook {
 
     public List<MeasurementVariable> getAllVariables() {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
-        variableList.addAll(conditions);
-        variableList.addAll(constants);
-        variableList.addAll(factors);
-        variableList.addAll(variates);
+        if (conditions != null) variableList.addAll(conditions);
+        if (constants != null) variableList.addAll(constants);
+        if (factors != null) variableList.addAll(factors);
+        if (variates != null) variableList.addAll(variates);
 
         return variableList;
     }
@@ -532,6 +537,42 @@ public class Workbook {
     
 	}
 
-	
+	public Map<String, ?> getVariableMap() {
+		return variableMap;
+	}
+
+	public void setVariableMap(Map<String, ?> variableMap) {
+		this.variableMap = variableMap;
+	}
+
+    public void populateStudyAndDatasetIds(int studyId, int trialDatasetId, int measurementDatasetId) {
+    	this.studyId = studyId;
+    	this.trialDatasetId = trialDatasetId;
+    	this.measurementDatesetId = measurementDatasetId;
+    }
+
+	public Integer getStudyId() {
+		return studyId;
+	}
+
+	public void setStudyId(Integer studyId) {
+		this.studyId = studyId;
+	}
+
+	public Integer getTrialDatasetId() {
+		return trialDatasetId;
+	}
+
+	public void setTrialDatasetId(Integer trialDatasetId) {
+		this.trialDatasetId = trialDatasetId;
+	}
+
+	public Integer getMeasurementDatesetId() {
+		return measurementDatesetId;
+	}
+
+	public void setMeasurementDatesetId(Integer measurementDatesetId) {
+		this.measurementDatesetId = measurementDatesetId;
+	}
 	
 }
