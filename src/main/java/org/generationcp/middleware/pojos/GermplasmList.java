@@ -117,12 +117,12 @@ public class GermplasmList implements Serializable{
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
             "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) OR desig = :q OR listname = :q )";
     
-    public static String SEARCH_FOR_GERMPLASM_LIST_EQUAL_GID_LIKE =
-    		"SELECT DISTINCT listnms.* " +
-            "FROM listnms " +
-            "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
-            "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND (listdata.gid LIKE :gid OR desig = :q OR listname = :q) ";
+    //public static String SEARCH_FOR_GERMPLASM_LIST_EQUAL_GID_LIKE =
+    //		"SELECT DISTINCT listnms.* " +
+    //        "FROM listnms " +
+    //        "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
+    //        "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
+    //        "WHERE liststatus!=9 AND (listdata.gid LIKE :gid OR desig = :q OR listname = :q) ";
     
     
     //Full Text version

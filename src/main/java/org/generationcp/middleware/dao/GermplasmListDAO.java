@@ -335,12 +335,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             SQLQuery query;
             
             if(o.equals(Operation.EQUAL)){
-            	if(q.contains("%") || q.contains("_")){
-            		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL_GID_LIKE);
-            	} else {
-            		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL);
-            		query.setParameter("gidLength", q.length());
-            	}
+           		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL);
+           		query.setParameter("gidLength", q.length());
             	query.setParameter("q", q);
             } else {
             	if(q.contains("%") || q.contains("_")){
