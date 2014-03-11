@@ -468,7 +468,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     	if (!isEntryExists(ontology, workbook.getFactors())) {
     		initializeIfNull(errors,Constants.GLOBAL);
-        	errors.get(Constants.GLOBAL).add(new Message("error.entry.doesnt.exist"));
+        	errors.get(Constants.GLOBAL).add(new Message("error.entry.doesnt.exist.wizard"));
         }
 
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
