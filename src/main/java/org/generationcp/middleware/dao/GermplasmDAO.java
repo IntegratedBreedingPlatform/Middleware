@@ -925,7 +925,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             
             SQLQuery p1_query;
             
-            if(q.contains("%") || q.contains("_")){
+            if((q.contains("%") || q.contains("_")) && o.equals(Operation.LIKE)){
             	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE);
             } else {
             	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
