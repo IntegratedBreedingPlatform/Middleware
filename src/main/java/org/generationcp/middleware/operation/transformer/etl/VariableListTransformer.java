@@ -193,7 +193,7 @@ public class VariableListTransformer extends Transformer {
 		Variable variable = null;
 		
 		if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
-			boolean found = true;
+			boolean found = false;
 			for (VariableType variableType : variableTypeList.getVariableTypes()) {
     			if (variableType.getStandardVariable() != null) {
     				StandardVariable standardVariable = variableType.getStandardVariable();
@@ -208,7 +208,7 @@ public class VariableListTransformer extends Transformer {
 				VariableType variableType = new VariableType(localName, localDescription, standardVariable, rank);
 				variable = new Variable(variableType, value);
 				variables.add(variable);
-				return rank++;
+				return rank + 1;
 			}
 		}
 		return rank;
