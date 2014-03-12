@@ -950,7 +950,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     p2_query1.setParameter("qNoSpaces", q.replace(" ", "")+"%");
                     p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
             }
-            p2_query1.setParameter("deletedStatus", STATUS_DELETED);
+            //p2_query1.setParameter("deletedStatus", STATUS_DELETED);
             List p2_result1 = p2_query1.list();
             
             if(searchByNameInLocalDbAlso && localSession != null){
@@ -966,7 +966,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                         p2_query2.setParameter("qNoSpaces", q.replace(" ", "")+"%");
                         p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
                 }
-                p2_query2.setParameter("deletedStatus", STATUS_DELETED);
                 p2_result1.addAll(p2_query2.list());
             }
             

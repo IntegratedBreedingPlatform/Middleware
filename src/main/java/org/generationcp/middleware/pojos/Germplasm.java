@@ -336,16 +336,14 @@ public class Germplasm implements Serializable{
     		"FROM germplsm " +
     		"WHERE gid IN (:gids) AND gid!=grplce";
     public static final String SEARCH_GID_BY_GERMPLASM_NAME = 
-    		"SELECT DISTINCT names.gid AS gid " +
-    		"FROM names " +
-    		"LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-    		"WHERE nstat!=:deletedStatus AND (nval LIKE :q OR nval LIKE :qStandardized OR REPLACE(nval,' ','') LIKE :qNoSpaces) " +
+    		"SELECT DISTINCT germplsm.gid AS gid " +
+    		"FROM germplsm LEFT JOIN names ON (germplsm.gid=names.gid AND germplsm.gid!=germplsm.grplce) " +
+    		"WHERE nval LIKE :q OR nval LIKE :qStandardized OR nval LIKE :qNoSpaces " +
     		"LIMIT 5000";
     public static final String SEARCH_GID_BY_GERMPLASM_NAME_EQUAL = 
-    		"SELECT DISTINCT names.gid AS gid " +
-    		"FROM names " +
-    		"LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-    		"WHERE nstat!=:deletedStatus AND (nval = :q OR nval = :qStandardized OR REPLACE(nval,' ','') = :qNoSpaces) " +
+    		"SELECT DISTINCT germplsm.gid AS gid " +
+    		"FROM germplsm LEFT JOIN names ON (germplsm.gid=names.gid AND germplsm.gid!=germplsm.grplce) " +
+    		"WHERE nval = :q OR nval = :qStandardized OR nval = :qNoSpaces " +
     		"LIMIT 5000";
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
     		"SELECT listid " +
