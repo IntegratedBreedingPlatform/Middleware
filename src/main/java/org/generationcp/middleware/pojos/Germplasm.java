@@ -353,7 +353,6 @@ public class Germplasm implements Serializable{
     		"    SELECT listnms.*, " +
             "        (MATCH(listname) AGAINST(:q)) AS searchScore " +
             "    FROM listnms " +
-            "         LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
             "    WHERE liststatus!=:deletedStatus " +
             "    GROUP BY listid  " +
             "    HAVING searchScore>0 " +
@@ -365,7 +364,6 @@ public class Germplasm implements Serializable{
     		"    SELECT listnms.*, " +
             "        (MATCH(listname) AGAINST(:q)) AS searchScore " +
             "    FROM listnms " +
-            "         LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
             "    WHERE liststatus!=:deletedStatus " +
             "        AND listname=:q " +
             "    GROUP BY listid  " +
