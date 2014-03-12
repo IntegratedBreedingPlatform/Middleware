@@ -982,6 +982,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             }
             
             //Third priority, get germplasms in list with listname like (full text search) q
+            /**
             SQLQuery p3_query1;
             if(o.equals(Operation.EQUAL))
                 p3_query1 = getSession().createSQLQuery(Germplasm.SEARCH_LIST_ID_BY_LIST_NAME_EQUAL);
@@ -990,7 +991,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             p3_query1.setParameter("q", q);
             p3_query1.setParameter("deletedStatus", STATUS_DELETED);
             
-            List p3_result1 = p2_query1.list();
+            List p3_result1 = p3_query1.list();
             
             if(p3_result1.size()>0 && p3_result1.get(0)!=null){            
                 SQLQuery p3_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_LIST_ID);
@@ -1003,6 +1004,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                         result.add((Germplasm) g);
                 }
             }
+            **/
             
             //Add parents to results if specified by "includeParents" flag
             if(includeParents){
