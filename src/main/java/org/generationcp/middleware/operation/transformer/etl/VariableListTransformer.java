@@ -191,8 +191,8 @@ public class VariableListTransformer extends Transformer {
 		
 		Variable variable = null;
 		
+		boolean found = false;
 		if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
-			boolean found = false;
 			for (VariableType variableType : variableTypeList.getVariableTypes()) {
     			if (variableType.getStandardVariable() != null) {
     				StandardVariable standardVariable = variableType.getStandardVariable();
@@ -202,13 +202,14 @@ public class VariableListTransformer extends Transformer {
     				}
     			}
 			}
-			if (!found) {
-				StandardVariable standardVariable = getStandardVariableBuilder().create(termId.getId());
-				VariableType variableType = new VariableType(localName, localDescription, standardVariable, rank);
-				variable = new Variable(variableType, value);
-				variables.add(variable);
-				return rank + 1;
-			}
+
+		}
+		if (!found) {
+			StandardVariable standardVariable = getStandardVariableBuilder().create(termId.getId());
+			VariableType variableType = new VariableType(localName, localDescription, standardVariable, rank);
+			variable = new Variable(variableType, value);
+			variables.add(variable);
+			return rank + 1;
 		}
 		return rank;
 	}
