@@ -175,7 +175,6 @@ public class VariableListTransformer extends Transformer {
 			int rank = 1;
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name", studyDetails.getStudyName(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TITLE, "STUDY_TITLE", "Study title", studyDetails.getTitle(), rank);
-			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name", studyDetails.getStudyName(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.PM_KEY, "PM_KEY", "Project Management Key", studyDetails.getPmKey(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective", studyDetails.getObjective(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TYPE, "STUDY_TYPE", "Study type", 
