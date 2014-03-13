@@ -36,13 +36,16 @@ import org.hibernate.criterion.Restrictions;
 @SuppressWarnings("unchecked")
 public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 
-    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException{
+    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max
+            , int start, int numOfRows) throws MiddlewareQueryException{
         try {
             SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_MARKER_IDS_BY_QTL);
             query.setParameter("qtlName", qtlName);
             query.setParameter("chromosome", chromosome);
             query.setParameter("min", min);
             query.setParameter("max", max);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
             return query.list();
             
         } catch (HibernateException e) {
