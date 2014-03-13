@@ -26,6 +26,27 @@ import org.generationcp.middleware.pojos.Germplasm;
  */
 public class GermplasmDataManagerUtil{
 
+    /**
+     * Transforms the germplasm name to compare into: (1) its standardized form and 
+     * (2) its form without spaces to check if it is equal to the value stored in 
+     * the database.
+     * 
+     * @param nameToCompare - germplasm name to test against the name in the database.
+     * @param nameInDb - germplasm name as retrieved in the database.
+     * @return Returns true if the name to compare is essentially equal to the name in the database. Returns false otherwise.
+     */
+    public static boolean compareGermplasmNames(String nameToCompare, String nameInDb) {
+        String standardizedNameToCompare = standardizeName(nameToCompare).toLowerCase();
+        String nameToCompareWithSpacesRemoved = removeSpaces(nameToCompare).toLowerCase();
+        
+        nameInDb = nameInDb.toLowerCase();
+        if(nameInDb.equals(nameToCompare)
+                || nameInDb.equals(standardizedNameToCompare)
+                || nameInDb.equals(nameToCompareWithSpacesRemoved)){
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Given a germplasm name, apply the standardization procedure to it.
