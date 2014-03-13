@@ -946,9 +946,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
             } else {
                     p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
-                    p2_query1.setParameter("q", q+"%");
-                    p2_query1.setParameter("qNoSpaces", q.replace(" ", "")+"%");
-                    p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
+                    if(q.contains("%") || q.contains("_")){
+                    	p2_query1.setParameter("q", q);
+                    	p2_query1.setParameter("qNoSpaces", q.replace(" ", ""));
+                    	p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+                    } else {
+                    	p2_query1.setParameter("q", q+"%");
+                    	p2_query1.setParameter("qNoSpaces", q.replace(" ", "")+"%");
+                    	p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");                    	
+                    }
             }
             //p2_query1.setParameter("deletedStatus", STATUS_DELETED);
             List p2_result1 = p2_query1.list();
@@ -956,15 +962,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             if(searchByNameInLocalDbAlso && localSession != null){
             	SQLQuery p2_query2;
                 if(o.equals(Operation.EQUAL)) {
-                        p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
+                    p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
+                    p2_query2.setParameter("q", q);
+                    p2_query2.setParameter("qNoSpaces", q.replace(" ", ""));
+                    p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+                } else {
+                	if(q.contains("%") || q.contains("_")){
+                        p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
                         p2_query2.setParameter("q", q);
                         p2_query2.setParameter("qNoSpaces", q.replace(" ", ""));
                         p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
-                } else {
+                	} else {
                         p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
                         p2_query2.setParameter("q", q+"%");
                         p2_query2.setParameter("qNoSpaces", q.replace(" ", "")+"%");
-                        p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
+                        p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");                		
+                	}
                 }
                 p2_result1.addAll(p2_query2.list());
             }
