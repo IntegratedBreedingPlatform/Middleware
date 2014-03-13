@@ -819,7 +819,7 @@ public class TestGenotypicDataManagerImpl{
         } catch (MiddlewareQueryException e){
             //Ignore. There is already a record for testing.
         }
-        String qtlName = "TestQTL";  
+        String qtlName = "TestQTL%";  
         
         List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
                 (int) manager.countQtlByName(qtlName));
