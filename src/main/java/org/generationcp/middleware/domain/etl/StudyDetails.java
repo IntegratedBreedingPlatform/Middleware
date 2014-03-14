@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
@@ -45,6 +46,10 @@ public class StudyDetails {
     private String piName;
     
     private Season season;
+    
+    private Integer piId;
+    
+    private Integer siteId;
 
 	public StudyDetails(){
 		
@@ -66,6 +71,20 @@ public class StudyDetails {
     }
 
     // Used by getStudyDetails
+    public StudyDetails(Integer id, String studyName, String title,
+            String objective, String startDate, String endDate, StudyType studyType, 
+            String piName, String siteName, String piId, String siteId) {
+
+        this(studyName, title, objective, startDate, endDate, studyType, piName, siteName);
+        this.id = id;
+        if (piId != null && NumberUtils.isNumber(piId)) {
+        	this.piId = Integer.valueOf(piId);
+        }
+        if (siteId != null && NumberUtils.isNumber(siteId)) {
+        	this.siteId = Integer.valueOf(siteId);
+        }
+    }
+
     public StudyDetails(Integer id, String studyName, String title,
             String objective, String startDate, String endDate, StudyType studyType, 
             String piName, String siteName) {
@@ -215,8 +234,35 @@ public class StudyDetails {
 		this.season = season;
 	}
 
+    /**
+	 * @return the piId
+	 */
+	public Integer getPiId() {
+		return piId;
+	}
 
-    @Override
+	/**
+	 * @param piId the piId to set
+	 */
+	public void setPiId(Integer piId) {
+		this.piId = piId;
+	}
+
+	/**
+	 * @return the siteId
+	 */
+	public Integer getSiteId() {
+		return siteId;
+	}
+
+	/**
+	 * @param siteId the siteId to set
+	 */
+	public void setSiteId(Integer siteId) {
+		this.siteId = siteId;
+	}
+
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -342,6 +388,10 @@ public class StudyDetails {
         builder.append(piName);
         builder.append(", season=");
         builder.append(season);
+        builder.append(", piId=");
+        builder.append(piId);
+        builder.append(", siteId=");
+        builder.append(siteId);
         builder.append("]");
         return builder.toString();
     }
@@ -362,6 +412,8 @@ public class StudyDetails {
         Debug.println(indent + 3, "Site Name: " + siteName);
         Debug.println(indent + 3, "Season: " + season);
         Debug.println(indent + 3, "PI Name: " + piName);
+        Debug.println(indent + 3, "PI Id: " + piId);
+        Debug.println(indent + 3, "Site Id: " + siteId);
 	}
 
 }

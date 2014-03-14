@@ -13,7 +13,9 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -53,6 +55,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -477,7 +481,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) 
             throws MiddlewareQueryException {
         setWorkingDatabase(instance);
-        return getDmsProjectDao().getAllStudyDetails(studyType);
+        List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType);
+        populateSiteAndPersonIfNecessary(details);
+        return details;
     }
 
     @Override
@@ -836,20 +842,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countAllStudyDetails", "getAllStudyDetails");
         Object[] parameters = new Object[]{studyType};
-        return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
+        List<StudyDetails> details = getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
                 parameters, new Class[]{StudyType.class});
+        populateSiteAndPersonIfNecessary(details);
+        return details;
     }
 
     @Override
     public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
-        return getDmsProjectDao().getAllStudyDetails(studyType, start, numOfRows);
+        List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType, start, numOfRows);
+        populateSiteAndPersonIfNecessary(details);
+        return details;
     }
     
     @Override
     public StudyDetails getStudyDetails(Database instance, StudyType studyType, int studyId) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
-        return getDmsProjectDao().getStudyDetails(studyType, studyId);
+        StudyDetails studyDetails = getDmsProjectDao().getStudyDetails(studyType, studyId);
+        populateSiteAnPersonIfNecessary(studyDetails);
+        return studyDetails;
     }
 
     @SuppressWarnings("unchecked")
@@ -857,14 +869,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countAllNurseryAndTrialStudyDetails", "getAllNurseryAndTrialStudyDetails");
         Object[] parameters = new Object[]{};
-        return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
+        List<StudyDetails> list = getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
                 parameters, new Class[]{});
+        populateSiteAndPersonIfNecessary(list);
+        return list;
     }
 
     @Override
     public List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
-        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start, numOfRows);
+        List<StudyDetails> list = getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start, numOfRows);
+        populateSiteAndPersonIfNecessary(list);
+        return list;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -883,6 +899,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 list.addAll(centralList);
             }
         }
+        
+        populateSiteAndPersonIfNecessary(list);
+        
         return list;
     }
 
@@ -926,6 +945,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 list.addAll(centralList);
             }
         }
+        
+        populateSiteAndPersonIfNecessary(list);
+        
         return list;
     }
 
@@ -963,5 +985,79 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return getPhenotypeDao().countPlantsSelectedOfNursery(dataSetId);
         }
         return 0;
+    }
+    
+    private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
+		if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
+			setWorkingDatabase(detail.getSiteId());
+			Location loc = getLocationDao().getById(detail.getSiteId());
+			if (loc != null) {
+				detail.setSiteName(loc.getLname());
+			}
+		}    	
+		if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
+			setWorkingDatabase(detail.getPiId());
+			Person person = getPersonDao().getById(detail.getPiId());
+			if (person != null) {
+				detail.setPiName(person.getDisplayName());
+			}
+		}
+    }
+    
+    private void populateSiteAndPersonIfNecessary(List<StudyDetails> studyDetails) throws MiddlewareQueryException {
+    	if (studyDetails != null && !studyDetails.isEmpty()) {
+	    	List<Integer> centralSite = new ArrayList<Integer>();
+	    	List<Integer> localSite = new ArrayList<Integer>();
+	    	List<Integer> centralPerson = new ArrayList<Integer>();
+	    	List<Integer> localPerson = new ArrayList<Integer>();
+	    	
+	    	for (StudyDetails detail : studyDetails) {
+	    		if ((detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) && detail.getSiteId() != null) {
+	    			if (detail.getSiteId() > 0) {
+	    				centralSite.add(detail.getSiteId());
+	    			}
+	    			else {
+	    				localSite.add(detail.getSiteId());
+	    			}
+	    		}
+	    		if ((detail.getPiName() == null || "".equals(detail.getPiName().trim())) && detail.getPiId() != null) {
+	    			if (detail.getPiId() > 0) {
+	    				centralPerson.add(detail.getPiId());
+	    			}
+	    			else {
+	    				localPerson.add(detail.getPiId());
+	    			}
+	    		}
+	    	}
+	    	
+	    	Map<Integer, String> siteMap = new HashMap<Integer, String>();
+	    	Map<Integer, String> personMap = new HashMap<Integer, String>();
+	    	
+	    	if (!centralSite.isEmpty()) {
+	    		setWorkingDatabase(Database.CENTRAL);
+	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(centralSite));
+	    	}
+	    	if (!localSite.isEmpty()) {
+	    		setWorkingDatabase(Database.LOCAL);
+	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(localSite));
+	    	}
+	    	if (!centralPerson.isEmpty()) {
+	    		setWorkingDatabase(Database.CENTRAL);
+	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(centralPerson));
+	    	}
+	    	if (!localPerson.isEmpty()) {
+	    		setWorkingDatabase(Database.LOCAL);
+	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(localPerson));
+	    	}
+	    	
+	    	for (StudyDetails detail : studyDetails) {
+	    		if ((detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) && detail.getSiteId() != null) {
+	    			detail.setSiteName(siteMap.get(detail.getSiteId()));
+	    		}
+	    		if ((detail.getPiName() == null || "".equals(detail.getPiName().trim())) && detail.getPiId() != null) {
+	    			detail.setPiName(personMap.get(detail.getPiId()));
+	    		}
+	    	}
+    	}
     }
 }

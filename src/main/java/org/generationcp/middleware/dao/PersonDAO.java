@@ -12,11 +12,16 @@
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Person}.
@@ -42,5 +47,22 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
                     + ") query from Person: " + e.getMessage(), e);
         }
         return false;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds) throws MiddlewareQueryException {
+    	Map<Integer, String> map = new HashMap<Integer, String>();
+        try {
+            List<Person> persons = getSession().createCriteria(Person.class).add(Restrictions.in("id", personIds)).list();
+            if (persons != null && !persons.isEmpty()) {
+            	for (Person person: persons) {
+            		map.put(person.getId(), person.getDisplayName());
+            	}
+            }
+            
+        } catch (HibernateException e) {
+            logAndThrowException(String.format("Error with getPersonNamesByPersonIds(id=[%s])", StringUtils.join(personIds, ",")),e);
+        }
+        return map;
     }
 }
