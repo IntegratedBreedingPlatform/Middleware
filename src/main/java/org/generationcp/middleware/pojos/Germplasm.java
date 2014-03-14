@@ -336,14 +336,14 @@ public class Germplasm implements Serializable{
     		"FROM germplsm " +
     		"WHERE gid IN (:gids) AND gid!=grplce";
     public static final String SEARCH_GID_BY_GERMPLASM_NAME = 
-    		"SELECT DISTINCT germplsm.gid AS gid " +
-    		"FROM germplsm LEFT JOIN names ON (germplsm.gid=names.gid AND germplsm.gid!=germplsm.grplce) " +
-    		"WHERE nval LIKE :q OR nval LIKE :qStandardized OR nval LIKE :qNoSpaces " +
+    		"SELECT DISTINCT gid " +
+    		"FROM names " +
+    		"WHERE nstat != :deletedStatus AND (nval LIKE :q OR nval LIKE :qStandardized OR nval LIKE :qNoSpaces) " +
     		"LIMIT 5000";
     public static final String SEARCH_GID_BY_GERMPLASM_NAME_EQUAL = 
-    		"SELECT DISTINCT germplsm.gid AS gid " +
-    		"FROM germplsm LEFT JOIN names ON (germplsm.gid=names.gid AND germplsm.gid!=germplsm.grplce) " +
-    		"WHERE nval = :q OR nval = :qStandardized OR nval = :qNoSpaces " +
+    		"SELECT DISTINCT gid " +
+    		"FROM names " +
+    		"WHERE nstat != :deletedStatus AND (nval = :q OR nval = :qStandardized OR nval = :qNoSpaces) " +
     		"LIMIT 5000";
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
     		"SELECT listid " +
