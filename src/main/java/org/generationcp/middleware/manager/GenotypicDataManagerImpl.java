@@ -146,12 +146,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative gIds
         return (List<Integer>) super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), gIds.get(0), "getNameIdsByGermplasmIds",
                 new Object[] { gIds }, new Class[] { List.class });
     }
 
     @Override
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException {
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative nIds
         return (List<Name>) super.getFromInstanceByIdAndMethod(getNameDao(), nIds.get(0), "getNamesByNameIds", new Object[] { nIds },
                 new Class[] { List.class });
     }
@@ -281,12 +283,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative nIds
         return (List<String>) super.getFromInstanceByIdAndMethod(getMarkerDao(), markerIds.get(0), "getMarkerTypeByMarkerIds",
                 new Object[] { markerIds }, new Class[] { List.class });
     }
 
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative nIds
         return (List<MarkerNameElement>) super.getFromInstanceByIdAndMethod(getMarkerDao(), gIds.get(0), "getMarkerNamesByGIds", 
                 new Object[]{gIds}, new Class[]{List.class});
     }
@@ -301,6 +305,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
             int numOfRows) throws MiddlewareQueryException {
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative gIds
+        // and marker names from both local and central
     	List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
     	
     	int gid = gids.get(0);
@@ -460,12 +466,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countMarkerNamesByMarkerType", "getMarkerNamesByMarkerType");
-        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows, new Object[]{markerType}, new Class[]{String.class});
+        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows, 
+                new Object[]{markerType}, new Class[]{String.class});
     }
     
     @Override
     public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countMarkerNamesByMarkerType", new Object[]{markerType}, new Class[]{String.class});
+        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countMarkerNamesByMarkerType", 
+                new Object[]{markerType}, new Class[]{String.class});
     }
 
     @Override
@@ -524,6 +532,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative datasetIds (and gIds?)
+
         return (List<Integer>) super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), datasetIds.get(0), "getNIDsByDatasetIds", 
                 new Object[]{datasetIds, gids, start, numOfRows}, new Class[]{List.class, List.class, Integer.TYPE, Integer.TYPE});
     }
@@ -656,12 +666,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
+        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
         return getForPolyMorphicMarkersRetrieval("countIntAlleleValuesForPolymorphicMarkersRetrieval", 
                 "getIntAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
     }
 
     @Override
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
+        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
         return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(),
                 "countIntAlleleValuesForPolymorphicMarkersRetrieval", new Object[] { gids }, new Class[] { List.class });
     }
@@ -669,12 +681,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
+        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
         return getForPolyMorphicMarkersRetrieval("countCharAlleleValuesForPolymorphicMarkersRetrieval", 
                 "getCharAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
     }
 
     @Override
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
+        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
         return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(), 
                 "countCharAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
@@ -682,12 +696,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
+        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
         return getForPolyMorphicMarkersRetrieval("countMappingAlleleValuesForPolymorphicMarkersRetrieval", 
                 "getMappingAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
     }
 
     @Override
     public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
+        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
         return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(), 
                 "countMappingAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
@@ -989,7 +1005,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows)
             throws MiddlewareQueryException {
         //TODO
-        return null;
+//        return null;
+        List<String> methods = Arrays.asList("countMarkerIdsByQtl", "getMarkerIdsByQtl");
+        return super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows,
+                new Object[]{qtlName, chromosome, min, max}, 
+                new Class[]{String.class, String.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
@@ -1648,12 +1668,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     
     @Override
     public List<Dataset> getDatasetDetailsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException{
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative datasetIds
         return super.getFromInstanceByIdAndMethod(getDatasetDao(), datasetIds.get(0), 
                 "getDatasetsByIds", new Object[] { datasetIds }, new Class[] { List.class });
     }
     
     @Override
     public List<Integer> getQTLIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException{
+        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative datasetIds
         return super.getFromInstanceByIdAndMethod(getQtlDao(), datasetIds.get(0), 
                 "getQTLIdsByDatasetIds", new Object[] { datasetIds }, new Class[] { List.class });
     }

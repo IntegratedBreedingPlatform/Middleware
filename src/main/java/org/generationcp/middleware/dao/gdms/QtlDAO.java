@@ -351,7 +351,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
     public List<Qtl> getQtlByName(String qtlName) throws MiddlewareQueryException{
             try {
                 Criteria criteria = getSession().createCriteria(getPersistentClass());
-                criteria.add(Restrictions.eq("qtlName", qtlName));
+                criteria.add(Restrictions.like("qtlName", qtlName));
                 
                 return criteria.list();
 

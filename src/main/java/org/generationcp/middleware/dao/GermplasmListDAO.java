@@ -345,13 +345,17 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             } else {
             	if(q.contains("%") || q.contains("_")){
             		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE);
+                	query.setParameter("q", q);
+                	query.setParameter("qNoSpaces", q.replace(" ", ""));
+                	query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
             	} else {
             		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
             		query.setParameter("gidLength", q.length());
+                	query.setParameter("q", "%"+q+"%");
+                	query.setParameter("qNoSpaces", "%"+q.replace(" ", "")+"%");
+                	query.setParameter("qStandardized", "%"+GermplasmDataManagerUtil.standardizeName(q)+"%");
             	}
-            	query.setParameter("q", "%"+q+"%");
-            	query.setParameter("qNoSpaces", "%"+q.replace(" ", "")+"%");
-            	query.setParameter("qStandardized", "%"+GermplasmDataManagerUtil.standardizeName(q)+"%");
+
             }
         	query.setParameter("gid", q);
         	
