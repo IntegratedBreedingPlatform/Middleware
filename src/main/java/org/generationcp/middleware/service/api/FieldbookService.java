@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -330,4 +331,8 @@ public interface FieldbookService {
     Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException;
     
     List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
+    
+    List<Location> getAllFieldLocations(int locationId) throws MiddlewareQueryException;
+    List<Location> getAllBlockLocations(int fieldId) throws MiddlewareQueryException;
+    FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException;
 }

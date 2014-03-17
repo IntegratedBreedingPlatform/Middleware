@@ -35,6 +35,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -525,6 +526,28 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<Germplasm> getGermplasms(List<Integer> gids)
 			throws MiddlewareQueryException {
 		return getGermplasmDataManager().getGermplasms(gids);
+	}
+
+	@Override
+	public List<Location> getAllFieldLocations(int locationId)
+			throws MiddlewareQueryException {
+		GermplasmDataManager germplasmDataManager = getGermplasmDataManager();
+    	return germplasmDataManager.getAllLocations().subList(0, 50);
+	}
+
+	@Override
+	public List<Location> getAllBlockLocations(int fieldId)
+			throws MiddlewareQueryException {
+		GermplasmDataManager germplasmDataManager = getGermplasmDataManager();
+		//for testing only
+    	return germplasmDataManager.getAllLocations().subList(0, 50);
+	}
+
+	@Override
+	public FieldmapBlockInfo getBlockInformation(int blockId)
+			throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return new FieldmapBlockInfo(blockId, 20, 20, 20);
 	}
     
     
