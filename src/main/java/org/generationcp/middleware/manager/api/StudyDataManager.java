@@ -41,6 +41,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets
  * from the CHADO schema.
@@ -584,6 +585,8 @@ public interface StudyDataManager{
     /**
      * Gets the study details.
      *
+     * @param instance the instance
+     * @param studyType the study type
      * @param id the id
      * @return the study details
      * @throws MiddlewareQueryException the middleware query exception
@@ -676,5 +679,23 @@ public interface StudyDataManager{
      */
     List<FolderReference> getFolderTree() throws MiddlewareQueryException;
     
+    /**
+     * Count plots with plants selectedof dataset.
+     *
+     * @param dataSetId the data set id
+     * @return the int
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the geolocation prop value.
+     *
+     * @param instance the instance
+     * @param stdVarId the std var id
+     * @param studyId the study id
+     * @return the geolocation prop value
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException;
 }

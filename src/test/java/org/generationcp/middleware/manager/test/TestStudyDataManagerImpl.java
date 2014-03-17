@@ -43,6 +43,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -60,6 +61,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -1093,6 +1095,12 @@ public class TestStudyDataManagerImpl{
             }
         }
         //assertTrue(fieldMapCount.getEntryCount() > 0);
+    }
+    
+    @Test
+    public void testGetGeolocationPropValue() throws MiddlewareQueryException {
+        String value = manager.getGeolocationPropValue(Database.LOCAL, TermId.LOCATION_ID.getId(), -1);
+        Debug.println(0, value);
     }
     
     @Test
