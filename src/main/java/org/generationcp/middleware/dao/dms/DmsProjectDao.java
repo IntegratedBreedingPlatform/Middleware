@@ -436,6 +436,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("prop.typeId", type));
 			criteria.add(Restrictions.eq("prop.value", value));
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			criteria.addOrder(Order.asc("prop.rank"));//this is important in ETL
 			
 			return criteria.list();
 			
