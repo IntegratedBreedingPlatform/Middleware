@@ -2053,6 +2053,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private AccMetadataSetPK saveAccMetadataSet(Integer datasetId, AccMetadataSet accMetadataSet) throws Exception{
+	    requireLocalDatabaseInstance();
         AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
         accMetadataSet.setDatasetId(datasetId);
         
