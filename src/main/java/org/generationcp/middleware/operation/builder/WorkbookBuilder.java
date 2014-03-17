@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -35,6 +36,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class WorkbookBuilder extends Builder {
 	
@@ -107,7 +109,6 @@ public class WorkbookBuilder extends Builder {
             Workbook workbook = new Workbook();
             Study study = getStudyBuilder().createStudy(id);
             int dataSetId = 0;
-            
             //get observation dataset
             if (dataSetId == 0) {
                 List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
@@ -132,7 +133,27 @@ public class WorkbookBuilder extends Builder {
             List<MeasurementVariable> factors = buildFactors(variables);
             List<MeasurementVariable> variates = buildVariates(variables);
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
-
+            List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
+            
+            for (ProjectProperty projectProperty : projectProperties) {
+                if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
+                    StandardVariable stdVariable = getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
+                    if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
+                        String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+                        
+                        MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), projectProperty.getValue(), 
+                                stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+                                stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), 
+                                getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id), 
+                                label);
+                        measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+                        measurementVariable.setFactor(true);
+                        
+                        conditions.add(measurementVariable);
+                    }
+                }
+            }
+            
             workbook.setFactors(factors);
             workbook.setVariates(variates);
             workbook.setConditions(conditions);

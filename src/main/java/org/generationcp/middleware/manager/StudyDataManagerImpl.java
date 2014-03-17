@@ -987,6 +987,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return 0;
     }
     
+    @Override
+    public String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        return getGeolocationPropertyDao().getGeolocationPropValue(stdVarId, studyId);
+    }
+    
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
 		if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
 			setWorkingDatabase(detail.getSiteId());

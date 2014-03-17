@@ -321,9 +321,6 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String generateTrialDatasetName(String studyName, StudyType studyType) {
-		if(studyType == StudyType.N) {
-			return "NURSERY_" + studyName;
-		}
 		return "TRIAL_" + studyName;
 	}
 	
