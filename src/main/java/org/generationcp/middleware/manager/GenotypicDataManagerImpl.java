@@ -1134,6 +1134,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException {
+        //TODO check for existence. duplicate marker names are not allowed.
         requireLocalDatabaseInstance();
         marker.setMarkerId(getMarkerDao().getNegativeId("markerId"));
         return ((Marker) super.saveOrUpdate(getMarkerDao(), marker)).getMarkerId();
@@ -2032,7 +2033,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveMarkerOnMap(Integer markerId, Integer mapId, MarkerOnMap markerOnMap) throws Exception{
-
+	    requireLocalDatabaseInstance();
         MarkerOnMapDAO markerOnMapDao = getMarkerOnMapDao();
 
         // No need to generate id, MarkerOnMap(markerId, mapId) are foreign keys
