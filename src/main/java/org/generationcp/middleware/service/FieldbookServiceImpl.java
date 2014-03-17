@@ -547,7 +547,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public FieldmapBlockInfo getBlockInformation(int blockId)
 			throws MiddlewareQueryException {
 		// TODO Auto-generated method stub
-		return new FieldmapBlockInfo(blockId, 20, 20, 20);
+		return new FieldmapBlockInfo(blockId, 20, 20, 20, false);
 	}
     
     
