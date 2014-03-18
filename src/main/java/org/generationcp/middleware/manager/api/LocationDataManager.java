@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -231,7 +232,18 @@ public interface LocationDataManager {
      */
     UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
     
-    
+    /**
+     * Returns the Map representation of <Code, UserDefinedField> 
+     * of the given ftable and ftype from the udflds table.
+     * 
+     * @param table
+     * @param type
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByTableAndType(String table, String type) 
+            throws MiddlewareQueryException;
+
     /**
      * Returns the udfld records identified by the given tablename.
      *
@@ -241,8 +253,7 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(
-            String tableName,String fieldType) 
-            throws MiddlewareQueryException;
+            String tableName,String fieldType)  throws MiddlewareQueryException;
 
     /**
      * Returns the country record identified by the given id.

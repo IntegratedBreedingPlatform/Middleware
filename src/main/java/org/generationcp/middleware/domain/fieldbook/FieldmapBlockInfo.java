@@ -13,13 +13,14 @@ package org.generationcp.middleware.domain.fieldbook;
 
 import java.io.Serializable;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class FieldmapBlockInfo.
  */
 public class FieldmapBlockInfo implements Serializable{
 	
-	/** The block id. */
+    private static final long serialVersionUID = 1L;
+
+    /** The block id. */
 	private int blockId;
 	
 	/** The rows in block. */
@@ -143,6 +144,57 @@ public class FieldmapBlockInfo implements Serializable{
 	public void setNew(boolean isNew) {
 		this.isNew = isNew;
 	}
+	
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + blockId;
+        result = prime * result + (isNew ? 1231 : 1237);
+        result = prime * result + numberOfRowsInPlot;
+        result = prime * result + rangesInBlock;
+        result = prime * result + rowsInBlock;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        FieldmapBlockInfo other = (FieldmapBlockInfo) obj;
+        if (blockId != other.blockId)
+            return false;
+        if (isNew != other.isNew)
+            return false;
+        if (numberOfRowsInPlot != other.numberOfRowsInPlot)
+            return false;
+        if (rangesInBlock != other.rangesInBlock)
+            return false;
+        if (rowsInBlock != other.rowsInBlock)
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("FieldmapBlockInfo [blockId=");
+        builder.append(blockId);
+        builder.append(", rowsInBlock=");
+        builder.append(rowsInBlock);
+        builder.append(", rangesInBlock=");
+        builder.append(rangesInBlock);
+        builder.append(", numberOfRowsInPlot=");
+        builder.append(numberOfRowsInPlot);
+        builder.append(", isNew=");
+        builder.append(isNew);
+        builder.append("]");
+        return builder.toString();
+    }
 	
 	
 }
