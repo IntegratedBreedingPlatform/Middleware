@@ -32,6 +32,12 @@ public class FieldmapBlockInfo implements Serializable{
 	/** The number of rows in plot. */
 	private int numberOfRowsInPlot;
 	
+	/** planting order */
+	private String plantingOrder;
+	
+	/** machine row capacity */
+	private int machineRowCapacity;
+	
 	/** The is new. */
 	private boolean isNew;
 	
@@ -143,6 +149,34 @@ public class FieldmapBlockInfo implements Serializable{
 	 */
 	public void setNew(boolean isNew) {
 		this.isNew = isNew;
+	}
+
+	/**
+	 * @return the plantingOrder
+	 */
+	public String getPlantingOrder() {
+		return plantingOrder;
+	}
+
+	/**
+	 * @param plantingOrder the plantingOrder to set
+	 */
+	public void setPlantingOrder(String plantingOrder) {
+		this.plantingOrder = plantingOrder;
+	}
+
+	/**
+	 * @return the machineRowCapacity
+	 */
+	public int getMachineRowCapacity() {
+		return machineRowCapacity;
+	}
+
+	/**
+	 * @param machineRowCapacity the machineRowCapacity to set
+	 */
+	public void setMachineRowCapacity(int machineRowCapacity) {
+		this.machineRowCapacity = machineRowCapacity;
 	}
 	
     @Override
