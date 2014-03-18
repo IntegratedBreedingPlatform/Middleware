@@ -528,7 +528,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered in importing observations: ", e, LOG);
             return 0;
         } finally {
             timerWatch.stop();
