@@ -86,7 +86,12 @@ public class PhenotypeSaver extends Saver{
 	        else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 	            phenotype = getPhenotypeObject(phenotype);
 	            if(variable.getValue()!=null && !variable.getValue().equals("")) {
-	                phenotype.setcValue(Double.valueOf(variable.getValue()).intValue()); 
+	            	try {
+	            		phenotype.setcValue(Double.valueOf(variable.getValue()).intValue());
+	            	} catch (Exception e) {
+	            		throw new MiddlewareQueryException(variable.getValue() +" is not a valid value for "+variable.getVariableType()
+	            				.getLocalName()+". Categorical variates should be numeric. ");//TODO - INTERNATIONALIZE
+	            	}
 	            }           
 	            phenotype.setObservableId(variable.getVariableType().getId());
 	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
