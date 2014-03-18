@@ -185,8 +185,14 @@ import org.generationcp.middleware.util.PropertyReader;
     
     //Manage Settings
     , NURSERY_TYPE
-    ;
     
+    //Experimental Design
+    , EXPERIMENT_DESIGN_FACTOR
+    , NUMBER_OF_REPLICATES
+    , BLOCK_SIZE
+    , BLOCKS_PER_REPLICATE
+    ;
+
     private static final String PROPERTY_FILE = "constants/termId.properties";
     private static final PropertyReader propertyReader = new PropertyReader(PROPERTY_FILE);
     
