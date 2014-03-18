@@ -227,20 +227,20 @@ public class WorkbookParser {
         Date startDate = null;
         Date endDate = null;
 
-        if (startDateStr.length() != 0 && startDateStr.length() != 8) {
+        if (startDateStr!=null && startDateStr.length() != 0 && startDateStr.length() != 8) {
             errorMessages.add(new Message("error.start.date.invalid"));
         } else {
             try {
-                if (!startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
+                if (startDateStr!=null && !startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.start.date.invalid"));
             }
         }
-        if (endDateStr.length() != 0 && endDateStr.length() != 8) {
+        if (endDateStr!=null && endDateStr.length() != 0 && endDateStr.length() != 8) {
             errorMessages.add(new Message("error.end.date.invalid"));
         } else {
             try {
-                if (!endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
+                if (endDateStr!=null && !endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.end.date.invalid"));
             }
