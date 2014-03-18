@@ -71,7 +71,12 @@ public class PoiUtil {
             case Cell.CELL_TYPE_STRING:
                 return cell.getStringCellValue();
             case Cell.CELL_TYPE_NUMERIC:
-                return cell.getNumericCellValue();
+            	double doubleVal = cell.getNumericCellValue();
+            	if ((doubleVal % 1) == 0){
+            		return (int) doubleVal; 
+            	}else{
+            		return doubleVal;
+            	}
             case Cell.CELL_TYPE_FORMULA:
                 return cell.getCellFormula();
             default:

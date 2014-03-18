@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -399,6 +400,19 @@ public class WorkbookParser {
             workbook) throws WorkbookParserException {
         List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         long stockId = 0;
+        
+        //add each row in observations
+        Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
+        Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
+        
+        // GCP-7541 limit the observations rows to prevent Out-Of-Memory error.
+        Integer maxLimit = 10000;
+        if (lastRowNum > maxLimit){
+        	List<Message> messages = new ArrayList<Message>();
+        	Message message = new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(maxLimit));
+        	messages.add(message);
+        	throw new WorkbookParserException(messages);
+        }
 
         try {
             //validate headers and set header labels
@@ -425,10 +439,7 @@ public class WorkbookParser {
             }
 
             currentRow++;
-
-            //add each row in observations
-            Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
-            Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
+            
             while (currentRow <= lastRowNum) {
                 // skip over blank rows in the observation sheet
                 if (rowIsEmpty(wb, OBSERVATION_SHEET, currentRow, factors.size() + variates.size())) {
@@ -470,19 +481,13 @@ public class WorkbookParser {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
             Cell cell = row.getCell(columnNumber);
-            return getCellStringValue(wb,cell);
+            return PoiUtil.getCellStringValue(cell);
         } catch (IllegalStateException e) {
-            Sheet sheet = wb.getSheetAt(sheetNumber);
-            Row row = sheet.getRow(rowNumber);
-            Cell cell = row.getCell(columnNumber);
-
-            if (cell.getNumericCellValue() == Math.floor(cell.getNumericCellValue())) {
-                return String.valueOf(Integer.valueOf((int) cell.getNumericCellValue()));
-            } else {
-                return String.valueOf(Double.valueOf(cell.getNumericCellValue()));
-            }
+           
+        	return "";
 
         } catch (NullPointerException e) {
+        	
             return "";
         }
     }
