@@ -573,7 +573,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) 
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info) 
             throws MiddlewareQueryException {
 
         if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
@@ -585,7 +585,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             try {
                 trans = session.beginTransaction();
 
-                getExperimentPropertySaver().saveFieldmapProperties(info, fieldmapUUID);
+                //TODO: confirm if blocks and fields are always read only, then no need to save 
+                //getLocdesSaver().saveLocationDescriptions(info);
+                getLocdesSaver().updateDeletedPlots(info);
+                getGeolocationPropertySaver().saveFieldmapProperties(info);
+                getExperimentPropertySaver().saveFieldmapProperties(info);
 
                 trans.commit();
 

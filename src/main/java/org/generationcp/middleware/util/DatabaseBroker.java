@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.InstallationDAO;
 import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.LotDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -147,6 +148,7 @@ public class DatabaseBroker {
     private BibrefDAO bibrefDao;
     private GermplasmDAO germplasmDao;
     private LocationDAO locationDao;
+    private LocdesDAO locdesDao;
     private MethodDAO methodDao;
     private ProgenitorDAO progenitorDao;
     private UserDefinedFieldDAO userDefinedFieldDao;
@@ -818,6 +820,14 @@ public class DatabaseBroker {
 		return locationDao;
 	}    
     
+    protected final LocdesDAO getLocdesDao() {
+        if (locdesDao == null) {
+            locdesDao = new LocdesDAO();
+        }
+        locdesDao.setSession(getActiveSession());
+        return locdesDao;
+    }
+
     //================================ GermplasmListDataManager DAO Methods =============================
     
     protected final GermplasmListDAO getGermplasmListDAO() {

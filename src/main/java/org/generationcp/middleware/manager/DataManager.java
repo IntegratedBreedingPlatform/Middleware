@@ -36,7 +36,22 @@ import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.DataSetDestroyer;
-import org.generationcp.middleware.operation.saver.*;
+import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
+import org.generationcp.middleware.operation.saver.CvTermSaver;
+import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
+import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
+import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
+import org.generationcp.middleware.operation.saver.GeolocationPropertySaver;
+import org.generationcp.middleware.operation.saver.GeolocationSaver;
+import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
+import org.generationcp.middleware.operation.saver.LocdesSaver;
+import org.generationcp.middleware.operation.saver.PhenotypeSaver;
+import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
+import org.generationcp.middleware.operation.saver.ProjectRelationshipSaver;
+import org.generationcp.middleware.operation.saver.ProjectSaver;
+import org.generationcp.middleware.operation.saver.StandardVariableSaver;
+import org.generationcp.middleware.operation.saver.StockSaver;
+import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Session;
@@ -1151,5 +1166,13 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final FolderBuilder getFolderBuilder() {
         return new FolderBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final LocdesSaver getLocdesSaver() {
+        return new LocdesSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final GeolocationPropertySaver getGeolocationPropertySaver() {
+    	return new GeolocationPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

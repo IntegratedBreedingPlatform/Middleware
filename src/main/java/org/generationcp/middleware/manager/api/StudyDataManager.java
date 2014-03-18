@@ -460,10 +460,9 @@ public interface StudyDataManager{
      * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
      *
      * @param info the info
-     * @param fieldmapUUID the fieldmap uuid
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException;
+    void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info) throws MiddlewareQueryException;
     
     /**
      * Save Project Properties of the Project.
