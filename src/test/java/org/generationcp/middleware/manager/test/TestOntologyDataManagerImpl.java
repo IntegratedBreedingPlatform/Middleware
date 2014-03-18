@@ -788,7 +788,10 @@ public class TestOntologyDataManagerImpl {
         } catch (MiddlewareException e){
             Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
             assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
-        }
+        } catch (MiddlewareQueryException e){
+        Debug.println(3, "MiddlewareQueryException expected: \"" + e.getMessage() + "\"");
+        assertTrue(e.getMessage().contains("The term you entered is invalid"));
+    }
     }
 
     @Test

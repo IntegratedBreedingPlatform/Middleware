@@ -573,27 +573,36 @@ public class TestGermplasmListManagerImpl{
     public void testSaveListDataColumns() throws MiddlewareQueryException {
     	List<ListDataInfo> listDataCollection = new ArrayList<ListDataInfo>();
     	
-    	//list Data ID 1
-    	List<ListDataColumn> columns = new ArrayList<ListDataColumn>();
-    	columns.add(new ListDataColumn("Preferred Name", "IRGC65"));
-    	columns.add(new ListDataColumn("Germplasm Date", ""));
-    	columns.add(new ListDataColumn("Location1", null));
-    	columns.add(new ListDataColumn("Location2", "IRRI222"));
-    	columns.add(new ListDataColumn("Location3", "IRRI333"));
-    	listDataCollection.add( new ListDataInfo(-464, columns)); // Change the List Data ID applicable for local db
+    	List<GermplasmList> firstListData = manager.getAllGermplasmLists(0, 2, Database.LOCAL);
+    
+    	if (firstListData != null && firstListData.size() == 2){
+    	    Integer listDataId = firstListData.get(0).getId();
+    	    
+    	       //list Data ID 1
+            List<ListDataColumn> columns = new ArrayList<ListDataColumn>();
+            columns.add(new ListDataColumn("Preferred Name", "IRGC65"));
+            columns.add(new ListDataColumn("Germplasm Date", ""));
+            columns.add(new ListDataColumn("Location1", null));
+            columns.add(new ListDataColumn("Location2", "IRRI222"));
+            columns.add(new ListDataColumn("Location3", "IRRI333"));
+            listDataCollection.add( new ListDataInfo(listDataId, columns)); // Change the List Data ID applicable for local db
+            
+            listDataId = firstListData.get(1).getId();
+            //list Data ID 2
+            columns = new ArrayList<ListDataColumn>();
+            columns.add(new ListDataColumn("Location1", "IRRI1"));
+            columns.add(new ListDataColumn("Location2", "IRRI2"));
+            columns.add(new ListDataColumn("Location3", "IRRI3"));
+            listDataCollection.add( new ListDataInfo(listDataId, columns)); // Change the List Data ID applicable for local db
+            
+            
+            List<ListDataInfo> results = manager.saveListDataColumns(listDataCollection);
+            for (ListDataInfo data : results){
+                data.print(0);
+            }
+    	}
     	
-    	//list Data ID 2
-    	columns = new ArrayList<ListDataColumn>();
-    	columns.add(new ListDataColumn("Location1", "IRRI1"));
-    	columns.add(new ListDataColumn("Location2", "IRRI2"));
-    	columns.add(new ListDataColumn("Location3", "IRRI3"));
-    	listDataCollection.add( new ListDataInfo(-462, columns)); // Change the List Data ID applicable for local db
-    	
-    	
-        List<ListDataInfo> results = manager.saveListDataColumns(listDataCollection);
-        for (ListDataInfo data : results){
-        	data.print(0);
-        }
+
     } 
     
     @Test

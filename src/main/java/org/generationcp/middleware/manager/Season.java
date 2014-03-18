@@ -12,41 +12,46 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.util.PropertyReader;
 
 /**
  * Used to specify the different seasons
+ * Values are stored in season.properties
  * 
  * @author Joyce Avestro, Tiffany Go
  * 
  */
 public enum Season {
-    DRY ("Dry", "Dry season", 0), WET ("Wet", "Wet season", 1), GENERAL("General", "General", 2);
+    DRY ("DRY_LABEL", "DRY_DEFINITION", "DRY_SORT_ORDER")
+    , WET ("WET_LABEL", "WET_DEFINITION", "WET_SORT_ORDER")
+    , GENERAL("GENERAL_LABEL", "GENERAL_DEFINITION", "GENERAL_SORT_ORDER");
     
     private String label;
 
     private String definition;
     
-    private Integer sortOrder;
+    private String sortOrder;
     
-    private Season() {
-    }
+    private static final String PROPERTY_FILE = "constants/season.properties";
+    private static final PropertyReader propertyReader = new PropertyReader(PROPERTY_FILE);
+
     
-    private Season(String label, String definition, Integer sortOrder) {
+    private Season(String label, String definition, String sortOrder) {
         this.label = label;
     	this.definition = definition;
     	this.sortOrder = sortOrder;
     }
-    
+
     public String getLabel() {
-        return this.label;
+        return propertyReader.getValue(this.label);
     }
     
     public String getDefinition() {
-        return this.definition;
+        return propertyReader.getValue(this.definition);
     }
     
     public Integer getSortOrder(){
-        return this.sortOrder;
+        return propertyReader.getIntegerValue(this.sortOrder);
     }
     
     /**

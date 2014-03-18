@@ -11,55 +11,81 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import java.io.IOException;
+import java.util.Properties;
+
+import org.generationcp.middleware.domain.oms.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The different types for germplasm names. Taken from the udflds table. The
  * primary key is included for querying purposes.
+ * Values are stored in germplasmNameType.properties
  * 
  * @author Kevin Manansala
  * 
  */
 public enum GermplasmNameType {
-    GERMPLASM_BANK_ACCESSION_NUMBER(1)
-    , CROSS_NAME(2)
-    , UNNAMED_CROSS(3)
-    , RELEASE_NAME(4)
-    , DERIVATIVE_NAME(5)
-    , CULTIVAR_NAME(6)
-    , ABBREVIATED_CULTIVAR_NAME(7)
-    , SPECIES_NAME(8)
-    , COLLECTORS_NUMBER(9)
-    , FOREIGN_ACCESSION_NUMBER(10)
-    , INTERNATIONAL_TESTING_NUMBER(11)
-    , NATIONAL_TESTING_NUMBER(12)
-    , LINE_NAME(13)
-    , TEMPORARY_ACCESSION_NUMBER_QUARANTINE_NUMBER(14)
-    , ALTERNATIVE_DERIVATIVE_NAME(15)
-    , ALTERNATIVE_CULTIVAR_NAME(16)
-    , ALTERNATIVE_ABBREVIATION(17)
-    , OLD_MUTANT_NAME_1(18)
-    , OLD_MUTANT_NAME_2(19)
-    , ELITE_LINES(20)
-    , MANAGEMENT_NAME(21)
-    , DONORS_ACCESSION_NUMBER(22)
-    , LOCAL_COMMON_NAME_OF_WILD_RICE_SPECIES(23)
-    , IRRI_HRDC_CODE(24)
-    , GQNPC_Unique_ID(25)
-    , NATIONAL_RICE_COOPERATIVE_TESTING_PROJECT_ID(26)
-    , TRANSGENIC_EVENT_ID(27)
-    , ALTERNATE_CROSS_NAME(28)
-    , CIAT_GERMPLASM_BANK_ACCESSION_NUMBER(1019)
-    , UNRESOLVED_NAME(1027)
-    , CIMMYT_SELECTION_HISTORY(1028)
-    , CIMMYT_WHEAT_PEDIGREE(1029)
+    GERMPLASM_BANK_ACCESSION_NUMBER
+    , CROSS_NAME
+    , UNNAMED_CROSS
+    , RELEASE_NAME
+    , DERIVATIVE_NAME
+    , CULTIVAR_NAME
+    , ABBREVIATED_CULTIVAR_NAME
+    , SPECIES_NAME
+    , COLLECTORS_NUMBER
+    , FOREIGN_ACCESSION_NUMBER
+    , INTERNATIONAL_TESTING_NUMBER
+    , NATIONAL_TESTING_NUMBER
+    , LINE_NAME
+    , TEMPORARY_ACCESSION_NUMBER_QUARANTINE_NUMBER
+    , ALTERNATIVE_DERIVATIVE_NAME
+    , ALTERNATIVE_CULTIVAR_NAME
+    , ALTERNATIVE_ABBREVIATION
+    , OLD_MUTANT_NAME_1
+    , OLD_MUTANT_NAME_2
+    , ELITE_LINES
+    , MANAGEMENT_NAME
+    , DONORS_ACCESSION_NUMBER
+    , LOCAL_COMMON_NAME_OF_WILD_RICE_SPECIE
+    , IRRI_HRDC_CODE
+    , GQNPC_Unique_ID
+    , NATIONAL_RICE_COOPERATIVE_TESTING_PROJECT_ID
+    , TRANSGENIC_EVENT_ID
+    , ALTERNATE_CROSS_NAME
+    , CIAT_GERMPLASM_BANK_ACCESSION_NUMBER
+    , UNRESOLVED_NAME
+    , CIMMYT_SELECTION_HISTORY
+    , CIMMYT_WHEAT_PEDIGREE
     ;
 
-    private final int userDefinedField;
+    private static final Logger LOG = LoggerFactory.getLogger(GermplasmNameType.class);
+    
+    private static final String PROPERTY_FILE = "constants/germplasmNameType.properties";
 
-    private GermplasmNameType(int id) {
-        this.userDefinedField = id;
+    public int getId(){
+        int id = 0;
+        String value = null;
+        Properties configFile = new Properties();
+        try {
+            configFile.load(TermId.class.getClassLoader().getResourceAsStream(PROPERTY_FILE));
+            value = configFile.getProperty(this.toString().trim());
+            id = Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            LOG.error("Invalid ID: " + value, e);
+        } catch (IOException e) {
+            LOG.error("Error accessing property file: " + PROPERTY_FILE, e); 
+        }
+        if (id == 0){
+            LOG.error("ID value not found: " + value);
+        }
+        return id;
     }
-
+    
     public int getUserDefinedFieldID() {
-        return this.userDefinedField;
+        return getId();
     }
+    
 }

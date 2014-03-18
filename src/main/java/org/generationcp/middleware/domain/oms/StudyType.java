@@ -11,46 +11,51 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import org.generationcp.middleware.util.PropertyReader;
+
 /**
  * The possible study types used in Middleware.
+ * Values are stored in studyType.properties.
  *
  */
 public enum StudyType {
 
 	//CV_ID = 2010
-	N("N", 10000, "Nursery")
-	,HB("HB", 10001, "Hybridization Nursery")
-	,PN("PN", 10002, "Pedigree Nursery")
-	,CN("CN", 10003, "Characterization Nursery")
-	,OYT("OYT", 10005, "Observational Yield Trial")
-	,BON("BON", 10007, "BULU Observational Nursery")
-	,T("T", 10010, "Trial")
-	,RYT("RYT", 10015, "Replication Yield Trial")
-	,OFT("OFT", 10017, "On Form Trial")
-	,S("S", 10020, "Survey")
-	,E("E", 10030, "Experiment");
+    N("N_NAME", "N_ID", "N_LABEL")
+    ,HB("HB_NAME", "H_ID", "H_LABEL")
+    ,PN("PN_NAME", "PN_ID", "PN_LABEL")
+    ,CN("CN_NAME", "CN_ID", "CN_LABEL")
+    ,OYT("OYT_NAME", "OYT_ID", "OYT_LABEL")
+    ,BON("BON_NAME", "BON_ID", "BON_LABEL")
+    ,T("T_NAME", "T_ID", "T_LABEL")
+    ,RYT("RYT_NAME", "RYT_ID", "RYT_LABEL")
+    ,OFT("OFT_NAME", "OFT_ID", "OFT_LABEL")
+    ,S("S_NAME", "S_ID", "S_LABEL")
+    ,E("E_NAME", "E_ID", "E_LABEL");
 	
-	
-	private final int id;
 	private final String name; 
+    private final String id;
 	private final String label;
 	
-	private StudyType(String name, int id, String label) {
+    private static final String PROPERTY_FILE = "constants/studyType.properties";
+    private static final PropertyReader propertyReader = new PropertyReader(PROPERTY_FILE);        
+
+    private StudyType(String name, String id, String label) {
 		this.name = name;
 		this.id = id;
 		this.label = label;
 	}
 	
 	public int getId() {
-		return this.id;
-	}
+	    return propertyReader.getIntegerValue(this.id);
+    }
 
     public String getName() {
-        return name;
+        return propertyReader.getValue(this.name);
     }
 
     public String getLabel() {
-        return label;
+        return propertyReader.getValue(this.label);
     }
 
     public static StudyType getStudyType(String name) {
@@ -62,4 +67,6 @@ public enum StudyType {
 
         return null;
     }
+    
+            
 }

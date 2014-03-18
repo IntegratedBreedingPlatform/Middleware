@@ -1,18 +1,39 @@
+/*******************************************************************************
+ * Copyright (c) 2013, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.util.PropertyReader;
+
+/**
+ * Values are stored in gdmsTable.properties.
+ *
+ */
 public enum GdmsTable {
 	
-	GDMS_DATASET("gdms_dataset", "dataset_id")
-	, GDMS_MARKER("gdms_marker", "marker_id")
-	, GDMS_CHAR_VALUES("gdms_char_values", "ac_id")
-	, GDMS_ALLELE_VALUES("gdms_allele_values", "an_id")
-	, GDMS_DART_VALUES("gdms_dart_values", "ad_id")
-	, GDMS_MAPPING_POP_VAUES("gdms_mapping_pop_values", "mp_id")
-	, GDMS_MTA("gdms_mta", "mta_id")
+	GDMS_DATASET("GDMS_DATASET_TABLE", "GDMS_DATASET_ID")
+	, GDMS_MARKER("GDMS_MARKER_TABLE", "GDMS_MARKER_ID")
+	, GDMS_CHAR_VALUES("GDMS_CHAR_VALUES_TABLE", "GDMS_CHAR_VALUES_ID")
+	, GDMS_ALLELE_VALUES("GDMS_ALLELE_VALUES_TABLE", "GDMS_ALLELE_VALUES_ID")
+	, GDMS_DART_VALUES("GDMS_DART_VALUES_TABLE", "GDMS_DART_VALUES_ID")
+	, GDMS_MAPPING_POP_VAUES("GDMS_MAPPING_POP_VAUES_TABLE", "GDMS_MAPPING_POP_VAUES_ID")
+	, GDMS_MTA("GDMS_MTA_TABLE", "GDMS_MTA_ID")
 	;
 
 	private final String tableName;
 	private final String idName;
+	
+    private static final String PROPERTY_FILE = "constants/gdmsTable.properties";
+    private static final PropertyReader propertyReader = new PropertyReader(PROPERTY_FILE);
+
 	
 	private GdmsTable(String tableName, String idName) {
 		this.tableName = tableName;
@@ -20,11 +41,12 @@ public enum GdmsTable {
 	}
 
 	public String getTableName() {
-		return tableName;
+		return propertyReader.getValue(tableName);
 	}
 
 	public String getIdName() {
-		return idName;
+		return propertyReader.getValue(idName);
 	}
+	
 
 }

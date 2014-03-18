@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.Values;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
@@ -235,7 +234,9 @@ public class WorkbookSaver extends Saver {
         
         watch.restart("set to observations(total)");
     	for(MeasurementRow row : workbook.getObservations()) {
-   			row.setLocationId(studyLocationId);
+    	    if (studyLocationId != null){
+    	        row.setLocationId(studyLocationId);
+    	    }
         }
     	watch.stop();
 
@@ -337,7 +338,11 @@ public class WorkbookSaver extends Saver {
 	
 	private int createStudyIfNecessary(Workbook workbook, int studyLocationId, boolean saveStudyExperiment) throws Exception {
 		TimerWatch watch = new TimerWatch("find study", LOG);
-		Integer studyId = getStudyId(workbook.getStudyDetails().getStudyName());
+	
+		Integer studyId = null;
+		if (workbook.getStudyDetails() != null){
+		    studyId = getStudyId(workbook.getStudyDetails().getStudyName());
+		}
 
 		if (studyId == null) {
 			watch.restart("transform variables for study");
@@ -438,7 +443,7 @@ public class WorkbookSaver extends Saver {
 		
 		Session session = getCurrentSessionForLocal();
 		int i = 0;
-		List<Integer> variableIndexesList = new ArrayList();
+		List<Integer> variableIndexesList = new ArrayList<Integer>();
 		//we get the indexes so that in the next rows we dont need to compare anymore per row
 		if(workbook.getObservations() != null && workbook.getObservations().size() != 0){
 			MeasurementRow row = workbook.getObservations().get(0);

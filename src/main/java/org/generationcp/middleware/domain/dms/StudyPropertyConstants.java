@@ -12,6 +12,7 @@
 package org.generationcp.middleware.domain.dms;
 
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.util.PropertyReader;
 
 /**
  * The constants of StudyProperty - e.g. USER_ID, STUDY_TYPE, START_DATE.
@@ -19,17 +20,21 @@ import org.generationcp.middleware.domain.oms.TermId;
  */
 public enum StudyPropertyConstants {
 
-	USER_ID (TermId.STUDY_UID.getId(), "USERID", "User ID", 1)
-	, STUDY_TYPE (TermId.STUDY_TYPE.getId(), "TYPE", "Study type", 2)
-	, START_DATE (TermId.START_DATE.getId(), "START", "Start date", 3)
+	USER_ID (TermId.STUDY_UID.getId(), "USER_ID_NAME", "USER_ID_DESCRIPTION", "USER_ID_RANK")
+	, STUDY_TYPE (TermId.STUDY_TYPE.getId(), "STUDY_TYPE_NAME", "STUDY_TYPE_DESCRIPTION", "STUDY_TYPE_RANK")
+	, START_DATE (TermId.START_DATE.getId(), "START_DATE_NAME", "START_DATE_DESCRIPTION", "START_DATE_RANK")
 	;
 	
 	private Integer cvTermId;
 	private String name;
 	private String description;
-	private Integer rank;
+	private String rank;
 	
-	StudyPropertyConstants(Integer cvTermId, String name, String description, Integer rank) {
+    private static final String PROPERTY_FILE = "constants/studyPropertyConstants.properties";
+    private static final PropertyReader propertyReader = new PropertyReader(PROPERTY_FILE);
+
+	
+	StudyPropertyConstants(Integer cvTermId, String name, String description, String rank) {
 		this.cvTermId = cvTermId;
 		this.name = name;
 		this.description = description;
@@ -41,15 +46,15 @@ public enum StudyPropertyConstants {
 	}
 	
 	public String getName() {
-		return this.name;
+		return propertyReader.getValue(this.name);
 	}
 	
 	public String getDescription() {
-		return this.description;
+		return propertyReader.getValue(this.description);
 	}
 	
 	public Integer getRank() {
-		return this.rank;
+		return propertyReader.getIntegerValue(this.rank);
 	}
 	
 	

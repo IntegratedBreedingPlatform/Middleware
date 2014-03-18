@@ -11,34 +11,38 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.PropertyReader;
+
 /**
  * The different dataset types used - e.g. study conditions, means, summary, plot.
+ * Values are stored in dataSetType.properties.
  *
  */
 public enum DataSetType {
 
-	STUDY_CONDITIONS (10060)
-	, MEANS_DATA (10070)
-	, SUMMARY_DATA (10080)
-	, PLOT_DATA (10090)
+	STUDY_CONDITIONS
+	, MEANS_DATA
+	, SUMMARY_DATA
+	, PLOT_DATA
 	;
 	
-	private int id;
+    private static final String PROPERTY_FILE = "constants/dataSetType.properties";
+    private static final PropertyReader propertyReader = new PropertyReader(PROPERTY_FILE);
+
+    public int getId(){
+        return propertyReader.getIntegerValue(this.toString().trim());
+    }
 	
-	private DataSetType(int id) {
-		this.id = id;
-	}
+
+    public static DataSetType findById(int id) {
+        for (DataSetType type : DataSetType.values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
+    }
+    
 	
-	public int getId() {
-		return this.id;
-	}
 	
-	public static DataSetType findById(int id) {
-		for (DataSetType type : DataSetType.values()) {
-			if (type.getId() == id) {
-				return type;
-			}
-		}
-		return null;
-	}
 }
