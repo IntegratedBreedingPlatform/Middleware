@@ -3,6 +3,7 @@ package org.generationcp.middleware.operation.saver;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,17 +33,38 @@ public class LocdesSaver extends Saver {
 				
 				setWorkingDatabase(blockInfo.getBlockId());
 				List<Locdes> descriptions = getLocdesDao().getByLocation(blockInfo.getBlockId());
+				Map<String, Integer> udfldMap = getUdfldMap();
 				
 				setWorkingDatabase(Database.LOCAL);
-				saveOrUpdateLocdes(blockId, descriptions, LocdesType.COLUMNS_IN_BLOCK, blockInfo.getNumberOfColumnsInBlock());
-				saveOrUpdateLocdes(blockId, descriptions, LocdesType.RANGES_IN_BLOCK, blockInfo.getNumberOfRangesInBlock());
-				saveOrUpdateLocdes(blockId, descriptions, LocdesType.ROWS_IN_PLOT, blockInfo.getNumberOfRowsPerPlot());
-				saveOrUpdateLocdes(blockId, descriptions, LocdesType.MACHINE_ROW_CAPACITY, blockInfo.getMachineRowCapacity());
-				saveOrUpdateLocdes(blockId, descriptions, LocdesType.PLANTING_ORDER, blockInfo.getPlantingOrder());
+				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.COLUMNS_IN_BLOCK), blockInfo.getNumberOfColumnsInBlock());
+				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.RANGES_IN_BLOCK), blockInfo.getNumberOfRangesInBlock());
+				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.ROWS_IN_PLOT), blockInfo.getNumberOfRowsPerPlot());
+				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.MACHINE_ROW_CAPACITY), blockInfo.getMachineRowCapacity());
+				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.PLANTING_ORDER), blockInfo.getPlantingOrder());
 				
 				updateDeletedPlots(blockId, descriptions, blockInfo.getDeletedPlots());
 			}
 		}
+	}
+	
+	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
+		setWorkingDatabase(Database.CENTRAL);
+		Map<String, Integer> udfldMap = getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE", 
+				Arrays.asList(LocdesType.COLUMNS_IN_BLOCK.getCode()
+						, LocdesType.RANGES_IN_BLOCK.getCode()
+						, LocdesType.ROWS_IN_PLOT.getCode()
+						, LocdesType.MACHINE_ROW_CAPACITY.getCode()
+						, LocdesType.PLANTING_ORDER.getCode()
+						, LocdesType.DELETED_PLOTS.getCode()));
+		return udfldMap;
+	}
+	
+	private int getId(Map<String, Integer> map, LocdesType type) throws MiddlewareQueryException {
+		Integer id = map.get(type.getCode());
+		if (id == null) {
+			throw new MiddlewareQueryException("Locdes Type " + type.getCode() + " does not exists, please contact your system administrator");
+		}
+		return id;
 	}
 	
 	public void updateDeletedPlots(List<FieldMapInfo> infoList) throws MiddlewareQueryException {
@@ -60,8 +82,9 @@ public class LocdesSaver extends Saver {
 		}
 	}
 	
-	public void updateDeletedPlots(Integer locId, List<Locdes> descriptions, List<String> deletedPlots) throws MiddlewareQueryException {
-		List<Locdes> savedDeletedPlots = findAllLocdes(descriptions, LocdesType.DELETED_PLOTS);
+	private void updateDeletedPlots(Integer locId, List<Locdes> descriptions, List<String> deletedPlots) throws MiddlewareQueryException {
+		Map<String, Integer> udfldMap = getUdfldMap();
+		List<Locdes> savedDeletedPlots = findAllLocdes(descriptions, getId(udfldMap, LocdesType.DELETED_PLOTS));
 		if (savedDeletedPlots != null && !savedDeletedPlots.isEmpty()) {
 			for (Locdes savedDeletedPlot : savedDeletedPlots) {
 				getLocdesDao().makeTransient(savedDeletedPlot);
@@ -69,26 +92,26 @@ public class LocdesSaver extends Saver {
 		}
 		if (deletedPlots != null && !deletedPlots.isEmpty()) {
 			for (String deletedPlot : deletedPlots) {
-				Locdes locdes = createLocdes(locId, LocdesType.DELETED_PLOTS, deletedPlot);
+				Locdes locdes = createLocdes(locId, getId(udfldMap, LocdesType.DELETED_PLOTS), deletedPlot);
 				getLocdesDao().save(locdes);
 			}
 		}
 	}
 	
-	private void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, LocdesType type, Object value) throws MiddlewareQueryException {
+	private void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value) throws MiddlewareQueryException {
 		if (value != null) {
-			Locdes locdes = findLocdes(descriptions, type);
+			Locdes locdes = findLocdes(descriptions, typeId);
 			if (locdes == null) {
-				locdes = createLocdes(locId, type, value);
+				locdes = createLocdes(locId, typeId, value);
 			}
 			getLocdesDao().saveOrUpdate(locdes);
 		}
 	}
 	
-	private Locdes findLocdes(List<Locdes> descriptions, LocdesType type) {
+	private Locdes findLocdes(List<Locdes> descriptions, int typeId) {
 		if (descriptions != null && !descriptions.isEmpty()) {
 			for (Locdes description : descriptions) {
-				if (description.getTypeId() == type.getId()) {
+				if (description.getTypeId() == typeId) {
 					return description;
 				}
 			}
@@ -96,11 +119,11 @@ public class LocdesSaver extends Saver {
 		return null;
 	}
 	
-	private List<Locdes> findAllLocdes(List<Locdes> descriptions, LocdesType type) {
+	private List<Locdes> findAllLocdes(List<Locdes> descriptions, int typeId) {
 		List<Locdes> list = new ArrayList<Locdes>();
 		if (descriptions != null && !descriptions.isEmpty()) {
 			for (Locdes description : descriptions) {
-				if (description.getTypeId() == type.getId()) {
+				if (description.getTypeId() == typeId) {
 					list.add(description);
 				}
 			}
@@ -108,11 +131,11 @@ public class LocdesSaver extends Saver {
 		return list;
 	}
 	
-	private Locdes createLocdes(Integer locId, LocdesType type, Object value) throws MiddlewareQueryException {
+	private Locdes createLocdes(Integer locId, int typeId, Object value) throws MiddlewareQueryException {
 		Locdes locdes = new Locdes();
 		locdes.setLdid(getLocdesDao().getNegativeId("ldid"));
 		locdes.setLocationId(locId);
-		locdes.setTypeId(type.getId());
+		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
 		DateFormat df = new SimpleDateFormat("YYYYMMDD");
 		locdes.setDdate(Integer.valueOf(df.format(new Date())));
