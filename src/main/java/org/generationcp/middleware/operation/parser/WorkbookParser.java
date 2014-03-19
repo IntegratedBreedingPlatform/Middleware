@@ -405,9 +405,14 @@ public class WorkbookParser {
         Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
         Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
         
-        // GCP-7541 limit the observations rows to prevent Out-Of-Memory error.
+        // GCP-7541 limit the observations rows
         Integer maxLimit = 10000;
-        if (lastRowNum > maxLimit){
+        if (lastRowNum == 0){
+        	List<Message> messages = new ArrayList<Message>();
+        	Message message = new Message("error.observation.no.records");
+        	messages.add(message);
+        	throw new WorkbookParserException(messages);
+        } else if (lastRowNum > maxLimit){
         	List<Message> messages = new ArrayList<Message>();
         	Message message = new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(maxLimit));
         	messages.add(message);
