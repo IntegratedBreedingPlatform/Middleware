@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -29,6 +28,10 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.LocationType;
+import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -156,6 +159,41 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
 
     @Override
+    public Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType type) 
+            throws MiddlewareQueryException{
+        Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
+        
+        List<UserDefinedField> dTypeFields = getUserDefinedFieldByFieldTableNameAndType(type.getTable(), type.getType());
+        for (UserDefinedField dTypeField: dTypeFields){
+            types.put(dTypeField.getFcode(),  dTypeField);
+        }
+        return types;
+    }
+    
+    @Override
+    public Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code) 
+            throws MiddlewareQueryException{
+        Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
+        
+        List<UserDefinedField> dTypeFields = getUserDefinedFieldByFieldTableNameAndType(
+                                                tableType.getTable(), tableType.getType());
+        for (UserDefinedField dTypeField: dTypeFields){
+            types.put(dTypeField.getFcode(),  dTypeField);
+        }
+        
+        return types.get(code) != null ? types.get(code).getFldno() : null;
+    }
+
+
+    @Override
+    public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType)
+            throws MiddlewareQueryException {
+        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getUserDefinedFieldDao()
+                , "getByFieldTableNameAndType", new Object[] { tableName, fieldType }
+        , new Class[] { String.class, String.class });
+    }
+
+    @Override
     public Country getCountryById(Integer id) throws MiddlewareQueryException {
         if (setWorkingDatabase(id)) {
             return getCountryDao().getById(id, false);
@@ -171,6 +209,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException {
         List<Location> results = new ArrayList<Location>();
@@ -366,14 +405,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
 
     @Override
-    public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType)
-            throws MiddlewareQueryException {
-        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getUserDefinedFieldDao()
-                , "getByFieldTableNameAndType", new Object[] { tableName, fieldType }
-        , new Class[] { String.class, String.class });
-    }
-
-    @Override
     public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
         Database centralInstance = Database.CENTRAL;
         Database localInstance = Database.LOCAL;
@@ -399,27 +430,70 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			 return getLocationDao().getNegativeId("locid");
 			
 	}    
-	
 
     @Override
     public List<Location> getAllFieldLocations(int locationId)
             throws MiddlewareQueryException {
-        //TODO TEMPORARY IMPLEMENTATION - FOR TESTING ONLY
-        return getAllLocations().subList(0, 50);
+        Integer fieldParentFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
+        Integer fieldLtypeFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+
+        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
+            , new Object[]{String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId}
+            , new Class[]{String.class, Integer.class, Integer.class});
     }
 
     @Override
     public List<Location> getAllBlockLocations(int fieldId)
             throws MiddlewareQueryException {
-        //TODO TEMPORARY IMPLEMENTATION - FOR TESTING ONLY
-        return getAllLocations().subList(0, 50);
-    }
+        Integer blockParentFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
+        Integer blockLtypeFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
+        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
+                , new Object[]{String.valueOf(fieldId), blockParentFldId, blockLtypeFldId}
+                , new Class[]{String.class, Integer.class, Integer.class});
+    }
+    
     @Override
-    public FieldmapBlockInfo getBlockInformation(int blockId)
-            throws MiddlewareQueryException {
-        // TODO Auto-generated method stub
-        return new FieldmapBlockInfo(blockId, 20, 20, 20, false);
+    public FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException {
+        int rowsInBlock = 0;
+        int rowsInPlot = 0;
+        int rangesInBlock = 0;
+        int plantingOrder = 0;
+        int machineRowCapacity = 0;
+        boolean isNew = true;
+        
+        Map<String, UserDefinedField> dTypes = getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
+
+        List<Locdes> locdesOfLocation = getLocdesDao().getByLocation(blockId);
+        
+        for (Locdes locdes : locdesOfLocation){
+            if (locdes != null){
+                int typeId = locdes.getTypeId();
+                int value = 0;
+                try {
+                    value = Integer.parseInt(locdes.getDval());
+                }catch (NumberFormatException e) {
+                    value = 0; // if it's nut a number, set to 0
+                }
+                if (typeId == dTypes.get(LocdesType.COLUMNS_IN_BLOCK.getCode()).getFldno()){
+                    rowsInBlock = value;
+                }else if (typeId == dTypes.get(LocdesType.ROWS_IN_PLOT.getCode()).getFldno()){
+                    rowsInPlot = value;
+                } else if (typeId == dTypes.get(LocdesType.RANGES_IN_BLOCK.getCode()).getFldno()){
+                    rangesInBlock = value;
+                } else if (typeId == dTypes.get(LocdesType.PLANTING_ORDER.getCode()).getFldno()){
+                    plantingOrder = value;
+                } else if (typeId == dTypes.get(LocdesType.MACHINE_ROW_CAPACITY.getCode()).getFldno()){
+                    machineRowCapacity = value;
+                }
+            }
+        }
+        
+        if (rowsInBlock > 0 || rangesInBlock > 0 || rowsInPlot > 0){
+            isNew = false;
+        }
+        
+        return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew);
     }
     
 }

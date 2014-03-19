@@ -788,6 +788,14 @@ public class DatabaseBroker {
         return locationDao;
     }
 
+    protected final LocdesDAO getLocDesDao() {
+        if (locdesDao == null) {
+            locdesDao = new LocdesDAO();
+        }
+        locdesDao.setSession(getActiveSession());
+        return locdesDao;
+    }
+
     protected final MethodDAO getMethodDao() {
         if (methodDao == null) {
             methodDao = new MethodDAO();

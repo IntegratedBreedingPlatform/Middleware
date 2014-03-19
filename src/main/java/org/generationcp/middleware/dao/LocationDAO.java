@@ -460,4 +460,51 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         
         return toreturn;
     }
+    
+
+    @SuppressWarnings("unchecked")
+    public List<Location> getLocationsByDTypeAndLType(String dval
+            , Integer dType, Integer lType) throws MiddlewareQueryException {
+        List<Location> locations = new ArrayList<Location>();
+        try {
+            StringBuilder sqlString = new StringBuilder()
+            .append("SELECT  l.locid, l.ltype, l.nllp, l.lname, l.labbr")
+            .append(", l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce ")
+            .append("FROM locdes ld INNER JOIN location l ")
+            .append(" ON l.locid = ld.locid ")
+            .append("WHERE dtype = :dtype  AND ltype = :ltype ")
+            ;
+            
+            SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameter("dtype", dType);
+            query.setParameter("ltype", lType);
+            
+            List<Object[]> results = query.list();
+
+            if (results.size() > 0) {
+                for (Object[] row : results) {
+                    Integer locid = (Integer) row[0];
+                    Integer ltype = (Integer) row[1];
+                    Integer nllp = (Integer) row[2];
+                    String lname = (String) row[3];
+                    String labbr = (String) row[4];
+                    Integer snl3id = (Integer) row[5];
+                    Integer snl2id = (Integer) row[6];
+                    Integer snl1id = (Integer) row[7];
+                    Integer cntryid = (Integer) row[8];
+                    Integer lrplce = (Integer) row[9];
+                    
+                    locations.add(new Location(
+                            locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce));
+                    
+                }
+            }
+            
+            
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getLoctionsByDTypeAndLType(dtype=" + dType 
+                    + ", ltype=" + lType + ") query from Locdes: " + e.getMessage(), e);
+        }
+        return locations;
+    }
 }
