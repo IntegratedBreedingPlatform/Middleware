@@ -462,7 +462,7 @@ public interface StudyDataManager{
      * @param info the info
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info) throws MiddlewareQueryException;
+    void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) throws MiddlewareQueryException;
     
     /**
      * Save Project Properties of the Project.

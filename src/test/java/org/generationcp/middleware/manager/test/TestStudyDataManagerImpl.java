@@ -1133,7 +1133,7 @@ public class TestStudyDataManagerImpl{
         }*/
         //TODO
     	List<FieldMapInfo> info = createFieldmapData();
-        manager.saveOrUpdateFieldmapProperties(info);
+        manager.saveOrUpdateFieldmapProperties(info, -1, false);
     }
     
     @Test
