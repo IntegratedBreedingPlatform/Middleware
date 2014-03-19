@@ -555,13 +555,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<Location> getAllFieldLocations(int locationId)
 			throws MiddlewareQueryException {
-    	return getLocationDataManager().getAllLocations().subList(0, 50);
+    	return getLocationDataManager().getAllFieldLocations(locationId);
 	}
 
 	@Override
 	public List<Location> getAllBlockLocations(int fieldId)
 			throws MiddlewareQueryException {
-        return getLocationDataManager().getAllLocations().subList(0, 50);
+        return getLocationDataManager().getAllBlockLocations(fieldId);
 	}
 
 	@Override
