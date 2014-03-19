@@ -697,4 +697,13 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException;
+    
+    /**
+     * 
+     * @param blockId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
+            throws MiddlewareQueryException;
 }

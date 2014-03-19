@@ -414,4 +414,7 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId)throws MiddlewareQueryException;
+    
+    List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
+            throws MiddlewareQueryException;
 }

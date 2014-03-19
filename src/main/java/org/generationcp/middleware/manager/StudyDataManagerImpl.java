@@ -679,7 +679,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         setWorkingDatabase(datasetId);
         
         fieldMapInfos = getExperimentPropertyDao()
-                .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
+                .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
         
         int blockId = getBlockId(fieldMapInfos);
         FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
@@ -714,6 +714,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return fieldMapInfos;
     }
 
+    @Override
+    public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
+            throws MiddlewareQueryException {
+
+        List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
+        setWorkingDatabase(Database.LOCAL);
+        
+        fieldMapInfos = getExperimentPropertyDao()
+                .getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
+        
+        FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
+        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
+
+        return fieldMapInfos;
+    }
+    
+    
     @Override
     public boolean isStudy(int id) throws MiddlewareQueryException {
         setWorkingDatabase(id);
