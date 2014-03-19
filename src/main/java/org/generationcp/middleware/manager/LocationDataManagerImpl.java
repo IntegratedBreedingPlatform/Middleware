@@ -496,4 +496,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew);
     }
     
+    @Override
+    public List<Location> getAllFields() throws MiddlewareQueryException{
+        Integer fieldLtype = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType"
+                , new Object[]{fieldLtype} , new Class[]{Integer.class});
+        }
+    
 }

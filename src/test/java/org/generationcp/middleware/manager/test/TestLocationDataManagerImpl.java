@@ -439,6 +439,12 @@ public class TestLocationDataManagerImpl{
         Debug.println(3, result);
     }
 
+    @Test
+    public void testGetAllFields() throws Exception {
+        List<Location> result = manager.getAllFields();
+        assertNotNull(result);
+        Debug.printObjects(3, result);
+    }
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

@@ -567,8 +567,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllFields() throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
-		return new ArrayList();
+	    return getLocationDataManager().getAllFields();
 	}
 
 	@Override

@@ -390,5 +390,13 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException;
+
+    /**
+     * Retrieves all location entries from both central and local where location type = FIELD
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Location> getAllFields() throws MiddlewareQueryException;
     
 }
