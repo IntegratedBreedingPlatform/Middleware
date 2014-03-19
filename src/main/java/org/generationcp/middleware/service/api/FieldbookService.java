@@ -35,6 +35,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -323,18 +324,94 @@ public interface FieldbookService {
      */
     List<Person> getAllPersons() throws MiddlewareQueryException;
     
+    /**
+     * Count plots with plants selectedof nursery.
+     *
+     * @param nurseryId the nursery id
+     * @return the int
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException;
     
+    /**
+     * Filter standard variables by mode.
+     *
+     * @param storedInIds the stored in ids
+     * @return the list
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) throws MiddlewareQueryException;
     
+    /**
+     * Gets the nursery variable settings.
+     *
+     * @param id the id
+     * @return the nursery variable settings
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException;
     
+    /**
+     * Gets the germplasms.
+     *
+     * @param gids the gids
+     * @return the germplasms
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
     
+    /**
+     * Gets the all field locations.
+     *
+     * @param locationId the location id
+     * @return the all field locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     List<Location> getAllFieldLocations(int locationId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the all block locations.
+     *
+     * @param fieldId the field id
+     * @return the all block locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     List<Location> getAllBlockLocations(int fieldId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the block information.
+     *
+     * @param blockId the block id
+     * @return the block information
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the all fields.
+     *
+     * @return the all fields
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     List<Location> getAllFields()throws MiddlewareQueryException;
-    int addFieldLocation(String fieldName, Integer parentlocationId)throws MiddlewareQueryException;
+    
+    /**
+     * Adds the field location.
+     *
+     * @param fieldName the field name
+     * @param parentlocationId the parentlocation id
+     * @return the int
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    int addFieldLocation(String fieldName, Integer parentLocationId)throws MiddlewareQueryException;
+    
+    /**
+     * Adds the block location.
+     *
+     * @param blockName the block name
+     * @param parentFieldId the parent field id
+     * @return the int
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     int addBlockLocation(String blockName, Integer parentFieldId)throws MiddlewareQueryException;
 }

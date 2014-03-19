@@ -20,9 +20,11 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for managing Location information.
  * 
@@ -307,6 +309,16 @@ public interface LocationDataManager {
     List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
     
     /**
+     * Adds location and locdes.
+     *
+     * @param location the location
+     * @param locdes the locdes
+     * @return the integer
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException;
+
+    /**
      * Deletes a single {@code Location} object into the database.
      *
      * @param location - The {@code Location} object to be deleted from the database.
@@ -392,10 +404,10 @@ public interface LocationDataManager {
     FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException;
 
     /**
-     * Retrieves all location entries from both central and local where location type = FIELD
-     * 
-     * @return
-     * @throws MiddlewareQueryException
+     * Retrieves all location entries from both central and local where location type = FIELD.
+     *
+     * @return the all fields
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Location> getAllFields() throws MiddlewareQueryException;
     

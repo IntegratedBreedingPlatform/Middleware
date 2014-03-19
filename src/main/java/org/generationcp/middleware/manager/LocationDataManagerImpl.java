@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -316,7 +317,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Location: GermplasmDataManager.addLocation(location=" + location + "): "
+            logAndThrowException("Error encountered while saving Location: LocationDataManager.addLocation(location=" + location + "): "
                     + e.getMessage(), e, LOG);
         } finally {
             session.flush();
@@ -349,12 +350,47 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Locations: GermplasmDataManager.addLocation(locations=" + locations
+            logAndThrowException("Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations
                     + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
         return idLocationsSaved;
+    }
+
+    @Override
+    public int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idLocationSaved = null;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            // Auto-assign negative IDs for new local DB records
+            LocationDAO locationDao = getLocationDao();
+            Integer negativeId = locationDao.getNegativeId("locid");
+            location.setLocid(negativeId);
+            Location recordSaved = locationDao.saveOrUpdate(location);
+            idLocationSaved = recordSaved.getLocid();
+            
+            LocdesDAO locdesDao = getLocdesDao();
+            negativeId = locdesDao.getNegativeId("ldid");
+            locdes.setLdid(negativeId);
+            locdes.setLocationId(idLocationSaved);
+            locdesDao.saveOrUpdate(locdes);
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Location: addLocationAndLocdes(" +
+            		"location=" + location + ", locdes=" + locdes + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return idLocationSaved;
     }
 
     @Override
@@ -369,7 +405,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while deleting Location: GermplasmDataManager.deleteLocation(location=" + location
+            logAndThrowException("Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location
                     + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
@@ -501,6 +537,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         Integer fieldLtype = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
         return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType"
                 , new Object[]{fieldLtype} , new Class[]{Integer.class});
-        }
+    }
+    
+
     
 }

@@ -44,13 +44,18 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationType;
+import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -571,20 +576,31 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int addFieldLocation(String fieldName, Integer parentlocationId)
+	public int addFieldLocation(String fieldName, Integer parentLocationId)
 			throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
-		return 0;
+	    LocationDataManager manager = getLocationDataManager();
+	    
+	    Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+	    Location location = new Location(null, lType, 0, fieldName, "-", 0, 0, 0, 0, 0);
+
+	    Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
+	    Locdes locdes = new Locdes(null, null, dType, 0, String.valueOf(parentLocationId), 0, 0);
+
+	    return manager.addLocationAndLocdes(location, locdes);
 	}
 
 	@Override
 	public int addBlockLocation(String blockName, Integer parentFieldId)
 			throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+        LocationDataManager manager = getLocationDataManager();
+        
+        Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+        Location location = new Location(null, lType, 0, blockName, "-", 0, 0, 0, 0, 0);
 
-	
-    
+        Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
+        Locdes locdes = new Locdes(null, null, dType, 0, String.valueOf(parentFieldId), 0, 0);
+        
+        return manager.addLocationAndLocdes(location, locdes);
+	}    
     
 }
