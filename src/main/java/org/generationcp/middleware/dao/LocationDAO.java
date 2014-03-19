@@ -472,12 +472,13 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             .append(", l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce ")
             .append("FROM locdes ld INNER JOIN location l ")
             .append(" ON l.locid = ld.locid ")
-            .append("WHERE dtype = :dtype  AND ltype = :ltype ")
+            .append("WHERE dtype = :dtype  AND ltype = :ltype AND dval = :dval ")
             ;
             
             SQLQuery query = getSession().createSQLQuery(sqlString.toString());
             query.setParameter("dtype", dType);
             query.setParameter("ltype", lType);
+            query.setParameter("dval", dval);
             
             List<Object[]> results = query.list();
 
