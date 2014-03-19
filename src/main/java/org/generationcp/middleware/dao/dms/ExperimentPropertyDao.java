@@ -146,7 +146,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("       AND geo.type_id = ").append(TermId.PLOT_EXPERIMENT.getId())
                 .append(" INNER JOIN nd_geolocation inst ON geo.nd_geolocation_id = inst.nd_geolocation_id ")
                 .append(" LEFT JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
-                .append("       AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
+                .append("       AND site.type_id = ").append(TermId.LOCATION_ID.getId())
                 .append(" LEFT JOIN nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ")
                 .append("       AND blk.type_id = ").append(TermId.BLOCK_ID.getId())
                 .append(" INNER JOIN project proj on proj.project_id = eproj.project_id ")
@@ -178,7 +178,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("season")
                     ;
             query.setParameter("projectId", projectId);
-            System.out.println(sql.toString());
             List<Object[]> list =  query.list();           
             if (list != null && list.size() > 0) {
                 datasets = createFieldMapDatasetInfo(list);        
@@ -349,7 +348,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         //Integer columnsInBlock = null;
         //Integer plantingOrder = null;
         //Integer rowsPerPlot = null;
-        
         for (Object[] row : list) {
             if (geolocationId == null){
                 trialInstance = new FieldMapTrialInstanceInfo();
@@ -477,7 +475,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         dataset.setDatasetName(datasetName);
         dataset.setTrialInstances(trialInstances);
         datasets.add(dataset);
-        
+
         return datasets;
     }
     

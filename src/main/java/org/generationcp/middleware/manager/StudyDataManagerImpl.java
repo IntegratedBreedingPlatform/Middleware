@@ -575,11 +575,28 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             fieldMapInfos.add(fieldMapInfo);
         }
         
-        int blockId = getBlockId(fieldMapInfos);
-        FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
-        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
+        updateFieldMapInfoWithBlockInfo(fieldMapInfos);
 
         return fieldMapInfos;
+    }
+    
+    private void updateFieldMapInfoWithBlockInfo(List<FieldMapInfo> fieldMapInfos) throws MiddlewareQueryException{
+        if (fieldMapInfos != null) { 
+            for (FieldMapInfo info : fieldMapInfos) {
+                    if (info.getDatasets() != null) {
+                            for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+                                    if (dataset.getTrialInstances() != null) {
+                                            for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+                                                if (trial.getBlockId() != null) {
+                                                    FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
+                                                    trial.updateBlockInformation(blockInfo);
+                                                }
+                                            }
+                                    }
+                            }
+                    }
+            }
+        }
     }
 
     @Override
@@ -1089,7 +1106,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     private Integer getBlockId(List<FieldMapInfo> infos) {
-    	if (infos != null) {
+    	if (infos != null) { 
     		for (FieldMapInfo info : infos) {
     			if (info.getDatasets() != null) {
     				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
