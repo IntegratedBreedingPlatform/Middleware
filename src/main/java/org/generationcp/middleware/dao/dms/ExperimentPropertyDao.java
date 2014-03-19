@@ -192,7 +192,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
     }
     
     @SuppressWarnings("unchecked")
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException {
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, Integer blockId) throws MiddlewareQueryException {
         List<FieldMapInfo> fieldmaps = new ArrayList<FieldMapInfo>();
 
         try {
@@ -276,13 +276,19 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 //                .append("    INNER JOIN nd_experiment_project eproject ON eproject.nd_experiment_id = e.nd_experiment_id ")
 //                .append("    WHERE e.nd_geolocation_id = :geolocationId ")
 //                .append("    AND eproject.project_id = :datasetId) ")
-                .append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId())
-                .append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
-		        .append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
-			    .append(" AND bexp.nd_geolocation_id = :geolocationId ")
-			    .append(" INNER JOIN nd_experiment_project bep ON bep.nd_experiment_id = bexp.nd_experiment_id ")
-			    .append(" AND bep.project_id = :datasetId) ")
-                .append(" ORDER BY eproj.nd_experiment_id ").append(order);
+                .append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId());
+            
+	            if (blockId != null) {
+	            	sql.append(" AND blk.value = :blockId ");
+	            }
+	            else {
+	                sql.append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
+			        .append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
+				    .append(" AND bexp.nd_geolocation_id = :geolocationId ")
+				    .append(" INNER JOIN nd_experiment_project bep ON bep.nd_experiment_id = bexp.nd_experiment_id ")
+				    .append(" AND bep.project_id = :datasetId) ");
+	            }
+	            sql.append(" ORDER BY eproj.nd_experiment_id ").append(order);
                 
                 Query query = getSession().createSQLQuery(sql.toString())
                         .addScalar("datasetId")
@@ -313,9 +319,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("startDate")
                         .addScalar("season")
                         ;
-                query.setParameter("datasetId", datasetId);
-                query.setParameter("geolocationId", geolocationId);
-
+                
+                if (blockId != null) {
+                	query.setParameter("blockId", blockId);
+                }
+                else {
+	                query.setParameter("datasetId", datasetId);
+	                query.setParameter("geolocationId", geolocationId);
+                }
+                
                 List<Object[]> list =  query.list();           
                 
                 if (list != null && list.size() > 0) {

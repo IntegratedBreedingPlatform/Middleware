@@ -603,4 +603,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return manager.addLocationAndLocdes(location, locdes);
 	}    
     
+	@Override
+	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
+            throws MiddlewareQueryException {
+		return getStudyDataManager().getAllFieldMapsInBlockByBlockId(blockId);
+	}
 }
