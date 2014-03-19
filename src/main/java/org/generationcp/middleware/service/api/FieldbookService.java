@@ -403,7 +403,7 @@ public interface FieldbookService {
      * @return the int
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int addFieldLocation(String fieldName, Integer parentLocationId)throws MiddlewareQueryException;
+    int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId)throws MiddlewareQueryException;
     
     /**
      * Adds the block location.
@@ -413,5 +413,5 @@ public interface FieldbookService {
      * @return the int
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int addBlockLocation(String blockName, Integer parentFieldId)throws MiddlewareQueryException;
+    int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId)throws MiddlewareQueryException;
 }

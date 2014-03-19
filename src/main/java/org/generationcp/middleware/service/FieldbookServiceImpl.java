@@ -576,7 +576,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int addFieldLocation(String fieldName, Integer parentLocationId)
+	public int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId)
 			throws MiddlewareQueryException {
 	    LocationDataManager manager = getLocationDataManager();
 	    
@@ -584,13 +584,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	    Location location = new Location(null, lType, 0, fieldName, "-", 0, 0, 0, 0, 0);
 
 	    Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
-	    Locdes locdes = new Locdes(null, null, dType, 0, String.valueOf(parentLocationId), 0, 0);
+	    Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentLocationId), 0, 0);
 
 	    return manager.addLocationAndLocdes(location, locdes);
 	}
 
 	@Override
-	public int addBlockLocation(String blockName, Integer parentFieldId)
+	public int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId)
 			throws MiddlewareQueryException {
         LocationDataManager manager = getLocationDataManager();
         
@@ -598,7 +598,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         Location location = new Location(null, lType, 0, blockName, "-", 0, 0, 0, 0, 0);
 
         Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
-        Locdes locdes = new Locdes(null, null, dType, 0, String.valueOf(parentFieldId), 0, 0);
+        Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentFieldId), 0, 0);
         
         return manager.addLocationAndLocdes(location, locdes);
 	}    
