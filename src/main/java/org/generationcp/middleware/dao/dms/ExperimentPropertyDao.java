@@ -204,73 +204,84 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , st.name AS studyName ")
                 .append(" , e.nd_geolocation_id AS geolocationId ")
                 .append(" , site.value AS siteName ")
-                .append(" , uid.nd_experiment_id AS experimentId ")
+                .append(" , siteId.value AS siteId")
+                .append(" , e.nd_experiment_id AS experimentId ")
                 .append(" , s.uniqueName AS entryNumber ")
                 .append(" , s.name AS germplasmName ")
                 .append(" , epropRep.value AS rep ")
                 .append(" , epropPlot.value AS plotNo ")
                 .append(" , row.value AS row ")
-                .append(" , col.value AS col, rBlock.value AS rowsInBlock ")
-                .append(" , cBlock.value AS columnsInBlock ")
-                .append(" , pOrder.value AS plantingOrder ")
-                .append(" , rpp.value AS rowsPerPlot ")
-                .append(" , blkName.value AS blockName ")
-                .append(" , locName.value AS locationName ")
-                .append(" , fldName.value AS fieldName ")
+                .append(" , col.value AS col ")
+                .append(" , blk.value AS blockId ")
+//                .append(" , rBlock.value AS rowsInBlock ")
+//                .append(" , cBlock.value AS columnsInBlock ")
+//                .append(" , pOrder.value AS plantingOrder ")
+//                .append(" , rpp.value AS rowsPerPlot ")
+//                .append(" , blkName.value AS blockName ")
+//                .append(" , locName.value AS locationName ")
+//                .append(" , fldName.value AS fieldName ")
                 .append(" , st.project_id AS studyId ")
-                .append(" , machRow.value AS machineRow ")
+//                .append(" , machRow.value AS machineRow ")
                 .append(" , geo.description AS trialInstance ")
                 .append(" , s.dbxref_id AS gid ")
                 .append(" , ppStartDate.value as startDate ") 
                 .append(" , gpSeason.value as season ")
                 .append(" FROM ")
-                .append("  nd_experimentprop uid ")
-                .append("  INNER JOIN nd_experiment e ON e.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  nd_geolocationprop blk ")
+                .append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ")
                 .append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
-                .append("  INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = e.nd_experiment_id ")
                 .append("  INNER JOIN project p ON p.project_id = eproj.project_id ")
                 .append("  INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id ")
                 .append("     AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
                 .append("  INNER JOIN project st ON st.project_id = pr.object_project_id ")
-                .append("  INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ")
                 .append("  INNER JOIN stock s ON es.stock_id = s.stock_id ")
-                .append("  LEFT JOIN nd_experimentprop epropRep ON epropRep.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  LEFT JOIN nd_experimentprop epropRep ON epropRep.nd_experiment_id = e.nd_experiment_id ")
                 .append("    AND epropRep.type_id = ").append(TermId.REP_NO.getId()).append(" AND epropRep.value <> '' ")
-                .append("  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = e.nd_experiment_id ")
                 .append("    AND epropPlot.type_id IN (").append(TermId.PLOT_NO.getId()).append(", ")
                             .append(TermId.PLOT_NNO.getId()).append(") ").append(" AND epropPlot.value <> '' ")
                 .append("  LEFT JOIN nd_geolocationprop site ON site.nd_geolocation_id = e.nd_geolocation_id ")
-                .append("    AND site.type_id = ").append(TermId.LOCATION_ID.getId())
-                .append("  LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = uid.nd_experiment_id ")
+                .append("    AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
+                .append("  LEFT JOIN nd_geolocationprop siteId ON siteId.nd_geolocation_id = e.nd_geolocation_id ")
+                .append("    AND siteId.type_id = ").append(TermId.LOCATION_ID.getId())
+                .append("  LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = e.nd_experiment_id ")
                 .append("    AND row.type_id = ").append(TermId.COLUMN_NO.getId())
-                .append("  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = e.nd_experiment_id ")
                 .append("    AND col.type_id = ").append(TermId.RANGE_NO.getId())
-                .append("  LEFT JOIN nd_experimentprop rBlock ON rBlock.nd_experiment_id = uid.nd_experiment_id ")
-                .append("    AND rBlock.type_id = ").append(TermId.COLUMNS_IN_BLOCK.getId())
-                .append("  LEFT JOIN nd_experimentprop cBlock ON cBlock.nd_experiment_id = uid.nd_experiment_id ")
-                .append("    AND cBlock.type_id = ").append(TermId.RANGES_IN_BLOCK.getId())
-                .append("  LEFT JOIN nd_experimentprop pOrder ON pOrder.nd_experiment_id = uid.nd_experiment_id ")
-                .append("    AND pOrder.type_id = ").append(TermId.PLANTING_ORDER.getId())
-                .append("  LEFT JOIN nd_experimentprop rpp ON rpp.nd_experiment_id = uid.nd_experiment_id ")
-                .append("    AND rpp.type_id = ").append(TermId.ROWS_PER_PLOT.getId())
-                .append("  LEFT JOIN nd_experimentprop blkName ON blkName.nd_experiment_id = uid.nd_experiment_id ")
-                .append("    AND blkName.type_id = ").append(TermId.BLOCK_NAME.getId())
-                .append("  LEFT JOIN nd_experimentprop locName ON locName.nd_experiment_id = uid.nd_experiment_id ")
-                .append("    AND locName.type_id = ").append(TermId.SITE_NAME.getId())
-                .append("  LEFT JOIN nd_experimentprop fldName ON fldName.nd_experiment_id = uid.nd_experiment_id ")
-                .append("     AND fldName.type_id = ").append(TermId.FIELD_NAME.getId())
-                .append("  LEFT JOIN nd_experimentprop machRow ON machRow.nd_experiment_id = uid.nd_experiment_id ")
-                .append("     AND machRow.type_id = ").append(TermId.MACHINE_ROW_CAPACITY.getId())
+//                .append("  LEFT JOIN nd_experimentprop rBlock ON rBlock.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("    AND rBlock.type_id = ").append(TermId.COLUMNS_IN_BLOCK.getId())
+//                .append("  LEFT JOIN nd_experimentprop cBlock ON cBlock.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("    AND cBlock.type_id = ").append(TermId.RANGES_IN_BLOCK.getId())
+//                .append("  LEFT JOIN nd_experimentprop pOrder ON pOrder.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("    AND pOrder.type_id = ").append(TermId.PLANTING_ORDER.getId())
+//                .append("  LEFT JOIN nd_experimentprop rpp ON rpp.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("    AND rpp.type_id = ").append(TermId.ROWS_PER_PLOT.getId())
+//                .append("  LEFT JOIN nd_experimentprop blkName ON blkName.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("    AND blkName.type_id = ").append(TermId.BLOCK_NAME.getId())
+//                .append("  LEFT JOIN nd_experimentprop locName ON locName.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("    AND locName.type_id = ").append(TermId.SITE_NAME.getId())
+//                .append("  LEFT JOIN nd_experimentprop fldName ON fldName.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("     AND fldName.type_id = ").append(TermId.FIELD_NAME.getId())
+//                .append("  LEFT JOIN nd_experimentprop machRow ON machRow.nd_experiment_id = uid.nd_experiment_id ")
+//                .append("     AND machRow.type_id = ").append(TermId.MACHINE_ROW_CAPACITY.getId())
                 .append("  LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id ")
                 .append("     AND ppStartDate.type_id =  ").append(TermId.START_DATE.getId()).append(" ")
                 .append("  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
                 .append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") //--  8371 (2452)
-                .append(" WHERE uid.value in (SELECT DISTINCT fmid.value ")
-                .append("    FROM nd_experiment e ")
-                .append("    INNER JOIN nd_experimentprop fmid ON fmid.type_id = 32785 AND fmid.nd_experiment_id = e.nd_experiment_id ")
-                .append("    INNER JOIN nd_experiment_project eproject ON eproject.nd_experiment_id = e.nd_experiment_id ")
-                .append("    WHERE e.nd_geolocation_id = :geolocationId ")
-                .append("    AND eproject.project_id = :datasetId) ")
+//                .append(" WHERE uid.value in (SELECT DISTINCT fmid.value ")
+//            	.append("    FROM nd_experiment e ")
+//                .append("    INNER JOIN nd_experimentprop fmid ON fmid.type_id = 32785 AND fmid.nd_experiment_id = e.nd_experiment_id ")
+//                .append("    INNER JOIN nd_experiment_project eproject ON eproject.nd_experiment_id = e.nd_experiment_id ")
+//                .append("    WHERE e.nd_geolocation_id = :geolocationId ")
+//                .append("    AND eproject.project_id = :datasetId) ")
+                .append(" WHERE blk.type_id = ").append(TermId.BLOCK_ID.getId())
+                .append(" AND blk.value IN (SELECT DISTINCT bval.value FROM nd_geolocationprop bval ")
+		        .append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
+			    .append(" AND bexp.nd_geolocation_id = :geolocationId ")
+			    .append(" INNER JOIN nd_experiment_project bep ON bep.nd_experiment_id = bexp.nd_experiment_id ")
+			    .append(" AND bep.project_id = :datasetId) ")
                 .append(" ORDER BY eproj.nd_experiment_id ").append(order);
                 
                 Query query = getSession().createSQLQuery(sql.toString())
@@ -279,6 +290,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("studyName")
                         .addScalar("geolocationId")
                         .addScalar("siteName")
+                        .addScalar("siteId")
                         .addScalar("experimentId")
                         .addScalar("entryNumber")
                         .addScalar("germplasmName")
@@ -286,15 +298,16 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("plotNo")
                         .addScalar("row")
                         .addScalar("col")
-                        .addScalar("rowsInBlock")
-                        .addScalar("columnsInBlock")
-                        .addScalar("plantingOrder")
-                        .addScalar("rowsPerPlot")
-                        .addScalar("blockName")
-                        .addScalar("locationName")
-                        .addScalar("fieldName")
+                        .addScalar("blockId")
+//                        .addScalar("rowsInBlock")
+//                        .addScalar("columnsInBlock")
+//                        .addScalar("plantingOrder")
+//                        .addScalar("rowsPerPlot")
+//                        .addScalar("blockName")
+//                        .addScalar("locationName")
+//                        .addScalar("fieldName")
                         .addScalar("studyId")
-                        .addScalar("machineRow")
+//                        .addScalar("machineRow")
                         .addScalar("trialInstance")
                         .addScalar("gid")
                         .addScalar("startDate")
@@ -480,21 +493,21 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         
         for (Object[] row : rows) {
             FieldMapLabel label = new FieldMapLabel();
-            String startDate = (String) row[23];
+            String startDate = (String) row[17];
             label.setStudyName((String) row[2]);
-            label.setExperimentId(getIntegerValue(row[5]));
-            label.setEntryNumber(getIntegerValue(row[6]));
-            label.setRep(getIntegerValue(row[8]));
-            label.setPlotNo(getIntegerValue(row[9]));
-            label.setColumn(getIntegerValue(row[10]));
+            label.setExperimentId(getIntegerValue(row[6]));
+            label.setEntryNumber(getIntegerValue(row[7]));
+            label.setRep(getIntegerValue(row[9]));
+            label.setPlotNo(getIntegerValue(row[10]));
+            label.setColumn(getIntegerValue(row[12]));
             label.setRange(getIntegerValue(row[11]));
-            label.setGermplasmName((String) row[7]);
+            label.setGermplasmName((String) row[8]);
             label.setDatasetId((Integer) row[0]);
             label.setGeolocationId((Integer) row[3]);
             label.setSiteName((String) row[4]);
-            label.setGid((Integer) row[22]);
+            label.setGid((Integer) row[16]);
             label.setStartYear(startDate != null && !startDate.equals("null") ? startDate.substring(0, 4) : null);
-            label.setSeason(Season.getSeason((String) row[24]));
+            label.setSeason(Season.getSeason((String) row[18]));
 
             String trialKey = getTrialKey((Integer) row[0], (Integer) row[3]);
             FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
@@ -502,18 +515,21 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial = new FieldMapTrialInstanceInfo();
                 trial.setGeolocationId((Integer) row[3]);
                 trial.setSiteName((String) row[4]);
-                trial.setRangesInBlock(getIntegerValue(row[13]));
-                trial.setColumnsInBlock(getIntegerValue(row[12]));
-                trial.setMachineRowCapacity(getIntegerValue(row[20]));
-                trial.setRowsPerPlot(getIntegerValue(row[15]));
-                trial.setTrialInstanceNo((String) row[21]);
-                Integer pOrder = getIntegerValue(row[14]);
-                if (pOrder != null) {
-                    trial.setPlantingOrder(TermId.SERPENTINE.getId() == pOrder ? 2 : 1);
-                }
-                trial.setBlockName((String) row[16]);
-                trial.setFieldName((String) row[18]);
-                trial.setLocationName((String) row[17]);
+                trial.setLocationName((String) row[4]);
+                trial.setLocationId((Integer) row[5]);
+                trial.setBlockId((Integer) row[13]);
+//                trial.setRangesInBlock(getIntegerValue(row[13]));
+//                trial.setColumnsInBlock(getIntegerValue(row[12]));
+//                trial.setMachineRowCapacity(getIntegerValue(row[20]));
+//                trial.setRowsPerPlot(getIntegerValue(row[15]));
+                trial.setTrialInstanceNo((String) row[15]);
+//                Integer pOrder = getIntegerValue(row[14]);
+//                if (pOrder != null) {
+//                    trial.setPlantingOrder(TermId.SERPENTINE.getId() == pOrder ? 2 : 1);
+//                }
+//                trial.setBlockName((String) row[16]);
+//                trial.setFieldName((String) row[18]);
+//                trial.setLocationName((String) row[17]);
                 trialMap.put(trialKey, trial);
             }
             
@@ -524,10 +540,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 dataset.setDatasetName((String) row[1]);
                 datasetMap.put(dataset.getDatasetId(), dataset);
                 
-                FieldMapInfo study = infoMap.get((Integer) row[19]);
+                FieldMapInfo study = infoMap.get((Integer) row[14]);
                 if (study == null) {
                     study = new FieldMapInfo();
-                    study.setFieldbookId((Integer) row[19]);
+                    study.setFieldbookId((Integer) row[14]);
                     study.setFieldbookName((String) row[2]);
                     infoMap.put(study.getFieldbookId(), study);
                 }

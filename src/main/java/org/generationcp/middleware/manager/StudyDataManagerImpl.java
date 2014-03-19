@@ -40,6 +40,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -54,6 +55,7 @@ import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
@@ -71,6 +73,8 @@ import org.slf4j.LoggerFactory;
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
     private GermplasmDataManagerImpl germplasmDataManager;
+    
+    private LocationDataManager locationDataManager;
 
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
@@ -82,12 +86,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         super(sessionProviderForLocal, sessionProviderForCentral);
         germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, 
                 sessionProviderForCentral);
-
+        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     public StudyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
         germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForLocal);
+        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     @Override
@@ -653,7 +658,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         
         fieldMapInfos = getExperimentPropertyDao()
                 .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
-
+        
+        int blockId = getBlockId(fieldMapInfos);
+        FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
+        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
+        
         // Filter those belonging to the given geolocationId
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
@@ -1071,6 +1080,39 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    			detail.setPiName(personMap.get(detail.getPiId()));
 	    		}
 	    	}
+    	}
+    }
+    
+    private Integer getBlockId(List<FieldMapInfo> infos) {
+    	if (infos != null) {
+    		for (FieldMapInfo info : infos) {
+    			if (info.getDatasets() != null) {
+    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+    					if (dataset.getTrialInstances() != null) {
+    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+    							return trial.getBlockId();
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return null;
+    }
+    
+    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo) {
+    	if (infos != null) {
+    		for (FieldMapInfo info : infos) {
+    			if (info.getDatasets() != null) {
+    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+    					if (dataset.getTrialInstances() != null) {
+    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+    							trial.updateBlockInformation(blockInfo);
+    						}
+    					}
+    				}
+    			}
+    		}
     	}
     }
 }

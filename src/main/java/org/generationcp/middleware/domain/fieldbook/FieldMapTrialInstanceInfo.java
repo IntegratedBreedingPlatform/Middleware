@@ -98,6 +98,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     /** The deleted plot coordintes in (row, range) format */
     private List<String> deletedPlots;
+    
         
     /**
      * Instantiates a new field map trial instance info.
@@ -636,6 +637,17 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	 */
 	public void setDeletedPlots(List<String> deletedPlots) {
 		this.deletedPlots = deletedPlots;
+	}
+
+	/**
+	 * @param blockInfo the blockInfo to set
+	 */
+	public void updateBlockInformation(FieldmapBlockInfo blockInfo) {
+		this.columnsInBlock = blockInfo.getRowsInBlock();
+		this.rangesInBlock = blockInfo.getRangesInBlock();
+		this.rowsPerPlot = blockInfo.getNumberOfRowsInPlot();
+		this.plantingOrder = blockInfo.getPlantingOrder();
+		this.machineRowCapacity = blockInfo.getMachineRowCapacity();
 	}
 
 
