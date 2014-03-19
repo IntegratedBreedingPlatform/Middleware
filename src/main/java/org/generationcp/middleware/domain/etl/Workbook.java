@@ -258,8 +258,9 @@ public class Workbook {
 	}
 	
 	private List<MeasurementVariable> getNonTrialVariables(List<MeasurementVariable> variables) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		List<MeasurementVariable> list = null;
 		if (variables != null && variables.size() > 0) {
+			list = new ArrayList<MeasurementVariable>();
 			for (MeasurementVariable variable : variables) {
 				if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
@@ -270,8 +271,9 @@ public class Workbook {
 	}
 	
 	private List<MeasurementVariable> getTrialVariables(List<MeasurementVariable> variables) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		List<MeasurementVariable> list = null;
 		if (variables != null && variables.size() > 0) {
+			list = new ArrayList<MeasurementVariable>();
 			for (MeasurementVariable variable : variables) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
