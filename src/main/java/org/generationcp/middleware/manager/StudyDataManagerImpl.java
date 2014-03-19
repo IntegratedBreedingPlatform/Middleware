@@ -574,6 +574,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
             fieldMapInfos.add(fieldMapInfo);
         }
+        
+        int blockId = getBlockId(fieldMapInfos);
+        FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
+        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
+
         return fieldMapInfos;
     }
 
