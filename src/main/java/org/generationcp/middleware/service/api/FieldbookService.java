@@ -334,4 +334,7 @@ public interface FieldbookService {
     List<Location> getAllFieldLocations(int locationId) throws MiddlewareQueryException;
     List<Location> getAllBlockLocations(int fieldId) throws MiddlewareQueryException;
     FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException;
+    List<Location> getAllFields()throws MiddlewareQueryException;
+    int addFieldLocation(String fieldName, Integer parentlocationId)throws MiddlewareQueryException;
+    int addBlockLocation(String blockName, Integer parentFieldId)throws MiddlewareQueryException;
 }

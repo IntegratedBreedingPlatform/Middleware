@@ -565,6 +565,26 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	    return getLocationDataManager().getBlockInformation(blockId);
 	}
 
+	@Override
+	public List<Location> getAllFields() throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return new ArrayList();
+	}
+
+	@Override
+	public int addFieldLocation(String fieldName, Integer parentlocationId)
+			throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int addBlockLocation(String blockName, Integer parentFieldId)
+			throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	
     
     
