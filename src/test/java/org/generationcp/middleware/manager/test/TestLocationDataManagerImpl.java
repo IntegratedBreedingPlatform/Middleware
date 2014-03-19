@@ -417,18 +417,18 @@ public class TestLocationDataManagerImpl{
 
     @Test
     public void testGetAllFieldLocations() throws Exception {
-        Integer locationId = 1;
+        Integer locationId = 17649; //TODO replace later with get field by id OR get first BREED ltype from location
         List<Location> result = manager.getAllFieldLocations(locationId);
         assertNotNull(result);
-        Debug.println(3, result);
+        Debug.printObjects(3, result);
     }
 
     @Test
     public void testGetAllBlockLocations() throws Exception {
-        Integer fieldId = 1;
+        Integer fieldId = -11; //TODO replace later with get field by id OR get first field from location
         List<Location> result = manager.getAllBlockLocations(fieldId);
         assertNotNull(result);
-        Debug.println(3, result);
+        Debug.printObjects(3, result);
     }
 
     @Test

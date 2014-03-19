@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
 /**
@@ -233,17 +234,26 @@ public interface LocationDataManager {
     UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
     
     /**
-     * Returns the Map representation of <Code, UserDefinedField> 
-     * of the given ftable and ftype from the udflds table.
-     * 
-     * @param table
-     * @param type
-     * @return
-     * @throws MiddlewareQueryException
+     * Returns the Map representation of <Code, UserDefinedField>
+     * of the given tableType (ftable and ftype from the udflds table).
+     *
+     * @param tableType the table type
+     * @return the user defined field map of code by ud table type
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByTableAndType(String table, String type) 
+    Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType tableType) 
             throws MiddlewareQueryException;
 
+    
+    /**
+     * Gets the user defined field id of code.
+     *
+     * @param tableType the table type
+     * @param code the code
+     * @return the user defined field id of code
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code) throws MiddlewareQueryException;
     /**
      * Returns the udfld records identified by the given tablename.
      *

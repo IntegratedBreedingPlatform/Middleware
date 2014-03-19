@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -158,15 +159,29 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
 
     @Override
-    public Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByTableAndType(String table, String type) 
+    public Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType type) 
             throws MiddlewareQueryException{
-        Map<String, UserDefinedField> dTypes = new HashMap<String, UserDefinedField>();
+        Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
         
-        List<UserDefinedField> dTypeFields = getUserDefinedFieldByFieldTableNameAndType(table, type);
+        List<UserDefinedField> dTypeFields = getUserDefinedFieldByFieldTableNameAndType(type.getTable(), type.getType());
         for (UserDefinedField dTypeField: dTypeFields){
-            dTypes.put(dTypeField.getFcode(),  dTypeField);
+            types.put(dTypeField.getFcode(),  dTypeField);
         }
-        return dTypes;
+        return types;
+    }
+    
+    @Override
+    public Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code) 
+            throws MiddlewareQueryException{
+        Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
+        
+        List<UserDefinedField> dTypeFields = getUserDefinedFieldByFieldTableNameAndType(
+                                                tableType.getTable(), tableType.getType());
+        for (UserDefinedField dTypeField: dTypeFields){
+            types.put(dTypeField.getFcode(),  dTypeField);
+        }
+        
+        return types.get(code) != null ? types.get(code).getFldno() : null;
     }
 
 
@@ -415,22 +430,28 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			 return getLocationDao().getNegativeId("locid");
 			
 	}    
-	
 
     @Override
     public List<Location> getAllFieldLocations(int locationId)
             throws MiddlewareQueryException {
-        //TODO TEMPORARY IMPLEMENTATION - FOR TESTING ONLY
-        return getAllLocations().subList(0, 50);
+        Integer fieldParentFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
+        Integer fieldLtypeFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+
+        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
+            , new Object[]{String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId}
+            , new Class[]{String.class, Integer.class, Integer.class});
     }
 
     @Override
     public List<Location> getAllBlockLocations(int fieldId)
             throws MiddlewareQueryException {
-        //TODO TEMPORARY IMPLEMENTATION - FOR TESTING ONLY
-        return getAllLocations().subList(0, 50);
-    }
+        Integer blockParentFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
+        Integer blockLtypeFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
+        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
+                , new Object[]{String.valueOf(fieldId), blockParentFldId, blockLtypeFldId}
+                , new Class[]{String.class, Integer.class, Integer.class});
+    }
     
     @Override
     public FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException {
@@ -441,8 +462,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         int machineRowCapacity = 0;
         boolean isNew = true;
         
-        Map<String, UserDefinedField> dTypes = getUserDefinedFieldMapOfCodeByTableAndType(
-                                UDTableType.LOCDES_DTYPE.getTable(), UDTableType.LOCDES_DTYPE.getType());
+        Map<String, UserDefinedField> dTypes = getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 
         List<Locdes> locdesOfLocation = getLocdesDao().getByLocation(blockId);
         

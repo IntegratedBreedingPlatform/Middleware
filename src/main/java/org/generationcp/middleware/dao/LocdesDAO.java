@@ -22,20 +22,31 @@ import org.hibernate.criterion.Restrictions;
 
 public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 
-	@SuppressWarnings("unchecked")
-	public List<Locdes> getByLocation(Integer locId) throws MiddlewareQueryException {
+    @SuppressWarnings("unchecked")
+    public List<Locdes> getByLocation(Integer locId) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Locdes.class);
-
             criteria.add(Restrictions.eq("locationId", locId));
-
             return criteria.list();
-            
         } catch (HibernateException e) {
-            logAndThrowException("Error with getByLocation(locId=" + locId + ") query from Location: "
+            logAndThrowException("Error with getByLocation(locId=" + locId + ") query from Locdes: "
                     + e.getMessage(), e);
         }
         return new ArrayList<Locdes>();
-	}
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Locdes> getByDval(String dval) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Locdes.class);
+            criteria.add(Restrictions.eq("dval", dval));
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByValue(value=" + dval + ") query from Locdes: "
+                    + e.getMessage(), e);
+        }
+        return new ArrayList<Locdes>();
+    }
+
 
 }

@@ -12,25 +12,20 @@
 package org.generationcp.middleware.pojos;
 
 /**
- * Locdes type = fcode in udflds table.
+ * Location type = fcode in udflds table.
  * 
  */
-public enum LocdesType {
-    
+public enum LocationType {
 
-    COLUMNS_IN_BLOCK("COL_IN_BLK")
-    , RANGES_IN_BLOCK("RANGE_IN_BLK")
-    , PLANTING_ORDER("PLOT_LYOUT")
-    , ROWS_IN_PLOT("ROWS_IN_PLOT")
-    , MACHINE_ROW_CAPACITY("MACHINE_CAP")
-    , DELETED_PLOTS("DELETED_PLOT")
-    , FIELD_PARENT("FIELD_PARENT")
-    , BLOCK_PARENT("BLOCK_PARENT")
+    COUNTRY("COUNTRY")
+    , PROV("PROV")
+    , BREED("BREED")
+    , BLOCK("BLOCK")
+    , FIELD("FIELD")
     ;
-    
 	private String code;
 	
-	private LocdesType(String code) {
+	private LocationType(String code) {
 		this.code = code;
 	}
 
@@ -41,6 +36,5 @@ public enum LocdesType {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
 
 }
