@@ -340,7 +340,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                     
                     // Save germplasm
                     germplasm.setGid(gId);
-                    germplasm.setLgid(Integer.valueOf(0));
+                    germplasm.setLgid(gId);
                     germplasmDao.save(germplasm);
 
                 } 
