@@ -152,7 +152,11 @@ public class StudyDetails {
 	
 	public String getStartYear(){
 	    if (startDate != null){
-	        return startDate.substring(0,4);
+	    	try {
+	    		return startDate.substring(0,4);
+	    	} catch(Exception e) {
+	    		return null;
+	    	}
 	    }
 	    return null;
 	}
