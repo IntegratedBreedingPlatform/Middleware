@@ -439,7 +439,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             geolocationId = (Integer) row[2];
             siteName = (String) row[3];
             trialInstanceNo = (String) row[12];
-            blockId = (Integer) row[11];
+            if(row[11] != null)
+            	blockId = Integer.valueOf((String)row[11]);
+            else
+            	blockId = null;
             /*
             blockName = (String) row[15];
             locationName = (String) row[16];
@@ -527,7 +530,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial.setSiteName((String) row[4]);
                 trial.setLocationName((String) row[4]);
                 trial.setLocationId((Integer) row[5]);
-                trial.setBlockId((Integer) row[13]);
+                Integer blockId = null;
+                if(row[11] != null)
+                	blockId = Integer.valueOf((String)row[13]);
+                else
+                	blockId = null;
+                
+                trial.setBlockId(blockId);
 //                trial.setRangesInBlock(getIntegerValue(row[13]));
 //                trial.setColumnsInBlock(getIntegerValue(row[12]));
 //                trial.setMachineRowCapacity(getIntegerValue(row[20]));
