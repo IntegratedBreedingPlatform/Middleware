@@ -137,7 +137,7 @@ public class LocdesSaver extends Saver {
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
-		DateFormat df = new SimpleDateFormat("YYYYMMDD");
+		DateFormat df = new SimpleDateFormat("YYYYMMdd");
 		locdes.setDdate(Integer.valueOf(df.format(new Date())));
 		locdes.setReferenceId(0);
 		locdes.setUserId(userId);
