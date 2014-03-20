@@ -433,7 +433,7 @@ public class TestLocationDataManagerImpl{
 
     @Test
     public void testGetBlockInformation() throws Exception {
-        Integer blockId = 1;
+        Integer blockId = -15;
         FieldmapBlockInfo result = manager.getBlockInformation(blockId);
         assertNotNull(result);
         Debug.println(3, result);
