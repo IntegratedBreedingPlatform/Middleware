@@ -84,33 +84,33 @@ import org.junit.rules.TestName;
 
 public class TestGenotypicDataManagerImpl{
 
-    private static ManagerFactory factory;
+    private static ManagerFactory       factory;
     private static GenotypicDataManager manager;
-    
-    private long startTime;
-    
-    private int INDENT = 3;
+
+    private long                        startTime;
+
+    private int                         INDENT              = 3;
 
     @Rule
-    public TestName name = new TestName();
+    public TestName                     name                = new TestName();
 
-    private static final String DATASET = "Dataset";
-    private static final String DATASET_USERS = "DatasetUsers";
-    private static final String ACC_METADATA_SET = "AccMetadataSet";
-    private static final String MARKER_METADATA_SET = "MarkerMetadataSet";
-    private static final String ALLELE_VALUES = "AlleleValues";
-    private static final String CHAR_VALUES = "CharValues";
-    private static final String MAPPING_POP = "MappingPop";
-    private static final String MAPPING_POP_VALUES = "MappingPopValues";
-    private static final String DART_VALUES = "DartValues";
-    private static final String MARKER = "Marker";
-
-
+    private static final String         DATASET             = "Dataset";
+    private static final String         DATASET_USERS       = "DatasetUsers";
+    private static final String         ACC_METADATA_SET    = "AccMetadataSet";
+    private static final String         MARKER_METADATA_SET = "MarkerMetadataSet";
+    private static final String         ALLELE_VALUES       = "AlleleValues";
+    private static final String         CHAR_VALUES         = "CharValues";
+    private static final String         MAPPING_POP         = "MappingPop";
+    private static final String         MAPPING_POP_VALUES  = "MappingPopValues";
+    private static final String         DART_VALUES         = "DartValues";
+    private static final String         MARKER              = "Marker";
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "localgroundnut");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "centralgroundnut");
+        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
+                "localgroundnut");
+        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
+                "centralgroundnut");
         factory = new ManagerFactory(local, central);
         manager = factory.getGenotypicDataManager();
     }
@@ -120,11 +120,12 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "#####" + name.getMethodName() + " Start: ");
         startTime = System.nanoTime();
     }
-    
+
     @After
     public void afterEachTest() {
         long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = "
+                + ((double) elapsedTime / 1000000000) + " s");
     }
 
     @Test
@@ -165,14 +166,14 @@ public class TestGenotypicDataManagerImpl{
         String mapName = "RIL-8 (Yueyou13 x J 11)"; // CENTRAL test data
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.CENTRAL);
 
-        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: " );
+        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
     @Test
     public void testGetMapInfoByMapNameBothDB() throws Exception {
-      String mapName = "GCP-833TestMap"; // LOCAL test data
-      List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
+        String mapName = "GCP-833TestMap"; // LOCAL test data
+        List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
 
         Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: ");
         Debug.printObjects(INDENT, results);
@@ -186,20 +187,20 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetDatasetNames() throws Exception {
-        List<String> results = manager.getDatasetNames(0, 5, Database.LOCAL);
-        Debug.println(0, "testGetDatasetNames(0,5,Database.Local) RESULTS: " + results);
+        List<String> result = manager.getDatasetNames(0, Integer.MAX_VALUE, Database.LOCAL);
+        Debug.printObjects(0, result);
     }
 
     @Test
     public void testGetDatasetNamesByQtlId() throws Exception {
-    	Integer qtlId = 1;    		// Crop tested: Groundnut
+        Integer qtlId = 1; // Crop tested: Groundnut
         List<String> results = manager.getDatasetNamesByQtlId(qtlId, 0, 5);
         Debug.println(0, "testGetDatasetNamesByQtlId(0,5) RESULTS: " + results);
     }
 
     @Test
     public void testCountDatasetNamesByQtlId() throws Exception {
-    	Integer qtlId = 1;   		// Crop tested: Groundnut 
+        Integer qtlId = 1; // Crop tested: Groundnut
         long results = manager.countDatasetNamesByQtlId(qtlId);
         Debug.println(0, "testCountDatasetNamesByQtlId() RESULTS: " + results);
     }
@@ -212,16 +213,14 @@ public class TestGenotypicDataManagerImpl{
     }
 
     @Test
-    public void testGetMarkerIdsByMarkerNames() throws Exception {
+    public void testGetMarkersByMarkerNames() throws Exception {
         List<String> markerNames = new ArrayList<String>();
-        markerNames.add("1_0085");
-        markerNames.add("1_0319");
-        markerNames.add("1_0312");
-
-        /* Expected results are: [1, 2, 3, 174, 199, 201]
-         * This is based on the sample input data templates uploaded to GDMS */
-        List<Integer> markerIds = manager.getMarkerIdsByMarkerNames(markerNames, 0, 100, Database.LOCAL);
-        Debug.println(0, "getMarkerIdsByMarkerNames (" + markerNames + ") RESULTS: " + markerIds);
+        markerNames.add("GA101");
+        markerNames.add("GA110");
+        markerNames.add("GA122");
+        List<Marker> markers = manager.getMarkersByMarkerNames(markerNames, 0, 100, Database.CENTRAL);
+        assertTrue(markers.size() > 0);
+        Debug.printObjects(3, markers);
     }
 
     @Test
@@ -269,8 +268,8 @@ public class TestGenotypicDataManagerImpl{
         markerNames.add("1_0007");
         markerNames.add("1_0013");
 
-        List<GermplasmMarkerElement> results = (List<GermplasmMarkerElement>) manager.getGermplasmNamesByMarkerNames(markerNames,
-                Database.LOCAL);
+        List<GermplasmMarkerElement> results = (List<GermplasmMarkerElement>) manager.getGermplasmNamesByMarkerNames(
+                markerNames, Database.LOCAL);
         Debug.println(0, "testGetGermplasmNamesByMarkerNames(" + markerNames + ")  RESULTS: " + results);
     }
 
@@ -284,10 +283,15 @@ public class TestGenotypicDataManagerImpl{
         markerNames.add("1_0085");
         markerNames.add("1_0319");
         markerNames.add("1_0312");
-        /* Expected results are: [datasetId=2, mappingType=allelic, parentAGid=-6785, parentBGid=-6786, markerType=S]
-         * This is based on the sample input data templates uploaded to GDMS */
-        List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0, 100);
-        Debug.println(0, "testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + mappingValues);
+        /*
+         * Expected results are: [datasetId=2, mappingType=allelic,
+         * parentAGid=-6785, parentBGid=-6786, markerType=S] This is based on
+         * the sample input data templates uploaded to GDMS
+         */
+        List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0,
+                100);
+        Debug.println(0, "testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: "
+                + mappingValues);
     }
 
     @Test
@@ -303,7 +307,7 @@ public class TestGenotypicDataManagerImpl{
         markerNames.add("1_0013");
         markerNames.add("1_0025");
         markerNames.add("1_0031");
-        
+
         List<Integer> gids = new ArrayList<Integer>();
         gids.add(-5276);
         gids.add(-5287);
@@ -314,22 +318,30 @@ public class TestGenotypicDataManagerImpl{
         gids.add(-3785);
         gids.add(-3786);
 
-        /* Results will vary depending on the database connected to.
-         * As of the moment, we have no data that contains test values in all 3 source tables */
+        /*
+         * Results will vary depending on the database connected to. As of the
+         * moment, we have no data that contains test values in all 3 source
+         * tables
+         */
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
-        Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
+        Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: "
+                + allelicValues);
     }
-    
 
     @Test
     public void testGetAllelicValuesByGidsAndMarkerNamesForGDMS() throws Exception {
 
-        List<String> markerNames = Arrays.asList("TC03A12", "Seq19E09", "TC7E04", "SeqTEST"); //marker id = 3295, 3296, 1044;
+        List<String> markerNames = Arrays.asList("TC03A12", "Seq19E09", "TC7E04", "SeqTEST"); // marker
+                                                                                              // id
+                                                                                              // =
+                                                                                              // 3295,
+                                                                                              // 3296,
+                                                                                              // 1044;
         List<Integer> gids = Arrays.asList(1434, 1435, 1);
-        
-        // Local test data 
-        testAddGDMSMarker(); // add Marker with markerName = "SeqTEST" 
-        
+
+        // Local test data
+        testAddGDMSMarker(); // add Marker with markerName = "SeqTEST"
+
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
         Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNamesForGDMS(" + gids + ", " + markerNames + ") RESULTS: ");
         Debug.printFormattedObjects(INDENT, allelicValues);
@@ -339,10 +351,12 @@ public class TestGenotypicDataManagerImpl{
     public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, (int) count);
-        Debug.println(0, "testGetAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues.size());
-        for(AllelicValueWithMarkerIdElement results : allelicValues) {
-        	Debug.println(0, results.toString());
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(
+                datasetId, 0, (int) count);
+        Debug.println(0,
+                "testGetAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues.size());
+        for (AllelicValueWithMarkerIdElement results : allelicValues) {
+            Debug.println(0, results.toString());
         }
     }
 
@@ -350,23 +364,25 @@ public class TestGenotypicDataManagerImpl{
     public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         long count = manager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager
-                .getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, (int) count);
-        Debug.println(0, "testGetAllelicValuesFromAlleleValuesByDatasetId(dataset=" + datasetId + ") RESULTS: " + allelicValues.size());
-        for(AllelicValueWithMarkerIdElement results : allelicValues) {
-        	Debug.println(0, results.toString());
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromAlleleValuesByDatasetId(
+                datasetId, 0, (int) count);
+        Debug.println(0, "testGetAllelicValuesFromAlleleValuesByDatasetId(dataset=" + datasetId + ") RESULTS: "
+                + allelicValues.size());
+        for (AllelicValueWithMarkerIdElement results : allelicValues) {
+            Debug.println(0, results.toString());
         }
     }
 
     @Test
     public void testGetAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {
-    	//23-Jul-2013, currently no test data with datasetid = 2 in groundnut central, using datasetid=3 instead
-        //Integer datasetId = Integer.valueOf(2);
+        // 23-Jul-2013, currently no test data with datasetid = 2 in groundnut
+        // central, using datasetid=3 instead
+        // Integer datasetId = Integer.valueOf(2);
         Integer datasetId = Integer.valueOf(3);
-        long count = manager.countAllelicValuesFromMappingPopValuesByDatasetId(datasetId); 
-        		//manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0,
-                (int) count);
+        long count = manager.countAllelicValuesFromMappingPopValuesByDatasetId(datasetId);
+        // manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(
+                datasetId, 0, (int) count);
         Debug.println(0, "COUNT IS " + count);
         Debug.println(0, "testGetAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") RESULTS: ");
         if (allelicValues != null) {
@@ -525,7 +541,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetDatasetIdsForFingerPrinting() throws Exception {
-        List<Integer> datasetIds = manager.getDatasetIdsForFingerPrinting(0, (int) manager.countDatasetIdsForFingerPrinting());
+        List<Integer> datasetIds = manager.getDatasetIdsForFingerPrinting(0,
+                (int) manager.countDatasetIdsForFingerPrinting());
         Debug.println(0, "testGetDatasetIdsForFingerPrinting() RESULTS: " + datasetIds);
     }
 
@@ -554,15 +571,15 @@ public class TestGenotypicDataManagerImpl{
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
         germplasmIds.add(Integer.valueOf(-2215));
-        List<AccMetadataSetPK> accMetadataSets = manager.getGdmsAccMetadatasetByGid(germplasmIds, 0, 
+        List<AccMetadataSetPK> accMetadataSets = manager.getGdmsAccMetadatasetByGid(germplasmIds, 0,
                 (int) manager.countGdmsAccMetadatasetByGid(germplasmIds));
         Debug.println(0, "testGetGdmsAccMetadatasetByGid() RESULTS: ");
         Debug.printObjects(INDENT, accMetadataSets);
     }
 
     @Test
-    public void testCountGdmsAccMetadatasetByGid() throws Exception { 
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+    public void testCountGdmsAccMetadatasetByGid() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>();
         germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
@@ -573,20 +590,20 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMarkersByGidAndDatasetIds() throws Exception {
-        Integer gid = Integer.valueOf(-2215);    // Crop Tested: Groundnut
+        Integer gid = Integer.valueOf(-2215); // Crop Tested: Groundnut
 
         List<Integer> datasetIds = new ArrayList<Integer>();
         datasetIds.add(Integer.valueOf(1));
         datasetIds.add(Integer.valueOf(2));
 
-        List<Integer> markerIds = manager.getMarkersByGidAndDatasetIds(gid, datasetIds, 0, 
+        List<Integer> markerIds = manager.getMarkersByGidAndDatasetIds(gid, datasetIds, 0,
                 (int) manager.countMarkersByGidAndDatasetIds(gid, datasetIds));
         Debug.println(0, "testGetMarkersByGidAndDatasetIds() RESULTS: " + markerIds);
     }
 
     @Test
-    public void testCountMarkersByGidAndDatasetIds() throws Exception { 
-        Integer gid = Integer.valueOf(-2215);    // Crop Tested: Groundnut
+    public void testCountMarkersByGidAndDatasetIds() throws Exception {
+        Integer gid = Integer.valueOf(-2215); // Crop Tested: Groundnut
 
         List<Integer> datasetIds = new ArrayList<Integer>();
         datasetIds.add(Integer.valueOf(1));
@@ -595,10 +612,10 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countMarkersByGidAndDatasetIds(gid, datasetIds);
         Debug.println(0, "testCountGdmsAccMetadatasetByGid() RESULTS: " + count);
     }
-    
+
     @Test
-    public void testCountAlleleValuesByGids() throws Exception { 
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+    public void testCountAlleleValuesByGids() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>();
         germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
@@ -606,170 +623,196 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countAlleleValuesByGids(germplasmIds);
         Debug.println(0, "testCountAlleleValuesByGids() RESULTS: " + count);
     }
-    
 
     @Test
-    public void testCountCharValuesByGids() throws Exception { 
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
-        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found in the target crop to be used in testing
+    public void testCountCharValuesByGids() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>();
+        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found
+                                                // in the target crop to be used
+                                                // in testing
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
         germplasmIds.add(Integer.valueOf(-2215));
         long count = manager.countCharValuesByGids(germplasmIds);
         Debug.println(0, "testCountCharValuesByGids() RESULTS: " + count);
     }
-    
 
     @Test
     public void testGetIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        List<Integer> germplasmIds = new ArrayList<Integer>();
         germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
         germplasmIds.add(Integer.valueOf(-2215));
 
-        List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
+        List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0,
                 (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        
+
         Debug.println(0, "testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
     @Test
-    public void testCountIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+    public void testCountIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>();
         germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
         germplasmIds.add(Integer.valueOf(-2215));
         long count = manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
-    }    
-    
+    }
+
     @Test
     public void testGetCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
-        //For rice db(v20), you can use germplasmIds: 58, 29811
-        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found in the target crop to be used in testing
+        List<Integer> germplasmIds = new ArrayList<Integer>();
+        // For rice db(v20), you can use germplasmIds: 58, 29811
+        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found
+                                                // in the target crop to be used
+                                                // in testing
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
         germplasmIds.add(Integer.valueOf(-2215));
 
-        List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
+        List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0,
                 (int) manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
         Debug.println(0, "testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
-
     @Test
-    public void testCountCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
-        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found in the target crop to be used in testing
+    public void testCountCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>();
+        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found
+                                                // in the target crop to be used
+                                                // in testing
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
         germplasmIds.add(Integer.valueOf(-2215));
         long count = manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
-    }    
-    
+    }
+
     @Test
-    public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception { 
-        List<Integer> gIds = new ArrayList<Integer>(); 
-        gIds.add(Integer.valueOf(956)); // Please replace the germplasm ids found in the target crop to be used in testing
+    public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
+        List<Integer> gIds = new ArrayList<Integer>();
+        gIds.add(Integer.valueOf(956)); // Please replace the germplasm ids
+                                        // found in the target crop to be used
+                                        // in testing
         gIds.add(Integer.valueOf(1042));
         gIds.add(Integer.valueOf(1128));
-        
-        List<Integer> datasetIds = new ArrayList<Integer>(); 
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
-        
-        List<Integer> markerIds = new ArrayList<Integer>(); 
-        markerIds.add(Integer.valueOf(6)); // Please replace the marker ids found in the target crop to be used in testing
-        markerIds.add(Integer.valueOf(10)); 
 
-        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 
-                0, manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-        Debug.println(0, "testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds="+datasetIds+") RESULTS: " + nIdList);
-        
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
+                                            // found in the target crop to be
+                                            // used in testing
+
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(Integer.valueOf(6)); // Please replace the marker ids
+                                           // found in the target crop to be
+                                           // used in testing
+        markerIds.add(Integer.valueOf(10));
+
+        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 0,
+                manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        Debug.println(0, "testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=" + datasetIds + ") RESULTS: "
+                + nIdList);
+
         nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(null, gIds, markerIds, 0, 5);
         Debug.println(0, "testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=null) RESULTS: " + nIdList);
-        
+
         nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, null, markerIds, 0, 5);
         Debug.println(0, "testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(gIds=null) RESULTS: " + nIdList);
-        
+
         nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, gIds, null, 0, 5);
         Debug.println(0, "testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(markerIds=null) RESULTS: " + nIdList);
-        
-        
-    }  
-    
+
+    }
+
     @Test
-    public void testCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception { 
-        List<Integer> gIds = new ArrayList<Integer>(); 
-        gIds.add(Integer.valueOf(29)); // Please replace the germplasm ids found in the target crop to be used in testing
+    public void testCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
+        List<Integer> gIds = new ArrayList<Integer>();
+        gIds.add(Integer.valueOf(29)); // Please replace the germplasm ids found
+                                       // in the target crop to be used in
+                                       // testing
         gIds.add(Integer.valueOf(303));
         gIds.add(Integer.valueOf(4950));
-        
-        List<Integer> datasetIds = new ArrayList<Integer>(); 
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
-        
-        List<Integer> markerIds = new ArrayList<Integer>(); 
-        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
+                                            // found in the target crop to be
+                                            // used in testing
+
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids
+                                              // found in the target crop to be
+                                              // used in testing
 
         int count = manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
         Debug.println(0, "testcCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() RESULTS: " + count);
-    }  
-    
-    @Test
-    public void testGetNIdsByDatasetIdsAndMarkerIds() throws Exception { 
-        
-        List<Integer> datasetIds = new ArrayList<Integer>(); 
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
-        
-        List<Integer> markerIds = new ArrayList<Integer>(); 
-        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+    }
 
-        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 0, 
+    @Test
+    public void testGetNIdsByDatasetIdsAndMarkerIds() throws Exception {
+
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
+                                            // found in the target crop to be
+                                            // used in testing
+
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids
+                                              // found in the target crop to be
+                                              // used in testing
+
+        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 0,
                 manager.countNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         Debug.println(0, "testGetNIdsByDatasetIdsAndMarkerIds() RESULTS: " + nIdList);
-    }  
-    
+    }
+
     @Test
-    public void testCountNIdsByDatasetIdsAndMarkerIds() throws Exception { 
-        
-        List<Integer> datasetIds = new ArrayList<Integer>(); 
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
-        
-        List<Integer> markerIds = new ArrayList<Integer>(); 
-        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+    public void testCountNIdsByDatasetIdsAndMarkerIds() throws Exception {
+
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
+                                            // found in the target crop to be
+                                            // used in testing
+
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids
+                                              // found in the target crop to be
+                                              // used in testing
 
         int count = manager.countNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds);
         Debug.println(0, "testCountNIdsByDatasetIdsAndMarkerIds() RESULTS: " + count);
-    }  
+    }
 
     @Test
     public void testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
-        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids found in the target crop to be used in testing
+        List<Integer> germplasmIds = new ArrayList<Integer>();
+        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids
+                                                 // found in the target crop to
+                                                 // be used in testing
         germplasmIds.add(Integer.valueOf(1435));
 
-        List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
-                (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        
+        List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds,
+                0, (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+
         Debug.println(0, "testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
-
     @Test
-    public void testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
-        List<Integer> germplasmIds = new ArrayList<Integer>(); 
-        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids found in the target crop to be used in testing
+    public void testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>();
+        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids
+                                                 // found in the target crop to
+                                                 // be used in testing
         germplasmIds.add(Integer.valueOf(1435));
         long count = manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
-    }    
-    
+    }
+
     @Test
     public void testGetAllQtl() throws Exception {
         List<Qtl> qtls = manager.getAllQtl(0, (int) manager.countAllQtl());
@@ -782,137 +825,127 @@ public class TestGenotypicDataManagerImpl{
         long result = manager.countAllQtl();
         Debug.println(0, "testCountAllQtl() RESULTS: " + result);
     }
-    
+
     @Test
-    public void testCountQtlIdByName() throws Exception { 
-        String qtlName = "SLA%";     // Crop tested: Groundnut
+    public void testCountQtlIdByName() throws Exception {
+        String qtlName = "SLA%"; // Crop tested: Groundnut
         long count = manager.countQtlIdByName(qtlName);
         Debug.println(0, "testCountQtlIdByName() RESULTS: " + count);
     }
 
     @Test
     public void testGetQtlIdByName() throws Exception {
-        String qtlName = "SLA%";     // Crop tested: Groundnut
+        String qtlName = "SLA%"; // Crop tested: Groundnut
 
-        List<Integer> results = manager.getQtlIdByName(qtlName, 0, 
-                (int) manager.countQtlIdByName(qtlName));
+        List<Integer> results = manager.getQtlIdByName(qtlName, 0, (int) manager.countQtlIdByName(qtlName));
         Debug.println(0, "testGetQtlIdByName() RESULTS: " + results);
     }
-    
+
     @Test
     public void testGetQtlByNameFromCentral() throws Exception {
-        String qtlName = "HI Control%";     // Crop tested: Groundnut
-        
-        List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
-                (int) manager.countQtlByName(qtlName));
-        
+        String qtlName = "HI Control%"; // Crop tested: Groundnut
+
+        List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, (int) manager.countQtlByName(qtlName));
+
         assertTrue(results.size() > 0);
-        
+
         Debug.printFormattedObjects(3, results);
         Debug.println(0, "testGetQtlByNameFromCentral() #records: " + results.size());
-    } 
-    
+    }
+
     @Test
     public void testGetQtlByNameFromLocal() throws Exception {
-        try{
+        try {
             testSetQTL(); // to add a qtl_details entry with name = "TestQTL"
-        } catch (MiddlewareQueryException e){
-            //Ignore. There is already a record for testing.
+        } catch (MiddlewareQueryException e) {
+            // Ignore. There is already a record for testing.
         }
-        String qtlName = "TestQTL%";  
-        
-        List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
-                (int) manager.countQtlByName(qtlName));
-        
+        String qtlName = "TestQTL%";
+
+        List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, (int) manager.countQtlByName(qtlName));
+
         assertTrue(results.size() > 0);
- 
+
         Debug.printFormattedObjects(3, results);
         Debug.println(0, "testGetQtlByNameFromLocal() #records: " + results.size());
-    } 
+    }
 
-    
     @Test
-    public void testCountQtlByName() throws Exception { 
-        String qtlName = "HI Control%";     // Crop tested: Groundnut
+    public void testCountQtlByName() throws Exception {
+        String qtlName = "HI Control%"; // Crop tested: Groundnut
         long count = manager.countQtlByName(qtlName);
         assertTrue(count > 0);
         Debug.println(0, "testCountQtlByName() RESULTS: " + count);
-    }    
+    }
 
-    
     @Test
-    public void testgetQtlNamesByQtlIds() throws Exception { 
+    public void testgetQtlNamesByQtlIds() throws Exception {
         List<Integer> qtlIds = Arrays.asList(1, 2, 3, -4, -5);
         java.util.Map<Integer, String> qtlNames = manager.getQtlNamesByQtlIds(qtlIds);
         assertTrue(qtlNames.size() > 0);
-        for (int i=0;  i<qtlIds.size(); i++){
+        for (int i = 0; i < qtlIds.size(); i++) {
             Debug.println(3, "QTL ID = " + qtlIds.get(i) + " : QTL NAME = " + qtlNames.get(qtlIds.get(i)));
         }
 
-    }    
+    }
 
     @Test
     public void testGetQtlByTrait() throws Exception {
-        Integer qtlTraitId = 1001; // "SL%";     // Crop tested: Groundnut
-        List<Integer> results = manager.getQtlByTrait(qtlTraitId, 0, 
-                (int) manager.countQtlByTrait(qtlTraitId));
+        Integer qtlTraitId = 1001; // "SL%"; // Crop tested: Groundnut
+        List<Integer> results = manager.getQtlByTrait(qtlTraitId, 0, (int) manager.countQtlByTrait(qtlTraitId));
         Debug.println(0, "testGetQtlByTrait() RESULTS: " + results);
     }
 
-
     @Test
-    public void testCountQtlByTrait() throws Exception { 
-        Integer qtlTraitId = 1001; // "SL%";     // Crop tested: Groundnut
+    public void testCountQtlByTrait() throws Exception {
+        Integer qtlTraitId = 1001; // "SL%"; // Crop tested: Groundnut
         long count = manager.countQtlByTrait(qtlTraitId);
         Debug.println(0, "testCountQtlByTrait() RESULTS: " + count);
-    }    
-    
+    }
+
     @Test
     public void testGetQtlTraitsByDatasetId() throws Exception {
-    	Integer datasetId = 7;		// Crop tested: Groundnut
-        List<Integer> results = manager.getQtlTraitsByDatasetId(datasetId, 0, 
+        Integer datasetId = 7; // Crop tested: Groundnut
+        List<Integer> results = manager.getQtlTraitsByDatasetId(datasetId, 0,
                 (int) manager.countQtlTraitsByDatasetId(datasetId));
         Debug.println(0, "testGetQtlTraitsByDatasetId() RESULTS: " + results);
     }
 
-
     @Test
-    public void testCountQtlTraitsByDatasetId() throws Exception { 
-    	Integer datasetId = 7;		// Crop tested: Groundnut
+    public void testCountQtlTraitsByDatasetId() throws Exception {
+        Integer datasetId = 7; // Crop tested: Groundnut
         long count = manager.countQtlTraitsByDatasetId(datasetId);
         Debug.println(0, "testCountQtlTraitsByDatasetId() RESULTS: " + count);
-    }    
-    
+    }
+
     @Test
-    public void testGetMapIdsByQtlName() throws Exception { 
-        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
-        List<Integer> results = manager.getMapIdsByQtlName(qtlName, 0, 
-                (int) manager.countMapIdsByQtlName(qtlName));
+    public void testGetMapIdsByQtlName() throws Exception {
+        String qtlName = "HI Control 08_AhI"; // Crop tested: Groundnut
+        List<Integer> results = manager.getMapIdsByQtlName(qtlName, 0, (int) manager.countMapIdsByQtlName(qtlName));
         Debug.println(0, "testGetMapIdsByQtlName() RESULTS: " + results);
     }
 
     @Test
-    public void testCountMapIdsByQtlName() throws Exception { 
-        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
+    public void testCountMapIdsByQtlName() throws Exception {
+        String qtlName = "HI Control 08_AhI"; // Crop tested: Groundnut
         long count = manager.countMapIdsByQtlName(qtlName);
         Debug.println(0, "testCountMapIdsByQtlName() RESULTS: " + count);
     }
 
-
     @Test
-    public void testGetMarkersByQtl() throws Exception { 
-        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
+    public void testGetMarkersByQtl() throws Exception {
+        String qtlName = "HI Control 08_AhI"; // Crop tested: Groundnut
         String chromosome = "LG01";
         int min = 0;
         int max = 10;
-        List<Integer> results = manager.getMarkerIdsByQtl(qtlName, chromosome, min, max, 0, 
+        List<Integer> results = manager.getMarkerIdsByQtl(qtlName, chromosome, min, max, 0,
                 (int) manager.countMarkerIdsByQtl(qtlName, chromosome, min, max));
         Debug.println(0, "testGetMarkersByQtl() RESULTS: " + results);
     }
 
     @Test
-    public void testCountMarkersByQtl() throws Exception { 
-        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
+    public void testCountMarkersByQtl() throws Exception {
+        String qtlName = "HI Control 08_AhI"; // Crop tested: Groundnut
         String chromosome = "LG01";
         int min = 0;
         int max = 10;
@@ -921,18 +954,19 @@ public class TestGenotypicDataManagerImpl{
 
     }
 
-
     @Test
     public void getAllParentsFromMappingPopulation() throws Exception {
-    	int start = 0;
-    	int end = 10;
+        int start = 0;
+        int end = 10;
         List<ParentElement> parentElements = manager.getAllParentsFromMappingPopulation(start, end);
         Debug.println(0, "getAllParentsFromMappingPopulation(" + start + "," + end + ")");
         for (ParentElement parentElement : parentElements) {
-            Debug.println(3, "Parent A NId: " + parentElement.getParentANId() 
-                    + "  |  Parent B NId: "+parentElement.getParentBGId());
+            Debug.println(
+                    3,
+                    "Parent A NId: " + parentElement.getParentANId() + "  |  Parent B NId: "
+                            + parentElement.getParentBGId());
         }
-    }    
+    }
 
     @Test
     public void countAllParentsFromMappingPopulation() throws Exception {
@@ -940,28 +974,26 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "countAllParentsFromMappingPopulation()");
         Debug.println(0, "Count: " + parentElementsCount);
     }
-    
+
     @Test
     public void getMapDetailsByName() throws Exception {
         String nameLike = "tag%";
         int start = 0;
         int end = 10;
         List<MapDetailElement> maps = manager.getMapDetailsByName(nameLike, start, end);
-        Debug.println(0, "getMapDetailsByName('"+nameLike+"'," + start + "," + end + ")");
+        Debug.println(0, "getMapDetailsByName('" + nameLike + "'," + start + "," + end + ")");
         for (MapDetailElement map : maps) {
-            Debug.println(0, "Map: " + map.getMarkerCount() 
-                    + "  |  maxStartPosition: " + map.getMaxStartPosition() 
-                    + "  |  linkageGroup: " + map.getLinkageGroup() 
-                    + "  |  mapName: " + map.getMapName() 
+            Debug.println(0, "Map: " + map.getMarkerCount() + "  |  maxStartPosition: " + map.getMaxStartPosition()
+                    + "  |  linkageGroup: " + map.getLinkageGroup() + "  |  mapName: " + map.getMapName()
                     + "  |  mapType:  " + map.getMapType());
         }
-    }    
+    }
 
     @Test
     public void countMapDetailsByName() throws Exception {
         String nameLike = "tag%";
         Long parentElementsCount = manager.countMapDetailsByName(nameLike);
-        Debug.println(0, "countMapDetailsByName('"+nameLike+"')");
+        Debug.println(0, "countMapDetailsByName('" + nameLike + "')");
         Debug.println(0, "Count: " + parentElementsCount);
     }
 
@@ -971,8 +1003,8 @@ public class TestGenotypicDataManagerImpl{
         int end = (int) manager.countAllMapDetails();
         List<MapDetailElement> maps = manager.getAllMapDetails(start, end);
         Debug.println(0, "testGetAllMapDetails(" + start + "," + end + ")");
-        Debug.printObjects(INDENT, maps);        
-    }    
+        Debug.printObjects(INDENT, maps);
+    }
 
     @Test
     public void testCountAllMapDetails() throws Exception {
@@ -981,118 +1013,116 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddQtlDetails() throws Exception {
-        Integer qtlId = -1;          // Crop tested: Groundnut
-        Integer mapId = -2; 
-        Float minPosition = 0f; 
-        Float maxPosition = 8f; 
-        Integer traitId = 1001; // "DE"; 
-        String experiment = ""; 
+        Integer qtlId = -1; // Crop tested: Groundnut
+        Integer mapId = -2;
+        Float minPosition = 0f;
+        Float maxPosition = 8f;
+        Integer traitId = 1001; // "DE";
+        String experiment = "";
         Integer effect = 0;
         Float scoreValue = 2.5f;
-        Float rSquare = 10f; 
-        String linkageGroup = "LG06"; 
-        String interactions = ""; 
+        Float rSquare = 10f;
+        String linkageGroup = "LG06";
+        String interactions = "";
         String leftFlankingMarker = "Ah4-101";
-        String rightFlankingMarker = "GM2536"; 
-        Float position = 34.71f; 
-        Float clen = 0f; 
-        String seAdditive = null; 
-        String hvParent = null; 
-        String hvAllele = null; 
+        String rightFlankingMarker = "GM2536";
+        Float position = 34.71f;
+        Float clen = 0f;
+        String seAdditive = null;
+        String hvParent = null;
+        String hvAllele = null;
         String lvParent = null;
         String lvAllele = null;
-                
+
         QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect,
-                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker,
-                rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);
-        
+                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker, rightFlankingMarker, position,
+                clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);
+
         QtlDetailsPK idAdded = manager.addQtlDetails(qtlDetails);
         Debug.println(0, "testAddQtlDetails() Added: " + (idAdded != null ? qtlDetails : null));
     }
 
-
     @Test
     public void testAddMarkerDetails() throws Exception {
-        Integer markerId = -1;           // Replace with desired values
-        Integer noOfRepeats = 0; 
-        String motifType = ""; 
-        String sequence = ""; 
+        Integer markerId = -1; // Replace with desired values
+        Integer noOfRepeats = 0;
+        String motifType = "";
+        String sequence = "";
         Integer sequenceLength = 0;
-        Integer minAllele = 0; 
-        Integer maxAllele = 0; 
-        Integer ssrNr = 0; 
-        Float forwardPrimerTemp = 0f; 
-        Float reversePrimerTemp = 0f; 
+        Integer minAllele = 0;
+        Integer maxAllele = 0;
+        Integer ssrNr = 0;
+        Float forwardPrimerTemp = 0f;
+        Float reversePrimerTemp = 0f;
         Float elongationTemp = 0f;
-        Integer fragmentSizeExpected = 0; 
-        Integer fragmentSizeObserved = 0; 
-        Integer expectedProductSize = 0; 
+        Integer fragmentSizeExpected = 0;
+        Integer fragmentSizeObserved = 0;
+        Integer expectedProductSize = 0;
         Integer positionOnReferenceSequence = 0;
         String restrictionEnzymeForAssay = null;
-        
+
         MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
                 minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
                 fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
                 restrictionEnzymeForAssay);
-        
+
         Integer idAdded = manager.addMarkerDetails(markerDetails);
         Debug.println(0, "testAddMarkerDetails() Added: " + (idAdded != null ? markerDetails : null));
     }
 
-
     @Test
     public void testAddMarkerUserInfo() throws Exception {
-        Integer markerId = -1;           // Replace with desired values
+        Integer markerId = -1; // Replace with desired values
         String principalInvestigator = "Juan Dela Cruz";
         String contact = "juan@irri.com.ph";
         String institute = "IRRI";
-        
+
         MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
-        
+
         Integer idAdded = manager.addMarkerUserInfo(markerUserInfo);
         Debug.println(0, "testAddMarkerUserInfo() Added: " + (idAdded != null ? markerUserInfo : null));
     }
-    
+
     @Test
     public void testAddAccMetadataSet() throws Exception {
-        Integer datasetId = -1;  // Crop tested: Groundnut
-        Integer germplasmId = 1; 
+        Integer datasetId = -1; // Crop tested: Groundnut
+        Integer germplasmId = 1;
         Integer nameId = 1;
-        
+
         AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, germplasmId, nameId);
-        
+
         AccMetadataSetPK idAdded = manager.addAccMetadataSet(accMetadataSet);
         Debug.println(0, "testAccMetadataSet() Added: " + (idAdded != null ? accMetadataSet : null));
     }
 
     @Test
     public void testAddMarkerMetadataSet() throws Exception {
-        Integer datasetId = -1;  // Crop tested: Groundnut
-        Integer markerId = -1; 
-        
+        Integer datasetId = -1; // Crop tested: Groundnut
+        Integer markerId = -1;
+
         MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
-        
+
         MarkerMetadataSetPK idAdded = manager.addMarkerMetadataSet(markerMetadataSet);
         Debug.println(0, "testAddMarkerMetadataSet() Added: " + (idAdded != null ? markerMetadataSet : null));
     }
 
     @Test
     public void testAddDataset() throws Exception {
-    	Dataset dataset = createDataset();
-    	manager.addDataset(dataset);
+        Dataset dataset = createDataset();
+        manager.addDataset(dataset);
         Debug.println(0, "testAddDataset() Added: " + (dataset.getDatasetId() != null ? dataset : null));
     }
-    
-    private Dataset createDataset() throws Exception{
-        Integer datasetId = null;       // Crop tested: Groundnut
-        String datasetName = " QTL_ ICGS 44 X ICGS 78" + (int) (Math.random()*1000);
+
+    private Dataset createDataset() throws Exception {
+        Integer datasetId = null; // Crop tested: Groundnut
+        String datasetName = " QTL_ ICGS 44 X ICGS 78" + (int) (Math.random() * 1000);
         String datasetDesc = "ICGS 44 X ICGS 78";
         String datasetType = "QTL";
-        String genus = "Groundnut"; 
-        String species = ""; 
-        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
-        String remarks = ""; 
-        String dataType = "int"; 
+        String genus = "Groundnut";
+        String species = "";
+        Date uploadTemplateDate = new Date(System.currentTimeMillis());
+        String remarks = "";
+        String dataType = "int";
         String missingData = null;
         String method = null;
         String score = null;
@@ -1100,23 +1130,22 @@ public class TestGenotypicDataManagerImpl{
         String principalInvestigator = null;
         String email = null;
         String purposeOfStudy = null;
-        
-        return new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
-    }
 
+        return new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate,
+                remarks, dataType, missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
+    }
 
     @Test
     public void testAddGDMSMarker() throws Exception {
-    	
-    	Integer markerId = 0;
+
+        Integer markerId = 0;
         String markerType = "SSR";
         String markerName = "SeqTEST";
         String species = "Groundnut";
         String dbAccessionId = null;
         String reference = null;
         String genotype = null;
-        String ploidy = null; 
+        String ploidy = null;
         String primerId = null;
         String remarks = null;
         String assayType = null;
@@ -1126,71 +1155,74 @@ public class TestGenotypicDataManagerImpl{
         String productSize = null;
         Float annealingTemp = Float.valueOf(0);
         String amplification = null;
-        
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
-        
+
+        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
+                ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
+                amplification);
+
         Integer idAdded = manager.addGDMSMarker(marker);
         Debug.println(0, "testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
     }
 
     @Test
     public void testAddGDMSMarkerAlias() throws Exception {
-  	
+
         Integer markerId = -1;
         String alias = "testalias";
-      
+
         MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
-      
+
         Integer idAdded = manager.addGDMSMarkerAlias(markerAlias);
         Debug.println(0, "testAddGDMSMarkerAlias() Added: " + (idAdded != null ? markerAlias : null));
     }
-    
+
     @Test
     public void testAddDatasetUser() throws Exception {
-  	
+
         Integer datasetId = -1;
         Integer userId = 123;
-      
+
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-      
+
         Integer idAdded = manager.addDatasetUser(datasetUser);
         Debug.println(0, "testAddDatasetUser() Added: " + (idAdded != null ? datasetUser : null));
-    }  
+    }
 
     @Test
     public void testAddAlleleValues() throws Exception {
-        Integer anId = null;                // Crop tested: Groundnut
-        Integer datasetId = -1; 
-        Integer gId = 1920; 
-        Integer markerId = 1037; 
-        String alleleBinValue = "alleleBinValue"; 
+        Integer anId = null; // Crop tested: Groundnut
+        Integer datasetId = -1;
+        Integer gId = 1920;
+        Integer markerId = 1037;
+        String alleleBinValue = "alleleBinValue";
         String alleleRawValue = "alleleRawValue";
         Integer peakHeight = 10;
-      
-        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
-      
+
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue,
+                peakHeight);
+
         Integer idAdded = manager.addAlleleValues(alleleValues);
         Debug.println(0, "testAddAlleleValues() Added: " + (idAdded != null ? alleleValues : null));
-    }  
-  
+    }
+
     @Test
     public void testAddCharValues() throws Exception {
-        Integer acId = null;            // Crop tested: Groundnut
-        Integer datasetId = -1; 
-        Integer gId = 1920; 
-        Integer markerId = 1037; 
-        String charValue = "CV"; 
-      
+        Integer acId = null; // Crop tested: Groundnut
+        Integer datasetId = -1;
+        Integer gId = 1920;
+        Integer markerId = 1037;
+        String charValue = "CV";
+
         CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
-      
+
         Integer idAdded = manager.addCharValues(charValues);
         Debug.println(0, "testAddCharValues() Added: " + (idAdded != null ? charValues : null));
-    }  
+    }
 
     @Test
     public void testAddMappingPop() throws Exception {
-  	
-    	Integer datasetId = -1;
+
+        Integer datasetId = -1;
         String mappingType = "test";
         Integer parentAGId = 956;
         Integer parentBGId = 1042;
@@ -1199,82 +1231,83 @@ public class TestGenotypicDataManagerImpl{
         String mapDataDescription = "test";
         String scoringScheme = "test";
         Integer mapId = 0;
-      
-        MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize, populationType, mapDataDescription, scoringScheme, mapId);
-      
+
+        MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize,
+                populationType, mapDataDescription, scoringScheme, mapId);
+
         Integer idAdded = manager.addMappingPop(mappingPop);
         Debug.println(0, "testAddMappingPop() Added: " + (idAdded != null ? mappingPop : null));
-    }    
-    
+    }
+
     @Test
     public void testAddMappingPopValue() throws Exception {
-  	
-    	Integer mpId = null;
+
+        Integer mpId = null;
         String mapCharValue = "X";
         Integer datasetId = -1;
         Integer gid = 1434;
         Integer markerId = 2537;
-      
+
         MappingPopValues mappingPopValue = new MappingPopValues(mpId, mapCharValue, datasetId, gid, markerId);
-      
+
         Integer idAdded = manager.addMappingPopValue(mappingPopValue);
         Debug.println(0, "testAddMappingPopValue() Added: " + (idAdded != null ? mappingPopValue : null));
-    }    
+    }
 
-    
     @Test
     public void testAddMarkerOnMap() throws Exception {
-  	
-    	Integer mapId = -2;
-    	Integer markerId = -6;
-    	Float startPosition = Float.valueOf("123.4");
-    	Float endPosition = Float.valueOf("567.8");
-//    	String mapUnit = "TS";
-    	String linkageGroup = "Test";
-      
+
+        Integer mapId = -2;
+        Integer markerId = -6;
+        Float startPosition = Float.valueOf("123.4");
+        Float endPosition = Float.valueOf("567.8");
+        // String mapUnit = "TS";
+        String linkageGroup = "Test";
+
         MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
 
-        try{
-        	Integer idAdded = manager.addMarkerOnMap(markerOnMap);
+        try {
+            Integer idAdded = manager.addMarkerOnMap(markerOnMap);
             Debug.println(0, "testAddMarkerOnMap() Added: " + (idAdded != null ? markerOnMap : null));
-        }catch(MiddlewareQueryException e){
-        	if (e.getMessage().contains("Map Id not found")){
-        		Debug.println(0, "Foreign key constraint violation: Map Id not found");
-        	}
+        } catch (MiddlewareQueryException e) {
+            if (e.getMessage().contains("Map Id not found")) {
+                Debug.println(0, "Foreign key constraint violation: Map Id not found");
+            }
         }
-    }    
-    
+    }
+
     @Test
     public void testAddDartValue() throws Exception {
-  	
-    	Integer adId = null;
-    	Integer datasetId = -6;
-    	Integer markerId = -1;
-    	Integer cloneId = -1;
-    	Float qValue = Float.valueOf("123.45");
-    	Float reproducibility = Float.valueOf("543.21");
-    	Float callRate = Float.valueOf("12.3");
-    	Float picValue = Float.valueOf("543.2");
-    	Float discordance = Float.valueOf("1.2");
-    	
-        DartValues dartValue = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
-      
+
+        Integer adId = null;
+        Integer datasetId = -6;
+        Integer markerId = -1;
+        Integer cloneId = -1;
+        Float qValue = Float.valueOf("123.45");
+        Float reproducibility = Float.valueOf("543.21");
+        Float callRate = Float.valueOf("12.3");
+        Float picValue = Float.valueOf("543.2");
+        Float discordance = Float.valueOf("1.2");
+
+        DartValues dartValue = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate,
+                picValue, discordance);
+
         Integer idAdded = manager.addDartValue(dartValue);
         Debug.println(0, "testAddDartValue() Added: " + (idAdded != null ? dartValue : null));
-    }    
-    
+    }
+
     @Test
     public void testAddQtl() throws Exception {
-    
+
         Integer qtlId = null;
         String qtlName = "TestQTL";
         Integer datasetId = -6;
-        
+
         Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
-      
+
         Integer idAdded = manager.addQtl(qtl);
         Debug.println(0, "testAddQtl() Added: " + (idAdded != null ? qtl : null));
-    }    
+    }
 
     @Test
     public void testAddMap() throws Exception {
@@ -1283,24 +1316,24 @@ public class TestGenotypicDataManagerImpl{
         String mapType = "genetic";
         Integer mpId = 0;
         String mapDesc = null;
-        String mapUnit = null;        		
-        
+        String mapUnit = null;
+
         Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit);
-      
+
         Integer idAdded = manager.addMap(map);
         Debug.println(0, "testAddMap() Added: " + (idAdded != null ? map : null));
-    }    
+    }
 
     @Test
     public void testSetSSRMarkers() throws Exception {
-    	List<Object> markerRecords = createMarkerMarkeRecords();
+        List<Object> markerRecords = createMarkerMarkeRecords();
         Marker marker = (Marker) markerRecords.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
         MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
-        
+
         Boolean addStatus = manager.setSSRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        if (addStatus){
+        if (addStatus) {
             Debug.println(0, "testSetSSRMarkers() Added: ");
             Debug.println(3, marker.toString());
             Debug.println(3, markerAlias.toString());
@@ -1308,17 +1341,17 @@ public class TestGenotypicDataManagerImpl{
             Debug.println(3, markerUserInfo.toString());
         }
     }
-    
-	private List<Object> createMarkerMarkeRecords() {
 
-    	Integer markerId = null; //Will be set/overridden by the function
-        String markerType = null; //Will be set/overridden by the function
-        String markerName = "SeqTEST" + (int) (Math.random()*1000);
+    private List<Object> createMarkerMarkeRecords() {
+
+        Integer markerId = null; // Will be set/overridden by the function
+        String markerType = null; // Will be set/overridden by the function
+        String markerName = "SeqTEST" + (int) (Math.random() * 1000);
         String species = "Groundnut";
         String dbAccessionId = null;
         String reference = null;
         String genotype = null;
-        String ploidy = null; 
+        String ploidy = null;
         String primerId = null;
         String remarks = null;
         String assayType = null;
@@ -1330,52 +1363,54 @@ public class TestGenotypicDataManagerImpl{
         String amplification = null;
 
         String alias = "testalias";
-        Integer noOfRepeats = 0; 
-        String motifType = ""; 
-        String sequence = ""; 
+        Integer noOfRepeats = 0;
+        String motifType = "";
+        String sequence = "";
         Integer sequenceLength = 0;
-        Integer minAllele = 0; 
-        Integer maxAllele = 0; 
-        Integer ssrNr = 0; 
-        Float forwardPrimerTemp = 0f; 
-        Float reversePrimerTemp = 0f; 
+        Integer minAllele = 0;
+        Integer maxAllele = 0;
+        Integer ssrNr = 0;
+        Float forwardPrimerTemp = 0f;
+        Float reversePrimerTemp = 0f;
         Float elongationTemp = 0f;
-        Integer fragmentSizeExpected = 0; 
-        Integer fragmentSizeObserved = 0; 
-        Integer expectedProductSize = 0; 
+        Integer fragmentSizeExpected = 0;
+        Integer fragmentSizeObserved = 0;
+        Integer expectedProductSize = 0;
         Integer positionOnReferenceSequence = 0;
         String restrictionEnzymeForAssay = null;
         String principalInvestigator = "Juan Dela Cruz";
         String contact = "juan@irri.com.ph";
         String institute = "IRRI";
 
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
+        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
+                ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
+                amplification);
         MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
         MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
                 minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
                 fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
                 restrictionEnzymeForAssay);
         MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
-        
+
         List<Object> markerRecords = new ArrayList<Object>();
         markerRecords.add(marker);
         markerRecords.add(markerAlias);
         markerRecords.add(markerDetails);
         markerRecords.add(markerUserInfo);
         return markerRecords;
-        
+
     }
-    
+
     @Test
     public void testSetSNPMarkers() throws Exception {
-    	List<Object> markerRecrods = createMarkerMarkeRecords();
+        List<Object> markerRecrods = createMarkerMarkeRecords();
         Marker marker = (Marker) markerRecrods.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
         MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
         Boolean addStatus = manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        if (addStatus){
+        if (addStatus) {
             Debug.println(0, "testSetSNPMarkers() Added: ");
             Debug.println(3, marker.toString());
             Debug.println(3, markerAlias.toString());
@@ -1386,14 +1421,14 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetCAPMarkers() throws Exception {
-    	List<Object> markerRecrods = createMarkerMarkeRecords();
+        List<Object> markerRecrods = createMarkerMarkeRecords();
         Marker marker = (Marker) markerRecrods.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
         MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
         Boolean addStatus = manager.setCAPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        if (addStatus){
+        if (addStatus) {
             Debug.println(0, "testSetCAPMarkers() Added: ");
             Debug.println(3, marker.toString());
             Debug.println(3, markerAlias.toString());
@@ -1404,14 +1439,14 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetCISRMarkers() throws Exception {
-    	List<Object> markerRecrods = createMarkerMarkeRecords();
+        List<Object> markerRecrods = createMarkerMarkeRecords();
         Marker marker = (Marker) markerRecrods.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
         MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
         Boolean addStatus = manager.setCISRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        if (addStatus){
+        if (addStatus) {
             Debug.println(0, "testSetCISRMarkers() Added: ");
             Debug.println(3, marker.toString());
             Debug.println(3, markerAlias.toString());
@@ -1419,41 +1454,41 @@ public class TestGenotypicDataManagerImpl{
             Debug.println(3, markerUserInfo.toString());
         }
     }
-    
+
     // Create test data for setSSR, setSNP, setDArT, setMappingData
-    private java.util.Map<String, Object> createMappingRecords() throws Exception{
+    private java.util.Map<String, Object> createMappingRecords() throws Exception {
         java.util.Map<String, Object> records = new HashMap<String, Object>();
 
         // DatasetUser Fields
-        Integer datasetId = null; //Will be set/overridden by the function
+        Integer datasetId = null; // Will be set/overridden by the function
         Integer userId = 123;
 
         // AccMetadataSet Additional Fields
-        Integer gId = 1; 
+        Integer gId = 1;
         Integer nameId = 1;
 
         // MarkerMetadataSet Additional Field
         Integer markerId = 1;
 
         // AlleleValues Additional Fields
-        Integer anId = null;     //Will be set/overridden by the function
+        Integer anId = null; // Will be set/overridden by the function
         String alleleBinValue = "238:238";
         String alleleRawValue = "0.0:0.0";
         Integer peakHeight = 10;
-        
+
         // DartValues Additional Fields
-        Integer adId = null;  //Will be set/overridden by the function
+        Integer adId = null; // Will be set/overridden by the function
         Integer cloneId = 1;
-        Float qValue = 0f; 
+        Float qValue = 0f;
         Float reproducibility = 0f;
-        Float callRate = 0f; 
-        Float picValue = 0f; 
+        Float callRate = 0f;
+        Float picValue = 0f;
         Float discordance = 0f;
 
         // charValues Additional Fields
-        Integer acId = null;           
-        String charValue = "CV"; 
-        
+        Integer acId = null;
+        String charValue = "CV";
+
         // MappingPop Additional Fields
         String mappingType = "abh";
         Integer parentAGId = 1035;
@@ -1463,19 +1498,22 @@ public class TestGenotypicDataManagerImpl{
         String mapDataDescription = "Flood resistant";
         String scoringScheme = "";
         Integer mapId = 1;
-        
+
         // MappingPopValues Additional Fields
-        Integer mpId = null;  //Will be set/overridden by the function
+        Integer mpId = null; // Will be set/overridden by the function
         String mapCharValue = "-";
 
         Dataset dataset = createDataset();
         AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
         MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue,
+                peakHeight);
         CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
-        DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
-        MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize, populationType, mapDataDescription, scoringScheme, mapId);
+        DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate,
+                picValue, discordance);
+        MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize,
+                populationType, mapDataDescription, scoringScheme, mapId);
         MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId);
         Marker marker = (Marker) createMarkerMarkeRecords().get(0);
 
@@ -1489,69 +1527,78 @@ public class TestGenotypicDataManagerImpl{
         records.put(MAPPING_POP, mappingPop);
         records.put(MAPPING_POP_VALUES, mappingPopValues);
         records.put(MARKER, marker);
-        
+
         return records;
     }
-    
-    
+
     @Test
     public void testSetQTL() throws Exception {
-        Integer datasetId = null; //Will be set/overridden by the function
+        Integer datasetId = null; // Will be set/overridden by the function
         Integer userId = 123;
-        
-        Integer qtlId = null; //Will be set/overridden by the function
-        Integer mapId = 1; 
-        Float minPosition = 0f; 
-        Float maxPosition = 8f; 
-        Integer traitId = 1001; //"DE"; 
-        String experiment = ""; 
+
+        Integer qtlId = null; // Will be set/overridden by the function
+        Integer mapId = 1;
+        Float minPosition = 0f;
+        Float maxPosition = 8f;
+        Integer traitId = 1001; // "DE";
+        String experiment = "";
         Integer effect = 0;
         Float scoreValue = 2.5f;
-        Float rSquare = 10f; 
-        String linkageGroup = "LG06"; 
-        String interactions = ""; 
+        Float rSquare = 10f;
+        String linkageGroup = "LG06";
+        String interactions = "";
         String leftFlankingMarker = "Ah4-101";
-        String rightFlankingMarker = "GM2536"; 
-        Float position = 34.71f; 
-        Float clen = 0f; 
-        String seAdditive = null; 
-        String hvParent = null; 
-        String hvAllele = null; 
+        String rightFlankingMarker = "GM2536";
+        Float position = 34.71f;
+        Float clen = 0f;
+        String seAdditive = null;
+        String hvParent = null;
+        String hvAllele = null;
         String lvParent = null;
         String lvAllele = null;
-                
-    	String qtlName = "TestQTL";
-    	        
+
+        String qtlName = "TestQTL";
+
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-        
+
         Dataset dataset = createDataset();
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100)); //Used to insert a new dataset
-        
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used
+                                                                                        // to
+                                                                                        // insert
+                                                                                        // a
+                                                                                        // new
+                                                                                        // dataset
+
         QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect,
-                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker,
-                rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);        
+                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker, rightFlankingMarker, position,
+                clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);
 
         Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
-        
+
         List<QtlDataRow> dataRows = new ArrayList<QtlDataRow>();
         dataRows.add(new QtlDataRow(qtl, qtlDetails));
-                
+
         Boolean addStatus = manager.setQTL(dataset, datasetUser, dataRows);
 
         assertTrue(addStatus);
 
         Debug.println(0, "testSetQTL() Added: ");
-        Debug.println(3, datasetUser.toString()); 
-        Debug.println(3, dataset.toString()); 
+        Debug.println(3, datasetUser.toString());
+        Debug.println(3, dataset.toString());
         Debug.printObjects(INDENT, dataRows);
     }
-    
+
     @Test
     public void testSetDart() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100)); //Used to insert a new dataset
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used
+                                                                                        // to
+                                                                                        // insert
+                                                                                        // a
+                                                                                        // new
+                                                                                        // dataset
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
@@ -1563,17 +1610,17 @@ public class TestGenotypicDataManagerImpl{
         dataRows.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues, dartValues));
 
         Boolean addStatus = manager.setDart(dataset, datasetUser, dataRows);
-        
+
         assertTrue(addStatus);
         Debug.println(0, "testSetDArT() Added: ");
-        Debug.println(3, dataset.toString()); 
-        Debug.println(3, datasetUser.toString()); 
+        Debug.println(3, dataset.toString());
+        Debug.println(3, datasetUser.toString());
         Debug.printObjects(INDENT, dataRows);
     }
-    
+
     @Test
     public void testSetDartDuplicateDataset() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -1586,9 +1633,9 @@ public class TestGenotypicDataManagerImpl{
         List<DartDataRow> dataRows = new ArrayList<DartDataRow>();
         dataRows.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues, dartValues));
 
-        try{
-                manager.setDart(dataset, datasetUser, dataRows);  
-                manager.setDart(dataset, datasetUser, dataRows);  
+        try {
+            manager.setDart(dataset, datasetUser, dataRows);
+            manager.setDart(dataset, datasetUser, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
@@ -1596,10 +1643,15 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetSSR() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*1000)); //Used to insert a new dataset
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 1000)); // Used
+                                                                                         // to
+                                                                                         // insert
+                                                                                         // a
+                                                                                         // new
+                                                                                         // dataset
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
@@ -1613,15 +1665,15 @@ public class TestGenotypicDataManagerImpl{
 
         assertTrue(addStatus);
         Debug.println(0, "testSetSSR() Added: ");
-        Debug.println(3, dataset.toString());         
-        Debug.println(3, datasetUser.toString()); 
+        Debug.println(3, dataset.toString());
+        Debug.println(3, datasetUser.toString());
         Debug.printObjects(INDENT, dataRows);
 
     }
-    
+
     @Test
     public void testSetSSRtDuplicateDataset() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -1633,7 +1685,7 @@ public class TestGenotypicDataManagerImpl{
         List<SSRDataRow> dataRows = new ArrayList<SSRDataRow>();
         dataRows.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues));
 
-        try{
+        try {
             manager.setSSR(dataset, datasetUser, dataRows);
             manager.setSSR(dataset, datasetUser, dataRows);
         } catch (MiddlewareQueryException e) {
@@ -1641,13 +1693,17 @@ public class TestGenotypicDataManagerImpl{
         }
     }
 
-    
     @Test
     public void testSetSNP() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100)); //Used to insert a new dataset
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used
+                                                                                        // to
+                                                                                        // insert
+                                                                                        // a
+                                                                                        // new
+                                                                                        // dataset
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
@@ -1660,14 +1716,14 @@ public class TestGenotypicDataManagerImpl{
         Boolean addStatus = manager.setSNP(dataset, datasetUser, dataRows);
         assertTrue(addStatus);
         Debug.println(0, "testSetSNP() Added: ");
-        Debug.println(3, dataset.toString());         
-        Debug.println(3, datasetUser.toString()); 
+        Debug.println(3, dataset.toString());
+        Debug.println(3, datasetUser.toString());
         Debug.printObjects(INDENT, dataRows);
     }
-    
+
     @Test
     public void testSetSNPDuplicateDataset() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -1679,17 +1735,17 @@ public class TestGenotypicDataManagerImpl{
         List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
         dataRows.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues));
 
-        try{
+        try {
             manager.setSNP(dataset, datasetUser, dataRows);
             manager.setSNP(dataset, datasetUser, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
     }
-    
+
     @Test
     public void testSetMappingABH() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -1703,12 +1759,17 @@ public class TestGenotypicDataManagerImpl{
         String datasetName = "Map_Pop GCP-832 Test";
         String datasetDesc = "Map_Pop GCP-832 Test Description";
         String datasetType = "mapping";
-        String species = "Groundnut"; 
-        String dataType = "map"; 
-        String genus = "Groundnut"; 
+        String species = "Groundnut";
+        String dataType = "map";
+        String genus = "Groundnut";
 
         dataset.setDatasetName(datasetName);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100)); //Used to insert a new dataset
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used
+                                                                                        // to
+                                                                                        // insert
+                                                                                        // a
+                                                                                        // new
+                                                                                        // dataset
 
         dataset.setDatasetDesc(datasetDesc);
         dataset.setDatasetType(datasetType);
@@ -1716,20 +1777,19 @@ public class TestGenotypicDataManagerImpl{
         dataset.setSpecies(species);
         dataset.setDataType(dataType);
         dataset.setGenus(genus);
-        
+
         List<MappingABHRow> dataRows = new ArrayList<MappingABHRow>();
         dataRows.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues));
-        
+
         Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);
 
         assertTrue(addStatus);
         Debug.println(0, "testSetMappingABH() Added: ");
-        Debug.println(3, dataset.toString());         
-        Debug.println(3, datasetUser.toString());    
-        Debug.println(3, mappingPop.toString()); 
+        Debug.println(3, dataset.toString());
+        Debug.println(3, datasetUser.toString());
+        Debug.println(3, mappingPop.toString());
         Debug.printObjects(INDENT, dataRows);
     }
-    
 
     @Test
     public void testSetMappingABHDuplicateDataset() throws Exception {
@@ -1747,9 +1807,9 @@ public class TestGenotypicDataManagerImpl{
         String datasetName = "Map_Pop GCP-832 Test";
         String datasetDesc = "Map_Pop GCP-832 Test Description";
         String datasetType = "mapping";
-        String species = "Groundnut"; 
-        String dataType = "map"; 
-        String genus = "Groundnut"; 
+        String species = "Groundnut";
+        String dataType = "map";
+        String genus = "Groundnut";
 
         dataset.setDatasetName(datasetName);
         dataset.setDatasetDesc(datasetDesc);
@@ -1758,14 +1818,13 @@ public class TestGenotypicDataManagerImpl{
         dataset.setSpecies(species);
         dataset.setDataType(dataType);
         dataset.setGenus(genus);
-        
+
         List<MappingABHRow> dataRows = new ArrayList<MappingABHRow>();
         dataRows.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues));
-        
 
-        try{
+        try {
             manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);
-            manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);            
+            manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
@@ -1773,10 +1832,15 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetMappingAllelicSNP() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100)); //Used to insert a new dataset
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used
+                                                                                        // to
+                                                                                        // insert
+                                                                                        // a
+                                                                                        // new
+                                                                                        // dataset
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
@@ -1784,20 +1848,19 @@ public class TestGenotypicDataManagerImpl{
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         Marker marker = (Marker) mappingRecords.get(MARKER);
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
-        
+
         List<MappingAllelicSNPRow> dataRows = new ArrayList<MappingAllelicSNPRow>();
         dataRows.add(new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, charValues));
-        
+
         Boolean addStatus = manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, dataRows);
 
         assertTrue(addStatus);
         Debug.println(0, "testSetMappingAllelicSNP() Added: ");
-        Debug.println(3, dataset.toString());         
-        Debug.println(3, datasetUser.toString());    
-        Debug.println(3, mappingPop.toString()); 
+        Debug.println(3, dataset.toString());
+        Debug.println(3, datasetUser.toString());
+        Debug.println(3, mappingPop.toString());
         Debug.printObjects(INDENT, dataRows);
     }
-    
 
     @Test
     public void testSetMappingAllelicSNPDuplicateDataset() throws Exception {
@@ -1814,8 +1877,8 @@ public class TestGenotypicDataManagerImpl{
 
         List<MappingAllelicSNPRow> dataRows = new ArrayList<MappingAllelicSNPRow>();
         dataRows.add(new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, charValues));
-        
-        try{
+
+        try {
             manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, dataRows);
             manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, dataRows);
         } catch (MiddlewareQueryException e) {
@@ -1823,36 +1886,46 @@ public class TestGenotypicDataManagerImpl{
         }
     }
 
-           
     @Test
     public void testSetMappingAllelicSSRDArT() throws Exception {
-        
+
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100));  //Used to insert a new dataset
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used
+                                                                                        // to
+                                                                                        // insert
+                                                                                        // a
+                                                                                        // new
+                                                                                        // dataset
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
         MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         Marker marker = (Marker) mappingRecords.get(MARKER);
-        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //Remove line to test duplicate marker entries
+        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random() * 100)); // Remove
+                                                                                    // line
+                                                                                    // to
+                                                                                    // test
+                                                                                    // duplicate
+                                                                                    // marker
+                                                                                    // entries
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
-        
+
         List<MappingAllelicSSRDArTRow> dataRows = new ArrayList<MappingAllelicSSRDArTRow>();
-        dataRows.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, alleleValues, dartValues));
+        dataRows.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues,
+                alleleValues, dartValues));
 
         Boolean addStatus = manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, dataRows);
-        
+
         assertTrue(addStatus);
         Debug.println(0, "testSetMappingAllelicSSRDArT() Added: ");
-        Debug.println(3, dataset.toString());         
-        Debug.println(3, datasetUser.toString());    
-        Debug.println(3, mappingPop.toString()); 
+        Debug.println(3, dataset.toString());
+        Debug.println(3, datasetUser.toString());
+        Debug.println(3, mappingPop.toString());
         Debug.printObjects(INDENT, dataRows);
     }
-        
 
     @Test
     public void testSetMappingAllelicSSRDArTDuplicateDataset() throws Exception {
@@ -1865,44 +1938,51 @@ public class TestGenotypicDataManagerImpl{
         MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         Marker marker = (Marker) mappingRecords.get(MARKER);
-        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //Remove line to test duplicate marker entries
+        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random() * 100)); // Remove
+                                                                                    // line
+                                                                                    // to
+                                                                                    // test
+                                                                                    // duplicate
+                                                                                    // marker
+                                                                                    // entries
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
-        
-        List<MappingAllelicSSRDArTRow> dataRows = new ArrayList<MappingAllelicSSRDArTRow>();
-        dataRows.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, alleleValues, dartValues));
 
-        try{
+        List<MappingAllelicSSRDArTRow> dataRows = new ArrayList<MappingAllelicSSRDArTRow>();
+        dataRows.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues,
+                alleleValues, dartValues));
+
+        try {
             manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, dataRows);
             manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
     }
-    
+
     @Test
     public void testSetMaps() throws Exception {
-        
+
         // Marker Fields
-        Integer markerId = null; // Value will be set/overriden by the function 
+        Integer markerId = null; // Value will be set/overriden by the function
         String markerType = "UA";
         String markerName = "GCP-833TestMarker";
         String species = "Groundnut";
-        
+
         Marker marker = new Marker();
         marker.setMarkerId(markerId);
         marker.setMarkerType(markerType);
         marker.setMarkerName(markerName);
         marker.setSpecies(species);
         marker.setAnnealingTemp(new Float(0));
-        
+
         // Map Fields
         Integer mapId = null; // Value will be set/overriden by the function
         String mapName = "GCP-833TestMap";
         String mapType = "genetic";
         Integer mpId = 0;
         String mapDesc = null;
-        
+
         // MarkerOnMap Fields
         Float startPosition = new Float(0);
         Float endPosition = new Float(0);
@@ -1912,21 +1992,20 @@ public class TestGenotypicDataManagerImpl{
         Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit);
 
         MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
-        
+
         Boolean addStatus = null;
-        try{
-	        addStatus = manager.setMaps(marker, markerOnMap, map);
-        } catch(MiddlewareQueryException e){
-        	if (e.getMessage().contains("The marker on map combination already exists")){
-        			Debug.println(0, "The marker on map combination already exists");        		
-        	} else {
-	        		Debug.println(0, "testSetMaps() Added: " + (addStatus != null ? marker : null) 
-	                    + " | " + (addStatus != null ? markerOnMap : null) 
-	                    + " | " + (addStatus != null ? map : null));
-        	}
-        }   
+        try {
+            addStatus = manager.setMaps(marker, markerOnMap, map);
+        } catch (MiddlewareQueryException e) {
+            if (e.getMessage().contains("The marker on map combination already exists")) {
+                Debug.println(0, "The marker on map combination already exists");
+            } else {
+                Debug.println(0, "testSetMaps() Added: " + (addStatus != null ? marker : null) + " | "
+                        + (addStatus != null ? markerOnMap : null) + " | " + (addStatus != null ? map : null));
+            }
+        }
     }
-    
+
     @Test
     public void TestGetMapIDsByQTLName() throws Exception {
         String qtlName = "HI Control 08_AhI";
@@ -1938,7 +2017,7 @@ public class TestGenotypicDataManagerImpl{
             Debug.println(3, "Map ID: " + mapID);
         }
     }
-    
+
     @Test
     public void TestCountMapIDsByQTLName() throws Exception {
         String qtlName = "HI Control 08_AhI";
@@ -1947,23 +2026,23 @@ public class TestGenotypicDataManagerImpl{
 
         Debug.println(0, "TestCountMapIDsByQTLName(" + qtlName + ")");
         Debug.println(INDENT, "Count of Map IDs: " + count);
-        
+
     }
-    
+
     @Test
     public void testGetMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
         int mapID = 1;
         String linkage = "LG01";
         double startPos = 0;
         double endPos = 2.2;
-        Set<Integer> markerIDs = manager.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(
-                                                mapID, linkage, startPos, endPos, 0, 1);
+        Set<Integer> markerIDs = manager.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkage, startPos,
+                endPos, 0, 1);
 
         for (Integer markerID : markerIDs) {
             Debug.println(INDENT, "Marker ID: " + markerID);
         }
     }
-    
+
     @Test
     public void testCountMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
         int mapID = 1;
@@ -1975,17 +2054,17 @@ public class TestGenotypicDataManagerImpl{
 
         Debug.println(0, "Count of Marker IDs: " + count);
     }
-    
+
     @Test
     public void testGetMarkersByMarkerIDs() throws Exception {
         List<Integer> markerIDs = new ArrayList<Integer>();
         markerIDs.add(1317);
-        
+
         List<Marker> markerList = manager.getMarkersByMarkerIds(markerIDs, 0, 5);
 
         Debug.printObjects(INDENT, markerList);
     }
-    
+
     @Test
     public void testCountMarkersByMarkerIDs() throws Exception {
         List<Integer> markerIDs = new ArrayList<Integer>();
@@ -1995,39 +2074,37 @@ public class TestGenotypicDataManagerImpl{
 
         Debug.println(0, "Count of Markers: " + count);
     }
-    
+
     @Test
     public void testGetQtlByQtlIdsFromCentral() throws Exception {
         List<Integer> qtlIds = new ArrayList<Integer>();
         qtlIds.add(1);
         qtlIds.add(2);
         qtlIds.add(3);
-      
-        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, 
-                (int) manager.countQtlByQtlIds(qtlIds));
-        
+
+        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, (int) manager.countQtlByQtlIds(qtlIds));
+
         assertTrue(results.size() > 0);
-        Debug.printFormattedObjects(3, results); 
+        Debug.printFormattedObjects(3, results);
     }
 
     @Test
     public void testGetQtlByQtlIdsFromLocal() throws Exception {
-        try{
+        try {
             testSetQTL(); // to add a qtl_details entry
-        } catch (MiddlewareQueryException e){
-            //Ignore. There is already a record for testing.
+        } catch (MiddlewareQueryException e) {
+            // Ignore. There is already a record for testing.
         }
         List<Integer> qtlIds = new ArrayList<Integer>();
         qtlIds.add(-1);
         qtlIds.add(-2);
         qtlIds.add(-3);
-      
-        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, 
-                (int) manager.countQtlByQtlIds(qtlIds));
-        
+
+        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, (int) manager.countQtlByQtlIds(qtlIds));
+
         Debug.printFormattedObjects(INDENT, results);
     }
-    
+
     @Test
     public void testGetQtlByQtlIdsBothDB() throws Exception {
         List<Integer> qtlIds = new ArrayList<Integer>();
@@ -2037,14 +2114,13 @@ public class TestGenotypicDataManagerImpl{
         qtlIds.add(-1);
         qtlIds.add(-2);
         qtlIds.add(-3);
-      
-        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, 
-                (int) manager.countQtlByQtlIds(qtlIds));
-        
+
+        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, (int) manager.countQtlByQtlIds(qtlIds));
+
         assertTrue(results.size() > 0);
-        Debug.printFormattedObjects(3, results); 
+        Debug.printFormattedObjects(3, results);
     }
-   
+
     @Test
     public void testCountQtlByQtlIdsFromCentral() throws Exception {
         List<Integer> qtlIds = new ArrayList<Integer>();
@@ -2057,7 +2133,7 @@ public class TestGenotypicDataManagerImpl{
     }
 
     @Test
-    public void testCountQtlByQtlIds() throws Exception { 
+    public void testCountQtlByQtlIds() throws Exception {
         List<Integer> qtlIds = new ArrayList<Integer>();
         qtlIds.add(1);
         qtlIds.add(2);
@@ -2068,146 +2144,143 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countQtlByQtlIds(qtlIds);
         assertTrue(count > 0);
         Debug.println(0, "testCountQtlByQtlIds() RESULTS: " + count);
-    }   
-    
-    
+    }
+
     @Test
     public void testGetQtlDataByQtlTraits() throws Exception {
-        List<Integer> qtlTraits = new ArrayList<Integer>();   // Crop tested: Groundnut
-		qtlTraits.add(1001);     // "DE"
-        List<QtlDataElement> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, 
-                (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
+        List<Integer> qtlTraits = new ArrayList<Integer>(); // Crop tested:
+                                                            // Groundnut
+        qtlTraits.add(1001); // "DE"
+        List<QtlDataElement> results = manager.getQtlDataByQtlTraits(qtlTraits, 0,
+                (int) manager.countQtlDataByQtlTraits(qtlTraits));
         Debug.println(0, "testGetQtlDataByQtlTraits() RESULTS: " + results.size());
         Debug.printObjects(INDENT, results);
     }
 
-
     @Test
-    public void testCountQtlDataByQtlTraits() throws Exception { 
-        List<Integer> qtlTraits = new ArrayList<Integer>();   // Crop tested: Groundnut
-		qtlTraits.add(1001);     // "DE"
-        long count =  manager.countQtlDataByQtlTraits(qtlTraits); 
+    public void testCountQtlDataByQtlTraits() throws Exception {
+        List<Integer> qtlTraits = new ArrayList<Integer>(); // Crop tested:
+                                                            // Groundnut
+        qtlTraits.add(1001); // "DE"
+        long count = manager.countQtlDataByQtlTraits(qtlTraits);
         Debug.println(0, "testCountQtlDataByQtlTraits() RESULTS: " + count);
     }
-    
-    
+
     @Test
-    public void testCountAllelicValuesFromAlleleValuesByDatasetId() throws Exception { 
+    public void testCountAllelicValuesFromAlleleValuesByDatasetId() throws Exception {
         Integer datasetId = -1; // change value of the datasetid
         long count = manager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
         assertNotNull(count);
-        Debug.println(0, "testCountAllelicValuesFromAlleleValuesByDatasetId("+datasetId+") Results: " + count);
+        Debug.println(0, "testCountAllelicValuesFromAlleleValuesByDatasetId(" + datasetId + ") Results: " + count);
     }
-    
+
     @Test
-    public void testCountAllelicValuesFromCharValuesByDatasetId() throws Exception { 
+    public void testCountAllelicValuesFromCharValuesByDatasetId() throws Exception {
         Integer datasetId = -1; // change value of the datasetid
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
         assertNotNull(count);
-        Debug.println(0, "testCountAllelicValuesFromCharValuesByDatasetId("+datasetId+") Results: " + count);
+        Debug.println(0, "testCountAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") Results: " + count);
     }
-    
+
     @Test
-    public void testCountAllelicValuesFromMappingPopValuesByDatasetId() throws Exception { 
+    public void testCountAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {
         Integer datasetId = 3; // change value of the datasetid
         long count = manager.countAllelicValuesFromMappingPopValuesByDatasetId(datasetId);
         assertNotNull(count);
-        Debug.println(0, "testCountAllelicValuesFromMappingPopValuesByDatasetId("+datasetId+") Results: " + count);
+        Debug.println(0, "testCountAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") Results: " + count);
     }
-    
+
     @Test
     public void testCountAllParentsFromMappingPopulation() throws Exception {
-    	long count = manager.countAllParentsFromMappingPopulation();
+        long count = manager.countAllParentsFromMappingPopulation();
         assertNotNull(count);
         Debug.println(0, "testCountAllParentsFromMappingPopulation() Results: " + count);
     }
-    
+
     @Test
     public void testCountMapDetailsByName() throws Exception {
-    	String nameLike = "GCP-833TestMap"; //change map_name
-    	long count = manager.countMapDetailsByName(nameLike);
+        String nameLike = "GCP-833TestMap"; // change map_name
+        long count = manager.countMapDetailsByName(nameLike);
         assertNotNull(count);
-        Debug.println(0, "testCountMapDetailsByName("+nameLike+") Results: " + count);
+        Debug.println(0, "testCountMapDetailsByName(" + nameLike + ") Results: " + count);
     }
-    
-    
+
     @Test
     public void testGetMapNamesByMarkerIds() throws Exception {
         List<Integer> markerIds = Arrays.asList(-6, 1317, 621, 825, 211);
         java.util.Map<Integer, List<String>> markerMaps = manager.getMapNamesByMarkerIds(markerIds);
         assertTrue(markerMaps.size() > 0);
-        for (int i = 0;  i < markerIds.size(); i++){
-            Debug.println(3, "Marker ID = " + markerIds.get(i) + " : Map Name/s = " 
-                            + markerMaps.get(markerIds.get(i)));
+        for (int i = 0; i < markerIds.size(); i++) {
+            Debug.println(3, "Marker ID = " + markerIds.get(i) + " : Map Name/s = " + markerMaps.get(markerIds.get(i)));
         }
     }
-    
+
     @Test
     public void testCountMarkerInfoByDbAccessionId() throws Exception {
-    	String dbAccessionId = ""; //change dbAccessionId
-    	long count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
+        String dbAccessionId = ""; // change dbAccessionId
+        long count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
         assertNotNull(count);
-        Debug.println(0, "testCountMarkerInfoByDbAccessionId("+dbAccessionId+") Results: " + count);
+        Debug.println(0, "testCountMarkerInfoByDbAccessionId(" + dbAccessionId + ") Results: " + count);
     }
-    
+
     @Test
     public void testCountMarkerInfoByGenotype() throws Exception {
-    	String genotype = "cv. Tatu"; //change genotype
-    	long count = manager.countMarkerInfoByGenotype(genotype);
+        String genotype = "cv. Tatu"; // change genotype
+        long count = manager.countMarkerInfoByGenotype(genotype);
         assertNotNull(count);
-        Debug.println(0, "testCountMarkerInfoByGenotype("+genotype+") Results: " + count);
+        Debug.println(0, "testCountMarkerInfoByGenotype(" + genotype + ") Results: " + count);
     }
-    
+
     @Test
     public void testCountMarkerInfoByMarkerName() throws Exception {
-    	String markerName = "SeqTEST"; //change markerName
-    	long count = manager.countMarkerInfoByMarkerName(markerName);
+        String markerName = "SeqTEST"; // change markerName
+        long count = manager.countMarkerInfoByMarkerName(markerName);
         assertNotNull(count);
-        Debug.println(0, "testCountMarkerInfoByMarkerName("+markerName+") Results: " + count);
+        Debug.println(0, "testCountMarkerInfoByMarkerName(" + markerName + ") Results: " + count);
     }
-    
+
     @Test
     public void testGetAllParentsFromMappingPopulation() throws Exception {
-    	long count = manager.countAllParentsFromMappingPopulation();
-    	List<ParentElement> results = manager.getAllParentsFromMappingPopulation(0, (int) count);
-    	assertNotNull(results);
+        long count = manager.countAllParentsFromMappingPopulation();
+        List<ParentElement> results = manager.getAllParentsFromMappingPopulation(0, (int) count);
+        assertNotNull(results);
         assertFalse(results.isEmpty());
         Debug.println(0, "testGetAllParentsFromMappingPopulation() Results: ");
         Debug.printObjects(INDENT, results);
 
     }
- 
+
     @Test
     public void testGetMapDetailsByName() throws Exception {
-    	String nameLike = "GCP-833TestMap"; //change map_name
-    	long count = manager.countMapDetailsByName(nameLike);
-    	List<MapDetailElement> results = manager.getMapDetailsByName(nameLike, 0, (int) count);
-    	assertNotNull(results);
+        String nameLike = "GCP-833TestMap"; // change map_name
+        long count = manager.countMapDetailsByName(nameLike);
+        List<MapDetailElement> results = manager.getMapDetailsByName(nameLike, 0, (int) count);
+        assertNotNull(results);
         assertFalse(results.isEmpty());
-        Debug.println(0, "testGetMapDetailsByName("+nameLike+")");
+        Debug.println(0, "testGetMapDetailsByName(" + nameLike + ")");
         Debug.printObjects(3, results);
     }
-    
+
     @Test
     public void testGetMarkersByIds() throws Exception {
-    	List<Integer> markerIds = new ArrayList<Integer>();
-    	markerIds.add(1);
-    	markerIds.add(3);
-    	
-    	List<Marker> results = manager.getMarkersByIds(markerIds, 0,100);
-    	assertNotNull(results);
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(1);
+        markerIds.add(3);
+
+        List<Marker> results = manager.getMarkersByIds(markerIds, 0, 100);
+        assertNotNull(results);
         assertFalse(results.isEmpty());
-        Debug.println(0, "testGetMarkersByIds("+markerIds+") Results: ");
+        Debug.println(0, "testGetMarkersByIds(" + markerIds + ") Results: ");
         Debug.printObjects(INDENT, results);
     }
-    
+
     @Test
     public void testCountAllMaps() throws Exception {
         long count = manager.countAllMaps(Database.LOCAL);
         assertNotNull(count);
-        Debug.println(0, "testCountAllMaps("+Database.LOCAL+") Results: " + count);	
+        Debug.println(0, "testCountAllMaps(" + Database.LOCAL + ") Results: " + count);
     }
-    
+
     @Test
     public void testGetAllMaps() throws Exception {
         List<Map> results = manager.getAllMaps(0, 100, Database.LOCAL);
@@ -2219,83 +2292,90 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountNidsFromAccMetadatasetByDatasetIds() throws Exception {
-        //GROUNDNUT DATABASE
+        // GROUNDNUT DATABASE
         List<Integer> datasetIds = Arrays.asList(2, 3, 4);
         long count = manager.countNidsFromAccMetadatasetByDatasetIds(datasetIds);
         Debug.println(0, "testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
     }
-    
+
     @Test
     public void testCountMarkersFromMarkerMetadatasetByDatasetIds() throws Exception {
-        //GROUNDNUT DATABASE
+        // GROUNDNUT DATABASE
         List<Integer> datasetIds = Arrays.asList(2, 3, 4);
         long count = manager.countMarkersFromMarkerMetadatasetByDatasetIds(datasetIds);
         Debug.println(0, "testCountMarkersFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
     }
-    
+
     @Test
     public void testGetMapIdByName() throws Exception {
-    	//GROUNDNUT DATABASE
-    	String mapName = "Consensus_Biotic";  //CENTRAL test data
-    	Integer mapId = manager.getMapIdByName(mapName);
-    	Debug.println(0, "Map ID for " + mapName + " = " + mapId);
-    	mapName = "name that does not exist";
-    	mapId = manager.getMapIdByName(mapName);
-    	Debug.println(0, "Map ID for " + mapName + " = " + mapId);
-    	mapName = "TEST"; //local test data INSERT INTO gdms_map (map_id, map_name, map_type, mp_id, map_desc, map_unit) values(-1, 'TEST', 'genetic', 0, 'TEST', 'cM');
-    	mapId = manager.getMapIdByName(mapName);
-    	Debug.println(0, "Map ID for " + mapName + " = " + mapId);
+        // GROUNDNUT DATABASE
+        String mapName = "Consensus_Biotic"; // CENTRAL test data
+        Integer mapId = manager.getMapIdByName(mapName);
+        Debug.println(0, "Map ID for " + mapName + " = " + mapId);
+        mapName = "name that does not exist";
+        mapId = manager.getMapIdByName(mapName);
+        Debug.println(0, "Map ID for " + mapName + " = " + mapId);
+        mapName = "TEST"; // local test data INSERT INTO gdms_map (map_id,
+                          // map_name, map_type, mp_id, map_desc, map_unit)
+                          // values(-1, 'TEST', 'genetic', 0, 'TEST', 'cM');
+        mapId = manager.getMapIdByName(mapName);
+        Debug.println(0, "Map ID for " + mapName + " = " + mapId);
     }
-    
+
     @Test
     public void testCountMappingPopValuesByGids() throws Exception {
-        List<Integer> gIds = Arrays.asList(1434, 1435, 1436);   // IBDBv2 Groundnut
+        List<Integer> gIds = Arrays.asList(1434, 1435, 1436); // IBDBv2
+                                                              // Groundnut
         long count = manager.countMappingPopValuesByGids(gIds);
         Debug.println(0, "countMappingPopValuesByGids(" + gIds + ") = " + count);
     }
-    
+
     @Test
     public void testCountMappingAlleleValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2213, 2214);
         long count = manager.countMappingAlleleValuesByGids(gIds);
         Debug.println(0, "testCountMappingAlleleValuesByGids(" + gIds + ") = " + count);
     }
-    
+
     @Test
-    public void testGetAllFromMarkerMetadatasetByMarker() throws Exception {
-        Integer markerId = 3302; 
-        List<MarkerMetadataSet> result = manager.getAllFromMarkerMetadatasetByMarker(markerId);
-        Debug.println(0, "testGetAllFromMarkerMetadatasetByMarker(" + markerId + "): ");
+    public void testGetAllFromMarkerMetadatasetByMarkers() throws Exception {
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(3302);
+        markerIds.add(-1);
+        List<MarkerMetadataSet> result = manager.getAllFromMarkerMetadatasetByMarkers(markerIds);
+        Debug.println(0, "testGetAllFromMarkerMetadatasetByMarker(" + markerIds + "): ");
         Debug.printObjects(INDENT, result);
     }
+
     @Test
     public void testGetDatasetDetailsByDatasetIds() throws Exception {
-        List<Integer> datasetIds = Arrays.asList(3, 4, 5); 
+        List<Integer> datasetIds = Arrays.asList(3, 4, 5);
         List<Dataset> result = manager.getDatasetDetailsByDatasetIds(datasetIds);
         Debug.println(0, "testGetDatasetDetailsByDatasetId(" + datasetIds + "): ");
         Debug.printObjects(INDENT, result);
     }
-    
+
     @Test
     public void testGetQTLIdsByDatasetIds() throws Exception {
-        List<Integer> datasetIds = Arrays.asList(1, 2, 3, 4);   // IBDBv2 Groundnut
+        List<Integer> datasetIds = Arrays.asList(1, 2, 3, 4); // IBDBv2
+                                                              // Groundnut
         List<Integer> qtlIds = manager.getQTLIdsByDatasetIds(datasetIds);
         Debug.println(0, "testGetQTLIdsByDatasetIds(" + datasetIds + "): " + qtlIds);
     }
-    
+
     @Test
     public void testGetAllFromAccMetadataset() throws Exception {
         List<Integer> gids = new ArrayList<Integer>();
         gids.add(2012);
         gids.add(2014);
         gids.add(2016);
-        
-        Integer datasetId = 5; 
+
+        Integer datasetId = 5;
         List<AccMetadataSetPK> result = manager.getAllFromAccMetadataset(gids, datasetId, SetOperation.NOT_IN);
         Debug.println(0, "testGetAllFromAccMetadataset(gid=" + gids + ", datasetId=" + datasetId + "): ");
         Debug.printObjects(INDENT, result);
     }
-    
+
     @Test
     public void testGetMapAndMarkerCountByMarkers() throws Exception {
         List<Integer> markerIds = Arrays.asList(1317, 1318, 1788, 1053, 2279, 50);
@@ -2303,20 +2383,20 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testGetMapAndMarkerCountByMarkers(" + markerIds + ")");
         Debug.printObjects(INDENT, details);
     }
-    
+
     @Test
     public void testGetAllMTAs() throws Exception {
         List<Mta> result = manager.getAllMTAs();
         Debug.println(0, "testGetAllMTAs(): ");
         Debug.printObjects(INDENT, result);
     }
-    
+
     @Test
     public void testCountAllMTAs() throws Exception {
         long count = manager.countAllMTAs();
         Debug.println(0, "testCountAllMTAs(): " + count);
     }
-    
+
     @Test
     public void testGetMTAsByTrait() throws Exception {
         Integer traitId = 1;
@@ -2324,71 +2404,73 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testGetMTAsByTrait(): ");
         Debug.printObjects(INDENT, result);
     }
-    
+
     @Test
     public void testDeleteQTLs() throws Exception {
-        /*TEST DATA - GROUNDNUT
-        insert into gdms_dataset values(-7, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
-        insert into gdms_dataset_users values (-7, 123);
-        insert into gdms_qtl values (-1, 'TEST QTL1', -7);
-        insert into gdms_qtl values (-2, 'TEST QTL2', -7);
-        insert into gdms_qtl_details values (-1, -1, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
-        insert into gdms_qtl_details values (-2, -2, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
+        /*
+         * TEST DATA - GROUNDNUT insert into gdms_dataset values(-7, 'TEST
+         * DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24',
+         * null, 'int', null, null, null, null, null, null, null); insert into
+         * gdms_dataset_users values (-7, 123); insert into gdms_qtl values (-1,
+         * 'TEST QTL1', -7); insert into gdms_qtl values (-2, 'TEST QTL2', -7);
+         * insert into gdms_qtl_details values (-1, -1, 0, 8.1, 0, null, 0, 2.3,
+         * 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null,
+         * null, null); insert into gdms_qtl_details values (-2, -2, 0, 8.1, 0,
+         * null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null,
+         * null, null, null, null); //List<Integer> qtlIds = Arrays.asList(-1,
+         * -2); //int datasetId = -7;
+         */
 
-        //List<Integer> qtlIds = Arrays.asList(-1, -2);
-        //int datasetId = -7;
-
-        */
-        
-        
         List<Qtl> qtls = manager.getAllQtl(0, 1);
         List<Integer> qtlIds = new ArrayList<Integer>();
-        if (qtls != null && qtls.size() > 0){
-                qtlIds.add(qtls.get(0).getQtlId());
-                int datasetId = qtls.get(0).getDatasetId();
-                Debug.println(0, "testDeleteQTLs(qtlIds=" + qtlIds + ", datasetId=" + datasetId);
-                manager.deleteQTLs(qtlIds, datasetId);
-                Debug.println(0, "done with testDeleteQTLs");
+        if (qtls != null && qtls.size() > 0) {
+            qtlIds.add(qtls.get(0).getQtlId());
+            int datasetId = qtls.get(0).getDatasetId();
+            Debug.println(0, "testDeleteQTLs(qtlIds=" + qtlIds + ", datasetId=" + datasetId);
+            manager.deleteQTLs(qtlIds, datasetId);
+            Debug.println(0, "done with testDeleteQTLs");
         }
-        
+
     }
-    
+
     @Test
     public void testDeleteSSRGenotypingDatasets() throws Exception {
         List<Qtl> qtls = manager.getAllQtl(0, 1);
-        if (qtls != null && qtls.size() > 0){
-                int datasetId = qtls.get(0).getDatasetId();
-                Debug.println(0, "testDeleteSSRGenotypingDatasets(" + datasetId + ")");
-                manager.deleteSSRGenotypingDatasets(datasetId);
-                Debug.println(0, "done with testDeleteSSRGenotypingDatasets");
+        if (qtls != null && qtls.size() > 0) {
+            int datasetId = qtls.get(0).getDatasetId();
+            Debug.println(0, "testDeleteSSRGenotypingDatasets(" + datasetId + ")");
+            manager.deleteSSRGenotypingDatasets(datasetId);
+            Debug.println(0, "done with testDeleteSSRGenotypingDatasets");
         }
     }
-    
-    
+
     @Test
     public void testDeleteSNPGenotypingDatasets() throws Exception {
-        /* TEST DATA - GROUNDNUT
-        insert into gdms_dataset values(-5, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
-        insert into gdms_dataset_users values (-5, 123);
-        insert into gdms_char_values values(-4, -5, 1, 1, 'TEST VALUE');
-        insert into gdms_acc_metadataset values (-5, 1, 1);
-        insert into gdms_marker_metadataset values(-5, 1);
+        /*
+         * TEST DATA - GROUNDNUT insert into gdms_dataset values(-5, 'TEST
+         * DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24',
+         * null, 'int', null, null, null, null, null, null, null); insert into
+         * gdms_dataset_users values (-5, 123); insert into gdms_char_values
+         * values(-4, -5, 1, 1, 'TEST VALUE'); insert into gdms_acc_metadataset
+         * values (-5, 1, 1); insert into gdms_marker_metadataset values(-5, 1);
          */
         int datasetId = -5;
         Debug.println(0, "testDeleteSNPGenotypingDatasets(" + datasetId + ")");
         manager.deleteSNPGenotypingDatasets(datasetId);
         Debug.println(0, "done with testDeleteSNPGenotypingDatasets");
     }
-    
+
     @Test
     public void testDeleteDArTGenotypingDatasets() throws Exception {
-        /* TEST DATA - GROUNDNUT
-        insert into gdms_dataset values(-5, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
-        insert into gdms_dataset_users values (-5, 123);
-        insert into gdms_allele_values values(-35, -5, 1, 1, '238:238', '0.0:0.0', 10);
-        insert into gdms_dart_values values(-25, -5, -1, -1, 1.0, 2.0, 3.0, 4.0, 5.0);
-        insert into gdms_acc_metadataset values (-5, 1, 1);
-        insert into gdms_marker_metadataset values(-5, 1);
+        /*
+         * TEST DATA - GROUNDNUT insert into gdms_dataset values(-5, 'TEST
+         * DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24',
+         * null, 'int', null, null, null, null, null, null, null); insert into
+         * gdms_dataset_users values (-5, 123); insert into gdms_allele_values
+         * values(-35, -5, 1, 1, '238:238', '0.0:0.0', 10); insert into
+         * gdms_dart_values values(-25, -5, -1, -1, 1.0, 2.0, 3.0, 4.0, 5.0);
+         * insert into gdms_acc_metadataset values (-5, 1, 1); insert into
+         * gdms_marker_metadataset values(-5, 1);
          */
         int datasetId = -5;
         Debug.println(0, "testDeleteDArTGenotypingDatasets(" + datasetId + ")");
@@ -2398,26 +2480,28 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testDeleteMappingPopulationDatasets() throws Exception {
-        /* TEST DATA - GROUNDNUT
-        insert into gdms_dataset values(-5, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
-        insert into gdms_dataset_users values (-5, 123);
-        insert into gdms_mapping_pop_values values( -25, 'X', -5, 1434, 2537);
-        insert into gdms_mapping_pop values(-5, 'test', 956, 1042, 999, 'test', 'test', 'test', 0);
-        insert into gdms_acc_metadataset values (-5, 1, 1);
-        insert into gdms_marker_metadataset values(-5, 1);
+        /*
+         * TEST DATA - GROUNDNUT insert into gdms_dataset values(-5, 'TEST
+         * DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24',
+         * null, 'int', null, null, null, null, null, null, null); insert into
+         * gdms_dataset_users values (-5, 123); insert into
+         * gdms_mapping_pop_values values( -25, 'X', -5, 1434, 2537); insert
+         * into gdms_mapping_pop values(-5, 'test', 956, 1042, 999, 'test',
+         * 'test', 'test', 0); insert into gdms_acc_metadataset values (-5, 1,
+         * 1); insert into gdms_marker_metadataset values(-5, 1);
          */
         int datasetId = -5;
         Debug.println(0, "testDeleteMappingPopulationDatasets(" + datasetId + ")");
         manager.deleteMappingPopulationDatasets(datasetId);
         Debug.println(0, "done with testDeleteMappingPopulationDatasets");
     }
-    
+
     @Test
     public void testGetQtlDetailsByMapId() throws Exception {
-        try{
+        try {
             testSetQTL(); // to add a qtl_details entry with map_id = 1
-        } catch (MiddlewareQueryException e){
-            //Ignore. There is already a record for testing.
+        } catch (MiddlewareQueryException e) {
+            // Ignore. There is already a record for testing.
         }
         int mapId = 1;
         List<QtlDetails> qtls = manager.getQtlDetailsByMapId(mapId);
@@ -2432,72 +2516,73 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countQtlDetailsByMapId(mapId);
         Debug.println(0, "COUNT = " + count);
     }
-    
+
     @Test
     public void testDeleteMaps() throws Exception {
-        /* TEST DATA - GROUNDNUT
-        INSERT INTO gdms_map VALUES(-1,'BC-1','genetic',0,'BC-1','cM');
-        INSERT INTO gdms_map VALUES(-2,'Consensus_Abiotic','genetic',0,'Consensus_Abiotic','cM');
-        INSERT INTO gdms_markers_onmap VALUES(-1,1317,0,0,'BC-1_b11');
-        INSERT INTO gdms_markers_onmap VALUES(-1,1318,4.2,4.2,'BC-1_b11');
-        INSERT INTO gdms_markers_onmap VALUES(-1,1321,0,0,'BC-1_b10');
-        INSERT INTO gdms_markers_onmap VALUES(-1,1345,0,0,'BC-1_b09');
-        INSERT INTO gdms_markers_onmap VALUES(-2,1776,102.84,102.84,'LG11');
-        INSERT INTO gdms_markers_onmap VALUES(-2,1794,33.3,33.3,'LG14');
-        INSERT INTO gdms_markers_onmap VALUES(-2,1782,158.9,158.9,'LG12');
+        /*
+         * TEST DATA - GROUNDNUT INSERT INTO gdms_map
+         * VALUES(-1,'BC-1','genetic',0,'BC-1','cM'); INSERT INTO gdms_map
+         * VALUES(-2,'Consensus_Abiotic','genetic',0,'Consensus_Abiotic','cM');
+         * INSERT INTO gdms_markers_onmap VALUES(-1,1317,0,0,'BC-1_b11'); INSERT
+         * INTO gdms_markers_onmap VALUES(-1,1318,4.2,4.2,'BC-1_b11'); INSERT
+         * INTO gdms_markers_onmap VALUES(-1,1321,0,0,'BC-1_b10'); INSERT INTO
+         * gdms_markers_onmap VALUES(-1,1345,0,0,'BC-1_b09'); INSERT INTO
+         * gdms_markers_onmap VALUES(-2,1776,102.84,102.84,'LG11'); INSERT INTO
+         * gdms_markers_onmap VALUES(-2,1794,33.3,33.3,'LG14'); INSERT INTO
+         * gdms_markers_onmap VALUES(-2,1782,158.9,158.9,'LG12');
          */
         int mapId = -1;
         Debug.println(0, "testDeleteMaps(" + mapId + ")");
         manager.deleteMaps(mapId);
         Debug.println(0, "done with testDeleteMaps");
     }
-    
+
     @Test
     public void testGetMarkerFromCharValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2012, 2014, 2016, 310544);
         List<Integer> result = manager.getMarkerFromCharValuesByGids(gIds);
-        Debug.println(0, "testGetMarkerFromCharValuesByGids(): " + result.size() +"\n\t" + result);
+        Debug.println(0, "testGetMarkerFromCharValuesByGids(): " + result.size() + "\n\t" + result);
     }
-    
+
     @Test
     public void testGetMarkerFromAlleleValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2213, 2214);
         List<Integer> result = manager.getMarkerFromAlleleValuesByGids(gIds);
-        Debug.println(0, "testGetMarkerFromAlleleValuesByGids(): " + result.size() +"\n\t" + result);
+        Debug.println(0, "testGetMarkerFromAlleleValuesByGids(): " + result.size() + "\n\t" + result);
     }
-    
+
     @Test
     public void testGetMarkerFromMappingPopValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(1434, 1435);
         List<Integer> result = manager.getMarkerFromMappingPopByGids(gIds);
-        Debug.println(0, "testGetMarkerFromMappingPopValuesByGids(): " + result.size() +"\n\t" + result);
+        Debug.println(0, "testGetMarkerFromMappingPopValuesByGids(): " + result.size() + "\n\t" + result);
     }
-    
+
     @Test
     public void testGetLastId() throws Exception {
-    	Database instance = Database.LOCAL;
-    	for (GdmsTable gdmsTable : GdmsTable.values()) {
-        	long lastId = manager.getLastId(instance, gdmsTable);
-        	Debug.println(0, "testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-    	}    	
+        Database instance = Database.LOCAL;
+        for (GdmsTable gdmsTable : GdmsTable.values()) {
+            long lastId = manager.getLastId(instance, gdmsTable);
+            Debug.println(0, "testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
+        }
 
-    	instance = Database.CENTRAL;
-    	for (GdmsTable gdmsTable : GdmsTable.values()) {
-        	long lastId = manager.getLastId(instance, gdmsTable);
-        	Debug.println(0, "testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-    	}    	
+        instance = Database.CENTRAL;
+        for (GdmsTable gdmsTable : GdmsTable.values()) {
+            long lastId = manager.getLastId(instance, gdmsTable);
+            Debug.println(0, "testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
+        }
     }
-    
+
     @Test
     public void testAddMTA() throws Exception {
-    	Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null, "REMARKS", 
-    			"int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
-    	Mta mta = new Mta(null, 1, null, 1, "LINKAGE GROUP", 2.1f, 3, 1, "HVALLELE", "EXPERIMENT", 3.3f, 2.2f);
-    	DatasetUsers users = new DatasetUsers(null, 1);
-    	manager.addMTA(dataset, mta, users);
-    	Debug.println(0, "done with testAddMTA");
+        Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
+                "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
+        Mta mta = new Mta(null, 1, null, 1, "LINKAGE GROUP", 2.1f, 3, 1, "HVALLELE", "EXPERIMENT", 3.3f, 2.2f);
+        DatasetUsers users = new DatasetUsers(null, 1);
+        manager.addMTA(dataset, mta, users);
+        Debug.println(0, "done with testAddMTA");
     }
-    
+
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

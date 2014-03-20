@@ -117,12 +117,12 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
     
     
     @SuppressWarnings("rawtypes")
-    public List<MarkerMetadataSet> getByMarkerId(Integer markerId) throws MiddlewareQueryException{
+    public List<MarkerMetadataSet> getByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
         List<MarkerMetadataSet> toReturn = new ArrayList<MarkerMetadataSet>();
         try{
-            if (markerId != null){
-                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.GET_BY_MARKER_ID); 
-                query.setParameter("markerId", markerId);
+            if (markerIds != null && markerIds.size() > 0){
+                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.GET_BY_MARKER_IDS); 
+                query.setParameterList("markerIdList", markerIds);
 
                 List results = query.list();
                 for (Object o : results) {
@@ -137,7 +137,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
                 }
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getByMarkerId(markerId=" + markerId 
+            logAndThrowException("Error with getByMarkerIds(markerIds=" + markerIds 
                     + ") query from MarkerMetadataSet: " + e.getMessage(), e);
         }
         return toReturn;
