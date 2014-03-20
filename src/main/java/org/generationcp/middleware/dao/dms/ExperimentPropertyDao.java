@@ -288,6 +288,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				    .append(" AND bep.project_id = :datasetId) ");
 	            }
 	            sql.append(" ORDER BY eproj.nd_experiment_id ").append(order);
+	            
+	            System.out.println(sql.toString());
                 
                 Query query = getSession().createSQLQuery(sql.toString())
                         .addScalar("datasetId")
@@ -439,7 +441,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             geolocationId = (Integer) row[2];
             siteName = (String) row[3];
             trialInstanceNo = (String) row[12];
-            blockId = (Integer) row[11];
+            blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
             /*
             blockName = (String) row[15];
             locationName = (String) row[16];
@@ -526,8 +528,12 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial.setGeolocationId((Integer) row[3]);
                 trial.setSiteName((String) row[4]);
                 trial.setLocationName((String) row[4]);
-                trial.setLocationId((Integer) row[5]);
-                trial.setBlockId((Integer) row[13]);
+                if (row[5] != null && NumberUtils.isNumber((String) row[5])) {
+                    trial.setLocationId(Integer.valueOf((String) row[5]));
+                }
+                if (row[13] != null && NumberUtils.isNumber((String) row[13])) {
+                	trial.setBlockId(Integer.valueOf((String) row[13]));
+                }
 //                trial.setRangesInBlock(getIntegerValue(row[13]));
 //                trial.setColumnsInBlock(getIntegerValue(row[12]));
 //                trial.setMachineRowCapacity(getIntegerValue(row[20]));

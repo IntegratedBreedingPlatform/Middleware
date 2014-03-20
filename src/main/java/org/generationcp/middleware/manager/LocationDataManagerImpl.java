@@ -500,6 +500,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         
         Map<String, UserDefinedField> dTypes = getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 
+        setWorkingDatabase(blockId);
         List<Locdes> locdesOfLocation = getLocdesDao().getByLocation(blockId);
         
         for (Locdes locdes : locdesOfLocation){
