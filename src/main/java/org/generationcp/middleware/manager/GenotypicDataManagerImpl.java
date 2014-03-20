@@ -246,9 +246,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
+    public List<Marker> getMarkersByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
             throws MiddlewareQueryException {
-        return (List<Integer>) super.getFromInstanceByMethod(getMarkerDao(), instance, "getIdsByNames", new Object[] { markerNames, start, numOfRows },
+        return (List<Marker>) super.getFromInstanceByMethod(getMarkerDao(), instance, "getByNames", new Object[] { markerNames, start, numOfRows },
                 new Class[] { List.class, Integer.TYPE, Integer.TYPE });
     }
 
@@ -1634,11 +1634,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarker(Integer markerId) throws MiddlewareQueryException{
+    public List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarkers(List<Integer> markerIds) throws MiddlewareQueryException{
         return (List<MarkerMetadataSet>) super.getAllFromCentralAndLocalByMethod(
                                                     getMarkerMetadataSetDao(), 
-                                                    "getByMarkerId", new Object[] { markerId },
-                                                    new Class[] { Integer.class });
+                                                    "getByMarkerIds", new Object[] { markerIds },
+                                                    new Class[] { List.class });
     }
 
     @Override
