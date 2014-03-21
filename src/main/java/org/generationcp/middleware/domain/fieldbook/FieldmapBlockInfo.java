@@ -12,6 +12,7 @@
 package org.generationcp.middleware.domain.fieldbook;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * The Class FieldmapBlockInfo.
@@ -41,6 +42,8 @@ public class FieldmapBlockInfo implements Serializable{
 	/** The is new. */
 	private boolean isNew;
 	
+	private List<String> deletedPlots;
+	
 	
 	/**
 	 * Instantiates a new fieldmap block info.
@@ -61,7 +64,7 @@ public class FieldmapBlockInfo implements Serializable{
     }
 	
     public FieldmapBlockInfo(int blockId, int rowsInBlock, int rangesInBlock,
-            int numberOfRowsInPlot, int plantingOrder, int machineRowCapacity, boolean isNew) {
+            int numberOfRowsInPlot, int plantingOrder, int machineRowCapacity, boolean isNew, List<String> deletedPlots) {
         this.blockId = blockId;
         this.rowsInBlock = rowsInBlock;
         this.rangesInBlock = rangesInBlock;
@@ -69,6 +72,7 @@ public class FieldmapBlockInfo implements Serializable{
         this.plantingOrder = plantingOrder;
         this.machineRowCapacity = machineRowCapacity;
         this.isNew = isNew;
+        this.deletedPlots = deletedPlots;
     }
 	/**
 	 * Gets the block id.
@@ -188,7 +192,21 @@ public class FieldmapBlockInfo implements Serializable{
 		this.machineRowCapacity = machineRowCapacity;
 	}
 	
-    @Override
+    /**
+	 * @return the deletedPlots
+	 */
+	public List<String> getDeletedPlots() {
+		return deletedPlots;
+	}
+
+	/**
+	 * @param deletedPlots the deletedPlots to set
+	 */
+	public void setDeletedPlots(List<String> deletedPlots) {
+		this.deletedPlots = deletedPlots;
+	}
+
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

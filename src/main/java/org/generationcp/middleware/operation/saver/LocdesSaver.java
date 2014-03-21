@@ -134,16 +134,8 @@ public class LocdesSaver extends Saver {
 	}
 	
 	private Locdes createLocdes(Integer locId, int typeId, Object value, int userId) throws MiddlewareQueryException {
-		return createLocdes(locId, typeId, value, userId, null);
-	}
-	private Locdes createLocdes(Integer locId, int typeId, Object value, int userId, Integer id) throws MiddlewareQueryException {
 		Locdes locdes = new Locdes();
-		if (id != null) {
-			locdes.setLdid(id);
-		}
-		else {
-			locdes.setLdid(getLocdesDao().getNegativeId("ldid"));
-		}
+		locdes.setLdid(getLocdesDao().getNegativeId("ldid"));
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
