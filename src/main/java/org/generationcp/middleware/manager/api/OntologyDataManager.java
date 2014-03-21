@@ -379,6 +379,7 @@ public interface OntologyDataManager {
      * @param cvId the cv id
      * @param typeId the type id
      * @param objectId the object id
+     * @param cropOntologyId the crop ontology id
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
@@ -435,10 +436,10 @@ public interface OntologyDataManager {
      * Adds or updates standard variable constraints.
      *
      * @param standardVariableId the standard variable id
-     * @param constraint the constraint
+     * @param constraints the constraints
      * @return the variable constraints
      * @throws MiddlewareQueryException the middleware query exception
-     * @throws MiddlewareException 
+     * @throws MiddlewareException the middleware exception
      */
     void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
             throws MiddlewareQueryException, MiddlewareException;
@@ -455,13 +456,30 @@ public interface OntologyDataManager {
      * Adds standard variable enumeration.
      *
      * @param variable the variable
-     * @param validValue the valid value
+     * @param enumeration the enumeration
      * @return the enumeration
      * @throws MiddlewareQueryException the middleware query exception
-     * @throws MiddlewareException 
+     * @throws MiddlewareException the middleware exception
      */
     Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) 
             throws MiddlewareQueryException, MiddlewareException;
+    
+    /**
+     * - Save or update standard variable enumeration. 
+     * - The enumeration passed is treated as a new value if the id is null, 
+     *    otherwise it is treated as an update operation.
+     * - If the ID of the Enumeration passed is positive, a new entry is added to local. 
+     * - If the ID of the Enumeration passed is negative, the existing entry in local is updated. 
+     * - Only the name and description can be updated.
+     *
+     * @param variable the variable
+     * @param enumeration the enumeration
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration)  
+            throws MiddlewareQueryException, MiddlewareException;
+
     
     /**
      * Deletes standard variable enumeration.
@@ -509,25 +527,27 @@ public interface OntologyDataManager {
     void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
     
     /**
-     * Returns the variable id given the property, scale, method, and role (P-S-M-R)
-     * 
-     * @param propertyId
-     * @param scaleId
-     * @param methodId
-     * @return
-     * @throws MiddlewareQueryException
+     * Returns the variable id given the property, scale, method, and role (P-S-M-R).
+     *
+     * @param property the property
+     * @param scale the scale
+     * @param method the method
+     * @param role the role
+     * @return the standard variable id by property scale method role
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
     throws MiddlewareQueryException;
 
     /**
-     * Returns the variable id given the property, scale, method, and role (P-S-M-R)
-     * 
-     * @param propertyId
-     * @param scaleId
-     * @param methodId
-     * @return
-     * @throws MiddlewareQueryException
+     * Returns the variable id given the property, scale, method, and role (P-S-M-R).
+     *
+     * @param propertyId the property id
+     * @param scaleId the scale id
+     * @param methodId the method id
+     * @param role the role
+     * @return the standard variable id by property scale method role
+     * @throws MiddlewareQueryException the middleware query exception
      */
 	Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
 	throws MiddlewareQueryException;

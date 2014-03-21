@@ -114,22 +114,34 @@ public class StandardVariableBuilder extends Builder {
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
-
+	
 	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
-	    
-	    //TODO
-		if (hasEnumerations(cvTermRelationships)) {
+	    if (hasEnumerations(cvTermRelationships)) {
 			List<Enumeration> enumerations = new ArrayList<Enumeration>();
 			for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
 				if (cvTermRelationship.getTypeId().equals(TermId.HAS_VALUE.getId())) {
 					Integer id = cvTermRelationship.getObjectId();
-					enumerations.add(createEnumeration(getCvTerm(id)));
+					
+					Enumeration newValue = createEnumeration(getCvTerm(id));
+					
+					if (!isEnumerationValueExists(enumerations, newValue)){
+					    enumerations.add(newValue);
+					}
 				}
 			}
 			Collections.sort(enumerations);
 			standardVariable.setEnumerations(enumerations);
 		}
 	}
+	
+    private boolean isEnumerationValueExists(List<Enumeration> enumerations, Enumeration value) {
+        for (Enumeration enumeration : enumerations) {
+            if (enumeration.getName().equals(value.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	private Enumeration createEnumeration(CVTerm cvTerm) throws MiddlewareQueryException {
 		return new Enumeration(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), getRank(cvTerm.getCvTermId()));
