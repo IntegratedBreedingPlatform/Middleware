@@ -502,26 +502,24 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
         setWorkingDatabase(blockId);
         List<Locdes> locdesOfLocation = getLocdesDao().getByLocation(blockId);
+        List<String> deletedPlots = new ArrayList<String>();
         
         for (Locdes locdes : locdesOfLocation){
             if (locdes != null){
                 int typeId = locdes.getTypeId();
-                int value = 0;
-                try {
-                    value = Integer.parseInt(locdes.getDval());
-                }catch (NumberFormatException e) {
-                    value = 0; // if it's nut a number, set to 0
-                }
+                String value = locdes.getDval();
                 if (typeId == dTypes.get(LocdesType.COLUMNS_IN_BLOCK.getCode()).getFldno()){
-                    rowsInBlock = value;
+                    rowsInBlock = getNumericValue(value);
                 }else if (typeId == dTypes.get(LocdesType.ROWS_IN_PLOT.getCode()).getFldno()){
-                    rowsInPlot = value;
+                    rowsInPlot = getNumericValue(value);
                 } else if (typeId == dTypes.get(LocdesType.RANGES_IN_BLOCK.getCode()).getFldno()){
-                    rangesInBlock = value;
+                    rangesInBlock = getNumericValue(value);
                 } else if (typeId == dTypes.get(LocdesType.PLANTING_ORDER.getCode()).getFldno()){
-                    plantingOrder = value;
+                    plantingOrder = getNumericValue(value);
                 } else if (typeId == dTypes.get(LocdesType.MACHINE_ROW_CAPACITY.getCode()).getFldno()){
-                    machineRowCapacity = value;
+                    machineRowCapacity = getNumericValue(value);
+                } else if (typeId == dTypes.get(LocdesType.DELETED_PLOTS.getCode()).getFldno()) {
+                	deletedPlots.add(value);
                 }
             }
         }
@@ -530,7 +528,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             isNew = false;
         }
         
-        return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew);
+        return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew, deletedPlots);
     }
     
     @Override
@@ -541,5 +539,14 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
     
 
+    private int getNumericValue(String strValue) {
+        int value = 0;
+        try {
+            value = Integer.parseInt(strValue);
+        }catch (NumberFormatException e) {
+            value = 0; // if it's nut a number, set to 0
+        }
+        return value;
+    }
     
 }

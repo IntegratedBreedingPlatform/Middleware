@@ -648,6 +648,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 		this.rowsPerPlot = blockInfo.getNumberOfRowsInPlot();
 		this.plantingOrder = blockInfo.getPlantingOrder();
 		this.machineRowCapacity = blockInfo.getMachineRowCapacity();
+		this.deletedPlots = blockInfo.getDeletedPlots();
 	}
 
 
