@@ -496,6 +496,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         int rangesInBlock = 0;
         int plantingOrder = 0;
         int machineRowCapacity = 0;
+        Integer fieldId = null;
         boolean isNew = true;
         
         Map<String, UserDefinedField> dTypes = getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
@@ -520,6 +521,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
                     machineRowCapacity = getNumericValue(value);
                 } else if (typeId == dTypes.get(LocdesType.DELETED_PLOTS.getCode()).getFldno()) {
                 	deletedPlots.add(value);
+                } else if (typeId == dTypes.get(LocdesType.BLOCK_PARENT.getCode()).getFldno()) {
+                	fieldId = getNumericValue(value);
                 }
             }
         }
@@ -528,7 +531,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             isNew = false;
         }
         
-        return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew, deletedPlots);
+        return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew, deletedPlots, fieldId);
     }
     
     @Override

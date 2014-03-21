@@ -44,6 +44,7 @@ public class FieldmapBlockInfo implements Serializable{
 	
 	private List<String> deletedPlots;
 	
+	private Integer fieldId;
 	
 	/**
 	 * Instantiates a new fieldmap block info.
@@ -64,7 +65,7 @@ public class FieldmapBlockInfo implements Serializable{
     }
 	
     public FieldmapBlockInfo(int blockId, int rowsInBlock, int rangesInBlock,
-            int numberOfRowsInPlot, int plantingOrder, int machineRowCapacity, boolean isNew, List<String> deletedPlots) {
+            int numberOfRowsInPlot, int plantingOrder, int machineRowCapacity, boolean isNew, List<String> deletedPlots, Integer fieldId) {
         this.blockId = blockId;
         this.rowsInBlock = rowsInBlock;
         this.rangesInBlock = rangesInBlock;
@@ -73,6 +74,7 @@ public class FieldmapBlockInfo implements Serializable{
         this.machineRowCapacity = machineRowCapacity;
         this.isNew = isNew;
         this.deletedPlots = deletedPlots;
+        this.fieldId = fieldId;
     }
 	/**
 	 * Gets the block id.
@@ -204,6 +206,20 @@ public class FieldmapBlockInfo implements Serializable{
 	 */
 	public void setDeletedPlots(List<String> deletedPlots) {
 		this.deletedPlots = deletedPlots;
+	}
+	
+	/**
+	 * @return the fieldId
+	 */
+	public Integer getFieldId() {
+		return fieldId;
+	}
+
+	/**
+	 * @param fieldId the fieldId to set
+	 */
+	public void setFieldId(Integer fieldId) {
+		this.fieldId = fieldId;
 	}
 
 	@Override

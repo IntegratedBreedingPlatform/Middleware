@@ -683,7 +683,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         
         int blockId = getBlockId(fieldMapInfos);
         FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
-        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
+        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo, true);
         
         // Filter those belonging to the given geolocationId
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
@@ -1139,7 +1139,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	return null;
     }
     
-    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo) {
+    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo) throws MiddlewareQueryException {
+    	updateFieldMapWithBlockInformation(infos, blockInfo, false);
+    }
+    
+    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
+    	Map<Integer, String> locationMap = new HashMap<Integer, String>();
     	if (infos != null) {
     		for (FieldMapInfo info : infos) {
     			if (info.getDatasets() != null) {
@@ -1147,11 +1152,32 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     					if (dataset.getTrialInstances() != null) {
     						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
     							trial.updateBlockInformation(blockInfo);
+    							if (isGetLocation) {
+	    							trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
+	    							trial.setFieldName(getLocationName(locationMap, trial.getFieldId()));
+	    							trial.setBlockName(getLocationName(locationMap, trial.getBlockId()));
+    							}
     						}
     					}
     				}
     			}
     		}
     	}
+    }
+    
+    private String getLocationName(Map<Integer, String> locationMap, Integer id) throws MiddlewareQueryException {
+    	if (id != null) {
+	    	String name = locationMap.get(id);
+	    	if (name != null) {
+	    		return name;
+	    	}
+	    	setWorkingDatabase(id);
+	    	Location location = getLocationDAO().getById(id);
+	    	if (location != null) {
+	    		locationMap.put(id, location.getLname());
+	    		return location.getLname();
+	    	}
+    	}
+    	return null;
     }
 }
