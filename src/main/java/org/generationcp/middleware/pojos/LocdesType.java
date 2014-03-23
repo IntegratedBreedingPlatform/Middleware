@@ -18,7 +18,7 @@ package org.generationcp.middleware.pojos;
 public enum LocdesType {
     
 
-    COLUMNS_IN_BLOCK("COL_IN_BLK")
+    ROWS_IN_BLOCK("COL_IN_BLK")
     , RANGES_IN_BLOCK("RANGE_IN_BLK")
     , PLANTING_ORDER("PLOT_LYOUT")
     , ROWS_IN_PLOT("ROWS_IN_PLOT")

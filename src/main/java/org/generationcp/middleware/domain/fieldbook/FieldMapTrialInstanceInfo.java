@@ -53,9 +53,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /** The fieldmap uuid. */
     private String fieldmapUUID;
     
-    
     /** The columns in block. */
-    private Integer columnsInBlock;
+    private Integer rowsInBlock;
     
     /** The ranges in block. */
     private Integer rangesInBlock;
@@ -233,8 +232,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      *
      * @return the columnsInBlock
      */
-    public Integer getColumnsInBlock() {
-        return columnsInBlock;
+    public Integer getRowsInBlock() {
+        return rowsInBlock;
     }
 
     
@@ -243,8 +242,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      *
      * @param columnsInBlock the columnsInBlock to set
      */
-    public void setColumnsInBlock(Integer columnsInBlock) {
-        this.columnsInBlock = columnsInBlock;
+    public void setRowsInBlock(Integer rowsInBlock) {
+        this.rowsInBlock = rowsInBlock;
     }
 
     
@@ -643,7 +642,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	 * @param blockInfo the blockInfo to set
 	 */
 	public void updateBlockInformation(FieldmapBlockInfo blockInfo) {
-		this.columnsInBlock = blockInfo.getRowsInBlock();
+		this.rowsInBlock = blockInfo.getRowsInBlock();
 		this.rangesInBlock = blockInfo.getRangesInBlock();
 		this.rowsPerPlot = blockInfo.getNumberOfRowsInPlot();
 		this.plantingOrder = blockInfo.getPlantingOrder();

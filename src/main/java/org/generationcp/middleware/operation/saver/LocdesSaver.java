@@ -36,7 +36,7 @@ public class LocdesSaver extends Saver {
 				Map<String, Integer> udfldMap = getUdfldMap();
 				
 				setWorkingDatabase(Database.LOCAL);
-				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.COLUMNS_IN_BLOCK), blockInfo.getNumberOfColumnsInBlock(), userId);
+				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.ROWS_IN_BLOCK), blockInfo.getNumberOfRowsInBlock(), userId);
 				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.RANGES_IN_BLOCK), blockInfo.getNumberOfRangesInBlock(), userId);
 				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.ROWS_IN_PLOT), blockInfo.getNumberOfRowsPerPlot(), userId);
 				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.MACHINE_ROW_CAPACITY), blockInfo.getMachineRowCapacity(), userId);
@@ -50,7 +50,7 @@ public class LocdesSaver extends Saver {
 	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
 		setWorkingDatabase(Database.CENTRAL);
 		Map<String, Integer> udfldMap = getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE", 
-				Arrays.asList(LocdesType.COLUMNS_IN_BLOCK.getCode()
+				Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode()
 						, LocdesType.RANGES_IN_BLOCK.getCode()
 						, LocdesType.ROWS_IN_PLOT.getCode()
 						, LocdesType.MACHINE_ROW_CAPACITY.getCode()
@@ -159,7 +159,7 @@ public class LocdesSaver extends Saver {
 							blockInfo = new BlockInfo();
 							blockInfo.setBlockId(trial.getBlockId());
 							blockInfo.setMachineRowCapacity(trial.getMachineRowCapacity());
-							blockInfo.setNumberOfColumnsInBlock(trial.getColumnsInBlock());
+							blockInfo.setNumberOfRowsInBlock(trial.getRowsInBlock());
 							blockInfo.setNumberOfRangesInBlock(trial.getRangesInBlock());
 							blockInfo.setNumberOfRowsPerPlot(trial.getRowsPerPlot());
 							blockInfo.setPlantingOrder(trial.getPlantingOrder());
@@ -177,7 +177,7 @@ public class LocdesSaver extends Saver {
 	
 	private class BlockInfo {
 		private Integer blockId;
-		private Integer numberOfColumnsInBlock;
+		private Integer numberOfRowsInBlock;
 		private Integer numberOfRangesInBlock;
 		private Integer plantingOrder;
 		private Integer numberOfRowsPerPlot;
@@ -190,11 +190,11 @@ public class LocdesSaver extends Saver {
 		public void setBlockId(Integer blockId) {
 			this.blockId = blockId;
 		}
-		public Integer getNumberOfColumnsInBlock() {
-			return numberOfColumnsInBlock;
+		public Integer getNumberOfRowsInBlock() {
+			return numberOfRowsInBlock;
 		}
-		public void setNumberOfColumnsInBlock(Integer numberOfColumnsInBlock) {
-			this.numberOfColumnsInBlock = numberOfColumnsInBlock;
+		public void setNumberOfRowsInBlock(Integer numberOfRowsInBlock) {
+			this.numberOfRowsInBlock = numberOfRowsInBlock;
 		}
 		public Integer getNumberOfRangesInBlock() {
 			return numberOfRangesInBlock;

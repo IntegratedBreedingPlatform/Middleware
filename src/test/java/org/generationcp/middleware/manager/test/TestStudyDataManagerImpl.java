@@ -1221,7 +1221,7 @@ public class TestStudyDataManagerImpl{
     	FieldMapTrialInstanceInfo trial = new FieldMapTrialInstanceInfo();
     	trial.setBlockId(26190);
     	trial.setBlockName("TEST BLOCK 1");
-    	trial.setColumnsInBlock(20);
+    	trial.setRowsInBlock(20);
     	trial.setDeletedPlots(Arrays.asList("3,1"));
     	trial.setFieldId(26189);
     	trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());

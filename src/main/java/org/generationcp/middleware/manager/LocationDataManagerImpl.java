@@ -509,7 +509,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             if (locdes != null){
                 int typeId = locdes.getTypeId();
                 String value = locdes.getDval();
-                if (typeId == dTypes.get(LocdesType.COLUMNS_IN_BLOCK.getCode()).getFldno()){
+                if (typeId == dTypes.get(LocdesType.ROWS_IN_BLOCK.getCode()).getFldno()){
                     rowsInBlock = getNumericValue(value);
                 }else if (typeId == dTypes.get(LocdesType.ROWS_IN_PLOT.getCode()).getFldno()){
                     rowsInPlot = getNumericValue(value);
