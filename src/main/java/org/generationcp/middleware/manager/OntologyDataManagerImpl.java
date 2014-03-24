@@ -863,6 +863,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         // Add cv entry of the standard variable if none found
         setWorkingDatabase(Database.CENTRAL);
         Integer cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
+        
+        if (cvId == null) {
+            setWorkingDatabase(Database.LOCAL);
+            cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
+        }
+        
         if (cvId == null){
             cvId = getStandardVariableSaver().createCv(variable).getCvId();
         }
