@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -172,11 +173,22 @@ public class WorkbookBuilder extends Builder {
 	        for (Variable variable : factors.getVariables()) {
 	        	
 	            if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
-                        MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+	            	MeasurementData measurementData = null;	
+	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+                        		variable.getDisplayValue(), false, 
+                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()), 
+                                id);
+	            	}
+	            	else {
+                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                                 variable.getValue(), false, 
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()));
-                        measurementDataList.add(measurementData);
-                    }
+	            	}
+                    
+	            	measurementDataList.add(measurementData);
+	            }
 	        }
 	        
 	        for (Variable variable : variates.getVariables()) {

@@ -25,6 +25,8 @@ public class MeasurementData {
 	
 	private Integer phenotypeId;
 	
+	private Integer valueId;
+	
 	public MeasurementData() {
 	}
 	
@@ -42,6 +44,11 @@ public class MeasurementData {
 		this.dataType = dataType;
 	}
 
+	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId) {
+		this(label, value, isEditable, dataType);
+		this.valueId = valueId;
+	}
+	
 	public String getLabel() {
 		return label;
 	}
@@ -105,6 +112,18 @@ public class MeasurementData {
 		this.dataType = dataType;
 	}
 
-	
-	
+	/**
+	 * @return the valueId
+	 */
+	public Integer getValueId() {
+		return valueId;
+	}
+
+	/**
+	 * @param valueId the valueId to set
+	 */
+	public void setValueId(Integer valueId) {
+		this.valueId = valueId;
+	}
+
 }
