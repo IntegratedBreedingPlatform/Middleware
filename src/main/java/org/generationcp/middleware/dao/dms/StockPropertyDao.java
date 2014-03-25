@@ -34,7 +34,7 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
 			criteria.add(Restrictions.eq("value", value));
-			criteria.setProjection(Projections.property("stock.stockId"));
+			criteria.setProjection(Projections.property("stockModel.stockId"));
 			
 			return criteria.list();
 			
