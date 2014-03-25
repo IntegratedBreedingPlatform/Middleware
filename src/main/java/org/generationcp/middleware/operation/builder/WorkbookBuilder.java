@@ -173,7 +173,7 @@ public class WorkbookBuilder extends Builder {
 	        for (Variable variable : factors.getVariables()) {
 	        	
 	            if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
-	            	MeasurementData measurementData = null;	
+	            	MeasurementData measurementData = null;
 	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
