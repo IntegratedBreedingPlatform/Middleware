@@ -547,19 +547,19 @@ public class StandardVariableBuilder extends Builder {
     	Integer storedInId = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), standardVariableId).get(0);
     	String value = String.valueOf(enumerationId);
     	if (storedInId == TermId.STUDY_INFO_STORAGE.getId() || storedInId == TermId.DATASET_INFO_STORAGE.getId()) {
-    		return isExistsPropertyByTypeAndValue(standardVariableId, value);
+    		return !isExistsPropertyByTypeAndValue(standardVariableId, value);
     	}
     	else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
-    		return isExistsStocksByTypeAndValue(standardVariableId, value);
+    		return !isExistsStocksByTypeAndValue(standardVariableId, value);
     	}
     	else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-    		return isExistsGeolocationByTypeAndValue(standardVariableId, value);
+    		return !isExistsGeolocationByTypeAndValue(standardVariableId, value);
     	}
     	else if (storedInId == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
-    		return isExistsExperimentsByTypeAndValue(standardVariableId, value);
+    		return !isExistsExperimentsByTypeAndValue(standardVariableId, value);
     	}
     	else if (storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
-    		return isExistsPhenotypeByTypeAndValue(standardVariableId, value, true);
+    		return !isExistsPhenotypeByTypeAndValue(standardVariableId, value, true);
     	}
     	else {
     		throw new MiddlewareQueryException("Not a valid categorical variable - " + standardVariableId);
