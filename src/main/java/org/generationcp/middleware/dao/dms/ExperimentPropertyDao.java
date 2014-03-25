@@ -46,7 +46,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
 			criteria.add(Restrictions.eq("value", value));
-			criteria.setProjection(Projections.property("ndExperimentId"));
+			criteria.setProjection(Projections.property("experiment.ndExperimentId"));
 			
 			return criteria.list();
 			
