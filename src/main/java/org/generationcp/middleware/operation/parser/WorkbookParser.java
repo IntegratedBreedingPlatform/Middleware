@@ -38,6 +38,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -247,9 +248,22 @@ public class WorkbookParser {
             }
 
         }
-
+        
         if (startDate != null && endDate != null && startDate.after(endDate)) {
             errorMessages.add(new Message("error.start.is.after.end.date"));
+        }
+        
+        if (startDate == null && endDate != null) {
+            errorMessages.add(new Message("error.date.startdate.required"));
+        }
+        
+        Date currentDate = Calendar.getInstance().getTime();
+        if (startDate != null && startDate.after(currentDate)) {
+            errorMessages.add(new Message("error.start.is.after.current.date"));
+        }
+        
+        if (endDate != null && endDate.after(currentDate)) {
+            errorMessages.add(new Message("error.end.is.after.current.date"));
         }
 
 
