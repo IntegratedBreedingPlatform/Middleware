@@ -1048,6 +1048,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
         return null;
     }
+    
+    @Override
+    public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
+    	return getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
+    }
 }
 
 

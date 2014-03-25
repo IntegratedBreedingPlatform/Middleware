@@ -584,6 +584,15 @@ public interface OntologyService{
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
     
-    
+
+    /**
+     * Validates if the enumeration is being used.
+     * 
+     * @param standardVariableId
+     * @param enumerationId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
     
 }

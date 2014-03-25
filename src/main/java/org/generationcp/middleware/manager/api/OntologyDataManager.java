@@ -551,4 +551,14 @@ public interface OntologyDataManager {
      */
 	Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
 	throws MiddlewareQueryException;
+
+	/**
+	 * validate if the enumeration is being used.
+	 * 
+	 * @param standardVariableId
+	 * @param enumerationId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+    public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
 }

@@ -367,4 +367,8 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getAllPropertiesWithTraitClass();
     }
 
+    @Override
+    public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
+    	return getOntologyDataManager().validateDeleteStandardVariableEnumeration(standardVariableId, enumerationId);
+    }
 }

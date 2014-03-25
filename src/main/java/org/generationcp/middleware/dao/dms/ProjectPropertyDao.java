@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -27,6 +28,9 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -141,5 +145,20 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
                     "Error in getDistinctStandardVariableValues("    + stdVarId + ") in ProjectPropertyDao: " + e.getMessage(), e);
 		}
 		return results;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ProjectProperty> getByTypeAndValue(int typeId, String value) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.eq("value", value));
+			return criteria.list();
+			
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getByTypeAndValue("    + typeId + ", " + value + ") in ProjectPropertyDao: " + e.getMessage(), e);
+		}
+		return new ArrayList<ProjectProperty>();
 	}
 }
