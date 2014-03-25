@@ -407,9 +407,11 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ "   and pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()  
 					+ "   and pr.object_project_id = p.project_id "//link to the dataset instead
 					+ "   and e.nd_geolocation_id = g.nd_geolocation_id "
-					+ "   and p.name = '"+ projectName + "'" 
-					+ "   and g.description = '"+ locationDescription + "'";
+					+ "   and p.name = :projectName"  
+					+ "   and g.description = :locationDescription";
 			Query query = getSession().createSQLQuery(sql);
+			query.setParameter("projectName", projectName);
+			query.setParameter("locationDescription", locationDescription);
 			List<Integer> list = (List<Integer>) query.list();
 			if(list!=null && !list.isEmpty()) {
 				return list.get(0);
