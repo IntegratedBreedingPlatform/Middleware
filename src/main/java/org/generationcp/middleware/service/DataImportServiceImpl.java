@@ -99,7 +99,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered with saving to database: ", e, LOG);
 
         } finally {
             timerWatch.stop();
@@ -122,7 +122,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans2);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered with saving to database: ", e, LOG);
 
         } finally {
             timerWatch.stop();
@@ -252,12 +252,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 
     private void checkForDuplicatePSMCombo(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        // GCP-6438
-        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
-        /*workbookVariables.addAll(workbook.getFactors());
-        workbookVariables.addAll(workbook.getVariates());*/
-
+        List<MeasurementVariable> workbookVariables = workbook.getNonVariateVariables();
+        
         Map<String, String> psmMap = new HashMap<String, String>();
+
+        for (MeasurementVariable measurementVariable : workbookVariables) {
+            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
+            if (!psmMap.containsKey(temp)) {
+                psmMap.put(temp, measurementVariable.getName());
+            } else {
+                messages.add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
+            }
+        }
+        
+        workbookVariables = workbook.getVariates();
+        psmMap = new HashMap<String, String>();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
             String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
@@ -504,7 +513,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered with importing project ontology: ", e, LOG);
 
         } finally {
             timerWatch.stop();

@@ -46,7 +46,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 
     public List<String> getDatasetNames(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_NOT_QTL);
+            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_NOT_QTL_AND_MTA);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             return (List<String>) query.list();

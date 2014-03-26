@@ -78,10 +78,10 @@ public class StudyDetails {
         this(studyName, title, objective, startDate, endDate, studyType, piName, siteName);
         this.id = id;
         if (piId != null && NumberUtils.isNumber(piId)) {
-        	this.piId = Integer.valueOf(piId);
+        	this.piId = Double.valueOf(piId).intValue();
         }
         if (siteId != null && NumberUtils.isNumber(siteId)) {
-        	this.siteId = Integer.valueOf(siteId);
+        	this.siteId = Double.valueOf(siteId).intValue();
         }
     }
 

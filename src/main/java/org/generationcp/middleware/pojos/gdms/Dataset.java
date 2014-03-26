@@ -38,10 +38,10 @@ public class Dataset implements Serializable{
     		+ "WHERE dataset_type != 'QTL' "
             ;
 
-    public static final String GET_DATASET_NAMES_NOT_QTL = 
+    public static final String GET_DATASET_NAMES_NOT_QTL_AND_MTA = 
             "SELECT CONCAT(dataset_name, '') " 
     		+ "FROM gdms_dataset "
-            + "WHERE dataset_type != 'QTL' "
+            + "WHERE dataset_type != 'QTL' AND dataset_type != 'MTA' "
     		;
 
     public static final String GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL = 
