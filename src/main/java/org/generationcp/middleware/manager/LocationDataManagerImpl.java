@@ -17,8 +17,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
@@ -537,8 +539,28 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     @Override
     public List<Location> getAllFields() throws MiddlewareQueryException{
         Integer fieldLtype = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType"
-                , new Object[]{fieldLtype} , new Class[]{Integer.class});
+        Integer relationshipType = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
+        List<Location> locations = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByTypeWithParent"
+                , new Object[]{fieldLtype, relationshipType} , new Class[]{Integer.class, Integer.class});
+        
+        Set<Integer> parentIds = new HashSet<Integer>();
+        for (Location location : locations) {
+        	parentIds.add(location.getParentLocationId());
+        }
+        
+        Map<Integer, String> namesMap = new HashMap<Integer, String>();
+        if (!parentIds.isEmpty()) {
+	        setWorkingDatabase(Database.LOCAL);
+	        namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
+	        setWorkingDatabase(Database.CENTRAL);
+	        namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
+        }
+        
+        for (Location location : locations) {
+        	location.setParentLocationName(namesMap.get(location.getParentLocationId()));
+        }
+        
+        return locations;
     }
     
 
