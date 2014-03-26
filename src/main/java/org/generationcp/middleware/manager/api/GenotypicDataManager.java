@@ -1899,4 +1899,13 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     void addMTA(Dataset dataset, Mta mta, DatasetUsers users) throws MiddlewareQueryException;
+
+    // GCP-7873
+    List<Marker> getAllSNPMarkers() throws MiddlewareQueryException;
+
+    // GCP-7874
+    List<Marker> getSNPsByHaplotype(String haplotype) throws MiddlewareQueryException;
+
+    // GCP-7881
+    List<MarkerInfo> getMarkerInfoByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
 }

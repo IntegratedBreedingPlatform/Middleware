@@ -1,13 +1,13 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public
  * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.gdms;
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -38,18 +39,18 @@ import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Marker}.
- *
+ * <p/>
  * <b>Authors</b>: Mark Agarrado <br>
  * <b>File Created</b>: Jul 10, 2012
  */
 @SuppressWarnings("unchecked")
-public class MarkerDAO extends GenericDAO<Marker, Integer>{
+public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
     /**
      * Gets the ids by names.
      *
-     * @param names the names
-     * @param start the start
+     * @param names     the names
+     * @param start     the start
      * @param numOfRows the num of rows
      * @return the ids by names
      * @throws MiddlewareQueryException the MiddlewareQueryException
@@ -71,7 +72,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
         return new ArrayList<Integer>();
     }
-    
+
     public List<Marker> getByNames(List<String> names, int start, int numOfRows) throws MiddlewareQueryException {
         List<Marker> toReturn = new ArrayList<Marker>();
         if (names == null || names.isEmpty()) {
@@ -87,14 +88,29 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
         return toReturn;
     }
-    
+
+    public List<Marker> getByType(String markerType) throws MiddlewareQueryException {
+        List<Marker> returnVal = new ArrayList<Marker>();
+
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("marker_type", markerType));
+            returnVal = criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByType(type=" + markerType + ") query from Marker: " + e.getMessage(), e);
+        }
+
+        return returnVal;
+    }
+
     /**
      * Gets the marker_id of the first occurence of the marker_name
+     *
      * @param names
      * @return
      * @throws MiddlewareQueryException
      */
-     public Map<Integer, String> getFirstMarkerIdByMarkerName(List<String> names, Database instance) throws MiddlewareQueryException{
+    public Map<Integer, String> getFirstMarkerIdByMarkerName(List<String> names, Database instance) throws MiddlewareQueryException {
         Map<Integer, String> toReturn = new HashMap<Integer, String>();
         if (names == null || names.isEmpty()) {
             return toReturn;
@@ -102,7 +118,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
 
         try {
             SQLQuery query = getSession().createSQLQuery(Marker.GET_ID_AND_NAME_BY_NAMES);
-            if (instance == Database.LOCAL){
+            if (instance == Database.LOCAL) {
                 query = getSession().createSQLQuery(Marker.GET_ID_AND_NAME_BY_NAMES + "DESC");
             }
             query.setParameterList("markerNameList", names);
@@ -115,17 +131,17 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
                     String name = (String) result[1];
 
                     // Add to map if it doesn't contain the name yet. Ignore the case.
-                    if (!toReturn.containsValue(name.toUpperCase())){
+                    if (!toReturn.containsValue(name.toUpperCase())) {
                         toReturn.put(id, name.toUpperCase());
                     }
                 }
             }
-            
+
         } catch (HibernateException e) {
             logAndThrowException("Error with getIdAndNameByNames(names=" + names + ") query from Marker: " + e.getMessage(), e);
         }
         return toReturn;
-        
+
     }
 
     /**
@@ -148,7 +164,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             return (List<String>) query.list();
 
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getMarkerTypeByMarkerIds(markerIds=" + markerIds + ") query from Marker: " + e.getMessage(),
+            logAndThrowException("Error with getMarkerTypeByMarkerIds(markerIds=" + markerIds + ") query from Marker: " + e.getMessage(),
                     e);
         }
         return new ArrayList<String>();
@@ -156,11 +172,11 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
 
     /**
      * Gets the marker names by gids.
-     * 
+     * <p/>
      * - Searches the allele_values, char_values, mapping_pop_values tables for the existence of gids.
      * - Gets marker ids from allele_values, char_values, mapping_pop_values by gids
      * - Gets marker name from marker table by marker ids
-     * - Returns marker names matching the gids 
+     * - Returns marker names matching the gids
      *
      * @param gIds the g ids
      * @return the marker names by g ids
@@ -241,13 +257,13 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             return dataValues;
 
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getMarkerNamesByGIds(gIds=" + gIds + ") query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with getMarkerNamesByGIds(gIds=" + gIds + ") query from Marker: " + e.getMessage(), e);
         }
         return dataValues;
     }
 
     /**
-     * Gets the GermplasmMarkerElement items from the given list. 
+     * Gets the GermplasmMarkerElement items from the given list.
      * Converts the result of SQL return values to GermplasmMarkerElement list.
      * Used by getGermplasmNamesByMarkerNames().
      *
@@ -355,7 +371,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             return dataValues;
 
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getGermplasmNamesByMarkerNames(markerNames=" + markerNames + ") query from Marker: "
+            logAndThrowException("Error with getGermplasmNamesByMarkerNames(markerNames=" + markerNames + ") query from Marker: "
                     + e.getMessage(), e);
         }
         return dataValues;
@@ -409,7 +425,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     /**
      * Gets the allelic values by gids and marker names.
      *
-     * @param gids the gids
+     * @param gids        the gids
      * @param markerNames the marker names
      * @return the allelic values by gids and marker names
      * @throws MiddlewareQueryException the MiddlewareQueryException
@@ -432,12 +448,12 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
 
         return getAllelicValuesByGidsAndMarkerIds(gids, markerIds);
     }
-    
+
 
     /**
      * Gets the allelic values by gids and marker ids.
      *
-     * @param gids the gids
+     * @param gids      the gids
      * @param markerIds the marker ids
      * @return the allelic values by gids and marker ids
      * @throws MiddlewareQueryException the MiddlewareQueryException
@@ -482,8 +498,8 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
         return allelicValues;
     }
-    
-    
+
+
     @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getAllelicValuesFromLocal(List<Integer> gids) throws MiddlewareQueryException {
 
@@ -520,7 +536,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
         return allelicValues;
     }
-    
+
 
     /**
      * Get list of marker names by marker ids.
@@ -559,7 +575,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
         return new ArrayList<MarkerIdMarkerNameElement>();
     }
-    
+
     public Map<Integer, String> getNamesByIdsMap(List<Integer> ids) throws MiddlewareQueryException {
         Map<Integer, String> dataValues = new HashMap<Integer, String>();
         if (ids == null || ids.isEmpty()) {
@@ -610,7 +626,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     /**
      * Get all marker types.
      *
-     * @param start the start
+     * @param start     the start
      * @param numOfRows the num of rows
      * @return the all marker types
      * @throws MiddlewareQueryException the MiddlewareQueryException
@@ -626,7 +642,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             return markerTypes;
 
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getAllMarkerTypes() query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllMarkerTypes() query from Marker: " + e.getMessage(), e);
         }
         return new ArrayList<String>();
     }
@@ -647,7 +663,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
                 return 0L;
             }
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countAllMarkerTypes() query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllMarkerTypes() query from Marker: " + e.getMessage(), e);
         }
         return 0L;
     }
@@ -656,8 +672,8 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
      * Gets the all marker names by marker type.
      *
      * @param markerType the marker type
-     * @param start the start
-     * @param numOfRows the num of rows
+     * @param start      the start
+     * @param numOfRows  the num of rows
      * @return the all marker names by marker type
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
@@ -673,7 +689,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
 
             return markerNames;
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getMarkerNamesByMarkerType(markerType=" + markerType + ") query from Marker: "
+            logAndThrowException("Error with getMarkerNamesByMarkerType(markerType=" + markerType + ") query from Marker: "
                     + e.getMessage(), e);
         }
         return new ArrayList<String>();
@@ -697,7 +713,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countMarkerNamesByMarkerType(markerType=" + markerType + ") query from Marker: "
+            logAndThrowException("Error with countMarkerNamesByMarkerType(markerType=" + markerType + ") query from Marker: "
                     + e.getMessage(), e);
         }
         return 0;
@@ -706,10 +722,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     /**
      * Gets the all db accession ids.
      *
-     * @param start the start
+     * @param start     the start
      * @param numOfRows the num of rows
      * @return all non-empty db accession ids
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException
      */
     public List<String> getAllDbAccessionIds(int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -718,7 +734,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             query.setMaxResults(numOfRows);
             return (List<String>) query.list();
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getAllDbAccessionIds() query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllDbAccessionIds() query from Marker: " + e.getMessage(), e);
         }
         return new ArrayList<String>();
     }
@@ -739,14 +755,14 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
                 return 0L;
             }
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countAllDbAccessionIds() query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllDbAccessionIds() query from Marker: " + e.getMessage(), e);
         }
         return 0L;
     }
 
     @SuppressWarnings("rawtypes")
-    public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException{
-        if ((markerIds == null) || (markerIds.isEmpty())){
+    public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
+        if ((markerIds == null) || (markerIds.isEmpty())) {
             return new ArrayList<Marker>();
         }
 
@@ -756,42 +772,75 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             List results = query.list();
-            
+
             List<Marker> dataValues = new ArrayList<Marker>();
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
-                    Integer markerId = (Integer) result[0];
-                    String markerType = (String) result[1];
-                    String markerName = (String) result[2];
-                    String species = (String) result[3];
-                    String dbAccessionId = (String) result[4];
-                    String reference = (String) result[5];
-                    String genotype = (String) result[6];
-                    String ploidy = (String) result[7];
-                    String primerId = (String) result[8];
-                    String remarks = (String) result[9];
-                    String assayType = (String) result[10];
-                    String motif = (String) result[11];
-                    String forwardPrimer = (String) result[12];
-                    String reversePrimer = (String) result[13];
-                    String productSize = (String) result[14];
-                    Float annealingTemp = (Float) result[15];
-                    String amplification = (String) result[16];
-                    Marker element = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy,
-                            primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
-                    dataValues.add(element);
+                    dataValues.add(convertToMarker(result));
                 }
             }
             return dataValues;
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getMarkersByIds() query from Marker: " + e.getMessage(), e);    
+            logAndThrowException("Error with getMarkersByIds() query from Marker: " + e.getMessage(), e);
         }
         return new ArrayList<Marker>();
     }
 
-    public long countMarkersByIds(List<Integer> markerIds) throws MiddlewareQueryException{
-        if ((markerIds == null) || (markerIds.isEmpty())){
+    // GCP-7874
+    public List<Marker> getMarkersByHaplotype(String haplotype) throws MiddlewareQueryException {
+        if (StringUtils.isEmpty(haplotype)) {
+            return new ArrayList<Marker>();
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_IDS);
+            query.setParameter("trackName", haplotype);
+            List results = query.list();
+
+            List<Marker> dataValues = new ArrayList<Marker>();
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    dataValues.add(convertToMarker(result));
+                }
+            }
+            return dataValues;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkersByHaplotype() query from Marker: " + e.getMessage(), e);
+        }
+
+        return new ArrayList<Marker>();
+    }
+
+    protected Marker convertToMarker(Object[] result) {
+
+        Integer markerId = (Integer) result[0];
+        String markerType = (String) result[1];
+        String markerName = (String) result[2];
+        String species = (String) result[3];
+        String dbAccessionId = (String) result[4];
+        String reference = (String) result[5];
+        String genotype = (String) result[6];
+        String ploidy = (String) result[7];
+        String primerId = (String) result[8];
+        String remarks = (String) result[9];
+        String assayType = (String) result[10];
+        String motif = (String) result[11];
+        String forwardPrimer = (String) result[12];
+        String reversePrimer = (String) result[13];
+        String productSize = (String) result[14];
+        Float annealingTemp = (Float) result[15];
+        String amplification = (String) result[16];
+
+        Marker element = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy,
+                primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
+
+        return element;
+    }
+
+    public long countMarkersByIds(List<Integer> markerIds) throws MiddlewareQueryException {
+        if ((markerIds == null) || (markerIds.isEmpty())) {
             return 0;
         }
         try {
@@ -804,14 +853,14 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
                 return 0L;
             }
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countMarkersByIds() query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with countMarkersByIds() query from Marker: " + e.getMessage(), e);
         }
         return 0L;
     }
-    
-    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos, int start, int numOfRows) throws MiddlewareQueryException{
+
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            
+
             SQLQuery query;
 
             query = getSession().createSQLQuery(Marker.GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
@@ -824,17 +873,17 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             Set<Integer> markerIDSet = new TreeSet<Integer>(query.list());
 
             return markerIDSet;
-            
+
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" + linkageGroup + ", start=" + start + ", numOfRows=" + numOfRows + ") query from Marker: "
+            logAndThrowException("Error with getMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" + linkageGroup + ", start=" + start + ", numOfRows=" + numOfRows + ") query from Marker: "
                     + e.getMessage(), e);
         }
         return new TreeSet<Integer>();
     }
-    
-    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException{
+
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException {
         try {
-            
+
             SQLQuery query;
 
             query = getSession().createSQLQuery(Marker.COUNT_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
@@ -848,25 +897,25 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             } else {
                 return 0;
             }
-            
+
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" + linkageGroup + ") query from Marker: "
+            logAndThrowException("Error with countMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" + linkageGroup + ") query from Marker: "
                     + e.getMessage(), e);
         }
         return 0L;
     }
-    
+
     public Integer getIdByName(String name) throws MiddlewareQueryException {
-    	try {
-    		SQLQuery query = getSession().createSQLQuery(Marker.GET_ID_BY_NAME);
-    		query.setParameter("markerName", name);
-    		return (Integer) query.uniqueResult();
-    		
-    	} catch(HibernateException e) {
-    		logAndThrowException("Error with getIdByName(" + name + "): " + e.getMessage(), e);
-    	}
-    	
-    	return null;
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_ID_BY_NAME);
+            query.setParameter("markerName", name);
+            return (Integer) query.uniqueResult();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getIdByName(" + name + "): " + e.getMessage(), e);
+        }
+
+        return null;
     }
     
 /*    @SuppressWarnings("rawtypes")
