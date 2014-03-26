@@ -120,6 +120,7 @@ public class StandardVariableBuilder extends Builder {
 	
 	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
 	    if (hasEnumerations(cvTermRelationships)) {
+	    	Map<Integer, Integer> overridenEnumerations = new HashMap<Integer, Integer>();
 			List<Enumeration> enumerations = new ArrayList<Enumeration>();
 			for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
 				if (cvTermRelationship.getTypeId().equals(TermId.HAS_VALUE.getId())) {
@@ -127,23 +128,38 @@ public class StandardVariableBuilder extends Builder {
 					
 					Enumeration newValue = createEnumeration(getCvTerm(id));
 					
-					if (!isEnumerationValueExists(enumerations, newValue)){
+					Enumeration existingMatch = getExistingEnumeration(enumerations, newValue);
+					//if (!isEnumerationValueExists(enumerations, newValue)){
+					if (existingMatch == null) {
 					    enumerations.add(newValue);
+					}
+					else {
+						overridenEnumerations.put(newValue.getId(), existingMatch.getId());
 					}
 				}
 			}
 			Collections.sort(enumerations);
 			standardVariable.setEnumerations(enumerations);
+			standardVariable.setOverridenEnumerations(overridenEnumerations);
 		}
 	}
 	
-    private boolean isEnumerationValueExists(List<Enumeration> enumerations, Enumeration value) {
+//    private boolean isEnumerationValueExists(List<Enumeration> enumerations, Enumeration value) {
+//        for (Enumeration enumeration : enumerations) {
+//            if (enumeration.getName().equals(value.getName())) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+    private Enumeration getExistingEnumeration(List<Enumeration> enumerations, Enumeration value) {
         for (Enumeration enumeration : enumerations) {
             if (enumeration.getName().equals(value.getName())) {
-                return true;
+                return enumeration;
             }
         }
-        return false;
+        return null;
     }
 
 	private Enumeration createEnumeration(CVTerm cvTerm) throws MiddlewareQueryException {
