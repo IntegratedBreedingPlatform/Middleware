@@ -713,5 +713,34 @@ public class PoiUtil {
 
         return lastRowNum;
     }
+    
+    
+    public static boolean areSheetRowsOverMaxLimit(String fileName, int sheetIndex, int maxLimit){
+    	
+    	
+    	try {
+			new PoiEventUserModel().areSheetRowsOverMaxLimit(fileName, sheetIndex, maxLimit);
+		} catch (Exception e) {
+			//Exception means parser has exeeded the set max limit
+			return true;
+		}
+    	
+    	
+    	return false;
+    }
+    
+    public static boolean isAnySheetRowsOverMaxLimit(String fileName, int maxLimit){
+ 
+    	
+    	try {
+			new PoiEventUserModel().isAnySheetRowsOverMaxLimit(fileName, maxLimit);
+		} catch (Exception e) {
+			//Exception means parser has exeeded the set max limit
+			return true;
+		}
+    	
+    	
+    	return false;
+    }
 }
 

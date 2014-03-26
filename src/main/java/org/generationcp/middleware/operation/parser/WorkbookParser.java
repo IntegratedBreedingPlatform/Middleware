@@ -85,7 +85,7 @@ public class WorkbookParser {
      * @return
      * @throws IOException
      */
-    private Workbook getCorrectWorkbook(File file) throws IOException {
+    private Workbook getCorrectWorkbook(File file) throws IOException, WorkbookParserException {
         InputStream inp = new FileInputStream(file);
         InputStream inp2 = new FileInputStream(file);
         Workbook wb;
@@ -93,7 +93,16 @@ public class WorkbookParser {
             wb = new HSSFWorkbook(inp);
         } catch (OfficeXmlFileException ee) {
             // TODO: handle exception
-            wb = new XSSFWorkbook(inp2);
+        	int maxLimit = 65000;
+        	Boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
+            if (overLimit){
+            	WorkbookParserException workbookParserException = new WorkbookParserException("");
+            	workbookParserException.addMessage(new Message("error.file.is.too.large", new DecimalFormat("###,###,###").format(maxLimit)));
+            	throw workbookParserException;
+            }else{
+            	wb = new XSSFWorkbook(inp2);
+            }
+        	
         } finally {
             inp.close();
             inp2.close();
