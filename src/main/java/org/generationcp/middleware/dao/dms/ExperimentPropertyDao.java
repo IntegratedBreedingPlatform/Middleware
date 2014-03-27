@@ -432,7 +432,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             }
             label.setStudyName((String) row[13]);
             label.setGid(gid);
-            label.setStartYear(startDate != null && !startDate.equals("null") ? startDate.substring(0, 4) : null);
+            label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
             label.setSeason(Season.getSeason(season));
             labels.add(label);
             
@@ -518,7 +518,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             label.setGeolocationId((Integer) row[3]);
             label.setSiteName((String) row[4]);
             label.setGid((Integer) row[16]);
-            label.setStartYear(startDate != null && !startDate.equals("null") ? startDate.substring(0, 4) : null);
+            label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
             label.setSeason(Season.getSeason((String) row[18]));
 
             String trialKey = getTrialKey((Integer) row[0], (Integer) row[3]);
