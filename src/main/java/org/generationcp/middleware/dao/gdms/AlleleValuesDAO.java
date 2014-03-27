@@ -1,13 +1,13 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public
  * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
@@ -28,15 +28,14 @@ import org.hibernate.SQLQuery;
  * DAO class for {@link AlleleValues}.
  *
  * @author Joyce Avestro
- * 
  */
-public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
+public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 
     /**
      * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.
-     * 
+     *
      * @param datasetId the dataset id
-     * @param start the start of the rows to retrieve
+     * @param start     the start of the rows to retrieve
      * @param numOfRows the number of rows to retrieve
      * @return the Allelic Values (germplasm id, data value, and marker id) for the given dataset id
      * @throws MiddlewareQueryException the MiddlewareQueryException
@@ -47,31 +46,65 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
         List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
 
         try {
-        	if (datasetId != null){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_DATASET_ID);
-	            query.setParameter("datasetId", datasetId);
-	            query.setFirstResult(start);
-	            query.setMaxResults(numOfRows);
-	            List results = query.list();
-	
-	            for (Object o : results) {
-	                Object[] result = (Object[]) o;
-	                if (result != null) {
-	                    Integer gid = (Integer) result[0];
-	                    Integer markerId = (Integer) result[1];
-	                    String data = (String) result[2];
-	                    Integer peakHeight = (Integer) result[3];
-	                    AllelicValueWithMarkerIdElement allelicValueElement = 
-	                    		new AllelicValueWithMarkerIdElement(gid, data, markerId, peakHeight);
-	                    toReturn.add(allelicValueElement);
-	                }
-	            }
-        	}
-            
+            if (datasetId != null) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_DATASET_ID);
+                query.setParameter("datasetId", datasetId);
+                query.setFirstResult(start);
+                query.setMaxResults(numOfRows);
+                List results = query.list();
+
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer gid = (Integer) result[0];
+                        Integer markerId = (Integer) result[1];
+                        String data = (String) result[2];
+                        Integer peakHeight = (Integer) result[3];
+                        AllelicValueWithMarkerIdElement allelicValueElement =
+                                new AllelicValueWithMarkerIdElement(gid, data, markerId, peakHeight);
+                        toReturn.add(allelicValueElement);
+                    }
+                }
+            }
+
         } catch (HibernateException e) {
             logAndThrowException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId + ") query from AlleleValues: " + e.getMessage(), e);
         }
         return toReturn;
+    }
+
+    public List<AlleleValues> getAlleleValuesByMarkerId(List<Integer> markerIdList) throws MiddlewareQueryException {
+        List<AlleleValues> returnVal = new ArrayList<AlleleValues>();
+
+        if (markerIdList == null || markerIdList.size() == 0) {
+            return returnVal;
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_MARKER_IDS);
+            query.setParameterList("markerIdList", markerIdList);
+
+            List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer anId = (Integer) result[0];
+                    Integer datasetId = (Integer) result[1];
+                    Integer gId = (Integer) result[2];
+                    Integer markerId = (Integer) result[3];
+                    String data = (String) result[4];
+                    String rawData = (String) result[5];
+                    Integer peakHeight = (Integer) result[6];
+                    AlleleValues value = new AlleleValues(anId, datasetId,gId, markerId, data, rawData, peakHeight);
+                    returnVal.add(value);
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAlleleValuesByMarkerId() query from AlleleValues: " + e.getMessage(), e);
+        }
+
+        return returnVal;
     }
 
     /**
@@ -83,14 +116,14 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
      */
     public long countByDatasetId(Integer datasetId) throws MiddlewareQueryException {
         try {
-        	if (datasetId != null){
-	            Query query = getSession().createSQLQuery(AlleleValues.COUNT_BY_DATASET_ID);
-	            query.setParameter("datasetId", datasetId);
-	            BigInteger result = (BigInteger) query.uniqueResult();
-	            if (result != null) {
-	                return result.longValue();
-	            }
-        	}
+            if (datasetId != null) {
+                Query query = getSession().createSQLQuery(AlleleValues.COUNT_BY_DATASET_ID);
+                query.setParameter("datasetId", datasetId);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from AlleleValues: "
                     + e.getMessage(), e);
@@ -101,8 +134,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
     /**
      * Gets the gids by marker id.
      *
-     * @param markerId the marker id
-     * @param start the start
+     * @param markerId  the marker id
+     * @param start     the start
      * @param numOfRows the num of rows
      * @return the gI ds by marker id
      * @throws MiddlewareQueryException the MiddlewareQueryException
@@ -110,13 +143,13 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
     @SuppressWarnings("unchecked")
     public List<Integer> getGIDsByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-        	if (markerId != null){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_GIDS_BY_MARKER_ID);
-	            query.setParameter("markerId", markerId);
-	            query.setFirstResult(start);
-	            query.setMaxResults(numOfRows);
-	            return (List<Integer>) query.list();
-        	}
+            if (markerId != null) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_GIDS_BY_MARKER_ID);
+                query.setParameter("markerId", markerId);
+                query.setFirstResult(start);
+                query.setMaxResults(numOfRows);
+                return (List<Integer>) query.list();
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);
         }
@@ -132,30 +165,30 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
      */
     public long countGIDsByMarkerId(Integer markerId) throws MiddlewareQueryException {
         try {
-        	if (markerId != null){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_GIDS_BY_MARKER_ID);
-	            query.setParameter("markerId", markerId);
-	            BigInteger result = (BigInteger) query.uniqueResult();
-	            if (result != null) {
-	                return result.longValue();
-	            }
-        	}
+            if (markerId != null) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_GIDS_BY_MARKER_ID);
+                query.setParameter("markerId", markerId);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);
         }
         return 0;
     }
 
-    public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
+    public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
         try {
-        	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_ALLELE_VALUES_BY_GIDS);
-	            query.setParameterList("gids", gids);
-	            BigInteger result = (BigInteger) query.uniqueResult();
-	            if (result != null) {
-	                return result.longValue();
-	            }
-        	}
+            if (gids != null && !gids.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_ALLELE_VALUES_BY_GIDS);
+                query.setParameterList("gids", gids);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with countAlleleValuesByGids(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
@@ -165,83 +198,83 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
     @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start,
-            int numOfRows) throws MiddlewareQueryException {
+                                                                                      int numOfRows) throws MiddlewareQueryException {
         try {
-        	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
-	            query.setParameterList("gids", gids);
-	            query.setFirstResult(start);
-	            query.setMaxResults(numOfRows);
-	            List results = query.list();
-	
-	            List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
-	
-	            for (Object o : results) {
-	                Object[] result = (Object[]) o;
-	                if (result != null) {
-	                    Integer datasetId = (Integer) result[0];
-	                    Integer gid = (Integer) result[1];
-	                    String markerName = (String) result[2];
-	                    String alleleBinValue = (String) result[3];
-	                    Integer peakHeight = (Integer) result[4];
-	                    AllelicValueElement allelicValueElement = 
-	                    		new AllelicValueElement(datasetId, gid, markerName, alleleBinValue, peakHeight);
-	                    values.add(allelicValueElement);
-	                }
-	            }
-	
-	            return values;
-        	}
+            if (gids != null && !gids.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
+                query.setParameterList("gids", gids);
+                query.setFirstResult(start);
+                query.setMaxResults(numOfRows);
+                List results = query.list();
+
+                List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
+
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer datasetId = (Integer) result[0];
+                        Integer gid = (Integer) result[1];
+                        String markerName = (String) result[2];
+                        String alleleBinValue = (String) result[3];
+                        Integer peakHeight = (Integer) result[4];
+                        AllelicValueElement allelicValueElement =
+                                new AllelicValueElement(datasetId, gid, markerName, alleleBinValue, peakHeight);
+                        values.add(allelicValueElement);
+                    }
+                }
+
+                return values;
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with getIntAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
-        }    
+        }
         return new ArrayList<AllelicValueElement>();
     }
 
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
         try {
-        	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
-	            query.setParameterList("gids", gids);
-	            BigInteger result = (BigInteger) query.uniqueResult();
-	            if (result != null) {
-	                return result.longValue();
-	            }
-	            return 0;
-        	}
+            if (gids != null && !gids.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
+                query.setParameterList("gids", gids);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+                return 0;
+            }
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
         return 0;
     }
 
     @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start,
-            int numOfRows) throws MiddlewareQueryException {
+                                                                                       int numOfRows) throws MiddlewareQueryException {
         try {
-        	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
-	            query.setParameterList("gids", gids);
-	            query.setFirstResult(start);
-	            query.setMaxResults(numOfRows);
-	            List results = query.list();
-	
-	            List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
-	
-	            for (Object o : results) {
-	                Object[] result = (Object[]) o;
-	                if (result != null) {
-	                    Integer datasetId = (Integer) result[0];
-	                    Integer gid = (Integer) result[1];
-	                    String markerName = (String) result[2];
-	                    String charValue = (String) result[3];
-	                    AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, markerName, charValue);
-	                    values.add(allelicValueElement);
-	                }
-	            }
-	
-	            return values;
-        	}
+            if (gids != null && !gids.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
+                query.setParameterList("gids", gids);
+                query.setFirstResult(start);
+                query.setMaxResults(numOfRows);
+                List results = query.list();
+
+                List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
+
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer datasetId = (Integer) result[0];
+                        Integer gid = (Integer) result[1];
+                        String markerName = (String) result[2];
+                        String charValue = (String) result[3];
+                        AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, markerName, charValue);
+                        values.add(allelicValueElement);
+                    }
+                }
+
+                return values;
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
@@ -250,14 +283,14 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
         try {
-        	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
-	            query.setParameterList("gids", gids);
-	            BigInteger result = (BigInteger) query.uniqueResult();
-	            if (result != null) {
-	                return result.longValue();
-	            }
-        	}
+            if (gids != null && !gids.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
+                query.setParameterList("gids", gids);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
@@ -266,32 +299,32 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
     @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids,
-            int start, int numOfRows) throws MiddlewareQueryException {
-        try {        	
-        	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
-	            query.setParameterList("gids", gids);
-	            query.setFirstResult(start);
-	            query.setMaxResults(numOfRows);
-	            List results = query.list();
-	
-	            List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
-	
-	            for (Object o : results) {
-	                Object[] result = (Object[]) o;
-	                if (result != null) {
-	                    Integer datasetId = (Integer) result[0];
-	                    Integer gid = (Integer) result[1];
-	                    String markerName = (String) result[2];
-	                    String data = (String) result[3];
-	                    AllelicValueElement allelicValueElement = 
-	                    		new AllelicValueElement(datasetId, gid, markerName, data);
-	                    values.add(allelicValueElement);
-	                }
-	            }
-	
-	            return values;
-        	}
+                                                                                          int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            if (gids != null && !gids.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
+                query.setParameterList("gids", gids);
+                query.setFirstResult(start);
+                query.setMaxResults(numOfRows);
+                List results = query.list();
+
+                List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
+
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer datasetId = (Integer) result[0];
+                        Integer gid = (Integer) result[1];
+                        String markerName = (String) result[2];
+                        String data = (String) result[3];
+                        AllelicValueElement allelicValueElement =
+                                new AllelicValueElement(datasetId, gid, markerName, data);
+                        values.add(allelicValueElement);
+                    }
+                }
+
+                return values;
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with getMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
@@ -300,35 +333,35 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
     public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
         try {
-        	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
-	            query.setParameterList("gids", gids);
-	            BigInteger result = (BigInteger) query.uniqueResult();
-	            if (result != null) {
-	                return result.longValue();
-	            }
-        	}
-    	} catch (HibernateException e) {
+            if (gids != null && !gids.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
+                query.setParameterList("gids", gids);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+            }
+        } catch (HibernateException e) {
             logAndThrowException("Error with countMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
         return 0;
     }
-    
-    public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
-		try {
-			this.flush();
-			
-			SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_allele_values WHERE dataset_id = " + datasetId);
-			statement.executeUpdate();
 
-			this.flush();
+    public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
+        try {
+            this.flush();
+
+            SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_allele_values WHERE dataset_id = " + datasetId);
+            statement.executeUpdate();
+
+            this.flush();
             this.clear();
 
-		} catch(HibernateException e) {
-			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in AlleleValuesDAO: " + e.getMessage(), e);
-		}
+        } catch (HibernateException e) {
+            logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in AlleleValuesDAO: " + e.getMessage(), e);
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<Integer> getMarkerIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
 
@@ -336,7 +369,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             if (gIds != null && gIds.size() > 0) {
                 SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_MARKER_IDS_BY_GIDS);
                 query.setParameterList("gids", gIds);
-                
+
                 return query.list();
             }
         } catch (HibernateException e) {
@@ -344,10 +377,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
         }
         return new ArrayList<Integer>();
     }
-    
+
     public long countByGids(List<Integer> gIds) throws MiddlewareQueryException {
         try {
-            if (gIds != null && gIds.get(0) != null){
+            if (gIds != null && gIds.get(0) != null) {
                 SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_BY_GIDS);
                 query.setParameterList("gIdList", gIds);
                 BigInteger result = (BigInteger) query.uniqueResult();

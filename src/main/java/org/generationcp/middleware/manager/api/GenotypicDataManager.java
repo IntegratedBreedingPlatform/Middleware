@@ -1908,4 +1908,7 @@ public interface GenotypicDataManager{
 
     // GCP-7881
     List<MarkerInfo> getMarkerInfoByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
+
+    // GCP-7875
+    List<AlleleValues> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
 }

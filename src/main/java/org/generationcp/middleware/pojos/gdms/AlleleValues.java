@@ -88,11 +88,7 @@ public class AlleleValues implements Serializable {
                     "ORDER BY gav.gid DESC";
 
     public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
-            "SELECT DISTINCT " +
-                    "gav.gid, " +
-                    "gav.marker_id, " +
-                    "CONCAT(gav.allele_bin_value, ''), " +
-                    "gav.peak_height " +
+            "SELECT * " +
                     "FROM gdms_allele_values gav " +
                     "WHERE  gav.marker_id IN (:markerIdList) " +
                     "ORDER BY gav.gid DESC";
