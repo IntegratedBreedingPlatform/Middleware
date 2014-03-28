@@ -53,10 +53,10 @@ public class MarkerMetadataSet implements Serializable{
             "    AND gdms_acc_metadataset.gid = :gid " + 
             "ORDER BY gdms_marker_metadataset.marker_id ";
     
-    public static final String GET_BY_MARKER_ID = 
+    public static final String GET_BY_MARKER_IDS = 
             "SELECT * " +
             "FROM gdms_marker_metadataset " +
-            "WHERE  marker_id = :markerId ";
+            "WHERE  marker_id IN (:markerIdList) ";
    
     public static final String COUNT_MARKER_BY_DATASET_IDS = 
             "SELECT COUNT(DISTINCT marker_id) " 

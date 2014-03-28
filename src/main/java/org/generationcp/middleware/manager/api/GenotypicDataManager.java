@@ -280,10 +280,10 @@ public interface GenotypicDataManager{
      * @param instance 
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
-     * @return List of matching marker ids based on the specified marker names
+     * @return List of matching markers based on the specified marker names
      * @throws MiddlewareQueryException
      */
-    List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
+    List<Marker> getMarkersByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
             throws MiddlewareQueryException;
 
     /**
@@ -1797,12 +1797,12 @@ public interface GenotypicDataManager{
     long countMappingAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
     
     /**
-     * Returns the list of MarkerMetadataSet from gdms_marker_metadataset matching the given marker ID.
-     * @param markerId
-     * @return
+     * Returns the list of MarkerMetadataSet from gdms_marker_metadataset matching the given marker IDs.
+     * @param markerIds - list of marker ids
+     * @return List of MarkerMetadataSet objects
      * @throws MiddlewareQueryException
      */
-    List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarker(Integer markerId) throws MiddlewareQueryException;
+    List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
     
     /**
      * Returns the Dataset details given a dataset ID
@@ -1963,4 +1963,16 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     void addMTA(Dataset dataset, Mta mta, DatasetUsers users) throws MiddlewareQueryException;
+
+    // GCP-7873
+    List<Marker> getAllSNPMarkers() throws MiddlewareQueryException;
+
+    // GCP-7874
+    List<Marker> getSNPsByHaplotype(String haplotype) throws MiddlewareQueryException;
+
+    // GCP-7881
+    List<MarkerInfo> getMarkerInfoByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
+
+    // GCP-7875
+    List<AlleleValues> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
 }
