@@ -109,7 +109,6 @@ public class Qtl implements Serializable{
     public static final String GET_QTL_ID_BY_NAME = 
             GET_QTL_DETAILS_SELECT 
             + GET_QTL_DETAILS_FROM_CENTRAL
-            + "FROM gdms_qtl "
             + "WHERE qtl_name LIKE LOWER(:qtlName) "
             + "ORDER BY qtl_id";
     

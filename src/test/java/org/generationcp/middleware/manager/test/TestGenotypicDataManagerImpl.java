@@ -901,8 +901,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQtlIdByName() throws Exception {
-        String qtlName = "SLA%"; // Crop tested: Groundnut
-
+        String qtlName = "TWW09_AhV"; // Crop tested: Groundnut
+        
         List<Integer> results = manager.getQtlIdByName(qtlName, 0, (int) manager.countQtlIdByName(qtlName));
         Debug.println(0, "testGetQtlIdByName() RESULTS: " + results);
     }
