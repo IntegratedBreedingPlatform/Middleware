@@ -150,6 +150,49 @@ public interface GenotypicDataManager{
     List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException;
 
     /**
+     * Gets map information given a map id and a chromosome.
+     * 
+     * @param instance
+     * @param mapId
+     * @param chromosome
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException;
+    
+    /**
+     * Gets map information given a map id and a chromosome on both local and central database.
+     * 
+     * @param mapId
+     * @param chromosome
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<MapInfo> getAllMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException;
+    
+    /**
+     * Gets map information given a map id and a chromosome.
+     * 
+     * @param instance
+     * @param mapId
+     * @param chromosome
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Database instance, int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
+    
+    /**
+     * Gets map information given a map id and a chromosome on both local and central database.
+     * 
+     * @param mapId
+     * @param chromosome
+     * @param startPosition
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<MapInfo> getAllMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
+    
+    /**
      * Counts all the dataset names.
      *
      * @param instance 
@@ -620,6 +663,27 @@ public interface GenotypicDataManager{
      */
     List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException;
 
+    /**
+     * Retrieve GIDs by markers and allele values.
+     * 
+     * @param instance
+     * @param markerIdList
+     * @param alleleValueList
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Integer> getGidsByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException;
+    
+    /**
+     * Get GIDs by markers and allele values from both local and central database.
+     * 
+     * @param markerIdList
+     * @param alleleValueList
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Integer> getAllGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException;
+    
     /**
      * Counts the number of germplasm ids matching the given marker id 
      * from the mapping_pop_values table.

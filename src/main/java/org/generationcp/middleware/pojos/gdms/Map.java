@@ -97,6 +97,71 @@ public class Map implements Serializable{
     		"WHERE k.marker_id IN (:markerIds) " +
     		"GROUP BY m.map_name";
     
+    public static final String GET_MAP_INFO_BY_MAP_AND_CHROMOSOME =
+            "SELECT DISTINCT "
+            + "  gdms_markers_onmap.marker_id"
+            + " ,gdms_marker.marker_name"
+            + " ,gdms_map.map_name"
+            + " ,gdms_map.map_type"
+            + " ,gdms_markers_onmap.start_position"
+            + " ,gdms_markers_onmap.linkage_group"
+            + " ,gdms_map.map_unit"
+            + " FROM gdms_map"
+            + "     INNER JOIN gdms_markers_onmap ON"
+            + "         gdms_map.map_id = gdms_markers_onmap.map_id"
+            + "     INNER JOIN gdms_marker ON"
+            + "         gdms_marker.marker_id = gdms_markers_onmap.marker_id"
+            + " WHERE"
+            + "     gdms_markers_onmap.map_id = :mapId"
+            + "     AND gdms_markers_onmap.linkage_group = :chromosome"
+            ;
+    
+    public static final String GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION =
+            "SELECT DISTINCT "
+            + "  gdms_markers_onmap.marker_id"
+            + " ,gdms_marker.marker_name"
+            + " ,gdms_map.map_name"
+            + " ,gdms_map.map_type"
+            + " ,gdms_markers_onmap.linkage_group"
+            + " ,gdms_map.map_unit"
+            + " FROM gdms_map"
+            + "     INNER JOIN gdms_markers_onmap ON"
+            + "         gdms_map.map_id = gdms_markers_onmap.map_id"
+            + "     INNER JOIN gdms_marker ON"
+            + "         gdms_marker.marker_id = gdms_markers_onmap.marker_id"
+            + " WHERE"
+            + "     gdms_markers_onmap.map_id = :mapId"
+            + "     AND gdms_markers_onmap.linkage_group = :chromosome"
+            + "     AND gdms_markers_onmap.startPosition = :startPosition"
+            + " ORDER BY"
+            + "      gdms_map.map_name"
+            + "     ,gdms_markers_onmap.linkage_group"
+            + "     ,gdms_markers_onmap.start_position ASC"
+            ;
+    
+    public static final String GET_MAP_INFO_BY_MARKERS_AND_MAP =
+            "SELECT DISTINCT "
+            + "  gdms_markers_onmap.marker_id"
+            + " ,gdms_marker.marker_name"
+            + " ,gdms_map.map_name"
+            + " ,gdms_map.map_type"
+            + " ,gdms_markers_onmap.start_position"
+            + " ,gdms_markers_onmap.linkage_group"
+            + " ,gdms_map.map_unit"
+            + " FROM gdms_map"
+            + "     INNER JOIN gdms_markers_onmap ON"
+            + "         gdms_map.map_id = gdms_markers_onmap.map_id"
+            + "     INNER JOIN gdms_marker ON"
+            + "         gdms_marker.marker_id = gdms_markers_onmap.marker_id"
+            + " WHERE"
+            + "     gdms_markers_onmap.marker_id IN (:markerIdList)"
+            + "     AND gdms_markers_onmap.map_id = :mapId"
+            + " ORDER BY"
+            + "     gdms_map.map_name"
+            + "     ,gdms_markers_onmap.linkage_group"
+            + "     ,gdms_markers_onmap.start_position ASC"
+            ;
+    
     public Map() {        
     }
 

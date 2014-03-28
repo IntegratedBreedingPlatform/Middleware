@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapDetailElement;
+import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -76,6 +77,107 @@ public class MapDAO extends GenericDAO<Map, Integer>{
         return maps;
     }
 
+    public List<MapInfo> getMapInfoByMapAndChromosome(Integer mapId, String chromosome) throws MiddlewareQueryException {
+        SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_INFO_BY_MAP_AND_CHROMOSOME);
+        query.setInteger("mapId", mapId);
+        query.setString("chromosome", chromosome);
+        
+        List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
+        
+        try {
+            @SuppressWarnings("rawtypes")
+            List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                
+                if (result != null) {
+                    Integer markerId        = (Integer) result[0];
+                    String markerName       = (String) result[1];
+                    String mapName          = (String) result[2];
+                    String mapType          = (String) result[3];
+                    Float startPosition     = (Float) result[4];
+                    String linkageGroup     = (String) result[5];
+                    String mapUnit          = (String) result[6];
+                    
+                    MapInfo mapInfo = new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
+                    mapInfoList.add(mapInfo);
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
+        }
+        
+        return mapInfoList;
+    }
+    
+    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Integer mapId, String chromosome, Float startPosition) throws MiddlewareQueryException {
+        SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_INFO_BY_MAP_AND_CHROMOSOME);
+        query.setInteger("mapId", mapId);
+        query.setString("chromosome", chromosome);
+        query.setFloat("startPosition", startPosition);
+        
+        List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
+        
+        try {
+            @SuppressWarnings("rawtypes")
+            List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                
+                if (result != null) {
+                    Integer markerId        = (Integer) result[0];
+                    String markerName       = (String) result[1];
+                    String mapName          = (String) result[2];
+                    String mapType          = (String) result[3];
+                    String linkageGroup     = (String) result[4];
+                    String mapUnit          = (String) result[5];
+                    
+                    MapInfo mapInfo = new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
+                    mapInfoList.add(mapInfo);
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMapInfoByMapChromosomeAndPosition() query: " + e.getMessage(), e);
+        }
+        
+        return mapInfoList;
+    }
+    
+    public List<MapInfo> getMapInfoByMarkersAndMap(List<String> markers, Integer mapId) throws MiddlewareQueryException {
+        SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_INFO_BY_MARKERS_AND_MAP);
+        query.setParameterList("markerIdList", markers);
+        query.setInteger("mapId", mapId);
+        
+        List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
+        
+        try {
+            @SuppressWarnings("rawtypes")
+            List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                
+                if (result != null) {
+                    Integer markerId        = (Integer) result[0];
+                    String markerName       = (String) result[1];
+                    String mapName          = (String) result[2];
+                    String mapType          = (String) result[3];
+                    Float startPosition     = (Float) result[4];
+                    String linkageGroup     = (String) result[5];
+                    String mapUnit          = (String) result[6];
+                    
+                    MapInfo mapInfo = new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
+                    mapInfoList.add(mapInfo);
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
+        }
+        
+        return mapInfoList;
+    }
     
     public Map getByName(String mapName) throws MiddlewareQueryException {
         Map map = null;
