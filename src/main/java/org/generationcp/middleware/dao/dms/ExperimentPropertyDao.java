@@ -289,8 +289,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	            }
 	            sql.append(" ORDER BY eproj.nd_experiment_id ").append(order);
 	            
-	            System.out.println(sql.toString());
-                
                 Query query = getSession().createSQLQuery(sql.toString())
                         .addScalar("datasetId")
                         .addScalar("datasetName")
