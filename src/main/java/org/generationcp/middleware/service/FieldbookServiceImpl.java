@@ -101,7 +101,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     @Override 
     public List<Location> getAllLocations()throws MiddlewareQueryException{
-    	return getLocationDataManager().getAllLocations();
+    	Integer fieldLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+    	Integer blockLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+    	
+    	List<Location> locList =  getLocationDataManager().getAllLocations();
+    	List<Location> newLocation = new ArrayList();
+    	
+    	for(Location loc : locList){
+    		if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue())
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()))
+    			continue;
+    		newLocation.add(loc);
+    	}
+    	
+    	return newLocation;
     }
 
     @Override
@@ -119,14 +132,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override           
     public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) 
             throws MiddlewareQueryException {
+    	Integer fieldLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+    	Integer blockLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+    	
         List<Location> locationList = new ArrayList<Location>();
         
         for(int i = 0 ; i < locationIds.size() ; i++){
             Integer locationId = Integer.valueOf(locationIds.get(i).toString());
             Location location = getLocationDataManager().getLocationByID(locationId);
+            
+            if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == location.getLtype().intValue())
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue()))
+    			continue;
+            
             locationList.add(location);
         }
         
+    	
         return locationList;
     }
     
