@@ -73,7 +73,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_MARKER_NAME);
+            SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_MARKER_ID);
             query.setParameterList("markerList", markerList);
 
             List results = query.list();

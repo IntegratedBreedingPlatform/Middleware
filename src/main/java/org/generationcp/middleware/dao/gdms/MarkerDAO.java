@@ -94,7 +94,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("marker_type", markerType));
+            criteria.add(Restrictions.eq("markerType", markerType));
             returnVal = criteria.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getByType(type=" + markerType + ") query from Marker: " + e.getMessage(), e);
