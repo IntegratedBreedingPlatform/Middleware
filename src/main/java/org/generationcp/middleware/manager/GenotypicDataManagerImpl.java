@@ -214,6 +214,38 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         Collections.sort(mapInfoList);
         return mapInfoList;
     }
+    
+    @Override
+    public List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        
+        List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapAndChromosome(mapId, chromosome);
+        return mapInfoList;
+    }
+    
+    @Override
+    public List<MapInfo> getAllMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException {
+        List<MapInfo> mapInfoList = getMapInfoByMapAndChromosome(Database.CENTRAL, mapId, chromosome); 
+        mapInfoList.addAll(getMapInfoByMapAndChromosome(Database.LOCAL, mapId, chromosome));
+        Collections.sort(mapInfoList);
+        return mapInfoList;
+    }
+    
+    @Override
+    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Database instance, int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        
+        List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapChromosomeAndPosition(mapId, chromosome, startPosition);
+        return mapInfoList;
+    }
+    
+    @Override
+    public List<MapInfo> getAllMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
+        List<MapInfo> mapInfoList = getMapInfoByMapChromosomeAndPosition(Database.CENTRAL, mapId, chromosome, startPosition); 
+        mapInfoList.addAll(getMapInfoByMapChromosomeAndPosition(Database.LOCAL, mapId, chromosome, startPosition));
+        Collections.sort(mapInfoList);
+        return mapInfoList;
+    }
 
     @Override
     public long countDatasetNames(Database instance) throws MiddlewareQueryException {
@@ -510,6 +542,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
         return super.countFromInstanceByIdAndMethod(getMappingPopValuesDao(), markerId, "countGIDsByMarkerId", new Object[]{markerId},
                 new Class[]{Integer.class});
+    }
+    
+    @Override
+    public List<Integer> getGidsByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        
+        return getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
+    }
+    
+    @Override
+    public List<Integer> getAllGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+        List<Integer> gids =  getGidsByMarkersAndAlleleValues(Database.LOCAL, markerIdList, alleleValueList);
+        gids.addAll(getGidsByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList));
+        return gids;
     }
 
     @Override
@@ -1596,6 +1642,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public long countQtlDataByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countQtlDataByQtlTraits", new Object[]{qtlTraits},
+                new Class[]{List.class});
+    }
+
+    @Override
+    public List<QtlDetailElement> getQtlDetailsByQtlTraits(List<Integer> qtlTraitIds, int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countQtlDetailsByQtlTraits", "getQtlDetailsByQtlTraits");
+        return (List<QtlDetailElement>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, new Object[]{qtlTraitIds},
+                new Class[]{List.class});
+    }
+
+    @Override
+    public long countQtlDetailsByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException {
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByQtlTraits", new Object[]{qtlTraits},
                 new Class[]{List.class});
     }
 

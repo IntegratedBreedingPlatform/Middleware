@@ -73,7 +73,6 @@ import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.util.Debug;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -176,6 +175,48 @@ public class TestGenotypicDataManagerImpl{
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
 
         Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }
+    
+    @Test
+    public void testGetMapInfoByMapAndChromosome() throws Exception {
+        String chromosome = "BC-1_b11";
+        int mapId = 1;
+        
+        List<MapInfo> results = manager.getMapInfoByMapAndChromosome(Database.CENTRAL, mapId, chromosome);
+        Debug.println(0, "testGetMapInfoByMapAndChromosome(mapId=" + mapId + " chromosome=" + chromosome + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }
+    
+    @Test
+    public void testGetAllMapInfoByMapAndChromosome() throws Exception {
+        String chromosome = "BC-1_b11";
+        int mapId = 1;
+        
+        List<MapInfo> results = manager.getAllMapInfoByMapAndChromosome(mapId, chromosome);
+        Debug.println(0, "testGetMapInfoByMapAndChromosome(mapId=" + mapId + " chromosome=" + chromosome + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }
+    
+    @Test
+    public void testGetMapInfoByMapChromosomeAndPosition() throws Exception {
+        String chromosome = "BC-1_b11";
+        int mapId = 1;
+        float startPosition = 4.2f;
+        
+        List<MapInfo> results = manager.getMapInfoByMapChromosomeAndPosition(Database.CENTRAL, mapId, chromosome, startPosition);
+        Debug.println(0, "testGetMapInfoByMapChromosomeAndPosition(mapId=" + mapId + " chromosome=" + chromosome + " startPosition=" + startPosition + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }
+    
+    @Test
+    public void testAllGetMapInfoByMapChromosomeAndPosition() throws Exception {
+        String chromosome = "BC-1_b11";
+        int mapId = 1;
+        float startPosition = 4.2f;
+        
+        List<MapInfo> results = manager.getAllMapInfoByMapChromosomeAndPosition(mapId, chromosome, startPosition);
+        Debug.println(0, "testGetMapInfoByMapChromosomeAndPosition(mapId=" + mapId + " chromosome=" + chromosome + " startPosition=" + startPosition + ") RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
@@ -501,6 +542,30 @@ public class TestGenotypicDataManagerImpl{
         Integer markerId = 1;
         List<Integer> gids = manager.getGIDsFromMappingPopValuesByMarkerId(markerId, 1, 10);
         Debug.println(0, "testGetGidsFromMappingPopValuesByMarkerId(" + markerId + ") RESULTS: " + gids);
+    }
+    
+    @Test
+    public void testGetGidsByMarkersAndAlleleValues() throws Exception {
+        List<Integer> markerIdList = new ArrayList<Integer>();
+        markerIdList.add(2325);
+        
+        List<String> alleleValueList = new ArrayList<String>();
+        alleleValueList.add("238/238");
+        
+        List<Integer> gids = manager.getGidsByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList);
+        Debug.println(0, "testGetGidsByMarkersAndAlleleValues(" + markerIdList + "," + alleleValueList + ") RESULTS: " + gids);
+    }
+    
+    @Test
+    public void testGetAllGidsByMarkersAndAlleleValues() throws Exception {
+        List<Integer> markerIdList = new ArrayList<Integer>();
+        markerIdList.add(2325);
+        
+        List<String> alleleValueList = new ArrayList<String>();
+        alleleValueList.add("238/238");
+        
+        List<Integer> gids = manager.getAllGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
+        Debug.println(0, "testGetAllGidsByMarkersAndAlleleValues(" + markerIdList + "," + alleleValueList + ") RESULTS: " + gids);
     }
 
     @Test
@@ -835,8 +900,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQtlIdByName() throws Exception {
-        String qtlName = "SLA%"; // Crop tested: Groundnut
-
+        String qtlName = "TWW09_AhV"; // Crop tested: Groundnut
+        
         List<Integer> results = manager.getQtlIdByName(qtlName, 0, (int) manager.countQtlIdByName(qtlName));
         Debug.println(0, "testGetQtlIdByName() RESULTS: " + results);
     }
@@ -2163,6 +2228,25 @@ public class TestGenotypicDataManagerImpl{
                                                             // Groundnut
         qtlTraits.add(1001); // "DE"
         long count = manager.countQtlDataByQtlTraits(qtlTraits);
+        Debug.println(0, "testCountQtlDataByQtlTraits() RESULTS: " + count);
+    }
+
+    @Test
+    public void testGetQtlDetailsByQtlTraits() throws Exception {
+        List<Integer> qtlTraits = new ArrayList<Integer>(); // Crop tested: Groundnut
+        qtlTraits.add(22396); 
+        List<QtlDetailElement> results = manager.getQtlDetailsByQtlTraits(qtlTraits, 0, Integer.MAX_VALUE);
+        
+        assertTrue(results.size() >= 3);
+        Debug.printObjects(INDENT, results);
+    }
+
+    @Test
+    public void testCountQtlDetailsByQtlTraits() throws Exception {
+        List<Integer> qtlTraits = new ArrayList<Integer>(); // Crop tested:  Groundnut
+        qtlTraits.add(22396); 
+        long count = manager.countQtlDetailsByQtlTraits(qtlTraits);
+        assertTrue(count >= 3);
         Debug.println(0, "testCountQtlDataByQtlTraits() RESULTS: " + count);
     }
 

@@ -122,6 +122,60 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
         return toReturn;
     }
     
+
+    public long countQtlAndQtlDetailsByName(String name) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_AND_QTL_DETAILS_BY_NAME);
+            query.setParameter("qtlName", name);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0;
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countQtlAndQtlDetailsByName(name=" + name 
+                    + ") query from gdms_qtl_details: " + e.getMessage(), e);
+        }
+        return 0L;
+    }
+    
+    public List<QtlDetailElement> getQtlDetailsByQtlTraits(List<Integer> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
+        List<QtlDetailElement> toReturn = new ArrayList<QtlDetailElement>();
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_DETAILS_BY_TRAITS);
+            query.setParameterList("qtlTraitIds", qtlTraits);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            toReturn = getQtlAndQtlDetails(query);
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getQtlDetailsByQtlTraits(qtlTraits=" + qtlTraits 
+                    + ") query from gdms_qtl_details: " + e.getMessage(), e);
+        }
+        return toReturn;
+    }
+    
+
+    public long countQtlDetailsByQtlTraits(List<Integer> traitIds) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_DETAILS_BY_TRAITS);
+            query.setParameterList("qtlTraitIds", traitIds);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0;
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countQtlAndQtlDetailsByName(traitIds=" + traitIds 
+                    + ") query from gdms_qtl_details: " + e.getMessage(), e);
+        }
+        return 0L;
+    }
+    
+    
     @SuppressWarnings("rawtypes")
     public List<QtlDetailElement> getQtlAndQtlDetails(SQLQuery query) throws HibernateException{
         List<QtlDetailElement> toReturn = new ArrayList<QtlDetailElement>();
@@ -168,23 +222,6 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
         return toReturn;
     }
 
-    public long countQtlAndQtlDetailsByName(String name) throws MiddlewareQueryException {
-        try {
-            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_AND_QTL_DETAILS_BY_NAME);
-            query.setParameter("qtlName", name);
-            BigInteger result = (BigInteger) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
-            } else {
-                return 0;
-            }
-        } catch (HibernateException e) {
-        	logAndThrowException("Error with countQtlAndQtlDetailsByName(name=" + name 
-        			+ ") query from gdms_qtl_details: " + e.getMessage(), e);
-        }
-        return 0L;
-    }
-    
     @SuppressWarnings("unchecked")
 	public Set<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) 
 			throws MiddlewareQueryException{
