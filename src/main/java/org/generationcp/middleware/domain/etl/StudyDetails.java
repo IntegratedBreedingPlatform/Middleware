@@ -25,7 +25,7 @@ public class StudyDetails {
 	
 	private String title;
 	
-	private String pmKey;
+	/*private String pmKey;*/
 	
 	private String objective;
 	
@@ -60,7 +60,7 @@ public class StudyDetails {
             long parentFolderId, String trialDatasetName, String measurementDatasetName) {
         this.studyName = studyName;
         this.title = title;
-        this.pmKey = pmKey;
+        /*this.pmKey = pmKey;*/
         this.objective = objective;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -126,13 +126,13 @@ public class StudyDetails {
 		this.title = title;
 	}
 
-	public String getPmKey() {
+	/*public String getPmKey() {
 		return pmKey;
 	}
 
 	public void setPmKey(String pmKey) {
 		this.pmKey = pmKey;
-	}
+	}*/
 
 	public String getObjective() {
 		return objective;
@@ -276,7 +276,7 @@ public class StudyDetails {
         result = prime * result + ((objective == null) ? 0 : objective.hashCode());
         result = prime * result + (int) (parentFolderId ^ (parentFolderId >>> 32));
         result = prime * result + ((piName == null) ? 0 : piName.hashCode());
-        result = prime * result + ((pmKey == null) ? 0 : pmKey.hashCode());
+        /*result = prime * result + ((pmKey == null) ? 0 : pmKey.hashCode());*/
         result = prime * result + ((season == null) ? 0 : season.hashCode());
         result = prime * result + ((siteName == null) ? 0 : siteName.hashCode());
         result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
@@ -323,11 +323,11 @@ public class StudyDetails {
                 return false;
         } else if (!piName.equals(other.piName))
             return false;
-        if (pmKey == null) {
+        /*if (pmKey == null) {
             if (other.pmKey != null)
                 return false;
         } else if (!pmKey.equals(other.pmKey))
-            return false;
+            return false;*/
         if (season != other.season)
             return false;
         if (siteName == null) {
@@ -370,8 +370,8 @@ public class StudyDetails {
         builder.append(studyName);
         builder.append(", title=");
         builder.append(title);
-        builder.append(", pmKey=");
-        builder.append(pmKey);
+        /*builder.append(", pmKey=");
+        builder.append(pmKey);*/
         builder.append(", objective=");
         builder.append(objective);
         builder.append(", startDate=");
@@ -405,7 +405,7 @@ public class StudyDetails {
         Debug.println(indent + 3, "Id: " + id);
 		Debug.println(indent + 3, "Name: " + studyName);
 	    Debug.println(indent + 3, "Title: " + title);
-	    Debug.println(indent + 3, "PM Key: " + pmKey);
+	    /*Debug.println(indent + 3, "PM Key: " + pmKey);*/
 	    Debug.println(indent + 3, "Objective: " + objective);
 	    Debug.println(indent + 3, "Start Date: " + startDate);
 	    Debug.println(indent + 3, "End Date: " + endDate);

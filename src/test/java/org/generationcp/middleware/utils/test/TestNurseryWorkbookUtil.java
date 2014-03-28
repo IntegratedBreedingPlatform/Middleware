@@ -134,7 +134,7 @@ public class TestNurseryWorkbookUtil {
 		StudyDetails details = new StudyDetails();
 		details.setStudyName("nursery_" + new Random().nextInt(10000));
 		details.setTitle("Nursery Workbook");
-		details.setPmKey("0");
+		/*details.setPmKey("0");*/
 		details.setObjective("To evaluate the Population 114");
 		details.setStartDate("20130805");
 		details.setEndDate("20130805");

@@ -193,7 +193,7 @@ public class TestWorkbookUtil {
 		StudyDetails details = new StudyDetails();
 		details.setStudyName(studyName);
 		details.setTitle("Phenotyping trials of the Population 114");
-		details.setPmKey("0");
+		/*details.setPmKey("0");*/
 		details.setObjective("To evaluate the Population 114");
 		details.setStartDate("20130805");
 		details.setEndDate("20130805");
