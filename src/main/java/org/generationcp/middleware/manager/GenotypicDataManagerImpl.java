@@ -1646,6 +1646,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
+    public List<QtlDetailElement> getQtlDetailsByQtlTraits(List<Integer> qtlTraitIds, int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countQtlDetailsByQtlTraits", "getQtlDetailsByQtlTraits");
+        return (List<QtlDetailElement>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, new Object[]{qtlTraitIds},
+                new Class[]{List.class});
+    }
+
+    @Override
+    public long countQtlDetailsByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException {
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByQtlTraits", new Object[]{qtlTraits},
+                new Class[]{List.class});
+    }
+
+    @Override
     public long countNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countNidsByDatasetIds",
                 new Object[]{datasetIds}, new Class[]{List.class});

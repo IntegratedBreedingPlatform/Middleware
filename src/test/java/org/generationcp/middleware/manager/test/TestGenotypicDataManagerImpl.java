@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -2229,6 +2228,25 @@ public class TestGenotypicDataManagerImpl{
                                                             // Groundnut
         qtlTraits.add(1001); // "DE"
         long count = manager.countQtlDataByQtlTraits(qtlTraits);
+        Debug.println(0, "testCountQtlDataByQtlTraits() RESULTS: " + count);
+    }
+
+    @Test
+    public void testGetQtlDetailsByQtlTraits() throws Exception {
+        List<Integer> qtlTraits = new ArrayList<Integer>(); // Crop tested: Groundnut
+        qtlTraits.add(22396); 
+        List<QtlDetailElement> results = manager.getQtlDetailsByQtlTraits(qtlTraits, 0, Integer.MAX_VALUE);
+        
+        assertTrue(results.size() >= 3);
+        Debug.printObjects(INDENT, results);
+    }
+
+    @Test
+    public void testCountQtlDetailsByQtlTraits() throws Exception {
+        List<Integer> qtlTraits = new ArrayList<Integer>(); // Crop tested:  Groundnut
+        qtlTraits.add(22396); 
+        long count = manager.countQtlDetailsByQtlTraits(qtlTraits);
+        assertTrue(count >= 3);
         Debug.println(0, "testCountQtlDataByQtlTraits() RESULTS: " + count);
     }
 
