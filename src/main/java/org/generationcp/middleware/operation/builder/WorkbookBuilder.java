@@ -94,7 +94,7 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementVariable> factors = buildFactors(experiments);
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
 		List<MeasurementVariable> variates = buildVariates(variables); //buildVariates(experiments);
-		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates());
+		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates);
 		
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
@@ -149,6 +149,7 @@ public class WorkbookBuilder extends Builder {
                                 label);
                         measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
                         measurementVariable.setFactor(true);
+                        measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
                         
                         conditions.add(measurementVariable);
                     }
@@ -161,7 +162,8 @@ public class WorkbookBuilder extends Builder {
             return workbook;
 	}
 	
-	private List<MeasurementRow> buildObservations(List<Experiment> experiments, VariableTypeList variateTypes) {
+	private List<MeasurementRow> buildObservations(List<Experiment> experiments, VariableTypeList variateTypes,
+			List<MeasurementVariable> factorList, List<MeasurementVariable> variateList) {
 	    List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 	   
 	    for (Experiment experiment : experiments) {
@@ -178,13 +180,15 @@ public class WorkbookBuilder extends Builder {
 	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                         		variable.getDisplayValue(), false, 
-                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()), 
-                                id);
+                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+                                id,
+                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
 	            	}
 	            	else {
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                                 variable.getValue(), false, 
-                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()));
+                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
 	            	}
                     
 	            	measurementDataList.add(measurementData);
@@ -194,7 +198,9 @@ public class WorkbookBuilder extends Builder {
 	        for (Variable variable : variates.getVariables()) {
                     MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                             variable.getValue(), true,  
-                            getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()));
+                            getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+                            variable.getVariableType().getStandardVariable().getDataType().getId(),
+                            getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
                     measurementData.setPhenotypeId(variable.getPhenotypeId());
                     measurementDataList.add(measurementData);
                 }
@@ -312,5 +318,15 @@ public class WorkbookBuilder extends Builder {
 		}
 		
 		return vlist;
+	}
+	
+	private MeasurementVariable getMeasurementVariableByName(String name, List<MeasurementVariable> list) {
+		MeasurementVariable var = null;
+		for (MeasurementVariable variable : list) {
+			if (variable.getName().equalsIgnoreCase(name)) {
+				return variable;
+			}
+		}
+		return var;
 	}
 }

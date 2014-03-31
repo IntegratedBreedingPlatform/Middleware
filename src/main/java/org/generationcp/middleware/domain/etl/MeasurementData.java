@@ -27,6 +27,8 @@ public class MeasurementData {
 	
 	private Integer valueId;
 	
+	private MeasurementVariable measurementVariable;
+	
 	public MeasurementData() {
 	}
 	
@@ -35,7 +37,8 @@ public class MeasurementData {
 		this.label = label;
 		this.value = value;
 	}
-	
+
+	@Deprecated
 	public MeasurementData(String label, String value, boolean isEditable, String dataType) {
 		super();
 		this.label = label;
@@ -43,12 +46,27 @@ public class MeasurementData {
 		this.isEditable = isEditable;
 		this.dataType = dataType;
 	}
-
+	
+	@Deprecated
 	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId) {
 		this(label, value, isEditable, dataType);
 		this.valueId = valueId;
 	}
+
+	public MeasurementData(String label, String value, boolean isEditable, String dataType, MeasurementVariable mvar) {
+		super();
+		this.label = label;
+		this.value = value;
+		this.isEditable = isEditable;
+		this.dataType = dataType;
+		this.measurementVariable = mvar;
+	}
 	
+	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId, MeasurementVariable mvar) {
+		this(label, value, isEditable, dataType, mvar);
+		this.valueId = valueId;
+	}
+
 	public String getLabel() {
 		return label;
 	}
@@ -125,5 +143,20 @@ public class MeasurementData {
 	public void setValueId(Integer valueId) {
 		this.valueId = valueId;
 	}
+
+	/**
+	 * @return the measurementVariable
+	 */
+	public MeasurementVariable getMeasurementVariable() {
+		return measurementVariable;
+	}
+
+	/**
+	 * @param measurementVariable the measurementVariable to set
+	 */
+	public void setMeasurementVariable(MeasurementVariable measurementVariable) {
+		this.measurementVariable = measurementVariable;
+	}
+
 
 }

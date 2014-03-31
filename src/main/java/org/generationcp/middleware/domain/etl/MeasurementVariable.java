@@ -11,6 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementVariable {
@@ -36,6 +40,10 @@ public class MeasurementVariable {
 	private int storedIn;
 	
 	private boolean isFactor;
+	
+	private Integer dataTypeId;
+	
+	private List<ValueReference> possibleValues;
 
 	public MeasurementVariable() {
 	}
@@ -189,4 +197,33 @@ public class MeasurementVariable {
 	public void setStoredIn(int storedIn){
 	    this.storedIn = storedIn;
 	}
+
+	/**
+	 * @return the dataTypeId
+	 */
+	public Integer getDataTypeId() {
+		return dataTypeId;
+	}
+
+	/**
+	 * @param dataTypeId the dataTypeId to set
+	 */
+	public void setDataTypeId(Integer dataTypeId) {
+		this.dataTypeId = dataTypeId;
+	}
+
+	/**
+	 * @return the possibleValues
+	 */
+	public List<ValueReference> getPossibleValues() {
+		return possibleValues;
+	}
+
+	/**
+	 * @param possibleValues the possibleValues to set
+	 */
+	public void setPossibleValues(List<ValueReference> possibleValues) {
+		this.possibleValues = possibleValues;
+	}
+
 }
