@@ -38,7 +38,6 @@ public class MeasurementData {
 		this.value = value;
 	}
 
-	@Deprecated
 	public MeasurementData(String label, String value, boolean isEditable, String dataType) {
 		super();
 		this.label = label;
@@ -47,7 +46,6 @@ public class MeasurementData {
 		this.dataType = dataType;
 	}
 	
-	@Deprecated
 	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId) {
 		this(label, value, isEditable, dataType);
 		this.valueId = valueId;
