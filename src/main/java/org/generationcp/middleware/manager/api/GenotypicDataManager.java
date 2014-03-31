@@ -142,6 +142,28 @@ public interface GenotypicDataManager{
     List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException;
 
     /**
+     * Gets map information given a list of markers and mapId.
+     * 
+     * @param instance
+     * @param markers
+     * @param mapId
+     * @return
+     * @throws MiddlewareQueryException 
+     */
+    List<MapInfo> getMapInfoByMarkersAndMap(Database instance, List<Integer> markers, Integer mapId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets map information given a list of markers and mapId from both local and central database.
+     * 
+     * @param instance
+     * @param markers
+     * @param mapId
+     * @return
+     * @throws MiddlewareQueryException 
+     */
+    List<MapInfo> getAllMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException;
+    
+    /**
      * Gets map information given a map id and a chromosome.
      *
      * @param instance the instance
@@ -150,7 +172,7 @@ public interface GenotypicDataManager{
      * @return the map info by map and chromosome
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException;
+    List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException;
     
     /**
      * Gets map information given a map id and a chromosome on both local and central database.
@@ -160,7 +182,7 @@ public interface GenotypicDataManager{
      * @return the all map info by map and chromosome
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<MapInfo> getAllMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException;
+    List<MapInfo> getAllMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException;
     
     /**
      * Gets map information given a map id and a chromosome.
@@ -172,7 +194,7 @@ public interface GenotypicDataManager{
      * @return the map info by map chromosome and position
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Database instance, int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
+    List<MapInfo> getMapInfoByMapChromosomeAndPosition(Database instance, int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
     
     /**
      * Gets map information given a map id and a chromosome on both local and central database.
@@ -183,7 +205,7 @@ public interface GenotypicDataManager{
      * @return the all map info by map chromosome and position
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<MapInfo> getAllMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
+    List<MapInfo> getAllMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
     
     /**
      * Counts all the dataset names.

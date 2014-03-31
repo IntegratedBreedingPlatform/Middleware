@@ -179,6 +179,28 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
+    public void testGetMapInfoByMarkersAndMap() throws Exception {
+        List<Integer> markerList = new ArrayList<Integer>();
+        markerList.add(1317);
+        int mapId = 1;
+        
+        List<MapInfo> results = manager.getMapInfoByMarkersAndMap(Database.CENTRAL, markerList, mapId);
+        Debug.println(0, "testGetMapInfoByMarkersAndMap(markerIdList=" + markerList + " mapId=" + mapId + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }
+    
+    @Test
+    public void testGetAllMapInfoByMarkersAndMap() throws Exception {
+        List<Integer> markerList = new ArrayList<Integer>();
+        markerList.add(1317);
+        int mapId = 1;
+        
+        List<MapInfo> results = manager.getAllMapInfoByMarkersAndMap(markerList, mapId);
+        Debug.println(0, "testGetMapInfoByMarkersAndMap(markerIdList=" + markerList + " mapId=" + mapId + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }
+    
+    @Test
     public void testGetMapInfoByMapAndChromosome() throws Exception {
         String chromosome = "BC-1_b11";
         int mapId = 1;

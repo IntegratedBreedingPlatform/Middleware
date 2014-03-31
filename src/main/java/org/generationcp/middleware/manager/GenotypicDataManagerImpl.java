@@ -216,6 +216,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
+    public List<MapInfo> getMapInfoByMarkersAndMap(Database instance, List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        
+        List<MapInfo> mapInfoList = getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
+        return mapInfoList;
+    }
+    
+    @Override
+    public List<MapInfo> getAllMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
+        List<MapInfo> mapInfoList = getMapInfoByMarkersAndMap(Database.LOCAL, markers, mapId);
+        mapInfoList.addAll(getMapInfoByMarkersAndMap(Database.CENTRAL, markers, mapId));
+        Collections.sort(mapInfoList);
+        return mapInfoList;
+    }
+    
+    @Override
     public List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
         

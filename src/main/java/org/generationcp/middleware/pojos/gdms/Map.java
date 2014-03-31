@@ -132,7 +132,7 @@ public class Map implements Serializable{
             + " WHERE"
             + "     gdms_markers_onmap.map_id = :mapId"
             + "     AND gdms_markers_onmap.linkage_group = :chromosome"
-            + "     AND gdms_markers_onmap.startPosition = :startPosition"
+            + "     AND gdms_markers_onmap.start_position = :startPosition"
             + " ORDER BY"
             + "      gdms_map.map_name"
             + "     ,gdms_markers_onmap.linkage_group"

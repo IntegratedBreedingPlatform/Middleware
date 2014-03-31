@@ -24,6 +24,10 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.FloatType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.Type;
 
 /**
  * DAO class for {@link Map}.
@@ -82,6 +86,14 @@ public class MapDAO extends GenericDAO<Map, Integer>{
         query.setInteger("mapId", mapId);
         query.setString("chromosome", chromosome);
         
+        query.addScalar("marker_id", new IntegerType());
+        query.addScalar("marker_name", new StringType());
+        query.addScalar("map_name", new StringType());
+        query.addScalar("map_type", new StringType());
+        query.addScalar("start_position", new FloatType());
+        query.addScalar("linkage_group", new StringType());
+        query.addScalar("map_unit", new StringType());
+        
         List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
         
         try {
@@ -112,10 +124,17 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     }
     
     public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Integer mapId, String chromosome, Float startPosition) throws MiddlewareQueryException {
-        SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_INFO_BY_MAP_AND_CHROMOSOME);
+        SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION);
         query.setInteger("mapId", mapId);
         query.setString("chromosome", chromosome);
         query.setFloat("startPosition", startPosition);
+        
+        query.addScalar("marker_id", new IntegerType());
+        query.addScalar("marker_name", new StringType());
+        query.addScalar("map_name", new StringType());
+        query.addScalar("map_type", new StringType());
+        query.addScalar("linkage_group", new StringType());
+        query.addScalar("map_unit", new StringType());
         
         List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
         
@@ -145,10 +164,18 @@ public class MapDAO extends GenericDAO<Map, Integer>{
         return mapInfoList;
     }
     
-    public List<MapInfo> getMapInfoByMarkersAndMap(List<String> markers, Integer mapId) throws MiddlewareQueryException {
+    public List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
         SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_INFO_BY_MARKERS_AND_MAP);
         query.setParameterList("markerIdList", markers);
         query.setInteger("mapId", mapId);
+        
+        query.addScalar("marker_id", new IntegerType());
+        query.addScalar("marker_name", new StringType());
+        query.addScalar("map_name", new StringType());
+        query.addScalar("map_type", new StringType());
+        query.addScalar("start_position", new FloatType());
+        query.addScalar("linkage_group", new StringType());
+        query.addScalar("map_unit", new StringType());
         
         List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
         
