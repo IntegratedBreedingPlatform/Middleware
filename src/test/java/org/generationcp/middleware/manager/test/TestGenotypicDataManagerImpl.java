@@ -2489,14 +2489,14 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testGetMapAndMarkerCountByMarkers(" + markerIds + ")");
         Debug.printObjects(INDENT, details);
     }
-
+    
     @Test
     public void testGetAllMTAs() throws Exception {
         List<Mta> result = manager.getAllMTAs();
         Debug.println(0, "testGetAllMTAs(): ");
         Debug.printObjects(INDENT, result);
     }
-
+ 
     @Test
     public void testCountAllMTAs() throws Exception {
         long count = manager.countAllMTAs();
@@ -2508,6 +2508,21 @@ public class TestGenotypicDataManagerImpl{
         Integer traitId = 1;
         List<Mta> result = manager.getMTAsByTrait(traitId);
         Debug.println(0, "testGetMTAsByTrait(): ");
+        Debug.printObjects(INDENT, result);
+    }
+    
+    @Test
+    public void testGetAllSNPs() throws Exception {
+        List<Marker> result = manager.getAllSNPMarkers();
+        Debug.println(0, "testGetAllSNPs(): ");
+        Debug.printObjects(INDENT, result);
+    }
+    
+    @Test
+    public void testGetAlleleValuesByMarkers() throws Exception {
+    	List<Integer> markerIds = Arrays.asList(-1, -2, 956);
+        List<AlleleValues> result = manager.getAlleleValuesByMarkers(markerIds);
+        Debug.println(0, "testGetAlleleValuesByMarkers(): ");
         Debug.printObjects(INDENT, result);
     }
 
