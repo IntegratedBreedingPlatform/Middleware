@@ -179,6 +179,21 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
+    public void testgetMarkerInfoByMarkerIds() throws Exception {
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(1);
+        markerIds.add(-1);
+        markerIds.add(2);
+        markerIds.add(-2);
+        markerIds.add(3);
+        markerIds.add(4);
+        markerIds.add(5);
+        List<MarkerInfo> results = manager.getMarkerInfoByMarkerIds(markerIds);
+        Debug.println(0, "testgetMarkerInfoByMarkerIds(" + markerIds + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }   
+    
+    @Test
     public void testGetMapInfoByMarkersAndMap() throws Exception {
         List<Integer> markerList = new ArrayList<Integer>();
         markerList.add(1317);
