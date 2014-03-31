@@ -94,8 +94,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                 if (result != null) {
                     Integer anId = (Integer) result[0];
                     Integer datasetId = (Integer) result[1];
-                    Integer gId = (Integer) result[2];
-                    Integer markerId = (Integer) result[3];
+                    Integer markerId = (Integer) result[2];
+                    Integer gId = (Integer) result[3];
                     String data = (String) result[4];
                     String rawData = (String) result[5];
                     Integer peakHeight = (Integer) result[6];

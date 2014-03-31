@@ -2359,7 +2359,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         returnVal = getMarkerInfoDao().getByMarkerIds(markerIds);
 
-        setWorkingDatabase(Database.LOCAL, getMarkerDao());
+        setWorkingDatabase(Database.LOCAL, getMarkerInfoDao());
         returnVal.addAll(getMarkerInfoDao().getByMarkerIds(markerIds));
 
         return returnVal;
@@ -2375,7 +2375,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         returnVal = getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds);
 
-        setWorkingDatabase(Database.LOCAL, getMarkerDao());
+        setWorkingDatabase(Database.LOCAL, getAlleleValuesDao());
         returnVal.addAll(getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds));
 
         return returnVal;
