@@ -116,7 +116,7 @@ public class Marker implements Serializable{
             "WHERE gdms_mapping_pop_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
 
-    public static final String GET_MARKERS_BY_HAPLOTYPE = "SELECT gdms.marker_id  "
+    public static final String GET_SNP_MARKERS_BY_HAPLOTYPE = "SELECT gdms.marker_id  "
                         + ", CONCAT(marker_type, '') "
                         + ", CONCAT(marker_name, '') "
                         + ", CONCAT(species, '') "
@@ -135,7 +135,7 @@ public class Marker implements Serializable{
                         + ", amplification "
                 + "FROM (gdms_marker gdms INNER JOIN gdms_track_markers track ON(track.marker_id = gdms.marker_id)) "
                 + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
-                + "WHERE track_name = (:trackName)";
+                + "WHERE track_name = (:trackName) and gdms.marker_type = 'SNP'";
     
     public static final String GET_ALL_DB_ACCESSION_IDS = 
             "SELECT DISTINCT (db_accession_id) " +

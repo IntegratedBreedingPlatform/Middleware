@@ -2342,10 +2342,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         setWorkingDatabase(Database.CENTRAL, getMarkerDao());
 
-        returnVal = getMarkerDao().getMarkersByHaplotype(haplotype);
+        returnVal = getMarkerDao().getSNPMarkersByHaplotype(haplotype);
 
         setWorkingDatabase(Database.LOCAL, getMarkerDao());
-        returnVal.addAll(getMarkerDao().getMarkersByHaplotype(haplotype));
+        returnVal.addAll(getMarkerDao().getSNPMarkersByHaplotype(haplotype));
 
         return returnVal;
     }

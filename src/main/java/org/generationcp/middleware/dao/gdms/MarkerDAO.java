@@ -788,13 +788,13 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
     }
 
     // GCP-7874
-    public List<Marker> getMarkersByHaplotype(String haplotype) throws MiddlewareQueryException {
+    public List<Marker> getSNPMarkersByHaplotype(String haplotype) throws MiddlewareQueryException {
         if (StringUtils.isEmpty(haplotype)) {
             return new ArrayList<Marker>();
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_HAPLOTYPE);
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_SNP_MARKERS_BY_HAPLOTYPE);
             query.setParameter("trackName", haplotype);
             List results = query.list();
 
@@ -807,7 +807,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             }
             return dataValues;
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMarkersByHaplotype() query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with getSNPMarkersByHaplotype() query from Marker: " + e.getMessage(), e);
         }
 
         return new ArrayList<Marker>();
