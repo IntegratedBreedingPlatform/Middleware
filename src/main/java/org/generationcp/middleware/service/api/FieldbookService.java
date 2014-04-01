@@ -172,6 +172,15 @@ public interface FieldbookService {
     Workbook getNurseryDataSet(int id) throws MiddlewareQueryException;
 
     /**
+     * Gets the data set.
+     *
+     * @param id the id
+     * @return the data set
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Workbook getTrialDataSet(int id) throws MiddlewareQueryException;
+
+    /**
      * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema.
      *
      * @param workbook that contains the measurement rows to save

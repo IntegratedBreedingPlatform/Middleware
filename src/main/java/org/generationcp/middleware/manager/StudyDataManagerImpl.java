@@ -1049,20 +1049,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
-		if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
-			setWorkingDatabase(detail.getSiteId());
-			Location loc = getLocationDao().getById(detail.getSiteId());
-			if (loc != null) {
-				detail.setSiteName(loc.getLname());
+    	if (detail != null) {
+			if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
+				setWorkingDatabase(detail.getSiteId());
+				Location loc = getLocationDao().getById(detail.getSiteId());
+				if (loc != null) {
+					detail.setSiteName(loc.getLname());
+				}
+			}    	
+			if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
+				setWorkingDatabase(detail.getPiId());
+				Person person = getPersonDao().getById(detail.getPiId());
+				if (person != null) {
+					detail.setPiName(person.getDisplayName());
+				}
 			}
-		}    	
-		if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
-			setWorkingDatabase(detail.getPiId());
-			Person person = getPersonDao().getById(detail.getPiId());
-			if (person != null) {
-				detail.setPiName(person.getDisplayName());
-			}
-		}
+    	}
     }
     
     private void populateSiteAndPersonIfNecessary(List<StudyDetails> studyDetails) throws MiddlewareQueryException {

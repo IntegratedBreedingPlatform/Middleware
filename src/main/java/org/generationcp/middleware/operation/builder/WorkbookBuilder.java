@@ -49,6 +49,10 @@ public class WorkbookBuilder extends Builder {
 	} 
 	
 	public Workbook create(int id) throws MiddlewareQueryException {
+		return create(id, StudyType.N);
+	}
+	
+	public Workbook create(int id, StudyType studyType) throws MiddlewareQueryException {
 		Workbook workbook = new Workbook();
 		
 		/*
@@ -64,7 +68,7 @@ public class WorkbookBuilder extends Builder {
                  *  
                  * */
 		
-		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, id);
+		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
 		Study study = getStudyBuilder().createStudy(id);
 		
 		int dataSetId = 0;

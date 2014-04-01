@@ -192,7 +192,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
 	@Override
     public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().create(id);                        
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.N);                        
+        return workbook;
+    }
+
+	@Override
+    public Workbook getTrialDataSet(int id) throws MiddlewareQueryException {
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.T);                        
         return workbook;
     }
 
