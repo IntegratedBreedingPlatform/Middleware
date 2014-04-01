@@ -12,10 +12,21 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -33,14 +44,25 @@ public class PhenotypeSaver extends Saver{
     public void savePhenotypes(ExperimentModel experimentModel, VariableList variates) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
         int i=0;
+        Map<Integer,PhenotypeExceptionDto> exceptions = null;
         if (variates != null && variates.getVariables() != null && variates.getVariables().size() > 0) {
             for (Variable variable : variates.getVariables()) {
-                save(experimentModel.getNdExperimentId(), variable);
+            	try {
+            		save(experimentModel.getNdExperimentId(), variable);
+            	} catch(PhenotypeException e) {
+            		if(exceptions==null) {
+            			exceptions = new LinkedHashMap<Integer,PhenotypeExceptionDto>();
+            		}
+            		exceptions.put(e.getException().getStandardVariableId(),e.getException());
+            	}
                 if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ // batch save
                     getPhenotypeDao().flush();
                     getPhenotypeDao().clear();
                 }
             }
+        }
+        if(exceptions!=null) {
+        	throw new PhenotypeException(exceptions);
         }
     }
     
@@ -86,7 +108,30 @@ public class PhenotypeSaver extends Saver{
 	        else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 	            phenotype = getPhenotypeObject(phenotype);
 	            if(variable.getValue()!=null && !variable.getValue().equals("")) {
-	                phenotype.setcValue(Double.valueOf(variable.getValue()).intValue()); 
+	            	phenotype.setValue(variable.getValue());
+	            	Enumeration enumeration = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
+	            	if(enumeration!=null) {
+	            		phenotype.setcValue(enumeration.getId());	
+	            	} else {
+	            		//throw a PhenotypeException
+	            		PhenotypeExceptionDto exception = new PhenotypeExceptionDto();
+	            		exception.setLocalVariableName(variable.getVariableType().getLocalName());
+	            		exception.setStandardVariableName(variable.getVariableType().getStandardVariable().getName());
+	            		exception.setStandardVariableId(variable.getVariableType().getStandardVariable().getId());
+	            		exception.setInvalidValues(new TreeSet<String>());
+	            		exception.getInvalidValues().add(variable.getValue());
+	            		List<Enumeration> enumerations = variable.getVariableType().getStandardVariable().getEnumerations();
+	            		if(enumerations!=null) {
+	            			for (int i = 0; i< enumerations.size(); i++) {
+	            				Enumeration e = enumerations.get(i);
+	            				if(exception.getValidValues()==null) {
+	            					exception.setValidValues(new TreeSet<String>());
+	            				}
+	            				exception.getValidValues().add(e.getName());
+							}
+	            		}
+	            		throw new PhenotypeException(exception);
+	            	}
 	            }           
 	            phenotype.setObservableId(variable.getVariableType().getId());
 	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());

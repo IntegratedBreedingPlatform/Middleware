@@ -99,7 +99,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered with saving to database: ", e, LOG);
 
         } finally {
             timerWatch.stop();
@@ -122,7 +122,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans2);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered with saving to database: ", e, LOG);
 
         } finally {
             timerWatch.stop();
@@ -216,14 +216,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
             for (MeasurementVariable measurementVariable : variableList) {
                 if (variableNameMap.containsKey(measurementVariable.getName())) {
-                    MeasurementVariable var = variableNameMap.get(measurementVariable.getName());
-                    messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), var.getProperty(),
-                            var.getMethod(), var.getScale()));
+                    messages.add(new Message("error.duplicate.local.variable", measurementVariable.getName()));
                 } else {
                     variableNameMap.put(measurementVariable.getName(), measurementVariable);
                 }
 
-                PhenotypicType type = (variableList == workbook.getVariates() ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
+                PhenotypicType type = ((variableList == workbook.getVariates() || variableList == workbook.getConstants()) ? 
+                		PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
                 Integer varId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(),
                         measurementVariable.getScale(), measurementVariable.getMethod(), type);
 
@@ -234,7 +233,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                     for (StandardVariable variable : variableSet) {
                         if (variable.getName().equalsIgnoreCase(measurementVariable.getName())) {
                             messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable.getProperty().getName(),
-                                    variable.getMethod().getName(), variable.getScale().getName()));
+                                    variable.getMethod().getName(), variable.getScale().getName(), variable.getPhenotypicType().getGroup()));
                         }
                     }
 
@@ -252,12 +251,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 
     private void checkForDuplicatePSMCombo(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        // GCP-6438
-        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
-        /*workbookVariables.addAll(workbook.getFactors());
-        workbookVariables.addAll(workbook.getVariates());*/
-
+        List<MeasurementVariable> workbookVariables = workbook.getNonVariateVariables();
+        
         Map<String, String> psmMap = new HashMap<String, String>();
+
+        for (MeasurementVariable measurementVariable : workbookVariables) {
+            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
+            if (!psmMap.containsKey(temp)) {
+                psmMap.put(temp, measurementVariable.getName());
+            } else {
+                messages.add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
+            }
+        }
+        
+        workbookVariables = workbook.getVariateVariables();
+        psmMap = new HashMap<String, String>();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
             String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
@@ -504,7 +512,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered with importing project ontology: ", e, LOG);
 
         } finally {
             timerWatch.stop();
@@ -528,7 +536,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered in importing observations: ", e, LOG);
             return 0;
         } finally {
             timerWatch.stop();

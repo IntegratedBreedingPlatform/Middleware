@@ -14,7 +14,7 @@
   <!-- Use the C3P0 connection pool provider --> 
   <property name="hibernate.c3p0.min_size">1</property> 
   <property name="hibernate.c3p0.max_size">20</property> 
-  <property name="hibernate.c3p0.timeout">300</property> 
+  <property name="hibernate.c3p0.timeout">10</property> 
   <property name="hibernate.c3p0.max_statements">50</property> 
   <property name="hibernate.c3p0.idle_test_period">3000</property>
  

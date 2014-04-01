@@ -78,8 +78,8 @@ public class VariableListTransformer extends Transformer {
 		*/
 		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
 		for(Integer index : variableIndexesList) {
-			if (nonTrialMD.get(index).getValueId() != null) {
-				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValueId().toString()));
+			if (nonTrialMD.get(index).getcValueId() != null) {
+				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getcValueId()));
 			}
 			else {
 				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
@@ -181,7 +181,7 @@ public class VariableListTransformer extends Transformer {
 			int rank = 1;
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name", studyDetails.getStudyName(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TITLE, "STUDY_TITLE", "Study title", studyDetails.getTitle(), rank);
-			rank = addVariableIfNecessary(variables, variableTypeList, TermId.PM_KEY, "PM_KEY", "Project Management Key", studyDetails.getPmKey(), rank);
+			/*rank = addVariableIfNecessary(variables, variableTypeList, TermId.PM_KEY, "PM_KEY", "Project Management Key", studyDetails.getPmKey(), rank);*/
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective", studyDetails.getObjective(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TYPE, "STUDY_TYPE", "Study type", 
 					(studyDetails.getStudyType()!=null?Integer.toString(studyDetails.getStudyType().getId()):null), rank);

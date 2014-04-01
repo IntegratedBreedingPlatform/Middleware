@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.saver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Values;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -35,6 +37,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -476,6 +479,7 @@ public class WorkbookSaver extends Saver {
 		Session session = getCurrentSessionForLocal();
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
+		Map<Integer,PhenotypeExceptionDto> exceptions = null;
 		for(MeasurementRow row : observations) {
 			rowWatch.restart("saving row "+(i++));
 			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
@@ -483,7 +487,24 @@ public class WorkbookSaver extends Saver {
 			if(trialVariates!=null) {
 				experimentValues.getVariableList().addAll(trialVariates);
 			}
-			experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+			try {
+				experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+			} catch(PhenotypeException e) {
+				if(exceptions==null) {
+					exceptions = e.getExceptions();
+				} else {
+					for (Integer standardVariableId : e.getExceptions().keySet()) {
+						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+						if(exceptions.get(standardVariableId)==null) {
+							exceptions.put(standardVariableId, exception);//add exception
+						} else {//add invalid values to the existing map of exceptions for each phenotype
+							for(String invalidValue : exception.getInvalidValues()) {
+								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+							}
+						}
+					}
+				}
+			}
 			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
 				session.flush();
 				session.clear();
@@ -491,6 +512,10 @@ public class WorkbookSaver extends Saver {
 		}
 		rowWatch.stop();
 		watch.stop();
+		
+		if(exceptions!=null) {
+			throw new PhenotypeException(exceptions);
+		}
 	}
 	
 	private boolean isTrialFactorInDataset(VariableTypeList list) {

@@ -56,6 +56,28 @@ public class MarkerInfo implements Serializable{
             "FROM gdms_marker_retrieval_info " +
             "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
 
+    public static final String GET_BY_MARKER_ID =
+                "SELECT marker_id " +
+                        ", CONCAT(marker_type, '') " +
+                        ", CONCAT(marker_name, '')  " +
+                        ", CONCAT(species, '')  " +
+                        ", db_accession_id " +
+                        ", reference " +
+                        ", CONCAT(genotype, '') " +
+                        ", ploidy " +
+                        ", motif " +
+                        ", forward_primer " +
+                        ", reverse_primer " +
+                        ", product_size " +
+                        ", annealing_temp " +
+                        ", amplification " +
+                        ", CONCAT(principal_investigator, '') " +
+                        ", contact " +
+                        ", institute " +
+                        ", genotypes_count " +
+                "FROM gdms_marker_retrieval_info " +
+                "WHERE marker_id in(:markerList)";
+
     /* Used by MarkerInfoDAO.countByMarkerName() */
     public static final String COUNT_BY_MARKER_NAME = 
             "SELECT COUNT(*) " +
