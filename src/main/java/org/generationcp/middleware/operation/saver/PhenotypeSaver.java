@@ -20,10 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
 import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
@@ -109,28 +112,43 @@ public class PhenotypeSaver extends Saver{
 	            phenotype = getPhenotypeObject(phenotype);
 	            if(variable.getValue()!=null && !variable.getValue().equals("")) {
 	            	phenotype.setValue(variable.getValue());
-	            	Enumeration enumeration = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
-	            	if(enumeration!=null) {
-	            		phenotype.setcValue(enumeration.getId());	
-	            	} else {
-	            		//throw a PhenotypeException
-	            		PhenotypeExceptionDto exception = new PhenotypeExceptionDto();
-	            		exception.setLocalVariableName(variable.getVariableType().getLocalName());
-	            		exception.setStandardVariableName(variable.getVariableType().getStandardVariable().getName());
-	            		exception.setStandardVariableId(variable.getVariableType().getStandardVariable().getId());
-	            		exception.setInvalidValues(new TreeSet<String>());
-	            		exception.getInvalidValues().add(variable.getValue());
-	            		List<Enumeration> enumerations = variable.getVariableType().getStandardVariable().getEnumerations();
-	            		if(enumerations!=null) {
-	            			for (int i = 0; i< enumerations.size(); i++) {
-	            				Enumeration e = enumerations.get(i);
-	            				if(exception.getValidValues()==null) {
-	            					exception.setValidValues(new TreeSet<String>());
-	            				}
-	            				exception.getValidValues().add(e.getName());
-							}
-	            		}
-	            		throw new PhenotypeException(exception);
+	            	Term dataType = variable.getVariableType().getStandardVariable().getDataType();
+	            	if(dataType.getId()==TermId.CATEGORICAL_VARIABLE.getId()) {//categorical variable
+	            		Enumeration enumeration = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
+		            	if(enumeration!=null) {
+		            		phenotype.setcValue(enumeration.getId());	
+		            	} else {
+		            		//throw a PhenotypeException
+		            		PhenotypeExceptionDto exception = new PhenotypeExceptionDto();
+		            		exception.setLocalVariableName(variable.getVariableType().getLocalName());
+		            		exception.setStandardVariableName(variable.getVariableType().getStandardVariable().getName());
+		            		exception.setStandardVariableId(variable.getVariableType().getStandardVariable().getId());
+		            		exception.setInvalidValues(new TreeSet<String>());
+		            		exception.getInvalidValues().add(variable.getValue());
+		            		List<Enumeration> enumerations = variable.getVariableType().getStandardVariable().getEnumerations();
+		            		if(enumerations!=null) {
+		            			for (int i = 0; i< enumerations.size(); i++) {
+		            				Enumeration e = enumerations.get(i);
+		            				if(exception.getValidValues()==null) {
+		            					exception.setValidValues(new TreeSet<String>());
+		            				}
+		            				exception.getValidValues().add(e.getName());
+								}
+		            		}
+		            		throw new PhenotypeException(exception);
+		            	}
+	            	} else if(dataType.getId()==TermId.NUMERIC_VARIABLE.getId()){//numeric variable
+	            		if(!NumberUtils.isNumber(variable.getValue())) {
+            				//TODO Technical debt - throw an error that value must be numeric - should be handled by GCP-7956
+            			} else {
+            				VariableConstraints constraints = variable.getVariableType().getStandardVariable().getConstraints();
+    	            		if(constraints!=null) {
+    	            			Double minValue = constraints.getMinValue();
+    	            			Double maxValue = constraints.getMaxValue();
+    	            			//TODO Technical debt - Check if value is within the min and max - should be handled by GCP-7956
+    	            		}
+            			}
+	            		
 	            	}
 	            }           
 	            phenotype.setObservableId(variable.getVariableType().getId());
