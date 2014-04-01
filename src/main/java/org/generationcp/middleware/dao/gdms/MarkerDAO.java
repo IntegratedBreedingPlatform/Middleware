@@ -794,7 +794,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_IDS);
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_HAPLOTYPE);
             query.setParameter("trackName", haplotype);
             List results = query.list();
 
