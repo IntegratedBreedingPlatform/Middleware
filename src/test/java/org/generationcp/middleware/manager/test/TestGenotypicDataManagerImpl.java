@@ -2394,6 +2394,15 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testGetMarkersByIds(" + markerIds + ") Results: ");
         Debug.printObjects(INDENT, results);
     }
+    
+    @Test
+    public void testGetSNPsByHaplotype() throws Exception {
+        String haplotype = "track5";
+
+        List<Marker> results = manager.getSNPsByHaplotype(haplotype);
+        Debug.println(0, "testGetSNPsByHaplotype(" + haplotype + ") Results: ");
+        Debug.printObjects(INDENT, results);
+    }
 
     @Test
     public void testCountAllMaps() throws Exception {
