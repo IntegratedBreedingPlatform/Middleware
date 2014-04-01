@@ -569,8 +569,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	}
     }
     
-    public Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().createNurseryVariableSettings(id);                        
+    public Workbook getStudyVariableSettings(int id, boolean isNursery)  throws MiddlewareQueryException {
+        Workbook workbook = getWorkbookBuilder().createStudyVariableSettings(id, isNursery);                        
         return workbook;
     }
 

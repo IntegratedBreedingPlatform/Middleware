@@ -110,7 +110,7 @@ public class WorkbookBuilder extends Builder {
 		return workbook;
 	}
 	
-	public Workbook createNurseryVariableSettings(int id) throws MiddlewareQueryException {
+	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
             Workbook workbook = new Workbook();
             Study study = getStudyBuilder().createStudy(id);
             int dataSetId = 0;
@@ -118,7 +118,10 @@ public class WorkbookBuilder extends Builder {
             if (dataSetId == 0) {
                 List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
                 if (datasetRefList != null) {
-                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, id);
+                	StudyType studyType = StudyType.N;
+                	if(!isNursery)
+                		studyType = StudyType.T;
+                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
                     for (DatasetReference datasetRef : datasetRefList) {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
                                 datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {

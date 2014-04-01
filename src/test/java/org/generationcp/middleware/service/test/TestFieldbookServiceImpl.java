@@ -424,7 +424,7 @@ public class TestFieldbookServiceImpl {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
         workbook.print(0);
         int id = dataImportService.saveDataset(workbook);
-        workbook = fieldbookService.getNurseryVariableSettings(id);
+        workbook = fieldbookService.getStudyVariableSettings(id, true);
         workbook.print(0);
     }
 

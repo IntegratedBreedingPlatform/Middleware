@@ -203,15 +203,19 @@ public class Workbook {
 				studyConditions = getStudyConditions();
 				studyConstants = getStudyConstants();
 			}
-			list.addAll(studyConditions);
-			list.addAll(studyConstants);
+			if(studyConditions != null)
+				list.addAll(studyConditions);
+			if(studyConstants != null)
+				list.addAll(studyConstants);
 		} else {
 			if(trialConditions == null && trialConstants == null) {
 				trialConditions = getTrialConditions();
 				trialConstants = getTrialConstants();
 			}
-			list.addAll(trialConditions);
-			list.addAll(trialConstants);
+			if(trialConditions != null)
+				list.addAll(trialConditions);
+			if(trialConstants != null)
+				list.addAll(trialConstants);
 		}
 		return list;
 	}

@@ -358,7 +358,8 @@ public interface FieldbookService {
      * @return the nursery variable settings
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException;
+    //Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException;
+    Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException;
     
     /**
      * Gets the germplasms.
