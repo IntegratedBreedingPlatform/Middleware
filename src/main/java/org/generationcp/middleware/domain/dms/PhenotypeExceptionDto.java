@@ -97,7 +97,9 @@ public class PhenotypeExceptionDto {
 		builder.append(invalidValues!=null?invalidValues.toString():null);
 		builder.append(" are not valid values of ");
 		builder.append(localVariableName);
-		builder.append(".");
+		builder.append(" (Standard Variable: ");
+		builder.append(standardVariableName);
+		builder.append(") .");
 		if(validValues!=null) {
 			builder.append(" Valid values are ");
 			builder.append(validValues.toString());
