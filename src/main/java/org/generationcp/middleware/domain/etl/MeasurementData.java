@@ -19,6 +19,8 @@ public class MeasurementData {
 	
 	private String value;
 	
+	private String cValueId;
+	
 	private boolean isEditable;
 	
 	private String dataType;
@@ -105,6 +107,13 @@ public class MeasurementData {
 		this.dataType = dataType;
 	}
 
+	public String getcValueId() {
+		return cValueId;
+	}
+
+	public void setcValueId(String cValueId) {
+		this.cValueId = cValueId;
+	}
 	
 	
 }

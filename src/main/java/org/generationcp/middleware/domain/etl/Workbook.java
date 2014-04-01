@@ -312,8 +312,15 @@ public class Workbook {
     public List<MeasurementVariable> getNonVariateVariables() {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
         if (conditions != null) variableList.addAll(conditions);
-        if (constants != null) variableList.addAll(constants);
         if (factors != null) variableList.addAll(factors);
+
+        return variableList;
+    }
+    
+    public List<MeasurementVariable> getVariateVariables() {
+        List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+        if (constants != null) variableList.addAll(constants);
+        if (variates != null) variableList.addAll(variates);
 
         return variableList;
     }

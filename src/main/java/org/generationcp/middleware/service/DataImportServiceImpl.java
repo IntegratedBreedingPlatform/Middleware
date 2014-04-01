@@ -216,14 +216,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
             for (MeasurementVariable measurementVariable : variableList) {
                 if (variableNameMap.containsKey(measurementVariable.getName())) {
-                    MeasurementVariable var = variableNameMap.get(measurementVariable.getName());
-                    messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), var.getProperty(),
-                            var.getMethod(), var.getScale()));
+                    messages.add(new Message("error.duplicate.local.variable", measurementVariable.getName()));
                 } else {
                     variableNameMap.put(measurementVariable.getName(), measurementVariable);
                 }
 
-                PhenotypicType type = (variableList == workbook.getVariates() ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
+                PhenotypicType type = ((variableList == workbook.getVariates() || variableList == workbook.getConstants()) ? 
+                		PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
                 Integer varId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(),
                         measurementVariable.getScale(), measurementVariable.getMethod(), type);
 
@@ -234,7 +233,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                     for (StandardVariable variable : variableSet) {
                         if (variable.getName().equalsIgnoreCase(measurementVariable.getName())) {
                             messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable.getProperty().getName(),
-                                    variable.getMethod().getName(), variable.getScale().getName()));
+                                    variable.getMethod().getName(), variable.getScale().getName(), variable.getPhenotypicType().getGroup()));
                         }
                     }
 
@@ -265,7 +264,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             }
         }
         
-        workbookVariables = workbook.getVariates();
+        workbookVariables = workbook.getVariateVariables();
         psmMap = new HashMap<String, String>();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {

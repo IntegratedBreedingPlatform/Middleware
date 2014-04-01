@@ -33,6 +33,7 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class ExperimentBuilder extends Builder {
 
@@ -136,7 +137,15 @@ public class ExperimentBuilder extends Builder {
 					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
 				}
 				else {
-					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId()));
+					if(phenotype.getcValueId()!=null) {//this should always be the case
+						CVTerm c = getCvTermDao().getById(phenotype.getcValueId());
+						if(c!=null) {//this should always be the case
+							String descriptiveValue = c.getDefinition();
+							variates.add(new Variable(phenotype.getPhenotypeId(), variableType, 
+									descriptiveValue));
+						}
+					}
+					
 				}
 			}
 		}
