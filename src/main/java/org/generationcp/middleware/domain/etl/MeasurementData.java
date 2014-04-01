@@ -19,13 +19,15 @@ public class MeasurementData {
 	
 	private String value;
 	
+	private String cValueId;
+	
 	private boolean isEditable;
 	
 	private String dataType;
 	
 	private Integer phenotypeId;
 	
-	private Integer valueId;
+//	private Integer valueId;
 	
 	private MeasurementVariable measurementVariable;
 	
@@ -48,7 +50,10 @@ public class MeasurementData {
 	
 	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId) {
 		this(label, value, isEditable, dataType);
-		this.valueId = valueId;
+//		this.valueId = valueId;
+		if (valueId != null) {
+			this.cValueId = valueId.toString();
+		}
 	}
 
 	public MeasurementData(String label, String value, boolean isEditable, String dataType, MeasurementVariable mvar) {
@@ -62,7 +67,10 @@ public class MeasurementData {
 	
 	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId, MeasurementVariable mvar) {
 		this(label, value, isEditable, dataType, mvar);
-		this.valueId = valueId;
+//		this.valueId = valueId;
+		if (valueId != null) {
+			this.cValueId = valueId.toString();
+		}
 	}
 
 	public String getLabel() {
@@ -128,19 +136,19 @@ public class MeasurementData {
 		this.dataType = dataType;
 	}
 
-	/**
-	 * @return the valueId
-	 */
-	public Integer getValueId() {
-		return valueId;
-	}
-
-	/**
-	 * @param valueId the valueId to set
-	 */
-	public void setValueId(Integer valueId) {
-		this.valueId = valueId;
-	}
+//	/**
+//	 * @return the valueId
+//	 */
+//	public Integer getValueId() {
+//		return valueId;
+//	}
+//
+//	/**
+//	 * @param valueId the valueId to set
+//	 */
+//	public void setValueId(Integer valueId) {
+//		this.valueId = valueId;
+//	}
 
 	/**
 	 * @return the measurementVariable
@@ -157,4 +165,12 @@ public class MeasurementData {
 	}
 
 
+	public String getcValueId() {
+		return cValueId;
+	}
+
+	public void setcValueId(String cValueId) {
+		this.cValueId = cValueId;
+	}
+	
 }

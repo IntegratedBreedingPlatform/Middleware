@@ -34,9 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,7 +85,7 @@ public class WorkbookParser {
      * @return
      * @throws IOException
      */
-    private Workbook getCorrectWorkbook(File file) throws IOException {
+    private Workbook getCorrectWorkbook(File file) throws IOException, WorkbookParserException {
         InputStream inp = new FileInputStream(file);
         InputStream inp2 = new FileInputStream(file);
         Workbook wb;
@@ -91,7 +93,16 @@ public class WorkbookParser {
             wb = new HSSFWorkbook(inp);
         } catch (OfficeXmlFileException ee) {
             // TODO: handle exception
-            wb = new XSSFWorkbook(inp2);
+        	int maxLimit = 65000;
+        	Boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
+            if (overLimit){
+            	WorkbookParserException workbookParserException = new WorkbookParserException("");
+            	workbookParserException.addMessage(new Message("error.file.is.too.large", new DecimalFormat("###,###,###").format(maxLimit)));
+            	throw workbookParserException;
+            }else{
+            	wb = new XSSFWorkbook(inp2);
+            }
+        	
         } finally {
             inp.close();
             inp2.close();
@@ -227,28 +238,41 @@ public class WorkbookParser {
         Date startDate = null;
         Date endDate = null;
 
-        if (startDateStr.length() != 0 && startDateStr.length() != 8) {
+        if (startDateStr!=null && startDateStr.length() != 0 && startDateStr.length() != 8) {
             errorMessages.add(new Message("error.start.date.invalid"));
         } else {
             try {
-                if (!startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
+                if (startDateStr!=null && !startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.start.date.invalid"));
             }
         }
-        if (endDateStr.length() != 0 && endDateStr.length() != 8) {
+        if (endDateStr!=null && endDateStr.length() != 0 && endDateStr.length() != 8) {
             errorMessages.add(new Message("error.end.date.invalid"));
         } else {
             try {
-                if (!endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
+                if (endDateStr!=null && !endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.end.date.invalid"));
             }
 
         }
-
+        
         if (startDate != null && endDate != null && startDate.after(endDate)) {
             errorMessages.add(new Message("error.start.is.after.end.date"));
+        }
+        
+        if (startDate == null && endDate != null) {
+            errorMessages.add(new Message("error.date.startdate.required"));
+        }
+        
+        Date currentDate = Calendar.getInstance().getTime();
+        if (startDate != null && startDate.after(currentDate)) {
+            errorMessages.add(new Message("error.start.is.after.current.date"));
+        }
+        
+        if (endDate != null && endDate.after(currentDate)) {
+            errorMessages.add(new Message("error.end.is.after.current.date"));
         }
 
 
@@ -399,6 +423,24 @@ public class WorkbookParser {
             workbook) throws WorkbookParserException {
         List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         long stockId = 0;
+        
+        //add each row in observations
+        Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
+        Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
+        
+        // GCP-7541 limit the observations rows
+        Integer maxLimit = 10000;
+        if (lastRowNum == 0){
+        	List<Message> messages = new ArrayList<Message>();
+        	Message message = new Message("error.observation.no.records");
+        	messages.add(message);
+        	throw new WorkbookParserException(messages);
+        } else if (lastRowNum > maxLimit){
+        	List<Message> messages = new ArrayList<Message>();
+        	Message message = new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(maxLimit));
+        	messages.add(message);
+        	throw new WorkbookParserException(messages);
+        }
 
         try {
             //validate headers and set header labels
@@ -425,10 +467,7 @@ public class WorkbookParser {
             }
 
             currentRow++;
-
-            //add each row in observations
-            Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
-            Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
+            
             while (currentRow <= lastRowNum) {
                 // skip over blank rows in the observation sheet
                 if (rowIsEmpty(wb, OBSERVATION_SHEET, currentRow, factors.size() + variates.size())) {
@@ -470,19 +509,13 @@ public class WorkbookParser {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
             Cell cell = row.getCell(columnNumber);
-            return getCellStringValue(wb,cell);
+            return PoiUtil.getCellStringValue(cell);
         } catch (IllegalStateException e) {
-            Sheet sheet = wb.getSheetAt(sheetNumber);
-            Row row = sheet.getRow(rowNumber);
-            Cell cell = row.getCell(columnNumber);
-
-            if (cell.getNumericCellValue() == Math.floor(cell.getNumericCellValue())) {
-                return String.valueOf(Integer.valueOf((int) cell.getNumericCellValue()));
-            } else {
-                return String.valueOf(Double.valueOf(cell.getNumericCellValue()));
-            }
+           
+        	return "";
 
         } catch (NullPointerException e) {
+        	
             return "";
         }
     }

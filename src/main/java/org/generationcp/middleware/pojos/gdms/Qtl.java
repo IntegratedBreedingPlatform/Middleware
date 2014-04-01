@@ -98,7 +98,7 @@ public class Qtl implements Serializable{
             + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "
             + "ORDER BY gq.qtl_id "
             ;
-    
+
     public static final String COUNT_QTL_AND_QTL_DETAILS_BY_NAME = 
             "SELECT  COUNT(*) " 
             + "FROM gdms_qtl_details gqd "
@@ -106,10 +106,23 @@ public class Qtl implements Serializable{
             + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "
             ;
     
+    public static final String GET_QTL_DETAILS_BY_TRAITS = 
+            GET_QTL_DETAILS_SELECT 
+            + GET_QTL_DETAILS_FROM_CENTRAL
+            + "WHERE   gqd.tid IN (:qtlTraitIds) "
+            + "ORDER BY gq.qtl_id "
+            ;
+
+    public static final String COUNT_QTL_DETAILS_BY_TRAITS = 
+            "SELECT  COUNT(*) " 
+            + "FROM gdms_qtl_details gqd "
+            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
+            + "WHERE   gqd.tid IN (:qtlTraitIds) "
+            ;
+
     public static final String GET_QTL_ID_BY_NAME = 
             GET_QTL_DETAILS_SELECT 
             + GET_QTL_DETAILS_FROM_CENTRAL
-            + "FROM gdms_qtl "
             + "WHERE qtl_name LIKE LOWER(:qtlName) "
             + "ORDER BY qtl_id";
     

@@ -168,7 +168,7 @@ public class Workbook {
 	
 
 	public List<MeasurementVariable> getNonTrialFactors() {
-		if(nonTrialFactors==null) {
+		if(nonTrialFactors==null || nonTrialFactors.isEmpty()) {
 			nonTrialFactors = getNonTrialVariables(factors);
 		}
 		return nonTrialFactors;
@@ -184,13 +184,16 @@ public class Workbook {
 	public List<MeasurementVariable> getTrialVariables() {
 		if(trialVariables==null) {
 			trialVariables = getConditionsAndConstants(false);
-			trialVariables.addAll(getTrialFactors());
+			List<MeasurementVariable> trialFactors = getTrialFactors();
+			if(trialFactors!=null) {
+				trialVariables.addAll(trialFactors);
+			}
 		}
 		return trialVariables;
 	}
 	
 	public List<MeasurementVariable> getTrialFactors() {
-		if(trialFactors==null) {
+		if(trialFactors==null || trialFactors.isEmpty()) {
 			trialFactors = getTrialVariables(factors);
 		}
 		return trialFactors;
@@ -305,6 +308,22 @@ public class Workbook {
         if (conditions != null) variableList.addAll(conditions);
         if (constants != null) variableList.addAll(constants);
         if (factors != null) variableList.addAll(factors);
+        if (variates != null) variableList.addAll(variates);
+
+        return variableList;
+    }
+    
+    public List<MeasurementVariable> getNonVariateVariables() {
+        List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+        if (conditions != null) variableList.addAll(conditions);
+        if (factors != null) variableList.addAll(factors);
+
+        return variableList;
+    }
+    
+    public List<MeasurementVariable> getVariateVariables() {
+        List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+        if (constants != null) variableList.addAll(constants);
         if (variates != null) variableList.addAll(variates);
 
         return variableList;

@@ -54,7 +54,7 @@ public class PoiUtil {
 
     public static String getCellStringValue(Cell cell) {
         try{
-        	return cell == null ? null : cell.getStringCellValue();
+        	return cell == null ? null : cell.getStringCellValue().trim();
         }catch(Exception e){
         	return String.format("%s", getCellValue(cell));
         }
@@ -71,9 +71,25 @@ public class PoiUtil {
             case Cell.CELL_TYPE_STRING:
                 return cell.getStringCellValue();
             case Cell.CELL_TYPE_NUMERIC:
-                return cell.getNumericCellValue();
+            	double doubleVal = cell.getNumericCellValue();
+            	if ((doubleVal % 1) == 0){
+            		return (int) doubleVal; 
+            	}else{
+            		return doubleVal;
+            	}
             case Cell.CELL_TYPE_FORMULA:
-                return cell.getCellFormula();
+          
+            	 switch(cell.getCachedFormulaResultType()) {
+            	 
+                 case Cell.CELL_TYPE_NUMERIC:
+                     return cell.getNumericCellValue();
+                 case Cell.CELL_TYPE_STRING:
+                     return cell.getRichStringCellValue();
+                 default: return cell.getCellFormula();    
+                    
+            	 }
+            	
+               
             default:
                 return null;
         }
@@ -696,6 +712,35 @@ public class PoiUtil {
         } while (rowIsEmpty(sheet,lastRowNum,start,end) && lastRowNum > 0);
 
         return lastRowNum;
+    }
+    
+    
+    public static boolean areSheetRowsOverMaxLimit(String fileName, int sheetIndex, int maxLimit){
+    	
+    	
+    	try {
+			new PoiEventUserModel().areSheetRowsOverMaxLimit(fileName, sheetIndex, maxLimit);
+		} catch (Exception e) {
+			//Exception means parser has exeeded the set max limit
+			return true;
+		}
+    	
+    	
+    	return false;
+    }
+    
+    public static boolean isAnySheetRowsOverMaxLimit(String fileName, int maxLimit){
+ 
+    	
+    	try {
+			new PoiEventUserModel().isAnySheetRowsOverMaxLimit(fileName, maxLimit);
+		} catch (Exception e) {
+			//Exception means parser has exeeded the set max limit
+			return true;
+		}
+    	
+    	
+    	return false;
     }
 }
 

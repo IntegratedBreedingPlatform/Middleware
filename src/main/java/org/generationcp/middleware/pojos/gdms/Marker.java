@@ -115,6 +115,27 @@ public class Marker implements Serializable{
             "FROM gdms_mapping_pop_values JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
             "WHERE gdms_mapping_pop_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
+
+    public static final String GET_SNP_MARKERS_BY_HAPLOTYPE = "SELECT gdms.marker_id  "
+                        + ", CONCAT(marker_type, '') "
+                        + ", CONCAT(marker_name, '') "
+                        + ", CONCAT(species, '') "
+                        + ", db_accession_id "
+                        + ", reference "
+                        + ", CONCAT(genotype, '') "
+                        + ", ploidy  "
+                        + ", primer_id  "
+                        + ", remarks  "
+                        + ", assay_type "
+                        + ", motif  "
+                        + ", forward_primer  "
+                        + ", reverse_primer  "
+                        + ", product_size  "
+                        + ", annealing_temp "
+                        + ", amplification "
+                + "FROM (gdms_marker gdms INNER JOIN gdms_track_markers track ON(track.marker_id = gdms.marker_id)) "
+                + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
+                + "WHERE track_name = (:trackName) and gdms.marker_type = 'SNP'";
     
     public static final String GET_ALL_DB_ACCESSION_IDS = 
             "SELECT DISTINCT (db_accession_id) " +
@@ -147,8 +168,7 @@ public class Marker implements Serializable{
                     + ", annealing_temp " 
                     + ", amplification " 
             + "FROM gdms_marker "
-            + "WHERE marker_id IN (:markerIdList) " 
-            ;
+            + "WHERE marker_id IN (:markerIdList) ";
 
     public static final String COUNT_MARKERS_BY_IDS = 
             "SELECT COUNT(marker_id)  "

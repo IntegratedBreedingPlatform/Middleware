@@ -154,7 +154,7 @@ public class TestVariableListTransformer {
 		switch(rank) {
 			case 1: return studyDetails.getStudyName();	
 			case 2: return studyDetails.getTitle();	
-			case 3: return studyDetails.getPmKey();
+			/*case 3: return studyDetails.getPmKey();*/
 			case 4: return studyDetails.getObjective();
 			case 5: return Integer.toString(studyDetails.getStudyType().getId());
 			case 6: return studyDetails.getStartDate();
@@ -259,7 +259,7 @@ public class TestVariableListTransformer {
 		StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyName("Study name");
 		studyDetails.setTitle("Study title");
-		studyDetails.setPmKey("123");
+		/*studyDetails.setPmKey("123");*/
 		studyDetails.setObjective("Test transformer");
 		studyDetails.setStudyType(StudyType.T);
 		studyDetails.setStartDate("20000101");

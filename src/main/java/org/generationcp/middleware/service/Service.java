@@ -12,6 +12,7 @@
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
@@ -43,6 +44,9 @@ public abstract class Service extends DatabaseBroker {
 	
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
         log.error(e.getMessage(), e);
+        if(e instanceof PhenotypeException) {
+        	throw (PhenotypeException)e;
+        }
         throw new MiddlewareQueryException(message + e.getMessage(), e);
     }
 
