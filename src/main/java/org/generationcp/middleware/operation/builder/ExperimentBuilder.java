@@ -137,14 +137,7 @@ public class ExperimentBuilder extends Builder {
 					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
 				}
 				else {
-					if(phenotype.getcValueId()!=null) {//this should always be the case
-						CVTerm c = getCvTermDao().getById(phenotype.getcValueId());
-						if(c!=null) {//this should always be the case
-							String descriptiveValue = c.getDefinition();
-							variates.add(new Variable(phenotype.getPhenotypeId(), variableType, 
-									descriptiveValue));
-						}
-					}
+					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId()));
 					
 				}
 			}
