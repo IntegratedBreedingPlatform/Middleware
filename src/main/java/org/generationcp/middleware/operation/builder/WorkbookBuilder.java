@@ -149,7 +149,7 @@ public class WorkbookBuilder extends Builder {
                     if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
                         
-                        MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), getLocalName(projectProperties),//projectProperty.getValue(), 
+                        MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), getLocalName(projectProperty.getRank(), projectProperties),//projectProperty.getValue(), 
                                 stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
                                 stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), 
                                 getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id), 
@@ -337,9 +337,9 @@ public class WorkbookBuilder extends Builder {
 		return var;
 	}
 	
-	private String getLocalName(List<ProjectProperty> properties) {
+	private String getLocalName(int rank, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
-			if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId()) {
+			if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId() && rank == property.getRank()) {
 				return property.getValue();
 			}
 		}
