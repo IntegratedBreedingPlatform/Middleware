@@ -100,6 +100,7 @@ public class Variable  implements Comparable<Variable> {
 	}
 	
 	public String getDisplayValue() {
+		String value = this.value;
 		if (variableType.getStandardVariable().hasEnumerations()) {
 		    try{
 		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value));
@@ -123,6 +124,7 @@ public class Variable  implements Comparable<Variable> {
 	}
 	
 	public String getActualValue() {
+		String value = this.value;
 		if (variableType.getStandardVariable().hasEnumerations()) {
 		    try{
 		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value));
