@@ -149,7 +149,7 @@ public class WorkbookBuilder extends Builder {
                     if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
                         
-                        MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), projectProperty.getValue(), 
+                        MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), stdVariable.getName(),//projectProperty.getValue(), 
                                 stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
                                 stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), 
                                 getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id), 
