@@ -96,25 +96,25 @@ import org.slf4j.LoggerFactory;
  * Implementation of the GenotypicDataManager interface.  To instantiate this
  * class, a Hibernate Session must be passed to its constructor.
  *
- * @author Joyce Avestro
+ * @author Joyce Avestro, Glenn Marintes, Daniel Villafuerte
  */
 @SuppressWarnings("unchecked")
 public class GenotypicDataManagerImpl extends DataManager implements GenotypicDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenotypicDataManagerImpl.class);
 
-    private static final String TYPE_SSR = "SSR";
-    private static final String TYPE_SNP = "SNP";
-    private static final String TYPE_DART = "DArT";
-    private static final String TYPE_MAPPING = "mapping";
-    private static final String TYPE_MTA = "MTA";
-    private static final String TYPE_QTL = "QTL";
-    private static final String TYPE_CAP = "CAP";
-    private static final String TYPE_CISR = "CISR";
-    private static final String TYPE_UA = "UA"; // Unassigned
+    private static final String TYPE_SSR = GdmsType.TYPE_SSR.getValue();
+    private static final String TYPE_SNP = GdmsType.TYPE_SNP.getValue();
+    private static final String TYPE_DART = GdmsType.TYPE_DART.getValue();
+    private static final String TYPE_MAPPING = GdmsType.TYPE_MAPPING.getValue();
+    private static final String TYPE_MTA = GdmsType.TYPE_MTA.getValue();
+    private static final String TYPE_QTL = GdmsType.TYPE_QTL.getValue();
+    private static final String TYPE_CAP = GdmsType.TYPE_CAP.getValue();
+    private static final String TYPE_CISR = GdmsType.TYPE_CISR.getValue();
+    private static final String TYPE_UA = GdmsType.TYPE_UA.getValue(); // Unassigned
 
-    private static final String DATA_TYPE_INT = "int";
-    private static final String DATA_TYPE_MAP = "map";
+    private static final String DATA_TYPE_INT = GdmsType.DATA_TYPE_INT.getValue();
+    private static final String DATA_TYPE_MAP = GdmsType.DATA_TYPE_MAP.getValue();
 
     public GenotypicDataManagerImpl() {
     }
@@ -1409,7 +1409,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             session.flush();
         }
     }
-
+    
     @Override
     public Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<SSRDataRow> rows) throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
@@ -1446,6 +1446,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             session.flush();
         }
     }
+    
 
     @Override
     public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<SNPDataRow> rows) throws MiddlewareQueryException {
@@ -1483,6 +1484,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             session.flush();
         }
     }
+    
 
     @Override
     public Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingABHRow> rows)
@@ -1518,6 +1520,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             session.flush();
         }
     }
+    
 
     @Override
     public Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingAllelicSNPRow> rows)
@@ -1554,6 +1557,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             session.flush();
         }
     }
+
+
 
     @Override
     public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
@@ -1592,6 +1597,415 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             session.flush();
         }
     }
+        
+    @Override
+    public Boolean updateDart(Dataset dataset, List<DartDataRow> rows) throws MiddlewareQueryException, MiddlewareException{
+        if (dataset == null || dataset.getDatasetId() == null){
+        	throw new MiddlewareException("Dataset is null and cannot be updated.");
+        }
+    	Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            Integer datasetId = updateDataset(dataset, TYPE_DART, DATA_TYPE_INT);
+
+            // Save data rows
+            if (rows != null && rows.size() > 0) {
+                for (DartDataRow row : rows) {
+
+                	// AlleleValues is mandatory
+                	AlleleValues alleleValues = row.getAlleleValues();
+                	if (alleleValues == null){
+                		throw new MiddlewareException("AlleleValues must not be null: " + row.toString());
+                	}
+
+                	// Save marker if non-existing
+                    Marker marker = row.getMarker();
+                    Integer markerId = null;
+                    if (marker != null){
+                    	markerId = marker.getMarkerId();
+                    	if (markerId == null){
+                    		markerId = saveMarker(marker, TYPE_DART);
+                    	}
+                    } 
+
+                    // Save or update alleleValues
+            		if (alleleValues.getAnId() == null){
+            			saveAlleleValues(datasetId, markerId, alleleValues);
+            		} else {
+            			updateAlleleValues(alleleValues);
+            		}
+
+                    // Save or update AccMetadaset and MarkerDataset
+            		saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+
+            		if (markerId != null){
+            			saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+            		} else {
+            			saveMarkerMetadataSet(datasetId, row.getMarkerMetadataSet());
+            		}
+
+            		// Save or update dartValues
+                    DartValues dartValues = row.getDartValues();
+                    if (dartValues == null || dartValues.getAdId() == null) {
+                    	saveDartValues(datasetId, markerId, dartValues);
+                    } else {
+                    	updateDartValues(dartValues);
+                    }
+                }
+            }
+
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while updating DArT: updateDart(): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return false;
+    }
+    
+    @Override
+    public Boolean updateSSR(Dataset dataset, List<SSRDataRow> rows) throws MiddlewareQueryException, MiddlewareException{
+        if (dataset == null || dataset.getDatasetId() == null){
+        	throw new MiddlewareException("Dataset is null and cannot be updated.");
+        }
+        
+    	Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            Integer datasetId = updateDataset(dataset, TYPE_SSR, DATA_TYPE_INT);
+
+            // Save data rows
+            if (rows != null && rows.size() > 0) {
+                for (SSRDataRow row : rows) {
+
+                	// AlleleValues is mandatory
+                	AlleleValues alleleValues = row.getAlleleValues();
+                	if (alleleValues == null){
+                		throw new MiddlewareException("AlleleValues must not be null: " + row.toString());
+                	}
+
+                	// Save marker if non-existing
+                    Marker marker = row.getMarker();
+                    Integer markerId = null;
+                    if (marker != null){
+                    	markerId = marker.getMarkerId();
+                    	if (markerId == null){
+                    		markerId = saveMarker(marker, TYPE_SSR);
+                    	}
+                    } 
+
+                    // Save or update alleleValues
+            		if (alleleValues.getAnId() == null){
+            			saveAlleleValues(datasetId, markerId, alleleValues);
+            		} else {
+            			updateAlleleValues(alleleValues);
+            		}
+
+                    // Save or update AccMetadaset and MarkerDataset
+            		saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+            		
+            		if (markerId != null){
+            			saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+            		} else {
+            			saveMarkerMetadataSet(datasetId, row.getMarkerMetadataSet());
+            		}
+                }
+            }
+
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while updating SSR: updateSSR(): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return false;
+    }
+    
+    @Override
+    public Boolean updateSNP(Dataset dataset, List<SNPDataRow> rows) throws MiddlewareQueryException, MiddlewareException{
+        if (dataset == null || dataset.getDatasetId() == null){
+        	throw new MiddlewareException("Dataset is null and cannot be updated.");
+        }
+        
+    	Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            Integer datasetId = updateDataset(dataset, TYPE_SNP, DATA_TYPE_INT);
+
+
+            // Save data rows
+            if (rows != null && rows.size() > 0) {
+                for (SNPDataRow row : rows) {
+
+                	// CharValues is mandatory
+                	CharValues charValues = row.getCharValues();
+                	if (charValues == null){
+                		throw new MiddlewareException("CharValues must not be null: " + row.toString());
+                	}
+
+                	// Save marker if non-existing
+                    Marker marker = row.getMarker();
+                    Integer markerId = null;
+                    if (marker != null){
+                    	markerId = marker.getMarkerId();
+                    	if (markerId == null){
+                    		markerId = saveMarker(marker, TYPE_SNP);
+                    	}
+                    } 
+
+                    // Save or update charValues
+            		if (charValues.getAcId() == null){
+            			saveCharValues(datasetId, markerId, charValues);
+            		} else {
+            			updateCharValues(charValues);
+            		}
+
+                    // Save or update AccMetadaset and MarkerDataset
+            		saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+            		
+            		if (markerId != null){
+            			saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+            		} else {
+            			saveMarkerMetadataSet(datasetId, row.getMarkerMetadataSet());
+            		}
+                }
+            }
+
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while updating SNP: updateSNP(): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return false;
+    }
+    
+    @Override
+    public Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop, List<MappingABHRow> rows) throws MiddlewareQueryException, MiddlewareException{
+        if (dataset == null || dataset.getDatasetId() == null){
+        	throw new MiddlewareException("Dataset is null and cannot be updated.");
+        }
+        
+    	Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            Integer datasetId = saveOrUpdateMappingData(dataset, mappingPop);
+
+            // Save data rows
+            if (rows != null && rows.size() > 0) {
+                for (MappingABHRow row : rows) {
+
+                	// MappingPopValues is mandatory
+                	MappingPopValues mappingPopValues = row.getMappingPopValues();
+                	if (mappingPopValues == null){
+                		throw new MiddlewareException("MappingPopValues must not be null: " + row.toString());
+                	}
+                	
+                	// Save marker if non-existing
+                    Marker marker = row.getMarker();
+                    Integer markerId = null;
+                    if (marker != null){
+                    	markerId = marker.getMarkerId();
+                    	if (markerId == null){
+                    		markerId = saveMarker(marker, TYPE_MAPPING);
+                    	}
+                    } 
+
+                    // Save or update mappingPopValues
+            		if (mappingPopValues.getMpId() == null){
+            			saveMappingPopValues(datasetId, markerId, mappingPopValues);
+            		} else {
+            			updateMappingPopValues(mappingPopValues);
+            		}
+                	
+                    // Save or update AccMetadaset and MarkerDataset
+            		saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+            		
+            		if (markerId != null){
+            			saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+            		} else {
+            			saveMarkerMetadataSet(datasetId, row.getMarkerMetadataSet());
+            		}
+                }
+
+            }
+
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while updating MappingABH: updateMappingABH(): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return false;
+    }
+
+
+    @Override
+    public Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, List<MappingAllelicSNPRow> rows) 
+    		throws MiddlewareQueryException, MiddlewareException{
+        if (dataset == null || dataset.getDatasetId() == null){
+        	throw new MiddlewareException("Dataset is null and cannot be updated.");
+        }
+        
+    	Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            Integer datasetId = saveOrUpdateMappingData(dataset, mappingPop);
+
+            // Save data rows
+            if (rows != null && rows.size() > 0) {
+                for (MappingAllelicSNPRow row : rows) {
+
+                	// MappingPopValues is mandatory
+                	MappingPopValues mappingPopValues = row.getMappingPopValues();
+                	if (mappingPopValues == null){
+                		throw new MiddlewareException("MappingPopValues must not be null: " + row.toString());
+                	}
+                	
+                	// Save marker if non-existing
+                    Marker marker = row.getMarker();
+                    Integer markerId = null;
+                    if (marker != null){
+                    	markerId = marker.getMarkerId();
+                    	if (markerId == null){
+                    		markerId = saveMarker(marker, TYPE_MAPPING);
+                    	}
+                    } 
+
+                    // Save or update mappingPopValues
+            		if (mappingPopValues.getMpId() == null){
+            			saveMappingPopValues(datasetId, markerId, mappingPopValues);
+            		} else {
+            			updateMappingPopValues(mappingPopValues);
+            		}
+                	
+                    // Save or update AccMetadaset and MarkerDataset
+            		saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+            		
+            		if (markerId != null){
+            			saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+            		} else {
+            			saveMarkerMetadataSet(datasetId, row.getMarkerMetadataSet());
+            		}
+
+            		// Save or update charValues
+                    CharValues charValues = row.getCharValues();
+                    if (charValues == null || charValues.getAcId() == null) {
+                    	saveCharValues(datasetId, markerId, charValues);
+                    } else {
+                    	updateCharValues(charValues);
+                    }
+                }
+
+            }
+
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean updateMappingAllelicSSRDArT(Dataset dataset, MappingPop mappingPop, List<MappingAllelicSSRDArTRow> rows) 
+    		throws MiddlewareQueryException, MiddlewareException{
+        if (dataset == null || dataset.getDatasetId() == null){
+        	throw new MiddlewareException("Dataset is null and cannot be updated.");
+        }
+        
+    	Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            Integer datasetId = saveOrUpdateMappingData(dataset, mappingPop);
+
+            // Save data rows
+            if (rows != null && rows.size() > 0) {
+                for (MappingAllelicSSRDArTRow row : rows) {
+
+                	// MappingPopValues is mandatory
+                	MappingPopValues mappingPopValues = row.getMappingPopValues();
+                	if (mappingPopValues == null){
+                		throw new MiddlewareException("MappingPopValues must not be null: " + row.toString());
+                	}
+                	
+                	// Save marker if non-existing
+                    Marker marker = row.getMarker();
+                    Integer markerId = null;
+                    if (marker != null){
+                    	markerId = marker.getMarkerId();
+                    	if (markerId == null){
+                    		markerId = saveMarker(marker, TYPE_MAPPING);
+                    	}
+                    } 
+
+                    // Save or update mappingPopValues
+            		if (mappingPopValues.getMpId() == null){
+            			saveMappingPopValues(datasetId, markerId, mappingPopValues);
+            		} else {
+            			updateMappingPopValues(mappingPopValues);
+            		}
+                	
+                    // Save or update AccMetadaset and MarkerDataset
+            		saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+
+            		if (markerId != null){
+            			saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+            		} else {
+            			saveMarkerMetadataSet(datasetId, row.getMarkerMetadataSet());
+            		}
+
+            		// Save or update alleleValues
+                    AlleleValues alleleValues = row.getAlleleValues();
+                    if (alleleValues == null || alleleValues.getAnId() == null) {
+                    	saveAlleleValues(datasetId, markerId, alleleValues);
+                    } else {
+                    	updateAlleleValues(alleleValues);
+                    }
+                }
+
+            }
+
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return false;
+    }
+
 
     // Returns the datasetId
     private Integer saveMappingData(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop) throws Exception {
@@ -1600,6 +2014,29 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         dataset.setDatasetId(datasetId);
         saveDatasetUser(datasetId, datasetUser);
         saveMappingPop(datasetId, mappingPop);
+
+        return datasetId;
+    }
+    
+    private Integer saveOrUpdateMappingData(Dataset dataset, MappingPop mappingPop) throws Exception {
+    	if (dataset == null){
+    		throw new MiddlewareException("dataset is null and cannot be saved nor updated.");
+    	}
+
+    	Integer datasetId = dataset.getDatasetId();
+    	if (datasetId == null){
+    		datasetId = saveDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
+    	} else {
+    		updateDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
+    	}
+    	
+    	if (mappingPop != null){
+    		if (mappingPop.getDatasetId() == null){
+    			saveMappingPop(datasetId, mappingPop);
+    		} else {
+    			updateMappingPop(datasetId, mappingPop);
+    		}
+    	}
 
         return datasetId;
     }
@@ -1729,7 +2166,25 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         return dataset;
     }
-
+    
+    @Override
+    public List<Dataset> getDatasetsByType(GdmsType type) throws MiddlewareQueryException{
+    	return super.getAllFromCentralAndLocalByMethod(getDatasetDao(), "getDatasetsByType"
+    			, new Object[]{type.getValue()}, new Class[]{String.class});
+    }
+    
+    @Override
+    public List<Dataset> getDatasetsByMappingTypeFromLocal(GdmsType type) throws MiddlewareQueryException{
+    	return super.getFromInstanceByMethod(getDatasetDao(), Database.LOCAL, "getDatasetsByMappingType"
+			, new Object[] { type }, new Class[] { GdmsType.class });
+	}
+    
+    @Override
+    public MappingPop getMappingPopByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+    	setWorkingDatabase(datasetId, getMappingPopDao());
+    	return getMappingPopDao().getMappingPopByDatasetId(datasetId);
+    }
+    
     private Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException {
 
         setWorkingDatabase(Database.CENTRAL);
@@ -2020,6 +2475,24 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     }
 
+    
+    private Integer updateDataset(Dataset dataset, String datasetType, String dataType) throws Exception {
+        requireLocalDatabaseInstance();
+
+        if (dataset == null || dataset.getDatasetId() == null) {
+        	throw new MiddlewareException("Dataset is null and cannot be updated.");
+        }
+        dataset.setDatasetType(datasetType);
+
+        if (!datasetType.equals(TYPE_QTL)) {
+            dataset.setDataType(dataType);
+        }
+
+        requireLocalDatabaseInstance();
+        Dataset datasetSaved = getDatasetDao().merge(dataset);
+        return datasetSaved.getDatasetId();
+    }
+
     // If the marker is not yet in the database, add.
     private Integer saveMarker(Marker marker, String markerType) throws Exception {
         requireLocalDatabaseInstance();
@@ -2050,7 +2523,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         return markerId;
     }
-
+    
     private Integer saveMarkerAlias(MarkerAlias markerAlias) throws Exception {
         requireLocalDatabaseInstance();
         MarkerAliasDAO markerAliasDao = getMarkerAliasDao();
@@ -2129,9 +2602,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     private AccMetadataSetPK saveAccMetadataSet(Integer datasetId, AccMetadataSet accMetadataSet) throws Exception {
+        accMetadataSet.setDatasetId(datasetId);
+        return saveAccMetadataSet(accMetadataSet);
+    }
+
+    private AccMetadataSetPK saveAccMetadataSet(AccMetadataSet accMetadataSet) throws Exception {
         requireLocalDatabaseInstance();
         AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
-        accMetadataSet.setDatasetId(datasetId);
 
         // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
         AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.merge(accMetadataSet);
@@ -2144,10 +2621,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     private MarkerMetadataSetPK saveMarkerMetadataSet(Integer datasetId, Integer markerId, MarkerMetadataSet markerMetadataSet) throws Exception {
-        requireLocalDatabaseInstance();
-        MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
         markerMetadataSet.setDatasetId(datasetId);
         markerMetadataSet.setMarkerId(markerId);
+        return saveMarkerMetadataSet(markerMetadataSet);
+    }
+
+    private MarkerMetadataSetPK saveMarkerMetadataSet(Integer datasetId, MarkerMetadataSet markerMetadataSet) throws Exception {
+        markerMetadataSet.setDatasetId(datasetId);
+        return saveMarkerMetadataSet(markerMetadataSet);
+    }
+
+    private MarkerMetadataSetPK saveMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws Exception {
+        requireLocalDatabaseInstance();
+        MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
 
         // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
         MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.merge(markerMetadataSet);
@@ -2158,6 +2644,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return markerMetadataSetSavedId;
     }
+
 
     private Integer saveDatasetUser(Integer datasetId, DatasetUsers datasetUser) throws Exception {
         requireLocalDatabaseInstance();
@@ -2229,6 +2716,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return charValuesSavedId;
 
     }
+    
+    private Integer updateCharValues(CharValues charValues) throws MiddlewareException, MiddlewareQueryException{ 
+    	
+    	if (charValues == null || charValues.getAcId() == null){
+    		throw new MiddlewareException("CharValues is null and cannot be updated.");
+    	}
+    	
+        requireLocalDatabaseInstance();
+        CharValues recordSaved = getCharValuesDao().merge(charValues);
+        return recordSaved.getAcId();
+    }
+
 
     private Integer saveMappingPop(Integer datasetId, MappingPop mappingPop) throws Exception {
         requireLocalDatabaseInstance();
@@ -2249,6 +2748,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return mappingPopSavedId;
     }
 
+    private Integer updateMappingPop(Integer datasetId, MappingPop mappingPop) throws Exception {
+        requireLocalDatabaseInstance();
+        mappingPop.setDatasetId(datasetId);
+
+        MappingPop mappingPopRecordSaved = getMappingPopDao().merge(mappingPop);
+        return mappingPopRecordSaved.getDatasetId();
+    }
+
     private Integer saveMappingPopValues(Integer datasetId, Integer markerId, MappingPopValues mappingPopValues) throws Exception {
         if (mappingPopValues == null) {
             return null;
@@ -2256,7 +2763,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         MappingPopValuesDAO mappingPopValuesDao = getMappingPopValuesDao();
         mappingPopValues.setDatasetId(datasetId);
-        mappingPopValues.setMarkerId(markerId);
+        if (markerId != null){
+        	mappingPopValues.setMarkerId(markerId);
+        }
 
         Integer mpId = mappingPopValuesDao.getNegativeId("mpId");
         mappingPopValues.setMpId(mpId);
@@ -2269,6 +2778,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return mappingPopValuesSavedId;
     }
+    
+    private Integer updateMappingPopValues(MappingPopValues mappingPopValues) throws MiddlewareException, MiddlewareQueryException{ 
+    	
+    	if (mappingPopValues == null || mappingPopValues.getMpId() == null){
+    		throw new MiddlewareException("MappingPopValues is null and cannot be updated.");
+    	}
+    	
+        requireLocalDatabaseInstance();
+        MappingPopValues recordSaved = getMappingPopValuesDao().merge(mappingPopValues);
+        return recordSaved.getMpId();
+    }
+
+
 
     private Integer saveAlleleValues(Integer datasetId, Integer markerId, AlleleValues alleleValues) throws Exception {
         if (alleleValues == null) {
@@ -2295,6 +2817,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return alleleValuesSavedId;
     }
+    
+    private Integer updateAlleleValues(AlleleValues alleleValues) throws MiddlewareException, MiddlewareQueryException{ 
+    	
+    	if (alleleValues == null || alleleValues.getAnId() == null){
+    		throw new MiddlewareException("AlleleValues is null and cannot be updated.");
+    	}
+    	
+        requireLocalDatabaseInstance();
+        AlleleValues recordSaved = getAlleleValuesDao().merge(alleleValues);
+        return recordSaved.getAnId();
+    }
 
     private Integer saveDartValues(Integer datasetId, Integer markerId, DartValues dartValues) throws Exception {
 
@@ -2319,6 +2852,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return dartValuesSavedId;
     }
+    
+    private Integer updateDartValues(DartValues dartValues) throws MiddlewareException, MiddlewareQueryException{ 
+    	
+    	if (dartValues == null || dartValues.getAdId() == null){
+    		throw new MiddlewareException("DartValues is null and cannot be updated.");
+    	}
+    	
+        requireLocalDatabaseInstance();
+        DartValues recordSaved = getDartValuesDao().merge(dartValues);
+        return recordSaved.getAdId();
+    }
+
 
     // GCP-7873
     @Override
@@ -2380,4 +2925,302 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         return returnVal;
     }
+    
+    @Override
+    public List<DartDataRow> getDartDataRows(Integer datasetId) throws MiddlewareQueryException{
+    	List<DartDataRow> toReturn = new ArrayList<DartDataRow>();
+
+    	// Get MarkerMetadataSets of the given datasetId
+    	List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), 
+    			datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), 
+    			datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AlleleValues> alleleValues = super.getFromInstanceByIdAndMethod(getAlleleValuesDao(), 
+    			datasetId, "getAlleleValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<DartValues> dartValues = super.getFromInstanceByIdAndMethod(getDartValuesDao(), 
+    			datasetId, "getDartValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
+			
+    		Integer markerId = markerMetadataSet.getMarkerId();
+    		super.setWorkingDatabase(markerId, getMarkerDao());
+    		Marker marker = getMarkerDao().getById(markerId);
+    		
+    		for (AccMetadataSet accMetadataSet : accMetadataSets){
+    			
+    			Integer gid = accMetadataSet.getGermplasmId();
+    			
+    			AlleleValues alleleValue = null;
+    			for (AlleleValues value : alleleValues){
+    				if (value.getDatasetId().equals(datasetId)
+    						&&	value.getGid().equals(gid)
+    						&& value.getMarkerId().equals(markerId)){
+    					alleleValue = value;
+    				}
+    			}
+    			
+    			DartValues dartValue = null;
+    			for (DartValues value : dartValues){
+    				if (value.getDatasetId().equals(datasetId)
+    						&& value.getMarkerId().equals(markerId)){
+    					dartValue = value;
+    				}
+    			}
+    			
+    			if (alleleValue != null){	
+    				toReturn.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue, dartValue));
+    			}
+				break;
+
+    		}
+    	}
+		
+    	return toReturn;
+    }
+    
+    @Override
+    public List<SNPDataRow> getSNPDataRows(Integer datasetId) throws MiddlewareQueryException{
+    	List<SNPDataRow> toReturn = new ArrayList<SNPDataRow>();
+
+    	// Get MarkerMetadataSets of the given datasetId
+    	List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), 
+    			datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), 
+    			datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<CharValues> charValues = super.getFromInstanceByIdAndMethod(getCharValuesDao(), 
+    			datasetId, "getCharValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
+			
+    		Integer markerId = markerMetadataSet.getMarkerId();
+    		super.setWorkingDatabase(markerId, getMarkerDao());
+    		Marker marker = getMarkerDao().getById(markerId);
+    		
+    		for (AccMetadataSet accMetadataSet : accMetadataSets){
+    			
+    			Integer gid = accMetadataSet.getGermplasmId();
+    			
+    			for (CharValues charValue : charValues){
+    				if (charValue.getDatasetId().equals(datasetId)
+    						&&	charValue.getGid().equals(gid)
+    						&& charValue.getMarkerId().equals(markerId)){
+    					if (charValue != null){
+	    					toReturn.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValue));   
+	    					break;
+    					}
+    				}
+    			}
+    		}
+    	}
+		
+    	return toReturn;
+    }
+    
+    
+    @Override
+    public List<SSRDataRow> getSSRDataRows(Integer datasetId) throws MiddlewareQueryException{
+    	List<SSRDataRow> toReturn = new ArrayList<SSRDataRow>();
+
+    	// Get MarkerMetadataSets of the given datasetId
+    	List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), 
+    			datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), 
+    			datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AlleleValues> alleleValues = super.getFromInstanceByIdAndMethod(getAlleleValuesDao(), 
+    			datasetId, "getAlleleValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
+			
+    		Integer markerId = markerMetadataSet.getMarkerId();
+    		super.setWorkingDatabase(markerId, getMarkerDao());
+    		Marker marker = getMarkerDao().getById(markerId);
+    		
+    		for (AccMetadataSet accMetadataSet : accMetadataSets){
+    			
+    			Integer gid = accMetadataSet.getGermplasmId();
+    			
+    			for (AlleleValues alleleValue : alleleValues){
+    				if (alleleValue.getDatasetId().equals(datasetId)
+    						&&	alleleValue.getGid().equals(gid)
+    						&& alleleValue.getMarkerId().equals(markerId)){
+    					if (alleleValue != null){
+    						toReturn.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue));   
+    						break;
+    					}
+
+    				}
+    			}
+    		}
+    	}
+		
+    	return toReturn;
+    }
+
+
+    @Override
+    public List<MappingABHRow> getMappingABHRows(Integer datasetId) throws MiddlewareQueryException{
+    	List<MappingABHRow> toReturn = new ArrayList<MappingABHRow>();
+
+    	List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), 
+    			datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), 
+    			datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<MappingPopValues> mappingPopValues = super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(), 
+    			datasetId, "getMappingPopValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+    	
+		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
+			
+    		Integer markerId = markerMetadataSet.getMarkerId();
+    		super.setWorkingDatabase(markerId, getMarkerDao());
+    		Marker marker = getMarkerDao().getById(markerId);
+    		
+    		for (AccMetadataSet accMetadataSet : accMetadataSets){
+    			
+    			Integer gid = accMetadataSet.getGermplasmId();
+    			
+    			for (MappingPopValues mappingPopValue : mappingPopValues){
+    				if (mappingPopValue.getDatasetId().equals(datasetId)
+    						&&	mappingPopValue.getGid().equals(gid)
+    						&& mappingPopValue.getMarkerId().equals(markerId)){
+    					if (mappingPopValue != null){
+    						toReturn.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue));   
+    						break;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+    	return toReturn;
+    }
+
+    @Override
+    public List<MappingAllelicSNPRow> getMappingAllelicSNPRows(Integer datasetId) throws MiddlewareQueryException{
+    	List<MappingAllelicSNPRow> toReturn = new ArrayList<MappingAllelicSNPRow>();
+
+    	List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), 
+    			datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), 
+    			datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<MappingPopValues> mappingPopValues = super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(), 
+    			datasetId, "getMappingPopValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<CharValues> charValues = super.getFromInstanceByIdAndMethod(getCharValuesDao(), 
+    			datasetId, "getCharValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+    	
+		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
+			
+    		Integer markerId = markerMetadataSet.getMarkerId();
+    		super.setWorkingDatabase(markerId, getMarkerDao());
+    		Marker marker = getMarkerDao().getById(markerId);
+    		
+    		for (AccMetadataSet accMetadataSet : accMetadataSets){
+    			
+    			Integer gid = accMetadataSet.getGermplasmId();
+    			
+    			MappingPopValues mappingPopValue = null;
+    			for (MappingPopValues value : mappingPopValues){
+    				if (value.getDatasetId().equals(datasetId)
+    						&&	value.getGid().equals(gid)
+    						&& value.getMarkerId().equals(markerId)){
+    					
+    					mappingPopValue = value;
+    					break;
+    				}
+    			}
+
+    			CharValues charValue = null;
+    			for (CharValues value : charValues){
+    				if (value.getDatasetId().equals(datasetId) && value.getGid().equals(gid)){
+    					charValue = value;
+    					break;
+    				}
+    			}
+    		
+    			if (mappingPopValue != null){
+    				toReturn.add(new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue, charValue));
+    			}
+
+    		}
+    	}
+
+    	return toReturn;
+    }
+    
+    @Override
+    public List<MappingAllelicSSRDArTRow> getMappingAllelicSSRDArTRows(Integer datasetId) throws MiddlewareQueryException{
+    	List<MappingAllelicSSRDArTRow> toReturn = new ArrayList<MappingAllelicSSRDArTRow>();
+
+    	List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), 
+    			datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), 
+    			datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<AlleleValues> alleleValues = super.getFromInstanceByIdAndMethod(getAlleleValuesDao(), 
+    			datasetId, "getAlleleValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<DartValues> dartValues = super.getFromInstanceByIdAndMethod(getDartValuesDao(), 
+    			datasetId, "getDartValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+
+    	List<MappingPopValues> mappingPopValues = super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(), 
+    			datasetId, "getMappingPopValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+    	
+		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
+			
+    		Integer markerId = markerMetadataSet.getMarkerId();
+    		super.setWorkingDatabase(markerId, getMarkerDao());
+    		Marker marker = getMarkerDao().getById(markerId);
+    		
+    		for (AccMetadataSet accMetadataSet : accMetadataSets){
+    			
+    			Integer gid = accMetadataSet.getGermplasmId();
+    			
+    			MappingPopValues mappingPopValue = null;
+    			for (MappingPopValues value : mappingPopValues){
+    				if (value.getDatasetId().equals(datasetId) &&	value.getGid().equals(gid) && value.getMarkerId().equals(markerId)){
+    					mappingPopValue = value;
+    					break;
+    				}
+    			}
+
+    			DartValues dartValue = null;
+    			for (DartValues value : dartValues){
+    				if (value.getDatasetId().equals(datasetId) && value.getMarkerId().equals(markerId)){
+    					dartValue = value;
+    					break;
+    				}
+    			}
+    			
+    			AlleleValues alleleValue = null;
+    			for (AlleleValues value : alleleValues){
+    				if (value.getDatasetId().equals(datasetId) && value.getMarkerId().equals(markerId) && value.getGid().equals(gid)){
+    					alleleValue = value;
+    					break;
+    				}
+    			}
+    		
+    			if (mappingPopValue != null){
+    				toReturn.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue, alleleValue, dartValue));
+    			}
+
+    		}
+    	}
+
+    	return toReturn;
+    }
+
+    
+
 }

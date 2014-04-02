@@ -14,9 +14,11 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GdmsTable;
+import org.generationcp.middleware.manager.GdmsType;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
@@ -143,23 +145,22 @@ public interface GenotypicDataManager{
 
     /**
      * Gets map information given a list of markers and mapId.
-     * 
-     * @param instance
-     * @param markers
-     * @param mapId
-     * @return
-     * @throws MiddlewareQueryException 
+     *
+     * @param instance the instance
+     * @param markers the markers
+     * @param mapId the map id
+     * @return the map info by markers and map
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<MapInfo> getMapInfoByMarkersAndMap(Database instance, List<Integer> markers, Integer mapId) throws MiddlewareQueryException;
     
     /**
      * Gets map information given a list of markers and mapId from both local and central database.
-     * 
-     * @param instance
-     * @param markers
-     * @param mapId
-     * @return
-     * @throws MiddlewareQueryException 
+     *
+     * @param markers the markers
+     * @param mapId the map id
+     * @return the all map info by markers and map
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<MapInfo> getAllMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException;
     
@@ -1367,6 +1368,7 @@ public interface GenotypicDataManager{
      */
     Boolean setSSRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
     
+    
     /**
      * Sets SNP Markers.
      *
@@ -1430,6 +1432,19 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<DartDataRow> rows) throws MiddlewareQueryException;
+   
+    
+    /**
+     * Update DArT Records.
+     *
+     * @param dataset the Dataset
+     * @param rows the rows to update
+     * @return true if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Boolean updateDart(Dataset dataset, List<DartDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
+    
     
     /**
      * Sets SSR
@@ -1447,6 +1462,18 @@ public interface GenotypicDataManager{
 
     
     /**
+     * Update SSR Records.
+     *
+     * @param dataset the Dataset
+     * @param rows the rows to update
+     * @return true if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Boolean updateSSR(Dataset dataset, List<SSRDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
+
+    
+    /**
      * Sets SNP
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
@@ -1459,6 +1486,18 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<SNPDataRow> rows) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Update SNP Recrods.
+     *
+     * @param dataset the Dataset
+     * @param rows the rows to update
+     * @return true if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Boolean updateSNP(Dataset dataset, List<SNPDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * Sets Mapping Data of type ABH
@@ -1475,7 +1514,20 @@ public interface GenotypicDataManager{
      */
     Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingABHRow> rows) 
             throws MiddlewareQueryException;
+
     
+    /**
+     * Update Mapping ABH Records.
+     *
+     * @param dataset the dataset
+     * @param mappingPop the mapping pop
+     * @param rows the rows to update
+     * @return true if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop, List<MappingABHRow> rows) throws MiddlewareQueryException, MiddlewareException;
+
     /**
      * Sets Mapping Data of Allelic SNP
      * 
@@ -1492,6 +1544,20 @@ public interface GenotypicDataManager{
     Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingAllelicSNPRow> rows) 
             throws MiddlewareQueryException;
     
+
+    /**
+     * Update Mapping Allelic SNP Record.
+     *
+     * @param dataset the Dataset
+     * @param mappingPop the mapping pop
+     * @param rows the rows to update
+     * @return true if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException, MiddlewareException;
+
+    
     /**
      * Sets Mapping Data of Allelic SSR DArT
      * 
@@ -1507,7 +1573,20 @@ public interface GenotypicDataManager{
      */
     Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser,  MappingPop mappingPop, 
             List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException;
- 
+
+    /**
+     * Update Mapping Allelic SSR DArT records.
+     *
+     * @param dataset the Dataset
+     * @param mappingPop the mapping pop
+     * @param rows the rows to update
+     * @return true if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Boolean updateMappingAllelicSSRDArT(Dataset dataset, MappingPop mappingPop, List<MappingAllelicSSRDArTRow> rows) 
+    		throws MiddlewareQueryException, MiddlewareException;
+
     /**
      * Sets Maps.
      *
@@ -1718,6 +1797,36 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     Dataset getDatasetById(Integer datasetId) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the datasets by type.
+     *
+     * @param type the type
+     * @return the datasets by type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Dataset> getDatasetsByType(GdmsType type) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the datasets by mapping type from local.
+     *
+     * @param type the type
+     * @return the datasets by mapping type from local
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Dataset> getDatasetsByMappingTypeFromLocal(GdmsType type) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the mapping pop by dataset id.
+     *
+     * @param datasetId the dataset id
+     * @return the mapping pop by dataset id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    MappingPop getMappingPopByDatasetId(Integer datasetId) throws MiddlewareQueryException;
+    
+    
     
     /**
      * Returns the Dataset details given a list of dataset IDs.
@@ -1937,4 +2046,60 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<AlleleValues> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
+    
+
+    /**
+     * Gets the dart data rows.
+     *
+     * @param datasetId the dataset id
+     * @return the dart data rows
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<DartDataRow> getDartDataRows(Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the sNP data rows.
+     *
+     * @param datasetId the dataset id
+     * @return the sNP data rows
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<SNPDataRow> getSNPDataRows(Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the sSR data rows.
+     *
+     * @param datasetId the dataset id
+     * @return the sSR data rows
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<SSRDataRow> getSSRDataRows(Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the mapping abh rows.
+     *
+     * @param datasetId the dataset id
+     * @return the mapping abh rows
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<MappingABHRow> getMappingABHRows(Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the mapping allelic snp rows.
+     *
+     * @param datasetId the dataset id
+     * @return the mapping allelic snp rows
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<MappingAllelicSNPRow> getMappingAllelicSNPRows(Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the mapping allelic ssrd ar t rows.
+     *
+     * @param datasetId the dataset id
+     * @return the mapping allelic ssrd ar t rows
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<MappingAllelicSSRDArTRow> getMappingAllelicSSRDArTRows(Integer datasetId) throws MiddlewareQueryException;
+
 }
