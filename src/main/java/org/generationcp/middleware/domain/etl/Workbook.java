@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
@@ -51,11 +52,15 @@ public class Workbook {
 	
 	private boolean isCheckFactorAddedOnly;
 	
+	private Integer totalNumberOfInstances;
+	
 	private Map<String, MeasurementVariable> measurementDatasetVariablesMap; //added for optimization
 	
 	private Integer studyId;
 	private Integer trialDatasetId;
 	private Integer measurementDatesetId;
+	
+	private List<MeasurementRow> trialObservations;
 
 	public void reset() {
 		trialHeaders = null;
@@ -598,4 +603,56 @@ public class Workbook {
 		this.measurementDatesetId = measurementDatesetId;
 	}
 	
+	public Map<Long, List<MeasurementRow>> segregateByTrialInstances() {
+		Map<Long, List<MeasurementRow>> map = new HashMap<Long, List<MeasurementRow>>();
+		
+		if (this.observations != null) {
+			for (MeasurementRow row : this.observations) {
+				Long locationId = row.getLocationId();
+				List<MeasurementRow> list = map.get(locationId);
+				if (list == null) {
+					list = new ArrayList<MeasurementRow>();
+					map.put(locationId, list);
+				}
+				list.add(row);
+			}
+		}
+		
+		this.totalNumberOfInstances = map.size();
+		return map;
+	}
+	
+	public int getTotalNumberOfInstances() {
+		if (this.totalNumberOfInstances == null) {
+			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+			this.totalNumberOfInstances = map.size();
+		}
+		return this.totalNumberOfInstances;
+	}
+
+	/**
+	 * @return the trialObservations
+	 */
+	public List<MeasurementRow> getTrialObservations() {
+		return trialObservations;
+	}
+
+	/**
+	 * @param trialObservations the trialObservations to set
+	 */
+	public void setTrialObservations(List<MeasurementRow> trialObservations) {
+		this.trialObservations = trialObservations;
+	}
+	
+	
+	public MeasurementRow getTrialObservation(long locationId) {
+		if (this.trialObservations != null) {
+			for (MeasurementRow row : this.trialObservations) {
+				if (row.getLocationId() == locationId) {
+					return row;
+				}
+			}
+		}
+		return null;
+	}
 }

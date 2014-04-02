@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
@@ -37,6 +38,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class WorkbookBuilder extends Builder {
@@ -53,6 +55,8 @@ public class WorkbookBuilder extends Builder {
 	}
 	
 	public Workbook create(int id, StudyType studyType) throws MiddlewareQueryException {
+		boolean isTrial = studyType == StudyType.T;
+		
 		Workbook workbook = new Workbook();
 		
 		/*
@@ -94,11 +98,20 @@ public class WorkbookBuilder extends Builder {
 		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
 		VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
 		
-		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
-		List<MeasurementVariable> factors = buildFactors(experiments);
+		VariableList conditionVariables = null;
+		if (isTrial) {
+			conditionVariables = new VariableList();
+			conditionVariables.addAll(study.getConditions());
+			conditionVariables.addAll(getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId));
+		}
+		else {
+			conditionVariables = study.getConditions();
+		}
+		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true);
+		List<MeasurementVariable> factors = buildFactors(experiments, isTrial);
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
 		List<MeasurementVariable> variates = buildVariates(variables); //buildVariates(experiments);
-		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates);
+		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates, isTrial);
 		
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
@@ -106,6 +119,11 @@ public class WorkbookBuilder extends Builder {
 		workbook.setConditions(conditions);
 		workbook.setConstants(constants);
 		workbook.setObservations(observations);
+		
+		if (isTrial) {
+			List<MeasurementRow> trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
+			workbook.setTrialObservations(trialObservations);
+		}
 		
 		return workbook;
 	}
@@ -170,7 +188,8 @@ public class WorkbookBuilder extends Builder {
 	}
 	
 	private List<MeasurementRow> buildObservations(List<Experiment> experiments, VariableTypeList variateTypes,
-			List<MeasurementVariable> factorList, List<MeasurementVariable> variateList) {
+			List<MeasurementVariable> factorList, List<MeasurementVariable> variateList, boolean isTrial) {
+		
 	    List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 	   
 	    for (Experiment experiment : experiments) {
@@ -181,7 +200,10 @@ public class WorkbookBuilder extends Builder {
 	        
 	        for (Variable variable : factors.getVariables()) {
 	        	
-	            if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
+	        	if (isTrial && 
+	        			variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
+	        			|| !PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
+	        		
 	            	MeasurementData measurementData = null;
 	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
@@ -195,7 +217,7 @@ public class WorkbookBuilder extends Builder {
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                                 variable.getValue(), false, 
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
+                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
 	            	}
                     
 	            	measurementDataList.add(measurementData);
@@ -214,6 +236,7 @@ public class WorkbookBuilder extends Builder {
 	        
 	        MeasurementRow measurementRow = new MeasurementRow(measurementDataList);
 	        measurementRow.setExperimentId(experimentId);
+	        measurementRow.setLocationId(experiment.getLocationId());
 	        
 	        observations.add(measurementRow);
 	    }
@@ -249,12 +272,14 @@ public class WorkbookBuilder extends Builder {
 		return getMeasurementVariableTransformer().transform(variableList, isFactor);
 	}
 	
-	private List<MeasurementVariable> buildFactors(List<Experiment> experiments) {
+	private List<MeasurementVariable> buildFactors(List<Experiment> experiments, boolean isTrial) {
 	    List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 	    VariableTypeList factorList = new VariableTypeList();
             for (Experiment experiment : experiments) {
                 for (Variable variable : experiment.getFactors().getVariables()) {
-                    if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
+                    if (isTrial && 
+    	        			variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
+    	        			|| !PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
                         factorList.add(variable.getVariableType());
                     }
                 }
@@ -344,6 +369,72 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 		return "";
+	}
+	
+	private VariableList getSingleRowOfEmptyTrialVariables(Workbook workbook, int studyId, int measurementDatasetId) throws MiddlewareQueryException {
+		DmsProject trialProject = getDataSetBuilder().getTrialDataset(studyId, measurementDatasetId);
+//		int totalRows = (int) getStudyDataManager().countExperiments(trialProject.getProjectId());
+//		List<Experiment> experiments = getStudyDataManager().getExperiments(trialProject.getProjectId(), 0, totalRows);
+//		
+//		if (experiments != null && !experiments.isEmpty()) {
+//			return experiments.get(0).getFactors();
+//		}
+//		return null;
+		DataSet dataset = getDataSetBuilder().build(trialProject.getProjectId());
+		VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
+		VariableList list = new VariableList();
+		for (VariableType type : typeList.getVariableTypes()) {
+			list.add(new Variable(type, (String) null));
+		}
+		workbook.setTrialDatasetId(dataset.getId());
+		return list;
+	}
+	
+	private List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
+	throws MiddlewareQueryException {
+		
+		int totalRows = (int) getStudyDataManager().countExperiments(trialDatasetId);
+		List<Experiment> experiments = getStudyDataManager().getExperiments(trialDatasetId, 0, totalRows);
+		
+		List<MeasurementRow> rows = new ArrayList<MeasurementRow>();
+		if (experiments != null) {
+			for (Experiment experiment : experiments) {
+				List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+				for (Variable variable : experiment.getFactors().getVariables()) {
+					MeasurementData measurementData = null;
+	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+                        		variable.getDisplayValue(), false, 
+                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+                                id,
+                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
+	            	}
+	            	else {
+                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+                                variable.getValue(), false, 
+                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
+	            	}
+	            	dataList.add(measurementData);
+				}
+		        for (Variable variable : experiment.getVariates().getVariables()) {
+                    MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+                            variable.getValue(), true,  
+                            getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+                            variable.getVariableType().getStandardVariable().getDataType().getId(),
+                            getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
+                    measurementData.setPhenotypeId(variable.getPhenotypeId());
+	            	dataList.add(measurementData);
+                }
+	        
+				MeasurementRow row = new MeasurementRow(dataList);
+				row.setExperimentId(experiment.getId());
+				row.setLocationId(experiment.getLocationId());
+				rows.add(row);
+			}
+		}
+		return rows;
 	}
 	
 }
