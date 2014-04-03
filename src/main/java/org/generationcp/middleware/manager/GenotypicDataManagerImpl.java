@@ -31,12 +31,9 @@ import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
-import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
-import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
-import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -2524,10 +2521,40 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return markerId;
     }
     
+    private void updateMarker(Marker marker) throws Exception {
+    	
+        if (marker == null || marker.getMarkerId() == null){
+        	throw new MiddlewareException("Marker is null and cannot be updated.");
+        }
+        
+        requireLocalDatabaseInstance();
+        MarkerDAO markerDao = getMarkerDao();
+        
+        // Marker id, name and species cannot be updated.
+        Marker markerFromDB = markerDao.getById(marker.getMarkerId());
+        if (markerFromDB == null){
+        	throw new MiddlewareException("Marker is not found in the database and cannot be updated.");
+        }
+        if (!marker.getMarkerName().equals(markerFromDB.getMarkerName()) || !marker.getSpecies().equals(markerFromDB.getSpecies())){
+        	throw new MiddlewareException("Marker name and species cannot be updated.");
+        }
+        
+        markerDao.merge(marker);
+        
+    }
+
     private Integer saveMarkerAlias(MarkerAlias markerAlias) throws Exception {
         requireLocalDatabaseInstance();
-        MarkerAliasDAO markerAliasDao = getMarkerAliasDao();
-        MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
+        MarkerAlias markerAliasRecordSaved = getMarkerAliasDao().save(markerAlias);
+        Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
+        if (markerAliasRecordSavedMarkerId == null) {
+            throw new Exception();
+        }
+        return markerAliasRecordSavedMarkerId;
+    }
+    private Integer saveOrUpdateMarkerAlias(MarkerAlias markerAlias) throws Exception {
+        requireLocalDatabaseInstance();
+        MarkerAlias markerAliasRecordSaved = getMarkerAliasDao().merge(markerAlias);
         Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
         if (markerAliasRecordSavedMarkerId == null) {
             throw new Exception();
@@ -2537,9 +2564,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     private Integer saveMarkerDetails(MarkerDetails markerDetails) throws Exception {
         requireLocalDatabaseInstance();
-        MarkerDetailsDAO markerDetailsDao = getMarkerDetailsDao();
-
-        MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
+        MarkerDetails markerDetailsRecordSaved = getMarkerDetailsDao().save(markerDetails);
+        Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
+        if (markerDetailsSavedMarkerId == null) {
+            throw new Exception();
+        }
+        return markerDetailsSavedMarkerId;
+    }
+    private Integer saveOrUpdateMarkerDetails(MarkerDetails markerDetails) throws Exception {
+        requireLocalDatabaseInstance();
+        MarkerDetails markerDetailsRecordSaved = getMarkerDetailsDao().merge(markerDetails);
         Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
         if (markerDetailsSavedMarkerId == null) {
             throw new Exception();
@@ -2549,9 +2583,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     private Integer saveMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
         requireLocalDatabaseInstance();
-        MarkerUserInfoDAO dao = getMarkerUserInfoDao();
+        MarkerUserInfo markerUserInfoRecordSaved = getMarkerUserInfoDao().save(markerUserInfo);
+        Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
+        if (markerUserInfoSavedId == null) {
+            throw new Exception();
+        }
+        return markerUserInfoSavedId;
+    }
 
-        MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
+    private Integer saveOrUpdateMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
+        requireLocalDatabaseInstance();
+        MarkerUserInfo markerUserInfoRecordSaved = getMarkerUserInfoDao().merge(markerUserInfo);
         Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
         if (markerUserInfoSavedId == null) {
             throw new Exception();
@@ -3220,6 +3262,57 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     	return toReturn;
     }
+    
+    @Override
+    public Boolean updateMarkerInfo(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) 
+    		throws MiddlewareQueryException{
+	
+	    Session session = requireLocalDatabaseInstance();
+	    Transaction trans = null;
+
+		try {
+			trans = session.beginTransaction();
+
+			// Update GDMS Marker - update all fields except marker_id, marker_name and species
+			updateMarker(marker);
+			Integer markerId = marker.getMarkerId();
+
+			// Add or Update GDMS Marker Alias
+			markerAlias.setMarkerId(markerId);
+			saveOrUpdateMarkerAlias(markerAlias);
+
+			// Add or Update Marker Details
+			markerDetails.setMarkerId(markerId);
+			saveOrUpdateMarkerDetails(markerDetails);
+
+			// Add or update marker user info
+			markerUserInfo.setMarkerId(markerId);
+			saveOrUpdateMarkerUserInfo(markerUserInfo);
+
+			trans.commit();
+			return true;
+
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException(
+					"Error encountered while updating MarkerInfo: updateMarkerInfo(marker="
+							+ marker + ", markerAlias=" + markerAlias
+							+ ", markerDetails=" + markerDetails
+							+ ", markerUserInfo=" + markerUserInfo + "): "
+							+ e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+		return false;
+
+	}
+
+    @Override
+    public List<DartValues> getDartMarkerDetails(List<Integer> markerIds) throws MiddlewareQueryException{
+    	return super.getAllFromCentralAndLocalByMethod(getDartValuesDao(), "getDartValuesByMarkerIds"
+    			, new Object[]{markerIds}, new Class[]{List.class});
+    }
+
 
     
 

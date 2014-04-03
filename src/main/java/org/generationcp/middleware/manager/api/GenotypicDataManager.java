@@ -2102,4 +2102,30 @@ public interface GenotypicDataManager{
      */
     List<MappingAllelicSSRDArTRow> getMappingAllelicSSRDArTRows(Integer datasetId) throws MiddlewareQueryException;
 
+    
+    /**
+     * Update marker info.
+     *
+     * @param marker the marker
+     * @param markerAlias the marker alias
+     * @param markerDetails the marker details
+     * @param markerUserInfo the marker user info
+     * @return the boolean
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Boolean updateMarkerInfo(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) 
+    		throws MiddlewareQueryException;
+
+    /**
+     * Gets the dart marker details.
+     *
+     * @param markerIds the marker ids
+     * @return the dart marker details
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<DartValues> getDartMarkerDetails(List<Integer> markerIds) throws MiddlewareQueryException;
+
+
 }
+
+

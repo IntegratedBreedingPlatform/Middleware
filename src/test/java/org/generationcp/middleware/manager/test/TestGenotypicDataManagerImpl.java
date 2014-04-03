@@ -1488,11 +1488,11 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetSNPMarkers() throws Exception {
-        List<Object> markerRecrods = createMarkerMarkeRecords();
-        Marker marker = (Marker) markerRecrods.get(0);
-        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
-        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
-        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
+        List<Object> markerRecords = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecords.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
 
         Boolean addStatus = manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         if (addStatus) {
@@ -1506,11 +1506,11 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetCAPMarkers() throws Exception {
-        List<Object> markerRecrods = createMarkerMarkeRecords();
-        Marker marker = (Marker) markerRecrods.get(0);
-        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
-        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
-        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
+        List<Object> markerRecords = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecords.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
 
         Boolean addStatus = manager.setCAPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         if (addStatus) {
@@ -1524,11 +1524,11 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetCISRMarkers() throws Exception {
-        List<Object> markerRecrods = createMarkerMarkeRecords();
-        Marker marker = (Marker) markerRecrods.get(0);
-        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
-        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
-        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
+        List<Object> markerRecords = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecords.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
 
         Boolean addStatus = manager.setCISRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         if (addStatus) {
@@ -2734,6 +2734,51 @@ public class TestGenotypicDataManagerImpl{
         manager.addMTA(dataset, mta, users);
         Debug.println(0, "done with testAddMTA");
     }
+    
+    @Test
+    public void testGetDartMarkerDetails() throws Exception {
+    	List<Integer> markerIds = Arrays.asList(-1, -2);
+        List<DartValues> result = manager.getDartMarkerDetails(markerIds);
+        Debug.printObjects(0, result);
+    }
+    
+
+    @Test
+    public void testUpdateMarkerInfo() throws Exception {
+    	// Update existing Marker, MarkerAlias, MarkerDetails, MarkerUserIno
+        List<Object> markerRecords = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecords.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
+
+        // Insert first
+        Boolean addStatus = manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
+        if (addStatus) {
+            Debug.println(0, "Added: ");
+            Debug.println(3, marker.toString());
+            Debug.println(3, markerAlias.toString());
+            Debug.println(3, markerDetails.toString());
+            Debug.println(3, markerUserInfo.toString());
+        }
+
+        Integer updateId = (int) (Math.random() * 100);
+        marker.setRemarks("UPDATE" + updateId);
+        markerAlias.setAlias(markerAlias.getAlias() + updateId);
+        markerDetails.setSequence(updateId.toString());
+        markerUserInfo.setContact(updateId.toString());
+        
+        addStatus = manager.updateMarkerInfo(marker, markerAlias, markerDetails, markerUserInfo);
+        if (addStatus) {
+            Debug.println(0, "Updated: ");
+            Debug.println(3, marker.toString());
+            Debug.println(3, markerAlias.toString());
+            Debug.println(3, markerDetails.toString());
+            Debug.println(3, markerUserInfo.toString());
+        }
+
+    }
+    
 
     @AfterClass
     public static void tearDown() throws Exception {
