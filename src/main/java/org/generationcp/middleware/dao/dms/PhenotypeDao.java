@@ -31,9 +31,11 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -735,5 +737,24 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	                            + e.getMessage(), e);
 	    }
 	    return 0;
+	}
+
+	public List<Phenotype> getByTypeAndValue(int typeId, String value, boolean isEnumeration) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("observableId", typeId));
+			if (isEnumeration) {
+				criteria.add(Restrictions.eq("cValueId", value));
+			}
+			else {
+				criteria.add(Restrictions.eq("value", value));
+			}
+			return criteria.list();
+			
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getByTypeAndValue("    + typeId + ", " + value + ") in PhenotypeDao: " + e.getMessage(), e);
+		}
+		return new ArrayList<Phenotype>();
 	}
 }

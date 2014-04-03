@@ -129,19 +129,18 @@ public class StandardVariableSaver extends Saver {
         
 	}
 	
-    public void saveEnumeration(StandardVariable variable, Enumeration enumeration) 
+    public void saveEnumeration(StandardVariable variable, Enumeration enumeration, Integer cvId) 
             throws MiddlewareException, MiddlewareQueryException{
 
         requireLocalDatabaseInstance();
         
         validateInputEnumeration(variable, enumeration);
         
-        // Check if cv entry of enumeration already exists
-        // Add cv entry of the standard variable if none found
-        Integer cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
-        if (cvId == null){
-            cvId = createCv(variable).getCvId();
-        }
+//        // Check if cv entry of enumeration already exists
+//        // Add cv entry of the standard variable if none found
+//        if (cvId == null){
+//            cvId = createCv(variable).getCvId();
+//        }
         
         //Save cvterm entry of the new valid value
         CVTerm cvTerm = createCvTerm(enumeration, cvId);
@@ -151,7 +150,7 @@ public class StandardVariableSaver extends Saver {
         saveCvTermRelationship(variable.getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
         
     }
-	
+    
     private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException{
         String name = enumeration.getName();
         String definition = enumeration.getDescription();
@@ -170,7 +169,13 @@ public class StandardVariableSaver extends Saver {
         }
             
         if (errorMessage.length() > 0){
-            throw new MiddlewareException(errorMessage.toString());
+            
+            if (enumeration.getId() != null && errorMessage.toString().contains("already exists")
+                    && !errorMessage.toString().contains("null or empty")){
+                // Ignore. Operation is UPDATE.
+            } else {
+                throw new MiddlewareException(errorMessage.toString());
+            }
         } 
 
     }
@@ -208,9 +213,10 @@ public class StandardVariableSaver extends Saver {
         return cvTerm;
     }
 
-    private CV createCv(StandardVariable variable) throws MiddlewareQueryException{
+    public CV createCv(StandardVariable variable) throws MiddlewareQueryException{
+        requireLocalDatabaseInstance();
         CV cv = new CV();
-        cv.setCvId(getCvTermDao().getNegativeId("cvId"));
+        cv.setCvId(getCvDao().getNegativeId("cvId"));
         cv.setName(String.valueOf(variable.getId()));
         cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
         getCvDao().save(cv);

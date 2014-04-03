@@ -18,7 +18,7 @@ public class DatasetValuesTransformer extends Transformer {
 				super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public DatasetValues  transform(String name, String description, DataSetType type, List<MeasurementVariable> mvList, VariableTypeList varTypeList) throws MiddlewareQueryException {
+	public DatasetValues transform(String name, String description, DataSetType type, List<MeasurementVariable> mvList, VariableTypeList varTypeList) throws MiddlewareQueryException {
 		DatasetValues dataValues = new DatasetValues();
 		
 		dataValues.setName(name);

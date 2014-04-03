@@ -77,8 +77,14 @@ public class VariableListTransformer extends Transformer {
 		}
 		*/
 		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
-		for(Integer index : variableIndexesList)
-			variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
+		for(Integer index : variableIndexesList) {
+			if (nonTrialMD.get(index).getcValueId() != null) {
+				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getcValueId()));
+			}
+			else {
+				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
+			}
+		}
 		return variableList;
 	}
 	

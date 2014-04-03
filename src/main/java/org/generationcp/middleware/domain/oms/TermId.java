@@ -117,8 +117,10 @@ public enum TermId {
     , PLOT_NO (8200)
     , PLOT_NNO (8380)
     , REP_NO (8210)
-    , COLUMN_NO (32769)
-    , RANGE_NO (32770)
+    , COLUMN_NO (8400) //
+    //(32769)
+    , RANGE_NO (8410)
+    //(32770)
     , BLOCK_NAME (8221)
     , COLUMNS_IN_BLOCK (32772)
     , RANGES_IN_BLOCK (32773)
@@ -127,6 +129,7 @@ public enum TermId {
     , FIELD_NAME (32783)
     , FIELDMAP_UUID (32785)
     , MACHINE_ROW_CAPACITY (32787)
+    , BLOCK_ID (77783)
 	
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE(1030)

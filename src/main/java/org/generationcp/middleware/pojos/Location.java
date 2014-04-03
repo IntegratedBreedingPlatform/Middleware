@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -90,6 +91,12 @@ public class Location implements Serializable, Comparable<Location>{
     @Basic(optional = false)
     @Column(name = "lrplce")
     private Integer lrplce;
+    
+    @Transient
+    private Integer parentLocationId;
+    
+    @Transient
+    private String parentLocationName;
 
     public static String GET_ALL_BREEDING_LOCATIONS = "SELECT locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce, nnpid FROM location WHERE ltype IN (410, 411, 412) ORDER BY lname";
     public static String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
@@ -218,7 +225,35 @@ public class Location implements Serializable, Comparable<Location>{
         return this.getLocid();
     }
 
-    @Override
+    /**
+	 * @return the parentLocationName
+	 */
+	public String getParentLocationName() {
+		return parentLocationName;
+	}
+
+	/**
+	 * @param parentLocationName the parentLocationName to set
+	 */
+	public void setParentLocationName(String parentLocationName) {
+		this.parentLocationName = parentLocationName;
+	}
+
+	/**
+	 * @return the parentLocationId
+	 */
+	public Integer getParentLocationId() {
+		return parentLocationId;
+	}
+
+	/**
+	 * @param parentLocationId the parentLocationId to set
+	 */
+	public void setParentLocationId(Integer parentLocationId) {
+		this.parentLocationId = parentLocationId;
+	}
+
+	@Override
     public boolean equals(Object obj) {
     	 if (this == obj) {
              return true;
@@ -263,6 +298,8 @@ public class Location implements Serializable, Comparable<Location>{
         builder.append(cntryid);
         builder.append(", lrplce=");
         builder.append(lrplce);
+        builder.append(", parentLocationName=");
+        builder.append(parentLocationName);
         builder.append("]");
         return builder.toString();
     }

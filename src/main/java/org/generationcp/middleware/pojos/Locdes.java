@@ -17,12 +17,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for locdes table. 
@@ -40,19 +35,14 @@ public class Locdes implements Serializable{
     @Column(name = "ldid")
     private Integer ldid;
 
-    @ManyToOne(targetEntity = Location.class)
-    @JoinColumn(name = "locid", nullable = false)
-    private Location location;
+    @Column(name = "locid")
+    private Integer locationId;
 
-    @ManyToOne(targetEntity = UserDefinedField.class)
-    @JoinColumn(name = "dtype", nullable = false)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private UserDefinedField type;
+    @Column(name = "dtype")
+    private Integer typeId;
 
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name = "duid", nullable = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private User user;
+    @Column(name = "duid")
+    private Integer userId;
 
     @Basic(optional = false)
     @Column(name = "dval")
@@ -62,10 +52,8 @@ public class Locdes implements Serializable{
     @Column(name = "ddate")
     private Integer ddate;
 
-    @ManyToOne(targetEntity = Bibref.class)
-    @JoinColumn(name = "dref", nullable = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private Bibref reference;
+    @Column(name = "dref")
+    private Integer referenceId;
 
     public Locdes() {
     }
@@ -74,54 +62,54 @@ public class Locdes implements Serializable{
         return ldid;
     }
 
-    public Locdes(Integer ldid, Location location, UserDefinedField type, User user, String dval, Integer ddate, Bibref reference) {
+    public Locdes(Integer ldid, Integer locationId, Integer typeId, Integer userId, String dval, Integer ddate, Integer referenceId) {
         super();
         this.ldid = ldid;
-        this.location = location;
-        this.type = type;
-        this.user = user;
+        this.locationId = locationId;
+        this.typeId = typeId;
+        this.userId = userId;
         this.dval = dval;
         this.ddate = ddate;
-        this.reference = reference;
+        this.referenceId = referenceId;
     }
 
     public void setLdid(Integer ldid) {
         this.ldid = ldid;
     }
 
-    public Location getLocation() {
-        return location;
-    }
+    public Integer getLocationId() {
+		return locationId;
+	}
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
+	public void setLocationId(Integer locationId) {
+		this.locationId = locationId;
+	}
 
-    public UserDefinedField getType() {
-        return type;
-    }
+	public Integer getTypeId() {
+		return typeId;
+	}
 
-    public void setType(UserDefinedField type) {
-        this.type = type;
-    }
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
+	}
 
-    public User getUser() {
-        return user;
-    }
+	public Integer getUserId() {
+		return userId;
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
 
-    public Bibref getReference() {
-        return reference;
-    }
+	public Integer getReferenceId() {
+		return referenceId;
+	}
 
-    public void setReference(Bibref reference) {
-        this.reference = reference;
-    }
+	public void setReferenceId(Integer referenceId) {
+		this.referenceId = referenceId;
+	}
 
-    public String getDval() {
+	public String getDval() {
         return dval;
     }
 
@@ -163,18 +151,18 @@ public class Locdes implements Serializable{
         StringBuilder builder = new StringBuilder();
         builder.append("Locdes [ldid=");
         builder.append(ldid);
-        builder.append(", location=");
-        builder.append(location);
-        builder.append(", type=");
-        builder.append(type);
-        builder.append(", user=");
-        builder.append(user);
+        builder.append(", locationId=");
+        builder.append(locationId);
+        builder.append(", typeId=");
+        builder.append(typeId);
+        builder.append(", userId=");
+        builder.append(userId);
         builder.append(", dval=");
         builder.append(dval);
         builder.append(", ddate=");
         builder.append(ddate);
-        builder.append(", reference=");
-        builder.append(reference);
+        builder.append(", referenceId=");
+        builder.append(referenceId);
         builder.append("]");
         return builder.toString();
     }

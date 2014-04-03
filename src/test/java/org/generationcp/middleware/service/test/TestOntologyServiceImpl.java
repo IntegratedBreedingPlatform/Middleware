@@ -583,6 +583,16 @@ public class TestOntologyServiceImpl {
         assertNull(term);
     }
     
+    @Test
+    public void testValidateDeleteStandardVariableEnumeration() throws Exception {
+    	
+    	int standardVariableId = TermId.CHECK.getId();
+    	int enumerationId = -2;
+    	
+    	boolean found = ontologyService.validateDeleteStandardVariableEnumeration(standardVariableId, enumerationId);
+    	System.out.println("testValidateDeleteStandardVariableEnumeration " + found);
+    }
+    
 
     private StandardVariable createNewStandardVariable(int dataType) throws MiddlewareQueryException{
         String propertyName = "property name " + new Random().nextInt(10000);
