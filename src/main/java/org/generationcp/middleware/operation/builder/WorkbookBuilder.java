@@ -105,6 +105,7 @@ public class WorkbookBuilder extends Builder {
 			conditionVariables.addAll(getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId));
 		}
 		else {
+			getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
 			conditionVariables = study.getConditions();
 		}
 		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true);
@@ -120,10 +121,10 @@ public class WorkbookBuilder extends Builder {
 		workbook.setConstants(constants);
 		workbook.setObservations(observations);
 		
-		if (isTrial) {
-			List<MeasurementRow> trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
-			workbook.setTrialObservations(trialObservations);
-		}
+		//if (isTrial) {
+		List<MeasurementRow> trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
+		workbook.setTrialObservations(trialObservations);
+		//}
 		
 		return workbook;
 	}
