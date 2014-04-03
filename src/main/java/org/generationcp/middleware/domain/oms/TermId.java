@@ -117,6 +117,7 @@ public enum TermId {
     , PLOT_NO (8200)
     , PLOT_NNO (8380)
     , REP_NO (8210)
+    , BLOCK_NO (8220)
     , COLUMN_NO (8400) //
     //(32769)
     , RANGE_NO (8410)
