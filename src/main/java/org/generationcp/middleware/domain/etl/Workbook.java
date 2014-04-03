@@ -12,10 +12,11 @@
 package org.generationcp.middleware.domain.etl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
@@ -652,6 +653,21 @@ public class Workbook {
 					return row;
 				}
 			}
+		}
+		return null;
+	}
+	
+	public List<MeasurementRow> getSortedTrialObservations() {
+		if (this.trialObservations != null) {
+			List<MeasurementRow> rows = new ArrayList<MeasurementRow>();
+			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+			List<Long> keys = new ArrayList<Long>(map.keySet());
+			Collections.sort(keys);
+			for (Long key : keys) {
+				rows.addAll(map.get(key));
+			}
+
+			return rows;
 		}
 		return null;
 	}
