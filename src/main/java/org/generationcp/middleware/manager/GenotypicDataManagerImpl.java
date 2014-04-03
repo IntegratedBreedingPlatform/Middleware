@@ -215,7 +215,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MapInfo> getMapInfoByMarkersAndMap(Database instance, List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
-        
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
         return mapInfoList;
     }
@@ -231,7 +230,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
-        
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapAndChromosome(mapId, chromosome);
         return mapInfoList;
     }
@@ -1305,7 +1303,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans = session.beginTransaction();
 
             // Add GDMS Marker
-            Integer idGDMSMarkerSaved = saveMarker(marker, markerType);
+            Integer idGDMSMarkerSaved = saveMarkerIfNotExisting(marker, markerType);
             marker.setMarkerId(idGDMSMarkerSaved);
             marker.setMarkerType(markerType);
 
@@ -2490,11 +2488,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return datasetSaved.getDatasetId();
     }
 
-    // If the marker is not yet in the database, add.
-    private Integer saveMarker(Marker marker, String markerType) throws Exception {
+    
+    private Integer saveMarkerIfNotExisting(Marker marker, String markerType) throws Exception {
         requireLocalDatabaseInstance();
 
-        // If the marker has same marker name existing in the database (local and central) - use the existing record.
+        // If the marker has same marker name existing in local, use the existing record.
         Integer markerId = marker.getMarkerId();
         if (markerId == null) {
             Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
@@ -2502,7 +2500,44 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 markerId = markerIdWithName;
             }
         }
+        
+        // If marker is existing in central, do not allow the insertion to local
+        if (markerId != null && markerId >= 0){
+        	throw new MiddlewareException("Marker already exists in Central and cannot be added.");
+        }
 
+        // If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
+        if (markerId == null) {
+            requireLocalDatabaseInstance();
+            MarkerDAO markerDao = getMarkerDao();
+            Integer markerGeneratedId = markerDao.getNegativeId("markerId");
+            marker.setMarkerId(markerGeneratedId);
+            marker.setMarkerType(markerType);
+            Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
+            markerId = markerRecordSaved.getMarkerId();
+        }
+
+        if (markerId == null) {
+            throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
+        }
+
+        return markerId;
+    }
+    
+    
+    // If the marker is not yet in the database, add.
+    private Integer saveMarker(Marker marker, String markerType) throws Exception {
+        requireLocalDatabaseInstance();
+
+        // If the marker has same marker name existing in local, use the existing record.
+        Integer markerId = marker.getMarkerId();
+        if (markerId == null) {
+            Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
+            if (markerIdWithName != null) {
+                markerId = markerIdWithName;
+            }
+        }
+        
         // If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
         if (markerId == null) {
             requireLocalDatabaseInstance();

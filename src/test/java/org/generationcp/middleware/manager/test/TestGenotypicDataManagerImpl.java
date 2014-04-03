@@ -1503,6 +1503,78 @@ public class TestGenotypicDataManagerImpl{
             Debug.println(3, markerUserInfo.toString());
         }
     }
+    
+    @Test
+    public void testSetSNPMarkersGCP8066() throws Exception {
+
+		//Marker [markerId=null, markerType=SNP, markerName=GKAM0001, species=Groundnut, dbAccessionId=, 
+		//reference=, genotype=, ploidy=, primerId=null, remarks=null, assayType=KASPar, 
+		//motif=A/T, forwardPrimer=AGCTTAACAATGAAGGAAATGGTGAGGAGAGGAGGAGGTTTGGTGAGAGACGAGGACCTG, 
+		//reversePrimer=TCGTTCTTTCAGGCCACCTTACAATGGTAATGTTAATGAGAACTTTCACCTTAATGCT, 
+		//productSize=, annealingTemp=null, amplification=null]
+        Integer markerId = null; // Will be set/overridden by the function
+        String markerType = GdmsType.TYPE_SNP.getValue(); // Will be set/overridden by the function
+        String markerName = "GKAM0001";
+        String species = "Groundnut";
+        String dbAccessionId = "";
+        String reference = "";
+        String genotype = "";
+        String ploidy = "";
+        String primerId = null;
+        String remarks = null;
+        String assayType = "KASPar";
+        String motif = "A/T";
+        String forwardPrimer = "AGCTTAACAATGAAGGAAATGGTGAGGAGAGGAGGAGGTTTGGTGAGAGACGAGGACCTG";
+        String reversePrimer = "TCGTTCTTTCAGGCCACCTTACAATGGTAATGTTAATGAGAACTTTCACCTTAATGCT";
+        String productSize = "";
+        Float annealingTemp = null;
+        String amplification = null;
+
+        //MarkerAlias [markerId=null, alias=]
+        String alias = "";
+
+		//MarkerDetails [markerId=null, noOfRepeats=null, motifType=null, sequence=, sequenceLength=null, 
+		//minAllele=null, maxAllele=null, ssrNr=null, forwardPrimerTemp=null, reversePrimerTemp=null, 
+		//elongationTemp=null, fragmentSizeExpected=null, fragmentSizeObserved=null, expectedProductSize=null, 
+		//positionOnReferenceSequence=null, restrictionEnzymeForAssay=null]
+        Integer noOfRepeats = null;
+        String motifType = null;
+        String sequence = "";
+        Integer sequenceLength = null;
+        Integer minAllele = null;
+        Integer maxAllele = null;
+        Integer ssrNr = null;
+        Float forwardPrimerTemp = null;
+        Float reversePrimerTemp = null;
+        Float elongationTemp = null;
+        Integer fragmentSizeExpected = null;
+        Integer fragmentSizeObserved = null;
+        Integer expectedProductSize = null;
+        Integer positionOnReferenceSequence = null;
+        String restrictionEnzymeForAssay = null;
+
+//        MarkerUserInfo [markerId=null, principalInvestigator=Rajeev K Varshney, contact=, institute=ICRISAT]
+        String principalInvestigator = "Rajeev K Varshney";
+        String contact = "";
+        String institute = "ICRISAT";
+
+        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
+                ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
+                amplification);
+        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
+        MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
+                minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
+                fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
+                restrictionEnzymeForAssay);
+        MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
+
+        try{
+        	manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
+        } catch (Exception e){
+        	assertTrue(e.getMessage().contains("Marker already exists in Central and cannot be added."));
+        }
+    }    
+    
 
     @Test
     public void testSetCAPMarkers() throws Exception {
