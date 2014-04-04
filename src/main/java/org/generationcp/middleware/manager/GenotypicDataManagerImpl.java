@@ -3325,6 +3325,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Boolean updateMarkerInfo(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) 
     		throws MiddlewareQueryException{
+    	
+    	if (marker.getMarkerId() >= 0){
+            Marker markerFromDB = getMarkerDao().getById(marker.getMarkerId());
+            if (markerFromDB != null){
+            	throw new MiddlewareQueryException("Marker is in central database and cannot be updated.");
+            } else {
+            	throw new MiddlewareQueryException("The given marker has positive id but is not found in central. Update cannot proceed.");
+            }
+    	}
 	
 	    Session session = requireLocalDatabaseInstance();
 	    Transaction trans = null;
