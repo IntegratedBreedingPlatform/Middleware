@@ -35,7 +35,13 @@ public class ExperimentValuesTransformer extends Transformer {
 				
 				for(int i = 0, l = varTypes.size(); i < l; i++ ){
 					VariableType varType = varTypes.get(i);
-					String value = nonTrialMD.get(i).getValue();
+					String value = null;
+					if (nonTrialMD.get(i).getcValueId() != null) {
+						value = nonTrialMD.get(i).getcValueId();
+					}
+					else {
+						value = nonTrialMD.get(i).getValue();
+					}
 					
 					Variable variable = new Variable(varType, value);
 					variableList.add(variable);

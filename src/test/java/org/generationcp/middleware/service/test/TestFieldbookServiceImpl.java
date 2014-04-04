@@ -424,9 +424,29 @@ public class TestFieldbookServiceImpl {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
         workbook.print(0);
         int id = dataImportService.saveDataset(workbook);
-        workbook = fieldbookService.getNurseryVariableSettings(id);
+        workbook = fieldbookService.getStudyVariableSettings(id, true);
         workbook.print(0);
     }
+
+    @Test
+    public void testAddFieldLocation() throws MiddlewareQueryException {
+        String fieldName = "Test Field JUnit";
+        Integer parentLocationId = 17649;
+        int result = fieldbookService.addFieldLocation(fieldName, parentLocationId, -1);
+        Debug.println(3, "Added: Location with id = " + result);
+    }
+    
+    @Test
+    public void testAddBlockLocation() throws MiddlewareQueryException {
+        String blockName = "Test Block JUnit";
+        Integer parentFieldId = -11;
+        int result = fieldbookService.addBlockLocation(blockName, parentFieldId, -1);
+        Debug.println(3, "Added: Location with id = " + result);
+    }
+    
+    
+    
+    
     
     @After
     public void afterEachTest() {

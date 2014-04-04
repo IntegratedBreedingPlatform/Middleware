@@ -236,11 +236,11 @@ public class AlleleValues implements Serializable {
         this.datasetId = datasetId;
     }
 
-    public Integer getgId() {
+    public Integer getGid() {
         return gId;
     }
 
-    public void setgId(Integer gId) {
+    public void setGid(Integer gId) {
         this.gId = gId;
     }
 

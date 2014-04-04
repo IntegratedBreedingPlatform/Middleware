@@ -12,11 +12,14 @@
 package org.generationcp.middleware.domain.etl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 
@@ -51,11 +54,15 @@ public class Workbook {
 	
 	private boolean isCheckFactorAddedOnly;
 	
+	private Integer totalNumberOfInstances;
+	
 	private Map<String, MeasurementVariable> measurementDatasetVariablesMap; //added for optimization
 	
 	private Integer studyId;
 	private Integer trialDatasetId;
 	private Integer measurementDatesetId;
+	
+	private List<MeasurementRow> trialObservations;
 
 	public void reset() {
 		trialHeaders = null;
@@ -151,7 +158,25 @@ public class Workbook {
 		return measurementDatasetVariables;
 	}
 	
-	
+	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (!isNursery()) {
+            MeasurementVariable trialFactor = null;
+            if (getTrialFactors() != null) {
+            	for (MeasurementVariable var : getTrialFactors()) {
+            		if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+            			trialFactor = var;
+            			break;
+            		}
+            	}
+            }
+            if (trialFactor != null) {
+            	list.add(trialFactor);
+            }
+		}
+		list.addAll(getMeasurementDatasetVariables());
+		return list;
+	}
 
 	public Map<String, MeasurementVariable> getMeasurementDatasetVariablesMap() {
 		//we set the id to the map
@@ -206,15 +231,19 @@ public class Workbook {
 				studyConditions = getStudyConditions();
 				studyConstants = getStudyConstants();
 			}
-			list.addAll(studyConditions);
-			list.addAll(studyConstants);
+			if(studyConditions != null)
+				list.addAll(studyConditions);
+			if(studyConstants != null)
+				list.addAll(studyConstants);
 		} else {
 			if(trialConditions == null && trialConstants == null) {
 				trialConditions = getTrialConditions();
 				trialConstants = getTrialConstants();
 			}
-			list.addAll(trialConditions);
-			list.addAll(trialConstants);
+			if(trialConditions != null)
+				list.addAll(trialConditions);
+			if(trialConstants != null)
+				list.addAll(trialConstants);
 		}
 		return list;
 	}
@@ -594,4 +623,71 @@ public class Workbook {
 		this.measurementDatesetId = measurementDatesetId;
 	}
 	
+	public Map<Long, List<MeasurementRow>> segregateByTrialInstances() {
+		Map<Long, List<MeasurementRow>> map = new HashMap<Long, List<MeasurementRow>>();
+		
+		if (this.observations != null) {
+			for (MeasurementRow row : this.observations) {
+				Long locationId = row.getLocationId();
+				List<MeasurementRow> list = map.get(locationId);
+				if (list == null) {
+					list = new ArrayList<MeasurementRow>();
+					map.put(locationId, list);
+				}
+				list.add(row);
+			}
+		}
+		
+		this.totalNumberOfInstances = map.size();
+		return map;
+	}
+	
+	public int getTotalNumberOfInstances() {
+		if (this.totalNumberOfInstances == null) {
+			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+			this.totalNumberOfInstances = map.size();
+		}
+		return this.totalNumberOfInstances;
+	}
+
+	/**
+	 * @return the trialObservations
+	 */
+	public List<MeasurementRow> getTrialObservations() {
+		return trialObservations;
+	}
+
+	/**
+	 * @param trialObservations the trialObservations to set
+	 */
+	public void setTrialObservations(List<MeasurementRow> trialObservations) {
+		this.trialObservations = trialObservations;
+	}
+	
+	
+	public MeasurementRow getTrialObservation(long locationId) {
+		if (this.trialObservations != null) {
+			for (MeasurementRow row : this.trialObservations) {
+				if (row.getLocationId() == locationId) {
+					return row;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public List<MeasurementRow> getSortedTrialObservations() {
+		if (this.trialObservations != null) {
+			List<MeasurementRow> rows = new ArrayList<MeasurementRow>();
+			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+			List<Long> keys = new ArrayList<Long>(map.keySet());
+			Collections.sort(keys);
+			for (Long key : keys) {
+				rows.addAll(map.get(key));
+			}
+
+			return rows;
+		}
+		return null;
+	}
 }

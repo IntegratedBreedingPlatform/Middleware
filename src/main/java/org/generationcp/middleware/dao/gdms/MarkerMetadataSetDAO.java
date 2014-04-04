@@ -159,5 +159,51 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 		}
     }
 
+	@SuppressWarnings("rawtypes")
+	public List<MarkerMetadataSet> getMarkerMetadataSetsByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+		
+	    List<MarkerMetadataSet> toReturn = new ArrayList<MarkerMetadataSet>();
+        try {
+            if (datasetId != null){
+                SQLQuery query = getSession().createSQLQuery("SELECT * FROM gdms_marker_metadataset where dataset_id = :datasetId "); 
+                query.setParameter("datasetId", datasetId);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer datasetId2 =  (Integer) result[0];
+                        Integer markerId = (Integer) result[1];
+
+                        MarkerMetadataSet dataElement = new MarkerMetadataSet(datasetId2, markerId);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkerMetadataSetsByDatasetId(datasetId=" + datasetId + ") query from MarkerMetadataSet " + e.getMessage(), e);
+        }
+        return toReturn;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public boolean isExisting(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException {
+	        try {
+	                SQLQuery query = getSession().createSQLQuery(
+	                		"SELECT * FROM gdms_marker_metadataset where dataset_id = :datasetId " +
+	                		"AND marker_id = :markerId "); 
+	                query.setParameter("datasetId", markerMetadataSet.getDatasetId());
+	                query.setParameter("markerId", markerMetadataSet.getMarkerId());
+
+	                List results = query.list();
+	                
+	                if (results.size() > 0) {
+	                	return true;
+	                }
+	        } catch (HibernateException e) {
+	            logAndThrowException("Error with isExisting(markerMetadataSet=" + markerMetadataSet + ") query from MarkerMetadataSet " + e.getMessage(), e);
+	        }
+			return false;	}
+
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -66,5 +67,23 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 		return results;
 	}
+	
+        public String getGeolocationPropValue(int stdVarId, int studyId) throws MiddlewareQueryException {
+                try {
+                    StringBuilder sql = new StringBuilder()
+                    .append("SELECT value ")
+                    .append("FROM nd_experiment e ")
+                    .append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
+                    .append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id ")
+                    .append("WHERE ep.project_id = :projectId AND gp.type_id = :stdVarId ORDER BY e.nd_geolocation_id ");
+                    SQLQuery query = getSession().createSQLQuery(sql.toString());
+                    query.setParameter("projectId", studyId);
+                    query.setParameter("stdVarId", stdVarId);
+                    return (String) query.uniqueResult();
+                } catch (HibernateException e) {
+                    logAndThrowException("Error at getGeolocationPropValue=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+                }
+                return "";
+        }
 	
 }

@@ -107,11 +107,22 @@ public class Variable  implements Comparable<Variable> {
 		        if (enumeration != null) { 
 		        	if(variableType.getStandardVariable().getDataType()!=null &&
 		        	   variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
+		        		
 		        		//GCP-5536 - get description instead
 		        		value = enumeration.getDescription();
 		        	} else {
 		        		value = enumeration.getName();
 		        	}
+		        }
+		        else if(variableType.getStandardVariable().getDataType()!=null &&
+		        	variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
+	        		
+	        		Integer overridingId = variableType.getStandardVariable().getOverridenEnumerations().get(Integer.parseInt(value));
+	        		if (overridingId != null) {
+	        			enumeration = variableType.getStandardVariable().findEnumerationById(overridingId);
+	        		}
+	        		
+	        		value = enumeration.getDescription();
 		        }
 		    }catch(NumberFormatException e){
 		        // Ignore, just return the value

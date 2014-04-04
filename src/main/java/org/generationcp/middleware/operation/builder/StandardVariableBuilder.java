@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +32,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -114,22 +117,50 @@ public class StandardVariableBuilder extends Builder {
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
-
+	
 	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
-	    
-	    //TODO
-		if (hasEnumerations(cvTermRelationships)) {
+	    if (hasEnumerations(cvTermRelationships)) {
+	    	Map<Integer, Integer> overridenEnumerations = new HashMap<Integer, Integer>();
 			List<Enumeration> enumerations = new ArrayList<Enumeration>();
 			for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
 				if (cvTermRelationship.getTypeId().equals(TermId.HAS_VALUE.getId())) {
 					Integer id = cvTermRelationship.getObjectId();
-					enumerations.add(createEnumeration(getCvTerm(id)));
+					
+					Enumeration newValue = createEnumeration(getCvTerm(id));
+					
+					Enumeration existingMatch = getExistingEnumeration(enumerations, newValue);
+					//if (!isEnumerationValueExists(enumerations, newValue)){
+					if (existingMatch == null) {
+					    enumerations.add(newValue);
+					}
+					else {
+						overridenEnumerations.put(newValue.getId(), existingMatch.getId());
+					}
 				}
 			}
 			Collections.sort(enumerations);
 			standardVariable.setEnumerations(enumerations);
+			standardVariable.setOverridenEnumerations(overridenEnumerations);
 		}
 	}
+	
+//    private boolean isEnumerationValueExists(List<Enumeration> enumerations, Enumeration value) {
+//        for (Enumeration enumeration : enumerations) {
+//            if (enumeration.getName().equals(value.getName())) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+    private Enumeration getExistingEnumeration(List<Enumeration> enumerations, Enumeration value) {
+        for (Enumeration enumeration : enumerations) {
+            if (enumeration.getName().equals(value.getName())) {
+                return enumeration;
+            }
+        }
+        return null;
+    }
 
 	private Enumeration createEnumeration(CVTerm cvTerm) throws MiddlewareQueryException {
 		return new Enumeration(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), getRank(cvTerm.getCvTermId()));
@@ -527,4 +558,73 @@ public class StandardVariableBuilder extends Builder {
         return stdVariableId;
     }
 
+    public boolean validateEnumerationUsage(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
+    	setWorkingDatabase(standardVariableId);
+    	Integer storedInId = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), standardVariableId).get(0);
+    	String value = String.valueOf(enumerationId);
+    	if (storedInId == TermId.STUDY_INFO_STORAGE.getId() || storedInId == TermId.DATASET_INFO_STORAGE.getId()) {
+    		return !isExistsPropertyByTypeAndValue(standardVariableId, value);
+    	}
+    	else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+    		return !isExistsStocksByTypeAndValue(standardVariableId, value);
+    	}
+    	else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+    		return !isExistsGeolocationByTypeAndValue(standardVariableId, value);
+    	}
+    	else if (storedInId == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+    		return !isExistsExperimentsByTypeAndValue(standardVariableId, value);
+    	}
+    	else if (storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
+    		return !isExistsPhenotypeByTypeAndValue(standardVariableId, value, true);
+    	}
+    	else {
+    		throw new MiddlewareQueryException("Not a valid categorical variable - " + standardVariableId);
+    	}
+    }
+    
+    private boolean isExistsGeolocationByTypeAndValue(int factorId, String value) throws MiddlewareQueryException {
+		Set<Integer> geolocationIds = new HashSet<Integer>();
+		setWorkingDatabase(Database.CENTRAL);
+		geolocationIds.addAll(getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
+		setWorkingDatabase(Database.LOCAL);
+		geolocationIds.addAll(getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
+		return !geolocationIds.isEmpty();
+	}    
+
+	private boolean isExistsStocksByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
+		Set<Integer> stockIds = new HashSet<Integer>();
+		setWorkingDatabase(Database.CENTRAL);
+		stockIds.addAll(getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
+		setWorkingDatabase(Database.LOCAL);
+		stockIds.addAll(getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
+		return !stockIds.isEmpty();
+	}
+	
+	private boolean isExistsExperimentsByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
+		Set<Integer> experimentIds = new HashSet<Integer>();
+		setWorkingDatabase(Database.CENTRAL);
+		experimentIds.addAll(getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
+		setWorkingDatabase(Database.LOCAL);
+		experimentIds.addAll(getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
+		return !experimentIds.isEmpty();
+	}
+	
+	private boolean isExistsPropertyByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
+		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
+		setWorkingDatabase(Database.CENTRAL);
+		properties.addAll(getProjectPropertyDao().getByTypeAndValue(factorId, value));
+		setWorkingDatabase(Database.LOCAL);
+		properties.addAll(getProjectPropertyDao().getByTypeAndValue(factorId, value));
+		return !properties.isEmpty();
+	}
+	
+	private boolean isExistsPhenotypeByTypeAndValue(Integer variateId, String value, boolean isEnum) throws MiddlewareQueryException {
+		List<Phenotype> phenotypes = new ArrayList<Phenotype>();
+		setWorkingDatabase(Database.CENTRAL);
+		phenotypes.addAll(getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
+		setWorkingDatabase(Database.LOCAL);
+		phenotypes.addAll(getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
+		return !phenotypes.isEmpty();
+	}
+	
 }

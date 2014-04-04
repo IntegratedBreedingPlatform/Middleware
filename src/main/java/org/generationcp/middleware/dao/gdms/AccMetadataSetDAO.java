@@ -300,4 +300,55 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
 			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in AccMetadataSetDAO: " + e.getMessage(), e);
 		}
     }
+     
+
+ 	@SuppressWarnings("rawtypes")
+	public List<AccMetadataSet> getAccMetadataSetsByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+ 		
+ 	    List<AccMetadataSet> toReturn = new ArrayList<AccMetadataSet>();
+         try {
+             if (datasetId != null){
+                 SQLQuery query = getSession().createSQLQuery("SELECT * FROM gdms_acc_metadataset where dataset_id = :datasetId "); 
+                 query.setParameter("datasetId", datasetId);
+
+                 List results = query.list();
+                 for (Object o : results) {
+                     Object[] result = (Object[]) o;
+                     if (result != null) {
+                         Integer datasetId2 =  (Integer) result[0];
+                         Integer gid = (Integer) result[1];
+                         Integer nid = (Integer) result[2];
+
+                         AccMetadataSet dataElement = new AccMetadataSet(datasetId2, gid, nid);
+                         toReturn.add(dataElement);
+                     }
+                 }
+             }
+         } catch (HibernateException e) {
+             logAndThrowException("Error with getAccMetadataSetsByDatasetId(datasetId=" + datasetId + ") query from AccMetadataSet " + e.getMessage(), e);
+         }
+         return toReturn;
+ 	}
+
+	@SuppressWarnings("rawtypes")
+	public boolean isExisting(AccMetadataSet accMetadataSet) throws MiddlewareQueryException {
+        try {
+                SQLQuery query = getSession().createSQLQuery(
+                		"SELECT * FROM gdms_acc_metadataset where dataset_id = :datasetId " +
+                		"AND gid = :gid AND nid = :nid "); 
+                query.setParameter("datasetId", accMetadataSet.getDatasetId());
+                query.setParameter("gid", accMetadataSet.getGermplasmId());
+                query.setParameter("nid", accMetadataSet.getNameId());
+
+                List results = query.list();
+                
+                if (results.size() > 0) {
+                	return true;
+                }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with isExisting(accMetadataSet=" + accMetadataSet + ") query from AccMetadataSet " + e.getMessage(), e);
+        }
+		return false;
+	}
+	
 }

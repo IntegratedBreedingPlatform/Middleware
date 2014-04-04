@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -460,4 +462,108 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         
         return toreturn;
     }
+    
+
+    @SuppressWarnings("unchecked")
+    public List<Location> getLocationsByDTypeAndLType(String dval
+            , Integer dType, Integer lType) throws MiddlewareQueryException {
+        List<Location> locations = new ArrayList<Location>();
+        try {
+            StringBuilder sqlString = new StringBuilder()
+            .append("SELECT  l.locid, l.ltype, l.nllp, l.lname, l.labbr")
+            .append(", l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce ")
+            .append("FROM locdes ld INNER JOIN location l ")
+            .append(" ON l.locid = ld.locid ")
+            .append("WHERE dtype = :dtype  AND ltype = :ltype AND dval = :dval ")
+            ;
+            
+            SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameter("dtype", dType);
+            query.setParameter("ltype", lType);
+            query.setParameter("dval", dval);
+            
+            List<Object[]> results = query.list();
+
+            if (results.size() > 0) {
+                for (Object[] row : results) {
+                    Integer locid = (Integer) row[0];
+                    Integer ltype = (Integer) row[1];
+                    Integer nllp = (Integer) row[2];
+                    String lname = (String) row[3];
+                    String labbr = (String) row[4];
+                    Integer snl3id = (Integer) row[5];
+                    Integer snl2id = (Integer) row[6];
+                    Integer snl1id = (Integer) row[7];
+                    Integer cntryid = (Integer) row[8];
+                    Integer lrplce = (Integer) row[9];
+                    
+                    locations.add(new Location(
+                            locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce));
+                    
+                }
+            }
+            
+            
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getLoctionsByDTypeAndLType(dtype=" + dType 
+                    + ", ltype=" + lType + ") query from Locdes: " + e.getMessage(), e);
+        }
+        return locations;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Location> getByTypeWithParent(Integer type, Integer relationshipType) throws MiddlewareQueryException {
+    	List<Location> locationList = new ArrayList<Location>();
+        try {
+        	Session session = getSession();
+        	String sql = "SELECT f.locid, f.lname, fd.dval "
+        			+ " FROM location f "
+        			+ " INNER JOIN locdes fd ON fd.locid = f.locid AND fd.dtype = " + relationshipType
+        			+ " WHERE f.ltype = " + type
+        			;
+        	SQLQuery query = session.createSQLQuery(sql);
+        	List<Object[]> results = query.list();
+        	
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+            		Integer fieldId = (Integer) result[0];
+            		String fieldName = (String) result[1];
+            		String parentId =  (String) result[2];
+                    
+                    Location location = new Location();
+                    location.setLocid(fieldId);
+                    location.setLname(fieldName);
+                    location.setParentLocationId(parentId != null && NumberUtils.isNumber(parentId) ? Integer.valueOf(parentId) : null);
+                    locationList.add(location);
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByTypeWithParent(type=" + type + ") query from Location: "
+                    + e.getMessage(), e);
+        }
+        return locationList;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, String> getNamesByIdsIntoMap(Collection<Integer> ids) throws MiddlewareQueryException {
+    	Map<Integer, String> map = new HashMap<Integer, String>();
+        try {
+            Criteria criteria = getSession().createCriteria(Location.class);
+            criteria.add(Restrictions.in("locid", ids));
+            List<Location> locations = criteria.list();
+            
+            if (locations != null && !locations.isEmpty()) {
+            	for (Location location : locations) {
+            		map.put(location.getLocid(), location.getLname());
+            	}
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getNamesByIdsIntoMap("  + ") query from Location: "
+                    + e.getMessage(), e);
+        }
+        return map;
+    }
+    
 }

@@ -176,4 +176,36 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
     }
 
 
+	@SuppressWarnings("rawtypes")
+	public List<CharValues> getCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+		
+	    List<CharValues> toReturn = new ArrayList<CharValues>();
+        try {
+            if (datasetId != null){
+                SQLQuery query = getSession().createSQLQuery(
+                		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') " +
+                		" FROM gdms_char_values where dataset_id = :datasetId "); 
+                query.setParameter("datasetId", datasetId);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer acId = (Integer) result[0];
+                        Integer datasetId2 =  (Integer) result[1];
+                        Integer markerId = (Integer) result[2];
+                        Integer gId = (Integer) result[3];
+                        String charValue  = (String) result[4];
+                        
+                        CharValues dataElement = new CharValues(acId, datasetId2, markerId, gId, charValue);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getCharValuesByDatasetId(datasetId=" + datasetId + ") query from CharValues " + e.getMessage(), e);
+        }
+        return toReturn;
+	}
+
 }

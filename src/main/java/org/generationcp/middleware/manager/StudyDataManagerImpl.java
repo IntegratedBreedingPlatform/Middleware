@@ -40,6 +40,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -54,6 +55,7 @@ import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
@@ -71,6 +73,8 @@ import org.slf4j.LoggerFactory;
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
     private GermplasmDataManagerImpl germplasmDataManager;
+    
+    private LocationDataManager locationDataManager;
 
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
@@ -82,12 +86,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         super(sessionProviderForLocal, sessionProviderForCentral);
         germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, 
                 sessionProviderForCentral);
-
+        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     public StudyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
         germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForLocal);
+        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     @Override
@@ -569,11 +574,33 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
             fieldMapInfos.add(fieldMapInfo);
         }
+        
+        updateFieldMapInfoWithBlockInfo(fieldMapInfos);
+
         return fieldMapInfos;
+    }
+    
+    private void updateFieldMapInfoWithBlockInfo(List<FieldMapInfo> fieldMapInfos) throws MiddlewareQueryException{
+        if (fieldMapInfos != null) { 
+            for (FieldMapInfo info : fieldMapInfos) {
+                    if (info.getDatasets() != null) {
+                            for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+                                    if (dataset.getTrialInstances() != null) {
+                                            for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+                                                if (trial.getBlockId() != null) {
+                                                    FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
+                                                    trial.updateBlockInformation(blockInfo);
+                                                }
+                                            }
+                                    }
+                            }
+                    }
+            }
+        }
     }
 
     @Override
-    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) 
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
             throws MiddlewareQueryException {
 
         if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
@@ -585,7 +612,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             try {
                 trans = session.beginTransaction();
 
-                getExperimentPropertySaver().saveFieldmapProperties(info, fieldmapUUID);
+                if (isNew) {
+                    getLocdesSaver().saveLocationDescriptions(info, userId);
+                }
+                else {
+	                getLocdesSaver().updateDeletedPlots(info, userId);
+                }
+                getGeolocationPropertySaver().saveFieldmapProperties(info);
+                getExperimentPropertySaver().saveFieldmapProperties(info);
 
                 trans.commit();
 
@@ -645,8 +679,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         setWorkingDatabase(datasetId);
         
         fieldMapInfos = getExperimentPropertyDao()
-                .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
-
+                .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
+        
+        int blockId = getBlockId(fieldMapInfos);
+        FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
+        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo, true);
+        
         // Filter those belonging to the given geolocationId
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
@@ -676,6 +714,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return fieldMapInfos;
     }
 
+    @Override
+    public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
+            throws MiddlewareQueryException {
+
+        List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
+        setWorkingDatabase(Database.LOCAL);
+        
+        fieldMapInfos = getExperimentPropertyDao()
+                .getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
+        
+        FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
+        updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
+
+        return fieldMapInfos;
+    }
+    
+    
     @Override
     public boolean isStudy(int id) throws MiddlewareQueryException {
         setWorkingDatabase(id);
@@ -987,21 +1042,29 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return 0;
     }
     
+    @Override
+    public String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        return getGeolocationPropertyDao().getGeolocationPropValue(stdVarId, studyId);
+    }
+    
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
-		if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
-			setWorkingDatabase(detail.getSiteId());
-			Location loc = getLocationDao().getById(detail.getSiteId());
-			if (loc != null) {
-				detail.setSiteName(loc.getLname());
+    	if (detail != null) {
+			if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
+				setWorkingDatabase(detail.getSiteId());
+				Location loc = getLocationDao().getById(detail.getSiteId());
+				if (loc != null) {
+					detail.setSiteName(loc.getLname());
+				}
+			}    	
+			if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
+				setWorkingDatabase(detail.getPiId());
+				Person person = getPersonDao().getById(detail.getPiId());
+				if (person != null) {
+					detail.setPiName(person.getDisplayName());
+				}
 			}
-		}    	
-		if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
-			setWorkingDatabase(detail.getPiId());
-			Person person = getPersonDao().getById(detail.getPiId());
-			if (person != null) {
-				detail.setPiName(person.getDisplayName());
-			}
-		}
+    	}
     }
     
     private void populateSiteAndPersonIfNecessary(List<StudyDetails> studyDetails) throws MiddlewareQueryException {
@@ -1059,5 +1122,64 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    		}
 	    	}
     	}
+    }
+    
+    private Integer getBlockId(List<FieldMapInfo> infos) {
+    	if (infos != null) { 
+    		for (FieldMapInfo info : infos) {
+    			if (info.getDatasets() != null) {
+    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+    					if (dataset.getTrialInstances() != null) {
+    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+    							return trial.getBlockId();
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return null;
+    }
+    
+    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo) throws MiddlewareQueryException {
+    	updateFieldMapWithBlockInformation(infos, blockInfo, false);
+    }
+    
+    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
+    	Map<Integer, String> locationMap = new HashMap<Integer, String>();
+    	if (infos != null) {
+    		for (FieldMapInfo info : infos) {
+    			if (info.getDatasets() != null) {
+    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+    					if (dataset.getTrialInstances() != null) {
+    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+    							trial.updateBlockInformation(blockInfo);
+    							if (isGetLocation) {
+	    							trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
+	    							trial.setFieldName(getLocationName(locationMap, trial.getFieldId()));
+	    							trial.setBlockName(getLocationName(locationMap, trial.getBlockId()));
+    							}
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    }
+    
+    private String getLocationName(Map<Integer, String> locationMap, Integer id) throws MiddlewareQueryException {
+    	if (id != null) {
+	    	String name = locationMap.get(id);
+	    	if (name != null) {
+	    		return name;
+	    	}
+	    	setWorkingDatabase(id);
+	    	Location location = getLocationDAO().getById(id);
+	    	if (location != null) {
+	    		locationMap.put(id, location.getLname());
+	    		return location.getLname();
+	    	}
+    	}
+    	return null;
     }
 }
