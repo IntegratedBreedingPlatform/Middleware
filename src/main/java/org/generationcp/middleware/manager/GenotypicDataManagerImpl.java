@@ -212,52 +212,64 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return mapInfoList;
     }
     
-    @Override
-    public List<MapInfo> getMapInfoByMarkersAndMap(Database instance, List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
-        List<MapInfo> mapInfoList = getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
-        return mapInfoList;
+    private void getMarkerNamesOfMapInfoFromCentral(List<MapInfo> mapInfoList) throws MiddlewareQueryException{
+
+    	List<Integer> markerIdsToGetFromCentral = new ArrayList<Integer>();
+        for (MapInfo mapInfo : mapInfoList){
+    		if (mapInfo.getMarkerName() == null && mapInfo.getMarkerId() >= 0){
+    			markerIdsToGetFromCentral.add(mapInfo.getMarkerId());
+    		}
+    	}
+    	
+    	if (markerIdsToGetFromCentral.size() > 0){
+    		// Get markers from central
+    		setWorkingDatabase(Database.CENTRAL);
+    		List<Marker> markersFromCentral = getMarkerDao().
+    						getMarkersByIds(markerIdsToGetFromCentral, 0, markerIdsToGetFromCentral.size());
+    		
+    		// Assign marker names to mapInfo
+        	for (MapInfo mapInfo : mapInfoList){
+        		for (Marker marker : markersFromCentral){
+        			if (mapInfo.getMarkerId().equals(marker.getMarkerId())){
+        				mapInfo.setMarkerName(marker.getMarkerName());
+        				break;
+        			}
+        		}
+        	}
+    	}
     }
-    
+
     @Override
-    public List<MapInfo> getAllMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
-        List<MapInfo> mapInfoList = getMapInfoByMarkersAndMap(Database.LOCAL, markers, mapId);
-        mapInfoList.addAll(getMapInfoByMarkersAndMap(Database.CENTRAL, markers, mapId));
-        Collections.sort(mapInfoList);
-        return mapInfoList;
-    }
-    
-    @Override
-    public List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
+    public List<MapInfo> getMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException {
+        setWorkingDatabase(mapId);
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapAndChromosome(mapId, chromosome);
+        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
+        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
+        }
         return mapInfoList;
     }
     
-    @Override
-    public List<MapInfo> getAllMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException {
-        List<MapInfo> mapInfoList = getMapInfoByMapAndChromosome(Database.CENTRAL, mapId, chromosome); 
-        mapInfoList.addAll(getMapInfoByMapAndChromosome(Database.LOCAL, mapId, chromosome));
-        Collections.sort(mapInfoList);
-        return mapInfoList;
-    }
     
     @Override
-    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Database instance, int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
-        
+    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
+        setWorkingDatabase(mapId);
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapChromosomeAndPosition(mapId, chromosome, startPosition);
-        return mapInfoList;
-    }
-    
-    @Override
-    public List<MapInfo> getAllMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
-        List<MapInfo> mapInfoList = getMapInfoByMapChromosomeAndPosition(Database.CENTRAL, mapId, chromosome, startPosition); 
-        mapInfoList.addAll(getMapInfoByMapChromosomeAndPosition(Database.LOCAL, mapId, chromosome, startPosition));
-        Collections.sort(mapInfoList);
+        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
+        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
+        }
         return mapInfoList;
     }
 
+    @Override
+    public List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
+        setWorkingDatabase(mapId);
+        List<MapInfo> mapInfoList = getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
+        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
+        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
+        }
+        return mapInfoList;
+    }
+    
     @Override
     public long countDatasetNames(Database instance) throws MiddlewareQueryException {
         return super.countFromInstanceByMethod(getDatasetDao(), instance, "countByName", new Object[]{}, new Class[]{});
@@ -1114,6 +1126,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return savedId;
 
+    }
+
+    @Override
+    public Integer addMarker(Marker marker) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        marker.setMarkerId(getMarkerDao().getNegativeId("markerId"));
+        return ((Marker) super.save(getMarkerDao(), marker)).getMarkerId();
     }
 
     @Override
@@ -2565,8 +2584,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         MarkerDAO markerDao = getMarkerDao();
         
+        Integer markerId = marker.getMarkerId();
         // Marker id, name and species cannot be updated.
-        Marker markerFromDB = markerDao.getById(marker.getMarkerId());
+        Marker markerFromDB = getMarkerDao().getById(markerId);
         if (markerFromDB == null){
         	throw new MiddlewareException("Marker is not found in the database and cannot be updated.");
         }
@@ -2589,12 +2609,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     private Integer saveOrUpdateMarkerAlias(MarkerAlias markerAlias) throws Exception {
         requireLocalDatabaseInstance();
-        MarkerAlias markerAliasRecordSaved = getMarkerAliasDao().merge(markerAlias);
-        Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
-        if (markerAliasRecordSavedMarkerId == null) {
-            throw new Exception();
+        MarkerAlias markerAliasFromDB = getMarkerAliasDao().getById(markerAlias.getMarkerId());
+        if (markerAliasFromDB == null){
+        	return saveMarkerAlias(markerAlias);
+        } else {
+        	getMarkerAliasDao().merge(markerAlias);
         }
-        return markerAliasRecordSavedMarkerId;
+        return markerAlias.getMarkerId();
     }
 
     private Integer saveMarkerDetails(MarkerDetails markerDetails) throws Exception {
@@ -2607,13 +2628,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return markerDetailsSavedMarkerId;
     }
     private Integer saveOrUpdateMarkerDetails(MarkerDetails markerDetails) throws Exception {
-        requireLocalDatabaseInstance();
-        MarkerDetails markerDetailsRecordSaved = getMarkerDetailsDao().merge(markerDetails);
-        Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
-        if (markerDetailsSavedMarkerId == null) {
-            throw new Exception();
+    	requireLocalDatabaseInstance();
+        MarkerDetails markerDetailsFromDB = getMarkerDetailsDao().getById(markerDetails.getMarkerId());
+        if (markerDetailsFromDB == null){
+        	return saveMarkerDetails(markerDetails);
+        } else {
+        	getMarkerDetailsDao().merge(markerDetails);
         }
-        return markerDetailsSavedMarkerId;
+        return markerDetails.getMarkerId();
     }
 
     private Integer saveMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
@@ -2627,13 +2649,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     private Integer saveOrUpdateMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
-        requireLocalDatabaseInstance();
-        MarkerUserInfo markerUserInfoRecordSaved = getMarkerUserInfoDao().merge(markerUserInfo);
-        Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
-        if (markerUserInfoSavedId == null) {
-            throw new Exception();
+    	requireLocalDatabaseInstance();
+    	MarkerUserInfo markerDetailsFromDB = getMarkerUserInfoDao().getById(markerUserInfo.getMarkerId());
+        if (markerDetailsFromDB == null){
+        	return saveMarkerUserInfo(markerUserInfo);
+        } else {
+        	getMarkerUserInfoDao().merge(markerUserInfo);
         }
-        return markerUserInfoSavedId;
+        return markerUserInfo.getMarkerId();
+
     }
 
     private Integer saveMap(Map map) throws Exception {
@@ -3301,6 +3325,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Boolean updateMarkerInfo(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) 
     		throws MiddlewareQueryException{
+    	
+    	if (marker.getMarkerId() >= 0){
+            Marker markerFromDB = getMarkerDao().getById(marker.getMarkerId());
+            if (markerFromDB != null){
+            	throw new MiddlewareQueryException("Marker is in central database and cannot be updated.");
+            } else {
+            	throw new MiddlewareQueryException("The given marker has positive id but is not found in central. Update cannot proceed.");
+            }
+    	}
 	
 	    Session session = requireLocalDatabaseInstance();
 	    Transaction trans = null;

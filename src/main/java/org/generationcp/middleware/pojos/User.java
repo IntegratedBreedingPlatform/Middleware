@@ -47,7 +47,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+public class User implements Serializable, BeanFormState {
 
     private static final long serialVersionUID = 1L;
     
@@ -94,6 +94,9 @@ public class User implements Serializable {
 
 	@Transient
     private Person person;
+	
+	@Transient
+    private Boolean active = false;
 
     public User() {
     }
@@ -285,9 +288,23 @@ public class User implements Serializable {
         builder.append(person); 
         builder.append(", isnew=");
         builder.append(isnew);
+        builder.append(", isActive=");
+        builder.append(active);
         
         builder.append("]");
         return builder.toString();
     }
+
+	@Override
+	public boolean getActive() {
+		// TODO Auto-generated method stub
+		return active;
+	}
+
+	@Override
+	public void setActive(Boolean val) {
+		// TODO Auto-generated method stub
+		this.active = val;
+	}
 
 }
