@@ -15,6 +15,8 @@ public class Variate  implements Serializable {
 	private String datatype;
 	private Integer dataTypeId;
 	private List<ValueReference> possibleValues;
+	private Double minRange;
+	private Double maxRange;
 	
 	public Variate(){
 		super();
@@ -22,7 +24,7 @@ public class Variate  implements Serializable {
 	
 	public Variate(String name, String description, String property,
 			String scale, String method, String role, String datatype, Integer dataTypeId,
-			List<ValueReference> possibleValues) {
+			List<ValueReference> possibleValues, Double minRange, Double maxRange) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -33,7 +35,10 @@ public class Variate  implements Serializable {
 		this.datatype = datatype;
 		this.dataTypeId = dataTypeId;
 		this.possibleValues = possibleValues;
+		this.minRange = minRange;
+		this.maxRange = maxRange;
 	}
+	
 	public String getName() {
 		return name;
 	}
@@ -103,6 +108,34 @@ public class Variate  implements Serializable {
 	 */
 	public void setPossibleValues(List<ValueReference> possibleValues) {
 		this.possibleValues = possibleValues;
+	}
+
+	/**
+	 * @return the minRange
+	 */
+	public Double getMinRange() {
+		return minRange;
+	}
+
+	/**
+	 * @param minRange the minRange to set
+	 */
+	public void setMinRange(Double minRange) {
+		this.minRange = minRange;
+	}
+
+	/**
+	 * @return the maxRange
+	 */
+	public Double getMaxRange() {
+		return maxRange;
+	}
+
+	/**
+	 * @param maxRange the maxRange to set
+	 */
+	public void setMaxRange(Double maxRange) {
+		this.maxRange = maxRange;
 	}
 
  }
