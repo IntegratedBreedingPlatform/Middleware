@@ -70,6 +70,7 @@ public interface DataImportService {
      * @throws WorkbookParserException
      * @throws MiddlewareQueryException
      */
+    @Deprecated
 	Workbook validateWorkbook(Workbook workbook)
 			throws WorkbookParserException, MiddlewareQueryException;
 	
