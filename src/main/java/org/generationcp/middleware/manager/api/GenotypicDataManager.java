@@ -168,7 +168,6 @@ public interface GenotypicDataManager{
     
     /**
      * Gets map information given a list of markers and mapId.
-     * If the mapId is (+), the map received from central, otherwise it is retrieved from local.
      *
      * @param markers the markers
      * @param mapId the map id
@@ -1178,6 +1177,15 @@ public interface GenotypicDataManager{
      */
     QtlDetailsPK addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException;
     
+
+    /**
+     * Adds the marker.
+     *
+     * @param marker the marker
+     * @return the integer
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer addMarker(Marker marker) throws MiddlewareQueryException;
 
     /**
      * Adds a MarkerDetails entry to the database.

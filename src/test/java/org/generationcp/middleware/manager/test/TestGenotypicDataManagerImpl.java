@@ -1361,7 +1361,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetSSRMarkers() throws Exception {
-        List<Object> markerRecords = createMarkerMarkeRecords();
+        List<Object> markerRecords = createMarkerRecords();
         Marker marker = (Marker) markerRecords.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
@@ -1377,7 +1377,7 @@ public class TestGenotypicDataManagerImpl{
         }
     }
 
-    private List<Object> createMarkerMarkeRecords() {
+    private List<Object> createMarkerRecords() {
 
         Integer markerId = null; // Will be set/overridden by the function
         String markerType = null; // Will be set/overridden by the function
@@ -1438,7 +1438,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetSNPMarkers() throws Exception {
-        List<Object> markerRecords = createMarkerMarkeRecords();
+        List<Object> markerRecords = createMarkerRecords();
         Marker marker = (Marker) markerRecords.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
@@ -1528,7 +1528,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetCAPMarkers() throws Exception {
-        List<Object> markerRecords = createMarkerMarkeRecords();
+        List<Object> markerRecords = createMarkerRecords();
         Marker marker = (Marker) markerRecords.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
@@ -1546,7 +1546,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetCISRMarkers() throws Exception {
-        List<Object> markerRecords = createMarkerMarkeRecords();
+        List<Object> markerRecords = createMarkerRecords();
         Marker marker = (Marker) markerRecords.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
@@ -2287,9 +2287,9 @@ public class TestGenotypicDataManagerImpl{
     
 
     @Test
-    public void testUpdateMarkerInfo() throws Exception {
-    	// Update existing Marker, MarkerAlias, MarkerDetails, MarkerUserIno
-        List<Object> markerRecords = createMarkerMarkeRecords();
+    public void testUpdateMarkerInfoExisting() throws Exception {
+    	// Update existing Marker, MarkerAlias, MarkerDetails, MarkerUserInfo
+        List<Object> markerRecords = createMarkerRecords();
         Marker marker = (Marker) markerRecords.get(0);
         MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
         MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
@@ -2298,13 +2298,14 @@ public class TestGenotypicDataManagerImpl{
         // Insert first
         Boolean addStatus = manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         if (addStatus) {
-            Debug.println(0, "Added: ");
+            Debug.println(0, "ADDED: ");
             Debug.println(3, marker.toString());
             Debug.println(3, markerAlias.toString());
             Debug.println(3, markerDetails.toString());
             Debug.println(3, markerUserInfo.toString());
         }
 
+        // Then update the newly-inserted set of records
         Integer updateId = (int) (Math.random() * 100);
         marker.setRemarks("UPDATE" + updateId);
         markerAlias.setAlias(markerAlias.getAlias() + updateId);
@@ -2313,11 +2314,75 @@ public class TestGenotypicDataManagerImpl{
         
         addStatus = manager.updateMarkerInfo(marker, markerAlias, markerDetails, markerUserInfo);
         if (addStatus) {
-            Debug.println(0, "Updated: ");
+            Debug.println(0, "UPDATED: ");
             Debug.println(3, marker.toString());
             Debug.println(3, markerAlias.toString());
             Debug.println(3, markerDetails.toString());
             Debug.println(3, markerUserInfo.toString());
+        }
+    }
+    
+    
+    @Test
+    public void testUpdateMarkerInfoNewRecords() throws Exception {
+        
+        // Add a new set of MarkerAlias, MarkerDetails, MarkerUserInfo for the given Marker - should insert, but update
+        List<Object> markerRecords = createMarkerRecords();
+        Marker markerUA = (Marker) markerRecords.get(0);
+        markerUA.setMarkerType(GdmsType.TYPE_UA.getValue());
+
+        Integer markerId = manager.addMarker(markerUA);
+        
+        Debug.println(0, "MARKER ADDED: " + markerUA);
+        
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        markerAlias.setMarkerId(markerId);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        markerDetails.setMarkerId(markerId);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
+        markerUserInfo.setMarkerId(markerId);
+    	
+    	Boolean addStatus = manager.updateMarkerInfo(markerUA, markerAlias, markerDetails, markerUserInfo);
+        if (addStatus) {
+            Debug.println(0, "MarkerAlias/MarkerDetails/MarkerUserInfo ADDED TO AN EXISTING Marker: ");
+            Debug.println(3, markerUA.toString());
+            Debug.println(3, markerAlias.toString());
+            Debug.println(3, markerDetails.toString());
+            Debug.println(3, markerUserInfo.toString());
+        }
+    	
+    }
+    
+    @Test
+    public void testUpdateMarkerInfoModifyMarkerNameSpecies() throws Exception {
+
+    	// Get an existing marker from local db 
+    	Marker marker = manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10), 0, 1).get(0);
+    	Debug.println(3, "Existing marker:" + marker.toString());
+    	
+    	List<Object> markerRecords = createMarkerRecords();
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
+
+        Integer updateId = (int) (Math.random() * 100);
+
+        // Try to update marker name - should not be allowed.
+        try{
+        	marker.setMarkerName(marker.getMarkerName() + updateId);
+        	manager.updateMarkerInfo(marker, markerAlias, markerDetails, markerUserInfo);
+        } catch (MiddlewareQueryException e){
+        	Debug.println(0, "Caught exception: Marker name and species cannot be updated.");
+        	assertTrue(e.getMessage().contains("Marker name and species cannot be updated."));
+        }
+
+        // Try to update species - should not be allowed.
+        try{
+        	marker.setSpecies(marker.getSpecies() + updateId);
+        	manager.updateMarkerInfo(marker, markerAlias, markerDetails, markerUserInfo);
+        } catch (MiddlewareQueryException e){
+        	Debug.println(0, "Caught exception: Marker name and species cannot be updated.");
+        	assertTrue(e.getMessage().contains("Marker name and species cannot be updated."));
         }
 
     }

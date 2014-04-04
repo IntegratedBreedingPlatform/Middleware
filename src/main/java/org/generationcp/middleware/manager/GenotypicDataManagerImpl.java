@@ -1129,6 +1129,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
+    public Integer addMarker(Marker marker) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        marker.setMarkerId(getMarkerDao().getNegativeId("markerId"));
+        return ((Marker) super.save(getMarkerDao(), marker)).getMarkerId();
+    }
+
+    @Override
     public Integer addMarkerDetails(MarkerDetails markerDetails) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         // No need to auto-assign negative id. It should come from an existing entry in Marker.
@@ -2577,8 +2584,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         MarkerDAO markerDao = getMarkerDao();
         
+        Integer markerId = marker.getMarkerId();
         // Marker id, name and species cannot be updated.
-        Marker markerFromDB = markerDao.getById(marker.getMarkerId());
+        Marker markerFromDB = getMarkerDao().getById(markerId);
         if (markerFromDB == null){
         	throw new MiddlewareException("Marker is not found in the database and cannot be updated.");
         }
@@ -2601,12 +2609,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     private Integer saveOrUpdateMarkerAlias(MarkerAlias markerAlias) throws Exception {
         requireLocalDatabaseInstance();
-        MarkerAlias markerAliasRecordSaved = getMarkerAliasDao().merge(markerAlias);
-        Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
-        if (markerAliasRecordSavedMarkerId == null) {
-            throw new Exception();
+        MarkerAlias markerAliasFromDB = getMarkerAliasDao().getById(markerAlias.getMarkerId());
+        if (markerAliasFromDB == null){
+        	return saveMarkerAlias(markerAlias);
+        } else {
+        	getMarkerAliasDao().merge(markerAlias);
         }
-        return markerAliasRecordSavedMarkerId;
+        return markerAlias.getMarkerId();
     }
 
     private Integer saveMarkerDetails(MarkerDetails markerDetails) throws Exception {
@@ -2619,13 +2628,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return markerDetailsSavedMarkerId;
     }
     private Integer saveOrUpdateMarkerDetails(MarkerDetails markerDetails) throws Exception {
-        requireLocalDatabaseInstance();
-        MarkerDetails markerDetailsRecordSaved = getMarkerDetailsDao().merge(markerDetails);
-        Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
-        if (markerDetailsSavedMarkerId == null) {
-            throw new Exception();
+    	requireLocalDatabaseInstance();
+        MarkerDetails markerDetailsFromDB = getMarkerDetailsDao().getById(markerDetails.getMarkerId());
+        if (markerDetailsFromDB == null){
+        	return saveMarkerDetails(markerDetails);
+        } else {
+        	getMarkerDetailsDao().merge(markerDetails);
         }
-        return markerDetailsSavedMarkerId;
+        return markerDetails.getMarkerId();
     }
 
     private Integer saveMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
@@ -2639,13 +2649,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     private Integer saveOrUpdateMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
-        requireLocalDatabaseInstance();
-        MarkerUserInfo markerUserInfoRecordSaved = getMarkerUserInfoDao().merge(markerUserInfo);
-        Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
-        if (markerUserInfoSavedId == null) {
-            throw new Exception();
+    	requireLocalDatabaseInstance();
+    	MarkerUserInfo markerDetailsFromDB = getMarkerUserInfoDao().getById(markerUserInfo.getMarkerId());
+        if (markerDetailsFromDB == null){
+        	return saveMarkerUserInfo(markerUserInfo);
+        } else {
+        	getMarkerUserInfoDao().merge(markerUserInfo);
         }
-        return markerUserInfoSavedId;
+        return markerUserInfo.getMarkerId();
+
     }
 
     private Integer saveMap(Map map) throws Exception {
