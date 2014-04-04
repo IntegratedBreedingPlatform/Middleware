@@ -144,69 +144,38 @@ public interface GenotypicDataManager{
     List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException;
 
     /**
-     * Gets map information given a list of markers and mapId.
+     * Gets map information given a map id and a chromosome. 
+     * If the mapId is (+), the map received from central, otherwise it is retrieved from local.
      *
-     * @param instance the instance
-     * @param markers the markers
-     * @param mapId the map id
-     * @return the map info by markers and map
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<MapInfo> getMapInfoByMarkersAndMap(Database instance, List<Integer> markers, Integer mapId) throws MiddlewareQueryException;
-    
-    /**
-     * Gets map information given a list of markers and mapId from both local and central database.
-     *
-     * @param markers the markers
-     * @param mapId the map id
-     * @return the all map info by markers and map
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<MapInfo> getAllMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException;
-    
-    /**
-     * Gets map information given a map id and a chromosome.
-     *
-     * @param instance the instance
      * @param mapId the map id
      * @param chromosome the chromosome
      * @return the map info by map and chromosome
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException;
-    
-    /**
-     * Gets map information given a map id and a chromosome on both local and central database.
-     *
-     * @param mapId the map id
-     * @param chromosome the chromosome
-     * @return the all map info by map and chromosome
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<MapInfo> getAllMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException;
+    List<MapInfo> getMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException;
     
     /**
      * Gets map information given a map id and a chromosome.
+     * If the mapId is (+), the map received from central, otherwise it is retrieved from local.
      *
-     * @param instance the instance
      * @param mapId the map id
      * @param chromosome the chromosome
      * @param startPosition the start position
      * @return the map info by map chromosome and position
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<MapInfo> getMapInfoByMapChromosomeAndPosition(Database instance, int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
+    List<MapInfo> getMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
     
     /**
-     * Gets map information given a map id and a chromosome on both local and central database.
+     * Gets map information given a list of markers and mapId.
+     * If the mapId is (+), the map received from central, otherwise it is retrieved from local.
      *
+     * @param markers the markers
      * @param mapId the map id
-     * @param chromosome the chromosome
-     * @param startPosition the start position
-     * @return the all map info by map chromosome and position
+     * @return the map info by markers and map
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<MapInfo> getAllMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException;
+    List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException;
     
     /**
      * Counts all the dataset names.

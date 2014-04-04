@@ -212,52 +212,64 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return mapInfoList;
     }
     
-    @Override
-    public List<MapInfo> getMapInfoByMarkersAndMap(Database instance, List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
-        List<MapInfo> mapInfoList = getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
-        return mapInfoList;
+    private void getMarkerNamesOfMapInfoFromCentral(List<MapInfo> mapInfoList) throws MiddlewareQueryException{
+
+    	List<Integer> markerIdsToGetFromCentral = new ArrayList<Integer>();
+        for (MapInfo mapInfo : mapInfoList){
+    		if (mapInfo.getMarkerName() == null && mapInfo.getMarkerId() >= 0){
+    			markerIdsToGetFromCentral.add(mapInfo.getMarkerId());
+    		}
+    	}
+    	
+    	if (markerIdsToGetFromCentral.size() > 0){
+    		// Get markers from central
+    		setWorkingDatabase(Database.CENTRAL);
+    		List<Marker> markersFromCentral = getMarkerDao().
+    						getMarkersByIds(markerIdsToGetFromCentral, 0, markerIdsToGetFromCentral.size());
+    		
+    		// Assign marker names to mapInfo
+        	for (MapInfo mapInfo : mapInfoList){
+        		for (Marker marker : markersFromCentral){
+        			if (mapInfo.getMarkerId().equals(marker.getMarkerId())){
+        				mapInfo.setMarkerName(marker.getMarkerName());
+        				break;
+        			}
+        		}
+        	}
+    	}
     }
-    
+
     @Override
-    public List<MapInfo> getAllMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
-        List<MapInfo> mapInfoList = getMapInfoByMarkersAndMap(Database.LOCAL, markers, mapId);
-        mapInfoList.addAll(getMapInfoByMarkersAndMap(Database.CENTRAL, markers, mapId));
-        Collections.sort(mapInfoList);
-        return mapInfoList;
-    }
-    
-    @Override
-    public List<MapInfo> getMapInfoByMapAndChromosome(Database instance, int mapId, String chromosome) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
+    public List<MapInfo> getMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException {
+        setWorkingDatabase(mapId);
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapAndChromosome(mapId, chromosome);
+        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
+        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
+        }
         return mapInfoList;
     }
     
-    @Override
-    public List<MapInfo> getAllMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException {
-        List<MapInfo> mapInfoList = getMapInfoByMapAndChromosome(Database.CENTRAL, mapId, chromosome); 
-        mapInfoList.addAll(getMapInfoByMapAndChromosome(Database.LOCAL, mapId, chromosome));
-        Collections.sort(mapInfoList);
-        return mapInfoList;
-    }
     
     @Override
-    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Database instance, int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
-        
+    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
+        setWorkingDatabase(mapId);
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapChromosomeAndPosition(mapId, chromosome, startPosition);
-        return mapInfoList;
-    }
-    
-    @Override
-    public List<MapInfo> getAllMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
-        List<MapInfo> mapInfoList = getMapInfoByMapChromosomeAndPosition(Database.CENTRAL, mapId, chromosome, startPosition); 
-        mapInfoList.addAll(getMapInfoByMapChromosomeAndPosition(Database.LOCAL, mapId, chromosome, startPosition));
-        Collections.sort(mapInfoList);
+        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
+        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
+        }
         return mapInfoList;
     }
 
+    @Override
+    public List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
+        setWorkingDatabase(mapId);
+        List<MapInfo> mapInfoList = getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
+        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
+        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
+        }
+        return mapInfoList;
+    }
+    
     @Override
     public long countDatasetNames(Database instance) throws MiddlewareQueryException {
         return super.countFromInstanceByMethod(getDatasetDao(), instance, "countByName", new Object[]{}, new Class[]{});
