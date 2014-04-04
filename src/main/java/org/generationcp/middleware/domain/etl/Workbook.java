@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 
@@ -157,7 +158,25 @@ public class Workbook {
 		return measurementDatasetVariables;
 	}
 	
-	
+	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (!isNursery()) {
+            MeasurementVariable trialFactor = null;
+            if (getTrialFactors() != null) {
+            	for (MeasurementVariable var : getTrialFactors()) {
+            		if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+            			trialFactor = var;
+            			break;
+            		}
+            	}
+            }
+            if (trialFactor != null) {
+            	list.add(trialFactor);
+            }
+		}
+		list.addAll(getMeasurementDatasetVariables());
+		return list;
+	}
 
 	public Map<String, MeasurementVariable> getMeasurementDatasetVariablesMap() {
 		//we set the id to the map
