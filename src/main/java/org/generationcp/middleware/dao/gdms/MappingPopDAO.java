@@ -20,8 +20,10 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link MappingPop}.
@@ -151,6 +153,21 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
         } catch(HibernateException e) {
             logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in MappingPopDAO: " + e.getMessage(), e);
         }
+    }
+    
+    
+    public MappingPop getMappingPopByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        try {
+            if (datasetId != null){
+    			Criteria criteria = getSession().createCriteria(getPersistentClass());
+    			criteria.add(Restrictions.eq("datasetId", datasetId));
+    			return (MappingPop) criteria.uniqueResult();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMappingPopByDatasetId(datasetId=" + datasetId + ") query from MappingPop " + e.getMessage(), e);
+        }
+        return null;
+
     }
     
         

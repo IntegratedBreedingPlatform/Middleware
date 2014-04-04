@@ -176,11 +176,11 @@ public class CharValues implements Serializable{
         this.markerId = markerId;
     }
     
-    public Integer getgId() {
+    public Integer getGid() {
         return gId;
     }
     
-    public void setgId(Integer gId) {
+    public void setGid(Integer gId) {
         this.gId = gId;
     }
     

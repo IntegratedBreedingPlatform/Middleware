@@ -76,32 +76,36 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     @Override
+    @Deprecated
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
     }
     
+    @Override
+    @Deprecated
     public List<Location> getAllLocations() throws MiddlewareQueryException{
         List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
         Collections.sort(locations);
         return locations;
     }
-
     
     @Override
+    @Deprecated
     public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {
         if (setWorkingDatabase(Database.LOCAL)) {
             return this.getLocationDao().getAll(start, numOfRows);
         }
-        
         return new ArrayList<Location>();
     }
 
     @Override
+    @Deprecated
     public long countAllLocations() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getLocationDao());
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         List<Location> locations = new ArrayList<Location>();
         if (setWorkingDatabase(Database.LOCAL)) {
@@ -114,6 +118,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByName", "getByName");
         return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { name, op },
@@ -123,18 +128,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 
     @Override
+    @Deprecated
     public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[] { name, op }, new Class[] { String.class,
                 Operation.class });
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException {
         return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[] { country },
                 new Class[] { Country.class });
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByCountry", "getByCountry");
         return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { country },
@@ -142,18 +150,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
         
     @Override
+    @Deprecated
     public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
         return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[] { country },
                 new Class[] { Country.class });
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
         return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[] { type },
                 new Class[] { Integer.class });
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByType", "getByType");
         return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { type },
@@ -161,6 +172,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public long countLocationsByType(Integer type) throws MiddlewareQueryException {
         return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[] { type }, new Class[] { Integer.class });
     }
@@ -731,6 +743,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public Country getCountryById(Integer id) throws MiddlewareQueryException {
         if (setWorkingDatabase(id)) {
             return getCountryDao().getById(id, false);
@@ -739,6 +752,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public Location getLocationByID(Integer id) throws MiddlewareQueryException {
         if (setWorkingDatabase(id)) {
             return getLocationDao().getById(id, false);
@@ -747,6 +761,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException {
         List<Location> results = new ArrayList<Location>();
 
@@ -785,6 +800,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException {
         List<LocationDetails> results = new ArrayList<LocationDetails>();
 
@@ -831,6 +847,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 
     @Override
+    @Deprecated
     public Integer addLocation(Location location) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
@@ -861,6 +878,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
@@ -894,6 +912,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public void deleteLocation(Location location) throws MiddlewareQueryException {
         Session session = getCurrentSessionForLocal();
         requireLocalDatabaseInstance();
@@ -1239,23 +1258,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    @Deprecated
     public List<Country> getAllCountry() throws MiddlewareQueryException {
         return (List<Country>) super.getAllFromCentralAndLocalByMethod(getCountryDao(), "getAllCountry", new Object[] {}, new Class[] {});
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
         return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountryAndType", new Object[] { country,
                 type}, new Class[]{Country.class, Integer.class});
     }
     
     @Override
+    @Deprecated
     public List<Location> getLocationsByNameCountryAndType(String name,Country country, Integer type) throws MiddlewareQueryException {
         return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByNameCountryAndType", new Object[] { name,country,
                 type}, new Class[]{String.class,Country.class, Integer.class});
     }
     
     @Override
+    @Deprecated
     public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
         return (List<LocationDetails>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationDetails", new Object[] { locationId,
@@ -1707,6 +1730,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     @Override
+    @Deprecated
     public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
         Database centralInstance = Database.CENTRAL;
         Database localInstance = Database.LOCAL;
@@ -1719,6 +1743,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     
     @Override
+    @Deprecated
     public Long countAllBreedingLocations() throws MiddlewareQueryException {
         return countAllFromCentralAndLocalByMethod(getLocationDAO(), "countAllBreedingLocations", new Object[] {}, new Class[] {});
     }

@@ -27,7 +27,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
-import org.hibernate.type.Type;
 
 /**
  * DAO class for {@link Map}.

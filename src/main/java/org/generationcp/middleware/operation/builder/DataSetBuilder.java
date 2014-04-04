@@ -105,7 +105,7 @@ public class DataSetBuilder extends Builder {
 	    if (datasets != null) {
 	        for (ProjectRelationship dataset : datasets) {
 	            if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
-	                    && !dataset.getSubjectProject().equals(measurementDatasetId)) {
+	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
 	                
 	                trialDataset = dataset.getSubjectProject();
 	                break;

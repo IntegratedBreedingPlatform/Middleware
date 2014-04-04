@@ -100,17 +100,29 @@ public class Variable  implements Comparable<Variable> {
 	}
 	
 	public String getDisplayValue() {
+		String value = this.value;
 		if (variableType.getStandardVariable().hasEnumerations()) {
 		    try{
 		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value));
 		        if (enumeration != null) { 
 		        	if(variableType.getStandardVariable().getDataType()!=null &&
 		        	   variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
+		        		
 		        		//GCP-5536 - get description instead
 		        		value = enumeration.getDescription();
 		        	} else {
 		        		value = enumeration.getName();
 		        	}
+		        }
+		        else if(variableType.getStandardVariable().getDataType()!=null &&
+		        	variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
+	        		
+	        		Integer overridingId = variableType.getStandardVariable().getOverridenEnumerations().get(Integer.parseInt(value));
+	        		if (overridingId != null) {
+	        			enumeration = variableType.getStandardVariable().findEnumerationById(overridingId);
+	        		}
+	        		
+	        		value = enumeration.getDescription();
 		        }
 		    }catch(NumberFormatException e){
 		        // Ignore, just return the value
@@ -123,6 +135,7 @@ public class Variable  implements Comparable<Variable> {
 	}
 	
 	public String getActualValue() {
+		String value = this.value;
 		if (variableType.getStandardVariable().hasEnumerations()) {
 		    try{
 		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value));

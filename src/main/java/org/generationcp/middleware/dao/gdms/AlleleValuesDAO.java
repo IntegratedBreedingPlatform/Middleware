@@ -13,10 +13,8 @@ package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
@@ -32,6 +30,7 @@ import org.hibernate.SQLQuery;
  *
  * @author Joyce Avestro
  */
+@SuppressWarnings("rawtypes")
 public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 
     /**
@@ -43,7 +42,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
      * @return the Allelic Values (germplasm id, data value, and marker id) for the given dataset id
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    @SuppressWarnings("rawtypes")
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
         List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
@@ -76,7 +74,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         return toReturn;
     }
 
-    public List<AlleleValues> getAlleleValuesByMarkerId(List<Integer> markerIdList) throws MiddlewareQueryException {
+	public List<AlleleValues> getAlleleValuesByMarkerId(List<Integer> markerIdList) throws MiddlewareQueryException {
         List<AlleleValues> returnVal = new ArrayList<AlleleValues>();
 
         if (markerIdList == null || markerIdList.size() == 0) {
@@ -236,7 +234,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
     }
 
 
-    @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start,
                                                                                       int numOfRows) throws MiddlewareQueryException {
         try {
@@ -288,7 +285,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         return 0;
     }
 
-    @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start,
                                                                                        int numOfRows) throws MiddlewareQueryException {
         try {
@@ -337,7 +333,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         return 0;
     }
 
-    @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids,
                                                                                           int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -433,5 +428,39 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         }
         return 0;
     }
+    
+
+	public List<AlleleValues> getAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+		
+	    List<AlleleValues> toReturn = new ArrayList<AlleleValues>();
+        try {
+            if (datasetId != null){
+                SQLQuery query = getSession().createSQLQuery(
+                		"SELECT an_id, dataset_id, marker_id, gid, CONCAT(allele_bin_value, ''), CONCAT(allele_raw_value,''), peak_height " +
+                		" FROM gdms_allele_values where dataset_id = :datasetId "); 
+                query.setParameter("datasetId", datasetId);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer anId = (Integer) result[0];
+                        Integer datasetId2 =  (Integer) result[1];
+                        Integer markerId = (Integer) result[2];
+                        Integer gId = (Integer) result[3];
+                        String alleleBinValue  = (String) result[4];
+                        String alleleRawValue = (String) result[5];
+                        Integer peakHeight = (Integer) result[6];
+                        
+                        AlleleValues dataElement = new AlleleValues(anId, datasetId2, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAlleleValuesByDatasetId(datasetId=" + datasetId + ") query from AlleleValues " + e.getMessage(), e);
+        }
+        return toReturn;
+	}
 
 }

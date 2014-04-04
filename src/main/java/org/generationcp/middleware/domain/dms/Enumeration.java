@@ -45,17 +45,35 @@ public class Enumeration implements Comparable<Enumeration> {
         return id;
     }
 
-	public String getName() {
-		return name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 	
 	@Override
     public String toString() {
-        return "[" + id + ":" + name + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Enumeration [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", rank=");
+        builder.append(rank);
+        builder.append("]");
+        return builder.toString();
     }
 
     public void print(int indent) {

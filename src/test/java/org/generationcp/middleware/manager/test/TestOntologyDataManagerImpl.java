@@ -54,11 +54,12 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+@SuppressWarnings("unused")
 public class TestOntologyDataManagerImpl {
 
-	private static final Integer CV_TERM_ID = 1010;
-	private static final String CV_TERM_NAME = "Study Information";
-	private static final Integer STD_VARIABLE_ID = 8350; // 8310; 
+    private static final Integer CV_TERM_ID = 1010;
+    private static final String CV_TERM_NAME = "Study Information";
+    private static final Integer STD_VARIABLE_ID = 8350; // 8310; 
 	
 	private static ManagerFactory factory;
 	private static OntologyDataManager manager;
@@ -221,6 +222,83 @@ public class TestOntologyDataManagerImpl {
 		
 		Debug.println(0, "Standard variable saved: " + stdVariable.getId());
 	}
+	
+
+    
+    @Test
+    public void testAddStandardVariableEnumeration() throws Exception {
+        int standardVariableId = 22554;
+        String name = "8";
+        String description = "Fully exserted";
+        StandardVariable standardVariable = manager.getStandardVariable(standardVariableId);
+        Enumeration validValue = new Enumeration(null, name, description, 1);
+
+        Debug.printObject(3, standardVariable);
+        manager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
+        Debug.printObject(3, validValue);
+        standardVariable = manager.getStandardVariable(standardVariableId);
+        Debug.printObject(3, standardVariable);
+        assertNotNull(standardVariable.getEnumeration(validValue.getId()));
+        
+        // TO VERIFY IN MYSQL, delete the lines marked (*) below, then check in local: 
+        // select * from cvterm where name = "8" and definition = "Fully exserted";
+        // select * from cvterm_relationship where subject_id = 22554;
+        
+        
+        // (*) clean up
+        manager.deleteStandardVariableEnumeration(standardVariableId, validValue.getId());
+
+    }
+    
+    @Test
+    public void testUpdateStandardVariableEnumeration() throws Exception {
+        // Case 1: NEW VALID VALUE
+        int standardVariableId = 22554;
+        String name = "8";
+        String description = "Fully exserted";
+        StandardVariable standardVariable = manager.getStandardVariable(standardVariableId);
+        Enumeration validValue = new Enumeration(null, name, description, 1);
+
+        Debug.printObject(3, standardVariable);
+        manager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
+        Integer validValueGeneratedId1 = validValue.getId();
+        Debug.printObject(3, validValue);
+        standardVariable = manager.getStandardVariable(standardVariableId);
+        Debug.printObject(3, standardVariable);
+        assertNotNull(standardVariable.getEnumeration(validValue.getId()));
+        
+        // TO VERIFY IN MYSQL, delete the lines marked (*) below, then check in local: 
+        // select * from cvterm where name = "8" and definition = "Fully exserted";
+        // select * from cvterm_relationship where subject_id = 22554;
+        
+        
+        // Case 2: UPDATE CENTRAL VALID VALUE
+        Integer validValueId = 22667;
+        name = "3"; 
+        description = "Moderately exserted"; // Original value in central:  "Moderately well exserted"
+        validValue = new Enumeration(validValueId, name, description, 1);
+        manager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
+        
+        Debug.printObject(3, validValue);
+        standardVariable = manager.getStandardVariable(standardVariableId);
+        Debug.printObject(3, standardVariable);
+        assertNotNull(standardVariable.getEnumeration(validValue.getId()));
+        
+        // Case 3: UPDATE LOCAL VALID VALUE
+        description = "Moderately well exserted";
+        validValue.setDescription(description);
+        manager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
+        
+        Debug.printObject(3, validValue);
+        standardVariable = manager.getStandardVariable(standardVariableId);
+        Debug.printObject(3, standardVariable);
+        assertTrue(standardVariable.getEnumeration(validValue.getId()).getDescription().equals(description));
+        
+        // (*) clean up
+        manager.deleteStandardVariableEnumeration(standardVariableId, validValueGeneratedId1);
+        manager.deleteStandardVariableEnumeration(standardVariableId, validValue.getId());
+    }
+	
 	
     @Test
 	public void testAddMethod() throws Exception {

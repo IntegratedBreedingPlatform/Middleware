@@ -33,7 +33,6 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class ExperimentBuilder extends Builder {
 
@@ -106,6 +105,7 @@ public class ExperimentBuilder extends Builder {
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(getFactors(experimentModel, variableTypes));
 		experiment.setVariates(getVariates(experimentModel, variableTypes));
+		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
 	}
 	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
@@ -113,6 +113,7 @@ public class ExperimentBuilder extends Builder {
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(getFactors(experimentModel, variableTypes, hasVariableType));
 		experiment.setVariates(getVariates(experimentModel, variableTypes));
+		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
 	}
 
