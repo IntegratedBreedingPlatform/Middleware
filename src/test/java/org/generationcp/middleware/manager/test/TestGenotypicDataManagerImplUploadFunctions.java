@@ -744,16 +744,12 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	Debug.printObjects(4, rows);
     	
     	// Update existing rows
-    	boolean isMarkerUpdated = false;
     	List<DartDataRow> updatedRows = new ArrayList<DartDataRow>();
     	for (DartDataRow row : rows){
 
     		// Update marker
     		Marker marker = row.getMarker();
-    		if (!isMarkerUpdated){
-    			marker.setRemarks(marker.getRemarks() + updateId);
-    			isMarkerUpdated = true;
-    		}
+			marker.setRemarks(marker.getRemarks() + updateId);
 
     		// No change in accMetadataSet and markerMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
@@ -879,16 +875,12 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	Debug.printObjects(4, rows);
     	
     	// Update existing rows
-    	boolean isMarkerUpdated = false;
     	List<SSRDataRow> updatedRows = new ArrayList<SSRDataRow>();
     	for (SSRDataRow row : rows){
 
     		// Update marker
     		Marker marker = row.getMarker();
-    		if (!isMarkerUpdated){
-    			marker.setRemarks(marker.getRemarks() + updateId);
-    			isMarkerUpdated = true;
-    		}
+			marker.setRemarks(marker.getRemarks() + updateId);
 
     		// No change in accMetadataSet and markerMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
@@ -948,7 +940,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	Debug.printObjects(4, rows);
     	
     	// Update existing rows
-    	boolean isMarkerUpdated = false;
     	List<MappingABHRow> updatedRows = new ArrayList<MappingABHRow>();
     	for (MappingABHRow row : rows){
 
@@ -957,10 +948,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     		
     		// Update marker
     		Marker marker = row.getMarker();
-    		if (!isMarkerUpdated){
-    			marker.setRemarks(marker.getRemarks() + updateId);
-    			isMarkerUpdated = true;
-    		}
+			marker.setRemarks(marker.getRemarks() + updateId);
 
     		// No change in accMetadataSet and markerMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
@@ -1021,7 +1009,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	Debug.printObjects(4, rows);
     	
     	// Update existing rows
-    	boolean isMarkerUpdated = false;
     	List<MappingAllelicSNPRow> updatedRows = new ArrayList<MappingAllelicSNPRow>();
     	for (MappingAllelicSNPRow row : rows){
 
@@ -1030,10 +1017,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     		
     		// Update marker
     		Marker marker = row.getMarker();
-    		if (!isMarkerUpdated){
-    			marker.setRemarks(marker.getRemarks() + updateId);
-    			isMarkerUpdated = true;
-    		}
+			marker.setRemarks(marker.getRemarks() + updateId);
 
     		// No change in accMetadataSet and markerMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
@@ -1097,7 +1081,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	Debug.printObjects(4, rows);
     	
     	// Update existing rows
-    	boolean isMarkerUpdated = false;
     	List<MappingAllelicSSRDArTRow> updatedRows = new ArrayList<MappingAllelicSSRDArTRow>();
     	for (MappingAllelicSSRDArTRow row : rows){
 
@@ -1106,10 +1089,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     		
     		// Update marker
     		Marker marker = row.getMarker();
-    		if (!isMarkerUpdated){
-    			marker.setRemarks(marker.getRemarks() + updateId);
-    			isMarkerUpdated = true;
-    		}
+			marker.setRemarks(marker.getRemarks() + updateId);
 
     		// No change in accMetadataSet and markerMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
