@@ -2985,13 +2985,25 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Marker> getSNPsByHaplotype(String haplotype) throws MiddlewareQueryException {
         List<Marker> returnVal = null;
+        List<Integer> markerIds = null;
 
-        setWorkingDatabase(Database.CENTRAL, getMarkerDao());
+        markerIds = getAllFromCentralAndLocalByMethod(getMarkerDao()
+                            , "getMarkerIDsByHaplotype", new Object[]{haplotype}, new Class[]{String.class});
+        /*setWorkingDatabase(Database.CENTRAL, getMarkerDao());
 
-        returnVal = getMarkerDao().getSNPMarkersByHaplotype(haplotype);
+        markerIds = getMarkerDao().getMarkerIDsByHaplotype(haplotype);
 
         setWorkingDatabase(Database.LOCAL, getMarkerDao());
-        returnVal.addAll(getMarkerDao().getSNPMarkersByHaplotype(haplotype));
+        markerIds.addAll(getMarkerDao().getMarkerIDsByHaplotype(haplotype));*/
+
+        returnVal = getAllFromCentralAndLocalByMethod(getMarkerDao()
+                                    , "getMarkersByIdsAndType", new Object[]{markerIds, GdmsType.TYPE_SNP.getValue()}, new Class[]{List.class, String.class});
+
+        /*setWorkingDatabase(Database.CENTRAL, getMarkerDao());
+        returnVal = getMarkerDao().getMarkersByIdsAndType(markerIds, GdmsType.TYPE_SNP.getValue());
+
+        setWorkingDatabase(Database.LOCAL, getMarkerDao());
+        returnVal.addAll(getMarkerDao().getMarkersByIdsAndType(markerIds, GdmsType.TYPE_SNP.getValue()));*/
 
         return returnVal;
     }

@@ -1947,7 +1947,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetSNPsByHaplotype() throws Exception {
-        String haplotype = "track5";
+        String haplotype = "TRIAL";
 
         List<Marker> results = manager.getSNPsByHaplotype(haplotype);
         Debug.println(0, "testGetSNPsByHaplotype(" + haplotype + ") Results: ");

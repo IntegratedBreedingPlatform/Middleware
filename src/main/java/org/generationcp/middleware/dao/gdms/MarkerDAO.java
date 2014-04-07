@@ -813,6 +813,52 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         return new ArrayList<Marker>();
     }
 
+    public List<Integer> getMarkerIDsByHaplotype(String haplotype) throws MiddlewareQueryException {
+        if (StringUtils.isEmpty(haplotype)) {
+            return new ArrayList<Integer>();
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKER_IDS_BY_HAPLOTYPE);
+            query.setParameter("trackName", haplotype);
+            return query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getSNPMarkerIDsByHaplotype() query from Marker: " + e.getMessage(), e);
+        }
+
+        return new ArrayList<Integer>();
+    }
+
+    public List<Marker> getMarkersByIdsAndType(List<Integer> markerIds, String markerType) throws MiddlewareQueryException {
+        if (StringUtils.isEmpty(markerType)) {
+            return new ArrayList<Marker>();
+        }
+
+        if (markerIds == null || markerIds.size() == 0) {
+            return new ArrayList<Marker>();
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_ID_AND_TYPE);
+            query.setParameter("markerIdList", markerIds);
+            query.setParameter("type", markerType);
+            List results = query.list();
+
+            List<Marker> dataValues = new ArrayList<Marker>();
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    dataValues.add(convertToMarker(result));
+                }
+            }
+            return dataValues;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getSNPMarkersByHaplotype() query from Marker: " + e.getMessage(), e);
+        }
+
+        return new ArrayList<Marker>();
+    }
+
     protected Marker convertToMarker(Object[] result) {
 
         Integer markerId = (Integer) result[0];
