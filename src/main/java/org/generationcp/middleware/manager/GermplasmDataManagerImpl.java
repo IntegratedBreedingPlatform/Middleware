@@ -831,10 +831,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                   //setWorkingDatabase(Database.LOCAL);
 
                   LocationDetails ld = new LocationDetails();
-
+                  ld.setCntryid(l.getCntryid());
                   ld.setCountry_full_name(c.getIsofull());
                   ld.setLocation_abbreviation(l.getLabbr());
                   ld.setLocation_name(l.getLname());
+                  ld.setLtype(l.getLtype());
                   ld.setLocation_type(udf.getFname());
                   ld.setLocation_description(udf.getFdesc());
 

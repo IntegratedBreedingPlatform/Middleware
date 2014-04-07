@@ -168,11 +168,17 @@ public class WorkbookBuilder extends Builder {
                     if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
                         
+                        Double minRange = null, maxRange = null;
+                        if (stdVariable.getConstraints() != null) {
+                        	minRange = stdVariable.getConstraints().getMaxValue();
+                        	maxRange = stdVariable.getConstraints().getMaxValue();
+                        }
+                        
                         MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), getLocalName(projectProperty.getRank(), projectProperties),//projectProperty.getValue(), 
                                 stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
                                 stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), 
                                 getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id), 
-                                label);
+                                label, minRange, maxRange);
                         measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
                         measurementVariable.setFactor(true);
                         measurementVariable.setDataTypeId(stdVariable.getDataType().getId());

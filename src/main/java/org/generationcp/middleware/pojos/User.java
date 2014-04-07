@@ -296,7 +296,7 @@ public class User implements Serializable, BeanFormState {
     }
 
 	@Override
-	public boolean getActive() {
+	public boolean isActive() {
 		// TODO Auto-generated method stub
 		return active;
 	}
