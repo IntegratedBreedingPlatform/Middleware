@@ -82,7 +82,7 @@ public class MeasurementData {
 	}
 
 	public String getValue() {
-		return value;
+		return (value == null ||  "null".equalsIgnoreCase(value)) ? "" : value;
 	}
 
 	public void setValue(String value) {
