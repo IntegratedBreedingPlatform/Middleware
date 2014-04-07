@@ -130,7 +130,7 @@ public enum TermId {
     , FIELD_NAME (32783)
     , FIELDMAP_UUID (32785)
     , MACHINE_ROW_CAPACITY (32787)
-    , BLOCK_ID (77783)
+    , BLOCK_ID (8583)// (77783)
 	
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE(1030)

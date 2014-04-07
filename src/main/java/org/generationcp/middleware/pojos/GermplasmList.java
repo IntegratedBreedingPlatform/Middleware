@@ -444,5 +444,13 @@ public class GermplasmList implements Serializable{
     public boolean hasParent() {
     	return getParent()!=null?true:false;
     }
+    
+    public boolean isLocalList() {
+        return this.getId() < 0;
+    }
+    
+    public boolean isLockedList() {
+        return this.getStatus() >= 100;
+    }
 
 }

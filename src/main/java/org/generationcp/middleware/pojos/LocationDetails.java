@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
- * 
- * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
- *******************************************************************************/
+  * Copyright (c) 2012, All Rights Reserved.
+  *
+  * Generation Challenge Programme (GCP)
+  *
+  *
+  * This software is licensed for use under the terms of the GNU General Public
+  * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+  *
+  *******************************************************************************/
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -26,12 +26,12 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * POJO for location details query.
- * 
+ *
  * select locid, lname as location_name, c.isofull as country_full_name, labbr
  * as location_abbreviation, ud.fname as location_type, ud.fdesc as
  * location_description from location l inner join cntry c on l.cntryid =
  * c.cntryid inner join udflds ud on ud.fldno = l.ltype where locid = 1
- * 
+ *
  * @author Aldrich Abrogena
  */
 @Entity
@@ -62,6 +62,11 @@ public class LocationDetails implements Serializable,
     @Column(name = "country_full_name")
     private String             country_full_name;
 
+
+    @Basic(optional = false)
+    @Column(name = "cntryid")
+    private Integer             cntryid;
+
     @Basic(optional = false)
     @Column(name = "location_abbreviation")
     private String             location_abbreviation;
@@ -69,6 +74,10 @@ public class LocationDetails implements Serializable,
     @Basic(optional = false)
     @Column(name = "location_type")
     private String             location_type;
+
+    @Basic(optional = false)
+    @Column(name = "ltype")
+    private Integer             ltype;
 
     @Basic(optional = false)
     @Column(name = "location_description")
@@ -87,8 +96,8 @@ public class LocationDetails implements Serializable,
     }
 
     public LocationDetails(Integer locid, String location_name,
-            String country_full_name, String location_abbreviation,
-            String location_type, String location_description) {
+        String country_full_name, String location_abbreviation,
+        String location_type, String location_description) {
         super();
         this.locid = locid;
         this.location_name = location_name;
@@ -200,17 +209,32 @@ public class LocationDetails implements Serializable,
         return this.location_name.compareTo(compareName);
     }
 
-    public static Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() { 
+    public static Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
 
-         @Override
-         public int compare(LocationDetails location1, LocationDetails location2) {
-             String locationName1 = location1.getLocation_name().toUpperCase();
-             String locationName2 = location2.getLocation_name().toUpperCase();
+        @Override
+        public int compare(LocationDetails location1, LocationDetails location2) {
+            String locationName1 = location1.getLocation_name().toUpperCase();
+            String locationName2 = location2.getLocation_name().toUpperCase();
 
-             // ascending order
-             return locationName1.compareTo(locationName2);
-         }
-         
-     };
+            // ascending order
+            return locationName1.compareTo(locationName2);
+        }
 
+    };
+
+    public Integer getCntryid() {
+        return cntryid;
+    }
+
+    public void setCntryid(Integer cntryid) {
+        this.cntryid = cntryid;
+    }
+
+    public Integer getLtype() {
+        return ltype;
+    }
+
+    public void setLtype(Integer ltype) {
+        this.ltype = ltype;
+    }
 }

@@ -34,7 +34,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 
 public class ExperimentModelSaver extends Saver {
 	
-	private static final String DUMMY_DESCRIPTION = "DUMMY LOCATION - for null constraint";
+//	private static final String DUMMY_DESCRIPTION = "DUMMY LOCATION - for null constraint";
 
 	public ExperimentModelSaver(
 			HibernateSessionProvider sessionProviderForLocal,
@@ -110,8 +110,7 @@ public class ExperimentModelSaver extends Saver {
 		experimentModel.setProperties(createProperties(experimentModel, values.getVariableList()));
 		
 		if (values.getLocationId() == null && values instanceof StudyValues) {
-			experimentModel.setGeoLocation(getDummyGeoLocation());
-			
+			experimentModel.setGeoLocation(createNewGeoLocation());
 		}
 		else if (values.getLocationId() != null) {
 			experimentModel.setGeoLocation(getGeolocationDao().getById(values.getLocationId())); 
@@ -123,18 +122,11 @@ public class ExperimentModelSaver extends Saver {
 		return experimentModel;
 	}
 
-	private Geolocation getDummyGeoLocation() throws MiddlewareQueryException {
-		Geolocation location = getGeolocationDao().findByDescription(DUMMY_DESCRIPTION);
-		if (location == null) {
-			location = createDummyGeoLocation();
-		}
-		return location;
-	}
-
-	private Geolocation createDummyGeoLocation() throws MiddlewareQueryException {
+   	//GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
+	private Geolocation createNewGeoLocation() throws MiddlewareQueryException {
 		Geolocation location = new Geolocation();
 		location.setLocationId(getGeolocationDao().getNegativeId("locationId"));
-		location.setDescription(DUMMY_DESCRIPTION);
+		location.setDescription("1");
 		getGeolocationDao().save(location);
 		return location;
 	}

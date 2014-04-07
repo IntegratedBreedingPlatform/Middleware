@@ -2387,6 +2387,27 @@ public class TestGenotypicDataManagerImpl{
 
     }
     
+    @Test
+    public void testUpdateMarkerInfoInCentral() throws Exception {
+
+    	// Get an existing marker from local db 
+    	Marker marker = manager.getMarkersByIds(Arrays.asList(3316), 0, 1).get(0);
+    	Debug.println(3, "Existing marker:" + marker.toString());
+    	
+    	List<Object> markerRecords = createMarkerRecords();
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
+
+        try{
+        	manager.updateMarkerInfo(marker, markerAlias, markerDetails, markerUserInfo);
+        } catch (MiddlewareQueryException e){
+        	Debug.println(0, "Marker is in central database and cannot be updated.");
+        	assertTrue(e.getMessage().contains("Marker is in central database and cannot be updated."));
+        }
+
+    }
+    
 
     @AfterClass
     public static void tearDown() throws Exception {
