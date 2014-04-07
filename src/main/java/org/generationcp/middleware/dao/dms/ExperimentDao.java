@@ -187,4 +187,18 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<ExperimentModel> getExperimentsByProjectIds(List<Integer> projectIds) throws MiddlewareQueryException {
+		List<ExperimentModel> list = new ArrayList<ExperimentModel>();
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.in("project.projectId", projectIds));
+			return criteria.list();
+
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getExperimentsByProjectIds query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return list;
+	}
+	
 }

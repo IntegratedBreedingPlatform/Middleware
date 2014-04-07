@@ -131,4 +131,12 @@ public class GeolocationSaver extends Saver {
 		geolocation.getVariates().add(variable);
 	}
 	
+	public Geolocation createMinimumGeolocation() throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		Geolocation geolocation = getGeolocationObject(null);
+		geolocation.setDescription("1");
+		getGeolocationDao().save(geolocation);
+		
+		return geolocation;
+	}
 }

@@ -25,8 +25,14 @@ public class GeolocationPropertySaver extends Saver {
         for (FieldMapInfo info : infos) {
             for (FieldMapDatasetInfo dataset : info.getDatasets()) {
                 for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+                	//GCP-8093 handle old data saved using the default location, default location is no longer used
+                	int locationId = trial.getGeolocationId();
+                	if (!info.isTrial() && trial.getGeolocationId() != null && trial.getGeolocationId().intValue() == 1) {
+                		locationId = getExperimentModelSaver().moveStudyToNewGeolocation(info.getFieldbookId());
+                	}
+                	
                 	if (trial.getBlockId() != null) {
-                		saveOrUpdate(trial.getGeolocationId(), TermId.BLOCK_ID.getId(), trial.getBlockId().toString());
+                		saveOrUpdate(locationId, TermId.BLOCK_ID.getId(), trial.getBlockId().toString());
                 	}
                 }
             }
