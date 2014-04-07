@@ -16,6 +16,10 @@ public class ValueReference extends Reference implements Comparable<ValueReferen
 
 	private String key;
 	
+	public ValueReference() {
+		super();
+	}
+	
     public ValueReference(int id, String name) {
         super.setId(id);
         setKey(String.valueOf(id));
