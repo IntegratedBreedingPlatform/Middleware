@@ -35,18 +35,26 @@ public class GeolocationPropertySaver extends Saver {
 
 	private void saveOrUpdate(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
 		Geolocation geolocation = getGeolocationDao().getById(geolocationId);
+		boolean createProperty = false;
+		GeolocationProperty property = null;
 		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
-			GeolocationProperty property = findProperty(geolocation.getProperties(), typeId);
+			property = findProperty(geolocation.getProperties(), typeId);
 			if (property == null) {
-				property = new GeolocationProperty();
-				property.setGeolocationPropertyId(getGeolocationPropertyDao().getNegativeId("geolocationPropertyId"));
-				property.setRank(getMaxRank(geolocation.getProperties()));
-				property.setGeolocation(geolocation);
-				property.setType(typeId);
-				property.setValue(value);
+				createProperty = true;
 			}
-			getGeolocationPropertyDao().saveOrUpdate(property);
 		}
+		else {
+			createProperty = true;
+		}
+		if (createProperty) {
+			property = new GeolocationProperty();
+			property.setGeolocationPropertyId(getGeolocationPropertyDao().getNegativeId("geolocationPropertyId"));
+			property.setRank(getMaxRank(geolocation.getProperties()));
+			property.setGeolocation(geolocation);
+			property.setType(typeId);
+			property.setValue(value);
+		}
+		getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 	
 	private int getMaxRank(List<GeolocationProperty> properties) {
