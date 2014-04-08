@@ -16,9 +16,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
@@ -687,6 +687,37 @@ public class Workbook {
 			}
 
 			return rows;
+		}
+		return null;
+	}
+	
+	public void updateTrialObservationsWithReferenceList(List<List<ValueReference>> trialList) {
+		//assumes rows are in the same order and size
+		if (trialList != null && !trialList.isEmpty() && this.trialObservations != null 
+				&& this.trialObservations.size() == trialList.size()) {
+			
+			int i = 0;
+			for (List<ValueReference> trialRow : trialList) {
+				List<MeasurementData> dataList = this.trialObservations.get(i).getDataList();
+
+				for (ValueReference trialCell : trialRow) {
+					MeasurementData data = getMeasurementDataById(dataList, trialCell.getId());
+					if (data != null) {
+						data.setValue(trialCell.getName());
+					}
+				}
+				i++;
+			}
+		}
+	}
+	
+	public MeasurementData getMeasurementDataById(List<MeasurementData> data, int id) {
+		if (data != null && !data.isEmpty()) {
+			for (MeasurementData cell : data) {
+				if (cell.getMeasurementVariable().getTermId() == id) {
+					return cell;
+				}
+			}
 		}
 		return null;
 	}

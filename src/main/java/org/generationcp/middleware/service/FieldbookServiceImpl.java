@@ -39,6 +39,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -213,6 +214,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         try {
             trans = session.beginTransaction();
             
+            saveTrialObservations(workbook);
+            
             List<MeasurementVariable> variates = workbook.getVariates();
             List<MeasurementRow> observations = workbook.getObservations();
             
@@ -262,6 +265,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 + ((System.currentTimeMillis() - startTime)/60));
         
     }
+	
+	private void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
+		setWorkingDatabase(Database.LOCAL);
+		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+			for (MeasurementRow trialObservation : workbook.getTrialObservations()) {
+				getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery());
+			}
+		}
+	}
 
 	@Override
 	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {

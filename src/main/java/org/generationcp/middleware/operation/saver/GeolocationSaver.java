@@ -15,8 +15,10 @@ import java.util.ArrayList;
 
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -33,20 +35,33 @@ public class GeolocationSaver extends Saver {
 	}
 	
 	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row, boolean isNursery) throws MiddlewareQueryException {
+		return saveGeolocation(variableList, row, isNursery, true);
+	}
+	
+	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row, boolean isNursery, boolean isCreate) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
-		Geolocation geolocation = create(variableList, row);
+		Integer locationId = null;
+		if (row != null && !isCreate && row.getLocationId() != 0) {
+			locationId = (int) row.getLocationId();
+		}
+		Geolocation geolocation = createOrUpdate(variableList, row, locationId);
 		if (geolocation != null) {
 			if(isNursery && geolocation.getDescription()==null) {
 				geolocation.setDescription("1");//GCP-7340, GCP-7346 - OCC should have a default value of 1
 			}
-			getGeolocationDao().save(geolocation);
+			if (isCreate) {
+				getGeolocationDao().save(geolocation);
+			}
+			else {
+				getGeolocationDao().saveOrUpdate(geolocation);
+			}
 			return geolocation;
 		}
 		return null;
 	}
 	
-	private Geolocation create(VariableList factors, MeasurementRow row) throws MiddlewareQueryException {
+	private Geolocation createOrUpdate(VariableList factors, MeasurementRow row, Integer locationId) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 		
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
@@ -58,31 +73,31 @@ public class GeolocationSaver extends Saver {
 				String value = variable.getValue();
 				
 				if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
-					geolocation = getGeolocationObject(geolocation);
+					geolocation = getGeolocationObject(geolocation, locationId);
 					geolocation.setDescription(value);
 					
 				} else if (TermId.LATITUDE_STORAGE.getId() == storedInId) {
-					geolocation = getGeolocationObject(geolocation);
+					geolocation = getGeolocationObject(geolocation, locationId);
 					geolocation.setLatitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
 				} else if (TermId.LONGITUDE_STORAGE.getId() == storedInId) {
-					geolocation = getGeolocationObject(geolocation);
+					geolocation = getGeolocationObject(geolocation, locationId);
 					geolocation.setLongitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
 				} else if (TermId.DATUM_STORAGE.getId() == storedInId) {
-					geolocation = getGeolocationObject(geolocation);
+					geolocation = getGeolocationObject(geolocation, locationId);
 					geolocation.setGeodeticDatum(value);
 					
 				} else if (TermId.ALTITUDE_STORAGE.getId() == storedInId) {
-					geolocation = getGeolocationObject(geolocation);
+					geolocation = getGeolocationObject(geolocation, locationId);
 					geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
 				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
-					geolocation = getGeolocationObject(geolocation);
-					addProperty(geolocation, createProperty(propertyIndex--, variable));
+					geolocation = getGeolocationObject(geolocation, locationId);
+					addProperty(geolocation, createOrUpdateProperty(propertyIndex--, variable, geolocation));
 				
 				} else if (TermId.OBSERVATION_VARIATE.getId() == storedInId || TermId.CATEGORICAL_VARIATE.getId() == storedInId) {
-					geolocation = getGeolocationObject(geolocation);
+					geolocation = getGeolocationObject(geolocation, locationId);
 					if(row!=null) {//value is in observation sheet
 						variable.setValue(row.getMeasurementDataValue(variable.getVariableType().getLocalName()));
 					}
@@ -97,23 +112,42 @@ public class GeolocationSaver extends Saver {
 		return geolocation;
 	}
 	
-	private Geolocation getGeolocationObject(Geolocation geolocation) throws MiddlewareQueryException {
+	private Geolocation getGeolocationObject(Geolocation geolocation, Integer locationId) throws MiddlewareQueryException {
 		if (geolocation == null) {
-			geolocation = new Geolocation();
-			geolocation.setLocationId(getGeolocationDao().getNegativeId("locationId"));
+			if (locationId != null) {
+				geolocation = getGeolocationDao().getById(locationId);
+			}
+			if (geolocation == null) {
+				geolocation = new Geolocation();
+				geolocation.setLocationId(getGeolocationDao().getNegativeId("locationId"));
+			}
 		}
 		return geolocation;
 	}
 	
-	private GeolocationProperty createProperty(int index, Variable variable) throws MiddlewareQueryException {
-		GeolocationProperty property = new GeolocationProperty();
+	private GeolocationProperty createOrUpdateProperty(int index, Variable variable, Geolocation geolocation) throws MiddlewareQueryException {
+		GeolocationProperty property = getGeolocationProperty(variable.getVariableType().getId(), geolocation);
 		
-		property.setGeolocationPropertyId(index);
-		property.setType(variable.getVariableType().getId());
+		if (property == null) {
+			property = new GeolocationProperty();
+			property.setGeolocationPropertyId(index);
+			property.setType(variable.getVariableType().getId());
+			property.setRank(variable.getVariableType().getRank());
+		}
 		property.setValue(variable.getValue());
-		property.setRank(variable.getVariableType().getRank());
 		
 		return property;
+	}
+	
+	private GeolocationProperty getGeolocationProperty(Integer typeId, Geolocation geolocation) {
+		if (typeId != null && geolocation != null && geolocation.getProperties() != null) {
+			for (GeolocationProperty property : geolocation.getProperties()) {
+				if (property.getTypeId().equals(typeId)) {
+					return property;
+				}
+			}
+		}
+		return null;
 	}
 	
 	private void addProperty(Geolocation geolocation, GeolocationProperty property) {
@@ -133,10 +167,18 @@ public class GeolocationSaver extends Saver {
 	
 	public Geolocation createMinimumGeolocation() throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
-		Geolocation geolocation = getGeolocationObject(null);
+		Geolocation geolocation = getGeolocationObject(null, null);
 		geolocation.setDescription("1");
 		getGeolocationDao().save(geolocation);
 		
 		return geolocation;
+	}
+	
+	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery) throws MiddlewareQueryException, MiddlewareException {
+		setWorkingDatabase(Database.LOCAL);
+		VariableTypeList variableTypes = getVariableTypeListTransformer().transform(row.getMeasurementVariables(), false);
+		VariableList variableList = getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
+		
+		return saveGeolocation(variableList, row, isNursery, false);
 	}
 }
