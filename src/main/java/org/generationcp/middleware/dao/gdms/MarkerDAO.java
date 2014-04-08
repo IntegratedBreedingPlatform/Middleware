@@ -43,7 +43,7 @@ import org.hibernate.criterion.Restrictions;
  * <b>Authors</b>: Mark Agarrado <br>
  * <b>File Created</b>: Jul 10, 2012
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
     /**
@@ -182,7 +182,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      * @return the marker names by g ids
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    @SuppressWarnings("rawtypes")
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
 
         // Used to store the result
@@ -270,7 +269,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      * @param results the results
      * @return the GermplasmMarkerElement items extracted from the list
      */
-    @SuppressWarnings("rawtypes")
     private List<GermplasmMarkerElement> getGermplasmMarkerElementsFromList(List results) {
         ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
         String prevGermplasmName = null;
@@ -312,7 +310,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      * @return the germplasm names by marker names
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    @SuppressWarnings("rawtypes")
     public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames) throws MiddlewareQueryException {
 
         ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
@@ -383,7 +380,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      * @param results the results
      * @return the allelic value elements from list
      */
-    @SuppressWarnings("rawtypes")
     private List<AllelicValueElement> getAllelicValueElementsFromList(List results) {
         List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
 
@@ -402,7 +398,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         return values;
     }
 
-    @SuppressWarnings("rawtypes")
     private List<AllelicValueElement> getAllelicValueElementsFromListLocal(List results) {
         List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
 
@@ -458,7 +453,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      * @return the allelic values by gids and marker ids
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerIds(List<Integer> gids, List<Integer> markerIds)
             throws MiddlewareQueryException {
 
@@ -499,8 +493,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         return allelicValues;
     }
 
-
-    @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getAllelicValuesFromLocal(List<Integer> gids) throws MiddlewareQueryException {
 
         List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
@@ -760,7 +752,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         return 0L;
     }
 
-    @SuppressWarnings("rawtypes")
     public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
         if ((markerIds == null) || (markerIds.isEmpty())) {
             return new ArrayList<Marker>();
@@ -788,7 +779,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
     }
 
     // GCP-7874
-    public List<Marker> getSNPMarkersByHaplotype(String haplotype) throws MiddlewareQueryException {
+	public List<Marker> getSNPMarkersByHaplotype(String haplotype) throws MiddlewareQueryException {
         if (StringUtils.isEmpty(haplotype)) {
             return new ArrayList<Marker>();
         }
@@ -830,37 +821,28 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
     }
 
     public List<Marker> getMarkersByIdsAndType(List<Integer> markerIds, String markerType) throws MiddlewareQueryException {
+    	List<Marker> dataValues = new ArrayList<Marker>();
         if (StringUtils.isEmpty(markerType)) {
-            return new ArrayList<Marker>();
-        }
-
-        if (markerIds == null || markerIds.size() == 0) {
-            return new ArrayList<Marker>();
+            return dataValues;
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_ID_AND_TYPE);
-            query.setParameter("markerIdList", markerIds);
-            query.setParameter("type", markerType);
-            List results = query.list();
-
-            List<Marker> dataValues = new ArrayList<Marker>();
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    dataValues.add(convertToMarker(result));
+        	List<Marker> markersByIds = getMarkersByIds(markerIds, 0, Integer.MAX_VALUE); 
+        	
+        	for (Marker marker : markersByIds) {
+                	if (marker.getMarkerType().equalsIgnoreCase(markerType)){
+                		dataValues.add(marker);
                 }
             }
-            return dataValues;
         } catch (HibernateException e) {
-            logAndThrowException("Error with getSNPMarkersByHaplotype() query from Marker: " + e.getMessage(), e);
+            logAndThrowException("Error with getMarkersByIdsAndType() query from Marker: " + e.getMessage(), e);
         }
 
-        return new ArrayList<Marker>();
+        return dataValues;
     }
 
     protected Marker convertToMarker(Object[] result) {
-
+    	
         Integer markerId = (Integer) result[0];
         String markerType = (String) result[1];
         String markerName = (String) result[2];
