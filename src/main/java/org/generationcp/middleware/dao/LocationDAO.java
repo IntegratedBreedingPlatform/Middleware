@@ -370,6 +370,18 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         }
     }
 
+    public List<Location> getAllProvinces() throws MiddlewareQueryException {
+
+            try {
+                SQLQuery query = getSession().createSQLQuery(Location.GET_ALL_PROVINCES);
+                query.addEntity(Location.class);
+                return query.list();
+            } catch (HibernateException e) {
+                logAndThrowException("Error with getAllProvinces() query from Location: " + e.getMessage(), e);
+                return new ArrayList<Location>();
+            }
+        }
+
     @SuppressWarnings("unchecked")
     public List<LocationDto> getLocationDtoByIds(Collection<Integer> ids) throws MiddlewareQueryException {
         List<LocationDto> returnList = new ArrayList<LocationDto>();

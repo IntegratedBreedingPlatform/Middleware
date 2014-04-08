@@ -412,5 +412,6 @@ public interface LocationDataManager {
     List<Location> getAllFields() throws MiddlewareQueryException;
 
     List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException;
+    List<Location> getAllProvinces() throws MiddlewareQueryException;
     
 }

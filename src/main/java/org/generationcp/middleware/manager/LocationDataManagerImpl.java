@@ -1,13 +1,13 @@
 /*******************************************************************************
  * Copyright (c) 2014, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public
  * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -44,12 +44,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of the LocationDataManager interface. To instantiate this
  * class, a Hibernate Session must be passed to its constructor.
- * 
+ *
  * @author Joyce Avestro
- * 
  */
 @SuppressWarnings("unchecked")
-public class LocationDataManagerImpl extends DataManager implements LocationDataManager{
+public class LocationDataManagerImpl extends DataManager implements LocationDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocationDataManagerImpl.class);
 
@@ -63,25 +62,25 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public LocationDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
     }
-    
+
     @Override
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
     }
-    
-    public List<Location> getAllLocations() throws MiddlewareQueryException{
+
+    public List<Location> getAllLocations() throws MiddlewareQueryException {
         List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
         Collections.sort(locations);
         return locations;
     }
 
-    
+
     @Override
     public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {
         if (setWorkingDatabase(Database.LOCAL)) {
             return this.getLocationDao().getAll(start, numOfRows);
         }
-        
+
         return new ArrayList<Location>();
     }
 
@@ -105,54 +104,54 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     @Override
     public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByName", "getByName");
-        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { name, op },
-                new Class[] { String.class, Operation.class });
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{name, op},
+                new Class[]{String.class, Operation.class});
     }
 
 
     @Override
     public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[] { name, op }, new Class[] { String.class,
-                Operation.class });
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[]{name, op}, new Class[]{String.class,
+                Operation.class});
     }
 
     @Override
     public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[] { country },
-                new Class[] { Country.class });
+        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[]{country},
+                new Class[]{Country.class});
     }
 
     @Override
     public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByCountry", "getByCountry");
-        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { country },
-                new Class[] { Country.class });
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country},
+                new Class[]{Country.class});
     }
-        
+
     @Override
     public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[] { country },
-                new Class[] { Country.class });
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country},
+                new Class[]{Country.class});
     }
 
     @Override
     public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[] { type },
-                new Class[] { Integer.class });
+        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type},
+                new Class[]{Integer.class});
     }
 
     @Override
     public List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByType", "getByType");
-        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { type },
-                new Class[] { Integer.class });
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{type},
+                new Class[]{Integer.class});
     }
 
     @Override
     public long countLocationsByType(Integer type) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[] { type }, new Class[] { Integer.class });
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[]{type}, new Class[]{Integer.class});
     }
-    
+
     @Override
     public UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException {
         if (setWorkingDatabase(id)) {
@@ -162,28 +161,28 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
 
     @Override
-    public Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType type) 
-            throws MiddlewareQueryException{
+    public Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(UDTableType type)
+            throws MiddlewareQueryException {
         Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
-        
+
         List<UserDefinedField> dTypeFields = getUserDefinedFieldByFieldTableNameAndType(type.getTable(), type.getType());
-        for (UserDefinedField dTypeField: dTypeFields){
-            types.put(dTypeField.getFcode(),  dTypeField);
+        for (UserDefinedField dTypeField : dTypeFields) {
+            types.put(dTypeField.getFcode(), dTypeField);
         }
         return types;
     }
-    
+
     @Override
-    public Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code) 
-            throws MiddlewareQueryException{
+    public Integer getUserDefinedFieldIdOfCode(UDTableType tableType, String code)
+            throws MiddlewareQueryException {
         Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
-        
+
         List<UserDefinedField> dTypeFields = getUserDefinedFieldByFieldTableNameAndType(
-                                                tableType.getTable(), tableType.getType());
-        for (UserDefinedField dTypeField: dTypeFields){
-            types.put(dTypeField.getFcode(),  dTypeField);
+                tableType.getTable(), tableType.getType());
+        for (UserDefinedField dTypeField : dTypeFields) {
+            types.put(dTypeField.getFcode(), dTypeField);
         }
-        
+
         return types.get(code) != null ? types.get(code).getFldno() : null;
     }
 
@@ -192,8 +191,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType)
             throws MiddlewareQueryException {
         return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getUserDefinedFieldDao()
-                , "getByFieldTableNameAndType", new Object[] { tableName, fieldType }
-        , new Class[] { String.class, String.class });
+                , "getByFieldTableNameAndType", new Object[]{tableName, fieldType}
+                , new Class[]{String.class, String.class});
     }
 
     @Override
@@ -214,53 +213,53 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @SuppressWarnings("rawtypes")
     @Override
-    public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException {
+    public List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException {
         List<Location> results = new ArrayList<Location>();
 
         List<Integer> pos = new ArrayList<Integer>();
         List<Integer> negs = new ArrayList<Integer>();
 
         //separate ids from local and central
-        for(Integer id : ids){
-            if(id > 0){
+        for (Integer id : ids) {
+            if (id > 0) {
                 pos.add(id);
             } else {
                 negs.add(id);
             }
         }
 
-        if (pos != null && setWorkingDatabase(Database.CENTRAL) && pos.size()>0) {
+        if (pos != null && setWorkingDatabase(Database.CENTRAL) && pos.size() > 0) {
             results.addAll(getLocationDao().getLocationByIds(pos));
         }
 
-        if (negs != null && setWorkingDatabase(Database.LOCAL) && negs.size()>0) {
-           results.addAll(getLocationDao().getLocationByIds(negs));
+        if (negs != null && setWorkingDatabase(Database.LOCAL) && negs.size() > 0) {
+            results.addAll(getLocationDao().getLocationByIds(negs));
         }
-        
+
         //loc.getLname();
-        
-        Collections.sort(results, new Comparator() {  
-            @Override  
-            public int compare(Object obj1, Object obj2) {  
-                Location loc1 = (Location)obj1;  
-                Location loc2 = (Location)obj2;  
-                return loc1.getLname().compareToIgnoreCase(loc2.getLname());  
-            }  
-        });  
-        
+
+        Collections.sort(results, new Comparator() {
+            @Override
+            public int compare(Object obj1, Object obj2) {
+                Location loc1 = (Location) obj1;
+                Location loc2 = (Location) obj2;
+                return loc1.getLname().compareToIgnoreCase(loc2.getLname());
+            }
+        });
+
         return results;
     }
 
     @Override
-    public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException {
+    public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException {
         List<LocationDetails> results = new ArrayList<LocationDetails>();
 
         List<Integer> pos = new ArrayList<Integer>();
         List<Integer> negs = new ArrayList<Integer>();
 
         //separate ids from local and central
-        for(Integer id : ids){
-            if(id > 0){
+        for (Integer id : ids) {
+            if (id > 0) {
                 pos.add(id);
             } else {
                 negs.add(id);
@@ -268,30 +267,30 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         }
 
         if (pos != null && pos.size() > 0 && setWorkingDatabase(Database.CENTRAL)) {
-            results.addAll(getLocationDao().getLocationDetails(pos,0,pos.size()));
+            results.addAll(getLocationDao().getLocationDetails(pos, 0, pos.size()));
         }
 
         if (negs != null && negs.size() > 0 && setWorkingDatabase(Database.LOCAL)) {
-              List<Location> locations = getLocationDao().getLocationByIds(negs);
+            List<Location> locations = getLocationDao().getLocationByIds(negs);
 
-              for (Location l : locations) {
-                  Country c = this.getCountryById(l.getCntryid());
-                  UserDefinedField udf = this.getUserDefinedFieldByID(l.getLtype());
+            for (Location l : locations) {
+                Country c = this.getCountryById(l.getCntryid());
+                UserDefinedField udf = this.getUserDefinedFieldByID(l.getLtype());
 
-                  // hack, reset working database to local
-                  //setWorkingDatabase(Database.LOCAL);
+                // hack, reset working database to local
+                //setWorkingDatabase(Database.LOCAL);
 
-                  LocationDetails ld = new LocationDetails();
-                  ld.setCntryid(l.getCntryid());
-                  ld.setCountry_full_name(c.getIsofull());
-                  ld.setLocation_abbreviation(l.getLabbr());
-                  ld.setLocation_name(l.getLname());
-                  ld.setLtype(l.getLtype());
-                  ld.setLocation_type(udf.getFname());
-                  ld.setLocation_description(udf.getFdesc());
+                LocationDetails ld = new LocationDetails();
+                ld.setCntryid(l.getCntryid());
+                ld.setCountry_full_name(c.getIsofull());
+                ld.setLocation_abbreviation(l.getLabbr());
+                ld.setLocation_name(l.getLname());
+                ld.setLtype(l.getLtype());
+                ld.setLocation_type(udf.getFname());
+                ld.setLocation_description(udf.getFdesc());
 
-                  results.add(ld);
-              }
+                results.add(ld);
+            }
         }
 
         return results;
@@ -378,18 +377,18 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             location.setLocid(negativeId);
             Location recordSaved = locationDao.saveOrUpdate(location);
             idLocationSaved = recordSaved.getLocid();
-            
+
             LocdesDAO locdesDao = getLocdesDao();
             negativeId = locdesDao.getNegativeId("ldid");
             locdes.setLdid(negativeId);
             locdes.setLocationId(idLocationSaved);
             locdesDao.saveOrUpdate(locdes);
-            
+
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException("Error encountered while saving Location: addLocationAndLocdes(" +
-            		"location=" + location + ", locdes=" + locdes + "): " + e.getMessage(), e, LOG);
+                    "location=" + location + ", locdes=" + locdes + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
@@ -417,58 +416,58 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Country> getAllCountry() throws MiddlewareQueryException {
-        return (List<Country>) super.getAllFromCentralAndLocalByMethod(getCountryDao(), "getAllCountry", new Object[] {}, new Class[] {});
+        return (List<Country>) super.getAllFromCentralAndLocalByMethod(getCountryDao(), "getAllCountry", new Object[]{}, new Class[]{});
     }
 
     @Override
     public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountryAndType", new Object[] { country,
+        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountryAndType", new Object[]{country,
                 type}, new Class[]{Country.class, Integer.class});
     }
-    
+
     @Override
-    public List<Location> getLocationsByNameCountryAndType(String name,Country country, Integer type) 
+    public List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type)
             throws MiddlewareQueryException {
         return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao()
-                , "getByNameCountryAndType", new Object[] { name,country,
-                type}, new Class[]{String.class,Country.class, Integer.class});
+                , "getByNameCountryAndType", new Object[]{name, country,
+                type}, new Class[]{String.class, Country.class, Integer.class});
     }
-    
+
     @Override
     public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
         return (List<LocationDetails>) super.getAllFromCentralAndLocalByMethod(getLocationDao()
-                , "getLocationDetails", new Object[] { locationId,
-            start,numOfRows}, new Class[]{Integer.class,Integer.class,Integer.class});
-        
+                , "getLocationDetails", new Object[]{locationId,
+                start, numOfRows}, new Class[]{Integer.class, Integer.class, Integer.class});
+
     }
 
     @Override
     public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
         Database centralInstance = Database.CENTRAL;
         Database localInstance = Database.LOCAL;
-        
+
         List<Location> allLocations = getFromInstanceByMethod(getLocationDAO()
-                , centralInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {});
+                , centralInstance, "getAllBreedingLocations", new Object[]{}, new Class[]{});
         allLocations.addAll(getFromInstanceByMethod(getLocationDAO()
-                , localInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {}));
-        
+                , localInstance, "getAllBreedingLocations", new Object[]{}, new Class[]{}));
+
         return allLocations;
     }
-    
-    
+
+
     @Override
     public Long countAllBreedingLocations() throws MiddlewareQueryException {
         return countAllFromCentralAndLocalByMethod(getLocationDAO()
-                , "countAllBreedingLocations", new Object[] {}, new Class[] {});
+                , "countAllBreedingLocations", new Object[]{}, new Class[]{});
     }
 
-	@Override
-	public Integer getNextNegativeId() throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-			 return getLocationDao().getNegativeId("locid");
-			
-	}    
+    @Override
+    public Integer getNextNegativeId() throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
+        return getLocationDao().getNegativeId("locid");
+
+    }
 
     @Override
     public List<Location> getAllFieldLocations(int locationId)
@@ -477,8 +476,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         Integer fieldLtypeFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
 
         return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
-            , new Object[]{String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId}
-            , new Class[]{String.class, Integer.class, Integer.class});
+                , new Object[]{String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId}
+                , new Class[]{String.class, Integer.class, Integer.class});
     }
 
     @Override
@@ -491,7 +490,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
                 , new Object[]{String.valueOf(fieldId), blockParentFldId, blockLtypeFldId}
                 , new Class[]{String.class, Integer.class, Integer.class});
     }
-    
+
     @Override
     public FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException {
         int rowsInBlock = 0;
@@ -501,73 +500,79 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         int machineRowCapacity = 0;
         Integer fieldId = null;
         boolean isNew = true;
-        
+
         Map<String, UserDefinedField> dTypes = getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 
         setWorkingDatabase(blockId);
         List<Locdes> locdesOfLocation = getLocdesDao().getByLocation(blockId);
         List<String> deletedPlots = new ArrayList<String>();
-        
-        for (Locdes locdes : locdesOfLocation){
-            if (locdes != null){
+
+        for (Locdes locdes : locdesOfLocation) {
+            if (locdes != null) {
                 int typeId = locdes.getTypeId();
                 String value = locdes.getDval();
-                if (typeId == dTypes.get(LocdesType.ROWS_IN_BLOCK.getCode()).getFldno()){
+                if (typeId == dTypes.get(LocdesType.ROWS_IN_BLOCK.getCode()).getFldno()) {
                     rowsInBlock = getNumericValue(value);
-                }else if (typeId == dTypes.get(LocdesType.ROWS_IN_PLOT.getCode()).getFldno()){
+                } else if (typeId == dTypes.get(LocdesType.ROWS_IN_PLOT.getCode()).getFldno()) {
                     rowsInPlot = getNumericValue(value);
-                } else if (typeId == dTypes.get(LocdesType.RANGES_IN_BLOCK.getCode()).getFldno()){
+                } else if (typeId == dTypes.get(LocdesType.RANGES_IN_BLOCK.getCode()).getFldno()) {
                     rangesInBlock = getNumericValue(value);
-                } else if (typeId == dTypes.get(LocdesType.PLANTING_ORDER.getCode()).getFldno()){
+                } else if (typeId == dTypes.get(LocdesType.PLANTING_ORDER.getCode()).getFldno()) {
                     plantingOrder = getNumericValue(value);
-                } else if (typeId == dTypes.get(LocdesType.MACHINE_ROW_CAPACITY.getCode()).getFldno()){
+                } else if (typeId == dTypes.get(LocdesType.MACHINE_ROW_CAPACITY.getCode()).getFldno()) {
                     machineRowCapacity = getNumericValue(value);
                 } else if (typeId == dTypes.get(LocdesType.DELETED_PLOTS.getCode()).getFldno()) {
-                	deletedPlots.add(value);
+                    deletedPlots.add(value);
                 } else if (typeId == dTypes.get(LocdesType.BLOCK_PARENT.getCode()).getFldno()) {
-                	fieldId = getNumericValue(value);
+                    fieldId = getNumericValue(value);
                 }
             }
         }
-        
-        if (rowsInBlock > 0 || rangesInBlock > 0 || rowsInPlot > 0){
+
+        if (rowsInBlock > 0 || rangesInBlock > 0 || rowsInPlot > 0) {
             isNew = false;
         }
-        
+
         return new FieldmapBlockInfo(blockId, rowsInBlock, rangesInBlock, rowsInPlot, plantingOrder, machineRowCapacity, isNew, deletedPlots, fieldId);
     }
-    
+
     @Override
-    public List<Location> getAllFields() throws MiddlewareQueryException{
+    public List<Location> getAllFields() throws MiddlewareQueryException {
         Integer fieldLtype = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
         Integer relationshipType = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
         List<Location> locations = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByTypeWithParent"
-                , new Object[]{fieldLtype, relationshipType} , new Class[]{Integer.class, Integer.class});
-        
+                , new Object[]{fieldLtype, relationshipType}, new Class[]{Integer.class, Integer.class});
+
         Set<Integer> parentIds = new HashSet<Integer>();
         for (Location location : locations) {
-        	parentIds.add(location.getParentLocationId());
+            parentIds.add(location.getParentLocationId());
         }
-        
+
         Map<Integer, String> namesMap = new HashMap<Integer, String>();
         if (!parentIds.isEmpty()) {
-	        setWorkingDatabase(Database.LOCAL);
-	        namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
-	        setWorkingDatabase(Database.CENTRAL);
-	        namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
+            setWorkingDatabase(Database.LOCAL);
+            namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
+            setWorkingDatabase(Database.CENTRAL);
+            namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
         }
-        
+
         for (Location location : locations) {
-        	location.setParentLocationName(namesMap.get(location.getParentLocationId()));
+            location.setParentLocationName(namesMap.get(location.getParentLocationId()));
         }
-        
+
         return locations;
     }
 
     @Override
     public List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException {
-        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvincesByCountry", new Object[]{countryId}, new Class[] {Integer.class});
+        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvincesByCountry", new Object[]{countryId}, new Class[]{Integer.class});
 
+        return provinces;
+    }
+
+    @Override
+    public List<Location> getAllProvinces() throws MiddlewareQueryException {
+        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvinces", new Object[]{}, new Class[]{});
         return provinces;
     }
 
@@ -575,10 +580,10 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         int value = 0;
         try {
             value = Integer.parseInt(strValue);
-        }catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             value = 0; // if it's nut a number, set to 0
         }
         return value;
     }
-    
+
 }
