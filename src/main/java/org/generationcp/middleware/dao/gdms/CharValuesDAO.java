@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -241,4 +242,41 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 
 	        return returnVal;
 	    }
+
+    @SuppressWarnings("unchecked")
+    public List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+        if (markerIdList.size() == 0 || alleleValueList.size() == 0) {
+            throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
+        }
+        if (markerIdList.size() != alleleValueList.size()) {
+            throw new MiddlewareQueryException("markerIdList and alleleValueList must have the same size");
+        }
+        
+        List<String> placeholderList = new ArrayList<String>();
+        for (int i=0; i < markerIdList.size(); i++) {
+            placeholderList.add("(?,?)");
+        }
+        String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
+        
+        String sql =
+            "SELECT gid"
+            + " FROM gdms_char_values"
+            + " WHERE (marker_id, char_value) IN (" + placeholders + ")";
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(sql);
+            for (int i=0; i < markerIdList.size(); i++) {
+                int baseIndex = i * 2;
+
+                query.setInteger(baseIndex, markerIdList.get(i));
+                query.setString(baseIndex + 1, alleleValueList.get(i));
+            }
+            
+            return (List<Integer>) query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidsByMarkersAndAlleleValues(markerIdList=" + markerIdList + " alleleValueList=" + alleleValueList + "): " + e.getMessage(), e);
+        }
+        
+        return new ArrayList<Integer>();
+	}
 }

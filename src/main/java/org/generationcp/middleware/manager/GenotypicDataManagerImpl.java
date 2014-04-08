@@ -569,9 +569,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     
     @Override
     public List<Integer> getGidsByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+    	List<Integer> gids = new ArrayList<Integer>();
         setWorkingDatabase(instance);
-        
-        return getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
+        gids = getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
+        gids.addAll(getCharValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList));
+        return gids;
     }
     
     @Override
