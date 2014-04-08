@@ -2094,8 +2094,8 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetAlleleValuesByMarkers() throws Exception {
-    	List<Integer> markerIds = Arrays.asList(-1, -2, 956);
-        List<AlleleValues> result = manager.getAlleleValuesByMarkers(markerIds);
+    	List<Integer> markerIds = Arrays.asList(-1, -2, 956, 1037);
+        List<AllelicValueElement> result = manager.getAlleleValuesByMarkers(markerIds);
         Debug.println(0, "testGetAlleleValuesByMarkers(): ");
         Debug.printObjects(INDENT, result);
     }

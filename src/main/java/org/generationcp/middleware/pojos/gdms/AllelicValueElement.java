@@ -26,6 +26,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class AllelicValueElement implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    private Integer id;
 
     private Integer gid;
     
@@ -58,7 +60,27 @@ public class AllelicValueElement implements Serializable{
         this.markerName = markerName;
         this.peakHeight = peakHeight;
     }
-    
+
+    /**
+     * Instantiates a AllelicValueElement object with datasetId, gid, markerId and data(char_value for table char_values, 
+     * allele_bin_value for allele_values table and map_char_value for mapping_pop_values).
+     * 
+     * @param id - anId if from gdms_allele_values and acId if from gdms_char_values
+     * @param datasetId
+     * @param gid
+     * @param markerId
+     * @param data
+     * @param peakHeight
+     */
+    public AllelicValueElement(Integer id, Integer datasetId, Integer gid, Integer markerId, String alleleBinValue, Integer peakHeight) {
+    	this.setId(id);
+        this.datasetId = datasetId;
+        this.gid = gid;
+        this.alleleBinValue = alleleBinValue;
+        this.markerId = markerId;
+        this.peakHeight = peakHeight;
+    }
+
     /**
      * Instantiates a AllelicValueElement object with datasetId, gid, markerName and data(char_value for table char_values, 
      * allele_bin_value for allele_values table and map_char_value for mapping_pop_values).
@@ -99,7 +121,23 @@ public class AllelicValueElement implements Serializable{
         this.peakHeight = peakHeight;
     }
     
-    public Integer getGid() {
+    public AllelicValueElement(Integer id, Integer datasetId, Integer gid, Integer markerId, String data) {
+    	this.id = id;
+    	this.datasetId = datasetId;
+    	this.gid = gid;
+    	this.markerId = markerId;
+    	this.data = data;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getGid() {
         return gid;
     }
 
@@ -160,10 +198,14 @@ public class AllelicValueElement implements Serializable{
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("AllelicValueElement [gid=");
+		builder.append("AllelicValueElement [id=");
+		builder.append(id);
+		builder.append(", gid=");
 		builder.append(gid);
 		builder.append(", data=");
 		builder.append(data);
+		builder.append(", markerId=");
+		builder.append(markerId);
 		builder.append(", markerName=");
 		builder.append(markerName);
 		builder.append(", datasetId=");

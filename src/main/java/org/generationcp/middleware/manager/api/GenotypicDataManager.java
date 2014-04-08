@@ -2016,13 +2016,16 @@ public interface GenotypicDataManager{
 
     // GCP-7875
     /**
-     * Gets the allele values by markers.
+     * Gets the allele values by markers. Retrieves from gdms_allele_values and gdms_char_values. 
+     * Corresponding fields in AllelicValueElement are populated based on the table where the data is retrieved from - 
+     * datasetId, markerId, gid, alleleBinValue, peakHeight for data coming from gdms_allele_values and
+     * datasetId, markerId, gid, data (charValue) for data coming from gdms_char_values.   
      *
      * @param markerIds the marker ids
      * @return the allele values by markers
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AlleleValues> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
+    List<AllelicValueElement> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
     
 
     /**

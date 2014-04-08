@@ -74,8 +74,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         return toReturn;
     }
 
-	public List<AlleleValues> getAlleleValuesByMarkerId(List<Integer> markerIdList) throws MiddlewareQueryException {
-        List<AlleleValues> returnVal = new ArrayList<AlleleValues>();
+	public List<AllelicValueElement> getAlleleValuesByMarkerId(List<Integer> markerIdList) throws MiddlewareQueryException {
+        List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
 
         if (markerIdList == null || markerIdList.size() == 0) {
             return returnVal;
@@ -94,10 +94,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     Integer datasetId = (Integer) result[1];
                     Integer markerId = (Integer) result[2];
                     Integer gId = (Integer) result[3];
-                    String data = (String) result[4];
-                    String rawData = (String) result[5];
-                    Integer peakHeight = (Integer) result[6];
-                    AlleleValues value = new AlleleValues(anId, datasetId,gId, markerId, data, rawData, peakHeight);
+                    String alleleBinValue = (String) result[4];
+                    Integer peakHeight = (Integer) result[5];
+                    AllelicValueElement value = new AllelicValueElement(anId, datasetId, gId, markerId, alleleBinValue, peakHeight);
                     returnVal.add(value);
                 }
             }
