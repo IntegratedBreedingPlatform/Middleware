@@ -445,6 +445,16 @@ public class TestLocationDataManagerImpl{
         assertNotNull(result);
         Debug.printObjects(3, result);
     }
+
+    @Test
+    public void testGetProvincesByCountry() throws Exception {
+        List<Location> provinces = manager.getAllProvincesByCountry(101);
+
+        assertNotNull(provinces);
+        assert(provinces.size() > 0);
+        Debug.printObjects(3, provinces);
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

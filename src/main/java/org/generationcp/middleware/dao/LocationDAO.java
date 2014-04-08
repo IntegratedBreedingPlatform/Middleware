@@ -354,21 +354,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return null;
     }
 
-    public List<Location> getAllProvinces() throws MiddlewareQueryException {
-            try {
-                String provinceQuery = "select l.* " +
-                        "from location l, udflds u " +
-                        "where l.ltype = u.fldno " +
-                        "and u.fcode = 'PROV' " +
-                        "order by l.lname";
-                SQLQuery query = getSession().createSQLQuery(provinceQuery);
-                query.addEntity(Location.class);
-                return query.list();
-            } catch (HibernateException e) {
-                logAndThrowException("Error with getAllProvinces() query from Location: " + e.getMessage(), e);
-                return new ArrayList<Location>();
-            }
+    public List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException {
+        if (countryId == null || countryId == 0) {
+            return new ArrayList<Location>();
         }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Location.GET_PROVINCE_BY_COUNTRY);
+            query.addEntity(Location.class);
+            query.setParameter("countryId", countryId);
+            return query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAllProvinces() query from Location: " + e.getMessage(), e);
+            return new ArrayList<Location>();
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public List<LocationDto> getLocationDtoByIds(Collection<Integer> ids) throws MiddlewareQueryException {

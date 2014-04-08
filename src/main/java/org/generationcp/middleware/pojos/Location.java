@@ -50,6 +50,8 @@ public class Location implements Serializable, Comparable<Location>{
     public static final String GET_ALL = "getAllLocation";
     public static final String COUNT_ALL = "countAllLocation";
 
+    public static final String GET_PROVINCE_BY_COUNTRY = "select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV'  and l.cntryid = (:countryId) order by l.lname";
+
     @Id
     @Basic(optional = false)
     @Column(name = "locid")

@@ -565,8 +565,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
 
     @Override
-    public List<Location> getAllProvinces() throws MiddlewareQueryException {
-        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvinces", new Object[]{}, new Class[] {});
+    public List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException {
+        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvincesByCountry", new Object[]{countryId}, new Class[] {Integer.class});
 
         return provinces;
     }
