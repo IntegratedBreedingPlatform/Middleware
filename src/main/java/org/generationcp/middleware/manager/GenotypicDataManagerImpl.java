@@ -3026,15 +3026,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     //GCP-7875
     @Override
-    public List<AlleleValues> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
-        List<AlleleValues> returnVal = null;
+    public List<AllelicValueElement> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
+        List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
 
-        setWorkingDatabase(Database.CENTRAL, getAlleleValuesDao());
-
+        setWorkingDatabase(Database.CENTRAL);
         returnVal = getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds);
+        returnVal.addAll(getCharValuesDao().getAlleleValuesByMarkerId(markerIds));
 
-        setWorkingDatabase(Database.LOCAL, getAlleleValuesDao());
+        setWorkingDatabase(Database.LOCAL);
         returnVal.addAll(getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds));
+        returnVal.addAll(getCharValuesDao().getAlleleValuesByMarkerId(markerIds));
 
         return returnVal;
     }

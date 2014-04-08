@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.hibernate.HibernateException;
@@ -208,4 +209,36 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         return toReturn;
 	}
 
+	@SuppressWarnings("rawtypes")
+	public List<AllelicValueElement> getAlleleValuesByMarkerId(List<Integer> markerIdList)  throws MiddlewareQueryException {
+	        List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
+
+	        if (markerIdList == null || markerIdList.size() == 0) {
+	            return returnVal;
+	        }
+
+	        try {
+	            SQLQuery query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_MARKER_IDS);
+	            query.setParameterList("markerIdList", markerIdList);
+
+	            List results = query.list();
+
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                if (result != null) {
+	                    Integer acId = (Integer) result[0];
+	                    Integer datasetId = (Integer) result[1];
+	                    Integer markerId = (Integer) result[2];
+	                    Integer gId = (Integer) result[3];
+	                    String data = (String) result[4];
+	                    AllelicValueElement value = new AllelicValueElement(acId, datasetId, gId, markerId, data);
+	                    returnVal.add(value);
+	                }
+	            }
+	        } catch (HibernateException e) {
+	            logAndThrowException("Error with getAlleleValuesByMarkerId() query from AlleleValues: " + e.getMessage(), e);
+	        }
+
+	        return returnVal;
+	    }
 }

@@ -119,6 +119,13 @@ public class CharValues implements Serializable{
         "SELECT DISTINCT marker_id " +
         "FROM gdms_char_values " +
         "WHERE gid IN (:gids)";
+	
+    public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
+    		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') "
+    		+ "FROM gdms_char_values cv " 
+    		+ "WHERE  cv.marker_id IN (:markerIdList) " 
+    		+ "ORDER BY cv.gid DESC ";
+
 
     @Id
     @Basic(optional = false)
