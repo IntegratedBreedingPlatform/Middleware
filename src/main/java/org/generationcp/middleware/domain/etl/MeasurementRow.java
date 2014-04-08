@@ -114,12 +114,14 @@ public class MeasurementRow {
 		List<MeasurementVariable> variables = new ArrayList<MeasurementVariable>();
 		if (this.dataList != null) {
 			for (MeasurementData data : dataList) {
-				variables.add(data.getMeasurementVariable());
+				if (data.getMeasurementVariable() != null) {
+					variables.add(data.getMeasurementVariable());
+				}
 			}
 		}
 		return variables;
 	}
-
+	
 	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

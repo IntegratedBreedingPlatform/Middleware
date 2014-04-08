@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
+import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -90,4 +91,8 @@ public abstract class Service extends DatabaseBroker {
     	return new ValueReferenceBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final GeolocationSaver getGeolocationSaver() {
+        return new GeolocationSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
 }

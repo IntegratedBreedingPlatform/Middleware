@@ -146,6 +146,38 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 	
+	public VariableList transformTrialEnvironment(MeasurementRow mRow, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+		VariableList variableList = new VariableList() ;
+		
+		List<MeasurementData> trialMD = mRow.getDataList();
+		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			List<VariableType> varTypes = variableTypeList.getVariableTypes();
+			int varTypeSize = varTypes.size();
+			for(int i = 0, l = varTypeSize; i < l; i++ ){
+				VariableType varType = varTypes.get(i);
+				MeasurementData trialData = null;
+				for (MeasurementData aData : trialMD) {
+					if (aData.getLabel().equalsIgnoreCase(varType.getLocalName())) {
+						trialData = aData;
+						break;
+					}
+				}
+				
+				if (trialData != null) {
+					String value = trialData.getValue();
+										
+					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT ||
+						varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {//include variate
+						Variable variable = new Variable(varType, value);
+						variableList.add(variable);
+					}
+				}
+			}
+		}
+		
+		return variableList;
+	}
+	
 	public VariableList transformTrialEnvironment(List<MeasurementVariable> mVarList, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		VariableList variableList = new VariableList() ;
 		
