@@ -33,7 +33,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * @author Kevin Manansala, Mark Agarrado, Joyce Avestro
  */
-@NamedQueries({ @NamedQuery(name = "getAllLocation", query = "FROM Location"),
+@NamedQueries({
+    @NamedQuery(name = "getAllLocation", query = "FROM Location"),
     @NamedQuery(name = "countAllLocation", query = "SELECT COUNT(l) FROM Location l")
 })
 @Entity

@@ -563,7 +563,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         
         return locations;
     }
-    
+
+    @Override
+    public List<Location> getAllProvinces() throws MiddlewareQueryException {
+        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvinces", new Object[]{}, new Class[] {});
+
+        return provinces;
+    }
 
     private int getNumericValue(String strValue) {
         int value = 0;
