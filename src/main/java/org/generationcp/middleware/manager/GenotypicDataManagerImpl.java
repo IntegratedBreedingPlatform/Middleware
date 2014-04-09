@@ -1477,6 +1477,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             saveDatasetUser(datasetId, datasetUser);
 
             // Save data rows
+            int rowsSaved = 0;
             if (rows != null && rows.size() > 0) {
                 for (SNPDataRow row : rows) {
                     Marker marker = row.getMarker();
@@ -1487,6 +1488,23 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     saveAccMetadataSet(datasetId, row.getAccMetadataSet());
                     saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
                     saveCharValues(datasetId, markerId, row.getCharValues());
+                    
+                    rowsSaved++;
+                    if (rowsSaved % JDBC_BATCH_SIZE == 0){
+                        // flush a batch of inserts and release memory
+                    	MarkerDAO markerDao = getMarkerDao();
+                    	markerDao.flush();
+                    	markerDao.clear();
+                    	AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
+                    	accMetadataSetDao.flush();
+                    	accMetadataSetDao.clear();
+                    	MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
+                    	markerMetadataSetDao.flush();
+                    	markerMetadataSetDao.clear();
+                    	CharValuesDAO charValuesDao = getCharValuesDao();
+                    	charValuesDao.flush();
+                    	charValuesDao.clear();
+                    }
                 }
             }
 
@@ -2465,23 +2483,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 
         // If the dataset is not yet existing in the database (local and central) - should create a new dataset in the local database.
-        Integer datasetId = dataset.getDatasetId();
-        if (datasetId == null) {
-            requireLocalDatabaseInstance();
-            DatasetDAO datasetDao = getDatasetDao();
-            Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
-            dataset.setDatasetId(datasetGeneratedId);
+        Integer datasetId = null;
+        requireLocalDatabaseInstance();
+        DatasetDAO datasetDao = getDatasetDao();
+        Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
+        dataset.setDatasetId(datasetGeneratedId);
 
-            dataset.setDatasetType(datasetType);
+        dataset.setDatasetType(datasetType);
 
-            if (!datasetType.equals(TYPE_QTL)) {
-                dataset.setDataType(dataType);
-            }
-
-            Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
-            datasetId = datasetRecordSaved.getDatasetId();
-
+        if (!datasetType.equals(TYPE_QTL)) {
+            dataset.setDataType(dataType);
         }
+
+        Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
+        datasetId = datasetRecordSaved.getDatasetId();
 
         if (datasetId == null) {
             throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
