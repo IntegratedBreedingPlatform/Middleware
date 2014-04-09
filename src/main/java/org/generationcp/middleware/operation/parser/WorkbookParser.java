@@ -271,9 +271,9 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.start.is.after.current.date"));
         }
         
-        if (endDate != null && endDate.after(currentDate)) {
+        /*if (endDate != null && endDate.after(currentDate)) {
             errorMessages.add(new Message("error.end.is.after.current.date"));
-        }
+        }*/
 
 
         if (studyTypeValue == null) {
