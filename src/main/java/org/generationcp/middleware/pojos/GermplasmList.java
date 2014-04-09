@@ -93,10 +93,11 @@ public class GermplasmList implements Serializable{
     @OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 
-    public static String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE'";
-    public static String GET_GERMPLASM_NAME_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'NAMES' AND ftype = 'NAME'";
+    public static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE'";
+
+    public static final String GET_GERMPLASM_NAME_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'NAMES' AND ftype = 'NAME'";
     
-    public static String SEARCH_FOR_GERMPLASM_LIST =
+    public static final String SEARCH_FOR_GERMPLASM_LIST =
     		"SELECT DISTINCT listnms.* " +
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
@@ -107,7 +108,7 @@ public class GermplasmList implements Serializable{
 		    "      OR desig LIKE :qStandardized " +
 		    ")";
 		    
-    public static String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE =
+    public static final String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE =
     		"SELECT DISTINCT listnms.* " +
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
@@ -118,7 +119,7 @@ public class GermplasmList implements Serializable{
             "      OR desig LIKE :qStandardized " +
             ")";
     
-    public static String SEARCH_FOR_GERMPLASM_LIST_EQUAL =
+    public static final String SEARCH_FOR_GERMPLASM_LIST_EQUAL =
     		"SELECT DISTINCT listnms.* " +
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +

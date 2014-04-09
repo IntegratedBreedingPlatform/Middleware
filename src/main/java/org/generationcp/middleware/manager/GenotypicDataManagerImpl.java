@@ -1075,8 +1075,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows)
             throws MiddlewareQueryException {
-        //TODO
-//        return null;
         List<String> methods = Arrays.asList("countMarkerIdsByQtl", "getMarkerIdsByQtl");
         return super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows,
                 new Object[]{qtlName, chromosome, min, max},
@@ -3085,8 +3083,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			
     			if (alleleValue != null){	
     				toReturn.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue, dartValue));
+    				break;
     			}
-				break;
 
     		}
     	}
@@ -3119,13 +3117,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			Integer gid = accMetadataSet.getGermplasmId();
     			
     			for (CharValues charValue : charValues){
-    				if (charValue.getDatasetId().equals(datasetId)
+    				
+    				if (charValue != null && charValue.getDatasetId().equals(datasetId)
     						&&	charValue.getGid().equals(gid)
     						&& charValue.getMarkerId().equals(markerId)){
-    					if (charValue != null){
-	    					toReturn.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValue));   
-	    					break;
-    					}
+    					toReturn.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValue));   
+    					break;
     				}
     			}
     		}
@@ -3160,14 +3157,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			Integer gid = accMetadataSet.getGermplasmId();
     			
     			for (AlleleValues alleleValue : alleleValues){
-    				if (alleleValue.getDatasetId().equals(datasetId)
+    				if (alleleValue != null && alleleValue.getDatasetId().equals(datasetId)
     						&&	alleleValue.getGid().equals(gid)
     						&& alleleValue.getMarkerId().equals(markerId)){
-    					if (alleleValue != null){
-    						toReturn.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue));   
-    						break;
-    					}
-
+						toReturn.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue));   
+						break;    					
     				}
     			}
     		}
@@ -3201,13 +3195,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			Integer gid = accMetadataSet.getGermplasmId();
     			
     			for (MappingPopValues mappingPopValue : mappingPopValues){
-    				if (mappingPopValue.getDatasetId().equals(datasetId)
+    				if (mappingPopValue != null && mappingPopValue.getDatasetId().equals(datasetId)
     						&&	mappingPopValue.getGid().equals(gid)
     						&& mappingPopValue.getMarkerId().equals(markerId)){
-    					if (mappingPopValue != null){
-    						toReturn.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue));   
-    						break;
-    					}
+						toReturn.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue));   
+						break;
     				}
     			}
     		}

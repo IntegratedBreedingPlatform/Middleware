@@ -11,10 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import java.io.Serializable;
+
 /** 
  * Contains the properties of a Term - id, vocabularyId, name, definition, nameSynonyms, obsolete.
  */
-public class TermProperty {
+public class TermProperty implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private Integer termPropertyId;
 

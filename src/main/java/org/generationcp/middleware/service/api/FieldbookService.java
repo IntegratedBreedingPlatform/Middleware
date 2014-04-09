@@ -35,7 +35,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 

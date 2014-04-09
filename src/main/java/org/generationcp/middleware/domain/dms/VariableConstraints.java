@@ -11,14 +11,18 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.util.Debug;
 
 /** 
  * Contains the min and max constraints of a variable.
  */
-public class VariableConstraints {
+public class VariableConstraints implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 
-    private Integer minValueId; // the cvtermprop id of min constraint- to identify if from local or central
+	private Integer minValueId; // the cvtermprop id of min constraint- to identify if from local or central
     
 	private Double minValue;
 	

@@ -12,7 +12,9 @@ import java.util.List;
  */
 public class WorkbookParserException extends Exception{
 
-    private List<Message> messages;
+	private static final long serialVersionUID = 1L;
+
+	private List<Message> messages;
 
     public WorkbookParserException() {
     }

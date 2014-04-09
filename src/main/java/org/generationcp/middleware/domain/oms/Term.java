@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.NameSynonym;
@@ -19,7 +20,9 @@ import org.generationcp.middleware.util.Debug;
 /** 
  * Contains the details of a Term - id, vocabularyId, name, definition, nameSynonyms, obsolete.
  */
-public class Term {
+public class Term implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private int id;
 	

@@ -104,16 +104,16 @@ public class ExperimentProperty implements Serializable {
 		return ndExperimentpropId;
 	}
 
-	public void setNdExperimentpropId(Integer nd_experimentprop_id) {
-		this.ndExperimentpropId = nd_experimentprop_id;
+	public void setNdExperimentpropId(Integer ndExperimentpropId) {
+		this.ndExperimentpropId = ndExperimentpropId;
 	}
 
 	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public void setTypeId(Integer type_id) {
-		this.typeId = type_id;
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
 	}
 
 	public String getValue() {

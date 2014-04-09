@@ -787,7 +787,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         
         //loc.getLname();
         
-        Collections.sort(results, new Comparator() {  
+        Collections.sort(results, new Comparator<Object>() {  
             @Override  
             public int compare(Object obj1, Object obj2) {  
                 Location loc1 = (Location)obj1;  

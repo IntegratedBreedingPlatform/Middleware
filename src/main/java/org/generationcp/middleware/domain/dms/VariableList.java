@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,11 +23,12 @@ import org.generationcp.middleware.domain.oms.TermId;
 /** 
  * List of variables and types.
  */
-public class VariableList {
+public class VariableList implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+	
 	private List<Variable> variables = new ArrayList<Variable>();
 	private VariableTypeList variableTypes = null;
-	
 	private Map<String, Variable> variableMap;
 	
 	public void add(Variable variable) {
@@ -54,7 +56,7 @@ public class VariableList {
 
 	public Map<String, Variable> getVariableMap(){
 		if(variableMap == null){
-			variableMap = new HashMap();
+			variableMap = new HashMap<String, Variable>();
 			for (Variable variable : this.getVariables()) {				
 				variableMap.put(Integer.toString(variable.getVariableType().getStandardVariable().getStoredIn().getId()), variable);
 			}

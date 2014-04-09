@@ -1756,7 +1756,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             
             if (sameProjectAndToolSettings.size() > 0){
                 for (TemplateSetting setting : sameProjectAndToolSettings){
-                    if (setting.getTemplateSettingId() != templateSetting.getTemplateSettingId() 
+                    if (!setting.getTemplateSettingId().equals(templateSetting.getTemplateSettingId()) 
                             && setting.isDefault()){
                         setting.setIsDefault(Boolean.FALSE);
                         getTemplateSettingDao().merge(setting);

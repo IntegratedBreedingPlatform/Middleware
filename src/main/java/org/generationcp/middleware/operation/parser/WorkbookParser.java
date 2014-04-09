@@ -76,7 +76,7 @@ public class WorkbookParser {
     private final static String[] SECTION_NAMES = new String[] {"CONDITION", "FACTOR", "CONSTANT", "VARIATE"};
 
 
-    private static final int DEFAULT_GEOLOCATION_ID = 1;
+//    private static final int DEFAULT_GEOLOCATION_ID = 1;
 
     /**
      * Added handling for parsing the file if its xls or xlsx

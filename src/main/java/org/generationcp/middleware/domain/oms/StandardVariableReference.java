@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.util.Debug;
 
@@ -21,8 +23,10 @@ import org.generationcp.middleware.util.Debug;
  * @author Joyce Avestro
  *
  */
-public class StandardVariableReference extends Reference implements Comparable<StandardVariableReference>{
+public class StandardVariableReference extends Reference implements Serializable, Comparable<StandardVariableReference>{
 	
+	private static final long serialVersionUID = 1L;
+
 	public StandardVariableReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);

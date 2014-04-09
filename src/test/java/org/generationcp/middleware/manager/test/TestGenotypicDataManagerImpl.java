@@ -82,7 +82,7 @@ public class TestGenotypicDataManagerImpl{
 
     private long                        startTime;
 
-    private int                         INDENT              = 3;
+    private static final int            INDENT              = 3;
 
     @Rule
     public TestName                     name                = new TestName();
@@ -1661,7 +1661,7 @@ public class TestGenotypicDataManagerImpl{
     }
 
     @Test
-    public void TestGetMapIDsByQTLName() throws Exception {
+    public void testGetMapIDsByQTLName() throws Exception {
         String qtlName = "HI Control 08_AhI";
 
         List<Integer> mapIDs = manager.getMapIDsByQTLName(qtlName, 0, 2);
@@ -1673,7 +1673,7 @@ public class TestGenotypicDataManagerImpl{
     }
 
     @Test
-    public void TestCountMapIDsByQTLName() throws Exception {
+    public void testCountMapIDsByQTLName() throws Exception {
         String qtlName = "HI Control 08_AhI";
 
         long count = manager.countMapIDsByQTLName(qtlName);

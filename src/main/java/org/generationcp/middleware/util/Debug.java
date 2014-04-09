@@ -49,6 +49,14 @@ public class Debug {
         }
     }
 
+    public static void println(String s) {
+        if (LOG.isDebugEnabled()){
+            LOG.debug(s.toString());
+        } else {
+            System.out.println(s.toString());
+        }
+    }
+
     /**
      * Println. Prints the obj.toString() with the given indent, followed by a newline.
      *
@@ -59,6 +67,10 @@ public class Debug {
         println(indent, obj.toString());
     }
 
+    public static void print(Object obj) {
+        print(0, obj);
+    }
+    
     /**
      * Prints the String s with the given indent.
      *
@@ -117,6 +129,10 @@ public class Debug {
             }
         }        
     }
+    
+    public static void printFormattedObject(Object obj){
+    	printFormattedObject(0, obj);
+    }
 
     /**
      * Prints multiple formatted objects. 
@@ -133,6 +149,10 @@ public class Debug {
         println(indent, "#RECORDS: " + (objects != null ? objects.size() : 0));
     }
 
+    public static void printFormattedObjects(List<?> objects){
+    	printFormattedObjects(0, objects);
+    }
+
     /**
      * Prints the obj.toString().
      *
@@ -143,6 +163,9 @@ public class Debug {
         println(indent, obj.toString());
     }
 
+    public static void printObject(Object obj) {
+        printObject(0, obj);
+    }
     /**
      * Prints the obj.toString() of the objects passed.
      *
@@ -157,5 +180,10 @@ public class Debug {
         }
         println(indent, "#RECORDS: " + (objects != null ? objects.size() : 0));
     }
+    
+    public static void printObjects(List<?> objects){
+    	printObjects(0, objects);
+    }
+
     
 }

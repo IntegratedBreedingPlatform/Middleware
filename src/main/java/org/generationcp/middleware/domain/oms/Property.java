@@ -17,9 +17,9 @@ import org.generationcp.middleware.util.Debug;
 
 public class Property {
     
-	Term term;
+	private Term term;
 	
-	Term IsA;
+	private Term isA;
 	
 	
 	public Property() {
@@ -31,7 +31,7 @@ public class Property {
 
     public Property(Term term, Term isA) {
         this.term = term;
-        this.IsA = isA;
+        this.isA = isA;
     }
     
     public Property(Term term, Term isA, String cropOntologyId) {
@@ -42,11 +42,11 @@ public class Property {
     }
 
     public Term getIsA() {
-		return IsA;
+		return isA;
 	}
 
 	public void setIsA(Term isA) {
-		IsA = isA;
+		this.isA = isA;
 	}
 
 	public Term getTerm() {
@@ -83,8 +83,8 @@ public class Property {
     }
     
     public int getIsAId() {
-        if(IsA != null){
-            return IsA.getId();
+        if(isA != null){
+            return isA.getId();
         }else{
             return -1;
         }
@@ -107,7 +107,7 @@ public class Property {
     public String toString() {
 
         if (term == null){
-            return null;
+            return "";
         }
 
         StringBuilder builder = new StringBuilder();
@@ -118,7 +118,7 @@ public class Property {
         builder.append(", definition=");
         builder.append(term.getDefinition());
         builder.append(", IsA=");
-        builder.append(IsA);
+        builder.append(isA);
         builder.append("]");
 		return builder.toString();
 	}
@@ -127,9 +127,9 @@ public class Property {
         Debug.println(indent, "Property: ");
         Debug.println(indent + 3, "term: ");
         term.print(indent + 6);
-        if (IsA != null){
+        if (isA != null){
             Debug.println(indent + 3, "IsA: ");
-            IsA.print(indent + 6);
+            isA.print(indent + 6);
         }
     }
 	

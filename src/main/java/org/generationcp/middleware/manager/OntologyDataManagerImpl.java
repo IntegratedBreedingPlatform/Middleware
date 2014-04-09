@@ -313,6 +313,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
+        if (term == null){
+        	return;
+        }
+        
         try {
             trans = session.beginTransaction();
             getTermSaver().update(term);
@@ -517,6 +521,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+
+        if (term == null){
+        	return null;
+        }
 
         try {
             trans = session.beginTransaction();

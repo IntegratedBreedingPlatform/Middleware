@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,9 +26,11 @@ import org.generationcp.middleware.util.Debug;
  * @author Joyce Avestro
  *
  */
-public class TraitClassReference extends Reference implements Comparable<TraitClassReference>{
+public class TraitClassReference extends Reference implements Serializable, Comparable<TraitClassReference>{
     
-    private int parentTraitClassId; // Either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS for first-level class
+	private static final long serialVersionUID = 1L;
+
+	private int parentTraitClassId; // Either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS for first-level class
     
     private List<TraitClassReference> traitClassChildren;
     

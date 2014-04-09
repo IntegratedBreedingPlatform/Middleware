@@ -67,7 +67,8 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         return new ArrayList<MarkerInfo>();
     }
 
-    public List<MarkerInfo> getByMarkerIds(List<Integer> markerList) throws MiddlewareQueryException {
+    @SuppressWarnings("rawtypes")
+	public List<MarkerInfo> getByMarkerIds(List<Integer> markerList) throws MiddlewareQueryException {
         if (markerList == null || markerList.size() == 0) {
             return new ArrayList<MarkerInfo>();
         }
