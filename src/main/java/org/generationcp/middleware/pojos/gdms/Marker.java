@@ -121,26 +121,6 @@ public class Marker implements Serializable{
                     + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
                     + "WHERE track_name = (:trackName)";
 
-    public static final String GET_MARKERS_BY_ID_AND_TYPE = "SELECT marker_id  "
-                        + ", CONCAT(marker_type, '') "
-                        + ", CONCAT(marker_name, '') "
-                        + ", CONCAT(species, '') "
-                        + ", db_accession_id "
-                        + ", reference "
-                        + ", CONCAT(genotype, '') "
-                        + ", ploidy  "
-                        + ", primer_id  "
-                        + ", remarks  "
-                        + ", assay_type "
-                        + ", motif  "
-                        + ", forward_primer  "
-                        + ", reverse_primer  "
-                        + ", product_size  "
-                        + ", annealing_temp "
-                        + ", amplification "
-                + "FROM gdms_marker "
-                + "WHERE marker_id IN (:markerIdList) and marker_type = (:type)";
-
     public static final String GET_SNP_MARKERS_BY_HAPLOTYPE = "SELECT gdms.marker_id  "
                         + ", CONCAT(marker_type, '') "
                         + ", CONCAT(marker_name, '') "

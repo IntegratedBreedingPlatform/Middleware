@@ -98,20 +98,27 @@ public class WorkbookBuilder extends Builder {
 		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
 		VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
 		
-		VariableList conditionVariables = null;
+		VariableList conditionVariables = null, constantVariables = null;
 		if (isTrial) {
 			conditionVariables = new VariableList();
 			conditionVariables.addAll(study.getConditions());
 			conditionVariables.addAll(getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId));
+			
+			constantVariables = new VariableList();
+			constantVariables.addAll(study.getConstants());
+			constantVariables.addAll(getTrialConstants(workbook.getTrialDatasetId()));
+			
+			variables = removeTrialDatasetVariables(variables, conditionVariables, constantVariables);
 		}
 		else {
 			getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
 			conditionVariables = study.getConditions();
+			constantVariables = study.getConstants();
 		}
 		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true);
 		List<MeasurementVariable> factors = buildFactors(experiments, isTrial);
-		List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
-		List<MeasurementVariable> variates = buildVariates(variables); //buildVariates(experiments);
+		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false);
+		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
 		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates, isTrial);
 		
 		workbook.setStudyDetails(studyDetails);
@@ -198,8 +205,8 @@ public class WorkbookBuilder extends Builder {
 			List<MeasurementVariable> factorList, List<MeasurementVariable> variateList, boolean isTrial) {
 		
 	    List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
-	   
 	    for (Experiment experiment : experiments) {
+	   
 	        int experimentId = experiment.getId();
 	        VariableList factors = experiment.getFactors();
 	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes); //experiment.getVariates();
@@ -320,11 +327,34 @@ public class WorkbookBuilder extends Builder {
             return variates;
         }
 
-	private List<MeasurementVariable> buildVariates(VariableTypeList variables) { 
+	private List<MeasurementVariable> buildVariates(VariableTypeList variables) {
+		return buildVariates(variables, null);
+	}
+	private List<MeasurementVariable> buildVariates(VariableTypeList variables, List<MeasurementVariable> constants) { 
 	    List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+	    VariableTypeList filteredVariables = null;
 	    
 	    if (variables != null && variables.getVariates() != null && !variables.getVariates().getVariableTypes().isEmpty()) {
-	    	variates = getMeasurementVariableTransformer().transform(variables.getVariates(), false);
+		    List<String> constantHeaders = new ArrayList<String>();
+		    if (constants != null) {
+			    for (MeasurementVariable constant : constants) {
+			    	constantHeaders.add(constant.getName());
+			    }
+			    filteredVariables = new VariableTypeList();
+			    for (VariableType variable : variables.getVariableTypes()) {
+			    	if (!constantHeaders.contains(variable.getLocalName())) {
+			    		filteredVariables.add(variable);
+			    	}
+			    }
+		    }
+		    else {
+		    	filteredVariables = variables;
+		    }
+		    
+	    
+		    if (filteredVariables.size() > 0) {
+		    	variates = getMeasurementVariableTransformer().transform(filteredVariables.getVariates(), false);
+		    }
 	    }
 	    
 	    return variates;
@@ -380,13 +410,6 @@ public class WorkbookBuilder extends Builder {
 	
 	private VariableList getSingleRowOfEmptyTrialVariables(Workbook workbook, int studyId, int measurementDatasetId) throws MiddlewareQueryException {
 		DmsProject trialProject = getDataSetBuilder().getTrialDataset(studyId, measurementDatasetId);
-//		int totalRows = (int) getStudyDataManager().countExperiments(trialProject.getProjectId());
-//		List<Experiment> experiments = getStudyDataManager().getExperiments(trialProject.getProjectId(), 0, totalRows);
-//		
-//		if (experiments != null && !experiments.isEmpty()) {
-//			return experiments.get(0).getFactors();
-//		}
-//		return null;
 		DataSet dataset = getDataSetBuilder().build(trialProject.getProjectId());
 		VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		VariableList list = new VariableList();
@@ -397,6 +420,17 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 	
+	private VariableList getTrialConstants(int trialDatasetId) throws MiddlewareQueryException {
+		DataSet dataset = getDataSetBuilder().build(trialDatasetId);
+		VariableTypeList typeList = dataset.getVariableTypes().getVariates();
+		
+		VariableList list = new VariableList();
+		for (VariableType type : typeList.getVariableTypes()) {
+			list.add(new Variable(type, (String) null));
+		}
+		return list;
+	}
+
 	private List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
 	throws MiddlewareQueryException {
 		
@@ -444,4 +478,27 @@ public class WorkbookBuilder extends Builder {
 		return rows;
 	}
 	
+	private VariableTypeList removeTrialDatasetVariables(VariableTypeList variables, VariableList conditions, VariableList constants) {
+		List<String> trialList = new ArrayList<String>();
+		if (conditions != null && conditions.size() > 0) {
+			for (Variable condition : conditions.getVariables()) {
+				trialList.add(condition.getVariableType().getLocalName());
+			}
+		}
+		if (constants != null && constants.size() > 0) {
+			for (Variable constant : constants.getVariables()) {
+				trialList.add(constant.getVariableType().getLocalName());
+			}
+		}
+		
+		VariableTypeList list = new VariableTypeList();
+		if (variables != null) {
+			for (VariableType type : variables.getVariableTypes()) {
+				if (!trialList.contains(type.getLocalName())) {
+					list.add(type);
+				}
+			}
+		}
+		return list;
+	}
 }
