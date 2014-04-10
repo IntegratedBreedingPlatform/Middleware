@@ -11,18 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.searcher;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 
 public class StudySearcherByGid extends Searcher {
 
@@ -33,7 +24,7 @@ public class StudySearcherByGid extends Searcher {
 	}
 	
 	// TODO: DELETE? UNUSED? 
-	public List<StudyReference> searchStudies(GidStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {
+/*	public List<StudyReference> searchStudies(GidStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {
 		int gid = filter.getGid();
 		List<StudyReference> studyRefs = new ArrayList<StudyReference>();
 		
@@ -45,7 +36,7 @@ public class StudySearcherByGid extends Searcher {
 		
 		return studyRefs;
 	}
-	
+*/	
 	public long countStudies(GidStudyQueryFilter filter) throws MiddlewareQueryException {
 		int gid = filter.getGid();
 		long count = 0;

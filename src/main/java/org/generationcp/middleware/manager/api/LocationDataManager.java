@@ -24,7 +24,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for managing Location information.
  * 

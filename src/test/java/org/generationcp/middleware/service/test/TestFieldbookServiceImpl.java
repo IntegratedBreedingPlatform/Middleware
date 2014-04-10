@@ -295,11 +295,11 @@ public class TestFieldbookServiceImpl {
     private GermplasmList createGermplasmsCimmytWheat(
             Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
         
-        int NUMBER_OF_ENTRIES = 3;
+        int numberOfEntries = 3;
         
         GermplasmList germList = createGermplasmList();
         
-        for (int i=0; i< NUMBER_OF_ENTRIES; i++){
+        for (int i=0; i< numberOfEntries; i++){
             Germplasm g = createGermplasm();
 
             List<Name> names = new ArrayList<Name>();
@@ -332,11 +332,11 @@ public class TestFieldbookServiceImpl {
     private GermplasmList createGermplasmsOtherCrop(
             Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
         
-        int NUMBER_OF_ENTRIES = 3;
+        int numberOfEntries = 3;
         
         GermplasmList germList = createGermplasmList();
         
-        for (int i=0; i< NUMBER_OF_ENTRIES; i++){
+        for (int i=0; i< numberOfEntries; i++){
             Germplasm g = createGermplasm();
 
             List<Name> names = new ArrayList<Name>();
@@ -351,7 +351,7 @@ public class TestFieldbookServiceImpl {
     }
     
     private GermplasmList createGermplasmList(){
-        String name = "Test List #1_" + "_" + (int) Math.random()*100;
+        String name = "Test List #1_" + "_" + (int) (Math.random()*100);
         GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206)
                 , "LST", Integer.valueOf(1), name + " Description", null, 1);
         return germList;
@@ -376,7 +376,7 @@ public class TestFieldbookServiceImpl {
         Name n = new Name();
         n.setLocationId(Integer.valueOf(9000));
         n.setNdate(Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date())));
-        n.setNval("Germplasm_" + i + "_" + (int) Math.random()*100);
+        n.setNval("Germplasm_" + i + "_" + (int) (Math.random()*100));
         n.setReferenceId(Integer.valueOf(1));
         n.setTypeId(Integer.valueOf(1));
         n.setNstat(Integer.valueOf(0));

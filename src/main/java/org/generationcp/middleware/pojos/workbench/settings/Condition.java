@@ -3,6 +3,8 @@ package org.generationcp.middleware.pojos.workbench.settings;
 import java.io.Serializable;
 
 public class Condition  implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String description;
 	private String property;

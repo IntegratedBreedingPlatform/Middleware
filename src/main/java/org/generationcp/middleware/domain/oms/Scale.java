@@ -65,7 +65,7 @@ public class Scale {
 	public String toString() {
 	    
 	    if (term == null){
-	        return null;
+	        return "";
 	    }
 	    
 		StringBuilder builder = new StringBuilder();

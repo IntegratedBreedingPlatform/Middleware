@@ -438,7 +438,7 @@ public class WorkbookSaver extends Saver {
 		
 		Session session = getCurrentSessionForLocal();
 		int i = 0;
-		List<Integer> variableIndexesList = new ArrayList();
+		List<Integer> variableIndexesList = new ArrayList<Integer>();
 		//we get the indexes so that in the next rows we dont need to compare anymore per row
 		if(workbook.getObservations() != null && workbook.getObservations().size() != 0){
 			MeasurementRow row = workbook.getObservations().get(0);

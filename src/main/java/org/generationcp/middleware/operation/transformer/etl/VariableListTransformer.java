@@ -89,7 +89,7 @@ public class VariableListTransformer extends Transformer {
 	}
 	
 	public List<Integer> transformStockIndexes(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
-		List<Integer> variableIndexesList = new ArrayList();
+		List<Integer> variableIndexesList = new ArrayList<Integer>();
 
 		if(mRow == null) {
 			return variableIndexesList;

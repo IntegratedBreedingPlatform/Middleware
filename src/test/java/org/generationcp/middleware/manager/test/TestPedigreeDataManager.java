@@ -15,7 +15,6 @@ package org.generationcp.middleware.manager.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -183,10 +182,7 @@ public class TestPedigreeDataManager{
         List<Object[]> results = pedigreeManager.getDescendants(id, 0, 100);
         assertNotNull(results);
         assertFalse(results.isEmpty());
-        for (Object[] result : results) {
-            Debug.println(0, "  " + result);
-        }
-        Debug.println(0, "Number of record/s: " + results.size() );
+        Debug.printObjects(0, results);
     }
     
 

@@ -11,11 +11,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+
 /** 
  * Contains the synonym of a name.
  */
-public class NameSynonym {
+public class NameSynonym implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
+
 	private String name;
 	  
     private NameType type;

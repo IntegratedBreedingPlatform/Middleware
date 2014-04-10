@@ -357,7 +357,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      */
     public FieldMapLabel getFieldMapLabel(Integer experimentId) {
         for (FieldMapLabel label: labels) {
-            if (experimentId == label.getExperimentId()) {
+            if (experimentId.equals(label.getExperimentId())) {
                 return label;
             } 
         }

@@ -590,7 +590,7 @@ public class TestOntologyServiceImpl {
     	int enumerationId = -2;
     	
     	boolean found = ontologyService.validateDeleteStandardVariableEnumeration(standardVariableId, enumerationId);
-    	System.out.println("testValidateDeleteStandardVariableEnumeration " + found);
+    	Debug.println(0, "testValidateDeleteStandardVariableEnumeration " + found);
     }
     
 
