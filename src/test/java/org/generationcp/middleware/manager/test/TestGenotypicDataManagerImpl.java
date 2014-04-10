@@ -262,10 +262,11 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMarkerNamesByGIds() throws Exception {
-        List<Integer> gIds = Arrays.asList(-4072, -4070, -4069);
-
+        List<Integer> gIds = Arrays.asList(1920, 1895, 1434);
+        // For test data, SELECT marker_id, gid from gdms_allele_values / gdms_char_values / gdms_mapping_pop_values
+       
         List<MarkerNameElement> results = manager.getMarkerNamesByGIds(gIds);
-        Debug.println(0, "testGetMarkerNamesByGIds(" + gIds + ") RESULTS: " + results);
+        Debug.println(0, "testGetMarkerNamesByGIds(" + gIds + ") RESULTS: " + results.size() + " : " + results);
     }
 
     @Test

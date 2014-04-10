@@ -342,10 +342,38 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
-        return (List<MarkerNameElement>) super.getFromInstanceByIdAndMethod(getMarkerDao(), gIds.get(0), "getMarkerNamesByGIds",
-                new Object[]{gIds}, new Class[]{List.class});
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative nIds
-        // Needs to refactor the SQL
+
+    	// Get from local and central (with marker names available in local
+    	List<MarkerNameElement> dataValues = (List<MarkerNameElement>) super.getAllFromCentralAndLocalByMethod(getMarkerDao(), 
+        		"getMarkerNamesByGIds", new Object[]{gIds}, new Class[]{List.class});
+        
+        // Get marker names from central
+        List<Integer> markerIds = new ArrayList<Integer>();
+        for (MarkerNameElement element : dataValues){
+        	if (element.getMarkerName() == null){
+        		markerIds.add(element.getMarkerId());
+        	}
+        }
+        if (markerIds != null){
+        	setWorkingDatabase(Database.CENTRAL);
+        	List<Marker> markers = getMarkerDao().getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
+            for (MarkerNameElement element : dataValues){
+            	for (Marker marker : markers){
+	            	if (element.getMarkerName() == null && element.getMarkerId().equals(marker.getMarkerId())){
+	            		element.setMarkerName(marker.getMarkerName());
+	            		break;
+	            	}
+            	}
+            }
+        }
+
+        // Remove duplicates
+        Set<MarkerNameElement> set = new HashSet<MarkerNameElement>();
+        set.addAll(dataValues);
+        dataValues.clear();
+        dataValues.addAll(set);
+
+        return dataValues;
     }
 
     @Override
