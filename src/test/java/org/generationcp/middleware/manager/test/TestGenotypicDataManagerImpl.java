@@ -77,15 +77,15 @@ import org.junit.rules.TestName;
 
 public class TestGenotypicDataManagerImpl{
 
-    private static ManagerFactory       factory;
+    private static ManagerFactory factory;
     private static GenotypicDataManager manager;
 
-    private long                        startTime;
+    private long startTime;
 
-    private static final int            INDENT              = 3;
+    private static final int INDENT = 3;
 
     @Rule
-    public TestName                     name                = new TestName();
+    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -112,22 +112,20 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetNameIdsByGermplasmIds() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(-3787));
-        germplasmIds.add(Integer.valueOf(-6785));
-        germplasmIds.add(Integer.valueOf(-4070));
-        List<Integer> results = manager.getNameIdsByGermplasmIds(germplasmIds);
-        Debug.println(0, "testGetNameIdsByGermplasmIds(" + germplasmIds + ") RESULTS: " + results);
+        List<Integer> germplasmIds = Arrays.asList(-3787, -6785, -4070, 1434, 2219);
+        // For test data, get gids from LOCAL and CENTRAL: SELECT nid, gid FROM gdms_acc_metadataset 
+
+    	List<Integer> results = manager.getNameIdsByGermplasmIds(germplasmIds);
+        Debug.println(0, "testGetNameIdsByGermplasmIds(" + germplasmIds + ") RESULTS: " + results.size() + " = " + results);
     }
 
     @Test
     public void testGetNamesByNameIds() throws Exception {
-        List<Integer> nameIds = new ArrayList<Integer>();
-        nameIds.add(Integer.valueOf(-1));
-        nameIds.add(Integer.valueOf(-2));
-        nameIds.add(Integer.valueOf(-3));
+        List<Integer> nameIds = Arrays.asList(1, 2, 3, -1, -2, -3);
+        // For test data, get gids from LOCAL and CENTRAL: SELECT * FROM names where nid in (:nidList)
+        
         List<Name> results = manager.getNamesByNameIds(nameIds);
-        Debug.println(0, "testGetNamesByNameIds(" + nameIds + ") RESULTS: " + results);
+        Debug.println(0, "testGetNamesByNameIds(" + nameIds + ") RESULTS: " + results.size() + " = " + results);
     }
 
     @Test
@@ -147,8 +145,6 @@ public class TestGenotypicDataManagerImpl{
     public void testGetMapInfoByMapName() throws Exception {
         String mapName = "RIL-8 (Yueyou13 x J 11)"; // CENTRAL test data
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.CENTRAL);
-
-        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
@@ -156,23 +152,13 @@ public class TestGenotypicDataManagerImpl{
     public void testGetMapInfoByMapNameBothDB() throws Exception {
         String mapName = "GCP-833TestMap"; // LOCAL test data
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
-
-        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
     
     @Test
     public void testgetMarkerInfoByMarkerIds() throws Exception {
-        List<Integer> markerIds = new ArrayList<Integer>();
-        markerIds.add(1);
-        markerIds.add(-1);
-        markerIds.add(2);
-        markerIds.add(-2);
-        markerIds.add(3);
-        markerIds.add(4);
-        markerIds.add(5);
+        List<Integer> markerIds = Arrays.asList(1, -1, 2, -2, 3, 4, 5);
         List<MarkerInfo> results = manager.getMarkerInfoByMarkerIds(markerIds);
-        Debug.println(0, "testgetMarkerInfoByMarkerIds(" + markerIds + ") RESULTS: ");
         Debug.printObjects(INDENT, results);
     }   
     
@@ -269,23 +255,14 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMarkerTypesByMarkerIds() throws Exception {
-        List<Integer> markerIds = new ArrayList<Integer>();
-        markerIds.add(Integer.valueOf(1));
-        markerIds.add(Integer.valueOf(2));
-        markerIds.add(Integer.valueOf(3));
-        markerIds.add(Integer.valueOf(4));
-        markerIds.add(Integer.valueOf(5));
-
+        List<Integer> markerIds = Arrays.asList(1, 2, 3, 4, 5, -1, -2, -3);
         List<String> results = manager.getMarkerTypesByMarkerIds(markerIds);
         Debug.println(0, "testGetMarkerTypeByMarkerIds(" + markerIds + ") RESULTS: " + results);
     }
 
     @Test
     public void testGetMarkerNamesByGIds() throws Exception {
-        List<Integer> gIds = new ArrayList<Integer>();
-        gIds.add(Integer.valueOf(-4072));
-        gIds.add(Integer.valueOf(-4070));
-        gIds.add(Integer.valueOf(-4069));
+        List<Integer> gIds = Arrays.asList(-4072, -4070, -4069);
 
         List<MarkerNameElement> results = manager.getMarkerNamesByGIds(gIds);
         Debug.println(0, "testGetMarkerNamesByGIds(" + gIds + ") RESULTS: " + results);
@@ -293,10 +270,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetGermplasmNamesByMarkerNames() throws Exception {
-        List<String> markerNames = new ArrayList<String>();
-        markerNames.add("1_0001");
-        markerNames.add("1_0007");
-        markerNames.add("1_0013");
+        List<String> markerNames = Arrays.asList("1_0001", "1_0007", "1_0013");
 
         List<GermplasmMarkerElement> results = (List<GermplasmMarkerElement>) manager.getGermplasmNamesByMarkerNames(
                 markerNames, Database.LOCAL);
@@ -305,57 +279,29 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMappingValuesByGidsAndMarkerNames() throws Exception {
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(-3785);
-        gids.add(-3786);
-        gids.add(-3787);
-        List<String> markerNames = new ArrayList<String>();
-        markerNames.add("1_0085");
-        markerNames.add("1_0319");
-        markerNames.add("1_0312");
+        List<Integer> gids = Arrays.asList(-3785, -3786, -3787);
+        List<String> markerNames = Arrays.asList("1_0085", "1_0319", "1_0312");
         /*
          * Expected results are: [datasetId=2, mappingType=allelic,
          * parentAGid=-6785, parentBGid=-6786, markerType=S] This is based on
          * the sample input data templates uploaded to GDMS
          */
-        List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0,
-                100);
-        Debug.println(0, "testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: "
-                + mappingValues);
+        List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0, 100);
+        Debug.println(0, "testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + mappingValues);
     }
 
     @Test
     public void testGetAllelicValuesByGidsAndMarkerNames() throws Exception {
-        List<String> markerNames = new ArrayList<String>();
-        markerNames.add("CaM0038");
-        markerNames.add("CaM0463");
-        markerNames.add("CaM0539");
-        markerNames.add("CaM0639");
-        markerNames.add("CaM0658");
-        markerNames.add("1_0001");
-        markerNames.add("1_0007");
-        markerNames.add("1_0013");
-        markerNames.add("1_0025");
-        markerNames.add("1_0031");
-
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(-5276);
-        gids.add(-5287);
-        gids.add(-5484);
-        gids.add(-5485);
-        gids.add(-6786);
-        gids.add(-6785);
-        gids.add(-3785);
-        gids.add(-3786);
-
+        List<String> markerNames = Arrays.asList("CaM0038", "CaM0463", "CaM0539", "CaM0639",
+        		"CaM0658", "1_0001", "1_0007","1_0013", "1_0025", "1_0031");
+        List<Integer> gids = Arrays.asList(-5276, -5287, -5484, -5485, -6786, -6785, -3785, -3786);
         /*
          * Results will vary depending on the database connected to. As of the
          * moment, we have no data that contains test values in all 3 source
          * tables
          */
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
-        Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: "
-                + allelicValues);
+        Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
     }
 
     @Test
@@ -417,18 +363,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMarkerNamesByMarkerIds() throws Exception {
-        List<Integer> markerIds = new ArrayList<Integer>();
-        markerIds.add(1);
-        markerIds.add(-1);
-        markerIds.add(2);
-        markerIds.add(-2);
-        markerIds.add(3);
-        markerIds.add(-3);
-        markerIds.add(4);
-        markerIds.add(-4);
-        markerIds.add(5);
-        markerIds.add(-5);
-
+        List<Integer> markerIds = Arrays.asList(1, -1, 2, -2, 3, -3, 4, -4, 5, -5);
         List<MarkerIdMarkerNameElement> markerNames = manager.getMarkerNamesByMarkerIds(markerIds);
         Debug.println(0, "testGetMarkerNamesByMarkerIds(" + markerIds + ") RESULTS: ");
         Debug.printObjects(INDENT, markerNames);
@@ -530,11 +465,8 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetGidsByMarkersAndAlleleValues() throws Exception {
-        List<Integer> markerIdList = new ArrayList<Integer>();
-        markerIdList.add(2325);
-        
-        List<String> alleleValueList = new ArrayList<String>();
-        alleleValueList.add("238/238");
+        List<Integer> markerIdList = Arrays.asList(2325);
+        List<String> alleleValueList = Arrays.asList("238/238");
         
         List<Integer> gids = manager.getGidsByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList);
         Debug.println(0, "testGetGidsByMarkersAndAlleleValues(" + markerIdList + "," + alleleValueList + ") RESULTS: " + gids);
@@ -542,11 +474,8 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetAllGidsByMarkersAndAlleleValues() throws Exception {
-        List<Integer> markerIdList = new ArrayList<Integer>();
-        markerIdList.add(2325);
-        
-        List<String> alleleValueList = new ArrayList<String>();
-        alleleValueList.add("238/238");
+        List<Integer> markerIdList = Arrays.asList(2325);
+        List<String> alleleValueList = Arrays.asList("238/238");
         
         List<Integer> gids = manager.getAllGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
         Debug.println(0, "testGetAllGidsByMarkersAndAlleleValues(" + markerIdList + "," + alleleValueList + ") RESULTS: " + gids);
@@ -573,13 +502,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetNidsFromAccMetadatasetByDatasetIds() throws Exception {
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        datasetIds.add(-1);
-        datasetIds.add(-2);
-        datasetIds.add(-3);
-
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(-2);
+        List<Integer> datasetIds = Arrays.asList(-1, -2, -3, 1, 2, 3);
+        List<Integer> gids = Arrays.asList(-2);
 
         List<Integer> nids = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, 0, 10);
         List<Integer> nidsWithGidFilter = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, gids, 0, 10);
@@ -615,11 +539,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetGdmsAccMetadatasetByGid() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);;
         List<AccMetadataSetPK> accMetadataSets = manager.getGdmsAccMetadatasetByGid(germplasmIds, 0,
                 (int) manager.countGdmsAccMetadatasetByGid(germplasmIds));
         Debug.println(0, "testGetGdmsAccMetadatasetByGid() RESULTS: ");
@@ -628,11 +548,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountGdmsAccMetadatasetByGid() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
         long count = manager.countGdmsAccMetadatasetByGid(germplasmIds);
         Debug.println(0, "testCountGdmsAccMetadatasetByGid() RESULTS: " + count);
     }
@@ -640,10 +556,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetMarkersByGidAndDatasetIds() throws Exception {
         Integer gid = Integer.valueOf(-2215); // Crop Tested: Groundnut
-
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        datasetIds.add(Integer.valueOf(1));
-        datasetIds.add(Integer.valueOf(2));
+        List<Integer> datasetIds = Arrays.asList(1, 2);
 
         List<Integer> markerIds = manager.getMarkersByGidAndDatasetIds(gid, datasetIds, 0,
                 (int) manager.countMarkersByGidAndDatasetIds(gid, datasetIds));
@@ -654,9 +567,7 @@ public class TestGenotypicDataManagerImpl{
     public void testCountMarkersByGidAndDatasetIds() throws Exception {
         Integer gid = Integer.valueOf(-2215); // Crop Tested: Groundnut
 
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        datasetIds.add(Integer.valueOf(1));
-        datasetIds.add(Integer.valueOf(2));
+        List<Integer> datasetIds = Arrays.asList(1, 2);
 
         long count = manager.countMarkersByGidAndDatasetIds(gid, datasetIds);
         Debug.println(0, "testCountGdmsAccMetadatasetByGid() RESULTS: " + count);
@@ -664,36 +575,21 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountAlleleValuesByGids() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
         long count = manager.countAlleleValuesByGids(germplasmIds);
         Debug.println(0, "testCountAlleleValuesByGids() RESULTS: " + count);
     }
 
     @Test
     public void testCountCharValuesByGids() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found
-                                                // in the target crop to be used
-                                                // in testing
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
         long count = manager.countCharValuesByGids(germplasmIds);
         Debug.println(0, "testCountCharValuesByGids() RESULTS: " + count);
     }
 
     @Test
     public void testGetIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
-
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
         List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0,
                 (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
 
@@ -703,25 +599,14 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
         long count = manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
     }
 
     @Test
     public void testGetCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        // For rice db(v20), you can use germplasmIds: 58, 29811
-        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found
-                                                // in the target crop to be used  in testing
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
-
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
         List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0,
                 (int) manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
         Debug.println(0, "testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
@@ -730,32 +615,16 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found
-                                                // in the target crop to be used  in testing
-        germplasmIds.add(Integer.valueOf(1042));
-        germplasmIds.add(Integer.valueOf(-2213));
-        germplasmIds.add(Integer.valueOf(-2215));
+        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
         long count = manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
     }
 
     @Test
     public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
-        List<Integer> gIds = new ArrayList<Integer>();
-        gIds.add(Integer.valueOf(956)); // Please replace the germplasm ids
-                                        // found in the target crop to be used in testing
-        gIds.add(Integer.valueOf(1042));
-        gIds.add(Integer.valueOf(1128));
-
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
-                                            // found in the target crop to be used in testing
-
-        List<Integer> markerIds = new ArrayList<Integer>();
-        markerIds.add(Integer.valueOf(6)); // Please replace the marker ids
-                                           // found in the target crop to be used in testing
-        markerIds.add(Integer.valueOf(10));
+        List<Integer> gIds = Arrays.asList(956, 1042, 1128);
+        List<Integer> datasetIds = Arrays.asList(2);
+        List<Integer> markerIds = Arrays.asList(6, 10);
 
         List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 0,
                 manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
@@ -775,35 +644,17 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
-        List<Integer> gIds = new ArrayList<Integer>();
-        gIds.add(Integer.valueOf(29)); // Please replace the germplasm ids found
-                                       // in the target crop to be used in testing
-        gIds.add(Integer.valueOf(303));
-        gIds.add(Integer.valueOf(4950));
-
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
-                                            // found in the target crop to be  used in testing
-
-        List<Integer> markerIds = new ArrayList<Integer>();
-        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids
-                                              // found in the target crop to be used in testing
-
+        List<Integer> gIds = Arrays.asList(29, 303, 4950);
+        List<Integer> datasetIds =Arrays.asList(2);
+        List<Integer> markerIds = Arrays.asList(6803);
         int count = manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
         Debug.println(0, "testcCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() RESULTS: " + count);
     }
 
     @Test
     public void testGetNIdsByDatasetIdsAndMarkerIds() throws Exception {
-
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
-                                            // found in the target crop to be used in testing
-
-        List<Integer> markerIds = new ArrayList<Integer>();
-        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids
-                                              // found in the target crop to be used in testing
-
+        List<Integer> datasetIds = Arrays.asList(2);
+        List<Integer> markerIds = Arrays.asList(6803);
         List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 0,
                 manager.countNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         Debug.println(0, "testGetNIdsByDatasetIdsAndMarkerIds() RESULTS: " + nIdList);
@@ -811,25 +662,15 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountNIdsByDatasetIdsAndMarkerIds() throws Exception {
-
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids
-                                            // found in the target crop to be used in testing
-
-        List<Integer> markerIds = new ArrayList<Integer>();
-        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids
-                                              // found in the target crop to be used in testing
-
+        List<Integer> datasetIds = Arrays.asList(2);
+        List<Integer> markerIds = Arrays.asList(6803);
         int count = manager.countNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds);
         Debug.println(0, "testCountNIdsByDatasetIdsAndMarkerIds() RESULTS: " + count);
     }
 
     @Test
     public void testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids
-                                                 // found in the target crop to be used in testing
-        germplasmIds.add(Integer.valueOf(1435));
+        List<Integer> germplasmIds = Arrays.asList(1434, 1435);
 
         List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds,
                 0, (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
@@ -840,10 +681,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = new ArrayList<Integer>();
-        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids
-                                                 // found in the target crop to be used in testing
-        germplasmIds.add(Integer.valueOf(1435));
+        List<Integer> germplasmIds = Arrays.asList(1434, 1435);
+
         long count = manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
     }
@@ -1191,12 +1030,16 @@ public class TestGenotypicDataManagerImpl{
         Float annealingTemp = Float.valueOf(0);
         String amplification = null;
 
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
-                ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
-                amplification);
+        try{
+	        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
+	                ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
+	                amplification);
+	        Integer idAdded = manager.addGDMSMarker(marker);
+	        Debug.println(0, "testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
+        } catch (MiddlewareQueryException e){
+        	Debug.println(e.getMessage() + "\n");
+        }
 
-        Integer idAdded = manager.addGDMSMarker(marker);
-        Debug.println(0, "testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
     }
 
     @Test
@@ -1731,10 +1574,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQtlByQtlIdsFromCentral() throws Exception {
-        List<Integer> qtlIds = new ArrayList<Integer>();
-        qtlIds.add(1);
-        qtlIds.add(2);
-        qtlIds.add(3);
+        List<Integer> qtlIds = Arrays.asList(1, 2, 3);
 
         List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, (int) manager.countQtlByQtlIds(qtlIds));
 
@@ -1749,10 +1589,7 @@ public class TestGenotypicDataManagerImpl{
         } catch (MiddlewareQueryException e) {
             // Ignore. There is already a record for testing.
         }
-        List<Integer> qtlIds = new ArrayList<Integer>();
-        qtlIds.add(-1);
-        qtlIds.add(-2);
-        qtlIds.add(-3);
+        List<Integer> qtlIds = Arrays.asList(-1, -2, -3);
 
         List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, (int) manager.countQtlByQtlIds(qtlIds));
 
@@ -1761,13 +1598,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQtlByQtlIdsBothDB() throws Exception {
-        List<Integer> qtlIds = new ArrayList<Integer>();
-        qtlIds.add(1);
-        qtlIds.add(2);
-        qtlIds.add(3);
-        qtlIds.add(-1);
-        qtlIds.add(-2);
-        qtlIds.add(-3);
+        List<Integer> qtlIds = Arrays.asList(1, 2, 3, -1, -2, -3);
 
         List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, (int) manager.countQtlByQtlIds(qtlIds));
 
@@ -1777,10 +1608,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountQtlByQtlIdsFromCentral() throws Exception {
-        List<Integer> qtlIds = new ArrayList<Integer>();
-        qtlIds.add(1);
-        qtlIds.add(2);
-        qtlIds.add(3);
+        List<Integer> qtlIds = Arrays.asList(1, 2, 3);
         long count = manager.countQtlByQtlIds(qtlIds);
         assertTrue(count > 0);
         Debug.println(0, "testCountQtlByQtlIdsFromCentral() RESULTS: " + count);
@@ -1788,13 +1616,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountQtlByQtlIds() throws Exception {
-        List<Integer> qtlIds = new ArrayList<Integer>();
-        qtlIds.add(1);
-        qtlIds.add(2);
-        qtlIds.add(3);
-        qtlIds.add(-1);
-        qtlIds.add(-2);
-        qtlIds.add(-3);
+        List<Integer> qtlIds = Arrays.asList(1, 2, 3, -1, -2, -3);
         long count = manager.countQtlByQtlIds(qtlIds);
         assertTrue(count > 0);
         Debug.println(0, "testCountQtlByQtlIds() RESULTS: " + count);
@@ -2029,7 +1851,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetDatasetDetailsByDatasetIds() throws Exception {
-        List<Integer> datasetIds = Arrays.asList(3, 4, 5);
+        List<Integer> datasetIds = Arrays.asList(-1, -2, -3, 3, 4, 5);
         List<Dataset> result = manager.getDatasetDetailsByDatasetIds(datasetIds);
         Debug.println(0, "testGetDatasetDetailsByDatasetId(" + datasetIds + "): ");
         Debug.printObjects(INDENT, result);
@@ -2037,19 +1859,15 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQTLIdsByDatasetIds() throws Exception {
-        List<Integer> datasetIds = Arrays.asList(1, 2, 3, 4); // IBDBv2
-                                                              // Groundnut
+        List<Integer> datasetIds = Arrays.asList(1, -6); // IBDBv2 	Groundnut
+        //To get test dataset_ids, run in Local and Central: select qtl_id, dataset_id from gdms_qtl;
         List<Integer> qtlIds = manager.getQTLIdsByDatasetIds(datasetIds);
         Debug.println(0, "testGetQTLIdsByDatasetIds(" + datasetIds + "): " + qtlIds);
     }
 
     @Test
     public void testGetAllFromAccMetadataset() throws Exception {
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(2012);
-        gids.add(2014);
-        gids.add(2016);
-
+        List<Integer> gids = Arrays.asList(2012, 2014, 2016);
         Integer datasetId = 5;
         List<AccMetadataSetPK> result = manager.getAllFromAccMetadataset(gids, datasetId, SetOperation.NOT_IN);
         Debug.println(0, "testGetAllFromAccMetadataset(gid=" + gids + ", datasetId=" + datasetId + "): ");
