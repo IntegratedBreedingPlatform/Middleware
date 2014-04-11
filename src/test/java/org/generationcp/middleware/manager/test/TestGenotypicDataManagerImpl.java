@@ -266,7 +266,7 @@ public class TestGenotypicDataManagerImpl{
         // For test data, SELECT marker_id, gid from gdms_allele_values / gdms_char_values / gdms_mapping_pop_values
        
         List<MarkerNameElement> results = manager.getMarkerNamesByGIds(gIds);
-        Debug.println(0, "testGetMarkerNamesByGIds(" + gIds + ") RESULTS: " + results.size() + " : " + results);
+        Debug.println(0, "testGetMarkerNamesByGIds(" + gIds + ") RESULTS: " + results.size() + " = " + results);
     }
 
     @Test
@@ -280,15 +280,21 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMappingValuesByGidsAndMarkerNames() throws Exception {
-        List<Integer> gids = Arrays.asList(-3785, -3786, -3787);
-        List<String> markerNames = Arrays.asList("1_0085", "1_0319", "1_0312");
-        /*
-         * Expected results are: [datasetId=2, mappingType=allelic,
-         * parentAGid=-6785, parentBGid=-6786, markerType=S] This is based on
-         * the sample input data templates uploaded to GDMS
-         */
+//    	List<Integer> gids = Arrays.asList(-3785, -3786, -3787);
+//      List<String> markerNames = Arrays.asList("1_0085", "1_0319", "1_0312");
+    	
+    	List<Integer> gids = Arrays.asList(2212, 2208, 1);
+        List<String> markerNames = Arrays.asList("Ah26", "AC2C05", "Ah193", "Seq14H06", "SeqTEST843", "SeqTEST129", "SeqTEST564");
+        
+        // For test input, please run the following in central/local, and choose select gid / marker_ids
+        // SELECT DISTINCT gid, gdms_mapping_pop_values.marker_id
+        // FROM gdms_mapping_pop_values 
+       	// JOIN gdms_mapping_pop ON gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id 
+        //   LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id; 
+
         List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0, 100);
-        Debug.println(0, "testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + mappingValues);
+        Debug.println(0, "testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " 
+        		+ mappingValues.size() + " = " + mappingValues);
     }
 
     @Test
