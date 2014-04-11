@@ -53,6 +53,9 @@ public class StudyDetails implements Serializable{
     private Integer piId;
     
     private Integer siteId;
+    
+    //row count in both trial dataset and measurement dataset
+    private Integer rowCount;
 
 	public StudyDetails(){
 		
@@ -269,6 +272,24 @@ public class StudyDetails implements Serializable{
 		this.siteId = siteId;
 	}
 
+	/**
+	 * @return the rowCount
+	 */
+	public Integer getRowCount() {
+		return rowCount;
+	}
+
+	/**
+	 * @param rowCount the rowCount to set
+	 */
+	public void setRowCount(Integer rowCount) {
+		this.rowCount = rowCount;
+	}
+	
+	public boolean hasRows() {
+		return rowCount != null && rowCount > 0;
+	}
+
 	@Override
     public int hashCode() {
         final int prime = 31;
@@ -399,6 +420,8 @@ public class StudyDetails implements Serializable{
         builder.append(piId);
         builder.append(", siteId=");
         builder.append(siteId);
+        builder.append(", rowCount=");
+        builder.append(rowCount);
         builder.append("]");
         return builder.toString();
     }
