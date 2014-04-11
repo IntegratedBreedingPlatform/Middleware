@@ -97,6 +97,9 @@ public class User implements Serializable, BeanFormState {
 	
 	@Transient
     private Boolean active = false;
+	
+	@Transient
+    private Boolean enabled = true;
 
     public User() {
     }
@@ -139,6 +142,8 @@ public class User implements Serializable, BeanFormState {
         user.setAdate(adate);
         user.setCdate(cdate);
         user.setIsNew(isnew);
+        user.setActive(active);
+        user.setEnabled(enabled);
         
         return user;
     }
@@ -290,6 +295,8 @@ public class User implements Serializable, BeanFormState {
         builder.append(isnew);
         builder.append(", isActive=");
         builder.append(active);
+        builder.append(", isEnabled=");
+        builder.append(enabled);
         
         builder.append("]");
         return builder.toString();
@@ -305,6 +312,18 @@ public class User implements Serializable, BeanFormState {
 	public void setActive(Boolean val) {
 		// TODO Auto-generated method stub
 		this.active = val;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return enabled;
+	}
+
+	@Override
+	public void setEnabled(Boolean val) {
+		this.enabled = val;
+		
 	}
 
 }

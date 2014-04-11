@@ -312,11 +312,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             for (GermplasmList germplasmList : germplasmLists) {
             	
             	//fetch list data for cascade delete
-            	int count = (int) getGermplasmListDataDAO().countByListId(germplasmList.getId());
-            	if (count > 0) {
-	            	listDataList = getGermplasmListDataDAO().getByListId(germplasmList.getId(), 0, count);
-	            	germplasmList.setListData(listDataList);
-            	}
+//            	int count = (int) getGermplasmListDataDAO().countByListId(germplasmList.getId());
+//            	if (count > 0) {
+//	            	listDataList = getGermplasmListDataDAO().getByListId(germplasmList.getId(), 0, count);
+//	            	germplasmList.setListData(listDataList);
+//            	}
             	
             	//delete GermplasmList
             	

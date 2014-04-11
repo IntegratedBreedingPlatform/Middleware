@@ -84,7 +84,6 @@ import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
-import org.generationcp.middleware.util.Debug;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -386,28 +385,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
                                                                           int numOfRows) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative gIds
-        // and marker names from both local and central
-//        List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
-//
-//        int gid = gids.get(0);
-//
-//        if (setWorkingDatabase(gid)) {
-//            List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
-//
-//            mappingValueElementLists = super.getFromInstanceByIdAndMethod(getMappingPopDao(), gids.get(0),
-//                    "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class});
-//        }
-//        return mappingValueElementLists;
-
 		List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
 
-		List<Integer> markerIds = super.getAllFromCentralAndLocalByMethod(
-				getMarkerDao(), "getIdsByNames", new Object[] { markerNames,
-						start, numOfRows }, new Class[] { List.class,
-						Integer.TYPE, Integer.TYPE });
-
-		Debug.println(0, "markerIds = " + markerIds);
+		List<Integer> markerIds = super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getIdsByNames"
+				, new Object[] { markerNames, start, numOfRows }, new Class[] { List.class,Integer.TYPE, Integer.TYPE });
 
 		mappingValueElementLists = super.getAllFromCentralAndLocalByMethod(getMappingPopDao(), "getMappingValuesByGidAndMarkerIds",
 				new Object[] { gids, markerIds }, new Class[] { List.class, List.class });
