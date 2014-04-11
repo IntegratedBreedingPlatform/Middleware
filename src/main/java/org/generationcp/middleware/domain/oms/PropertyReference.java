@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,11 @@ import org.generationcp.middleware.util.Debug;
  * @author Joyce Avestro
  *
  */
-public class PropertyReference extends Reference implements Comparable<PropertyReference>{
+public class PropertyReference extends Reference implements Serializable, Comparable<PropertyReference>{
     
-    private List<StandardVariableReference> standardVariables;
+    private static final long serialVersionUID = 1L;
+	
+	private List<StandardVariableReference> standardVariables;
 	
 	public PropertyReference(Integer id, String name) {
 		super.setId(id);

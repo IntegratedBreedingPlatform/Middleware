@@ -6,6 +6,8 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.ValueReference;
 
 public class Variate  implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String description;
 	private String property;

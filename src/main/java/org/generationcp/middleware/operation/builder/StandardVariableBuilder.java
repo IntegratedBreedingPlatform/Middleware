@@ -349,7 +349,9 @@ public class StandardVariableBuilder extends Builder {
 				case VARIATE: storedInId = TermId.OBSERVATION_VARIATE.getId();
 				    break;
 			}
-			storedIn = getTermBuilder().get(storedInId);
+			if (storedInId != null){
+				storedIn = getTermBuilder().get(storedInId);
+			}
 		} else {
 			storedIn = getTermBuilder().get(TermId.OBSERVATION_VARIATE.getId());
 		}

@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,9 @@ import org.generationcp.middleware.util.Debug;
  * The Standard Variable with term, property, scale, method, data type, etc.
  *
  */
-public class StandardVariable {
+public class StandardVariable implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private Term term = new Term();
 	

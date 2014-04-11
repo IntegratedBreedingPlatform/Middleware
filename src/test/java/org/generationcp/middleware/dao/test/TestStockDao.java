@@ -13,8 +13,6 @@
 
 package org.generationcp.middleware.dao.test;
 
-import static org.junit.Assert.assertFalse;
-
 import java.util.List;
 
 import org.generationcp.middleware.dao.dms.StockDao;

@@ -1079,9 +1079,9 @@ public class TestStudyDataManagerImpl{
     public void testGetParentFolder() throws MiddlewareQueryException{
     	DmsProject proj = manager.getParentFolder(10010);
     	if(proj==null)
-    		System.out.println("Parent is null");
+    		Debug.println(0, "Parent is null");
     	else
-    		System.out.println("Parent is NOT null");
+    		Debug.println(0, "Parent is NOT null");
     }
     
     @Test
@@ -1186,7 +1186,7 @@ public class TestStudyDataManagerImpl{
     @Test
     public void testGetFolderTree() throws MiddlewareQueryException {
         List<FolderReference> tree = manager.getFolderTree();
-        System.out.println("GetFolderTree Test");
+        Debug.println(0, "GetFolderTree Test");
         printFolderTree(tree, 1);
     }
     
@@ -1194,9 +1194,9 @@ public class TestStudyDataManagerImpl{
         if (tree != null && tree.size() > 0) {
             for (FolderReference folder : tree) {
                 for (int i = 0; i < tab; i++) {
-                    System.out.print("\t");
+                	Debug.print(0, "\t");
                 }
-                System.out.println(folder.getId() + " - " + folder.getName());
+                Debug.println(0, folder.getId() + " - " + folder.getName());
                 printFolderTree(folder.getSubFolders(), tab+1);
             }
         }

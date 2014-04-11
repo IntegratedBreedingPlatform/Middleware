@@ -11,15 +11,18 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
 
-public class StudyDetails {
+public class StudyDetails implements Serializable{
     
+	private static final long serialVersionUID = 1L;
 
-    private Integer id;
+	private Integer id;
 	
 	private String studyName;
 	
@@ -50,6 +53,9 @@ public class StudyDetails {
     private Integer piId;
     
     private Integer siteId;
+    
+    //row count in both trial dataset and measurement dataset
+    private Integer rowCount;
 
 	public StudyDetails(){
 		
@@ -266,6 +272,24 @@ public class StudyDetails {
 		this.siteId = siteId;
 	}
 
+	/**
+	 * @return the rowCount
+	 */
+	public Integer getRowCount() {
+		return rowCount;
+	}
+
+	/**
+	 * @param rowCount the rowCount to set
+	 */
+	public void setRowCount(Integer rowCount) {
+		this.rowCount = rowCount;
+	}
+	
+	public boolean hasRows() {
+		return rowCount != null && rowCount > 0;
+	}
+
 	@Override
     public int hashCode() {
         final int prime = 31;
@@ -396,6 +420,8 @@ public class StudyDetails {
         builder.append(piId);
         builder.append(", siteId=");
         builder.append(siteId);
+        builder.append(", rowCount=");
+        builder.append(rowCount);
         builder.append("]");
         return builder.toString();
     }

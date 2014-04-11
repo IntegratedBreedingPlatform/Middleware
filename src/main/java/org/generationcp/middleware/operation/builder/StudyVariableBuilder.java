@@ -118,6 +118,9 @@ public class StudyVariableBuilder extends Builder {
 	}
 
 	private boolean storedIn(VariableType variableType, TermId termId) {
+		if (variableType == null){
+			return false;
+		}
 		return variableType.getStandardVariable().getStoredIn().getId() == termId.getId();
 	}
 

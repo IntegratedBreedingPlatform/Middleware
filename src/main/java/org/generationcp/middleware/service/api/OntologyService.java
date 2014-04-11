@@ -31,7 +31,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
-// TODO: Auto-generated Javadoc
 /**
  * 
  * This is the API for Ontology Browser requirements.

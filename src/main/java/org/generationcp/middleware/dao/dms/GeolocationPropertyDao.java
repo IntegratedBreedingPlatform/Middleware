@@ -17,7 +17,6 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;

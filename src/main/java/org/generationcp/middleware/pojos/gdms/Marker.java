@@ -99,20 +99,20 @@ public class Marker implements Serializable{
     
     // For getMarkerNamesByGIds()
     public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 
-            "SELECT DISTINCT gdms_allele_values.gid, CONCAT(gdms_marker.marker_name,'') " +
-            "FROM gdms_allele_values JOIN gdms_marker ON gdms_allele_values.marker_id = gdms_marker.marker_id " +
+    		"SELECT DISTINCT gdms_allele_values.gid, gdms_allele_values.marker_id, CONCAT(gdms_marker.marker_name,'') " +
+			"FROM gdms_allele_values LEFT JOIN gdms_marker ON gdms_allele_values.marker_id = gdms_marker.marker_id " +
             "WHERE gdms_allele_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
 
     public static final String GET_CHAR_MARKER_NAMES_BY_GID =         
-            "SELECT DISTINCT gdms_char_values.gid, CONCAT(gdms_marker.marker_name,'') " +
-            "FROM gdms_char_values JOIN gdms_marker ON gdms_char_values.marker_id = gdms_marker.marker_id " +
+			"SELECT DISTINCT gdms_char_values.gid, gdms_char_values.marker_id, CONCAT(gdms_marker.marker_name,'') " +
+			"FROM gdms_char_values LEFT JOIN gdms_marker ON gdms_char_values.marker_id = gdms_marker.marker_id " +
             "WHERE gdms_char_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
 
     public static final String GET_MAPPING_MARKER_NAMES_BY_GID = 
-            "SELECT DISTINCT gdms_mapping_pop_values.gid, CONCAT(gdms_marker.marker_name,'') " + 
-            "FROM gdms_mapping_pop_values JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
+    		"SELECT DISTINCT gdms_mapping_pop_values.gid, gdms_mapping_pop_values.marker_id, CONCAT(gdms_marker.marker_name,'') " + 
+            "FROM gdms_mapping_pop_values LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
             "WHERE gdms_mapping_pop_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
 
@@ -481,7 +481,7 @@ public class Marker implements Serializable{
         return builder.toString();
     }
 
-    public static Comparator<Marker> MarkerComparator = new Comparator<Marker>() { 
+    public static Comparator<Marker> markerComparator = new Comparator<Marker>() { 
 
         @Override
         public int compare(Marker element1, Marker element2) {

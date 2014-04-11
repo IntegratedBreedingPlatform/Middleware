@@ -14,12 +14,9 @@ package org.generationcp.middleware.service.test;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import junit.framework.Assert;
 
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -201,7 +198,7 @@ public class TestDataImportServiceImpl {
             List<Message> messages = e.getErrorMessages();
 
             assertNotNull(messages);
-            assertSame(messages.size(), 1);
+            assertTrue(messages.size() == 1);
             assertEquals(expectedErrorKey, messages.get(0).getMessageKey());
             return;
         } catch (MiddlewareQueryException e) {

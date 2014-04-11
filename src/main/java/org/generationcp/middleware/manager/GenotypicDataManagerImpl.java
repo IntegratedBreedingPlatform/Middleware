@@ -84,6 +84,7 @@ import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -143,15 +144,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative gIds
-        return (List<Integer>) super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), gIds.get(0), "getNameIdsByGermplasmIds",
-                new Object[]{gIds}, new Class[]{List.class});
+        return super.getAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "getNameIdsByGermplasmIds",  new Object[]{gIds}, new Class[]{List.class});
     }
 
     @Override
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative nIds
-        return (List<Name>) super.getFromInstanceByIdAndMethod(getNameDao(), nIds.get(0), "getNamesByNameIds", new Object[]{nIds},
+        return (List<Name>) super.getAllFromCentralAndLocalByMethod(getNameDao(), "getNamesByNameIds", new Object[]{nIds},
                 new Class[]{List.class});
     }
 
@@ -338,16 +336,44 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative nIds
-        return (List<String>) super.getFromInstanceByIdAndMethod(getMarkerDao(), markerIds.get(0), "getMarkerTypeByMarkerIds",
+        return (List<String>) super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getMarkerTypeByMarkerIds",
                 new Object[]{markerIds}, new Class[]{List.class});
     }
 
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative nIds
-        return (List<MarkerNameElement>) super.getFromInstanceByIdAndMethod(getMarkerDao(), gIds.get(0), "getMarkerNamesByGIds",
-                new Object[]{gIds}, new Class[]{List.class});
+
+    	// Get from local and central (with marker names available in local
+    	List<MarkerNameElement> dataValues = (List<MarkerNameElement>) super.getAllFromCentralAndLocalByMethod(getMarkerDao(), 
+        		"getMarkerNamesByGIds", new Object[]{gIds}, new Class[]{List.class});
+        
+        // Get marker names from central
+        List<Integer> markerIds = new ArrayList<Integer>();
+        for (MarkerNameElement element : dataValues){
+        	if (element.getMarkerName() == null){
+        		markerIds.add(element.getMarkerId());
+        	}
+        }
+        if (markerIds != null){
+        	setWorkingDatabase(Database.CENTRAL);
+        	List<Marker> markers = getMarkerDao().getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
+            for (MarkerNameElement element : dataValues){
+            	for (Marker marker : markers){
+	            	if (element.getMarkerName() == null && element.getMarkerId().equals(marker.getMarkerId())){
+	            		element.setMarkerName(marker.getMarkerName());
+	            		break;
+	            	}
+            	}
+            }
+        }
+
+        // Remove duplicates
+        Set<MarkerNameElement> set = new HashSet<MarkerNameElement>();
+        set.addAll(dataValues);
+        dataValues.clear();
+        dataValues.addAll(set);
+
+        return dataValues;
     }
 
     @Override
@@ -362,16 +388,29 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                                                                           int numOfRows) throws MiddlewareQueryException {
         //TODO Refactor to retrieve from both local and central based on the combination of positive and negative gIds
         // and marker names from both local and central
-        List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
+//        List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
+//
+//        int gid = gids.get(0);
+//
+//        if (setWorkingDatabase(gid)) {
+//            List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
+//
+//            mappingValueElementLists = super.getFromInstanceByIdAndMethod(getMappingPopDao(), gids.get(0),
+//                    "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class});
+//        }
+//        return mappingValueElementLists;
 
-        int gid = gids.get(0);
+		List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
 
-        if (setWorkingDatabase(gid)) {
-            List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
+		List<Integer> markerIds = super.getAllFromCentralAndLocalByMethod(
+				getMarkerDao(), "getIdsByNames", new Object[] { markerNames,
+						start, numOfRows }, new Class[] { List.class,
+						Integer.TYPE, Integer.TYPE });
 
-            mappingValueElementLists = super.getFromInstanceByIdAndMethod(getMappingPopDao(), gids.get(0),
-                    "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class});
-        }
+		Debug.println(0, "markerIds = " + markerIds);
+
+		mappingValueElementLists = super.getAllFromCentralAndLocalByMethod(getMappingPopDao(), "getMappingValuesByGidAndMarkerIds",
+				new Object[] { gids, markerIds }, new Class[] { List.class, List.class });
 
         return mappingValueElementLists;
     }
@@ -603,9 +642,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative datasetIds (and gIds?)
-
-        return (List<Integer>) super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), datasetIds.get(0), "getNIDsByDatasetIds",
+        return (List<Integer>) super.getAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "getNIDsByDatasetIds",
                 new Object[]{datasetIds, gids, start, numOfRows}, new Class[]{List.class, List.class, Integer.TYPE, Integer.TYPE});
     }
 
@@ -1075,8 +1112,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows)
             throws MiddlewareQueryException {
-        //TODO
-//        return null;
         List<String> methods = Arrays.asList("countMarkerIdsByQtl", "getMarkerIdsByQtl");
         return super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows,
                 new Object[]{qtlName, chromosome, min, max},
@@ -1212,10 +1247,23 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException {
-        //TODO check for existence. duplicate marker names are not allowed.
-        requireLocalDatabaseInstance();
-        marker.setMarkerId(getMarkerDao().getNegativeId("markerId"));
-        return ((Marker) super.saveOrUpdate(getMarkerDao(), marker)).getMarkerId();
+        //Check for existence. duplicate marker names are not allowed.
+
+    	Session session = requireLocalDatabaseInstance(); 
+        Transaction trans = null;
+        Integer id = null;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            id = saveMarkerIfNotExisting(marker, marker.getMarkerType());
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while adding Marker: " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return id;
     }
 
     @Override
@@ -2233,16 +2281,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Dataset> getDatasetDetailsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative datasetIds
-        return super.getFromInstanceByIdAndMethod(getDatasetDao(), datasetIds.get(0),
+        return super.getAllFromCentralAndLocalByMethod(getDatasetDao(),
                 "getDatasetsByIds", new Object[]{datasetIds}, new Class[]{List.class});
+        
     }
 
     @Override
     public List<Integer> getQTLIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative datasetIds
-        return super.getFromInstanceByIdAndMethod(getQtlDao(), datasetIds.get(0),
-                "getQTLIdsByDatasetIds", new Object[]{datasetIds}, new Class[]{List.class});
+        return super.getAllFromCentralAndLocalByMethod(getQtlDao(), "getQTLIdsByDatasetIds", 
+        		new Object[]{datasetIds}, new Class[]{List.class});
     }
 
     @Override
@@ -2539,7 +2586,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         // If marker is existing in central, do not allow the insertion to local
         if (markerId != null && markerId >= 0){
-        	throw new MiddlewareException("Marker already exists in Central and cannot be added.");
+        	throw new MiddlewareException("Marker already exists in Central or Local and cannot be added.");
         }
 
         // If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
@@ -3085,8 +3132,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			
     			if (alleleValue != null){	
     				toReturn.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue, dartValue));
+    				break;
     			}
-				break;
 
     		}
     	}
@@ -3119,13 +3166,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			Integer gid = accMetadataSet.getGermplasmId();
     			
     			for (CharValues charValue : charValues){
-    				if (charValue.getDatasetId().equals(datasetId)
+    				
+    				if (charValue != null && charValue.getDatasetId().equals(datasetId)
     						&&	charValue.getGid().equals(gid)
     						&& charValue.getMarkerId().equals(markerId)){
-    					if (charValue != null){
-	    					toReturn.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValue));   
-	    					break;
-    					}
+    					toReturn.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValue));   
+    					break;
     				}
     			}
     		}
@@ -3160,14 +3206,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			Integer gid = accMetadataSet.getGermplasmId();
     			
     			for (AlleleValues alleleValue : alleleValues){
-    				if (alleleValue.getDatasetId().equals(datasetId)
+    				if (alleleValue != null && alleleValue.getDatasetId().equals(datasetId)
     						&&	alleleValue.getGid().equals(gid)
     						&& alleleValue.getMarkerId().equals(markerId)){
-    					if (alleleValue != null){
-    						toReturn.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue));   
-    						break;
-    					}
-
+						toReturn.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValue));   
+						break;    					
     				}
     			}
     		}
@@ -3201,13 +3244,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			Integer gid = accMetadataSet.getGermplasmId();
     			
     			for (MappingPopValues mappingPopValue : mappingPopValues){
-    				if (mappingPopValue.getDatasetId().equals(datasetId)
+    				if (mappingPopValue != null && mappingPopValue.getDatasetId().equals(datasetId)
     						&&	mappingPopValue.getGid().equals(gid)
     						&& mappingPopValue.getMarkerId().equals(markerId)){
-    					if (mappingPopValue != null){
-    						toReturn.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue));   
-    						break;
-    					}
+						toReturn.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValue));   
+						break;
     				}
     			}
     		}
