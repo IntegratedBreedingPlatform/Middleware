@@ -14,12 +14,7 @@ package org.generationcp.middleware.operation.parser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -37,11 +32,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class WorkbookParser {
 
@@ -73,10 +64,9 @@ public class WorkbookParser {
     private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
     private final static String[] EXPECTED_FACTOR_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "LABEL"};
 
-    private final static String[] SECTION_NAMES = new String[] {"CONDITION", "FACTOR", "CONSTANT", "VARIATE"};
+    private final static String[] SECTION_NAMES = new String[]{"CONDITION", "FACTOR", "CONSTANT", "VARIATE"};
 
-
-    private static final int DEFAULT_GEOLOCATION_ID = 1;
+//    private static final int DEFAULT_GEOLOCATION_ID = 1;
 
     /**
      * Added handling for parsing the file if its xls or xlsx
@@ -93,16 +83,16 @@ public class WorkbookParser {
             wb = new HSSFWorkbook(inp);
         } catch (OfficeXmlFileException ee) {
             // TODO: handle exception
-        	int maxLimit = 65000;
-        	Boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
-            if (overLimit){
-            	WorkbookParserException workbookParserException = new WorkbookParserException("");
-            	workbookParserException.addMessage(new Message("error.file.is.too.large", new DecimalFormat("###,###,###").format(maxLimit)));
-            	throw workbookParserException;
-            }else{
-            	wb = new XSSFWorkbook(inp2);
+            int maxLimit = 65000;
+            Boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
+            if (overLimit) {
+                WorkbookParserException workbookParserException = new WorkbookParserException("");
+                workbookParserException.addMessage(new Message("error.file.is.too.large", new DecimalFormat("###,###,###").format(maxLimit)));
+                throw workbookParserException;
+            } else {
+                wb = new XSSFWorkbook(inp2);
             }
-        	
+
         } finally {
             inp.close();
             inp2.close();
@@ -140,10 +130,10 @@ public class WorkbookParser {
                     /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
             } catch (IllegalArgumentException e) {
-            	errorMessages.add(new Message("error.missing.sheet.description"));
+                errorMessages.add(new Message("error.missing.sheet.description"));
                 /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
-            } catch (Exception e){
-            	throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
+            } catch (Exception e) {
+                throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
 
             try {
@@ -154,7 +144,7 @@ public class WorkbookParser {
                     /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
             } catch (IllegalArgumentException e) {
-            	errorMessages.add(new Message("error.missing.sheet.observation"));
+                errorMessages.add(new Message("error.missing.sheet.observation"));
                 /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
             } catch (Exception e) {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
@@ -184,7 +174,7 @@ public class WorkbookParser {
             throw new WorkbookParserException("File not found " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
-        } 
+        }
 
         return currentWorkbook;
     }
@@ -238,42 +228,42 @@ public class WorkbookParser {
         Date startDate = null;
         Date endDate = null;
 
-        if (startDateStr!=null && startDateStr.length() != 0 && startDateStr.length() != 8) {
+        if (startDateStr != null && startDateStr.length() != 0 && startDateStr.length() != 8) {
             errorMessages.add(new Message("error.start.date.invalid"));
         } else {
             try {
-                if (startDateStr!=null && !startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
+                if (startDateStr != null && !startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.start.date.invalid"));
             }
         }
-        if (endDateStr!=null && endDateStr.length() != 0 && endDateStr.length() != 8) {
+        if (endDateStr != null && endDateStr.length() != 0 && endDateStr.length() != 8) {
             errorMessages.add(new Message("error.end.date.invalid"));
         } else {
             try {
-                if (endDateStr!=null && !endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
+                if (endDateStr != null && !endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.end.date.invalid"));
             }
 
         }
-        
+
         if (startDate != null && endDate != null && startDate.after(endDate)) {
             errorMessages.add(new Message("error.start.is.after.end.date"));
         }
-        
+
         if (startDate == null && endDate != null) {
             errorMessages.add(new Message("error.date.startdate.required"));
         }
-        
+
         Date currentDate = Calendar.getInstance().getTime();
         if (startDate != null && startDate.after(currentDate)) {
             errorMessages.add(new Message("error.start.is.after.current.date"));
         }
         
-        if (endDate != null && endDate.after(currentDate)) {
+        /*if (endDate != null && endDate.after(currentDate)) {
             errorMessages.add(new Message("error.end.is.after.current.date"));
-        }
+        }*/
 
 
         if (studyTypeValue == null) {
@@ -423,36 +413,39 @@ public class WorkbookParser {
             workbook) throws WorkbookParserException {
         List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         long stockId = 0;
-        
+
         //add each row in observations
         Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
         Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
-        
+
         // GCP-7541 limit the observations rows
         Integer maxLimit = 10000;
-        if (lastRowNum == 0){
-        	List<Message> messages = new ArrayList<Message>();
-        	Message message = new Message("error.observation.no.records");
-        	messages.add(message);
-        	throw new WorkbookParserException(messages);
-        } else if (lastRowNum > maxLimit){
-        	List<Message> messages = new ArrayList<Message>();
-        	Message message = new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(maxLimit));
-        	messages.add(message);
-        	throw new WorkbookParserException(messages);
+        if (lastRowNum == 0) {
+            List<Message> messages = new ArrayList<Message>();
+            Message message = new Message("error.observation.no.records");
+            messages.add(message);
+            throw new WorkbookParserException(messages);
+        } else if (lastRowNum > maxLimit) {
+            List<Message> messages = new ArrayList<Message>();
+            Message message = new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(maxLimit));
+            messages.add(message);
+            throw new WorkbookParserException(messages);
         }
 
         try {
             //validate headers and set header labels
             List<MeasurementVariable> factors = workbook.getFactors();
             List<MeasurementVariable> variates = workbook.getVariates();
-            List<String> measurementDataLabel = new ArrayList<String>();
+            List<MeasurementVariable> variables = new ArrayList<MeasurementVariable>();
+
             for (int col = 0; col < factors.size() + variates.size(); col++) {
                 if (col < factors.size()) {
 
                     if (!factors.get(col).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
                         // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
+                    } else {
+                        variables.add(factors.get(col));
                     }
 
                 } else {
@@ -460,14 +453,16 @@ public class WorkbookParser {
                     if (!variates.get(col - factors.size()).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
                         // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
+                    } else {
+                        variables.add(variates.get(col - factors.size()));
                     }
 
                 }
-                measurementDataLabel.add(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
+                /*measurementDataLabel.add(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));*/
             }
 
             currentRow++;
-            
+
             while (currentRow <= lastRowNum) {
                 // skip over blank rows in the observation sheet
                 if (rowIsEmpty(wb, OBSERVATION_SHEET, currentRow, factors.size() + variates.size())) {
@@ -485,10 +480,12 @@ public class WorkbookParser {
                     }*/
 
                     // TODO verify usefulness / validity of next statement.
-                    if (measurementDataLabel.get(col).equals("GYLD")) {
+                    if (variables.get(col).getName().equals("GYLD")) {
                         LOG.debug(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
                     }
-                    measurementData.add(new MeasurementData(measurementDataLabel.get(col), getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)));
+                    measurementData.add(new MeasurementData(variables.get(col).getName(),
+                            getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)
+                    ));
                 }
 
                 // danielv -- made use of new constructor to make it clear that only the measurement data is needed at this point. The other values are computed later on in the process
@@ -511,11 +508,11 @@ public class WorkbookParser {
             Cell cell = row.getCell(columnNumber);
             return PoiUtil.getCellStringValue(cell);
         } catch (IllegalStateException e) {
-           
-        	return "";
+
+            return "";
 
         } catch (NullPointerException e) {
-        	
+
             return "";
         }
     }
@@ -553,7 +550,53 @@ public class WorkbookParser {
         }
         FormulaEvaluator formulaEval = wb.getCreationHelper().createFormulaEvaluator();
         DataFormatter formatter = new DataFormatter();
-        return (String) formatter.formatCellValue(cell,formulaEval);
+        return (String) formatter.formatCellValue(cell, formulaEval);
     }
+
+    /*
+
+    This approach currently abandoned because there are standard variables that do not have the proper associated data type.
+
+    public static String getCellStringValue(Cell cell, int dataTypeId) {
+        try {
+
+            if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
+                    || dataTypeId == TermId.CLASS.getId()) {
+                return cell.getStringCellValue();
+            } else if (dataTypeId == TermId.DATE_VARIABLE.getId()) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                Date date = cell.getDateCellValue();
+                return sdf.format(date);
+            } else if (dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() ) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss:nnn");
+                Date date = cell.getDateCellValue();
+                return sdf.format(date);
+            } else if (dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || dataTypeId == TermId.NUMERIC_DBID_VARIABLE.getId()
+                    || dataTypeId == TermId.NUMERIC_VARIABLE.getId()) {
+                try {
+                    double doubleVal = cell.getNumericCellValue();
+                    if ((doubleVal % 1) == 0) {
+                        return Integer.toString((int) doubleVal);
+                    } else {
+                        return Double.toString(doubleVal);
+                    }
+                } catch (Exception e) {
+                    String s = cell.getStringCellValue();
+                    Double doubleVal = Double.parseDouble(s);
+                    if ((doubleVal % 1) == 0) {
+                        return Integer.toString(doubleVal.intValue());
+                    } else {
+                        return Double.toString(doubleVal);
+                    }
+                }
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            LOG.error("Error retrieving value for cell in column " +
+                    cell.getColumnIndex() + " and row " + cell.getRowIndex() + " with type (term id) " + dataTypeId);
+            return "";
+        }
+    }*/
 
 }

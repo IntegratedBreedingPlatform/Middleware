@@ -25,7 +25,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.LocdesType;
 import org.hibernate.*;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -34,9 +33,9 @@ import org.hibernate.criterion.Restrictions;
 /**
  * DAO class for {@link Location}.
  */
+@SuppressWarnings("unchecked")
 public class LocationDAO extends GenericDAO<Location, Integer> {
 
-    @SuppressWarnings("unchecked")
     public List<Location> getByName(String name, Operation operation) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Location.class);
@@ -54,7 +53,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return new ArrayList<Location>();
     }
 
-    @SuppressWarnings("unchecked")
     public List<Location> getByName(String name, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Location.class);
@@ -96,7 +94,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return 0;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Location> getByCountry(Country country) throws MiddlewareQueryException {
         try {
             if (country != null) {
@@ -113,7 +110,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return new ArrayList<Location>();
     }
 
-    @SuppressWarnings("unchecked")
     public List<Location> getByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
         try {
             if (country != null && type != null) {
@@ -131,7 +127,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return new ArrayList<Location>();
     }
 
-    @SuppressWarnings("unchecked")
     public List<Location> getByNameCountryAndType(String name, Country country, Integer type) throws MiddlewareQueryException {
         try {
 
@@ -160,7 +155,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return new ArrayList<Location>();
     }
 
-    @SuppressWarnings("unchecked")
     public List<Location> getByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             if (country != null) {
@@ -194,8 +188,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return 0;
     }
 
-
-    @SuppressWarnings("unchecked")
     public List<Location> getByType(Integer type) throws MiddlewareQueryException {
         try {
             if (type != null) {
@@ -211,8 +203,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return new ArrayList<Location>();
     }
 
-
-    @SuppressWarnings("unchecked")
     public List<Location> getByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             if (type != null) {
@@ -289,7 +279,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return Long.valueOf(0);
     }
 
-    @SuppressWarnings("unchecked")
     public List<LocationDetails> getLocationDetails(Integer locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
@@ -321,7 +310,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     public List<LocationDetails> getLocationDetails(List<Integer> locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
@@ -354,7 +342,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return null;
     }
 
-    public List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException {
+	public List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException {
         if (countryId == null || countryId == 0) {
             return new ArrayList<Location>();
         }
@@ -370,7 +358,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         }
     }
 
-    public List<Location> getAllProvinces() throws MiddlewareQueryException {
+	public List<Location> getAllProvinces() throws MiddlewareQueryException {
 
             try {
                 SQLQuery query = getSession().createSQLQuery(Location.GET_ALL_PROVINCES);
@@ -382,7 +370,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
             }
         }
 
-    @SuppressWarnings("unchecked")
     public List<LocationDto> getLocationDtoByIds(Collection<Integer> ids) throws MiddlewareQueryException {
         List<LocationDto> returnList = new ArrayList<LocationDto>();
         if (ids != null && !ids.isEmpty()) {
@@ -409,7 +396,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return returnList;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Location> getLocationByIds(Collection<Integer> ids) throws MiddlewareQueryException {
         try {
             return getSession().createCriteria(Location.class).add(Restrictions.in("locid", ids)).list();
@@ -431,7 +417,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return toreturn;
     }
 
-    @SuppressWarnings("unchecked")
     public Map<Integer, String> getLocationNamesMapByGIDs(List<Integer> gids) throws MiddlewareQueryException {
         Map<Integer, String> toreturn = new HashMap<Integer, String>();
         for (Integer gid : gids) {
@@ -456,8 +441,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return toreturn;
     }
 
-
-    @SuppressWarnings("unchecked")
     public Map<Integer, LocationDto> getLocationNamesByGIDs(List<Integer> gids) throws MiddlewareQueryException {
         Map<Integer, LocationDto> toreturn = new HashMap<Integer, LocationDto>();
         for (Integer gid : gids) {
@@ -483,8 +466,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return toreturn;
     }
 
-
-    @SuppressWarnings("unchecked")
     public List<Location> getLocationsByDTypeAndLType(String dval
             , Integer dType, Integer lType) throws MiddlewareQueryException {
         List<Location> locations = new ArrayList<Location>();
@@ -530,7 +511,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return locations;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Location> getByTypeWithParent(Integer type, Integer relationshipType) throws MiddlewareQueryException {
         List<Location> locationList = new ArrayList<Location>();
         try {
@@ -563,7 +543,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return locationList;
     }
 
-    @SuppressWarnings("unchecked")
     public Map<Integer, String> getNamesByIdsIntoMap(Collection<Integer> ids) throws MiddlewareQueryException {
         Map<Integer, String> map = new HashMap<Integer, String>();
         try {

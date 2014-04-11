@@ -70,7 +70,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
-	private static final String DATA_TYPE_NUMERIC = "N";
+//	private static final String DATA_TYPE_NUMERIC = "N";
 	
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -106,7 +106,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	Integer blockLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
     	
     	List<Location> locList =  getLocationDataManager().getAllLocations();
-    	List<Location> newLocation = new ArrayList();
+    	List<Location> newLocation = new ArrayList<Location>();
     	
     	for(Location loc : locList){
     		if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue())

@@ -40,7 +40,10 @@ public class StockModelBuilder extends Builder {
 		if (setWorkingDatabase(datasetId)) {
 			Set<StockModel> stocks = getStockDao().findInDataSet(datasetId);
 			for (StockModel stock : stocks) {
-				stockMap.put(stock.getUniqueName(), stock.getStockId());
+                if (stock != null) {
+                    stockMap.put(stock.getUniqueName(), stock.getStockId());
+                }
+
 			}
 		}
 		

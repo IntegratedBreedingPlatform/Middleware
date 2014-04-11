@@ -164,8 +164,8 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             return (List<String>) query.list();
 
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMarkerTypeByMarkerIds(markerIds=" + markerIds + ") query from Marker: " + e.getMessage(),
-                    e);
+            logAndThrowException("Error with getMarkerTypeByMarkerIds(markerIds=" + markerIds + ") query from Marker: " 
+            		+ e.getMessage(), e);
         }
         return new ArrayList<String>();
     }
@@ -183,9 +183,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
-
-        // Used to store the result
-        List<MarkerNameElement> dataValues = new ArrayList<MarkerNameElement>();
+    	List<MarkerNameElement> dataValues = new ArrayList<MarkerNameElement>();
 
         if (gIds == null || gIds.isEmpty()) {
             return dataValues;
@@ -212,51 +210,42 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
                 query = getSession().createSQLQuery(Marker.GET_ALLELE_MARKER_NAMES_BY_GID);
                 query.setParameterList("gIdList", gIds);
                 List results = query.list();
-                for (Object o : results) {
-                    Object[] result = (Object[]) o;
-                    if (result != null) {
-                        Integer gId = (Integer) result[0];
-                        String markerName = (String) result[1];
-                        MarkerNameElement element = new MarkerNameElement(gId, markerName);
-                        dataValues.add(element);
-                    }
-                }
+                dataValues.addAll(createMarkerNameElementList(results));
             }
 
             if (charCount.intValue() > 0) {
                 query = getSession().createSQLQuery(Marker.GET_CHAR_MARKER_NAMES_BY_GID);
                 query.setParameterList("gIdList", gIds);
                 List results = query.list();
-                for (Object o : results) {
-                    Object[] result = (Object[]) o;
-                    if (result != null) {
-                        Integer gId = (Integer) result[0];
-                        String markerName = (String) result[1];
-                        MarkerNameElement element = new MarkerNameElement(gId, markerName);
-                        dataValues.add(element);
-                    }
-                }
+                dataValues.addAll(createMarkerNameElementList(results));
             }
 
             if (mappingCount.intValue() > 0) {
                 query = getSession().createSQLQuery(Marker.GET_MAPPING_MARKER_NAMES_BY_GID);
                 query.setParameterList("gIdList", gIds);
                 List results = query.list();
-                for (Object o : results) {
-                    Object[] result = (Object[]) o;
-                    if (result != null) {
-                        Integer gId = (Integer) result[0];
-                        String markerName = (String) result[1];
-                        MarkerNameElement element = new MarkerNameElement(gId, markerName);
-                        dataValues.add(element);
-                    }
-                }
+                dataValues.addAll(createMarkerNameElementList(results));
             }
 
             return dataValues;
 
         } catch (HibernateException e) {
             logAndThrowException("Error with getMarkerNamesByGIds(gIds=" + gIds + ") query from Marker: " + e.getMessage(), e);
+        }
+        return dataValues;
+    }
+    
+    private List<MarkerNameElement> createMarkerNameElementList(List<Object> list){
+    	 List<MarkerNameElement> dataValues = new ArrayList<MarkerNameElement>();
+        for (Object o : list) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+                Integer gId = (Integer) result[0];
+                Integer markerId = (Integer) result[1];
+                String markerName = (String) result[2];
+                MarkerNameElement element = new MarkerNameElement(gId, markerId, markerName);
+                dataValues.add(element);
+            }
         }
         return dataValues;
     }

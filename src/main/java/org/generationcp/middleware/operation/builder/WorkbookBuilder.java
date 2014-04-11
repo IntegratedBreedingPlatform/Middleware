@@ -43,7 +43,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class WorkbookBuilder extends Builder {
 	
-	private Map<String, String> labelMap = new HashMap();
+	private Map<String, String> labelMap = new HashMap<String, String> ();
 	
 	public WorkbookBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                   HibernateSessionProvider sessionProviderForCentral) {

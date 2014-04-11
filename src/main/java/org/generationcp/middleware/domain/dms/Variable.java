@@ -11,13 +11,17 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 /** 
  * Contains the details of a Variable - type and value.
  */
-public class Variable  implements Comparable<Variable> {
+public class Variable  implements Serializable, Comparable<Variable> {
+
+	private static final long serialVersionUID = 1L;
 
 	private VariableType variableType;
 	
@@ -122,7 +126,9 @@ public class Variable  implements Comparable<Variable> {
 	        			enumeration = variableType.getStandardVariable().findEnumerationById(overridingId);
 	        		}
 	        		
-	        		value = enumeration.getDescription();
+	        		if (enumeration != null){
+	        			value = enumeration.getDescription();
+	        		}
 		        }
 		    }catch(NumberFormatException e){
 		        // Ignore, just return the value

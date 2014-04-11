@@ -1,7 +1,6 @@
 package org.generationcp.middleware.util;
 import java.io.InputStream;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
-import org.apache.poi.xssf.model.SharedStringsTable;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -47,7 +46,9 @@ public class PoiEventUserModel {
 		
 		InputSource sheetSource = new InputSource(sheet2);
 		parser.parse(sheetSource);
-		sheet2.close();
+		if (sheet2 != null){
+			sheet2.close();
+		}
 	}
 	
 	public void isAnySheetRowsOverMaxLimit(String filename, int maxLimit) throws Exception {

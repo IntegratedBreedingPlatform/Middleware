@@ -11,12 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.util.Debug;
 
 /** 
  * Used to contain sortable list of values.
  */
-public class Enumeration implements Comparable<Enumeration> {
+public class Enumeration implements Serializable, Comparable<Enumeration> {
+
+	private static final long serialVersionUID = 1L;
 
 	private Integer id;
 	

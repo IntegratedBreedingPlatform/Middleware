@@ -49,6 +49,7 @@ import org.hibernate.criterion.Restrictions;
  * @author Darla Ani, Joyce Avestro
  *
  */
+@SuppressWarnings("unchecked")
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    
 	private static final String GET_CHILDREN_OF_FOLDER =		
@@ -105,7 +106,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	        + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() 
 	        ;
 	
-	@SuppressWarnings("unchecked")
 	public List<FolderReference> getRootFolders() throws MiddlewareQueryException{
 		
 		List<FolderReference> folderList = new ArrayList<FolderReference>();
@@ -142,7 +142,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<Reference> getChildrenOfFolder(Integer folderId) throws MiddlewareQueryException{
 		
 		List<Reference> childrenNodes = new ArrayList<Reference>();
@@ -173,9 +172,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 	}
 	
-	
-
-	@SuppressWarnings("unchecked")
 	public List<DatasetReference> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException{
 		
 		List<DatasetReference> datasetReferences = new ArrayList<DatasetReference>();
@@ -220,7 +216,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<DmsProject> getStudiesByName(String name) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
@@ -252,7 +248,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return getStudiesByStudyProperty(TermId.START_DATE.getId(), Restrictions.eq("p.value", startDate.toString()));
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	private List<DmsProject> getStudiesByStudyProperty(Integer studyPropertyId, Criterion valueExpression) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
@@ -272,7 +268,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<DmsProject>();
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<DmsProject> getStudiesByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
 		try {
 			if (projectIds != null && projectIds.size() > 0) {
@@ -290,7 +286,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<DmsProject>();
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<DmsProject> getDatasetsByStudy(Integer studyId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
@@ -345,7 +341,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<DmsProject>(projects);
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<DmsProject> getByFactor(Integer factorId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
@@ -363,7 +359,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<DmsProject>();
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<DmsProject> getByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
 		List<DmsProject> studyNodes = new ArrayList<DmsProject>();
 		try {
@@ -381,7 +377,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<DmsProject> getProjectsByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException{
 		List<DmsProject> projects = new ArrayList<DmsProject>();
 		if (folderId == null){
@@ -404,7 +400,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return projects;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public long countProjectsByFolder(Integer folderId) throws MiddlewareQueryException{
 		long count = 0;
 		if (folderId == null) {
@@ -425,7 +421,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<DmsProject> getDataSetsByStudyAndProjectProperty(int studyId, int type, String value) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
@@ -446,7 +442,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<DmsProject>();
 	}
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<StudyReference> getStudiesByTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
 		List<StudyReference> studies = new ArrayList<StudyReference>();
 		try {
@@ -496,7 +492,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
     public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
 		return getAllStudyDetails(studyType, -1, -1);
 	}
-	@SuppressWarnings("unchecked")
+	
     public List<StudyDetails> getAllStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
 	    List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
         try {
@@ -504,7 +500,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
             .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId ")
+            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId, count(de.nd_experiment_id) AS rowCount ")
             .append("FROM project p ")
             .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
             .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -524,9 +520,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
             .append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ") // 8180 
             .append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-            .append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ") 
+            .append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
+            .append("       LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id and pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
+            .append("       LEFT JOIN nd_experiment_project de ON de.project_id = pr.subject_project_id ")
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990
+            .append("	GROUP BY p.name, p.description, ppObjective.value, ppStartDate.value, ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppPIid.value, ")
+            .append("   gpSiteId.value ")
             .append("               ORDER BY p.name ") // 12990 
             ;
         
@@ -541,6 +541,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                         .addScalar("id")
                         .addScalar("piId")
                         .addScalar("siteId")
+                        .addScalar("rowCount")
                         ;
             setStartAndNumOfRows(query, start, numOfRows);
 
@@ -558,8 +559,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     Integer id = (Integer) row[7];
                     String piId = (String) row[8];
                     String siteId = (String) row[9];
+                    BigInteger rowCount = (BigInteger) row[10];
                     
-                    studyDetails.add(new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId));
+                    StudyDetails study = new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
+                    if (row[10] != null) {
+                    	study.setRowCount(rowCount.intValue());
+                    }
+                    studyDetails.add(study);
                 }
             }
 
@@ -569,6 +575,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         return studyDetails;
 	    
 	}
+	
 	
 	public StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException {
 	    StudyDetails studyDetails = null;
@@ -678,8 +685,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return getAllNurseryAndTrialStudyDetails(0, -1);
 	}
 	
-	@SuppressWarnings("unchecked")
 	    List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+	
 	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException {
         try {
             
@@ -796,7 +803,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	@SuppressWarnings("unchecked")
+	
 	public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException {
 	    List<StudyNode> studyNodes = new ArrayList<StudyNode>();
         try {
@@ -915,7 +922,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         return 0;
     }
 
-    public List<FolderReference> getAllFolders() throws MiddlewareQueryException {
+	public List<FolderReference> getAllFolders() throws MiddlewareQueryException {
         List<FolderReference> folders = new ArrayList<FolderReference>();
         try {
             SQLQuery query = getSession().createSQLQuery(GET_ALL_FOLDERS);
@@ -933,7 +940,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
     }
 
 	
-	@SuppressWarnings("unchecked")
+	
 	public List<ValueReference> getDistinctProjectNames() throws MiddlewareQueryException {
 		List<ValueReference> results = new ArrayList<ValueReference>();
 		try {
@@ -951,7 +958,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public List<ValueReference> getDistinctProjectDescriptions() throws MiddlewareQueryException {
 		List<ValueReference> results = new ArrayList<ValueReference>();
 		try {

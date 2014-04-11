@@ -11,17 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench.settings;
 
-import java.io.Serializable;
 import java.util.List;
 
-import org.generationcp.middleware.pojos.workbench.settings.Dataset;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TrialDataset.
  */
 public class TrialDataset  extends ParentDataset {
 	
+	private static final long serialVersionUID = 1L;
+
 	/** The name. */
 	private String name;
 	

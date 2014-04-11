@@ -63,7 +63,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     private long                        startTime;
 
-    private int                         INDENT              = 3;
+    private static final int   			INDENT              = 3;
 
     @Rule
     public TestName                     name                = new TestName();

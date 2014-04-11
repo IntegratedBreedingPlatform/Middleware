@@ -845,8 +845,8 @@ public class TestOntologyDataManagerImpl {
         Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
         if (origTerm == null){ // first run, add before update
             origTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340, null);
+            manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
         }
-        manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
         Term newTerm = manager.findTermByName(name, CvId.PROPERTIES);
         Debug.println(3, "Original:  " + origTerm);
         Debug.println(3, "Updated :  " + newTerm);
@@ -904,8 +904,8 @@ public class TestOntologyDataManagerImpl {
         Term origTerm = manager.findTermByName(name, CvId.SCALES);
         if (origTerm == null){ // first run, add before update
             origTerm = manager.addTerm(name, definition, CvId.SCALES);
+            manager.updateTerm(new Term(origTerm.getId(), name, definition));
         }
-        manager.updateTerm(new Term(origTerm.getId(), name, definition));
         Term newTerm = manager.findTermByName(name, CvId.SCALES);
         Debug.println(3, "Original:  " + origTerm);
         Debug.println(3, "Updated :  " + newTerm);

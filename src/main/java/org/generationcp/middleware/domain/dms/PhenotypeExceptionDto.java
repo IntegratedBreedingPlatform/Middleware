@@ -1,6 +1,5 @@
 package org.generationcp.middleware.domain.dms;
 
-import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.util.Debug;
@@ -104,6 +103,8 @@ public class PhenotypeExceptionDto {
 			builder.append(" Valid values are ");
 			builder.append(validValues.toString());
 			builder.append(".");
+		} else {
+			builder.append(" Valid values are not defined. Please update the variable using Manage Ontologies tool.");
 		}
 		return builder.toString();
 	}

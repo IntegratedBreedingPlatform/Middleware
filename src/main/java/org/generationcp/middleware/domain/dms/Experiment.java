@@ -68,7 +68,7 @@ public class Experiment {
 	public void setVariates(VariableList variates) {
 		this.variates = variates;
 		if(variatesMap == null){
-			variatesMap = new HashMap();
+			variatesMap = new HashMap<String, Variable>();
 			if(variates != null){
 				
 				for(Variable var : variates.getVariables()){

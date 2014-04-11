@@ -12,11 +12,6 @@
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * The Class MarkerNameElement. Contains the pair germplasm id and marker name. 
@@ -29,12 +24,10 @@ public class MarkerNameElement implements Serializable{
         
     private static final long serialVersionUID = 1L;
 
-    @Basic(optional = false)
-    @Column(name = "gid")
     private Integer gId;
     
-    @Basic(optional = false)
-    @Column(name = "marker_name")
+    private Integer markerId;
+    
     private String markerName;
     
     MarkerNameElement(){
@@ -42,6 +35,12 @@ public class MarkerNameElement implements Serializable{
    
     public MarkerNameElement(Integer gId, String markerName){
         this.gId = gId;
+        this.markerName = markerName;              
+    }
+
+    public MarkerNameElement(Integer gId, Integer markerId, String markerName){
+        this.gId = gId;
+        this.markerId = markerId;
         this.markerName = markerName;              
     }
 
@@ -53,6 +52,14 @@ public class MarkerNameElement implements Serializable{
         this.gId = gId;
     }
 
+    public Integer getMarkerId() {
+        return markerId;
+    }
+
+    public void setMarkerId(Integer markerId) {
+        this.markerId = markerId;
+    }
+   
     public String getMarkerName() {
         return markerName;
     }
@@ -62,36 +69,55 @@ public class MarkerNameElement implements Serializable{
     }
    
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder(139, 17).append(gId).append(markerName).toHashCode();
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((gId == null) ? 0 : gId.hashCode());
+		result = prime * result
+				+ ((markerId == null) ? 0 : markerId.hashCode());
+		result = prime * result
+				+ ((markerName == null) ? 0 : markerName.hashCode());
+		return result;
+	}
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof MarkerNameElement)) {
-            return false;
-        }
-
-        MarkerNameElement rhs = (MarkerNameElement) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(gId, rhs.gId)
-                .append(markerName, rhs.markerName).isEquals();
-    }
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MarkerNameElement other = (MarkerNameElement) obj;
+		if (gId == null) {
+			if (other.gId != null)
+				return false;
+		} else if (!gId.equals(other.gId))
+			return false;
+		if (markerId == null) {
+			if (other.markerId != null)
+				return false;
+		} else if (!markerId.equals(other.markerId))
+			return false;
+		if (markerName == null) {
+			if (other.markerName != null)
+				return false;
+		} else if (!markerName.equals(other.markerName))
+			return false;
+		return true;
+	}
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("MarkerNameElement [gId=");
-        builder.append(gId);
-        builder.append(", markerName=");
-        builder.append(markerName);
-        builder.append("]");
-        return builder.toString();
-    }
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MarkerNameElement [gId=");
+		builder.append(gId);
+		builder.append(", markerId=");
+		builder.append(markerId);
+		builder.append(", markerName=");
+		builder.append(markerName);
+		builder.append("]");
+		return builder.toString();
+	}
     
 }
