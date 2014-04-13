@@ -596,36 +596,64 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
-        List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0,
-                (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        // For test data, get gids from LOCAL and CENTRAL: SELECT distinct FROM gdms_allele_values; 
+        List<Integer> germplasmIds = Arrays.asList(1, 956, 1042, -2213, -2215);
 
+        List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 
+        		0, Integer.MAX_VALUE);
         Debug.println(0, "testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
     @Test
     public void testCountIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
+        // For test data, get gids from LOCAL and CENTRAL: SELECT distinct FROM gdms_allele_values; 
+        List<Integer> germplasmIds = Arrays.asList(1, 956, 1042, -2213, -2215);
+        
         long count = manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
     }
 
     @Test
     public void testGetCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
-        List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0,
-                (int) manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        // For test data, get gids from LOCAL and CENTRAL: SELECT distinct FROM gdms_char_values; 
+        List<Integer> germplasmIds = Arrays.asList(1, 956, 1042, -2213, -2215);
+        
+        List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 
+        		0, Integer.MAX_VALUE);
         Debug.println(0, "testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
         Debug.printObjects(INDENT, results);
     }
 
     @Test
     public void testCountCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);
+        // For test data, get gids from LOCAL and CENTRAL: SELECT distinct FROM gdms_char_values; 
+        List<Integer> germplasmIds = Arrays.asList(1, 956, 1042, -2213, -2215);
+        
         long count = manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
         Debug.println(0, "testCountCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
     }
+    
+    @Test
+    public void testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        // For test data, get gids from LOCAL and CENTRAL: SELECT distinct FROM gdms_mapping_pop_values; 
+        List<Integer> germplasmIds = Arrays.asList(1, 1434, 1435);
+
+        List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds,
+        		0, Integer.MAX_VALUE);
+        Debug.println(0, "testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
+        Debug.printObjects(INDENT, results);
+    }
+
+    @Test
+    public void testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        // For test data, get gids from LOCAL and CENTRAL: SELECT distinct FROM gdms_mapping_pop_values; 
+        List<Integer> germplasmIds = Arrays.asList(1, 1434, 1435);
+
+        long count = manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
+        Debug.println(0, "testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
+    }
+
 
     @Test
     public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception {
@@ -673,25 +701,6 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> markerIds = Arrays.asList(6803);
         int count = manager.countNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds);
         Debug.println(0, "testCountNIdsByDatasetIdsAndMarkerIds() RESULTS: " + count);
-    }
-
-    @Test
-    public void testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = Arrays.asList(1434, 1435);
-
-        List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds,
-                0, (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-
-        Debug.println(0, "testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
-        Debug.printObjects(INDENT, results);
-    }
-
-    @Test
-    public void testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
-        List<Integer> germplasmIds = Arrays.asList(1434, 1435);
-
-        long count = manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
-        Debug.println(0, "testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
     }
 
     @Test
