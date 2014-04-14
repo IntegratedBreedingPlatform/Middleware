@@ -11,6 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.DartValues;
@@ -41,5 +44,78 @@ public class DartValuesDAO extends GenericDAO<DartValues, Integer>{
             logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in DartValuesDAO: " + e.getMessage(), e);
         }
     }
+    
+	@SuppressWarnings("rawtypes")
+	public List<DartValues> getDartValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+		
+	    List<DartValues> toReturn = new ArrayList<DartValues>();
+        try {
+            if (datasetId != null){
+                SQLQuery query = getSession().createSQLQuery(
+                		"SELECT * " +
+                		" FROM gdms_dart_values where dataset_id = :datasetId "); 
+                query.setParameter("datasetId", datasetId);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer adId = (Integer) result[0];
+                        Integer datasetId2 =  (Integer) result[1];
+                        Integer markerId = (Integer) result[2];
+                        Integer cloneId = (Integer) result[3];
+                        Float qValue = (Float) result[4];
+                        Float reproducibility = (Float) result[5];
+                        Float callRate = (Float) result[6];
+                        Float picValue = (Float) result[7];
+                        Float discordance = (Float) result[8];
+                        
+                        DartValues dataElement = new DartValues(adId, datasetId2, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getDartValuesByDatasetId(datasetId=" + datasetId + ") query from DartValues " + e.getMessage(), e);
+        }
+        return toReturn;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public List<DartValues> getDartValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
+		
+	    List<DartValues> toReturn = new ArrayList<DartValues>();
+        try {
+            if (markerIds != null && markerIds.size() > 0){
+                SQLQuery query = getSession().createSQLQuery(
+                		"SELECT * " +
+                		" FROM gdms_dart_values where marker_id IN (:markerIds) "); 
+                query.setParameterList("markerIds", markerIds);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer adId = (Integer) result[0];
+                        Integer datasetId2 =  (Integer) result[1];
+                        Integer markerId = (Integer) result[2];
+                        Integer cloneId = (Integer) result[3];
+                        Float qValue = (Float) result[4];
+                        Float reproducibility = (Float) result[5];
+                        Float callRate = (Float) result[6];
+                        Float picValue = (Float) result[7];
+                        Float discordance = (Float) result[8];
+                        
+                        DartValues dataElement = new DartValues(adId, datasetId2, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getDartValuesByMarkerIds(markerIds=" + markerIds + ") query from DartValues " + e.getMessage(), e);
+        }
+        return toReturn;
+	}
+
 
 }

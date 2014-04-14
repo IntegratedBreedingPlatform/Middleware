@@ -12,11 +12,14 @@
 package org.generationcp.middleware.domain.etl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 
@@ -51,11 +54,15 @@ public class Workbook {
 	
 	private boolean isCheckFactorAddedOnly;
 	
+	private Integer totalNumberOfInstances;
+	
 	private Map<String, MeasurementVariable> measurementDatasetVariablesMap; //added for optimization
 	
 	private Integer studyId;
 	private Integer trialDatasetId;
 	private Integer measurementDatesetId;
+	
+	private List<MeasurementRow> trialObservations;
 
 	public void reset() {
 		trialHeaders = null;
@@ -153,7 +160,25 @@ public class Workbook {
 		return measurementDatasetVariables;
 	}
 	
-	
+	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (!isNursery()) {
+            MeasurementVariable trialFactor = null;
+            if (getTrialFactors() != null) {
+            	for (MeasurementVariable var : getTrialFactors()) {
+            		if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+            			trialFactor = var;
+            			break;
+            		}
+            	}
+            }
+            if (trialFactor != null) {
+            	list.add(trialFactor);
+            }
+		}
+		list.addAll(getMeasurementDatasetVariables());
+		return list;
+	}
 
 	public Map<String, MeasurementVariable> getMeasurementDatasetVariablesMap() {
 		//we set the id to the map
@@ -170,7 +195,7 @@ public class Workbook {
 	
 
 	public List<MeasurementVariable> getNonTrialFactors() {
-		if(nonTrialFactors==null) {
+		if(nonTrialFactors==null || nonTrialFactors.isEmpty()) {
 			nonTrialFactors = getNonTrialVariables(factors);
 		}
 		return nonTrialFactors;
@@ -186,13 +211,16 @@ public class Workbook {
 	public List<MeasurementVariable> getTrialVariables() {
 		if(trialVariables==null) {
 			trialVariables = getConditionsAndConstants(false);
-			trialVariables.addAll(getTrialFactors());
+			List<MeasurementVariable> trialFactors = getTrialFactors();
+			if(trialFactors!=null) {
+				trialVariables.addAll(trialFactors);
+			}
 		}
 		return trialVariables;
 	}
 	
 	public List<MeasurementVariable> getTrialFactors() {
-		if(trialFactors==null) {
+		if(trialFactors==null || trialFactors.isEmpty()) {
 			trialFactors = getTrialVariables(factors);
 		}
 		return trialFactors;
@@ -205,15 +233,19 @@ public class Workbook {
 				studyConditions = getStudyConditions();
 				studyConstants = getStudyConstants();
 			}
-			list.addAll(studyConditions);
-			list.addAll(studyConstants);
+			if(studyConditions != null)
+				list.addAll(studyConditions);
+			if(studyConstants != null)
+				list.addAll(studyConstants);
 		} else {
 			if(trialConditions == null && trialConstants == null) {
 				trialConditions = getTrialConditions();
 				trialConstants = getTrialConstants();
 			}
-			list.addAll(trialConditions);
-			list.addAll(trialConstants);
+			if(trialConditions != null)
+				list.addAll(trialConditions);
+			if(trialConstants != null)
+				list.addAll(trialConstants);
 		}
 		return list;
 	}
@@ -303,6 +335,22 @@ public class Workbook {
         if (conditions != null) variableList.addAll(conditions);
         if (constants != null) variableList.addAll(constants);
         if (factors != null) variableList.addAll(factors);
+        if (variates != null) variableList.addAll(variates);
+
+        return variableList;
+    }
+    
+    public List<MeasurementVariable> getNonVariateVariables() {
+        List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+        if (conditions != null) variableList.addAll(conditions);
+        if (factors != null) variableList.addAll(factors);
+
+        return variableList;
+    }
+    
+    public List<MeasurementVariable> getVariateVariables() {
+        List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+        if (constants != null) variableList.addAll(constants);
         if (variates != null) variableList.addAll(variates);
 
         return variableList;
@@ -577,4 +625,102 @@ public class Workbook {
 		this.measurementDatesetId = measurementDatesetId;
 	}
 	
+	public Map<Long, List<MeasurementRow>> segregateByTrialInstances() {
+		Map<Long, List<MeasurementRow>> map = new HashMap<Long, List<MeasurementRow>>();
+		
+		if (this.observations != null) {
+			for (MeasurementRow row : this.observations) {
+				Long locationId = row.getLocationId();
+				List<MeasurementRow> list = map.get(locationId);
+				if (list == null) {
+					list = new ArrayList<MeasurementRow>();
+					map.put(locationId, list);
+				}
+				list.add(row);
+			}
+		}
+		
+		this.totalNumberOfInstances = map.size();
+		return map;
+	}
+	
+	public int getTotalNumberOfInstances() {
+		if (this.totalNumberOfInstances == null) {
+			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+			this.totalNumberOfInstances = map.size();
+		}
+		return this.totalNumberOfInstances;
+	}
+
+	/**
+	 * @return the trialObservations
+	 */
+	public List<MeasurementRow> getTrialObservations() {
+		return trialObservations;
+	}
+
+	/**
+	 * @param trialObservations the trialObservations to set
+	 */
+	public void setTrialObservations(List<MeasurementRow> trialObservations) {
+		this.trialObservations = trialObservations;
+	}
+	
+	
+	public MeasurementRow getTrialObservation(long locationId) {
+		if (this.trialObservations != null) {
+			for (MeasurementRow row : this.trialObservations) {
+				if (row.getLocationId() == locationId) {
+					return row;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public List<MeasurementRow> getSortedTrialObservations() {
+		if (this.trialObservations != null) {
+			List<MeasurementRow> rows = new ArrayList<MeasurementRow>();
+			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+			List<Long> keys = new ArrayList<Long>(map.keySet());
+			Collections.sort(keys);
+			for (Long key : keys) {
+				rows.addAll(map.get(key));
+			}
+
+			return rows;
+		}
+		return null;
+	}
+	
+	public void updateTrialObservationsWithReferenceList(List<List<ValueReference>> trialList) {
+		//assumes rows are in the same order and size
+		if (trialList != null && !trialList.isEmpty() && this.trialObservations != null 
+				&& this.trialObservations.size() == trialList.size()) {
+			
+			int i = 0;
+			for (List<ValueReference> trialRow : trialList) {
+				List<MeasurementData> dataList = this.trialObservations.get(i).getDataList();
+
+				for (ValueReference trialCell : trialRow) {
+					MeasurementData data = getMeasurementDataById(dataList, trialCell.getId());
+					if (data != null) {
+						data.setValue(trialCell.getName());
+					}
+				}
+				i++;
+			}
+		}
+	}
+	
+	public MeasurementData getMeasurementDataById(List<MeasurementData> data, int id) {
+		if (data != null && !data.isEmpty()) {
+			for (MeasurementData cell : data) {
+				if (cell.getMeasurementVariable().getTermId() == id) {
+					return cell;
+				}
+			}
+		}
+		return null;
+	}
 }

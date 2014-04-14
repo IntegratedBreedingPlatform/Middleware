@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,11 +29,11 @@ import java.util.List;
  * A convenience class for POI library.
  *
  * @author Glenn Marintes
- *
- * TODO : determine if it's possible to remove duplicate copy of class in IBPCommons
+ *         <p/>
+ *         TODO : determine if it's possible to remove duplicate copy of class in IBPCommons
  */
 public class PoiUtil {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(PoiUtil.class);
 
     // WorkBook convenience methods
@@ -53,10 +54,10 @@ public class PoiUtil {
     }
 
     public static String getCellStringValue(Cell cell) {
-        try{
-        	return cell == null ? null : cell.getStringCellValue();
-        }catch(Exception e){
-        	return String.format("%s", getCellValue(cell));
+        try {
+            return cell == null ? null : cell.getStringCellValue().trim();
+        } catch (Exception e) {
+            return String.format("%s", getCellValue(cell));
         }
     }
 
@@ -65,15 +66,40 @@ public class PoiUtil {
             return null;
         }
 
+
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_BOOLEAN:
                 return cell.getBooleanCellValue();
             case Cell.CELL_TYPE_STRING:
                 return cell.getStringCellValue();
             case Cell.CELL_TYPE_NUMERIC:
-                return cell.getNumericCellValue();
+
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    Date date = cell.getDateCellValue();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    return sdf.format(date);
+                }
+
+                double doubleVal = cell.getNumericCellValue();
+                if ((doubleVal % 1) == 0) {
+                    return (int) doubleVal;
+                } else {
+                    return doubleVal;
+                }
             case Cell.CELL_TYPE_FORMULA:
-                return cell.getCellFormula();
+
+                switch (cell.getCachedFormulaResultType()) {
+
+                    case Cell.CELL_TYPE_NUMERIC:
+                        return cell.getNumericCellValue();
+                    case Cell.CELL_TYPE_STRING:
+                        return cell.getRichStringCellValue();
+                    default:
+                        return cell.getCellFormula();
+
+                }
+
+
             default:
                 return null;
         }
@@ -583,7 +609,7 @@ public class PoiUtil {
      * @return
      */
     public static String[] rowAsStringArray(Sheet sheet, int rowIndex, int start, int end) {
-        return rowAsStringArray(sheet,rowIndex,start,end,Integer.MAX_VALUE);
+        return rowAsStringArray(sheet, rowIndex, start, end, Integer.MAX_VALUE);
 
     }
 
@@ -597,7 +623,7 @@ public class PoiUtil {
      * @param max
      * @return
      */
-    public static String[] rowAsStringArray(Sheet sheet, int rowIndex, int start, int end,int max) {
+    public static String[] rowAsStringArray(Sheet sheet, int rowIndex, int start, int end, int max) {
         Row row = sheet.getRow(rowIndex);
         List<String> values = new ArrayList<String>();
 
@@ -605,7 +631,7 @@ public class PoiUtil {
 
             for (int cn = start; cn <= end && cn < max; cn++) {
                 try {
-                    Cell cell = row.getCell(cn,Row.RETURN_BLANK_AS_NULL);
+                    Cell cell = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
                     if (cell != null) {
                         cell.setCellType(Cell.CELL_TYPE_STRING);    // assures that the row we'll be getting is a string
 
@@ -651,13 +677,13 @@ public class PoiUtil {
     public static String rowAsString(Sheet sheet, int rowIndex, int start, int end, String delimiter, int max) {
 
 
-        return StringUtils.join(rowAsStringArray(sheet,rowIndex,start,end,max), delimiter);
+        return StringUtils.join(rowAsStringArray(sheet, rowIndex, start, end, max), delimiter);
 
     }
 
-    public static String rowAsString(Sheet sheet, int rowIndex,String delimiter) {
+    public static String rowAsString(Sheet sheet, int rowIndex, String delimiter) {
         Row row = sheet.getRow(rowIndex);
-        if ( row == null ) return "";
+        if (row == null) return "";
         int startCell = row.getFirstCellNum();
         int endCell = row.getLastCellNum() - 1;
 
@@ -665,7 +691,7 @@ public class PoiUtil {
     }
 
     public static String rowAsString(Sheet sheet, int rowIndex, String delimiter, int maxStringLength) {
-        String resultString = rowAsString(sheet,rowIndex,delimiter);
+        String resultString = rowAsString(sheet, rowIndex, delimiter);
         if (maxStringLength < resultString.length()) {
             return resultString.substring(0, maxStringLength);
         } else {
@@ -681,10 +707,12 @@ public class PoiUtil {
             return 0;
         }
 
-        Row row = null; int start = 0; int end = 0;
+        Row row = null;
+        int start = 0;
+        int end = 0;
 
         do {
-            lastRowNum --;
+            lastRowNum--;
 
             row = sheet.getRow(lastRowNum);
             if (row == null) {
@@ -693,9 +721,38 @@ public class PoiUtil {
             start = row.getFirstCellNum();
             end = row.getLastCellNum() - 1;
 
-        } while (rowIsEmpty(sheet,lastRowNum,start,end) && lastRowNum > 0);
+        } while (rowIsEmpty(sheet, lastRowNum, start, end) && lastRowNum > 0);
 
         return lastRowNum;
+    }
+
+
+    public static boolean areSheetRowsOverMaxLimit(String fileName, int sheetIndex, int maxLimit) {
+
+
+        try {
+            new PoiEventUserModel().areSheetRowsOverMaxLimit(fileName, sheetIndex, maxLimit);
+        } catch (Exception e) {
+            //Exception means parser has exeeded the set max limit
+            return true;
+        }
+
+
+        return false;
+    }
+
+    public static boolean isAnySheetRowsOverMaxLimit(String fileName, int maxLimit) {
+
+
+        try {
+            new PoiEventUserModel().isAnySheetRowsOverMaxLimit(fileName, maxLimit);
+        } catch (Exception e) {
+            //Exception means parser has exeeded the set max limit
+            return true;
+        }
+
+
+        return false;
     }
 }
 

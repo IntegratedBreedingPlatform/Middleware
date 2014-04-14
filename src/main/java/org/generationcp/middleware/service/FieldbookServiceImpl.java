@@ -36,22 +36,28 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationType;
+import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -65,7 +71,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
-	private static final String DATA_TYPE_NUMERIC = "N";
+//	private static final String DATA_TYPE_NUMERIC = "N";
 	
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -75,7 +81,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     @Override
     public List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException{
-        return getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
+    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
+    	List<StudyDetails> newList = new ArrayList<StudyDetails>();
+    	for(StudyDetails detail : studyDetailList){
+    		if(detail.hasRows())
+    			newList.add(detail);
+    	}
+    	return newList;
     }
     
     @Override 
@@ -84,26 +96,39 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) throws MiddlewareQueryException{
+    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) 
+            throws MiddlewareQueryException{
         return getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T);
     }
     
     @Override 
-    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) throws MiddlewareQueryException{
+    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) 
+            throws MiddlewareQueryException{
         return getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
     }
 
     @Override 
     public List<Location> getAllLocations()throws MiddlewareQueryException{
-    	GermplasmDataManager germplasmDataManager = getGermplasmDataManager();
-    	return germplasmDataManager.getAllLocations();
+    	Integer fieldLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+    	Integer blockLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+    	
+    	List<Location> locList =  getLocationDataManager().getAllLocations();
+    	List<Location> newLocation = new ArrayList<Location>();
+    	
+    	for(Location loc : locList){
+    		if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue())
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()))
+    			continue;
+    		newLocation.add(loc);
+    	}
+    	
+    	return newLocation;
     }
 
     @Override
-    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException {
-     
-        getStudyDataManager().saveOrUpdateFieldmapProperties(info, fieldmapUUID);
-    
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
+            throws MiddlewareQueryException {
+        getStudyDataManager().saveOrUpdateFieldmapProperties(info, userId, isNew);
     }
     
     @Override
@@ -113,25 +138,37 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override           
-    public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) throws MiddlewareQueryException {
+    public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) 
+            throws MiddlewareQueryException {
+    	Integer fieldLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+    	Integer blockLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+    	
         List<Location> locationList = new ArrayList<Location>();
         
         for(int i = 0 ; i < locationIds.size() ; i++){
             Integer locationId = Integer.valueOf(locationIds.get(i).toString());
-            Location location = getGermplasmDataManager().getLocationByID(locationId);
+            Location location = getLocationDataManager().getLocationByID(locationId);
+            
+            if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == location.getLtype().intValue())
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue()))
+    			continue;
+            
             locationList.add(location);
         }
         
+    	
         return locationList;
     }
     
     @Override
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException {
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) 
+            throws MiddlewareQueryException {
         return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
     }
 
     @Override
-    public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
+    public List<DatasetReference> getDatasetReferences(int studyId) 
+            throws MiddlewareQueryException {
         return getStudyDataManager().getDatasetReferences(studyId);
     }
 
@@ -144,7 +181,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Integer getGermplasmIdByName(String name)
 			throws MiddlewareQueryException {
 		
-		 List<Germplasm> germplasmList = getGermplasmDataManager().getGermplasmByName(name, 0, 1, Operation.EQUAL);
+		 List<Germplasm> germplasmList = getGermplasmDataManager()
+		         .getGermplasmByName(name, 0, 1, Operation.EQUAL);
 		 Integer gid = null;
 		 if(germplasmList != null && germplasmList.size() > 0){
 			 gid = germplasmList.get(0).getGid();
@@ -153,14 +191,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-    public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
+    public Integer getStandardVariableIdByPropertyScaleMethodRole(
+            String property, String scale, String method, PhenotypicType role)
             throws MiddlewareQueryException {
-        return getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
+        return getOntologyDataManager()
+                .getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
     }
     
 	@Override
     public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().create(id);                        
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.N);                        
+        return workbook;
+    }
+
+	@Override
+    public Workbook getTrialDataSet(int id) throws MiddlewareQueryException {
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.T);                        
         return workbook;
     }
 
@@ -174,6 +220,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
         try {
             trans = session.beginTransaction();
+            
+            saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
             List<MeasurementRow> observations = workbook.getObservations();
@@ -192,16 +240,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                                 if (field.getPhenotypeId() != null) {
 	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
                                 }
-                                if (phenotype == null && field.getValue() != null && !"".equals(field.getValue().trim())){
+                                if (phenotype == null && field.getValue() != null 
+                                        && !"".equals(field.getValue().trim())){
                                     phenotype = new Phenotype();
                                     phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
                                 }
                                 if (phenotype != null) {
-	                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId(), variate.getTermId(), 
-	                                            variate.getStoredIn(), field.getValue(), phenotype);
+	                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
+	                                        , variate.getTermId(), variate.getStoredIn()
+	                                        , field.getValue(), phenotype);
 	
 	                                i++;
-	                                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
+	                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
 	                                    session.flush();
 	                                    session.clear();
 	                                }
@@ -218,9 +268,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
         }
         
-        LOG.debug("========== saveMeasurementRows Duration (ms): " + ((System.currentTimeMillis() - startTime)/60));
+        LOG.debug("========== saveMeasurementRows Duration (ms): " 
+                + ((System.currentTimeMillis() - startTime)/60));
         
     }
+	
+	private void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
+		setWorkingDatabase(Database.LOCAL);
+		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+			for (MeasurementRow trialObservation : workbook.getTrialObservations()) {
+				getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery());
+			}
+		}
+	}
 
 	@Override
 	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {
@@ -309,7 +369,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                     // Check if the given germplasm name exists
                     if (germplasmFound == null){
                         List<Germplasm> germplasmsFound = getGermplasmDataManager()
-                                .getGermplasmByName(germplasm.getPreferredName().getNval(), 0, 1, Operation.EQUAL);
+                                .getGermplasmByName(germplasm.getPreferredName()
+                                        .getNval(), 0, 1, Operation.EQUAL);
                         
                         if (germplasmsFound.size() > 0){
                             germplasmFound = germplasmsFound.get(0);
@@ -331,7 +392,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                     
                     // Save germplasm
                     germplasm.setGid(gId);
-                    germplasm.setLgid(Integer.valueOf(0));
+                    germplasm.setLgid(gId);
                     germplasmDao.save(germplasm);
 
                 } 
@@ -354,13 +415,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasms="
+            logAndThrowException(
+                    "Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasms="
                     + germplasms + ", germplasmList=" + germplasmList + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
 
-        LOG.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): " + ((System.currentTimeMillis() - startTime)/60));
+        LOG.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): " 
+                    + ((System.currentTimeMillis() - startTime)/60));
 
         return listId;
 
@@ -375,7 +438,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return (names != null && !names.isEmpty() ? names.get(0).getNval() : null);
     }
     
-    private List<Name> getByGidAndNtype(int gid, GermplasmNameType nType) throws MiddlewareQueryException {
+    private List<Name> getByGidAndNtype(int gid, GermplasmNameType nType) 
+            throws MiddlewareQueryException {
         setWorkingDatabase(Database.CENTRAL);
         List<Name> names = getNameDao().getByGIDWithFilters(gid, null, nType);
         if (names == null || names.isEmpty()) {
@@ -414,12 +478,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 	
     @Override
-    public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
+    public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) 
+            throws MiddlewareQueryException {
     	return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
     }
     
     @Override
-    public List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role) 
+    public List<ValueReference> getDistinctStandardVariableValues(
+            String property, String scale, String method, PhenotypicType role) 
     		throws MiddlewareQueryException {
     	
     	Integer stdVarId = getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
@@ -492,7 +558,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) throws MiddlewareQueryException {
+    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) 
+            throws MiddlewareQueryException {
     	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
     	
     	List<CVTerm> variables = new ArrayList<CVTerm>();
@@ -509,21 +576,25 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	variables.addAll(getCvTermDao().getByIds(variableIdList));
     	
     	for (CVTerm variable : variables) {
-    		list.add(new StandardVariableReference(variable.getCvTermId(), variable.getName(), variable.getDefinition()));
+    		list.add(new StandardVariableReference(variable.getCvTermId()
+    		        , variable.getName(), variable.getDefinition()));
     	}
     	
     	return list;
     }
 
-    private void addAllVariableIdsInMode(Set<Integer> variableIds, List<Integer> storedInIds, Database database) throws MiddlewareQueryException {
+    private void addAllVariableIdsInMode(Set<Integer> variableIds
+            , List<Integer> storedInIds, Database database) 
+                    throws MiddlewareQueryException {
     	setWorkingDatabase(database);
     	for (Integer storedInId : storedInIds) {
-    		variableIds.addAll(getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
+    		variableIds.addAll(getCvTermRelationshipDao()
+    		        .getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
     	}
     }
     
-    public Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().createNurseryVariableSettings(id);                        
+    public Workbook getStudyVariableSettings(int id, boolean isNursery)  throws MiddlewareQueryException {
+        Workbook workbook = getWorkbookBuilder().createStudyVariableSettings(id, isNursery);                        
         return workbook;
     }
 
@@ -532,6 +603,61 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			throws MiddlewareQueryException {
 		return getGermplasmDataManager().getGermplasms(gids);
 	}
+
+	@Override
+	public List<Location> getAllFieldLocations(int locationId)
+			throws MiddlewareQueryException {
+    	return getLocationDataManager().getAllFieldLocations(locationId);
+	}
+
+	@Override
+	public List<Location> getAllBlockLocations(int fieldId)
+			throws MiddlewareQueryException {
+        return getLocationDataManager().getAllBlockLocations(fieldId);
+	}
+
+	@Override
+	public FieldmapBlockInfo getBlockInformation(int blockId)
+			throws MiddlewareQueryException {
+	    return getLocationDataManager().getBlockInformation(blockId);
+	}
+
+	@Override
+	public List<Location> getAllFields() throws MiddlewareQueryException {
+	    return getLocationDataManager().getAllFields();
+	}
+
+	@Override
+	public int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId)
+			throws MiddlewareQueryException {
+	    LocationDataManager manager = getLocationDataManager();
+	    
+	    Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+	    Location location = new Location(null, lType, 0, fieldName, "-", 0, 0, 0, 0, 0);
+
+	    Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
+	    Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentLocationId), 0, 0);
+
+	    return manager.addLocationAndLocdes(location, locdes);
+	}
+
+	@Override
+	public int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId)
+			throws MiddlewareQueryException {
+        LocationDataManager manager = getLocationDataManager();
+        
+        Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+        Location location = new Location(null, lType, 0, blockName, "-", 0, 0, 0, 0, 0);
+
+        Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
+        Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentFieldId), 0, 0);
+        
+        return manager.addLocationAndLocdes(location, locdes);
+	}    
     
-    
+	@Override
+	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
+            throws MiddlewareQueryException {
+		return getStudyDataManager().getAllFieldMapsInBlockByBlockId(blockId);
+	}
 }

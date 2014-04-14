@@ -139,6 +139,8 @@ public interface GermplasmDataManager {
             throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.getLocationDetailsByLocId().
+     * 
      * Returns the germplasm records that were created at the locations with
      * names matching the given parameter.
      *
@@ -149,6 +151,7 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException;
 
@@ -165,6 +168,8 @@ public interface GermplasmDataManager {
     long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getAllLocations().
+     * 
      * Returns all Locations.
      *
      * @param start - the starting index of the sublist of results to be returned
@@ -173,17 +178,23 @@ public interface GermplasmDataManager {
      * @return All Locations based on the given start and numOfRows
      * @throws MiddlewareQueryException the middleware query exception
      */   
+    @Deprecated
     List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.getAllLocations().
+     * 
      * Returns all Location information from central and local databases.
      *
      * @return All Locations
      * @throws MiddlewareQueryException the middleware query exception
      */   
+    @Deprecated
     List<Location> getAllLocations() throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getAllLocalLocations().
+     * 
      * Returns all Local Locations.
      *
      * @param start - the starting index of the sublist of results to be returned
@@ -192,19 +203,25 @@ public interface GermplasmDataManager {
      * @return All Locations based on the given start and numOfRows
      * @throws MiddlewareQueryException the middleware query exception
      */  
+    @Deprecated
     List<Location> getAllLocalLocations(int start, int numOfRows)
             throws MiddlewareQueryException;
     
     
     /**
+     * Please use LocationDataManager.countAllLocations().
+     * 
      * Returns number of all Locations.
      *
      * @return the number of all Locations
      * @throws MiddlewareQueryException the middleware query exception
      */   
+    @Deprecated
     long countAllLocations() throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getLocationsByName().
+     * 
      * Returns the Location records with
      * names matching the given parameter.
      *
@@ -213,10 +230,13 @@ public interface GermplasmDataManager {
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
     
 
     /**
+     * Please use LocationDataManager.getLocationsByName().
+     * 
      * Returns the Location records with
      * names matching the given parameter.
      *
@@ -228,17 +248,23 @@ public interface GermplasmDataManager {
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.getAllCountry().
+     * 
      * Returns all country records.
      *
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Country> getAllCountry() throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.countLocationsByName().
+     * 
      * Returns the number of Locations with
      * names matching the given parameter.
      *
@@ -247,10 +273,13 @@ public interface GermplasmDataManager {
      * @return Number of Locations
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
 
 
     /**
+     * Please use LocationDataManager.getLocationsByCountry().
+     * 
      * Returns all the Location records with
      * country matching the given parameter. The data is retrieved from both local and central databases.
      *
@@ -258,10 +287,13 @@ public interface GermplasmDataManager {
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
     
     
     /**
+     * Please use LocationDataManager.getLocationsByCountryAndType().
+     * 
      * Returns all the Location records with
      * country and location type  matching  the given parameter. The data is retrieved from both local and central databases.
      *
@@ -270,11 +302,15 @@ public interface GermplasmDataManager {
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByCountryAndType(Country country,Integer type) throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getLocationsByNameCountryAndType().
+     * 
      * Returns all the Location records with
-     * name, country and location type  matching  the given parameter. The data is retrieved from both local and central databases.
+     * name, country and location type  matching  the given parameter. 
+     * The data is retrieved from both local and central databases.
      *
      * @param name the name
      * @param country the country
@@ -282,13 +318,16 @@ public interface GermplasmDataManager {
      * @return the locations by name country and type
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByNameCountryAndType(String name,
             Country country, Integer type) throws MiddlewareQueryException;
     
 
     /**
-     * Returns the Location records with
-     * country matching the given parameter. The data is retrieved from both local and central databases.
+     * Please use LocationDataManager.getLocationsByCountry().
+     * 
+     * Returns the Location records with country matching the given parameter. 
+     * The data is retrieved from both local and central databases.
      *
      * @param country - search string for the country of the locations
      * @param start - the starting index of the sublist of results to be returned
@@ -297,31 +336,41 @@ public interface GermplasmDataManager {
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.countLocationsByContry().
+     * 
      * Returns the number of Locations with
-     * countries matching the given parameter. The data is retrieved from both local and central databases.
+     * countries matching the given parameter. 
+     * The data is retrieved from both local and central databases.
      *
      * @param country - search string for the country of the locations
      * @return Number of Locations
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     long countLocationsByCountry(Country country) throws MiddlewareQueryException;
     
 
 
     /**
-     * Returns the Location records with
-     * type matching the given parameter. The data is retrieved from both local and central databases.
+     * Please use LocationDataManager.getLocationsByType().
+     * 
+     * Returns the Location records with type matching the given parameter. 
+     * The data is retrieved from both local and central databases.
      *
      * @param type - search string for the type of the locations
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getLocationsByType().
+     * 
      * Returns the Location records with
      * type matching the given parameter. The data is retrieved from both local and central databases.
      *
@@ -332,9 +381,12 @@ public interface GermplasmDataManager {
      * @return List of Location POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.countLocationsByType().
+     * 
      * Returns the number of Locations with
      * types matching the given parameter. The data is retrieved from both local and central databases.
      *
@@ -342,6 +394,7 @@ public interface GermplasmDataManager {
      * @return Number of Locations
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     long countLocationsByType(Integer type) throws MiddlewareQueryException;
     
     
@@ -775,8 +828,6 @@ public interface GermplasmDataManager {
      */
     UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
     
-    
-    
     /**
      * Returns the udfld records identified by the given tablename.
      *
@@ -788,24 +839,32 @@ public interface GermplasmDataManager {
     List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName,String fieldType) throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getCountryById().
+     * 
      * Returns the country record identified by the given id.
      *
      * @param id - id of the country record
      * @return the Country POJO representing the record
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Country getCountryById(Integer id) throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getLocationById().
+     * 
      * Returns the location record identified by the given id.
      *
      * @param id - id of the location record
      * @return the Location POJO representing the record
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Location getLocationByID(Integer id) throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.addLocation().
+     * 
      * Inserts a single {@code Location} object into the database.
      *
      * @param location - The {@code Location} object to be persisted to the database.
@@ -815,9 +874,12 @@ public interface GermplasmDataManager {
      * Returns the id of the newly-added Germplasm {@code Name}s.
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Integer addLocation(Location location) throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.addLocation().
+     * 
      * Inserts a single {@code Location} object into the database.
      *
      * @param locations - The {@code Location} object to be persisted to the database.
@@ -826,15 +888,19 @@ public interface GermplasmDataManager {
      * database.
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.deleteLocation().
+     * 
      * Deletes a single {@code Location} object into the database.
      *
      * @param location - The {@code Location} object to be deleted from the database.
      * Must be a valid {@code Location} object.
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     void deleteLocation(Location location) throws MiddlewareQueryException;
 
     /**
@@ -1049,16 +1115,21 @@ public interface GermplasmDataManager {
     String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
     
     /**
-     * Get all breeding locations
+     * Please use LocationDataManager.getAllBreedingLocations().
+     * 
+     * Get all breeding locations.
      * 
      * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
      *
      * @return the all breeding locations
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
     
     /**
+     * Please use LocationDataManager.countAllBreedingLocations().
+     * 
      * Count all breeding locations
      * 
      * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB.
@@ -1066,6 +1137,7 @@ public interface GermplasmDataManager {
      * @return the long
      * @throws MiddlewareQueryException the middleware query exception
      */    
+    @Deprecated
     Long countAllBreedingLocations() throws MiddlewareQueryException;
     
     /**
@@ -1172,21 +1244,27 @@ public interface GermplasmDataManager {
     List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents) throws MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getLocationsByIDs().
+     * 
      * Gets the locations by the given IDs.
      *
      * @param ids Location IDs
      * @return the corresponding Locations
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
     /**
+     * Please use LocationDataManager.getLocationDetailsByLocationIDs().
+     * 
      * Gets the location details by location IDs.
      *
      * @param ids the Location IDs
      * @return the location details corresponding to the given IDs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
     /**

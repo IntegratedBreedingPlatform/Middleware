@@ -12,9 +12,17 @@
 
 package org.generationcp.middleware.domain.dms;
 
-public class ValueReference extends Reference implements Comparable<ValueReference>{
+import java.io.Serializable;
 
+public class ValueReference extends Reference implements Serializable, Comparable<ValueReference>{
+
+	private static final long serialVersionUID = 1L;
+	
 	private String key;
+	
+	public ValueReference() {
+		super();
+	}
 	
     public ValueReference(int id, String name) {
         super.setId(id);

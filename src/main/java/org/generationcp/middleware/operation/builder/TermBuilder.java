@@ -132,7 +132,7 @@ public class TermBuilder extends Builder {
         if (term == null) {
         	term = getTermSaver().save(name, name, cv);
         	//assign unclassified trait class
-        	getCvTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), TermId.UNCLASSIFIED_TRAIT_CLASS.getId());
+        	getCvTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
         }
         return term;
 	}

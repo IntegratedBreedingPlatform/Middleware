@@ -77,13 +77,19 @@ public class VariableListTransformer extends Transformer {
 		}
 		*/
 		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
-		for(Integer index : variableIndexesList)
-			variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
+		for(Integer index : variableIndexesList) {
+			if (nonTrialMD.get(index).getcValueId() != null) {
+				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getcValueId()));
+			}
+			else {
+				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
+			}
+		}
 		return variableList;
 	}
 	
 	public List<Integer> transformStockIndexes(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
-		List<Integer> variableIndexesList = new ArrayList();
+		List<Integer> variableIndexesList = new ArrayList<Integer>();
 
 		if(mRow == null) {
 			return variableIndexesList;
@@ -140,6 +146,38 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 	
+	public VariableList transformTrialEnvironment(MeasurementRow mRow, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+		VariableList variableList = new VariableList() ;
+		
+		List<MeasurementData> trialMD = mRow.getDataList();
+		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			List<VariableType> varTypes = variableTypeList.getVariableTypes();
+			int varTypeSize = varTypes.size();
+			for(int i = 0, l = varTypeSize; i < l; i++ ){
+				VariableType varType = varTypes.get(i);
+				MeasurementData trialData = null;
+				for (MeasurementData aData : trialMD) {
+					if (aData.getLabel().equalsIgnoreCase(varType.getLocalName())) {
+						trialData = aData;
+						break;
+					}
+				}
+				
+				if (trialData != null) {
+					String value = trialData.getValue();
+										
+					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT ||
+						varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {//include variate
+						Variable variable = new Variable(varType, value);
+						variableList.add(variable);
+					}
+				}
+			}
+		}
+		
+		return variableList;
+	}
+	
 	public VariableList transformTrialEnvironment(List<MeasurementVariable> mVarList, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		VariableList variableList = new VariableList() ;
 		
@@ -175,7 +213,7 @@ public class VariableListTransformer extends Transformer {
 			int rank = 1;
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name", studyDetails.getStudyName(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TITLE, "STUDY_TITLE", "Study title", studyDetails.getTitle(), rank);
-			rank = addVariableIfNecessary(variables, variableTypeList, TermId.PM_KEY, "PM_KEY", "Project Management Key", studyDetails.getPmKey(), rank);
+			/*rank = addVariableIfNecessary(variables, variableTypeList, TermId.PM_KEY, "PM_KEY", "Project Management Key", studyDetails.getPmKey(), rank);*/
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective", studyDetails.getObjective(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TYPE, "STUDY_TYPE", "Study type", 
 					(studyDetails.getStudyType()!=null?Integer.toString(studyDetails.getStudyType().getId()):null), rank);

@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
@@ -18,9 +20,11 @@ import org.generationcp.middleware.util.Debug;
  * Contains the details of a study - id, conditions and constants.
  */
 
-public class Study {
+public class Study implements Serializable{
 
-    private int id;
+	private static final long serialVersionUID = 1L;
+
+	private int id;
 	
 	private VariableList conditions;
 

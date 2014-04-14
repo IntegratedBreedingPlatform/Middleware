@@ -43,7 +43,10 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
+import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -1076,9 +1079,9 @@ public class TestStudyDataManagerImpl{
     public void testGetParentFolder() throws MiddlewareQueryException{
     	DmsProject proj = manager.getParentFolder(10010);
     	if(proj==null)
-    		System.out.println("Parent is null");
+    		Debug.println(0, "Parent is null");
     	else
-    		System.out.println("Parent is NOT null");
+    		Debug.println(0, "Parent is NOT null");
     }
     
     @Test
@@ -1113,6 +1116,12 @@ public class TestStudyDataManagerImpl{
     }
     
     @Test
+    public void testGetGeolocationPropValue() throws MiddlewareQueryException {
+        String value = manager.getGeolocationPropValue(Database.LOCAL, TermId.LOCATION_ID.getId(), -1);
+        Debug.println(0, value);
+    }
+    
+    @Test
     public void testSaveFieldMapProperties() throws MiddlewareQueryException {
         List<Integer> trialIdList = new ArrayList<Integer>();
         
@@ -1135,13 +1144,13 @@ public class TestStudyDataManagerImpl{
          
         List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
         //info.setBlockName("Block Name 1");
-        if (info != null) {
-            info.get(0).setFieldbookId(-186);
-        }
+//        if (info != null) {
+//            info.get(0).setFieldbookId(-186);
+//        }
         //info.setColumnsInBlock(7);
         //info.setRangesInBlock(8);
         //info.setPlantingOrder(1);
-        int columnCount = 1, rangeCount = 1;
+//        int columnCount = 1, rangeCount = 1;
         /*
         for (FieldMapLabel label : info.getFieldMapLabels()) {
             label.setColumn(columnCount);
@@ -1155,7 +1164,8 @@ public class TestStudyDataManagerImpl{
             }
         }*/
         //TODO
-        manager.saveOrUpdateFieldmapProperties(info, "");
+//    	List<FieldMapInfo> info = createFieldmapData();
+        manager.saveOrUpdateFieldmapProperties(info, -1, false);
     }
     
     @Test
@@ -1208,7 +1218,7 @@ public class TestStudyDataManagerImpl{
     @Test
     public void testGetFolderTree() throws MiddlewareQueryException {
         List<FolderReference> tree = manager.getFolderTree();
-        System.out.println("GetFolderTree Test");
+        Debug.println(0, "GetFolderTree Test");
         printFolderTree(tree, 1);
     }
     
@@ -1216,12 +1226,52 @@ public class TestStudyDataManagerImpl{
         if (tree != null && tree.size() > 0) {
             for (FolderReference folder : tree) {
                 for (int i = 0; i < tab; i++) {
-                    System.out.print("\t");
+                	Debug.print(0, "\t");
                 }
-                System.out.println(folder.getId() + " - " + folder.getName());
+                Debug.println(0, folder.getId() + " - " + folder.getName());
                 printFolderTree(folder.getSubFolders(), tab+1);
             }
         }
+    }
+    
+    private List<FieldMapInfo> createFieldmapData() {
+    	List<FieldMapInfo> list = new ArrayList<FieldMapInfo>();
+    	
+    	FieldMapInfo info = new FieldMapInfo();
+    	info.setFieldbookId(-8);
+    	info.setTrial(true);
+    	info.setFieldbookName("TrialTest");
+    	info.setDatasets(new ArrayList<FieldMapDatasetInfo>());
+    	list.add(info);
+    	
+    	FieldMapDatasetInfo dataset = new FieldMapDatasetInfo();
+    	dataset.setDatasetId(-9);
+    	dataset.setDatasetName("Trial Dataset");
+    	dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
+    	info.getDatasets().add(dataset);
+    	
+    	FieldMapTrialInstanceInfo trial = new FieldMapTrialInstanceInfo();
+    	trial.setBlockId(26190);
+    	trial.setBlockName("TEST BLOCK 1");
+    	trial.setRowsInBlock(20);
+    	trial.setDeletedPlots(Arrays.asList("3,1"));
+    	trial.setFieldId(26189);
+    	trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
+    	trial.setMachineRowCapacity(2);
+    	trial.setRangesInBlock(20);
+    	trial.setRowsPerPlot(2);
+    	trial.setGeolocationId(-3);
+    	dataset.getTrialInstances().add(trial);
+    	
+    	FieldMapLabel label = new FieldMapLabel();
+    	label.setExperimentId(-1915);
+    	label.setGeolocationId(-3);
+    	label.setColumn(1);
+    	label.setRange(1);
+    	label.setSiteName("site name");
+    	trial.getFieldMapLabels().add(label);
+    	
+    	return list;
     }
     
 }

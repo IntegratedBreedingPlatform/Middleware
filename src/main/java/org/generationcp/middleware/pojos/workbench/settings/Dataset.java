@@ -1,9 +1,10 @@
 package org.generationcp.middleware.pojos.workbench.settings;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class Dataset implements Serializable {
+public class Dataset extends ParentDataset {
+
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private List<Condition> conditions;
 	private List<Factor> factors;

@@ -105,6 +105,7 @@ public class ExperimentBuilder extends Builder {
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(getFactors(experimentModel, variableTypes));
 		experiment.setVariates(getVariates(experimentModel, variableTypes));
+		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
 	}
 	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
@@ -112,6 +113,7 @@ public class ExperimentBuilder extends Builder {
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(getFactors(experimentModel, variableTypes, hasVariableType));
 		experiment.setVariates(getVariates(experimentModel, variableTypes));
+		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
 	}
 
@@ -132,11 +134,13 @@ public class ExperimentBuilder extends Builder {
 		if (experiment.getPhenotypes() != null) {
 			for (Phenotype phenotype : experiment.getPhenotypes()) {
 				VariableType variableType = variableTypes.findById(phenotype.getObservableId());
-				if (variableType.getStandardVariable().getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()) {
-					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
+				if (variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId() &&
+						variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId()));
 				}
 				else {
-					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId()));
+					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
+					
 				}
 			}
 		}

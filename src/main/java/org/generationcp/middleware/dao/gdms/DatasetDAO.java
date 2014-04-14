@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.GdmsType;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.hibernate.Criteria;
@@ -46,7 +47,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 
     public List<String> getDatasetNames(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_NOT_QTL);
+            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_NOT_QTL_AND_MTA);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             return (List<String>) query.list();
@@ -181,38 +182,69 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
                 SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASETS_BY_IDS);
                 query.setParameterList("datasetIds", datasetIds);
                 List results = query.list();
-                for (Object o : results) {
-                    Object[] result = (Object[]) o;
-                    if (result != null) {
-                        Integer datasetId = (Integer) result[0];
-                        String datasetName = (String) result[1];
-                        String datasetDesc = (String) result[2];
-                        String datasetType = (String) result[3];
-                        String genus = (String) result[4];
-                        String species = (String) result[5];
-                        Date uploadTemplateDate = (Date) result[6];
-                        String remarks = (String) result[7];
-                        String dataType = (String) result[8];
-                        String missingData = (String) result[9];
-                        String method = (String) result[10];
-                        String score = (String) result[11];
-                        String institute = (String) result[12];
-                        String principalInvestigator = (String) result[13];
-                        String email = (String) result[14];
-                        String purposeOfStudy = (String) result[15];
-                        
-                        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType, missingData,
-                                method, score, institute, principalInvestigator, email, purposeOfStudy);
-                        dataValues.add(dataset);
-                    }
-                }
+                dataValues = buildDatasetList(results);
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getDatasetsByIds() query from Dataset: " + e.getMessage(), e);
         }
         return dataValues;
 	}
+	
+    public List<Dataset> getDatasetsByType(String type) throws MiddlewareQueryException{
+	    List<Dataset> dataValues = new ArrayList<Dataset>();
+        try {
+            if (type != null){
+                Criteria crit = getSession().createCriteria(Dataset.class);
+                crit.add(Restrictions.eq("datasetType", type));
+                dataValues = (List<Dataset>) crit.list();
 
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getDatasetsByType(type=" + type + ") query from Dataset " + e.getMessage(), e);
+        }
+        return dataValues;
+    }
+    
+    public List<Dataset> getDatasetsByMappingType(GdmsType type) throws MiddlewareQueryException{
+	    List<Dataset> dataValues = new ArrayList<Dataset>();
+        try {
+        		// MappingABH
+            	StringBuffer sqlString =  new StringBuffer()
+            		.append(Dataset.GET_DATASETS_SELECT)
+            		.append("FROM gdms_mapping_pop_values m JOIN gdms_dataset d ON m.dataset_id = d.dataset_id ")
+            		.append("WHERE d.dataset_type = '").append(GdmsType.TYPE_MAPPING.getValue()).append("' ")
+            	    .append("AND m.dataset_id NOT IN (SELECT a.dataset_id FROM gdms_allele_values a ")
+            	    .append("						  JOIN gdms_dataset d ON a.dataset_id = d.dataset_id WHERE d.dataset_type = '")
+            	    									.append(GdmsType.TYPE_MAPPING.getValue()).append("') ")
+            		.append("AND m.dataset_id NOT IN (SELECT c.dataset_id FROM gdms_char_values c ")
+    				.append("							JOIN gdms_dataset d ON c.dataset_id = d.dataset_id WHERE d.dataset_type = '")
+    													.append(GdmsType.TYPE_MAPPING.getValue()).append("') ")
+    				;
+            		 
+            	if (type == GdmsType.TYPE_SNP){ // MappingSSR (with char values)
+           		 sqlString =  new StringBuffer()
+           		 	.append(Dataset.GET_DATASETS_SELECT)
+           		 	.append("FROM gdms_char_values c JOIN gdms_dataset d ON c.dataset_id = d.dataset_id ")
+           		 	.append("WHERE d.dataset_type =  '").append(GdmsType.TYPE_MAPPING.getValue()).append("' ");
+            		
+            	} else if (type == GdmsType.TYPE_SSR){ // MappingAllelicSSRDArT (with allele values)
+              		 sqlString =  new StringBuffer()
+              		 	.append(Dataset.GET_DATASETS_SELECT)
+            		 	.append("FROM gdms_allele_values a JOIN gdms_dataset d ON a.dataset_id = d.dataset_id ")
+            		 	.append("WHERE d.dataset_type =  '").append(GdmsType.TYPE_MAPPING.getValue()).append("' ");
+            	}
+                SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+                
+                @SuppressWarnings("rawtypes")
+				List results = query.list();
+                dataValues = buildDatasetList(results);
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getDatasetsByMappingType(type=" + type + ") query from Dataset " + e.getMessage(), e);
+        }
+        return dataValues;
+    }
+    
     public Dataset getByName(String datasetName) throws MiddlewareQueryException {
         try {
             if (datasetName != null){
@@ -227,6 +259,38 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             logAndThrowException("Error with getByName(datasetName=" + datasetName + ") query from Dataset " + e.getMessage(), e);
         }
         return null;
+    }
+    
+    @SuppressWarnings("rawtypes")
+	private List<Dataset> buildDatasetList(List results){
+    	List<Dataset> dataValues = new ArrayList<Dataset>();
+
+        for (Object o : results) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+                Integer datasetId = (Integer) result[0];
+                String datasetName = (String) result[1];
+                String datasetDesc = (String) result[2];
+                String datasetType = (String) result[3];
+                String genus = (String) result[4];
+                String species = (String) result[5];
+                Date uploadTemplateDate = (Date) result[6];
+                String remarks = (String) result[7];
+                String dataType = (String) result[8];
+                String missingData = (String) result[9];
+                String method = (String) result[10];
+                String score = (String) result[11];
+                String institute = (String) result[12];
+                String principalInvestigator = (String) result[13];
+                String email = (String) result[14];
+                String purposeOfStudy = (String) result[15];
+                
+                Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType, missingData,
+                        method, score, institute, principalInvestigator, email, purposeOfStudy);
+                dataValues.add(dataset);
+            }
+        }
+        return dataValues;
     }
 
 }

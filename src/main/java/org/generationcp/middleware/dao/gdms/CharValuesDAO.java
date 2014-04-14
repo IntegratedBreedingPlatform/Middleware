@@ -17,8 +17,10 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -176,4 +178,105 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
     }
 
 
+	@SuppressWarnings("rawtypes")
+	public List<CharValues> getCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+		
+	    List<CharValues> toReturn = new ArrayList<CharValues>();
+        try {
+            if (datasetId != null){
+                SQLQuery query = getSession().createSQLQuery(
+                		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') " +
+                		" FROM gdms_char_values where dataset_id = :datasetId "); 
+                query.setParameter("datasetId", datasetId);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer acId = (Integer) result[0];
+                        Integer datasetId2 =  (Integer) result[1];
+                        Integer markerId = (Integer) result[2];
+                        Integer gId = (Integer) result[3];
+                        String charValue  = (String) result[4];
+                        
+                        CharValues dataElement = new CharValues(acId, datasetId2, markerId, gId, charValue);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getCharValuesByDatasetId(datasetId=" + datasetId + ") query from CharValues " + e.getMessage(), e);
+        }
+        return toReturn;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public List<AllelicValueElement> getAlleleValuesByMarkerId(List<Integer> markerIdList)  throws MiddlewareQueryException {
+	        List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
+
+	        if (markerIdList == null || markerIdList.size() == 0) {
+	            return returnVal;
+	        }
+
+	        try {
+	            SQLQuery query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_MARKER_IDS);
+	            query.setParameterList("markerIdList", markerIdList);
+
+	            List results = query.list();
+
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                if (result != null) {
+	                    Integer acId = (Integer) result[0];
+	                    Integer datasetId = (Integer) result[1];
+	                    Integer markerId = (Integer) result[2];
+	                    Integer gId = (Integer) result[3];
+	                    String data = (String) result[4];
+	                    AllelicValueElement value = new AllelicValueElement(acId, datasetId, gId, markerId, data);
+	                    returnVal.add(value);
+	                }
+	            }
+	        } catch (HibernateException e) {
+	            logAndThrowException("Error with getAlleleValuesByMarkerId() query from AlleleValues: " + e.getMessage(), e);
+	        }
+
+	        return returnVal;
+	    }
+
+    @SuppressWarnings("unchecked")
+    public List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+        if (markerIdList.size() == 0 || alleleValueList.size() == 0) {
+            throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
+        }
+        if (markerIdList.size() != alleleValueList.size()) {
+            throw new MiddlewareQueryException("markerIdList and alleleValueList must have the same size");
+        }
+        
+        List<String> placeholderList = new ArrayList<String>();
+        for (int i=0; i < markerIdList.size(); i++) {
+            placeholderList.add("(?,?)");
+        }
+        String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
+        
+        String sql =
+            "SELECT gid"
+            + " FROM gdms_char_values"
+            + " WHERE (marker_id, char_value) IN (" + placeholders + ")";
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(sql);
+            for (int i=0; i < markerIdList.size(); i++) {
+                int baseIndex = i * 2;
+
+                query.setInteger(baseIndex, markerIdList.get(i));
+                query.setString(baseIndex + 1, alleleValueList.get(i));
+            }
+            
+            return (List<Integer>) query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidsByMarkersAndAlleleValues(markerIdList=" + markerIdList + " alleleValueList=" + alleleValueList + "): " + e.getMessage(), e);
+        }
+        
+        return new ArrayList<Integer>();
+	}
 }

@@ -11,12 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.util.Debug;
 
 /** 
  * Used to contain sortable list of values.
  */
-public class Enumeration implements Comparable<Enumeration> {
+public class Enumeration implements Serializable, Comparable<Enumeration> {
+
+	private static final long serialVersionUID = 1L;
 
 	private Integer id;
 	
@@ -45,17 +49,35 @@ public class Enumeration implements Comparable<Enumeration> {
         return id;
     }
 
-	public String getName() {
-		return name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 	
 	@Override
     public String toString() {
-        return "[" + id + ":" + name + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Enumeration [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", rank=");
+        builder.append(rank);
+        builder.append("]");
+        return builder.toString();
     }
 
     public void print(int indent) {

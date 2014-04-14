@@ -109,7 +109,19 @@ public class MeasurementRow {
 	public void setDataList(List<MeasurementData> dataList) {
 		this.dataList = dataList;
 	}
-
+	
+	public List<MeasurementVariable> getMeasurementVariables() {
+		List<MeasurementVariable> variables = new ArrayList<MeasurementVariable>();
+		if (this.dataList != null) {
+			for (MeasurementData data : dataList) {
+				if (data.getMeasurementVariable() != null) {
+					variables.add(data.getMeasurementVariable());
+				}
+			}
+		}
+		return variables;
+	}
+	
 	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

@@ -1,7 +1,7 @@
 /*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
+ * Copyright (c) 2012, All Rights Reserved.
  * 
  * 
  * This software is licensed for use under the terms of the GNU General Public
@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.saver;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StudyValues;
@@ -31,10 +32,11 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.util.DatabaseBroker;
 
 public class ExperimentModelSaver extends Saver {
 	
-	private static final String DUMMY_DESCRIPTION = "DUMMY LOCATION - for null constraint";
+//	private static final String DUMMY_DESCRIPTION = "DUMMY LOCATION - for null constraint";
 
 	public ExperimentModelSaver(
 			HibernateSessionProvider sessionProviderForLocal,
@@ -110,8 +112,7 @@ public class ExperimentModelSaver extends Saver {
 		experimentModel.setProperties(createProperties(experimentModel, values.getVariableList()));
 		
 		if (values.getLocationId() == null && values instanceof StudyValues) {
-			experimentModel.setGeoLocation(getDummyGeoLocation());
-			
+			experimentModel.setGeoLocation(createNewGeoLocation());
 		}
 		else if (values.getLocationId() != null) {
 			experimentModel.setGeoLocation(getGeolocationDao().getById(values.getLocationId())); 
@@ -123,18 +124,11 @@ public class ExperimentModelSaver extends Saver {
 		return experimentModel;
 	}
 
-	private Geolocation getDummyGeoLocation() throws MiddlewareQueryException {
-		Geolocation location = getGeolocationDao().findByDescription(DUMMY_DESCRIPTION);
-		if (location == null) {
-			location = createDummyGeoLocation();
-		}
-		return location;
-	}
-
-	private Geolocation createDummyGeoLocation() throws MiddlewareQueryException {
+   	//GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
+	private Geolocation createNewGeoLocation() throws MiddlewareQueryException {
 		Geolocation location = new Geolocation();
 		location.setLocationId(getGeolocationDao().getNegativeId("locationId"));
-		location.setDescription(DUMMY_DESCRIPTION);
+		location.setDescription("1");
 		getGeolocationDao().save(location);
 		return location;
 	}
@@ -321,5 +315,40 @@ public class ExperimentModelSaver extends Saver {
 				
 		experimentModel.getProperties().add(property);
 		getExperimentPropertyDao().save(property);
+	}
+	
+	public int moveStudyToNewGeolocation(int studyId) throws MiddlewareQueryException {
+		if (studyId > 0) {
+			throw new MiddlewareQueryException("Can not update central studies");
+		}
+		setWorkingDatabase(Database.LOCAL);
+		List<DatasetReference> datasets = getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(studyId);
+		if (datasets != null) {
+			for (DatasetReference dataset : datasets) {
+				ids.add(dataset.getId());
+			}
+		}
+		
+		Geolocation location = getGeolocationSaver().createMinimumGeolocation();
+		
+		List<ExperimentModel> experiments = getExperimentDao().getExperimentsByProjectIds(ids);
+		if (experiments != null && !experiments.isEmpty()) {
+			int i = 0;
+			for (ExperimentModel experiment : experiments) {
+				if (experiment.getGeoLocation().getLocationId().intValue() == 1) {
+					experiment.setGeoLocation(location);
+					getExperimentDao().update(experiment);
+				}
+            	if (i > 0 && i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
+                    getExperimentDao().flush();
+                    getExperimentDao().clear();
+                }
+            	i++;
+			}
+		}
+		
+		return location.getLocationId();
 	}
 }

@@ -11,6 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementVariable {
@@ -36,6 +40,14 @@ public class MeasurementVariable {
 	private int storedIn;
 	
 	private boolean isFactor;
+	
+	private Integer dataTypeId;
+	
+	private List<ValueReference> possibleValues;
+	
+	private Double minRange;
+	
+	private Double maxRange;
 
 	public MeasurementVariable() {
 	}
@@ -58,7 +70,22 @@ public class MeasurementVariable {
         this.termId = termId;
     }
     
-    public int getTermId() {
+	public MeasurementVariable(String name, String description, String scale,
+			String method, String property, String dataType, String value, String label,
+			Double minRange, Double maxRange) {
+		this(name, description, scale, method, property, dataType, value, label);
+		this.minRange = minRange;
+		this.maxRange = maxRange;
+	}
+
+    public MeasurementVariable(int termId, String name, String description, String scale,
+            String method, String property, String dataType, String value, String label, 
+            Double minRange, Double maxRange) {
+        this(name, description, scale, method, property, dataType, value, label, minRange, maxRange);
+        this.termId = termId;
+    }
+	
+	public int getTermId() {
         return termId;
     }
     
@@ -189,4 +216,71 @@ public class MeasurementVariable {
 	public void setStoredIn(int storedIn){
 	    this.storedIn = storedIn;
 	}
+
+	/**
+	 * @return the dataTypeId
+	 */
+	public Integer getDataTypeId() {
+		return dataTypeId;
+	}
+
+	/**
+	 * @param dataTypeId the dataTypeId to set
+	 */
+	public void setDataTypeId(Integer dataTypeId) {
+		this.dataTypeId = dataTypeId;
+	}
+
+	/**
+	 * @return the possibleValues
+	 */
+	public List<ValueReference> getPossibleValues() {
+		return possibleValues;
+	}
+
+	/**
+	 * @param possibleValues the possibleValues to set
+	 */
+	public void setPossibleValues(List<ValueReference> possibleValues) {
+		this.possibleValues = possibleValues;
+	}
+
+	/**
+	 * @return the minRange
+	 */
+	public Double getMinRange() {
+		return minRange;
+	}
+
+	/**
+	 * @param minRange the minRange to set
+	 */
+	public void setMinRange(Double minRange) {
+		this.minRange = minRange;
+	}
+
+	/**
+	 * @return the maxRange
+	 */
+	public Double getMaxRange() {
+		return maxRange;
+	}
+
+	/**
+	 * @param maxRange the maxRange to set
+	 */
+	public void setMaxRange(Double maxRange) {
+		this.maxRange = maxRange;
+	}
+	
+	public String getDataTypeDisplay() {
+	    //datatype ids: 1120, 1125, 1128, 1130
+	    if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() || 
+	            dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()) {
+	        return "C";
+	    } else {
+	        return "N";
+	    }
+	}
+
 }

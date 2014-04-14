@@ -27,6 +27,8 @@ public class Experiment {
 	
 	private VariableList variates;
 	
+	private Integer locationId;
+	
 	private Map<String, Variable> variatesMap;
 
 	public int getId() {
@@ -49,10 +51,24 @@ public class Experiment {
 		return variates.sort();
 	}
 
+	/**
+	 * @return the locationId
+	 */
+	public Integer getLocationId() {
+		return locationId;
+	}
+
+	/**
+	 * @param locationId the locationId to set
+	 */
+	public void setLocationId(Integer locationId) {
+		this.locationId = locationId;
+	}
+
 	public void setVariates(VariableList variates) {
 		this.variates = variates;
 		if(variatesMap == null){
-			variatesMap = new HashMap();
+			variatesMap = new HashMap<String, Variable>();
 			if(variates != null){
 				
 				for(Variable var : variates.getVariables()){

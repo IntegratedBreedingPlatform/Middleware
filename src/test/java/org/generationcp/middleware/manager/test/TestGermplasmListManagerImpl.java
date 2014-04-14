@@ -601,8 +601,6 @@ public class TestGermplasmListManagerImpl{
                 data.print(0);
             }
     	}
-    	
-
     } 
     
     @Test

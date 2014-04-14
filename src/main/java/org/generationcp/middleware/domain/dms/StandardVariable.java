@@ -11,7 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.util.Debug;
@@ -20,7 +22,9 @@ import org.generationcp.middleware.util.Debug;
  * The Standard Variable with term, property, scale, method, data type, etc.
  *
  */
-public class StandardVariable {
+public class StandardVariable implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private Term term = new Term();
 	
@@ -41,6 +45,8 @@ public class StandardVariable {
     private VariableConstraints constraints;  // may be null
     
     private List<Enumeration> enumerations;
+    
+    private Map<Integer, Integer> overridenEnumerations;
     
     private String cropOntologyId;
     
@@ -326,6 +332,20 @@ public class StandardVariable {
 
 	public void setIsA(Term isA) {
 		this.isA = isA;
+	}
+
+	/**
+	 * @return the overridenEnumerations
+	 */
+	public Map<Integer, Integer> getOverridenEnumerations() {
+		return overridenEnumerations;
+	}
+
+	/**
+	 * @param overridenEnumerations the overridenEnumerations to set
+	 */
+	public void setOverridenEnumerations(Map<Integer, Integer> overridenEnumerations) {
+		this.overridenEnumerations = overridenEnumerations;
 	}
 	
 	

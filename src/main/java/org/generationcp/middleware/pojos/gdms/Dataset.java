@@ -38,10 +38,10 @@ public class Dataset implements Serializable{
     		+ "WHERE dataset_type != 'QTL' "
             ;
 
-    public static final String GET_DATASET_NAMES_NOT_QTL = 
+    public static final String GET_DATASET_NAMES_NOT_QTL_AND_MTA = 
             "SELECT CONCAT(dataset_name, '') " 
     		+ "FROM gdms_dataset "
-            + "WHERE dataset_type != 'QTL' "
+            + "WHERE dataset_type != 'QTL' AND dataset_type != 'MTA' "
     		;
 
     public static final String GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL = 
@@ -94,8 +94,8 @@ public class Dataset implements Serializable{
             + "WHERE gq.qtl_id = :qtlId "
             ;
     
-    public static final String GET_DATASETS_BY_IDS = 
-            "SELECT dataset_id "
+    public static final String GET_DATASETS_SELECT = 
+            "SELECT d.dataset_id "
                     + ", CONCAT(dataset_name, '')  "
                     + ", dataset_desc  "
                     + ", CONCAT(dataset_type, '')  "
@@ -111,7 +111,11 @@ public class Dataset implements Serializable{
                     + ", principal_investigator  "
                     + ", email  "
                     + ", purpose_of_study  " 
-            + "FROM gdms_dataset "
+                    ;
+    
+    public static final String GET_DATASETS_BY_IDS = 
+    		GET_DATASETS_SELECT
+            + "FROM gdms_dataset d "
             + "WHERE dataset_id in (:datasetIds) "
             ;
 

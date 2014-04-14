@@ -72,17 +72,17 @@ import org.generationcp.middleware.util.PropertyReader;
     , TIMESTAMP_VARIABLE
     , CATEGORICAL_VARIABLE
     
-    //Variate Types
+    // Variate Types
     , OBSERVATION_VARIATE
     , CATEGORICAL_VARIATE
     
-    //Folder, Study, Dataset Nodes
+    // Folder, Study, Dataset Nodes
     , HAS_PARENT_FOLDER
     , STUDY_HAS_FOLDER
     , BELONGS_TO_STUDY
     , IS_STUDY
     
-    //Season
+    // Season
     , SEASON
     , SEASON_VAR 
     , SEASON_WET
@@ -113,13 +113,14 @@ import org.generationcp.middleware.util.PropertyReader;
     , ENTRY_GID_STORAGE
     , ENTRY_DESIGNATION_STORAGE
     , ENTRY_CODE_STORAGE
-    
+
     // Stock Plot / Fieldmap 
     , PLOT_NO
     , PLOT_NNO
     , REP_NO
-    , COLUMN_NO
-    , RANGE_NO
+    , BLOCK_NO
+    , COLUMN_NO //(8400) //(32769)
+    , RANGE_NO //(8410) //(32770)
     , BLOCK_NAME
     , COLUMNS_IN_BLOCK
     , RANGES_IN_BLOCK
@@ -128,6 +129,7 @@ import org.generationcp.middleware.util.PropertyReader;
     , FIELD_NAME
     , FIELDMAP_UUID
     , MACHINE_ROW_CAPACITY
+    , BLOCK_ID //(8583)// (77783)
     
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE
@@ -139,7 +141,7 @@ import org.generationcp.middleware.util.PropertyReader;
     , DATASET_TITLE_STORAGE
     , STUDY_INFO_STORAGE
     , DATASET_INFO_STORAGE
-        
+            
     // Other
     , ORDER
     , MIN_VALUE
@@ -154,33 +156,33 @@ import org.generationcp.middleware.util.PropertyReader;
     , DESIG
     , CHECK
     
-    //Location 
+    // Location 
     , TRIAL_LOCATION
     , LOCATION_ID
     , SITE_NAME
     
-    //Study Type
+    // Study Type
     , NURSERY
     , TRIAL
     
-    //Main Factor ("Variable")
+    // Main Factor ("Variable")
     , TRIAL_INSTANCE_FACTOR
-    
+
     , DELETED_STUDY
     
-    //Planting Order
+    // Planting Order
     , ROW_COLUMN
     , SERPENTINE
     
     ,BREEDING_METHOD_ID
     ,BREEDING_METHOD
     
-    //Breeding Methods
+    // Breeding Methods
     , SINGLE_PLANT_SELECTION_SF
     , SELECTED_BULK_SF
     , RANDOM_BULK_SF
     
-    //Advance Nursery
+    // Advance Nursery
     , PLANTS_SELECTED
     
     //Manage Settings
@@ -201,3 +203,4 @@ import org.generationcp.middleware.util.PropertyReader;
     }
     
 }
+	

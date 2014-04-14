@@ -90,38 +90,38 @@ public interface OntologyService{
     Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
     /**
-     * Gets all the standard variables matching the given trait class ID. 
-     * 
-     * @param traitClassId
-     * @return
-     * @throws MiddlewareQueryException
+     * Gets all the standard variables matching the given trait class ID.
+     *
+     * @param traitClassId the trait class id
+     * @return the standard variables by trait class
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException;
     
     /**
-     * Gets all the standard variables matching the given property ID. 
-     * 
-     * @param propertyId
-     * @return
-     * @throws MiddlewareQueryException
+     * Gets all the standard variables matching the given property ID.
+     *
+     * @param propertyId the property id
+     * @return the standard variables by property
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException;
     
     /**
-     * Gets all the standard variables matching the given method ID. 
-     * 
-     * @param methodId
-     * @return
-     * @throws MiddlewareQueryException
+     * Gets all the standard variables matching the given method ID.
+     *
+     * @param methodId the method id
+     * @return the standard variables by method
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException;
     
     /**
-     * Gets all the standard variables matching the given scale ID. 
-     * 
-     * @param scaleId
-     * @return
-     * @throws MiddlewareQueryException
+     * Gets all the standard variables matching the given scale ID.
+     *
+     * @param scaleId the scale id
+     * @return the standard variables by scale
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException;
     
@@ -157,7 +157,7 @@ public interface OntologyService{
     /**
      * Delete standard variable.
      *
-     * @param standardVariable the standard variable
+     * @param stdVariableId the std variable id
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
@@ -166,10 +166,10 @@ public interface OntologyService{
      * Adds or update the given standard variable's min-max constraints.
      *
      * @param standardVariableId the standard variable id
-     * @param constraint the constraint containing the min and max constraints
+     * @param constraints the constraints
      * @return the variable constraints with the id set
      * @throws MiddlewareQueryException the middleware query exception
-     * @throws MiddlewareException 
+     * @throws MiddlewareException the middleware exception
      */
     void addOrUpdateStandardVariableMinMaxConstraints(
             int standardVariableId, VariableConstraints constraints) throws MiddlewareQueryException, MiddlewareException;
@@ -183,14 +183,14 @@ public interface OntologyService{
     void deleteStandardVariableMinMaxConstraints(int standardVariableId) throws MiddlewareQueryException;
 
     /**
-     * Adds a valid value to the given standard variable. 
+     * Adds a valid value to the given standard variable.
      * Checks if the standard variable passed is categorical.
      *
      * @param variable the variable
      * @param validValue the valid value to add
      * @return the enumeration containing the id of the new valid value
      * @throws MiddlewareQueryException the middleware query exception
-     * @throws MiddlewareException 
+     * @throws MiddlewareException the middleware exception
      */
     Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) 
             throws MiddlewareQueryException, MiddlewareException;
@@ -203,6 +203,16 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteStandardVariableValidValue(int standardVariableId, int validValueId) throws MiddlewareQueryException;
+    
+    /**
+     * Save or update standard variable enumeration.
+     *
+     * @param variable the variable
+     * @param enumeration the enumeration
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException;
     
     /*======================= PROPERTY ================================== */
    
@@ -256,6 +266,7 @@ public interface OntologyService{
      * @param name the name of the property
      * @param definition the defintion of the property
      * @param isAId the id of the trait class of the property
+     * @param cropOntologyId the crop ontology id
      * @return the Term of the added / updated property
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
@@ -572,6 +583,15 @@ public interface OntologyService{
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
     
-    
+
+    /**
+     * Validates if the enumeration is being used.
+     * 
+     * @param standardVariableId
+     * @param enumerationId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
     
 }

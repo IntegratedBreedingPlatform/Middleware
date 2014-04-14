@@ -18,12 +18,14 @@ public enum PhenotypicType {
             TermId.STUDY_NAME_STORAGE.getId(),
             TermId.STUDY_TITLE_STORAGE.getId(),
             TermId.STUDY_INFO_STORAGE.getId()),
-          Arrays.asList("STUDY")), 
+          Arrays.asList("STUDY"),
+          "STUDY"), 
     DATASET(Arrays.asList(
             TermId.DATASET_NAME_STORAGE.getId(),
             TermId.DATASET_TITLE_STORAGE.getId(),
             TermId.DATASET_INFO_STORAGE.getId()),
-          Arrays.asList("")), 
+          Arrays.asList(""),
+          "DATASET"), 
     TRIAL_ENVIRONMENT(Arrays.asList(
             TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId(),
             TermId.TRIAL_INSTANCE_STORAGE.getId(),
@@ -31,30 +33,36 @@ public enum PhenotypicType {
             TermId.LONGITUDE_STORAGE.getId(),
             TermId.DATUM_STORAGE.getId(),
             TermId.ALTITUDE_STORAGE.getId()),
-          Arrays.asList("TRIAL","OCC","TRIAL_NO", "TRIALNO", "SITE", "SITE_NO", "SITENO")), 
+          Arrays.asList("TRIAL","OCC","TRIAL_NO", "TRIALNO", "SITE", "SITE_NO", "SITENO"),
+          "TRIAL ENVIRONMENT"), 
     GERMPLASM(Arrays.asList(
             TermId.GERMPLASM_ENTRY_STORAGE.getId(),
             TermId.ENTRY_NUMBER_STORAGE.getId(),
             TermId.ENTRY_GID_STORAGE.getId(),
             TermId.ENTRY_DESIGNATION_STORAGE.getId(),
             TermId.ENTRY_CODE_STORAGE.getId()),
-           Arrays.asList("ENTRY", "ENTRY_NO", "ENTRYNO")), 
+           Arrays.asList("ENTRY", "ENTRY_NO", "ENTRYNO"),
+           "GERMPLASM ENTRY"), 
     TRIAL_DESIGN(Arrays.asList(
             TermId.TRIAL_DESIGN_INFO_STORAGE.getId()),
-           Arrays.asList("PLOT", "PLOT_NO", "PLOTNO")),
+           Arrays.asList("PLOT", "PLOT_NO", "PLOTNO"),
+           "TRIAL DESIGN"),
     VARIATE(Arrays.asList(
 		   TermId.OBSERVATION_VARIATE.getId(),
 		   TermId.CATEGORICAL_VARIATE.getId()),
-		   Arrays.asList("STUDY", "PLOT", "TRIAL"))
+		   Arrays.asList("STUDY", "PLOT", "TRIAL"),
+		   "VARIATE")
            ;
 
 
     private List<Integer> typeStorages;
     private List<String> labelList;
+    private String group;
     
-    private PhenotypicType(List<Integer> typeStorages, List<String> labelList) {
+    private PhenotypicType(List<Integer> typeStorages, List<String> labelList, String group) {
         this.typeStorages = typeStorages;
         this.labelList = labelList;
+        this.group = group;
     }
 
 	public List<Integer> getTypeStorages() {
@@ -65,7 +73,11 @@ public enum PhenotypicType {
 		return labelList;
 	}
     
-    public static PhenotypicType getPhenotypicTypeForLabel(String label){
+    public String getGroup() {
+		return group;
+	}
+
+	public static PhenotypicType getPhenotypicTypeForLabel(String label){
     	
     	return getPhenotypicTypeForLabel(label,false);
     }
@@ -98,4 +110,6 @@ public enum PhenotypicType {
         }
         return null;
     }
+    
+    
 }

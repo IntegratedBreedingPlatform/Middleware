@@ -22,6 +22,8 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -34,6 +36,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -53,8 +56,6 @@ import org.slf4j.LoggerFactory;
 public class WorkbookSaver extends Saver {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbookSaver.class);
-    
-    private static final int DEFAULT_GEOLOCATION_ID = 1;
     
     public WorkbookSaver(HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
@@ -166,7 +167,7 @@ public class WorkbookSaver extends Saver {
 		
 		
         //GCP-6091 start
-        int studyLocationId = DEFAULT_GEOLOCATION_ID;
+        int studyLocationId;
         List<Integer> locationIds = new ArrayList<Integer>();
         Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
         if(trialVariableTypeList!=null) {//multi-location
@@ -218,19 +219,19 @@ public class WorkbookSaver extends Saver {
 		VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(trialMV, trialVariables);
         Integer studyLocationId = null;
 
-        if (geolocation != null && geolocation.size() > 0) {
-            watch.restart("save geolocation");
-            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, null, workbook.isNursery());
-            studyLocationId = g.getLocationId();
-            if(g.getVariates()!=null && g.getVariates().size() > 0) {
-            	VariableList trialVariates = new VariableList();
-            	trialVariates.addAll(g.getVariates());
-            	trialVariatesMap.put(studyLocationId, trialVariates);
-            }
+       	//GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
+        if (geolocation == null || geolocation.size() == 0) {
+        	geolocation = createDefaultGeolocationVariableList();
+        }
 
-        } else if (workbook.isNursery()) {
-        	studyLocationId = DEFAULT_GEOLOCATION_ID;
-        } //TODO: else raise an exception? trial factor is mandatory, otherwise a default value will be set
+        watch.restart("save geolocation");
+        Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, null, workbook.isNursery());
+        studyLocationId = g.getLocationId();
+        if(g.getVariates()!=null && g.getVariates().size() > 0) {
+        	VariableList trialVariates = new VariableList();
+        	trialVariates.addAll(g.getVariates());
+        	trialVariatesMap.put(studyLocationId, trialVariates);
+        }
         
         watch.restart("set to observations(total)");
     	for(MeasurementRow row : workbook.getObservations()) {
@@ -239,8 +240,8 @@ public class WorkbookSaver extends Saver {
     	    }
         }
     	watch.stop();
-
-    	return studyLocationId != null ? studyLocationId : DEFAULT_GEOLOCATION_ID;
+    	
+    	return studyLocationId;
 	}
 	
 	private int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors, List<String> trialHeaders, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
@@ -481,6 +482,7 @@ public class WorkbookSaver extends Saver {
 		Session session = getCurrentSessionForLocal();
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
+		Map<Integer,PhenotypeExceptionDto> exceptions = null;
 		for(MeasurementRow row : observations) {
 			rowWatch.restart("saving row "+(i++));
 			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
@@ -488,7 +490,24 @@ public class WorkbookSaver extends Saver {
 			if(trialVariates!=null) {
 				experimentValues.getVariableList().addAll(trialVariates);
 			}
-			experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+			try {
+				experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+			} catch(PhenotypeException e) {
+				if(exceptions==null) {
+					exceptions = e.getExceptions();
+				} else {
+					for (Integer standardVariableId : e.getExceptions().keySet()) {
+						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+						if(exceptions.get(standardVariableId)==null) {
+							exceptions.put(standardVariableId, exception);//add exception
+						} else {//add invalid values to the existing map of exceptions for each phenotype
+							for(String invalidValue : exception.getInvalidValues()) {
+								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+							}
+						}
+					}
+				}
+			}
 			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
 				session.flush();
 				session.clear();
@@ -496,6 +515,10 @@ public class WorkbookSaver extends Saver {
 		}
 		rowWatch.stop();
 		watch.stop();
+		
+		if(exceptions!=null) {
+			throw new PhenotypeException(exceptions);
+		}
 	}
 	
 	private boolean isTrialFactorInDataset(VariableTypeList list) {
@@ -626,8 +649,9 @@ public class WorkbookSaver extends Saver {
 		VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
 		List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
 		
+       	//GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
 		//create locations (entries to nd_geolocation) and associate to observations
-        int studyLocationId = DEFAULT_GEOLOCATION_ID;
+        int studyLocationId/* = DEFAULT_GEOLOCATION_ID*/;
         List<Integer> locationIds = new ArrayList<Integer>();
         Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
         if(trialVariableTypeList!=null) {//multi-location
@@ -654,5 +678,18 @@ public class WorkbookSaver extends Saver {
    		}
         //3. measurement experiments
         createMeasurementEffectExperiments(measurementDatasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
+	}
+	
+	private VariableList createDefaultGeolocationVariableList() throws MiddlewareQueryException {
+		VariableList list = new VariableList();
+		
+		VariableType variableType = new VariableType(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0)
+				, PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0)
+				, getStandardVariableBuilder().create(TermId.TRIAL_INSTANCE_FACTOR.getId())
+				, 1);
+		Variable variable = new Variable(variableType, "1");
+		list.add(variable);
+		
+		return list;
 	}
 }

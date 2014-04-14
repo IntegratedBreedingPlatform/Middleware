@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,8 +21,10 @@ import org.generationcp.middleware.domain.oms.TermId;
 /** 
  * List of variable types.
  */
-public class VariableTypeList {
+public class VariableTypeList implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+	
 	private List<VariableType> variableTypes = new ArrayList<VariableType>();
 	
 	public void add(VariableType variableType) {

@@ -37,7 +37,7 @@ public class MappingPop implements Serializable{
             "SELECT parent_a_nid, parent_b_nid, mapping_type " +
             "FROM gdms_mapping_pop " +
             "WHERE dataset_id = :datasetId";
-    
+
     public static final String GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS =
             "SELECT DISTINCT" +
                 " gdms_mapping_pop_values.dataset_id" +
@@ -45,13 +45,11 @@ public class MappingPop implements Serializable{
                 ", gdms_mapping_pop.parent_a_nid" +
                 ", gdms_mapping_pop.parent_b_nid" +
                 ", CONCAT(gdms_marker.marker_type, '')" +
-            " FROM gdms_mapping_pop_values" +
-                ", gdms_mapping_pop" +
-                ", gdms_marker" +
-            " WHERE gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id" +
-                " and gdms_mapping_pop_values.marker_id = gdms_marker.marker_id" +
-                " and gdms_mapping_pop_values.marker_id IN (:markerIdList)" +
-                " and gdms_mapping_pop_values.gid IN (:gidList)" +
+            " FROM gdms_mapping_pop_values " +
+            	"JOIN gdms_mapping_pop ON gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id " +
+                "LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
+            " WHERE gdms_mapping_pop_values.marker_id IN (:markerIdList)" +
+                " AND gdms_mapping_pop_values.gid IN (:gidList)" +
             " ORDER BY" +
                 " gdms_mapping_pop_values.gid DESC" +
                 ", gdms_marker.marker_name";

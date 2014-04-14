@@ -26,7 +26,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
  */
 public final class StandardVariableCache {
 
-	private static final StandardVariableCache instance = new StandardVariableCache();
+	private static final StandardVariableCache INSTANCE = new StandardVariableCache();
 
 	private Map<Integer, StandardVariable> values = new HashMap<Integer, StandardVariable>();
 
@@ -34,7 +34,7 @@ public final class StandardVariableCache {
 	}
 	
 	public static StandardVariableCache getInstance(){
-        return instance;
+        return INSTANCE;
 	}
 	
 	/** Retrieves a standard variable from the cache. Returns null if not found. */

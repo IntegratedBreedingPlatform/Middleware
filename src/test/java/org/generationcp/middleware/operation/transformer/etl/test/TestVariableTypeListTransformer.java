@@ -49,12 +49,12 @@ public class TestVariableTypeListTransformer {
 	private static final String TEST_METHOD3 = "testMethod3";
 	private static final String TEST_SCALE3 = "testScale3";
 	
-	private static final StandardVariable stdvar1 = new StandardVariable();
-	private static final StandardVariable stdvar2 = new StandardVariable();
-	private static final StandardVariable stdvar3 = new StandardVariable();
+	private static final StandardVariable STDVAR1 = new StandardVariable();
+	private static final StandardVariable STDVAR2 = new StandardVariable();
+	private static final StandardVariable STDVAR3 = new StandardVariable();
 	
-	private static final StandardVariable[] factorArr = new StandardVariable[] {stdvar1, stdvar2}; 
-	private static final StandardVariable[] variateArr = new StandardVariable[] {stdvar3}; 
+	private static final StandardVariable[] FACTOR_ARR = new StandardVariable[] {STDVAR1, STDVAR2}; 
+	private static final StandardVariable[] VARIATE_ARR = new StandardVariable[] {STDVAR3}; 
 	
 
 	@Rule
@@ -65,20 +65,20 @@ public class TestVariableTypeListTransformer {
 		transformer = Mockito.mock(VariableTypeListTransformer.class);
 		standardVariableBuilder = Mockito.mock(StandardVariableBuilder.class);
 		injectStandardVariableBuilder(transformer, standardVariableBuilder);
-		stdvar1.setId(1);
+		STDVAR1.setId(1);
 		Mockito.when(
 				standardVariableBuilder.findOrSave(FACTOR1, FACTOR1, TEST_PROPERTY1, TEST_SCALE1, TEST_METHOD1, 
 						PhenotypicType.TRIAL_ENVIRONMENT, "C"))
-				.thenReturn(stdvar1);
-		stdvar2.setId(2);
+				.thenReturn(STDVAR1);
+		STDVAR2.setId(2);
 		Mockito.when(
 				standardVariableBuilder.findOrSave(FACTOR2, FACTOR2, TEST_PROPERTY2, TEST_SCALE2, TEST_METHOD2, 
 						PhenotypicType.TRIAL_ENVIRONMENT, "C"))
-				.thenReturn(stdvar2);
-		stdvar3.setId(3);
+				.thenReturn(STDVAR2);
+		STDVAR3.setId(3);
 		Mockito.when(
 				standardVariableBuilder.findOrSave(VARIATE1, VARIATE1, TEST_PROPERTY3, TEST_SCALE3, TEST_METHOD3, null, "C"))
-				.thenReturn(stdvar3);
+				.thenReturn(STDVAR3);
 	}
 
 	@Before
@@ -118,9 +118,9 @@ public class TestVariableTypeListTransformer {
 			Assert.assertEquals(i+1, variableType.getRank());
 			Assert.assertNotNull(variableType.getStandardVariable());
 			if (isVariate) {
-				Assert.assertEquals(variateArr[i], variableType.getStandardVariable());
+				Assert.assertEquals(VARIATE_ARR[i], variableType.getStandardVariable());
 			} else {
-				Assert.assertEquals(factorArr[i], variableType.getStandardVariable());
+				Assert.assertEquals(FACTOR_ARR[i], variableType.getStandardVariable());
 			}
 			variableType.print(1);
 			i++;

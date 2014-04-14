@@ -53,9 +53,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /** The fieldmap uuid. */
     private String fieldmapUUID;
     
-    
     /** The columns in block. */
-    private Integer columnsInBlock;
+    private Integer rowsInBlock;
     
     /** The ranges in block. */
     private Integer rangesInBlock;
@@ -89,6 +88,16 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     /** The order. */
     private Integer order;
+    
+    private Integer locationId;
+    
+    private Integer fieldId;
+    
+    private Integer blockId;
+    
+    /** The deleted plot coordintes in (row, range) format */
+    private List<String> deletedPlots;
+    
         
     /**
      * Instantiates a new field map trial instance info.
@@ -223,8 +232,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      *
      * @return the columnsInBlock
      */
-    public Integer getColumnsInBlock() {
-        return columnsInBlock;
+    public Integer getRowsInBlock() {
+        return rowsInBlock;
     }
 
     
@@ -233,8 +242,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      *
      * @param columnsInBlock the columnsInBlock to set
      */
-    public void setColumnsInBlock(Integer columnsInBlock) {
-        this.columnsInBlock = columnsInBlock;
+    public void setRowsInBlock(Integer rowsInBlock) {
+        this.rowsInBlock = rowsInBlock;
     }
 
     
@@ -348,7 +357,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      */
     public FieldMapLabel getFieldMapLabel(Integer experimentId) {
         for (FieldMapLabel label: labels) {
-            if (experimentId == label.getExperimentId()) {
+            if (experimentId.equals(label.getExperimentId())) {
                 return label;
             } 
         }
@@ -572,4 +581,75 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     public void setOrder(Integer order) {
         this.order = order;
     }
+
+	/**
+	 * @return the locationId
+	 */
+	public Integer getLocationId() {
+		return locationId;
+	}
+
+	/**
+	 * @param locationId the locationId to set
+	 */
+	public void setLocationId(Integer locationId) {
+		this.locationId = locationId;
+	}
+
+	/**
+	 * @return the fieldId
+	 */
+	public Integer getFieldId() {
+		return fieldId;
+	}
+
+	/**
+	 * @param fieldId the fieldId to set
+	 */
+	public void setFieldId(Integer fieldId) {
+		this.fieldId = fieldId;
+	}
+
+	/**
+	 * @return the blockId
+	 */
+	public Integer getBlockId() {
+		return blockId;
+	}
+
+	/**
+	 * @param blockId the blockId to set
+	 */
+	public void setBlockId(Integer blockId) {
+		this.blockId = blockId;
+	}
+
+	/**
+	 * @return the deletedPlots
+	 */
+	public List<String> getDeletedPlots() {
+		return deletedPlots;
+	}
+
+	/**
+	 * @param deletedPlots the deletedPlots to set
+	 */
+	public void setDeletedPlots(List<String> deletedPlots) {
+		this.deletedPlots = deletedPlots;
+	}
+
+	/**
+	 * @param blockInfo the blockInfo to set
+	 */
+	public void updateBlockInformation(FieldmapBlockInfo blockInfo) {
+		this.rowsInBlock = blockInfo.getRowsInBlock();
+		this.rangesInBlock = blockInfo.getRangesInBlock();
+		this.rowsPerPlot = blockInfo.getNumberOfRowsInPlot();
+		this.plantingOrder = blockInfo.getPlantingOrder();
+		this.machineRowCapacity = blockInfo.getMachineRowCapacity();
+		this.deletedPlots = blockInfo.getDeletedPlots();
+		this.fieldId = blockInfo.getFieldId();
+	}
+
+
 }

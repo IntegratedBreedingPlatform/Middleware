@@ -11,14 +11,18 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.util.Debug;
 
 /** 
  * Contains the details of a variable type - local name, local description and rank.
  */
-public class VariableType implements Comparable<VariableType>{
+public class VariableType implements Serializable, Comparable<VariableType>{
     
-    private String localName;
+	private static final long serialVersionUID = 1L;
+
+	private String localName;
     
     private String localDescription;
     

@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -32,7 +33,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * @author Kevin Manansala, Mark Agarrado, Joyce Avestro
  */
-@NamedQueries({ @NamedQuery(name = "getAllLocation", query = "FROM Location"),
+@NamedQueries({
+    @NamedQuery(name = "getAllLocation", query = "FROM Location"),
     @NamedQuery(name = "countAllLocation", query = "SELECT COUNT(l) FROM Location l")
 })
 @Entity
@@ -47,6 +49,9 @@ public class Location implements Serializable, Comparable<Location>{
     
     public static final String GET_ALL = "getAllLocation";
     public static final String COUNT_ALL = "countAllLocation";
+
+    public static final String GET_PROVINCE_BY_COUNTRY = "select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV'  and l.cntryid = (:countryId) order by l.lname";
+    public static final String GET_ALL_PROVINCES = "select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV' order by l.lname";
 
     @Id
     @Basic(optional = false)
@@ -90,9 +95,15 @@ public class Location implements Serializable, Comparable<Location>{
     @Basic(optional = false)
     @Column(name = "lrplce")
     private Integer lrplce;
+    
+    @Transient
+    private Integer parentLocationId;
+    
+    @Transient
+    private String parentLocationName;
 
-    public static String GET_ALL_BREEDING_LOCATIONS = "SELECT locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce, nnpid FROM location WHERE ltype IN (410, 411, 412) ORDER BY lname";
-    public static String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
+    public static final String GET_ALL_BREEDING_LOCATIONS = "SELECT locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce, nnpid FROM location WHERE ltype IN (410, 411, 412) ORDER BY lname";
+    public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
     public static final String GET_LOCATION_NAMES_BY_GIDS =
             "SELECT gid, g.glocn, lname "
             + "FROM germplsm g "
@@ -218,7 +229,35 @@ public class Location implements Serializable, Comparable<Location>{
         return this.getLocid();
     }
 
-    @Override
+    /**
+	 * @return the parentLocationName
+	 */
+	public String getParentLocationName() {
+		return parentLocationName;
+	}
+
+	/**
+	 * @param parentLocationName the parentLocationName to set
+	 */
+	public void setParentLocationName(String parentLocationName) {
+		this.parentLocationName = parentLocationName;
+	}
+
+	/**
+	 * @return the parentLocationId
+	 */
+	public Integer getParentLocationId() {
+		return parentLocationId;
+	}
+
+	/**
+	 * @param parentLocationId the parentLocationId to set
+	 */
+	public void setParentLocationId(Integer parentLocationId) {
+		this.parentLocationId = parentLocationId;
+	}
+
+	@Override
     public boolean equals(Object obj) {
     	 if (this == obj) {
              return true;
@@ -263,6 +302,8 @@ public class Location implements Serializable, Comparable<Location>{
         builder.append(cntryid);
         builder.append(", lrplce=");
         builder.append(lrplce);
+        builder.append(", parentLocationName=");
+        builder.append(parentLocationName);
         builder.append("]");
         return builder.toString();
     }

@@ -12,19 +12,23 @@
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
+import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
+import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -41,6 +45,9 @@ public abstract class Service extends DatabaseBroker {
 	
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
         log.error(e.getMessage(), e);
+        if(e instanceof PhenotypeException) {
+        	throw (PhenotypeException)e;
+        }
         throw new MiddlewareQueryException(message + e.getMessage(), e);
     }
 
@@ -68,6 +75,10 @@ public abstract class Service extends DatabaseBroker {
         return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final LocationDataManager getLocationDataManager() {
+        return new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
     protected final UserDataManager getUserDataManager() {
         return new UserDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
@@ -80,4 +91,8 @@ public abstract class Service extends DatabaseBroker {
     	return new ValueReferenceBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final GeolocationSaver getGeolocationSaver() {
+        return new GeolocationSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
 }

@@ -192,4 +192,38 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
         }
         return new ArrayList<Integer>();
     }
+    
+
+	@SuppressWarnings("rawtypes")
+	public List<MappingPopValues> getMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+		
+	    List<MappingPopValues> toReturn = new ArrayList<MappingPopValues>();
+        try {
+            if (datasetId != null){
+                SQLQuery query = getSession().createSQLQuery(
+                		"SELECT mp_id, CONCAT(map_char_value, ''), dataset_id, gid, marker_id " +
+                		" FROM gdms_mapping_pop_values where dataset_id = :datasetId "); 
+                query.setParameter("datasetId", datasetId);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer mpId = (Integer) result[0];
+                    	String mapCharValue = (String) result[1];
+                        Integer datasetId2 =  (Integer) result[2];
+                        Integer gId = (Integer) result[3];
+                        Integer markerId = (Integer) result[4];
+                        
+                        MappingPopValues dataElement = new MappingPopValues(mpId, mapCharValue, datasetId2, gId, markerId);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMappingPopValuesByDatasetId(datasetId=" + datasetId + ") query from MappingPopValues " + e.getMessage(), e);
+        }
+        return toReturn;
+	}
+	
 }
