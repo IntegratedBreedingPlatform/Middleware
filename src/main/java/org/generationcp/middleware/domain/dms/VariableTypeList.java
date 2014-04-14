@@ -33,7 +33,8 @@ public class VariableTypeList implements Serializable{
 	
 	public void addAll(VariableTypeList variableTypes) {
 		for (VariableType variableType : variableTypes.getVariableTypes()) {
-			if (findById(variableType.getId()) == null) {
+			if (findByLocalName(variableType.getLocalName()) == null) {
+//			if (findById(variableType.getId()) == null) { //causing an error bec some templates have multiple variables with same id (erroneous template, but..
 		        this.variableTypes.add(variableType);
 			}
 		}

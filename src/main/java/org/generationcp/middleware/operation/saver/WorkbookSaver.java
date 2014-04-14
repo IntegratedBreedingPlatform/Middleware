@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -158,7 +159,7 @@ public class WorkbookSaver extends Saver {
 //		boolean error = false;
 //		for (VariableType ev : effectVariables.getVariableTypes()) {
 //			if(ev.getStandardVariable().getStoredIn() == null) {
-//				LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
+//		c○		LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
 //				error = true;
 //			}
 //			else LOG.info("Role for : " + ev.getStandardVariable().getName() + " : " + ev.getStandardVariable().getStoredIn().getId());
@@ -172,6 +173,8 @@ public class WorkbookSaver extends Saver {
         Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
         if(trialVariableTypeList!=null) {//multi-location
    			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap);
+        } else if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { //also a multi-location
+        	studyLocationId = createLocationsAndSetToObservations(locationIds,  workbook,  trialVariables, trialHeaders, trialVariatesMap);
         } else {
         	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap);
         }
@@ -216,6 +219,17 @@ public class WorkbookSaver extends Saver {
 			VariableTypeList trialVariables, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("transform trial environment", LOG);
+		if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() == 1) {
+			MeasurementRow trialObs = workbook.getTrialObservations().get(0);
+			for (MeasurementVariable mv : trialMV) {
+				for (MeasurementData mvrow : trialObs.getDataList()) {
+					if (mvrow.getMeasurementVariable().getTermId() == mv.getTermId()) {
+						mv.setValue(mvrow.getValue());
+						break;
+					}
+				}
+			}
+		}
 		VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(trialMV, trialVariables);
         Integer studyLocationId = null;
 
@@ -234,6 +248,11 @@ public class WorkbookSaver extends Saver {
         }
         
         watch.restart("set to observations(total)");
+		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+			for (MeasurementRow row : workbook.getTrialObservations()) {
+				row.setLocationId(studyLocationId);
+			}
+		}
     	for(MeasurementRow row : workbook.getObservations()) {
    			row.setLocationId(studyLocationId);
         }
@@ -246,7 +265,17 @@ public class WorkbookSaver extends Saver {
 		
 		Set<String> trialInstanceNumbers = new HashSet<String>();
 		Integer locationId = null;
-		for (MeasurementRow row : workbook.getObservations()) {
+		List<MeasurementRow> observations = null;
+		boolean hasTrialObservations = false;
+		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+			observations = workbook.getTrialObservations();
+			hasTrialObservations = true;
+		}
+		else {
+			observations = workbook.getObservations();
+		}
+		Map<String, Integer> locationMap = new HashMap<String, Integer>();
+		for (MeasurementRow row : observations) {
 			TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
 			VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
 			if (geolocation != null && geolocation.size() > 0) {
@@ -266,10 +295,28 @@ public class WorkbookSaver extends Saver {
 		            }
 				}
 				row.setLocationId(locationId);
+				locationMap.put(trialInstanceNumber, locationId);
 	        }
+		}
+		
+		if (hasTrialObservations) {
+			for (MeasurementRow row : workbook.getObservations()) {
+				String trialInstance = getTrialInstanceNumber(row);
+				Integer locId = locationMap.get(trialInstance);
+				row.setLocationId(locId);
+			}
 		}
         //return studyLocationId
 		return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
+	}
+	
+	private String getTrialInstanceNumber(MeasurementRow row) {
+		for (MeasurementData data : row.getDataList()) {
+			if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+				return data.getValue();
+			}
+		}
+		return null;
 	}
 	
 	private MeasurementVariable getMainFactor(List<MeasurementVariable> mvars) {
