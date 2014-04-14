@@ -1380,7 +1380,7 @@ public class TestGenotypicDataManagerImpl{
         try{
         	manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         } catch (Exception e){
-        	assertTrue(e.getMessage().contains("Marker already exists in Central and cannot be added."));
+        	assertTrue(e.getMessage().contains("Marker already exists in Central or Local and cannot be added."));
         }
     }    
     
