@@ -183,7 +183,7 @@ public class WorkbookSaver extends Saver {
 		int studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
    		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
    		
-   		if(trialVariableTypeList!=null) {//multi-location
+   		if(trialVariableTypeList!=null || workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {//multi-location
    			for(Integer locationId : locationIds) {
    				createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
    			}
@@ -285,7 +285,7 @@ public class WorkbookSaver extends Saver {
                 }
                 if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
 		            watch.restart("save geolocation");
-		            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery()); 
+		            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery());
 		            locationId = g.getLocationId();
 		            locationIds.add(locationId);
 		            if(g.getVariates()!=null && g.getVariates().size() > 0) {
