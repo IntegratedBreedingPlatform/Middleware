@@ -6,4 +6,8 @@ public interface BeanFormState {
 	
 	public void setActive(Boolean val);
 	
+	public boolean isEnabled();
+	
+	public void setEnabled(Boolean val);
+	
 }
