@@ -1075,7 +1075,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	List<Integer> localPerson = new ArrayList<Integer>();
 	    	
 	    	for (StudyDetails detail : studyDetails) {
-	    		if ((detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) && detail.getSiteId() != null) {
+	    		//retrieve the name as long as the id exists even if name exists
+	    		if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
 	    			if (detail.getSiteId() > 0) {
 	    				centralSite.add(detail.getSiteId());
 	    			}
@@ -1083,7 +1084,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    				localSite.add(detail.getSiteId());
 	    			}
 	    		}
-	    		if ((detail.getPiName() == null || "".equals(detail.getPiName().trim())) && detail.getPiId() != null) {
+	    		if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
 	    			if (detail.getPiId() > 0) {
 	    				centralPerson.add(detail.getPiId());
 	    			}
@@ -1114,10 +1115,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	}
 	    	
 	    	for (StudyDetails detail : studyDetails) {
-	    		if ((detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) && detail.getSiteId() != null) {
+	    		if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
 	    			detail.setSiteName(siteMap.get(detail.getSiteId()));
 	    		}
-	    		if ((detail.getPiName() == null || "".equals(detail.getPiName().trim())) && detail.getPiId() != null) {
+	    		if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
 	    			detail.setPiName(personMap.get(detail.getPiId()));
 	    		}
 	    	}
