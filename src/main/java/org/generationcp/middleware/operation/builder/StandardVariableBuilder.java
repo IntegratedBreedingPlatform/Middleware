@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -47,18 +48,44 @@ public class StandardVariableBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	// If the standard variable is already in the cache, return. Else, create the variable, add to cache then return
-	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
+	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException {
+		if(setWorkingDatabase(standardVariableId)) {
+			return getStandardVariableDao().getStandardVariableSummary(standardVariableId);
+		}
+		return null;
+	}
 
-		StandardVariable standardVariable = new StandardVariable();
-		standardVariable.setId(standardVariableId);
-		CVTerm cvTerm = getCvTerm(standardVariableId);
-		if (cvTerm != null) {
-			standardVariable.setName(cvTerm.getName());
-			standardVariable.setDescription(cvTerm.getDefinition());
+	/**
+	 * Reads a {@link StandardVariable} from database identified by the given standardVariableId.
+	 * @param standardVariableId
+	 * @return the matching {@link StandardVariable}. Returns null if no match is found.
+	 * @throws MiddlewareQueryException
+	 */
+	//TODO Rename the "read" methods to get** or load** pattern, this is not a create operation!!
+	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
+		
+		StandardVariable standardVariable = null;
+		StandardVariableSummary summary = getStandardVariableSummary(standardVariableId);
+		
+		if(summary != null) {
+			standardVariable = new StandardVariable();
+			standardVariable.setId(summary.getId());
+			standardVariable.setName(summary.getName());
+			standardVariable.setDescription(summary.getDescription());
+			standardVariable.setProperty(new Term(summary.getProperty().getId(), summary.getProperty().getName(), summary.getProperty().getDefinition()));
+			standardVariable.setMethod(new Term(summary.getMethod().getId(), summary.getMethod().getName(), summary.getMethod().getDefinition()));
+			standardVariable.setScale(new Term(summary.getScale().getId(), summary.getScale().getName(), summary.getScale().getDefinition()));
+			standardVariable.setDataType(new Term(summary.getDataType().getId(), summary.getDataType().getName(), summary.getDataType().getDefinition()));
+			standardVariable.setStoredIn(new Term(summary.getStoredIn().getId(), summary.getStoredIn().getName(), summary.getStoredIn().getDefinition()));
+			//TODO Review isA override in original method
+			standardVariable.setIsA(new Term(summary.getIsA().getId(), summary.getIsA().getName(), summary.getIsA().getDefinition()));
 			
-			addConstraints(standardVariable, cvTerm);
-			addRelatedTerms(standardVariable, cvTerm);
+			//TODO is phenotypic type based on storedIn property??
+			standardVariable.setPhenotypicType(summary.getPhenotypicType());
+			
+			//Future candidates for moving into "details" concept.
+			addConstraints(standardVariable, standardVariableId);
+			addEnumerations(standardVariable);
 			
 			if (standardVariable.getProperty() != null) {
 			    standardVariable.setCropOntologyId(getCropOntologyId(standardVariable.getProperty()));
@@ -69,29 +96,19 @@ public class StandardVariableBuilder extends Builder {
 
 	public List<StandardVariable> create(List<Integer> standardVariableIds) throws MiddlewareQueryException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
-		
-		List<CVTerm> cvTerms = getCvTerms(standardVariableIds);
-		for (CVTerm cvTerm : cvTerms){
-			if (cvTerm != null) {
-				StandardVariable standardVariable = new StandardVariable();
-				standardVariable.setId(cvTerm.getCvTermId());
-				standardVariable.setName(cvTerm.getName());
-				standardVariable.setDescription(cvTerm.getDefinition());
-				addConstraints(standardVariable, cvTerm);
-				addRelatedTerms(standardVariable, cvTerm);
-	            if (standardVariable.getProperty() != null) {
-	                standardVariable.setCropOntologyId(getCropOntologyId(standardVariable.getProperty()));
-	            }
-
-	            standardVariables.add(standardVariable);
+		if(standardVariableIds != null && standardVariableIds.isEmpty()) {
+			for (Integer id : standardVariableIds){
+				standardVariables.add(create(id));
 			}
 		}
 		return standardVariables;
 	}
 
+	//This method needs to go!!
+	
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
 	    
-	    
+	    //Question RB  : Why are we looking at relationships in both DBs? Can one standard var relationships be spread across two DBs?
         setWorkingDatabase(Database.LOCAL);
         List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
         setWorkingDatabase(Database.CENTRAL);
@@ -104,7 +121,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
 			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
-			//get isA of property
+	//get isA of property - ASK RB what is this logic for?
 		    if (standardVariable.getProperty() != null){
 		        setWorkingDatabase(standardVariable.getProperty().getId());
 				List<CVTermRelationship> propertyCvTermRelationships = 
@@ -112,14 +129,23 @@ public class StandardVariableBuilder extends Builder {
 				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
 		    }
 			if (standardVariable.getStoredIn() != null){
-			    standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
+				if (standardVariable.getStoredIn() != null){
+				    standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
+				}
 			}
-			addEnumerations(standardVariable, cvTermRelationships);
+			//addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
 	
-	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
-	    if (hasEnumerations(cvTermRelationships)) {
+	private void addEnumerations(StandardVariable standardVariable) throws MiddlewareQueryException {
+		
+		//Question RB  : Why are we looking at relationships in both DBs? Can one standard var relationships be spread across two DBs?
+		setWorkingDatabase(Database.LOCAL);
+        List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
+        setWorkingDatabase(Database.CENTRAL);
+        cvTermRelationships.addAll(getCvTermRelationshipDao().getBySubject(standardVariable.getId()));
+		
+		if (hasEnumerations(cvTermRelationships)) {
 	    	Map<Integer, Integer> overridenEnumerations = new HashMap<Integer, Integer>();
 			List<Enumeration> enumerations = new ArrayList<Enumeration>();
 			for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
@@ -174,10 +200,11 @@ public class StandardVariableBuilder extends Builder {
 		return 0;
 	}
 	
-	private String getCropOntologyId(Term term) throws MiddlewareQueryException {
+	public String getCropOntologyId(Term term) throws MiddlewareQueryException {
 	    String cropOntologyId = null;
-	    if (term != null && term.getProperties() != null && term.getProperties().size() > 0) {
-	        for (TermProperty termProperty : term.getProperties()) {
+	    List<TermProperty> termProperties = createTermProperties(term.getId());
+	    if (termProperties != null && termProperties.size() > 0) {
+	        for (TermProperty termProperty : termProperties) {
 	            if (TermId.CROP_ONTOLOGY_ID.getId() == termProperty.getTypeId()) {
 	                cropOntologyId = termProperty.getValue();
 	                break;
@@ -211,8 +238,8 @@ public class StandardVariableBuilder extends Builder {
 		return findTermId(cvTermRelationships, TermId.HAS_VALUE) != null;
 	}
 
-	private void addConstraints(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
-	    List<CVTermProperty> properties = getTermPropertyBuilder().findProperties(cvTerm.getCvTermId());
+	private void addConstraints(StandardVariable standardVariable, int standardVariableId) throws MiddlewareQueryException {
+	    List<CVTermProperty> properties = getTermPropertyBuilder().findProperties(standardVariableId);
 		if (properties != null && !properties.isEmpty()) {
             Double minValue = null;
             Double maxValue = null;
@@ -256,17 +283,16 @@ public class StandardVariableBuilder extends Builder {
 	private Term createTerm(Integer id) throws MiddlewareQueryException {
 		CVTerm cvTerm = getCvTerm(id);
 		return cvTerm != null 
-		        ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), 
-		                    createSynonyms(cvTerm.getCvTermId()), createTermProperties(cvTerm.getCvTermId())) 
+		        ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition()) 
 		        : null;
 	}
 	
-	private List<NameSynonym> createSynonyms(int cvTermId) throws MiddlewareQueryException {
+	public List<NameSynonym> createSynonyms(int cvTermId) throws MiddlewareQueryException {
 	    List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(cvTermId);
 	    return getNameSynonymBuilder().create(synonyms);
 	}
 	
-	private List<TermProperty> createTermProperties(int cvTermId) throws MiddlewareQueryException {
+	public List<TermProperty> createTermProperties(int cvTermId) throws MiddlewareQueryException {
 	    List<CVTermProperty> cvTermProperties = getTermPropertyBuilder().findProperties(cvTermId);
 	    return getTermPropertyBuilder().create(cvTermProperties);
 	}

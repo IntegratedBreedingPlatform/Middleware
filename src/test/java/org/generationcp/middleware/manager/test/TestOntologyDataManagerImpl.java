@@ -138,9 +138,6 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
-		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
-		stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
-		stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
 		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
 		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
@@ -197,9 +194,6 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 		//added as this is required
 		stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));		
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
-		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
-		stdVariable.getNameSynonyms().add(new NameSynonym("test", NameType.ALTERNATIVE_ENGLISH));
-		stdVariable.getNameSynonyms().add(new NameSynonym("essai", NameType.ALTERNATIVE_FRENCH));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
 		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
 		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
@@ -913,9 +907,6 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
         stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
         stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
         stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
-        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
-        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
-        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
         stdVariable.setEnumerations(new ArrayList<Enumeration>());
         stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
         stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
@@ -1044,7 +1035,7 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
         
         Term dataType =new Term(1120, "Character variable", "variable with char values");
         Term storedIn = new Term(1010, "Study information", "Study element");
-        Term traitClass = new Term(600, "TRAIT CLASS", "TRAIT CLASS DEF", null, null);
+        Term traitClass = new Term(600, "TRAIT CLASS", "TRAIT CLASS DEF");
         
         StandardVariable standardVariable = new StandardVariable();
         standardVariable.setName("TestVariable" + new Random().nextInt(10000));
