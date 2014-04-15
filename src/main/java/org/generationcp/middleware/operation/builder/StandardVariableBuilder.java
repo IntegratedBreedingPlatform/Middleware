@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -48,44 +47,17 @@ public class StandardVariableBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException {
-		if(setWorkingDatabase(standardVariableId)) {
-			return getStandardVariableDao().getStandardVariableSummary(standardVariableId);
-		}
-		return null;
-	}
-
-	/**
-	 * Reads a {@link StandardVariable} from database identified by the given standardVariableId.
-	 * @param standardVariableId
-	 * @return the matching {@link StandardVariable}. Returns null if no match is found.
-	 * @throws MiddlewareQueryException
-	 */
-	//TODO Rename the "read" methods to get** or load** pattern, this is not a create operation!!
 	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
-		
-		StandardVariable standardVariable = null;
-		StandardVariableSummary summary = getStandardVariableSummary(standardVariableId);
-		
-		if(summary != null) {
-			standardVariable = new StandardVariable();
-			standardVariable.setId(summary.getId());
-			standardVariable.setName(summary.getName());
-			standardVariable.setDescription(summary.getDescription());
-			standardVariable.setProperty(new Term(summary.getProperty().getId(), summary.getProperty().getName(), summary.getProperty().getDefinition()));
-			standardVariable.setMethod(new Term(summary.getMethod().getId(), summary.getMethod().getName(), summary.getMethod().getDefinition()));
-			standardVariable.setScale(new Term(summary.getScale().getId(), summary.getScale().getName(), summary.getScale().getDefinition()));
-			standardVariable.setDataType(new Term(summary.getDataType().getId(), summary.getDataType().getName(), summary.getDataType().getDefinition()));
-			standardVariable.setStoredIn(new Term(summary.getStoredIn().getId(), summary.getStoredIn().getName(), summary.getStoredIn().getDefinition()));
-			//TODO Review isA override in original method
-			standardVariable.setIsA(new Term(summary.getIsA().getId(), summary.getIsA().getName(), summary.getIsA().getDefinition()));
+
+		StandardVariable standardVariable = new StandardVariable();
+		CVTerm cvTerm = getCvTerm(standardVariableId);
+		if (cvTerm != null) {
+			standardVariable.setId(standardVariableId);
+			standardVariable.setName(cvTerm.getName());
+			standardVariable.setDescription(cvTerm.getDefinition());
 			
-			//TODO is phenotypic type based on storedIn property??
-			standardVariable.setPhenotypicType(summary.getPhenotypicType());
-			
-			//Future candidates for moving into "details" concept.
-			addConstraints(standardVariable, standardVariableId);
-			addEnumerations(standardVariable);
+			addConstraints(standardVariable, cvTerm);
+			addRelatedTerms(standardVariable, cvTerm);
 			
 			if (standardVariable.getProperty() != null) {
 			    standardVariable.setCropOntologyId(getCropOntologyId(standardVariable.getProperty()));
@@ -104,11 +76,9 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariables;
 	}
 
-	//This method needs to go!!
-	
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
 	    
-	    //Question RB  : Why are we looking at relationships in both DBs? Can one standard var relationships be spread across two DBs?
+		// Why are we looking at relationships in both DBs? Can one standard variable's relationships be spread across two DBs?
         setWorkingDatabase(Database.LOCAL);
         List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
         setWorkingDatabase(Database.CENTRAL);
@@ -121,7 +91,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
 			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
-	//get isA of property - ASK RB what is this logic for?
+			//get isA of property - why is this logic needed?
 		    if (standardVariable.getProperty() != null){
 		        setWorkingDatabase(standardVariable.getProperty().getId());
 				List<CVTermRelationship> propertyCvTermRelationships = 
@@ -129,23 +99,15 @@ public class StandardVariableBuilder extends Builder {
 				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
 		    }
 			if (standardVariable.getStoredIn() != null){
-				if (standardVariable.getStoredIn() != null){
-				    standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
-				}
+			    standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
 			}
-			//addEnumerations(standardVariable, cvTermRelationships);
+			// Enumerations - Future candidate for separating out from StandardVariable as a "details" concept. Not a huge overhead at the moment.
+			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
 	
-	private void addEnumerations(StandardVariable standardVariable) throws MiddlewareQueryException {
-		
-		//Question RB  : Why are we looking at relationships in both DBs? Can one standard var relationships be spread across two DBs?
-		setWorkingDatabase(Database.LOCAL);
-        List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
-        setWorkingDatabase(Database.CENTRAL);
-        cvTermRelationships.addAll(getCvTermRelationshipDao().getBySubject(standardVariable.getId()));
-		
-		if (hasEnumerations(cvTermRelationships)) {
+	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
+	    if (hasEnumerations(cvTermRelationships)) {
 	    	Map<Integer, Integer> overridenEnumerations = new HashMap<Integer, Integer>();
 			List<Enumeration> enumerations = new ArrayList<Enumeration>();
 			for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
@@ -238,8 +200,8 @@ public class StandardVariableBuilder extends Builder {
 		return findTermId(cvTermRelationships, TermId.HAS_VALUE) != null;
 	}
 
-	private void addConstraints(StandardVariable standardVariable, int standardVariableId) throws MiddlewareQueryException {
-	    List<CVTermProperty> properties = getTermPropertyBuilder().findProperties(standardVariableId);
+	private void addConstraints(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
+	    List<CVTermProperty> properties = getTermPropertyBuilder().findProperties(cvTerm.getCvTermId());
 		if (properties != null && !properties.isEmpty()) {
             Double minValue = null;
             Double maxValue = null;
@@ -303,14 +265,7 @@ public class StandardVariableBuilder extends Builder {
 		}
 		return null;
 	}
-	
-	private List<CVTerm> getCvTerms(List<Integer> ids) throws MiddlewareQueryException {
-		if (setWorkingDatabase(ids.get(0))) {
-		    return getCvTermDao().getByIds(ids);
-		}
-		return null;
-	}
-	
+		
 	private PhenotypicType createPhenotypicType(int storedInTerm) {
 		for (PhenotypicType phenotypicType : PhenotypicType.values()) {
 			if (phenotypicType.getTypeStorages().contains(storedInTerm)) {
