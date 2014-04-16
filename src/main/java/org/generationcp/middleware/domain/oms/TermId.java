@@ -201,6 +201,6 @@ import org.generationcp.middleware.util.PropertyReader;
     public int getId(){
         return propertyReader.getIntegerValue(this.toString().trim());
     }
-    
+
 }
 	
