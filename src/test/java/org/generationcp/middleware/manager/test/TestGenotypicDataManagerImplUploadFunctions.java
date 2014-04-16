@@ -105,7 +105,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     private Dataset createDataset() throws Exception {
         Integer datasetId = null; // Crop tested: Groundnut
-        String datasetName = " QTL_ ICGS 44 X ICGS 78" + (int) (Math.random() * 1000);
+        String datasetName = " QTL_ ICGS 44 X ICGS 78  " + (int) (Math.random() * 1000);
         String datasetDesc = "ICGS 44 X ICGS 78";
         String datasetType = "QTL";
         String genus = "Groundnut";
@@ -129,7 +129,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
         Integer markerId = null; // Will be set/overridden by the function
         String markerType = null; // Will be set/overridden by the function
-        String markerName = "SeqTEST" + (int) (Math.random() * 1000);
+        String markerName = "SeqTEST " + (int) (Math.random() * 1000);
         String species = "Groundnut";
         String dbAccessionId = null;
         String reference = null;
@@ -420,14 +420,16 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
         List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
-        dataRows.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues));
+        for (int i=0; i<210*260; i++){
+            dataRows.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues));
+        }
 
         Boolean addStatus = manager.setSNP(dataset, datasetUser, dataRows);
         assertTrue(addStatus);
-        Debug.println(0, "testSetSNP() Added: ");
-        Debug.println(3, dataset.toString());
-        Debug.println(3, datasetUser.toString());
-        Debug.printObjects(INDENT, dataRows);
+//        Debug.println(0, "testSetSNP() Added: ");
+//        Debug.println(3, dataset.toString());
+//        Debug.println(3, datasetUser.toString());
+//        Debug.printObjects(INDENT, dataRows);
     }
 
     @Test

@@ -1511,13 +1511,46 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         try {
             trans = session.beginTransaction();
-
             Integer datasetId = saveDataset(dataset, TYPE_SNP, DATA_TYPE_INT);
             dataset.setDatasetId(datasetId);
             saveDatasetUser(datasetId, datasetUser);
 
             // Save data rows
             int rowsSaved = 0;
+//            if (rows != null && rows.size() > 0) {
+//                for (SNPDataRow row : rows) {
+//                    Marker marker = row.getMarker();
+//                    marker.setMarkerType(TYPE_SNP);
+//                    Integer markerId = saveMarker(marker, TYPE_SNP);
+//                    marker.setMarkerId(markerId);
+//
+//                    saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+//                    saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+//                    saveCharValues(datasetId, markerId, row.getCharValues());
+//                    
+//                    rowsSaved++;
+//                    if (rowsSaved % JDBC_BATCH_SIZE == 0){
+//                        // flush a batch of inserts and release memory
+//                    	MarkerDAO markerDao = getMarkerDao();
+//                    	markerDao.flush();
+//                    	markerDao.clear();
+//                    	AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
+//                    	accMetadataSetDao.flush();
+//                    	accMetadataSetDao.clear();
+//                    	MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
+//                    	markerMetadataSetDao.flush();
+//                    	markerMetadataSetDao.clear();
+//                    	CharValuesDAO charValuesDao = getCharValuesDao();
+//                    	charValuesDao.flush();
+//                    	charValuesDao.clear();
+//                    }
+//                }
+//            }
+
+            List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+            List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+            List<CharValues> charValues = new ArrayList<CharValues>();
+
             if (rows != null && rows.size() > 0) {
                 for (SNPDataRow row : rows) {
                     Marker marker = row.getMarker();
@@ -1525,27 +1558,35 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     Integer markerId = saveMarker(marker, TYPE_SNP);
                     marker.setMarkerId(markerId);
 
-                    saveAccMetadataSet(datasetId, row.getAccMetadataSet());
-                    saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
-                    saveCharValues(datasetId, markerId, row.getCharValues());
-                    
+                    //saveAccMetadataSet(datasetId, row.getAccMetadataSet());
+                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
+                    accMetadataSet.setDatasetId(datasetId);
+                    accMetadataSets.add(accMetadataSet);
+
+                    //saveMarkerMetadataSet(datasetId, markerId, row.getMarkerMetadataSet());
+                    MarkerMetadataSet markerMetadataSet = row.getMarkerMetadataSet();
+                    markerMetadataSet.setDatasetId(datasetId);
+                    markerMetadataSet.setMarkerId(markerId);
+                    markerMetadataSets.add(markerMetadataSet);
+
+                    //saveCharValues(datasetId, markerId, row.getCharValues());
+                    CharValues charValue = row.getCharValues();
+                    charValue.setDatasetId(datasetId);
+                    charValue.setMarkerId(markerId);
+                    charValues.add(charValue);
+
                     rowsSaved++;
-                    if (rowsSaved % JDBC_BATCH_SIZE == 0){
+                    if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
                         // flush a batch of inserts and release memory
-                    	MarkerDAO markerDao = getMarkerDao();
-                    	markerDao.flush();
-                    	markerDao.clear();
-                    	AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
-                    	accMetadataSetDao.flush();
-                    	accMetadataSetDao.clear();
-                    	MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
-                    	markerMetadataSetDao.flush();
-                    	markerMetadataSetDao.clear();
-                    	CharValuesDAO charValuesDao = getCharValuesDao();
-                    	charValuesDao.flush();
-                    	charValuesDao.clear();
+                        MarkerDAO markerDao = getMarkerDao();
+                        markerDao.flush();
+                        markerDao.clear();
                     }
                 }
+                
+                saveAccMetadataSets(accMetadataSets);
+                saveMarkerMetadataSets(markerMetadataSets);
+                saveCharValues(charValues);
             }
 
             trans.commit();
@@ -2514,7 +2555,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     private Integer saveDataset(Dataset dataset, String datasetType, String dataType) throws Exception {
         requireLocalDatabaseInstance();
 
-        // If the dataset has same dataset name existing in the database (local and central) - should throw an error.
+        //If the dataset has same dataset name existing in the database (local and central) - should throw an error.
         if (getDatasetByName(dataset.getDatasetName()) != null) {
             throw new MiddlewareQueryException(
                     "Dataset already exists. Please specify a new GDMS dataset record with a different name.");
@@ -2567,8 +2608,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     private Integer saveMarkerIfNotExisting(Marker marker, String markerType) throws Exception {
         requireLocalDatabaseInstance();
 
+      Integer markerId = marker.getMarkerId();
+
         // If the marker has same marker name existing in local, use the existing record.
-        Integer markerId = marker.getMarkerId();
         if (markerId == null) {
             Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
             if (markerIdWithName != null) {
@@ -2603,9 +2645,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     // If the marker is not yet in the database, add.
     private Integer saveMarker(Marker marker, String markerType) throws Exception {
         requireLocalDatabaseInstance();
+        Integer markerId = marker.getMarkerId();
 
         // If the marker has same marker name existing in local, use the existing record.
-        Integer markerId = marker.getMarkerId();
         if (markerId == null) {
             Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
             if (markerIdWithName != null) {
@@ -2777,6 +2819,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return accMetadatasetSavedId;
     }
 
+    private void saveAccMetadataSets(List<AccMetadataSet> accMetadataSets) throws Exception {
+        requireLocalDatabaseInstance();
+        AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
+        Integer rowsSaved = 0;
+        
+        // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
+        for (AccMetadataSet accMetadataSet : accMetadataSets){
+            accMetadataSetDao.merge(accMetadataSet);
+            rowsSaved++;
+            if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
+                accMetadataSetDao.flush();
+                accMetadataSetDao.clear();
+            }
+        }
+    }
+
     private MarkerMetadataSetPK saveMarkerMetadataSet(Integer datasetId, Integer markerId, MarkerMetadataSet markerMetadataSet) throws Exception {
         markerMetadataSet.setDatasetId(datasetId);
         markerMetadataSet.setMarkerId(markerId);
@@ -2787,7 +2845,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         markerMetadataSet.setDatasetId(datasetId);
         return saveMarkerMetadataSet(markerMetadataSet);
     }
-
+    
     private MarkerMetadataSetPK saveMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws Exception {
         requireLocalDatabaseInstance();
         MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
@@ -2802,6 +2860,21 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return markerMetadataSetSavedId;
     }
 
+
+    private void saveMarkerMetadataSets(List<MarkerMetadataSet> markerMetadataSets) throws Exception {
+        requireLocalDatabaseInstance();
+        MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
+        Integer rowsSaved = 0;
+       // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
+        for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
+            markerMetadataSetDao.merge(markerMetadataSet);
+            rowsSaved++;
+            if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
+                markerMetadataSetDao.flush();
+                markerMetadataSetDao.clear();
+            }
+        }
+    }
 
     private Integer saveDatasetUser(Integer datasetId, DatasetUsers datasetUser) throws Exception {
         requireLocalDatabaseInstance();
@@ -2874,6 +2947,30 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     }
     
+    private void saveCharValues(List<CharValues> charValuesList) throws Exception {
+        if (charValuesList == null) {
+            return;
+        }
+        requireLocalDatabaseInstance();
+        CharValuesDAO charValuesDao = getCharValuesDao();
+        Integer rowsSaved = 0;
+
+        Integer generatedId = charValuesDao.getNegativeId("acId");
+        
+        for (CharValues charValues : charValuesList){
+            charValues.setAcId(generatedId);
+            charValuesDao.merge(charValues);
+            generatedId--;
+            
+            rowsSaved++;
+            if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
+                charValuesDao.flush();
+                charValuesDao.clear();
+            }
+            
+        }
+    }
+
     private Integer updateCharValues(CharValues charValues) throws MiddlewareException, MiddlewareQueryException{ 
     	
     	if (charValues == null || charValues.getAcId() == null){
