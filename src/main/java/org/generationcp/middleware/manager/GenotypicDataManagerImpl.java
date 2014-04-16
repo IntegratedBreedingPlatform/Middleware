@@ -84,7 +84,6 @@ import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
-import org.generationcp.middleware.util.Debug;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -354,7 +353,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         		markerIds.add(element.getMarkerId());
         	}
         }
-        if (markerIds != null){
+        if (markerIds.size() > 0){
         	setWorkingDatabase(Database.CENTRAL);
         	List<Marker> markers = getMarkerDao().getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
             for (MarkerNameElement element : dataValues){
@@ -386,28 +385,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
                                                                           int numOfRows) throws MiddlewareQueryException {
-        //TODO Refactor to retrieve from both local and central based on the combination of positive and negative gIds
-        // and marker names from both local and central
-//        List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
-//
-//        int gid = gids.get(0);
-//
-//        if (setWorkingDatabase(gid)) {
-//            List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
-//
-//            mappingValueElementLists = super.getFromInstanceByIdAndMethod(getMappingPopDao(), gids.get(0),
-//                    "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class});
-//        }
-//        return mappingValueElementLists;
-
 		List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
 
-		List<Integer> markerIds = super.getAllFromCentralAndLocalByMethod(
-				getMarkerDao(), "getIdsByNames", new Object[] { markerNames,
-						start, numOfRows }, new Class[] { List.class,
-						Integer.TYPE, Integer.TYPE });
-
-		Debug.println(0, "markerIds = " + markerIds);
+		List<Integer> markerIds = super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getIdsByNames"
+				, new Object[] { markerNames, start, numOfRows }, new Class[] { List.class,Integer.TYPE, Integer.TYPE });
 
 		mappingValueElementLists = super.getAllFromCentralAndLocalByMethod(getMappingPopDao(), "getMappingValuesByGidAndMarkerIds",
 				new Object[] { gids, markerIds }, new Class[] { List.class, List.class });
@@ -774,53 +755,64 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
-        return getForPolyMorphicMarkersRetrieval("countIntAlleleValuesForPolymorphicMarkersRetrieval",
-                "getIntAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
+        return getForPolyMorphicMarkersRetrieval("getIntAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
     }
 
     @Override
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
-        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(),
+        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(),
                 "countIntAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
     @Override
     public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
-        return getForPolyMorphicMarkersRetrieval("countCharAlleleValuesForPolymorphicMarkersRetrieval",
-                "getCharAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
+        return getForPolyMorphicMarkersRetrieval("getCharAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
     }
 
     @Override
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
-        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(),
+        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(),
                 "countCharAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
     @Override
     public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
-        return getForPolyMorphicMarkersRetrieval("countMappingAlleleValuesForPolymorphicMarkersRetrieval",
-                "getMappingAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
+        return getForPolyMorphicMarkersRetrieval("getMappingAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
     }
 
     @Override
     public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        //TODO Refactor to remove inner join based on marker_id. marker_id may have references to central/local
-        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(),
+        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(),
                 "countMappingAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
-    private List<AllelicValueElement> getForPolyMorphicMarkersRetrieval(String countMethodName, String getMethodName,
+    private List<AllelicValueElement> getForPolyMorphicMarkersRetrieval(String getMethodName,
                                                                         List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList(countMethodName, getMethodName);
-        List<AllelicValueElement> allelicValueElements = (List<AllelicValueElement>) super.getFromCentralAndLocalBySignedIdAndMethod(
-                getAlleleValuesDao(), methods, start, numOfRows, new Object[]{gids}, new Class[]{List.class});
+        List<AllelicValueElement> allelicValueElements = (List<AllelicValueElement>) super.getAllFromCentralAndLocalByMethod(
+                getAlleleValuesDao(), getMethodName, new Object[]{gids, start, numOfRows}, new Class[]{List.class, Integer.TYPE, Integer.TYPE});
+
+        
+        // Get marker names from central
+        List<Integer> markerIds = new ArrayList<Integer>();
+        for (AllelicValueElement element : allelicValueElements){
+        	if (element.getMarkerName() == null){
+        		markerIds.add(element.getMarkerId());
+        	}
+        }
+        if (markerIds.size() > 0){
+        	setWorkingDatabase(Database.CENTRAL);
+        	List<Marker> markers = getMarkerDao().getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
+            for (AllelicValueElement element : allelicValueElements){
+            	for (Marker marker : markers){
+	            	if (element.getMarkerName() == null && element.getMarkerId().equals(marker.getMarkerId())){
+	            		element.setMarkerName(marker.getMarkerName());
+	            		break;
+	            	}
+            	}
+            }
+        }
 
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);

@@ -130,41 +130,41 @@ public class AlleleValues implements Serializable {
                     "FROM gdms_allele_values " +
                     "WHERE gid in (:gids)";
 
-    public static final String GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
-            "SELECT DISTINCT gdms_char_values.dataset_id, gdms_char_values.gid "
-                    + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_char_values.char_value,'') "
-                    + "FROM gdms_char_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_char_values.marker_id "
-                    + "WHERE gdms_char_values.gid IN (:gids) "
-                    + "ORDER BY gid, marker_name ";
-
-    public static final String COUNT_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
-            "SELECT COUNT(*) "
-                    + "FROM gdms_char_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_char_values.marker_id "
-                    + "WHERE gdms_char_values.gid IN (:gids) ";
-
     public static final String GET_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
-            "SELECT gdms_allele_values.dataset_id, gdms_allele_values.gid "
+            "SELECT gdms_allele_values.dataset_id, gdms_allele_values.gid, gdms_allele_values.marker_id  "
                     + ", CONCAT(gdms_marker.marker_name, ''), CONCAT(gdms_allele_values.allele_bin_value, '') "
                     + ", gdms_allele_values.peak_height "
-                    + "FROM gdms_allele_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_allele_values.marker_id "
+                    + "FROM gdms_allele_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_allele_values.marker_id "
                     + "WHERE gdms_allele_values.gid IN (:gids) "
                     + "ORDER BY gid, marker_name ";
 
     public static final String COUNT_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
             "SELECT COUNT(*) "
-                    + "FROM gdms_allele_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_allele_values.marker_id "
+                    + "FROM gdms_allele_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_allele_values.marker_id "
                     + "WHERE gdms_allele_values.gid IN (:gids) ";
 
+    public static final String GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
+            "SELECT gdms_char_values.dataset_id, gdms_char_values.gid, gdms_char_values.marker_id "
+                    + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_char_values.char_value,'') "
+                    + "FROM gdms_char_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_char_values.marker_id "
+                    + "WHERE gdms_char_values.gid IN (:gids) "
+                    + "ORDER BY gid, marker_name ";
+
+    public static final String COUNT_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
+            "SELECT COUNT(*) "
+                    + "FROM gdms_char_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_char_values.marker_id "
+                    + "WHERE gdms_char_values.gid IN (:gids) ";
+
     public static final String GET_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
-            "SELECT gdms_mapping_pop_values.dataset_id, gdms_mapping_pop_values.gid "
+            "SELECT gdms_mapping_pop_values.dataset_id, gdms_mapping_pop_values.gid, gdms_mapping_pop_values.marker_id "
                     + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_mapping_pop_values.map_char_value,'') "
-                    + "FROM gdms_mapping_pop_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id "
+                    + "FROM gdms_mapping_pop_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id "
                     + "WHERE gdms_mapping_pop_values.gid IN (:gids) "
                     + "ORDER BY gid, marker_name ";
 
     public static final String COUNT_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
             "SELECT COUNT(*) "
-                    + "FROM gdms_mapping_pop_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id "
+                    + "FROM gdms_mapping_pop_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id "
                     + "WHERE gdms_mapping_pop_values.gid IN (:gids) ";
 
     public static final String GET_MARKER_IDS_BY_GIDS =
