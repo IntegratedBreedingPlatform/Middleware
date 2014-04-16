@@ -251,32 +251,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 
     private void checkForDuplicatePSMCombo(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        List<MeasurementVariable> workbookVariables = workbook.getNonVariateVariables();
+        Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
+        checkForDuplicatePSMCombo(workbook, errors);
 
-        Map<Integer, String> psmMap = new HashMap<Integer, String>();
-
-        for (MeasurementVariable measurementVariable : workbookVariables) {
-            PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
-            Integer standardVariableId = getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), type);
-            if (!psmMap.containsKey(standardVariableId)) {
-                psmMap.put(standardVariableId, measurementVariable.getName());
-            } else {
-
-                messages.add(new Message("error.duplicate.psm", psmMap.get(standardVariableId), measurementVariable.getName()));
-            }
+        if (messages == null) {
+            messages = new ArrayList<Message>();
         }
 
-        workbookVariables = workbook.getVariateVariables();
-        psmMap = new HashMap<Integer, String>();
-
-        for (MeasurementVariable measurementVariable : workbookVariables) {
-            Integer standardVariableId = getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), PhenotypicType.VARIATE);
-            /*String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();*/
-            if (!psmMap.containsKey(standardVariableId)) {
-                psmMap.put(standardVariableId, measurementVariable.getName());
-            } else {
-                messages.add(new Message("error.duplicate.psm", psmMap.get(standardVariableId), measurementVariable.getName()));
-            }
+        for (List<Message> messageList : errors.values()) {
+            messages.addAll(messageList);
         }
 
         if (messages.size() > 0) {
@@ -288,30 +271,54 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         List<MeasurementVariable> workbookVariables = workbook.getNonVariateVariables();
 
-        Map<Integer, String> psmMap = new HashMap<Integer, String>();
+        Map<Integer, String> stdVarMap = new HashMap<Integer, String>();
+        Map<String, String> psmMap = new HashMap<String, String>();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
             PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
+
             Integer standardVariableId = getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), type);
-            if (!psmMap.containsKey(standardVariableId)) {
-                psmMap.put(standardVariableId, measurementVariable.getName());
-            } else {
+            String psmString = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
+            String previousFromVarId = null;
+            if (standardVariableId != null) {
+                previousFromVarId = stdVarMap.put(standardVariableId, measurementVariable.getName());
+            }
+
+            String previousFromPSMString = psmMap.put(psmString, measurementVariable.getName());
+
+            if (previousFromPSMString != null) {
                 initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
-                errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", psmMap.get(standardVariableId), measurementVariable.getName()));
+                errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", previousFromPSMString, measurementVariable.getName()));
+            }
+
+            if (previousFromVarId != null) {
+                initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
+                errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", previousFromVarId, measurementVariable.getName()));
             }
         }
 
         workbookVariables = workbook.getVariateVariables();
-        psmMap = new HashMap<Integer, String>();
+        stdVarMap = new HashMap<Integer, String>();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
             Integer standardVariableId = getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), PhenotypicType.VARIATE);
-                    /*String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();*/
-            if (!psmMap.containsKey(standardVariableId)) {
-                psmMap.put(standardVariableId, measurementVariable.getName());
-            } else {
+            String psmString = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
+
+            String previousFromVarId = null;
+            if (standardVariableId != null) {
+                previousFromVarId = stdVarMap.put(standardVariableId, measurementVariable.getName());
+            }
+
+            String previousFromPSMString = psmMap.put(psmString, measurementVariable.getName());
+
+            if (previousFromPSMString != null) {
                 initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
-                errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", psmMap.get(standardVariableId), measurementVariable.getName()));
+                errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", previousFromPSMString, measurementVariable.getName()));
+            }
+
+            if (previousFromVarId != null) {
+                initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
+                errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", previousFromVarId, measurementVariable.getName()));
             }
         }
     }
