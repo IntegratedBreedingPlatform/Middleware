@@ -50,9 +50,9 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
 
 		StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(standardVariableId);
 		CVTerm cvTerm = getCvTerm(standardVariableId);
-		if (cvTerm != null) {
-			standardVariable.setId(standardVariableId);
+		if (cvTerm != null) {			
 			standardVariable.setName(cvTerm.getName());
 			standardVariable.setDescription(cvTerm.getDefinition());
 			
