@@ -68,7 +68,7 @@ public class StandardVariableBuilder extends Builder {
 
 	public List<StandardVariable> create(List<Integer> standardVariableIds) throws MiddlewareQueryException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
-		if(standardVariableIds != null && standardVariableIds.isEmpty()) {
+		if(standardVariableIds != null && !standardVariableIds.isEmpty()) {
 			for (Integer id : standardVariableIds){
 				standardVariables.add(create(id));
 			}
