@@ -22,6 +22,7 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -80,13 +81,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     @Override
     public List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException{
-        List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
-        List<StudyDetails> newList = new ArrayList<StudyDetails>();
-        for(StudyDetails detail : studyDetailList){
-            if(detail.hasRows())
-                newList.add(detail);
-        }
-        return newList;
+    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
+    	List<StudyDetails> newList = new ArrayList<StudyDetails>();
+    	for(StudyDetails detail : studyDetailList){
+    		if(detail.hasRows())
+    			newList.add(detail);
+    	}
+    	return newList;
     }
     
     @Override 
@@ -513,10 +514,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
         StandardVariable stdVar = getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId());
         List<Enumeration> validValues = stdVar.getEnumerations();
-        
-        for (Enumeration value : validValues){
-            if (value != null){
-                nurseryTypes.add(new ValueReference(value.getId(), value.getName(), value.getDescription()));
+
+        if (validValues != null){
+            for (Enumeration value : validValues){
+                if (value != null){
+                    nurseryTypes.add(new ValueReference(value.getId(), value.getName(), value.getDescription()));
+                }
             }
         }
         
@@ -545,7 +548,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         
         //if not found in the list using the name, get dataset with Plot Data type
         if (dataSetId == 0) {
-            dataSetId = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA).getId();
+            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
+            if (dataset != null){
+                dataSetId = dataset.getId();
+            }
         }
         
         return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
