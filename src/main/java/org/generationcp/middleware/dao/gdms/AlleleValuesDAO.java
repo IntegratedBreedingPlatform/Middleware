@@ -250,12 +250,11 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     if (result != null) {
                         Integer datasetId = (Integer) result[0];
                         Integer gid = (Integer) result[1];
-                        Integer markerId = (Integer) result[2];
-                        String markerName = (String) result[3];
-                        String alleleBinValue = (String) result[4];
-                        Integer peakHeight = (Integer) result[5];
+                        String markerName = (String) result[2];
+                        String alleleBinValue = (String) result[3];
+                        Integer peakHeight = (Integer) result[4];
                         AllelicValueElement allelicValueElement =
-                                new AllelicValueElement(datasetId, gid, markerId, markerName, alleleBinValue, peakHeight);
+                                new AllelicValueElement(datasetId, gid, markerName, alleleBinValue, peakHeight);
                         values.add(allelicValueElement);
                     }
                 }
@@ -302,10 +301,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     if (result != null) {
                         Integer datasetId = (Integer) result[0];
                         Integer gid = (Integer) result[1];
-                        Integer markerId = (Integer) result[2];
-                        String markerName = (String) result[3];
-                        String charValue = (String) result[4];
-                        AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, markerId, markerName, charValue);
+                        String markerName = (String) result[2];
+                        String charValue = (String) result[3];
+                        AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, markerName, charValue);
                         values.add(allelicValueElement);
                     }
                 }
@@ -351,11 +349,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     if (result != null) {
                         Integer datasetId = (Integer) result[0];
                         Integer gid = (Integer) result[1];
-                        Integer markerId = (Integer) result[2];
-                        String markerName = (String) result[3];
-                        String data = (String) result[4];
+                        String markerName = (String) result[2];
+                        String data = (String) result[3];
                         AllelicValueElement allelicValueElement =
-                                new AllelicValueElement(datasetId, gid, markerId, markerName, data);
+                                new AllelicValueElement(datasetId, gid, markerName, data);
                         values.add(allelicValueElement);
                     }
                 }

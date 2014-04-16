@@ -500,7 +500,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
             .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId, count(de.nd_experiment_id) AS rowCount ")
+            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId ")
             .append("FROM project p ")
             .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
             .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -520,13 +520,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
             .append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ") // 8180 
             .append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-            .append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-            .append("       LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id and pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
-            .append("       LEFT JOIN nd_experiment_project de ON de.project_id = pr.subject_project_id ")
+            .append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ") 
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990
-            .append("	GROUP BY p.name, p.description, ppObjective.value, ppStartDate.value, ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppPIid.value, ")
-            .append("   gpSiteId.value ")
             .append("               ORDER BY p.name ") // 12990 
             ;
         
@@ -541,7 +537,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                         .addScalar("id")
                         .addScalar("piId")
                         .addScalar("siteId")
-                        .addScalar("rowCount")
                         ;
             setStartAndNumOfRows(query, start, numOfRows);
 
@@ -559,13 +554,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     Integer id = (Integer) row[7];
                     String piId = (String) row[8];
                     String siteId = (String) row[9];
-                    BigInteger rowCount = (BigInteger) row[10];
                     
-                    StudyDetails study = new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
-                    if (row[10] != null) {
-                    	study.setRowCount(rowCount.intValue());
-                    }
-                    studyDetails.add(study);
+                    studyDetails.add(new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId));
                 }
             }
 
