@@ -36,6 +36,9 @@ public class TrialDataset  extends ParentDataset {
 	
 	/** The trial level conditions. */
 	private List<Factor> trialLevelFactor;
+
+	/** The treatment factors. */
+	private List<TreatmentFactor> treatmentFactors;
 	
 	/**
 	 * Instantiates a new trial dataset.
@@ -144,8 +147,20 @@ public class TrialDataset  extends ParentDataset {
 	 */
 	public void setVariates(List<Variate> variates) {
 		this.variates = variates;
+	}
+
+	/**
+	 * @return the treatmentFactors
+	 */
+	public List<TreatmentFactor> getTreatmentFactors() {
+		return treatmentFactors;
+	}
+
+	/**
+	 * @param treatmentFactors the treatmentFactors to set
+	 */
+	public void setTreatmentFactors(List<TreatmentFactor> treatmentFactors) {
+		this.treatmentFactors = treatmentFactors;
 	}	
-	
-	
 	
 }
