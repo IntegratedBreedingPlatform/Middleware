@@ -579,25 +579,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         return fieldMapInfos;
     }
-    
-    private void updateFieldMapInfoWithBlockInfo(List<FieldMapInfo> fieldMapInfos) throws MiddlewareQueryException{
-        if (fieldMapInfos != null) { 
-            for (FieldMapInfo info : fieldMapInfos) {
-                    if (info.getDatasets() != null) {
-                            for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-                                    if (dataset.getTrialInstances() != null) {
-                                            for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-                                                if (trial.getBlockId() != null) {
-                                                    FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
-                                                    trial.updateBlockInformation(blockInfo);
-                                                }
-                                            }
-                                    }
-                            }
-                    }
-            }
-        }
-    }
 
     @Override
     public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
@@ -1153,9 +1134,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
     					if (dataset.getTrialInstances() != null) {
     						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+                            	if (blockInfo == null && trial.getBlockId() != null) {
+                            		blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
+                            	}
     							trial.updateBlockInformation(blockInfo);
     							if (isGetLocation) {
 	    							trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
+                                    trial.setSiteName(trial.getLocationName());
 	    							trial.setFieldName(getLocationName(locationMap, trial.getFieldId()));
 	    							trial.setBlockName(getLocationName(locationMap, trial.getBlockId()));
     							}
@@ -1167,6 +1152,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	}
     }
     
+    private void updateFieldMapInfoWithBlockInfo(List<FieldMapInfo> fieldMapInfos) throws MiddlewareQueryException {
+        updateFieldMapWithBlockInformation(fieldMapInfos, null, true);
+    }
+
     private String getLocationName(Map<Integer, String> locationMap, Integer id) throws MiddlewareQueryException {
     	if (id != null) {
 	    	String name = locationMap.get(id);
