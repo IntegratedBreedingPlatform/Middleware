@@ -39,6 +39,26 @@ public class CropType implements Serializable{
     public final static String SORGHUM = "Sorghum";
     public final static String PHASEOLUS = "Phaseolus";
     
+    public enum CropEnum {
+    	CASSAVA,
+    	CHICKPEA,
+    	COWPEA,
+    	GROUNDNUT,
+    	MAIZE,
+    	PHASEOLUS,
+    	RICE,
+    	SORGHUM,
+    	WHEAT,
+    	LENTIL,
+    	SOYBEAN,
+    	BEAN;
+    	
+    	@Override
+		public String toString(){
+    		return super.toString().toLowerCase();
+    	}
+    	
+    }
 
     @Id
     @Column(name = "crop_name")
