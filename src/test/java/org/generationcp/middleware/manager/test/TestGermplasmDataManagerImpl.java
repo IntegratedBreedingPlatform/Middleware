@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -623,13 +624,11 @@ public class TestGermplasmDataManagerImpl{
 
     @Test
     public void testGetGidAndNidByGermplasmNames() throws Exception {
-        List<String> germplasmNames = new ArrayList<String>();
-        germplasmNames.add("UCR2010001");
-        germplasmNames.add("UCR2010002");
-        germplasmNames.add("UCR2010003");
-
+        List<String> germplasmNames = Arrays.asList("C 65 CU 79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65");
+        // SQL TO VERIFY (CENTRAL AND LOCAL): select gid, nid, nval from names where nval in (:germplasmNames);
+        
         List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
-        Debug.println(0, "testGetGidAndNidByGermplasmNames(" + germplasmNames + ") RESULTS: " + results);
+        Debug.printObjects(results);
     }
 
     @Test

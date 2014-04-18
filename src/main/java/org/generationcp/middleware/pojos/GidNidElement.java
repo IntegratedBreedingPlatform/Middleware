@@ -30,10 +30,17 @@ public class GidNidElement implements Serializable{
     
     private Integer nameId;
     
+    private String nVal;
+    
     public GidNidElement(Integer germplasmId, Integer nameId) {
-        super();
         this.germplasmId = germplasmId;
         this.nameId = nameId;
+    }
+
+    public GidNidElement(Integer germplasmId, Integer nameId, String nVal) {
+        this.germplasmId = germplasmId;
+        this.nameId = nameId;
+        this.nVal = nVal;
     }
 
     public Integer getGermplasmId() {
@@ -52,6 +59,14 @@ public class GidNidElement implements Serializable{
         this.nameId = nameId;
     }
 
+    
+    public String getNVal() {
+        return nVal;
+    }
+    
+    public void setNVal(String nVal) {
+        this.nVal = nVal;
+    }
 
     @Override
     public String toString() {
@@ -60,6 +75,8 @@ public class GidNidElement implements Serializable{
         builder.append(germplasmId);
         builder.append(", nameId=");
         builder.append(nameId);
+        builder.append(", nVal=");
+        builder.append(nVal);
         builder.append("]");
         return builder.toString();
     }
@@ -78,13 +95,13 @@ public class GidNidElement implements Serializable{
 
         GidNidElement rhs = (GidNidElement) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(germplasmId, rhs.germplasmId)
-                .append(nameId, rhs.nameId).isEquals();
+                .append(nameId, rhs.nameId).append(nVal, rhs.nVal).isEquals();
     }
     
     @Override
     public int hashCode() {
         return new HashCodeBuilder(77, 7).append(germplasmId)
-                .append(nameId).toHashCode();
+                .append(nameId).append(nVal).toHashCode();
     }
 
 }
