@@ -471,21 +471,23 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testGetGidsByMarkersAndAlleleValues() throws Exception {
+    public void testGetAllelicValuesByMarkersAndAlleleValues() throws Exception {
         List<Integer> markerIdList = Arrays.asList(2325);
         List<String> alleleValueList = Arrays.asList("238/238");
         
-        List<Integer> gids = manager.getGidsByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList);
-        Debug.println(0, "testGetGidsByMarkersAndAlleleValues(" + markerIdList + "," + alleleValueList + ") RESULTS: " + gids);
+        List<AllelicValueElement> values = manager.getAllelicValuesByMarkersAndAlleleValues(
+                Database.CENTRAL, markerIdList, alleleValueList);
+        Debug.printObjects(3, values);
     }
     
     @Test
-    public void testGetAllGidsByMarkersAndAlleleValues() throws Exception {
+    public void testGetAllAllelicValuesByMarkersAndAlleleValues() throws Exception {
         List<Integer> markerIdList = Arrays.asList(2325);
         List<String> alleleValueList = Arrays.asList("238/238");
         
-        List<Integer> gids = manager.getAllGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
-        Debug.println(0, "testGetAllGidsByMarkersAndAlleleValues(" + markerIdList + "," + alleleValueList + ") RESULTS: " + gids);
+        List<AllelicValueElement> values = manager.getAllAllelicValuesByMarkersAndAlleleValue(
+                markerIdList, alleleValueList);
+        Debug.printObjects(3, values);
     }
 
     @Test

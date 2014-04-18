@@ -588,19 +588,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<Integer> getGidsByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
-    	List<Integer> gids = new ArrayList<Integer>();
+    public List<AllelicValueElement> getAllelicValuesByMarkersAndAlleleValues(
+            Database instance, List<Integer> markerIdList, List<String> alleleValueList) 
+            throws MiddlewareQueryException {
+    	List<AllelicValueElement> elements = new ArrayList<AllelicValueElement>();
         setWorkingDatabase(instance);
-        gids = getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
-        gids.addAll(getCharValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList));
-        return gids;
+        elements.addAll(getAlleleValuesDao().getByMarkersAndAlleleValues(markerIdList, alleleValueList));
+        elements.addAll(getCharValuesDao().getByMarkersAndAlleleValues(markerIdList, alleleValueList));
+        return elements;
     }
     
     @Override
-    public List<Integer> getAllGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
-        List<Integer> gids =  getGidsByMarkersAndAlleleValues(Database.LOCAL, markerIdList, alleleValueList);
-        gids.addAll(getGidsByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList));
-        return gids;
+    public List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValue(List<Integer> markerIdList, List<String> alleleValueList) 
+            throws MiddlewareQueryException {
+        List<AllelicValueElement> elements =  getAllelicValuesByMarkersAndAlleleValues(Database.LOCAL, markerIdList, alleleValueList);
+        elements.addAll(getAllelicValuesByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList));
+        return elements;
     }
 
     @Override

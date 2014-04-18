@@ -601,20 +601,23 @@ public interface GenotypicDataManager{
      * @param instance the instance
      * @param markerIdList the marker id list
      * @param alleleValueList the allele value list
-     * @return the gids by markers and allele values
+     * @return the gid, datasetId, markerId, alleleValue by markers and allele values
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getGidsByMarkersAndAlleleValues(Database instance, List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException;
+    List<AllelicValueElement> getAllelicValuesByMarkersAndAlleleValues(
+            Database instance, List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException;
     
     /**
-     * Get GIDs by markers and allele values from both local and central database.
+     * Get AllelicValueElement(gid, markerId, datasetId, alleleValue(data)) 
+     * by markers and allele values from both local and central database.
      *
      * @param markerIdList the marker id list
      * @param alleleValueList the allele value list
      * @return the all gids by markers and allele values
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getAllGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException;
+    List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValue(
+            List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException;
     
     /**
      * Counts the number of germplasm ids matching the given marker id
