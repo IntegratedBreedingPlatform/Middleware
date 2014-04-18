@@ -1182,4 +1182,33 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         
         return sb.toString();
     }
+    
+    public List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException {
+    	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+    	
+		try {
+			StringBuffer sqlString = new StringBuffer()
+				.append("SELECT c.cvterm_id, c.name, c.definition ")
+				.append(" FROM cvterm c ")
+				.append(" INNER JOIN cvterm_relationship stinrel ON stinrel.subject_id = c.cvterm_id ")
+				.append("   AND stinrel.type_id = ").append(TermId.STORED_IN.getId())
+				.append("   AND stinrel.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
+				.append(" INNER JOIN cvterm_relationship dtyprel ON dtyprel.subject_id = c.cvterm_id ")
+				.append("   AND dtyprel.type_id = ").append(TermId.HAS_TYPE.getId())
+				.append("   AND dtyprel.object_id = ").append(TermId.NUMERIC_VARIABLE.getId())
+			;
+			    
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+					             
+	        List<Object[]> results = (List<Object[]>) query.list();
+	        for (Object[] row : results) {
+	            list.add(new StandardVariableReference((Integer) row[0], (String) row[1], (String) row[2]));
+	        }
+		        
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getAllTreatmentLevels in CVTermDao: " + e.getMessage(), e);
+		}
+		
+		return list;
+    }
 }

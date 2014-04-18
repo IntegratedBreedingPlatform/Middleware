@@ -660,4 +660,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             throws MiddlewareQueryException {
 		return getStudyDataManager().getAllFieldMapsInBlockByBlockId(blockId);
 	}
+	
+	@Override
+	public List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException {
+		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+		setWorkingDatabase(Database.CENTRAL);
+		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		setWorkingDatabase(Database.LOCAL);
+		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		Collections.sort(list);
+		return list;
+	}
+	
 }
