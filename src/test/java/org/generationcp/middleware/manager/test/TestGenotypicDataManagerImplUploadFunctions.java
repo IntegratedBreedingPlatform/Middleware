@@ -407,6 +407,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         }
     }
 
+
     @Test
     public void testSetSNP() throws Exception {
 
@@ -452,6 +453,33 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
+    }
+    
+
+    @Test
+    public void testSetSNP2() throws Exception {
+
+        java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        Dataset dataset = (Dataset) mappingRecords.get(DATASET);
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
+        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+        DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
+        Marker marker = (Marker) mappingRecords.get(MARKER);
+        CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
+
+        List<Marker> markers = new ArrayList<Marker>();
+        List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
+        for (int i=0; i<210*260; i++){
+            markers.add(marker);
+            markerMetadataSet.setMarkerId(-1);
+            markerMetadataSets.add(markerMetadataSet);
+            dataRows.add(new SNPDataRow(accMetadataSet, charValues));
+        }
+        
+        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, dataRows);
+        assertTrue(addStatus);
     }
 
     @Test

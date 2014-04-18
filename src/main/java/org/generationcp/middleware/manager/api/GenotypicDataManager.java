@@ -1448,7 +1448,6 @@ public interface GenotypicDataManager{
      * @throws MiddlewareException the middleware exception
      */
     Boolean updateSSR(Dataset dataset, List<SSRDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
-
     
     /**
      * Sets SNP
@@ -1464,6 +1463,23 @@ public interface GenotypicDataManager{
      */
     Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<SNPDataRow> rows) throws MiddlewareQueryException;
     
+    /**
+     * Sets SNP
+     * 
+     * To use, supply the Dataset and DatasetUsers objects to save.
+     * 
+     * Also pass the list of Markers and MarkerMetadataSets, and SNP Genotyping data rows as a list of SNPDataRow objects.
+     *
+     * @param dataset - (Dataset) dataset_type = "SNP", datatype = "int"
+     * @param datasetUser - (DatasetUser)
+     * @param markers
+     * @param markerMetadataSets
+     * @param rows the rows
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
+            List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows) throws MiddlewareQueryException;
     
     /**
      * Update SNP Recrods.
