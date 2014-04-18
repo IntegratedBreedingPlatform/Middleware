@@ -10,6 +10,8 @@ public class TreatmentFactor implements Serializable {
 	
 	private Factor valueFactor;
 
+	public TreatmentFactor() {
+	}
 	
 	public TreatmentFactor(Factor levelFactor, Factor valueFactor) {
 		this.levelFactor = levelFactor;
@@ -42,6 +44,12 @@ public class TreatmentFactor implements Serializable {
 	 */
 	public void setValueFactor(Factor valueFactor) {
 		this.valueFactor = valueFactor;
+	}
+
+	@Override
+	public String toString() {
+		return "TreatmentFactor [levelFactor=" + levelFactor + ", valueFactor="
+				+ valueFactor + "]";
 	}
 	
 }
