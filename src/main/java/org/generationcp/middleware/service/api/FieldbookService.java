@@ -440,4 +440,14 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException;
+    
+    /**
+     * Fetch all the possible pairs of the treatment level variable.
+     * 
+     * @param cvTermId
+     * @param propertyId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException;
 }

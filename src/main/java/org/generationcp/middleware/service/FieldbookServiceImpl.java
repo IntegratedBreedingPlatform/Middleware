@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -671,5 +672,44 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		Collections.sort(list);
 		return list;
 	}
-	
+
+	@Override
+	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
+		List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
+		
+		setWorkingDatabase(Database.CENTRAL);
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		setWorkingDatabase(Database.LOCAL);
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		
+		List<Integer> termIds = new ArrayList<Integer>();
+		Map<Integer, CVTerm> termMap = new HashMap<Integer, CVTerm>();
+		
+		for (StandardVariable pair : treatmentPairs) {
+			termIds.add(pair.getProperty().getId());
+			termIds.add(pair.getScale().getId());
+			termIds.add(pair.getMethod().getId());
+		}
+		
+		List<CVTerm> terms = new ArrayList<CVTerm>();
+		setWorkingDatabase(Database.CENTRAL);
+		terms.addAll(getCvTermDao().getByIds(termIds));
+		setWorkingDatabase(Database.LOCAL);
+		terms.addAll(getCvTermDao().getByIds(termIds));
+		
+		for (CVTerm term : terms) {
+			termMap.put(term.getCvTermId(), term);
+		}
+		
+		for (StandardVariable pair : treatmentPairs) {
+			pair.getProperty().setName(termMap.get(pair.getProperty().getId()).getName());
+			pair.getProperty().setDefinition(termMap.get(pair.getProperty().getId()).getDefinition());
+			pair.getScale().setName(termMap.get(pair.getScale().getId()).getName());
+			pair.getScale().setDefinition(termMap.get(pair.getScale().getId()).getDefinition());
+			pair.getMethod().setName(termMap.get(pair.getMethod().getId()).getName());
+			pair.getMethod().setDefinition(termMap.get(pair.getMethod().getId()).getDefinition());
+		}
+		
+		return treatmentPairs;
+	}
 }

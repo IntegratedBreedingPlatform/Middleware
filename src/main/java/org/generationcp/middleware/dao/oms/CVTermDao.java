@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
@@ -1207,6 +1208,49 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		        
 		} catch(HibernateException e) {
 			logAndThrowException("Error in getAllTreatmentLevels in CVTermDao: " + e.getMessage(), e);
+		}
+		
+		return list;
+    }
+    
+    public List<StandardVariable> getAllPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
+    	List<StandardVariable> list = new ArrayList<StandardVariable>();
+    	
+		try {
+			StringBuffer sqlString = new StringBuffer()
+				.append("SELECT c.cvterm_id, c.name, c.definition, pr.object_id AS propertyId, sr.object_id AS scaleId, mr.object_id AS methodId ")
+				.append(" FROM cvterm c ")
+				.append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ").append(TermId.HAS_PROPERTY.getId())
+				.append("   AND pr.subject_id = c.cvterm_id and pr.object_id = ").append(propertyId)
+				.append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ").append(TermId.HAS_SCALE.getId())
+				.append("   AND sr.subject_id = c.cvterm_id ")
+				.append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ").append(TermId.HAS_METHOD.getId())
+				.append("   AND mr.subject_id = c.cvterm_id ")
+				.append(" WHERE c.cvterm_id <> ").append(cvTermId);
+			;
+			    
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString())
+					.addScalar("cvterm_id")
+					.addScalar("name")
+					.addScalar("definition")
+					.addScalar("propertyId")
+					.addScalar("scaleId")
+					.addScalar("methodId");
+					             
+	        List<Object[]> results = (List<Object[]>) query.list();
+	        for (Object[] row : results) {
+	        	StandardVariable variable = new StandardVariable();
+	        	variable.setId((Integer) row[0]);
+	        	variable.setName((String) row[1]);
+	        	variable.setDescription((String) row[2]);
+	        	variable.setProperty(new Term((Integer) row[3], null, null));
+	        	variable.setScale(new Term((Integer) row[4], null, null));
+	        	variable.setMethod(new Term((Integer) row[5], null, null));
+	            list.add(variable);
+	        }
+		        
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getAllPossibleTreatmentPairs in CVTermDao: " + e.getMessage(), e);
 		}
 		
 		return list;
