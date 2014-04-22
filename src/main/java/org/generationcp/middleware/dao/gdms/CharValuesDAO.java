@@ -262,7 +262,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
         
         String sql = new StringBuffer()
-                .append("SELECT dataset_id, gid, marker_id, char_value ")
+                .append("SELECT dataset_id, gid, marker_id, CONCAT(char_value,'') ")
                 .append("FROM gdms_char_values ")
                 .append("   WHERE (marker_id, char_value) IN (" + placeholders + ") ")
                 .toString();

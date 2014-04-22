@@ -432,8 +432,8 @@ public class TestGenotypicDataManagerImpl extends TestDataManager{
     
     @Test
     public void testGetAllelicValuesByMarkersAndAlleleValues() throws Exception {
-        List<Integer> markerIdList = Arrays.asList(2325);
-        List<String> alleleValueList = Arrays.asList("238/238");
+        List<Integer> markerIdList = Arrays.asList(2325, 3345);
+        List<String> alleleValueList = Arrays.asList("238/238", "T/T");
         List<AllelicValueElement> values = manager.getAllelicValuesByMarkersAndAlleleValues(
                 Database.CENTRAL, markerIdList, alleleValueList);
         Debug.printObjects(INDENT, values);
