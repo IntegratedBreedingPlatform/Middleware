@@ -35,6 +35,7 @@ public class VariableInfoBuilder {
 		
 		ProjectProperty localNameProperty = findLocalNameProperty(stdVariableProperty.getValue(), properties);
 		ProjectProperty localDescriptionProperty = findLocalDescriptionProperty(properties);
+		ProjectProperty treatmentLabelProperty = findTreatmentLabelProperty(properties);
 		
 		VariableInfo variableDef = new VariableInfo();
 		variableDef.setLocalName(localNameProperty == null ? null : localNameProperty.getValue());
@@ -43,6 +44,9 @@ public class VariableInfoBuilder {
 	    if (properties.iterator().hasNext()) {
 	    	variableDef.setRank(properties.iterator().next().getRank());
 	    }
+	    if (treatmentLabelProperty != null) {
+	    	variableDef.setTreatmentLabel(treatmentLabelProperty.getValue());
+	    }
 	    
 		return variableDef;
 	}
@@ -50,6 +54,15 @@ public class VariableInfoBuilder {
 	private ProjectProperty findLocalDescriptionProperty(Set<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
 			 if (isLocalDescriptionType(property)) {
+				 return property;
+			 }
+		 }
+		 return null;
+	}
+
+	private ProjectProperty findTreatmentLabelProperty(Set<ProjectProperty> properties) {
+		for (ProjectProperty property : properties) {
+			 if (isMultiFactorialType(property)) {
 				 return property;
 			 }
 		 }
