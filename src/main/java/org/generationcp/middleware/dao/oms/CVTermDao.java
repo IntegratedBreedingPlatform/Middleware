@@ -35,7 +35,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -1213,6 +1212,37 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return list;
     }
     
+    public boolean hasPossibleTreatmentPairs(int cvTermId) throws MiddlewareQueryException {
+    	List<StandardVariable> list = new ArrayList<StandardVariable>();
+    	
+		try {
+			StringBuffer sqlString = new StringBuffer()
+				.append("SELECT count(c.cvterm_id) ")
+				.append(" FROM cvterm c ")
+				.append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ").append(TermId.HAS_PROPERTY.getId())
+				.append("   AND pr.subject_id = c.cvterm_id ")
+				.append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ").append(TermId.HAS_SCALE.getId())
+				.append("   AND sr.subject_id = c.cvterm_id ")
+				.append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ").append(TermId.HAS_METHOD.getId())
+				.append("   AND mr.subject_id = c.cvterm_id ")
+				.append(" INNER JOIN cvterm_relationship stin ON stin.type_id = ").append(TermId.STORED_IN.getId())
+				.append("   AND stin.subject_id = c.cvterm_id AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
+				.append(" INNER JOIN cvterm_relationship pr1 ON pr1.subject_id = ").append(cvTermId)
+				.append("   AND pr1.type_id = ").append(TermId.HAS_PROPERTY.getId())
+				.append("   AND pr1.object_id = pr.object_id ")
+				.append(" WHERE c.cvterm_id <> ").append(cvTermId);
+			;
+			
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+			long count = ((BigInteger) query.uniqueResult()).longValue();
+			return count > 0;
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getAllPossibleTreatmentPairs in CVTermDao: " + e.getMessage(), e);
+		}
+		return false;
+    }
+    
     public List<StandardVariable> getAllPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
     	List<StandardVariable> list = new ArrayList<StandardVariable>();
     	
@@ -1226,6 +1256,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("   AND sr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ").append(TermId.HAS_METHOD.getId())
 				.append("   AND mr.subject_id = c.cvterm_id ")
+				.append(" INNER JOIN cvterm_relationship stin ON stin.type_id = ").append(TermId.STORED_IN.getId())
+				.append("   AND stin.subject_id = c.cvterm_id AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
 				.append(" WHERE c.cvterm_id <> ").append(cvTermId);
 			;
 			    

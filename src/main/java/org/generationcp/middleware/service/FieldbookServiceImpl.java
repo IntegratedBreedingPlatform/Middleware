@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -675,10 +676,27 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		list.addAll(getCvTermDao().getAllTreatmentLevels());
 		setWorkingDatabase(Database.LOCAL);
 		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		
+		for (Iterator<StandardVariableReference> iter = list.iterator(); iter.hasNext(); ) {
+			boolean hasPairInCentral = false, hasPairInLocal = false;
+			StandardVariableReference ref =  iter.next();
+			
+			setWorkingDatabase(Database.CENTRAL);
+			hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId());
+			if (!hasPairInCentral) {
+				setWorkingDatabase(Database.LOCAL);
+				hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId());
+			}
+			
+			if (!hasPairInCentral && !hasPairInLocal) {
+				iter.remove();
+			}
+		}
+		
 		Collections.sort(list);
 		return list;
 	}
-
+	
 	@Override
 	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
 		List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
