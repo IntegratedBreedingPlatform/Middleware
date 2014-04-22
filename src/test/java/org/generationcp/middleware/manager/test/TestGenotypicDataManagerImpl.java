@@ -986,16 +986,28 @@ public class TestGenotypicDataManagerImpl extends TestDataManager{
         Float annealingTemp = Float.valueOf(0);
         String amplification = null;
 
+        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, 
+                reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, 
+                reversePrimer, productSize, annealingTemp, amplification);
+
+        // On first run, this will insert record to local
         try{
-	        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, 
-	                reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, 
-	                reversePrimer, productSize, annealingTemp, amplification);
-	        Integer idAdded = manager.addGDMSMarker(marker);
+            Integer idAdded = manager.addGDMSMarker(marker);
 	        Debug.println("testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
         } catch (MiddlewareQueryException e){
         	Debug.println(e.getMessage() + "\n");
         }
 
+        
+        // Try adding record that exists in central
+        try{
+            marker.setMarkerName("GA101");
+            Integer idAdded = manager.addGDMSMarker(marker);
+            Debug.println("testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
+        } catch (MiddlewareQueryException e){
+            assertTrue(e.getMessage().contains("Marker already exists in Central or Local and cannot be added"));
+        }
+        
     }
 
     @Test
