@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.manager.test;
+package org.generationcp.middleware.utils.test;
 
 import org.generationcp.middleware.util.Debug;
 import org.junit.After;
@@ -22,7 +22,7 @@ import org.junit.rules.TestName;
  * @author Joyce Avestro
  *
  */
-public class TestDataManager{
+public class TestOutputFormatter{
     
     protected long startTime;
     protected static final int INDENT = 3;

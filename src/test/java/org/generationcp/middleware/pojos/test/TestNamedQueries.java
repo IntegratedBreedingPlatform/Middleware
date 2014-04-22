@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.test;
 
 import java.math.BigInteger;
@@ -19,38 +18,24 @@ import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 @SuppressWarnings("rawtypes")
-public class TestNamedQueries{
+public class TestNamedQueries extends TestOutputFormatter{
 
     private static HibernateUtil hibernateUtil;
-
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
     }
     
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-
     @Test
     public void testGetGermplasmByPrefName() {
         String name = "IR 64";
@@ -63,7 +48,7 @@ public class TestNamedQueries{
             Assert.assertTrue(obj instanceof Germplasm);
             Assert.assertTrue(obj != null);
             Germplasm holder = (Germplasm) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -77,7 +62,7 @@ public class TestNamedQueries{
             Assert.assertTrue(obj instanceof Germplasm);
             Assert.assertTrue(obj != null);
             Germplasm holder = (Germplasm) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -98,13 +83,6 @@ public class TestNamedQueries{
         BigInteger result = (BigInteger) query.uniqueResult();
         Assert.assertTrue(result != null);
     }
-
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
-    }
-
 
     @AfterClass
     public static void tearDown() throws Exception {

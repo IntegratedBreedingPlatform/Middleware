@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.AfterClass;
@@ -46,7 +47,7 @@ import org.junit.runners.MethodSorters;
 // Test using RICE database
 */
 @FixMethodOrder(MethodSorters.JVM)
-public class TestGermplasmListManagerImpl extends TestDataManager{
+public class TestGermplasmListManagerImpl extends TestOutputFormatter{
 
     private static ManagerFactory factory;
     private static GermplasmListManager manager;

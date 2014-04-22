@@ -48,11 +48,12 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestGenotypicDataManagerImplUploadFunctions extends TestDataManager{
+public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputFormatter{
 
     private static ManagerFactory       factory;
     private static GenotypicDataManager manager;
@@ -440,16 +441,20 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestDataManager
 
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<CharValues> charValueList = new ArrayList<CharValues>();
         List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
         for (int i=0; i<210*260; i++){
             marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
             markers.add(marker);
             markerMetadataSet.setMarkerId(-1);
             markerMetadataSets.add(markerMetadataSet);
-            dataRows.add(new SNPDataRow(accMetadataSet, charValues));
+            accMetadataSets.add(accMetadataSet);
+            dataRows.add(new SNPDataRow(charValues));
+            charValueList.add(charValues);
         }
         
-        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, charValueList);
         assertTrue(addStatus);
     }
 

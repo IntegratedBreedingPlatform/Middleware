@@ -23,11 +23,12 @@ import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestUserDataManagerImpl extends TestDataManager{
+public class TestUserDataManagerImpl extends TestOutputFormatter{
 
     private static ManagerFactory factory;
     private static UserDataManager manager;

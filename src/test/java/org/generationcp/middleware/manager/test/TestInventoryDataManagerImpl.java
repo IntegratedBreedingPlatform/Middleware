@@ -26,11 +26,12 @@ import org.generationcp.middleware.pojos.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestInventoryDataManagerImpl extends TestDataManager {
+public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     private static ManagerFactory factory;
     private static InventoryDataManager manager;

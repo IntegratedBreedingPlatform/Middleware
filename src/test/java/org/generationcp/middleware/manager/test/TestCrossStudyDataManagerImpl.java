@@ -30,11 +30,12 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestCrossStudyDataManagerImpl extends TestDataManager{
+public class TestCrossStudyDataManagerImpl extends TestOutputFormatter{
 
 	private static ManagerFactory factory;
 	private static CrossStudyDataManager manager;

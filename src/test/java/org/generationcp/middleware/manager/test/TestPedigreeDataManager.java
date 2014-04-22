@@ -26,11 +26,12 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.utils.test.MockDataUtil;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestPedigreeDataManager extends TestDataManager{
+public class TestPedigreeDataManager extends TestOutputFormatter{
 
     private static ManagerFactory factory;
     private static PedigreeDataManager pedigreeManager;

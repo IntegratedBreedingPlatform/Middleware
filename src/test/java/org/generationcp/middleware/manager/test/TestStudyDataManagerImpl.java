@@ -63,11 +63,12 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestStudyDataManagerImpl extends TestDataManager{
+public class TestStudyDataManagerImpl extends TestOutputFormatter{
 
     private static final Integer STUDY_ID   = 10010;
     private static final Integer DATASET_ID = 10045;

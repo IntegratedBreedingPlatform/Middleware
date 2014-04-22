@@ -67,12 +67,13 @@ import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 // Test using Groundnut Database
-public class TestGenotypicDataManagerImpl extends TestDataManager{
+public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     private static ManagerFactory factory;
     private static GenotypicDataManager manager;

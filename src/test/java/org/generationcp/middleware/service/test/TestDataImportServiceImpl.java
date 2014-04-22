@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.service.test;
 
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -27,29 +26,21 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.generationcp.middleware.utils.test.TestWorkbookUtil;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
-public class TestDataImportServiceImpl {
+public class TestDataImportServiceImpl extends TestOutputFormatter {
 
     private static ServiceFactory serviceFactory;
     private static DataImportService dataImportService;
-
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -57,20 +48,9 @@ public class TestDataImportServiceImpl {
                 "testDatabaseConfig.properties", "local");
         DatabaseConnectionParameters central = new DatabaseConnectionParameters(
                 "testDatabaseConfig.properties", "central");
-
         serviceFactory = new ServiceFactory(local, central);
-
         dataImportService = serviceFactory.getDataImportService();
-
     }
-
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-
-
 
     @Test
     public void testSaveMultiLocationDataset() throws MiddlewareQueryException {
@@ -85,25 +65,24 @@ public class TestDataImportServiceImpl {
             id = dataImportService.saveDataset(workbook);
         }
         String name = workbooks.get(0).getStudyDetails() != null ? workbooks.get(0).getStudyDetails().getStudyName() : null;
-        Debug.println(0, "Created study: " + id + ", name = " + name);
+        Debug.println(INDENT, "Created study: " + id + ", name = " + name);
     }
 
     @Test
     public void testSaveDataset() throws MiddlewareQueryException {
         Workbook workbook = TestWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         int id = dataImportService.saveDataset(workbook);
-        Debug.println(0, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
-
+        Debug.println(INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
     }
 
     @Test
     public void testSaveNurseryDataset() throws MiddlewareQueryException {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         int id = dataImportService.saveDataset(workbook);
         String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
-        Debug.println(0, "Created study:" + id + ", name = " + name);
+        Debug.println(INDENT, "Created study:" + id + ", name = " + name);
     }
 
     @Test
@@ -113,13 +92,12 @@ public class TestDataImportServiceImpl {
         String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
         File file = new File(fileLocation);
         Workbook workbook = dataImportService.parseWorkbook(file);
-        workbook.print(0);
+        workbook.print(INDENT);
 
 
         int id = dataImportService.saveDataset(workbook);
-        Debug.println(0, "Created study:" + id);
+        Debug.println(INDENT, "Created study:" + id);
     }
-
 
     // Daniel V
     // added new tests to cover validation scenarios for strict parsing of workbook
@@ -208,34 +186,19 @@ public class TestDataImportServiceImpl {
         fail(errorMessage);
     }
 
-
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
-    }
-
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        if (serviceFactory != null) {
-            serviceFactory.close();
-        }
-    }
-    
     @Test
 	public void testCheckIfProjectNameIsExisting() throws Exception {
     	//try to save first then use the name of the saved study
     	Workbook workbook = TestWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         dataImportService.saveDataset(workbook);
         String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
-        Debug.println(0, "Name: " + name);
+        Debug.println(INDENT, "Name: " + name);
 		boolean isExisting = dataImportService.checkIfProjectNameIsExisting(name);
 		assertTrue(isExisting);
 		
 		name = "SHOULDNOTEXISTSTUDY";
-		Debug.println(0, "Name: " + name);
+		Debug.println(INDENT, "Name: " + name);
 		isExisting = dataImportService.checkIfProjectNameIsExisting(name);
 		assertFalse(isExisting);
 	}
@@ -244,10 +207,10 @@ public class TestDataImportServiceImpl {
     public void getLocationIdByProjectNameAndDescription() throws MiddlewareQueryException {
     	//try to save first then use the name of the saved study
     	Workbook workbook = TestWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         dataImportService.saveDataset(workbook);
         String name = workbook.getStudyDetails().getStudyName();
-        Debug.println(0, "Name: " + name);
+        Debug.println(INDENT, "Name: " + name);
 		Integer locationId = dataImportService.getLocationIdByProjectNameAndDescription(name,"1");
 		assertEquals(locationId.longValue(),1L);        
     }
@@ -255,40 +218,40 @@ public class TestDataImportServiceImpl {
     @Test
     public void testSaveProjectOntology() throws MiddlewareQueryException {
         Workbook workbook = TestWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         int id = dataImportService.saveProjectOntology(workbook);
-        Debug.println(0, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+        Debug.println(INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
 
     }
     
     @Test
     public void testSaveProjectData() throws MiddlewareQueryException {
         Workbook workbook = TestWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         int studyId = dataImportService.saveProjectOntology(workbook);
         workbook.setStudyId(studyId);
         workbook.setTrialDatasetId(studyId-1);
         workbook.setMeasurementDatesetId(studyId-2); 
         dataImportService.saveProjectData(workbook);
-        Debug.println(0, "Saved project data:" + studyId + ", name = " + workbook.getStudyDetails().getStudyName());
+        Debug.println(INDENT, "Saved project data:" + studyId + ", name = " + workbook.getStudyDetails().getStudyName());
 
     }
     
     @Test
 	public void testValidateProjectOntology() throws MiddlewareQueryException {
         Workbook workbook = TestWorkbookUtil.getTestWorkbookWithErrors();
-        workbook.print(0);
+        workbook.print(INDENT);
         Map<String,List<Message>> errors = dataImportService.validateProjectOntology(workbook);
         assertNotNull(errors);
         if(errors!=null) {
-        	Debug.println(0, "Errors Identified: ");
+        	Debug.println(INDENT, "Errors Identified: ");
         	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
-        		Debug.println(3, e.getKey());
+        		Debug.println(INDENT+2, e.getKey());
         		for(Message m: e.getValue()) {
         			if(m.getMessageParams()!=null) {
-        				Debug.println(5, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
+        				Debug.println(INDENT+4, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
         			} else {
-        				Debug.println(5, "Key: " + m.getMessageKey());
+        				Debug.println(INDENT+4, "Key: " + m.getMessageKey());
         			}
         		}
         	}
@@ -300,22 +263,30 @@ public class TestDataImportServiceImpl {
     	String studyName = "validateProjectData_" + new Random().nextInt(10000);
     	int trialNo = 1;
     	Workbook workbook = TestWorkbookUtil.getTestWorkbookForWizard(studyName,trialNo);
-        workbook.print(0);
+        workbook.print(INDENT);
         dataImportService.saveDataset(workbook,true);
         Map<String,List<Message>> errors = dataImportService.validateProjectData(workbook);
         assertNotNull(errors);
         if(errors!=null) {
-        	Debug.println(0, "Errors Identified: ");
+        	Debug.println(INDENT, "Errors Identified: ");
         	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
-        		Debug.println(3, e.getKey());
+        		Debug.println(INDENT+2, e.getKey());
         		for(Message m: e.getValue()) {
         			if(m.getMessageParams()!=null) {
-        				Debug.println(5, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
+        				Debug.println(INDENT+4, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
         			} else {
-        				Debug.println(5, "Key: " + m.getMessageKey());
+        				Debug.println(INDENT+4, "Key: " + m.getMessageKey());
         			}
         		}
         	}
         }
     }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        if (serviceFactory != null) {
+            serviceFactory.close();
+        }
+    }
+    
 }

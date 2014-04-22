@@ -53,6 +53,7 @@ import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -60,7 +61,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestWorkbenchDataManagerImpl extends TestDataManager{
+public class TestWorkbenchDataManagerImpl extends TestOutputFormatter{
 
     private static WorkbenchDataManager manager;
     private static HibernateUtil hibernateUtil;

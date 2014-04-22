@@ -1482,8 +1482,12 @@ public interface GenotypicDataManager{
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
      */
+//    Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
+//            List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, 
+//            List<SNPDataRow> rows) throws MiddlewareQueryException;
     Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
-            List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows) throws MiddlewareQueryException;
+            List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, 
+            List<CharValues> charValues) throws MiddlewareQueryException;
     
     /**
      * Update SNP Recrods.

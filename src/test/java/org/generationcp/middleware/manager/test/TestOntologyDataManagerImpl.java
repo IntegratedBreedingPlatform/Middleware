@@ -42,6 +42,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -55,7 +56,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 @SuppressWarnings("unused")
-public class TestOntologyDataManagerImpl extends TestDataManager {
+public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 
     private static final Integer CV_TERM_ID = 1010;
     private static final String CV_TERM_NAME = "Study Information";
