@@ -161,6 +161,10 @@ public class TrialDataset  extends ParentDataset {
 	 */
 	public void setTreatmentFactors(List<TreatmentFactor> treatmentFactors) {
 		this.treatmentFactors = treatmentFactors;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}	
 	
 }

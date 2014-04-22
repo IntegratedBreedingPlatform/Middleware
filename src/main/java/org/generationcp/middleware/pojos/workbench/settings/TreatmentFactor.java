@@ -51,5 +51,9 @@ public class TreatmentFactor implements Serializable {
 		return "TreatmentFactor [levelFactor=" + levelFactor + ", valueFactor="
 				+ valueFactor + "]";
 	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	
 }

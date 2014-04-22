@@ -110,5 +110,9 @@ public class Condition  implements Serializable {
 	public void setMaxRange(Double maxRange) {
 		this.maxRange = maxRange;
 	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	
 }

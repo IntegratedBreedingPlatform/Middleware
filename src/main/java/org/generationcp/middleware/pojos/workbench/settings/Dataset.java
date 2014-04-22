@@ -45,6 +45,9 @@ public class Dataset extends ParentDataset {
 	public void setVariates(List<Variate> variates) {
 		this.variates = variates;
 	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	
 	
 }
