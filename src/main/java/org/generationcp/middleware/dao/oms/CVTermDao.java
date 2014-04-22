@@ -943,7 +943,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             SQLQuery query = getSession().createSQLQuery(sqlString.toString());
             query.setParameterList("propertyIds", propertyIds);
             
-            Debug.println(4, sqlString.toString());
+            //Debug.println(4, sqlString.toString());
             
             List<Object[]> list = query.list();
             
