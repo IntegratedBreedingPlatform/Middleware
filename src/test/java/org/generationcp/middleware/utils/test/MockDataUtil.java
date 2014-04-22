@@ -17,6 +17,8 @@ import org.mockito.Mockito;
 
 public class MockDataUtil {
 
+    private static final int INDENT = 3;
+
 	//Germplasm Test Data
 	private static Germplasm g1 = createTestGermplasm(-1, 1, -1, 0);
 	private static Germplasm g2 = createTestGermplasm(-2, 1, -1, -1);
@@ -171,7 +173,7 @@ public class MockDataUtil {
      * Default printing format for the console
      */
     public static void printTree(GermplasmPedigreeTree tree) {
-    	Debug.println(0, printTree(tree, "  ", "\n"));
+    	Debug.println(INDENT, printTree(tree, "   ", "\n"));
     }
 
     /**

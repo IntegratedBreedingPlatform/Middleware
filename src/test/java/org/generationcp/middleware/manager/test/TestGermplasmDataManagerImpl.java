@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
@@ -37,24 +36,16 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
-public class TestGermplasmDataManagerImpl{
+// Test using RICE database
+public class TestGermplasmDataManagerImpl extends TestDataManager{
 
     private static ManagerFactory factory;
     private static GermplasmDataManager manager;
     private static LocationDataManager locationManager;
-
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -67,28 +58,13 @@ public class TestGermplasmDataManagerImpl{
         locationManager = factory.getLocationDataManager();
     }
 
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-    
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " 
-                + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
-    }
-    
-
-
     @Test
     public void testGetMethodsByIDs() throws Exception {
 
         // Attempt to get all locations so we can proceed
         List<Method> locationList = manager.getAllMethods();
         assertTrue(locationList != null);
-        assertTrue("we cannot proceed test if size < 0",locationList.size()>0);
+        assertTrue("we cannot proceed test if size < 0", locationList.size() > 0);
 
         List<Integer> ids = new ArrayList<Integer>();
 
@@ -104,11 +80,7 @@ public class TestGermplasmDataManagerImpl{
         assertTrue(results != null);
         assertTrue(results.size() < 5);
 
-        Debug.println(0, "testGetMethodsByIDs() RESULTS: ");
-        for (Method l : results) {
-            Debug.println(0, "  " + l);
-        }
-
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -120,10 +92,8 @@ public class TestGermplasmDataManagerImpl{
                             Operation.EQUAL, null, null, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByName(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByName(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
@@ -133,54 +103,46 @@ public class TestGermplasmDataManagerImpl{
                 name, 0, Long.valueOf(manager.countGermplasmByName(
                                         name, Operation.EQUAL)).intValue(), Operation.EQUAL);
 
-        Debug.println(0, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" 
-                + name + ") RESULTS: " + germplasmList.size());
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" 
+                + name + "): " + germplasmList.size());
+        Debug.printObjects(INDENT, germplasmList);
         
         name = "IR 65%";
         germplasmList = manager.getGermplasmByName(name, 0, 
                 Long.valueOf(manager.countGermplasmByName(name, Operation.LIKE)).intValue(), 
                 Operation.LIKE);
 
-        Debug.println(0, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name 
-                + ") RESULTS: " + germplasmList.size());
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name 
+                + "): " + germplasmList.size());
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
     public void testCountGermplasmByName() throws Exception {
         String name = "IR 10";
-        
         long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
                 Operation.EQUAL, null, null, Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByName(" + name + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByName(" + name + "): " + count);
     }
 
     @Test
     public void testCountGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
         String name = "IR  65";
         long count = manager.countGermplasmByName(name, Operation.EQUAL);
-        Debug.println(0, "testCountGermplasmByNameOriginalStandardizedAndNoSpace(" + name 
-                + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByNameOriginalStandardizedAndNoSpace(" 
+                + name + "): " + count);
     }
 
     @Test
     public void testGetGermplasmByNameUsingLike() throws Exception {
         String name = "IR%";
         
-        List<Germplasm> germplasmList = manager.getGermplasmByName(
-                name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null,
-                Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, 
+                GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByNameUsingLike(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByNameUsingLike(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
@@ -189,7 +151,7 @@ public class TestGermplasmDataManagerImpl{
         
         long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
                 Operation.LIKE, null, null, Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByNameUsingLike(" + name + ") RESULTS:" + count);
+        Debug.println(INDENT, "testCountGermplasmByNameUsingLike(" + name + ") RESULTS:" + count);
     }
 
     @Test
@@ -200,10 +162,8 @@ public class TestGermplasmDataManagerImpl{
                 Integer.valueOf(1), null, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByNameWithStatus(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByNameWithStatus(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
@@ -212,7 +172,7 @@ public class TestGermplasmDataManagerImpl{
         long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
                 Operation.EQUAL, Integer.valueOf(1), null,
                 Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByNameWithStatus(" + name + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByNameWithStatus(" + name + "): " + count);
     }
 
     @Test
@@ -223,10 +183,8 @@ public class TestGermplasmDataManagerImpl{
                 Integer.valueOf(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByNameWithStatusAndType(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByNameWithStatusAndType(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
@@ -235,7 +193,7 @@ public class TestGermplasmDataManagerImpl{
         long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
                 Operation.EQUAL, Integer.valueOf(1),
                 GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByNameWithStatusAndType(" + name + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByNameWithStatusAndType(" + name + "): " + count);
     }
 
     @Test
@@ -245,10 +203,8 @@ public class TestGermplasmDataManagerImpl{
                 GetGermplasmByNameModes.NORMAL, Operation.LIKE, Integer.valueOf(
                 1), null, Database.CENTRAL);
         assertTrue(germplasmList != null);
-        Debug.println(0, "testGetGermplasmByNameWithStatusUsingLike(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByNameWithStatusUsingLike(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
@@ -259,10 +215,8 @@ public class TestGermplasmDataManagerImpl{
                 Integer.valueOf(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByNameWithStatusAndTypeUsingLike(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByNameWithStatusAndTypeUsingLike(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
@@ -270,17 +224,15 @@ public class TestGermplasmDataManagerImpl{
         String name = "Philippines";
         List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, 
                 Operation.EQUAL, Database.CENTRAL);
-        Debug.println(0, "testGetGermplasmByLocationNameUsingEqual(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByLocationNameUsingEqual(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
     public void testCountGermplasmByLocationNameUsingEqual() throws Exception {
         String name = "Philippines";
         long count = manager.countGermplasmByLocationName(name, Operation.EQUAL, Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByLocationNameUsingEqual(" + name + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByLocationNameUsingEqual(" + name + "): " + count);
     }
 
     @Test
@@ -289,17 +241,15 @@ public class TestGermplasmDataManagerImpl{
         List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, 
                 Operation.LIKE, Database.CENTRAL);
         assertTrue(germplasmList != null);
-        Debug.println(0, "testGetGermplasmByLocationNameUsingLike(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByLocationNameUsingLike(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
     public void testCountGermplasmByLocationNameUsingLike() throws Exception {
         String name = "International%";
         long count = manager.countGermplasmByLocationName(name, Operation.LIKE, Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByLocationNameUsingLike(" + name + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByLocationNameUsingLike(" + name + "): " + count);
     }
 
     @Test
@@ -310,18 +260,15 @@ public class TestGermplasmDataManagerImpl{
                 Operation.EQUAL, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByMethodNameUsingEqual(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByMethodNameUsingEqual(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
     public void testCountGermplasmByMethodNameUsingEqual() throws Exception {
         String name = "SINGLE CROSS";
-        
         long count = manager.countGermplasmByMethodName(name, Operation.EQUAL, Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByMethodNameUsingEqual(" + name + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByMethodNameUsingEqual(" + name + "): " + count);
     }
 
     @Test
@@ -332,25 +279,22 @@ public class TestGermplasmDataManagerImpl{
                 Operation.LIKE, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByMethodNameUsingLike(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByMethodNameUsingLike(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
 
     @Test
     public void testCountGermplasmByMethodNameUsingLike() throws Exception {
         String name = "%CROSS%";
-        
         long count = manager.countGermplasmByMethodName(name, Operation.LIKE, Database.CENTRAL);
-        Debug.println(0, "testCountGermplasmByMethodNameUsingLike(" + name + ") RESULTS: " + count);
+        Debug.println(INDENT, "testCountGermplasmByMethodNameUsingLike(" + name + "): " + count);
     }
 
     @Test
     public void testGetGermplasmByGID() throws Exception {
         Integer gid = Integer.valueOf(50533);
         Germplasm germplasm = manager.getGermplasmByGID(gid);
-        Debug.println(0, "testGetGermplasmByGID(" + gid + "): " + germplasm);
+        Debug.println(INDENT, "testGetGermplasmByGID(" + gid + "): " + germplasm);
     }
 
     @Test
@@ -358,9 +302,9 @@ public class TestGermplasmDataManagerImpl{
         Integer gid = Integer.valueOf(50533);
         Germplasm germplasm = manager.getGermplasmWithPrefName(gid);
 
-        Debug.println(0, "testGetGermplasmWithPrefName(" + gid + ") RESULTS: " + germplasm);
+        Debug.println(INDENT, "testGetGermplasmWithPrefName(" + gid + "): " + germplasm);
         if (germplasm != null) {
-            Debug.println(0, "  preferredName = " + germplasm.getPreferredName());
+            Debug.println("  preferredName = " + germplasm.getPreferredName());
         }
     }
 
@@ -368,61 +312,58 @@ public class TestGermplasmDataManagerImpl{
     public void testGetGermplasmWithPrefAbbrev() throws Exception {
         Integer gid = Integer.valueOf(151);
         Germplasm germplasm = manager.getGermplasmWithPrefAbbrev(gid);
-
-        Debug.println(0, "testGetGermplasmWithPrefAbbrev(" + gid + ") RESULTS: " + germplasm);
-        Debug.println(0, "  preferredName = " + germplasm.getPreferredName());
-        Debug.println(0, "  preferredAbbreviation = " + germplasm.getPreferredAbbreviation());
+        Debug.println(INDENT, "testGetGermplasmWithPrefAbbrev(" + gid + "): " + germplasm);
+        Debug.println("  preferredName = " + germplasm.getPreferredName());
+        Debug.println("  preferredAbbreviation = " + germplasm.getPreferredAbbreviation());
     }
 
     @Test
     public void testGetGermplasmNameByID() throws Exception {
         Integer gid = Integer.valueOf(42268);
         Name name = manager.getGermplasmNameByID(gid);
-        Debug.println(0, "testGetGermplasmNameByID(" + gid + ") RESULTS: " + name);
+        Debug.println(INDENT, "testGetGermplasmNameByID(" + gid + "): " + name);
     }
 
     @Test
     public void testGetNamesByGID() throws Exception {
         Integer gid = Integer.valueOf(2434138);
         List<Name> names = manager.getNamesByGID(gid, null, null);
-        Debug.println(0, "testGetNamesByGID(" + gid + ") RESULTS: " + names.size());
-        Debug.printObjects(0, names);
+        Debug.println(INDENT, "testGetNamesByGID(" + gid + "): " + names.size());
+        Debug.printObjects(names);
     }
 
     @Test
     public void testGetPreferredNameByGID() throws Exception {
         Integer gid = Integer.valueOf(1);
-        Debug.println(0, "testGetPreferredNameByGID(" + gid + ") RESULTS: " 
+        Debug.println(INDENT, "testGetPreferredNameByGID(" + gid + "): " 
                 + manager.getPreferredNameByGID(gid));
     }
     
     @Test
     public void testGetPreferredNameValueByGID() throws Exception {
         Integer gid = Integer.valueOf(1);
-        Debug.println(0, "testGetPreferredNameValueByGID(" + gid + ") RESULTS: " 
+        Debug.println(INDENT, "testGetPreferredNameValueByGID(" + gid + "): " 
                 + manager.getPreferredNameValueByGID(gid));
     }
 
     @Test
     public void testGetPreferredAbbrevByGID() throws Exception {
         Integer gid = Integer.valueOf(1);
-        Debug.println(0, "testGetPreferredAbbrevByGID(" + gid + ") RESULTS: " 
+        Debug.println(INDENT, "testGetPreferredAbbrevByGID(" + gid + "): " 
                 + manager.getPreferredAbbrevByGID(gid));
     }
     
     @Test
     public void testGetPreferredIdByGID() throws Exception {
-        //tested using Rice DB
         Integer gid = Integer.valueOf(986634);
-        Debug.println(0, "testGetPreferredIdByGID(" + gid + ") RESULTS: " 
+        Debug.println(INDENT, "testGetPreferredIdByGID(" + gid + "): " 
                 + manager.getPreferredIdByGID(gid));       
     }
     
     @Test
     public void testGetPreferredIdsByListId() throws Exception {
-        //tested using Rice DB
         Integer listId = Integer.valueOf(2591);
-        Debug.println(0, "testGetPreferredIdsByListId(" + listId + ") RESULTS: " 
+        Debug.println(INDENT, "testGetPreferredIdsByListId(" + listId + "): " 
                 + manager.getPreferredIdsByListId(listId));       
     }
 
@@ -430,14 +371,14 @@ public class TestGermplasmDataManagerImpl{
     public void testGetNameByGIDAndNval() throws Exception {
         Integer gid = Integer.valueOf(225266);
         String nVal = "C 65-44";
-        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
-                        + ", GetGermplasmByNameModes.NORMAL) RESULTS: " 
+        Debug.println(INDENT, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
+                        + ", GetGermplasmByNameModes.NORMAL) : " 
                         + manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
-        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
-                        + ", GetGermplasmByNameModes.SPACES_REMOVED) RESULTS: " 
+        Debug.println(INDENT, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
+                        + ", GetGermplasmByNameModes.SPACES_REMOVED) : " 
                         + manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.SPACES_REMOVED));
-        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
-                        + ", GetGermplasmByNameModes.STANDARDIZED) RESULTS: " 
+        Debug.println(INDENT, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
+                        + ", GetGermplasmByNameModes.STANDARDIZED) : " 
                         + manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.STANDARDIZED));
     }
 
@@ -447,8 +388,8 @@ public class TestGermplasmDataManagerImpl{
         Integer status = Integer.valueOf(1);
         GermplasmNameType type = null;
         List<Name> names = manager.getNamesByGID(gid, status, type);
-        Debug.println(0, "testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status 
-                + ", type=" + type + ") RESULTS: " + names);
+        Debug.println(INDENT, "testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status 
+                + ", type=" + type + "): " + names);
     }
 
     @Test
@@ -457,15 +398,15 @@ public class TestGermplasmDataManagerImpl{
         Integer status = Integer.valueOf(8);
         GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
         List<Name> names = manager.getNamesByGID(gid, status, type);
-        Debug.println(0, "testGetNamesByGIDWithStatusAndType(gid=" + gid 
-                + ", status" + status + ", type=" + type + ") RESULTS: " + names);
+        Debug.println(INDENT, "testGetNamesByGIDWithStatusAndType(gid=" + gid 
+                + ", status" + status + ", type=" + type + "): " + names);
     }
 
     @Test
     public void testGetAttributesByGID() throws Exception {
         Integer gid = Integer.valueOf(50533);
         List<Attribute> attributes = manager.getAttributesByGID(gid);
-        Debug.println(0, "testGetAttributesByGID(" + gid + ") RESULTS: " + attributes);
+        Debug.println(INDENT, "testGetAttributesByGID(" + gid + "): " + attributes);
     }
 
     @Test
@@ -487,13 +428,11 @@ public class TestGermplasmDataManagerImpl{
 
         method.setMtype("GEN");
 
-        // add the method
         manager.addMethod(method);
 
         method = manager.getMethodByID(-1);
-        Debug.println(0, "testAddMethod(" + method + ") RESULTS: " + method);
+        Debug.println(INDENT, "testAddMethod(" + method + "): " + method);
 
-        // delete the method
         manager.deleteMethod(method);
     }
 
@@ -513,18 +452,14 @@ public class TestGermplasmDataManagerImpl{
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), 
                 Integer.valueOf(2), Integer.valueOf(19980610)));
 
-        // add the methods
         List<Integer> methodsAdded = manager.addMethod(methods);
-
-        Debug.println(0, "testAddMethods() Methods added: " + methodsAdded.size());
+        Debug.println(INDENT, "testAddMethods() Methods added: " + methodsAdded.size());
 
         for (Integer id: methodsAdded ) {
             Method method = manager.getMethodByID(id);
-            Debug.println(0, "  " + method);
-            // delete the method
+            Debug.println(INDENT, method);
             manager.deleteMethod(method);
         }
-
     }
 
     @Test
@@ -534,24 +469,20 @@ public class TestGermplasmDataManagerImpl{
         int numOfRows = 5;
 
         List<Method> methods = manager.getMethodsByType(type);
-        Debug.println(0, "testGetMethodsByType(type=" + type + "): " + methods.size());
-        for (Method method : methods) {
-            Debug.println(0, "  " + method);
-        }
-        List<Method> methodList = manager.getMethodsByType(type, start, numOfRows);
-        Debug.println(0, "testGetMethodsByType(type=" + type + ", start=" + start 
-                + ", numOfRows=" + numOfRows + "): " + methodList.size());
-        for (Method method : methodList) {
-            Debug.println(0, "  " + method);
-        }
+        Debug.println(INDENT, "testGetMethodsByType(type=" + type + "): " + methods.size());
+        Debug.printObjects(INDENT*2, methods);
 
+        List<Method> methodList = manager.getMethodsByType(type, start, numOfRows);
+        Debug.println(INDENT, "testGetMethodsByType(type=" + type + ", start=" + start 
+                + ", numOfRows=" + numOfRows + "): " + methodList.size());
+        Debug.printObjects(INDENT*2, methods);
     }
 
     @Test
     public void testCountMethodsByType() throws Exception {
         String type = "GEN"; // Tested with rice and cowpea
         long count = manager.countMethodsByType(type);
-        Debug.println(0, "testCountMethodsByType(type=" + type + "): " + count);
+        Debug.println(INDENT, "testCountMethodsByType(type=" + type + "): " + count);
     }
 
     @Test
@@ -561,31 +492,21 @@ public class TestGermplasmDataManagerImpl{
         int numOfRows = 5;
 
         List<Method> methods = manager.getMethodsByGroup(group);
-        Debug.println(0, "testGetMethodsByGroup(group=" + group + "): " + methods.size());
-        for (Method method : methods) {
-            Debug.println(0, "  " + method);
-        }
+        Debug.println(INDENT, "testGetMethodsByGroup(group=" + group + "): " + methods.size());
+        Debug.printObjects(INDENT*2, methods);
 
         List<Method> methodList = manager.getMethodsByGroup(group, start, numOfRows);
-        Debug.println(0, "testGetMethodsByGroup(group=" + group + ", start=" + start 
+        Debug.println(INDENT, "testGetMethodsByGroup(group=" + group + ", start=" + start 
                 + ", numOfRows=" + numOfRows + "): " + methodList.size());
-        for (Method method : methodList) {
-            Debug.println(0, "  " + method);
-        }
-
+        Debug.printObjects(INDENT, methodList);
     }
     
     @Test
     public void testGetMethodsByGroupIncludesGgroup() throws MiddlewareQueryException {
         String group = "O"; // Tested with rice and cowpea
-
         List<Method> methods = manager.getMethodsByGroupIncludesGgroup(group);
-        Debug.println(0, "testGetMethodsByGroup(group=" + group + "): " + methods.size());
-        for (Method method : methods) {
-            Debug.println(0, "  " + method);
-        }
-
-
+        Debug.println(INDENT, "testGetMethodsByGroup(group=" + group + "): " + methods.size());
+        Debug.printObjects(INDENT, methods);
     }
     
     @Test
@@ -594,11 +515,9 @@ public class TestGermplasmDataManagerImpl{
         String type= "GEN"; // Tested with rice and cowpea
 
         List<Method> methods = manager.getMethodsByGroupAndType(group, type);
-        Debug.println(0, "testGetMethodsByGroupAndType(group=" + group +"and "
+        Debug.println(INDENT, "testGetMethodsByGroupAndType(group=" + group +"and "
                 + type + "): " + methods.size());
-        for (Method method : methods) {
-            Debug.println(0, "  " + method);
-        }
+        Debug.printObjects(INDENT, methods);
     }
     
     @Test
@@ -608,18 +527,16 @@ public class TestGermplasmDataManagerImpl{
         String name = "ALLO-POLYPLOID CF"; // Tested with rice and cowpea
 
         List<Method> methods = manager.getMethodsByGroupAndTypeAndName(group, type, name);
-        Debug.println(0, "testGetMethodsByGroupAndTypeAndName(group=" + group  
+        Debug.println(INDENT, "testGetMethodsByGroupAndTypeAndName(group=" + group  
                     + " and type=" + type + " and name=" + name + "): " + methods.size());
-        for (Method method : methods) {
-            Debug.println(0, "  " + method);
-        }
+        Debug.printObjects(INDENT, methods);
     }
 
     @Test
     public void testCountMethodsByGroup() throws Exception {
         String group = "S"; // Tested with rice and cowpea
         long count = manager.countMethodsByGroup(group);
-        Debug.println(0, "testCountMethodsByGroup(group=" + group + "): " + count);
+        Debug.println(INDENT, "testCountMethodsByGroup(group=" + group + "): " + count);
     }
 
     @Test
@@ -639,7 +556,7 @@ public class TestGermplasmDataManagerImpl{
             String nameBefore = name.toString();
             name.setLocationId(locationManager.getLocationByID(1).getLocid()); //Assumption: location with id=1 exists
             manager.updateGermplasmName(name);
-            Debug.println(0, "testUpdateGermplasmName(" + nameId + ") RESULTS: " 
+            Debug.println(INDENT, "testUpdateGermplasmName(" + nameId + "): " 
                     + "\n\tBEFORE: " + nameBefore
                     + "\n\tAFTER: " + name.toString());
         }
@@ -657,7 +574,7 @@ public class TestGermplasmDataManagerImpl{
         attribute.setReferenceId(0);
         attribute.setTypeId(0);
         Integer id = manager.addGermplasmAttribute(attribute);
-        Debug.println(0, "testAddGermplasmAttribute(" + gid + ") RESULTS: " + id + " = " + attribute);
+        Debug.println(INDENT, "testAddGermplasmAttribute(" + gid + "): " + id + " = " + attribute);
     }
 
 
@@ -677,7 +594,7 @@ public class TestGermplasmDataManagerImpl{
             attribute.setTypeId(0);
             manager.updateGermplasmAttribute(attribute);
 
-            Debug.println(0, "testUpdateGermplasmAttribute(" + attributeId + ") RESULTS: "
+            Debug.println(INDENT, "testUpdateGermplasmAttribute(" + attributeId + "): "
                     + "\ntBEFORE: " + attributeString
                     + "\ntAFTER: " + attribute);
         }
@@ -689,48 +606,42 @@ public class TestGermplasmDataManagerImpl{
         String fieldType="LTYPE";
         List<UserDefinedField> userDefineField = manager
                 .getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
-        Debug.println(0, "testGetUserDefineFieldByTableNameAndType(type=" + tableName 
+        Debug.println(INDENT, "testGetUserDefineFieldByTableNameAndType(type=" + tableName 
                 + "): " + userDefineField.size());
         for (UserDefinedField u : userDefineField) {
-            Debug.println(0, "  " + u);
+            Debug.println(INDENT, u);
         }
     }
     
     @Test
     public void testGetCrossExpansion() throws Exception {
-        Debug.println(0, manager.getCrossExpansion(Integer.valueOf(75), 2));
+        Debug.println(manager.getCrossExpansion(Integer.valueOf(75), 2));
     }
     
     @Test
     public void testGetNextSequenceNumberForCrossNameInDatabase() throws MiddlewareQueryException{
         String prefix = "IR";
         Database db = Database.CENTRAL;
-        Debug.println(0, "Next number in sequence for prefix (" + prefix + ") in " + db + " database: " + 
+        Debug.println("Next number in sequence for prefix (" + prefix + ") in " + db + " database: " + 
                 manager.getNextSequenceNumberForCrossName(prefix, db));
     }
     
     @Test
     public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException{
         String prefix = "PARA7A2";
-//      Debug.println(0, "Next number in sequence for prefix (" + prefix + "): " + 
+//      Debug.println("Next number in sequence for prefix (" + prefix + "): " + 
 //              manager.getNextSequenceNumberForCrossName(prefix));
-        Debug.println(0, prefix.substring(prefix.length()-1) + " " 
+        Debug.println(prefix.substring(prefix.length()-1) + " " 
                     + prefix.substring(prefix.length()-1).matches("\\d"));
             
     }
    
     @Test
     public void testGetPreferredIdsByGIDs() throws MiddlewareQueryException{
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(Integer.valueOf(50533));
-        gids.add(Integer.valueOf(50532));
-        gids.add(Integer.valueOf(50531));
-        gids.add(Integer.valueOf(404865));
-        gids.add(Integer.valueOf(274017));
-        
+        List<Integer> gids = Arrays.asList(50533, 50532, 50531, 404865, 274017);
         Map<Integer, String> results = manager.getPrefferedIdsByGIDs(gids);
         for(Integer gid : results.keySet()){
-            Debug.println(0, gid + " : " + results.get(gid));
+            Debug.println(INDENT, gid + " : " + results.get(gid));
         }
     }
     
@@ -738,7 +649,7 @@ public class TestGermplasmDataManagerImpl{
     public void testCountAllGermplasm() throws MiddlewareQueryException {
         long count = manager.countAllGermplasm((Database.CENTRAL));
         assertNotNull(count);
-        Debug.println(0, "testCountAllGermplasm() Results: " + count);
+        Debug.println(INDENT, "testCountAllGermplasm() : " + count);
     } 
     
     @Test
@@ -746,10 +657,7 @@ public class TestGermplasmDataManagerImpl{
         List<Method> results = manager.getAllMethods();
         assertNotNull(results);
         assertTrue(!results.isEmpty());
-        for (Method result : results){
-            Debug.println(0, result.toString());
-        }
-        Debug.println(0, "Number of record/s: " +results.size());
+        Debug.printObjects(INDENT, results);
     }
     
     @Test
@@ -757,7 +665,7 @@ public class TestGermplasmDataManagerImpl{
         String name = "CHALIMBANA"; //change nval
         long count = manager.countGermplasmByPrefName(name);
         assertNotNull(count);
-        Debug.println(0, "testCountGermplasmByPrefName("+name+") Results: " + count);
+        Debug.println(INDENT, "testCountGermplasmByPrefName("+name+"): " + count);
     }
 
     @Test
@@ -765,10 +673,7 @@ public class TestGermplasmDataManagerImpl{
         List<Germplasm> germplasms = manager.getAllGermplasm(0, 100, Database.CENTRAL);
         assertNotNull(germplasms);
         assertTrue(!germplasms.isEmpty());
-        for (Germplasm germplasm : germplasms) {
-            Debug.println(0, "  " + germplasm);
-        }
-        Debug.println(0, "Number of record/s: " +germplasms.size());
+        Debug.printObjects(INDENT, germplasms);
     }
     
     @Test
@@ -779,25 +684,24 @@ public class TestGermplasmDataManagerImpl{
         Integer id = Integer.valueOf(-1);
         Attribute attributes = manager.getAttributeById(id);
         assertNotNull(attributes);
-        Debug.println(0, "testGetAttributeById("+id+") Results:");
-        Debug.println(0, "  " + attributes);
+        Debug.println(INDENT, "testGetAttributeById("+id+") Results:");
+        Debug.println(INDENT, attributes);
     }
     
     @Test
     public void testGetBibliographicalReferenceById() throws Exception {
         Integer id = Integer.valueOf(1);
         Bibref bibref = manager.getBibliographicReferenceByID(id);
-        Debug.println(0, "testGetBibliographicalReferenceById(" + id + ") RESULTS: " + bibref);
+        Debug.println(INDENT, "testGetBibliographicalReferenceById(" + id + "): " + bibref);
     }
-
     
     @Test
     public void testGetMethodByID() throws Exception {
         Integer id = Integer.valueOf(2);
         Method methodid = manager.getMethodByID(id);
         assertNotNull(methodid);
-        Debug.println(0, "testGetMethodByID("+id+") Results: ");
-        Debug.println(0, "  " + methodid);
+        Debug.println(INDENT, "testGetMethodByID("+id+"): ");
+        Debug.println(INDENT, methodid);
     }
     
     @Test
@@ -805,7 +709,7 @@ public class TestGermplasmDataManagerImpl{
         Integer id = Integer.valueOf(2);
         UserDefinedField result = manager.getUserDefinedFieldByID(id);
         assertNotNull(result);
-        Debug.println(0, "  " + result);
+        Debug.println(INDENT, result);
     }
     
     @Test
@@ -813,7 +717,7 @@ public class TestGermplasmDataManagerImpl{
         Integer id = Integer.valueOf(2);
         Bibref result = manager.getBibliographicReferenceByID(id);
         assertNotNull(result);
-        Debug.println(0, "  " + result);
+        Debug.println(INDENT, result);
     }  
     
     @Test
@@ -824,10 +728,8 @@ public class TestGermplasmDataManagerImpl{
         List<Germplasm> germplasmList = manager.getGermplasmByLocationId(name, locationID);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByLocationId(" + name + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByLocationId(" + name + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
     
     @Test
@@ -838,55 +740,38 @@ public class TestGermplasmDataManagerImpl{
         List<Germplasm> germplasmList = manager.getGermplasmByGidRange(startGID, endGID);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByGidRange(" + startGID + "," + endGID + ") RESULTS: ");
-        for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
-        }
+        Debug.println(INDENT, "testGetGermplasmByGidRange(" + startGID + "," + endGID + "): ");
+        Debug.printObjects(INDENT, germplasmList);
     }
     
     @Test
     public void testGetGermplasmByGIDList() throws Exception {
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(1);
-        gids.add(-1);
-        gids.add(5);
+        List<Integer> gids = Arrays.asList(1, -1, 5);
         
         List<Germplasm> germplasmList = manager.getGermplasms(gids);
         assertTrue(germplasmList != null);
 
-        Debug.println(0, "testGetGermplasmByGidList(" + gids + ") RESULTS: ");
+        Debug.println(INDENT, "testGetGermplasmByGidList(" + gids + "): ");
         for (Germplasm g : germplasmList) {
-            Debug.println(0, "  " + g);
+            Debug.println(INDENT, g);
         }
     }
     
     @Test
     public void testGetPreferredNamesByGIDs() throws MiddlewareQueryException{
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(Integer.valueOf(50533));
-        gids.add(Integer.valueOf(50532));
-        gids.add(Integer.valueOf(50531));
-        gids.add(Integer.valueOf(404865));
-        gids.add(Integer.valueOf(274017));
-        
+        List<Integer> gids = Arrays.asList(50533, 50532, 50531, 404865, 274017);
         Map<Integer, String> results = manager.getPreferredNamesByGids(gids);
-        Debug.println(0, "RESULTS:");
         for(Integer gid : results.keySet()){
-            Debug.println(0, gid + " : " + results.get(gid));
+            Debug.println(INDENT, gid + " : " + results.get(gid));
         }
     }
     
     @Test
     public void testGetLocationNamesByGIDs() throws MiddlewareQueryException{
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(Integer.valueOf(50532));
-        gids.add(Integer.valueOf(1));
-        gids.add(Integer.valueOf(42268));
-        gids.add(Integer.valueOf(151));
-        
+        List<Integer> gids = Arrays.asList(50532, 1, 42268, 151);
         Map<Integer, String> results = manager.getLocationNamesByGids(gids);
         for(Integer gid : results.keySet()){
-            Debug.println(0, gid + " : " + results.get(gid));
+            Debug.println(INDENT, gid + " : " + results.get(gid));
         }
     }
     
@@ -898,70 +783,49 @@ public class TestGermplasmDataManagerImpl{
             
       List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, includeParents);
       
-      Debug.println(0, "###############################");
-      Debug.println(0, " searchForGermplasm("+q+")");
-      Debug.println(0, "###############################");
-      
+      Debug.println(INDENT, "searchForGermplasm(" + q + "): ");
       for(Germplasm g : results){
           String name = "";
-          if(g.getPreferredName()!=null)
-              if(g.getPreferredName().getNval()!=null)
+          if(g.getPreferredName()!= null)
+              if(g.getPreferredName().getNval() != null)
                   name = g.getPreferredName().getNval().toString();
-          Debug.println(3, g.getGid() + " - " + name);
+          Debug.println(INDENT, g.getGid() + " : " + name);
       }
   }         
   
   @Test
   public void getGermplasmDatesByGids() throws MiddlewareQueryException{
-      List<Integer> gids = new ArrayList<Integer>();
-      gids.add(50533);
-      gids.add(-1);
+      List<Integer> gids = Arrays.asList(50533, -1);
       Map<Integer,Integer> results = manager.getGermplasmDatesByGids(gids);
-      Debug.println(0, "###############################");
-      Debug.println(0, " getGermplasmDatesByGids("+gids+")");
-      Debug.println(0, "###############################");
-      Debug.println(0, results.toString());
+      Debug.println(INDENT, "getGermplasmDatesByGids(" + gids + "): ");
+      Debug.println(INDENT, results.toString());
   }
   
   @Test
   public void getMethodsByGids() throws MiddlewareQueryException{
-      List<Integer> gids = new ArrayList<Integer>();
-      gids.add(50533);
-      gids.add(-145);
+      List<Integer> gids = Arrays.asList(50533, -145);
       Map<Integer,Object> results = manager.getMethodsByGids(gids);
-      Debug.println(0, "###############################");
-      Debug.println(0, " getGermplasmDatesByGids("+gids+")");
-      Debug.println(0, "###############################");
-      Debug.println(0, results.toString());
+      Debug.println(INDENT, "getGermplasmDatesByGids(" + gids + "): ");
+      Debug.println(INDENT, results.toString());
   }  
   
     @Test
     public void getAttributeTypesByGIDList() throws MiddlewareQueryException {
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(110);
-        gids.add(50533);
-        gids.add(202580);
+        List<Integer> gids = Arrays.asList(110, 50533, 202580);
         List<UserDefinedField> results = manager.getAttributeTypesByGIDList(gids);
-        Debug.println(0, "###############################");
-        Debug.println(0, " getAttributeTypesByGIDList("+gids+")");
-        Debug.println(0, "###############################");
+        Debug.println(INDENT, "getAttributeTypesByGIDList(" + gids + "): ");
         for(UserDefinedField field : results) {
-            Debug.println(0, field.getFname());
+            Debug.println(INDENT, field.getFname());
         }
     }
     
     @Test
     public void getAttributeValuesByTypeAndGIDList() throws MiddlewareQueryException {
-        List<Integer> gids = new ArrayList<Integer>();
-        gids.add(110);
-        gids.add(50533);
-        gids.add(202580);
+        List<Integer> gids = Arrays.asList(110, 50533, 202580);
         Integer attributeType = 1115;
         Map<Integer, String> results = manager.getAttributeValuesByTypeAndGIDList(attributeType, gids);
-        Debug.println(0, "###############################");
-        Debug.println(0, " getAttributeValuesByTypeAndGIDList(" + attributeType + ", "+gids+")");
-        Debug.println(0, "###############################");
-        Debug.println(0, results.toString());
+        Debug.println(INDENT, "getAttributeValuesByTypeAndGIDList(" + attributeType + ", " + gids + "): ");
+        Debug.println(INDENT, results.toString());
     }
   
     @AfterClass

@@ -1507,7 +1507,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
 
-
+    @Deprecated
     @Override
     public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<SNPDataRow> rows) throws MiddlewareQueryException {
 
@@ -1559,8 +1559,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             if (rows != null && rows.size() > 0) {
                 for (SNPDataRow row : rows) {
                     Marker marker = row.getMarker();
-                    marker.setMarkerType(TYPE_SNP);
-                    Integer markerId = saveMarker(marker, TYPE_SNP);
+//                    marker.setMarkerType(TYPE_SNP);
+                    Integer markerId = saveMarker(marker); //saveMarker(marker, TYPE_SNP);
                     marker.setMarkerId(markerId);
 
                     //saveAccMetadataSet(datasetId, row.getAccMetadataSet());
@@ -1606,8 +1606,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, 
-            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows) 
+    public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
+                    List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows) 
                     throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1615,12 +1615,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             trans = session.beginTransaction();
 
-            Integer datasetId = saveDataset(dataset, TYPE_SNP, DATA_TYPE_INT);
+            Integer datasetId = saveDataset(dataset);
             dataset.setDatasetId(datasetId);
             
             saveDatasetUser(datasetId, datasetUser);
             
-            saveMarkers(markers, TYPE_SNP);
+            saveMarkers(markers);
             
             for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
                 markerMetadataSet.setDatasetId(datasetId);
@@ -2642,6 +2642,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     }
 
+    private Integer saveDataset(Dataset dataset) throws Exception {
+        requireLocalDatabaseInstance();
+        DatasetDAO datasetDao = getDatasetDao();
+        Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
+        dataset.setDatasetId(datasetGeneratedId);
+        Dataset datasetRecordSaved = datasetDao.merge(dataset);
+        return datasetRecordSaved.getDatasetId();
+    }
+
     
     private Integer updateDataset(Dataset dataset, String datasetType, String dataType) throws Exception {
         requireLocalDatabaseInstance();
@@ -2666,14 +2675,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
       Integer markerId = marker.getMarkerId();
 
-      //TODO Validations are disabled for performance testing. Re-enabled later
         //If the marker has same marker name existing in local, use the existing record.
-//        if (markerId == null) {
-//            Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
-//            if (markerIdWithName != null) {
-//                markerId = markerIdWithName;
-//            }
-//        }
+        if (markerId == null) {
+            Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
+            if (markerIdWithName != null) {
+                markerId = markerIdWithName;
+            }
+        }
         
         // If marker is existing in central, do not allow the insertion to local
         if (markerId != null && markerId >= 0){
@@ -2704,7 +2712,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         Integer markerId = marker.getMarkerId();
 
         //TODO Validations are disabled for performance testing. Re-enabled later
-        // If the marker has same marker name existing in local, use the existing record.
+//       //  If the marker has same marker name existing in local, use the existing record.
 //        if (markerId == null) {
 //          requireLocalDatabaseInstance();
 //            Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
@@ -2713,8 +2721,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 //            }
 //        }
         
-        // If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
-        if (markerId == null) {
+//        if (markerId == null) {
+        // Save the marker
             requireLocalDatabaseInstance();
             MarkerDAO markerDao = getMarkerDao();
             Integer markerGeneratedId = markerDao.getNegativeId("markerId");
@@ -2722,7 +2730,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             marker.setMarkerType(markerType);
             Marker markerRecordSaved = markerDao.merge(marker);
             markerId = markerRecordSaved.getMarkerId();
-        }
+//        }
 
         if (markerId == null) {
             throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
@@ -2731,26 +2739,37 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return markerId;
     }
     
+    private Integer saveMarker(Marker marker) throws Exception {
+        requireLocalDatabaseInstance();
+        MarkerDAO markerDao = getMarkerDao();
+        Integer markerGeneratedId = markerDao.getNegativeId("markerId");
+        marker.setMarkerId(markerGeneratedId);
+        Marker markerRecordSaved = markerDao.merge(marker);
+        return markerRecordSaved.getMarkerId();
+    }
+    
     private void saveMarkers(List<Marker> markers, String markerType) throws Exception {
         requireLocalDatabaseInstance();
         MarkerDAO markerDao = getMarkerDao();
         Integer markerGeneratedId = markerDao.getNegativeId("markerId");
         Integer rowsSaved = 0;
 
-        for (Marker marker: markers){
-            Integer markerId = marker.getMarkerId();
-            if (markerId == null) {
-                marker.setMarkerId(markerGeneratedId);
-                marker.setMarkerType(markerType);
-                markerDao.merge(marker);
-                markerGeneratedId--;
-                
-                // Flush
-                rowsSaved++;
-                if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
-                    markerDao.flush();
-                    markerDao.clear();
-                }
+        if (markers != null){
+            for (Marker marker: markers){
+    //            Integer markerId = marker.getMarkerId();
+    //            if (markerId == null) {
+                    marker.setMarkerId(markerGeneratedId);
+                    marker.setMarkerType(markerType);
+                    markerDao.merge(marker);
+                    markerGeneratedId--;
+                    
+                    // Flush
+                    rowsSaved++;
+                    if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
+                        markerDao.flush();
+                        markerDao.clear();
+                    }
+    //            }
             }
         }
     }
@@ -2761,11 +2780,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         MarkerDAO markerDao = getMarkerDao();
         Integer markerGeneratedId = markerDao.getNegativeId("markerId");
         Integer rowsSaved = 0;
-        for (Marker marker: markers){
-            Integer markerId = marker.getMarkerId();
-            
-            // If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
-            if (markerId == null) {
+        if (markers != null){
+            for (Marker marker: markers){
                 marker.setMarkerId(markerGeneratedId);
                 markerDao.merge(marker);
                 markerGeneratedId--;
@@ -3630,8 +3646,5 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	return super.getAllFromCentralAndLocalByMethod(getDartValuesDao(), "getDartValuesByMarkerIds"
     			, new Object[]{markerIds}, new Class[]{List.class});
     }
-
-
-    
 
 }

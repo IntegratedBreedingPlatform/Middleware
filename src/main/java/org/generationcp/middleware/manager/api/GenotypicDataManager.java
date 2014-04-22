@@ -1464,6 +1464,7 @@ public interface GenotypicDataManager{
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<SNPDataRow> rows) throws MiddlewareQueryException;
     
     /**

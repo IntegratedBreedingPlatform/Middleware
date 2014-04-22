@@ -48,36 +48,25 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
-public class TestGenotypicDataManagerImplUploadFunctions{
+public class TestGenotypicDataManagerImplUploadFunctions extends TestDataManager{
 
     private static ManagerFactory       factory;
     private static GenotypicDataManager manager;
 
-    private long                        startTime;
-
-    private static final int   			INDENT              = 3;
-
-    @Rule
-    public TestName                     name                = new TestName();
-
-    private static final String         DATASET             = "Dataset";
-    private static final String         DATASET_USERS       = "DatasetUsers";
-    private static final String         ACC_METADATA_SET    = "AccMetadataSet";
-    private static final String         MARKER_METADATA_SET = "MarkerMetadataSet";
-    private static final String         ALLELE_VALUES       = "AlleleValues";
-    private static final String         CHAR_VALUES         = "CharValues";
-    private static final String         MAPPING_POP         = "MappingPop";
-    private static final String         MAPPING_POP_VALUES  = "MappingPopValues";
-    private static final String         DART_VALUES         = "DartValues";
-    private static final String         MARKER              = "Marker";
+    private static final String DATASET             = "Dataset";
+    private static final String DATASET_USERS       = "DatasetUsers";
+    private static final String ACC_METADATA_SET    = "AccMetadataSet";
+    private static final String MARKER_METADATA_SET = "MarkerMetadataSet";
+    private static final String ALLELE_VALUES       = "AlleleValues";
+    private static final String CHAR_VALUES         = "CharValues";
+    private static final String MAPPING_POP         = "MappingPop";
+    private static final String MAPPING_POP_VALUES  = "MappingPopValues";
+    private static final String DART_VALUES         = "DartValues";
+    private static final String MARKER              = "Marker";
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -88,20 +77,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         factory = new ManagerFactory(local, central);
         manager = factory.getGenotypicDataManager();
     }
-
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = "
-                + ((double) elapsedTime / 1000000000) + " s");
-    }
-
 
     private Dataset createDataset() throws Exception {
         Integer datasetId = null; // Crop tested: Groundnut
@@ -306,7 +281,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
         assertTrue(addStatus);
 
-        Debug.println(0, "testSetQTL() Added: ");
+        Debug.println("testSetQTL() Added: ");
         Debug.println(3, datasetUser.toString());
         Debug.println(3, dataset.toString());
         Debug.printObjects(INDENT, dataRows);
@@ -314,7 +289,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetDart() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
@@ -331,7 +305,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         Boolean addStatus = manager.setDart(dataset, datasetUser, dataRows);
 
         assertTrue(addStatus);
-        Debug.println(0, "testSetDArT() Added: ");
+        Debug.println("testSetDArT() Added: ");
         Debug.println(3, dataset.toString());
         Debug.println(3, datasetUser.toString());
         Debug.printObjects(INDENT, dataRows);
@@ -339,7 +313,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     
     @Test
     public void testSetDartDuplicateDataset() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -362,7 +335,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetSSR() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 1000)); // Used to insert a new dataset
@@ -378,7 +350,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         Boolean addStatus = manager.setSSR(dataset, datasetUser, dataRows);
 
         assertTrue(addStatus);
-        Debug.println(0, "testSetSSR() Added: ");
+        Debug.println("testSetSSR() Added: ");
         Debug.println(3, dataset.toString());
         Debug.println(3, datasetUser.toString());
         Debug.printObjects(INDENT, dataRows);
@@ -387,7 +359,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetSSRtDuplicateDataset() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -410,7 +381,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetSNP() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
@@ -418,6 +388,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
         Marker marker = (Marker) mappingRecords.get(MARKER);
+        marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
         List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
@@ -427,21 +398,21 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
         Boolean addStatus = manager.setSNP(dataset, datasetUser, dataRows);
         assertTrue(addStatus);
-//        Debug.println(0, "testSetSNP() Added: ");
-//        Debug.println(3, dataset.toString());
-//        Debug.println(3, datasetUser.toString());
-//        Debug.printObjects(INDENT, dataRows);
+        Debug.println("testSetSNP() Added: ");
+        Debug.println(INDENT, dataset.toString());
+        Debug.println(INDENT, datasetUser.toString());
+        Debug.printObjects(INDENT, dataRows);
     }
 
     @Test
     public void testSetSNPDuplicateDataset() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
         Marker marker = (Marker) mappingRecords.get(MARKER);
+        marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
         List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
@@ -458,7 +429,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetSNP2() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
@@ -472,6 +442,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
         List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
         for (int i=0; i<210*260; i++){
+            marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
             markers.add(marker);
             markerMetadataSet.setMarkerId(-1);
             markerMetadataSets.add(markerMetadataSet);
@@ -484,7 +455,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetMappingABH() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -518,7 +488,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);
 
         assertTrue(addStatus);
-        Debug.println(0, "testSetMappingABH() Added: ");
+        Debug.println("testSetMappingABH() Added: ");
         Debug.println(3, dataset.toString());
         Debug.println(3, datasetUser.toString());
         Debug.println(3, mappingPop.toString());
@@ -527,7 +497,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetMappingABHDuplicateDataset() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -566,7 +535,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetMappingAllelicSNP() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
@@ -584,7 +552,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         Boolean addStatus = manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, dataRows);
 
         assertTrue(addStatus);
-        Debug.println(0, "testSetMappingAllelicSNP() Added: ");
+        Debug.println("testSetMappingAllelicSNP() Added: ");
         Debug.println(3, dataset.toString());
         Debug.println(3, datasetUser.toString());
         Debug.println(3, mappingPop.toString());
@@ -593,7 +561,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetMappingAllelicSNPDuplicateDataset() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -617,7 +584,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetMappingAllelicSSRDArT() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
@@ -638,7 +604,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         Boolean addStatus = manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, dataRows);
 
         assertTrue(addStatus);
-        Debug.println(0, "testSetMappingAllelicSSRDArT() Added: ");
+        Debug.println("testSetMappingAllelicSSRDArT() Added: ");
         Debug.println(3, dataset.toString());
         Debug.println(3, datasetUser.toString());
         Debug.println(3, mappingPop.toString());
@@ -647,7 +613,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 
     @Test
     public void testSetMappingAllelicSSRDArTDuplicateDataset() throws Exception {
-
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
@@ -672,7 +637,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         }
     }
     
-    
     // ============================================ UPDATE FUNCTIONS =====================================================
 
     private Dataset getTestDatasetByType(GdmsType type, GdmsType mappingType) throws MiddlewareQueryException{
@@ -686,7 +650,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	if (datasets.size() > 0){
 			return datasets.get(0);
     	}
-    	Debug.println(0, "No dataset of type " + type + " found in the local database for testing");
+    	Debug.println("No dataset of type " + type + " found in the local database for testing");
     	return null;
     }
 
@@ -754,7 +718,6 @@ public class TestGenotypicDataManagerImplUploadFunctions{
 		return dartValues;
     }
 
-    
     @Test
     public void testUpdateDart() throws Exception {
     	
@@ -770,8 +733,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	updateDataset(dataset, updateId.toString());
     	
     	List<DartDataRow> rows = manager.getDartDataRows(datasetId);
-    	Debug.println(0, "ROWS BEFORE: ");
-    	Debug.printObjects(4, rows);
+    	Debug.println("ROWS BEFORE: ");
+    	Debug.printObjects(INDENT, rows);
     	
     	// Update existing rows
     	List<DartDataRow> updatedRows = new ArrayList<DartDataRow>();
@@ -806,7 +769,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
         DartDataRow newRow = new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues, dartValues); 
 		updatedRows.add(newRow);
-    	Debug.println(0, "ADD OR UPDATE ROW: " + newRow);
+    	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
     	manager.updateDart(dataset, updatedRows);
@@ -816,8 +779,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	assertEquals(dataset, datasetAfter); // Dataset updated
 
     	List<DartDataRow> rowsAfter = manager.getDartDataRows(datasetId);
-    	Debug.println(0, "ROWS AFTER: ");
-    	Debug.printObjects(4, rowsAfter);
+    	Debug.println("ROWS AFTER: ");
+    	Debug.printObjects(INDENT, rowsAfter);
     	
     }
     
@@ -835,8 +798,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	updateDataset(dataset, updateId.toString());
     	
     	List<SNPDataRow> rows = manager.getSNPDataRows(datasetId);
-    	Debug.println(0, "ROWS BEFORE: ");
-    	Debug.printObjects(4, rows);
+    	Debug.println("ROWS BEFORE: ");
+    	Debug.printObjects(INDENT, rows);
     	
     	// Update existing rows
     	boolean isMarkerUpdated = false;
@@ -871,7 +834,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
         SNPDataRow newRow = new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues); 
 		updatedRows.add(newRow);
-    	Debug.println(0, "ADD OR UPDATE ROW: " + newRow);
+    	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
     	manager.updateSNP(dataset, updatedRows);
@@ -881,9 +844,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	assertEquals(dataset, datasetAfter); // Dataset updated
 
     	List<SNPDataRow> rowsAfter = manager.getSNPDataRows(datasetId);
-    	Debug.println(0, "ROWS AFTER: ");
-    	Debug.printObjects(4, rowsAfter);
-    	
+    	Debug.println("ROWS AFTER: ");
+    	Debug.printObjects(INDENT, rowsAfter);
     }
     
     @Test
@@ -901,8 +863,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	updateDataset(dataset, updateId.toString());
     	
     	List<SSRDataRow> rows = manager.getSSRDataRows(datasetId);
-    	Debug.println(0, "ROWS BEFORE: ");
-    	Debug.printObjects(4, rows);
+    	Debug.println("ROWS BEFORE: ");
+    	Debug.printObjects(INDENT, rows);
     	
     	// Update existing rows
     	List<SSRDataRow> updatedRows = new ArrayList<SSRDataRow>();
@@ -933,7 +895,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         SSRDataRow newRow = new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues); 
 		updatedRows.add(newRow);
-    	Debug.println(0, "ADD OR UPDATE ROW: " + newRow);
+    	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
     	manager.updateSSR(dataset, updatedRows);
@@ -943,9 +905,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	assertEquals(dataset, datasetAfter); // Dataset updated
 
     	List<SSRDataRow> rowsAfter = manager.getSSRDataRows(datasetId);
-    	Debug.println(0, "ROWS AFTER: ");
-    	Debug.printObjects(4, rowsAfter);
-    	
+    	Debug.println("ROWS AFTER: ");
+    	Debug.printObjects(INDENT, rowsAfter);
     }
     
     @Test
@@ -966,8 +927,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	updateMappingPop(mappingPop, updateId);
     	
     	List<MappingABHRow> rows = manager.getMappingABHRows(datasetId);
-    	Debug.println(0, "ROWS BEFORE: ");
-    	Debug.printObjects(4, rows);
+    	Debug.println("ROWS BEFORE: ");
+    	Debug.printObjects(INDENT, rows);
     	
     	// Update existing rows
     	List<MappingABHRow> updatedRows = new ArrayList<MappingABHRow>();
@@ -998,7 +959,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         MappingABHRow newRow = new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues); 
 		updatedRows.add(newRow);
-    	Debug.println(0, "ADD OR UPDATE ROW: " + newRow);
+    	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
     	manager.updateMappingABH(dataset, mappingPop, updatedRows);
@@ -1012,10 +973,9 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
     	
     	List<MappingABHRow> rowsAfter = manager.getMappingABHRows(datasetId);
-    	Debug.println(0, "ROWS AFTER: ");
-    	Debug.printObjects(4, rowsAfter);
+    	Debug.println("ROWS AFTER: ");
+    	Debug.printObjects(INDENT, rowsAfter);
     }
-    
     
     @Test
     public void testUpdateMappingAllelicSNP() throws Exception {
@@ -1035,8 +995,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	updateMappingPop(mappingPop, updateId);
     	
     	List<MappingAllelicSNPRow> rows = manager.getMappingAllelicSNPRows(datasetId);
-    	Debug.println(0, "ROWS BEFORE: ");
-    	Debug.printObjects(4, rows);
+    	Debug.println("ROWS BEFORE: ");
+    	Debug.printObjects(INDENT, rows);
     	
     	// Update existing rows
     	List<MappingAllelicSNPRow> updatedRows = new ArrayList<MappingAllelicSNPRow>();
@@ -1071,7 +1031,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
         MappingAllelicSNPRow newRow = new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, charValues); 
 		updatedRows.add(newRow);
-    	Debug.println(0, "ADD OR UPDATE ROW: " + newRow);
+    	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
     	manager.updateMappingAllelicSNP(dataset, mappingPop, updatedRows);
@@ -1085,8 +1045,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
     	
     	List<MappingABHRow> rowsAfter = manager.getMappingABHRows(datasetId);
-    	Debug.println(0, "ROWS AFTER: ");
-    	Debug.printObjects(4, rowsAfter);
+    	Debug.println("ROWS AFTER: ");
+    	Debug.printObjects(INDENT, rowsAfter);
     }
 
     @Test
@@ -1107,8 +1067,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	updateMappingPop(mappingPop, updateId.toString());
     	
     	List<MappingAllelicSSRDArTRow> rows = manager.getMappingAllelicSSRDArTRows(datasetId);
-    	Debug.println(0, "ROWS BEFORE: ");
-    	Debug.printObjects(4, rows);
+    	Debug.println("ROWS BEFORE: ");
+    	Debug.printObjects(INDENT, rows);
     	
     	// Update existing rows
     	List<MappingAllelicSSRDArTRow> updatedRows = new ArrayList<MappingAllelicSSRDArTRow>();
@@ -1147,7 +1107,7 @@ public class TestGenotypicDataManagerImplUploadFunctions{
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
         MappingAllelicSSRDArTRow newRow = new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, alleleValues, dartValues); 
 		updatedRows.add(newRow);
-    	Debug.println(0, "ADD OR UPDATE ROW: " + newRow);
+    	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
     	manager.updateMappingAllelicSSRDArT(dataset, mappingPop, updatedRows);
@@ -1161,8 +1121,8 @@ public class TestGenotypicDataManagerImplUploadFunctions{
     	assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
     	
     	List<MappingABHRow> rowsAfter = manager.getMappingABHRows(datasetId);
-    	Debug.println(0, "ROWS AFTER: ");
-    	Debug.printObjects(4, rowsAfter);
+    	Debug.println("ROWS AFTER: ");
+    	Debug.printObjects(INDENT, rowsAfter);
     }
 
     @AfterClass

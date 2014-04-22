@@ -29,23 +29,14 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
-public class TestLocationDataManagerImpl{
+public class TestLocationDataManagerImpl extends TestDataManager{
 
     private static ManagerFactory factory;
     private static LocationDataManager manager;
-
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -57,38 +48,20 @@ public class TestLocationDataManagerImpl{
         manager = factory.getLocationDataManager();
     }
 
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-    
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " 
-                + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
-    }
-    
     @Test
     public void testGetAllLocationsWithStartNumRows() throws Exception {
         List<Location> locationList = manager.getAllLocations(5, 10);
         assertTrue(locationList != null);
-        Debug.println(0, "testGetAllLocations(5,10) RESULTS: ");
-        for (Location l : locationList) {
-            Debug.println(0, "  " + l);
-        }
+        Debug.println(INDENT, "testGetAllLocations(5,10): ");
+        Debug.printObjects(INDENT, locationList);
     }
     
-
     @Test
     public void testGetAllLocations() throws Exception {
         List<Location> locationList = manager.getAllLocations();
         assertTrue(locationList != null);
-        Debug.println(0, "testGetAllLocations() RESULTS: ");
-        for (Location l : locationList) {
-            Debug.println(0, "  " + l);
-        }
+        Debug.println(INDENT, "testGetAllLocations(): ");
+        Debug.printObjects(INDENT, locationList);
     }
 
     @Test
@@ -113,11 +86,8 @@ public class TestLocationDataManagerImpl{
         assertTrue(results != null);
         assertTrue(results.size() < 5);
 
-        Debug.println(0, "testGetLocationsByIDs() RESULTS: ");
-        for (Location l : results) {
-            Debug.println(0, "  " + l);
-        }
-
+        Debug.println(INDENT, "testGetLocationsByIDs(): ");
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -142,35 +112,28 @@ public class TestLocationDataManagerImpl{
         assertTrue(results != null);
         assertTrue(results.size() < 5);
 
-        Debug.println(0, "testGetLocationDetailsByIDs() RESULTS: ");
-        for (LocationDetails l : results) {
-            Debug.println(0, "  " + l);
-        }
-
+        Debug.println(INDENT, "testGetLocationDetailsByIDs(): ");
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
     public void testGetAllCountry() throws Exception {
         List<Country> countryList = manager.getAllCountry();
         assertTrue(countryList != null);
-        for (Country c : countryList) {
-            Debug.println(0, "  " + c);
-        }
+        Debug.printObjects(INDENT, countryList);
     }
     
     @Test
     public void testLocationDetails() throws Exception {
         List<LocationDetails> locationList = manager.getLocationDetailsByLocId(1, 1, 1);
         assertTrue(locationList != null);
-        for (LocationDetails c : locationList) {
-            Debug.println(0, "  " + c);
-        }
+        Debug.printObjects(INDENT, locationList);
     }
 
     @Test
     public void testCountAllLocations() throws Exception {
         long count = manager.countAllLocations();
-        Debug.println(0, "testCountAllLocations(): " + count);
+        Debug.println(INDENT, "testCountAllLocations(): " + count);
     }
 
     @Test
@@ -181,24 +144,20 @@ public class TestLocationDataManagerImpl{
 
         List<Location> locationList = manager.getLocationsByName(name, Operation.EQUAL);
         assertTrue(locationList != null);
-        Debug.println(0, "testGetLocationsByName(" + name + ") RESULTS: " + locationList.size());
-        for (Location l : locationList) {
-            Debug.println(0, "  " + l);
-        }
+        Debug.println(INDENT, "testGetLocationsByName(" + name + "): " + locationList.size());
+        Debug.printObjects(INDENT, locationList);
         
         List<Location> locationList2 = manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
-        Debug.println(0, "testGetLocationsByName(" + name + ", start=" + start 
-                + ", numOfRows=" + numOfRows + ") RESULTS: ");
-        for (Location l : locationList2) {
-            Debug.println(0, "  " + l);
-        }
+        Debug.println(INDENT, "testGetLocationsByName(" + name + ", start=" + start 
+                + ", numOfRows=" + numOfRows + "): ");
+        Debug.printObjects(INDENT, locationList2);
     }
 
     @Test
     public void testCountLocationsByName() throws Exception {
         String name = "AFGHANISTAN";
         long count = manager.countLocationsByName(name, Operation.EQUAL);
-        Debug.println(0, "testCountLocationByName(" + name + "): " + count);
+        Debug.println(INDENT, "testCountLocationByName(" + name + "): " + count);
     }
 
     @Test
@@ -209,18 +168,14 @@ public class TestLocationDataManagerImpl{
         int numOfRows = 5;
 
         List<Location> locations = manager.getLocationsByCountry(country);
-        Debug.println(0, "testGetLocationByCountry(country=" + country + "): " + locations.size());
-        for (Location location : locations) {
-            Debug.println(0, "  " + location);
-        }
+        Debug.println(INDENT, "testGetLocationByCountry(country=" + country + "): " + locations.size());
+        Debug.printObjects(INDENT, locations);
 
         List<Location> locationList = manager.getLocationsByCountry(country, start, numOfRows);
-        Debug.println(0, "testGetLocationByCountry(country=" + country + ", start=" + start 
+        Debug.println(INDENT, "testGetLocationByCountry(country=" + country + ", start=" + start 
                 + ", numOfRows=" + numOfRows + "): "
                 + locationList.size());
-        for (Location location : locationList) {
-            Debug.println(0, "  " + location);
-        }
+        Debug.printObjects(INDENT, locationList);
     }
     
     @Test
@@ -230,11 +185,9 @@ public class TestLocationDataManagerImpl{
         int type=405;
 
         List<Location> locations = manager.getLocationsByCountryAndType(country, type);
-        Debug.println(0, "testGetLocationByCountryAndType(country=" + country 
+        Debug.println(INDENT, "testGetLocationByCountryAndType(country=" + country 
                 + "): type= " + type + ":" + locations.size());
-        for (Location location : locations) {
-            Debug.println(0, "  " + location);
-        }
+        Debug.printObjects(INDENT, locations);
     }
 
 
@@ -243,7 +196,7 @@ public class TestLocationDataManagerImpl{
         Integer id = 171; // Tested in rice db. 171 = Philippines
         Country country = manager.getCountryById(id);
         long count = manager.countLocationsByCountry(country);
-        Debug.println(0, "testCountLocationByCountry(country=" + country + "): " + count);
+        Debug.println(INDENT, "testCountLocationByCountry(country=" + country + "): " + count);
     }
 
     @Test
@@ -253,25 +206,21 @@ public class TestLocationDataManagerImpl{
         int numOfRows = 5;
 
         List<Location> locations = manager.getLocationsByType(type);
-        Debug.println(0, "testGetLocationByType(type=" + type + "): " + locations.size());
-        for (Location location : locations) {
-            Debug.println(0, "  " + location);
-        }
+        Debug.println(INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
+        Debug.printObjects(INDENT, locations);
 
         List<Location> locationList = manager.getLocationsByType(type, start, numOfRows);
-        Debug.println(0, "testGetLocationByType(type=" + type + ", start=" + start 
+        Debug.println(INDENT, "testGetLocationByType(type=" + type + ", start=" + start 
                 + ", numOfRows=" + numOfRows + "): "
                 + locationList.size());
-        for (Location location : locationList) {
-            Debug.println(0, "  " + location);
-        }
+        Debug.printObjects(INDENT, locations);
     }
 
     @Test
     public void testCountLocationsByType() throws Exception {
         Integer type = 405; // Tested in rice db
         long count = manager.countLocationsByType(type);
-        Debug.println(0, "testCountLocationByType(type=" + type + "): " + count);
+        Debug.println(INDENT, "testCountLocationByType(type=" + type + "): " + count);
     }
 
     @Test
@@ -290,7 +239,7 @@ public class TestLocationDataManagerImpl{
 
         // add the location
         Integer id = manager.addLocation(location);
-        Debug.println(0, "testAddLocation(" + location + ") RESULTS: " + id + "  \n  " 
+        Debug.println(INDENT, "testAddLocation(" + location + "): " + id + "  \n  " 
                 + manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 
         // cleanup
@@ -333,9 +282,9 @@ public class TestLocationDataManagerImpl{
         // add the location
         List<Integer> locationsAdded = manager.addLocation(locations);
 
-        Debug.println(0, "testAddLocations() Locations added: " + locationsAdded.size());
-        Debug.println(0, "  " + manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
-        Debug.println(0, "  " + manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
+        Debug.println(INDENT, "testAddLocations() Locations added: " + locationsAdded.size());
+        Debug.println(INDENT, manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
+        Debug.println(INDENT, manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
 
         // cleanup
         manager.deleteLocation(manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL).get(0));
@@ -345,44 +294,32 @@ public class TestLocationDataManagerImpl{
     public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
         String tableName="LOCATION";
         String fieldType="LTYPE";
-        List<UserDefinedField> userDefineField = manager
+        List<UserDefinedField> userDefinedField = manager
                 .getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
-        Debug.println(0, "testGetUserDefineFieldByTableNameAndType(type=" + tableName 
-                + "): " + userDefineField.size());
-        for (UserDefinedField u : userDefineField) {
-            Debug.println(0, "  " + u);
-        }
+        Debug.println(INDENT, "testGetUserDefineFieldByTableNameAndType(type=" + tableName 
+                + "): " + userDefinedField.size());
+        Debug.printObjects(INDENT, userDefinedField);
     }
     
     @Test
     public void testGetAllBreedingLocations() throws MiddlewareQueryException {
         List<Location> locations = manager.getAllBreedingLocations();
-        Debug.println(0, "getAllBreedingLocations()  " + locations);
+        Debug.println(INDENT, "getAllBreedingLocations()  " + locations);
     }    
     
     @Test
     public void testCountAllBreedingLocations() throws MiddlewareQueryException {
         Long locationCount = (Long) manager.countAllBreedingLocations();
-        Debug.println(0, "countAllBreedingLocations() - Total Count = " + locationCount);
+        Debug.println(INDENT, "countAllBreedingLocations() - Total Count = " + locationCount);
     }        
    
-    @Test
-    public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException{
-        String prefix = "PARA7A2";
-//      Debug.println(0, "Next number in sequence for prefix (" + prefix + "): " + 
-//              manager.getNextSequenceNumberForCrossName(prefix));
-        Debug.println(0, prefix.substring(prefix.length()-1) + " " 
-                    + prefix.substring(prefix.length()-1).matches("\\d"));
-            
-    }
-    
     @Test
     public void testGetCountryById() throws Exception {
         Integer id = Integer.valueOf(1);
         Country countries = manager.getCountryById(id);
         assertNotNull(countries);
-        Debug.println(0, "testGetCountryById("+id+") Results:");
-        Debug.println(0, "  " + countries);
+        Debug.println(INDENT, "testGetCountryById("+id+"): ");
+        Debug.println(INDENT, countries);
     }
 
     @Test
@@ -390,8 +327,8 @@ public class TestLocationDataManagerImpl{
         Integer id = Integer.valueOf(1);
         Location locid = manager.getLocationByID(id);
         assertNotNull(locid);
-        Debug.println(0, "testGetLocationByID("+id+") Results: ");
-        Debug.println(0, "  " + locid);
+        Debug.println(INDENT, "testGetLocationByID("+id+"): ");
+        Debug.println(INDENT, locid);
     }
     
     @Test
@@ -400,11 +337,8 @@ public class TestLocationDataManagerImpl{
         List<LocationDetails> locdetails = manager.getLocationDetailsByLocId(locationId, 0, 100);
         assertNotNull(locdetails);
         assertTrue(!locdetails.isEmpty());
-        Debug.println(0, "testGetLocationDetailsByLocId("+locationId+") Results: ");
-        for (LocationDetails locdetail : locdetails) {
-            Debug.println(0, "  " + locdetail);
-        }
-        Debug.println(0, "Number of record/s: " + locdetails.size() );
+        Debug.println(INDENT, "testGetLocationDetailsByLocId("+locationId+"): ");
+        Debug.printObjects(INDENT, locdetails);
     }
     
     @Test
