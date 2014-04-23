@@ -66,4 +66,21 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 	public void setKey(String key) {
 		this.key = key;
 	}
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ValueReference [key=");
+        builder.append(key);
+        builder.append(", getId()=");
+        builder.append(getId());
+        builder.append(", getName()=");
+        builder.append(getName());
+        builder.append(", getDescription()=");
+        builder.append(getDescription());
+        builder.append("]");
+        return builder.toString();
+    }
+	
+	
 }

@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013, All Rights Reserved.
+ *
+ * Generation Challenge Programme (GCP)
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
+ *******************************************************************************/
 package org.generationcp.middleware.operation.transformer.etl.test;
 
 import java.lang.reflect.Field;
@@ -12,24 +23,18 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.transformer.etl.Transformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
-import org.generationcp.middleware.util.Debug;
-import org.junit.After;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestVariableTypeListTransformer {
+public class TestVariableTypeListTransformer extends TestOutputFormatter {
     
     private static final Logger LOG = LoggerFactory.getLogger(TestVariableTypeListTransformer.class);
 
-	private long startTime;
-	
 	private static VariableTypeListTransformer transformer;
 	private static StandardVariableBuilder standardVariableBuilder;
 	
@@ -55,10 +60,6 @@ public class TestVariableTypeListTransformer {
 	
 	private static final StandardVariable[] FACTOR_ARR = new StandardVariable[] {STDVAR1, STDVAR2}; 
 	private static final StandardVariable[] VARIATE_ARR = new StandardVariable[] {STDVAR3}; 
-	
-
-	@Rule
-	public TestName name = new TestName();
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -79,18 +80,6 @@ public class TestVariableTypeListTransformer {
 		Mockito.when(
 				standardVariableBuilder.findOrSave(VARIATE1, VARIATE1, TEST_PROPERTY3, TEST_SCALE3, TEST_METHOD3, null, "C"))
 				.thenReturn(STDVAR3);
-	}
-
-	@Before
-	public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-	}
-	
-	@After
-	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - startTime;
-		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	@Test

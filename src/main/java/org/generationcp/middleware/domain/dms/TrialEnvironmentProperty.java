@@ -98,4 +98,22 @@ public class TrialEnvironmentProperty {
 			return false;
 		return true;
 	}
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("TrialEnvironmentProperty [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", environmentValuesMap=");
+        builder.append(environmentValuesMap);
+        builder.append(", numberOfEnvironments=");
+        builder.append(numberOfEnvironments);
+        builder.append("]");
+        return builder.toString();
+    }
+	
 }

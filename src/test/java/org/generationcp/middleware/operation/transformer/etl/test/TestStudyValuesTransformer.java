@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013, All Rights Reserved.
+ *
+ * Generation Challenge Programme (GCP)
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
+ *******************************************************************************/
 package org.generationcp.middleware.operation.transformer.etl.test;
 
 import java.util.ArrayList;
@@ -16,32 +27,18 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
-import org.junit.Before;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.mockito.Mockito;
 
-public class TestStudyValuesTransformer {
-	private long startTime;
-	
-	private static StudyValuesTransformer transformer;
+public class TestStudyValuesTransformer extends TestOutputFormatter {
 
-	@Rule
-	public TestName name = new TestName();
+	private static StudyValuesTransformer transformer;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		
 		transformer = new StudyValuesTransformer(Mockito.mock(HibernateSessionProvider.class), Mockito.mock(HibernateSessionProvider.class));
-	}
-
-	@Before
-	public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
 	}
 	
 	@Test
@@ -62,15 +59,9 @@ public class TestStudyValuesTransformer {
 		Debug.println(0, "LocationId:" + studyVal.getLocationId());
 		
 		for (Variable stock : result.getVariables()) {
-			Debug.println(0, stock.toString());
+			Debug.println(INDENT, stock.toString());
 		}
 		
-	}
-	
-	@After
-	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - startTime;
-		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	private StudyDetails createStudyDetailsTestData() {

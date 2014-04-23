@@ -182,8 +182,9 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 	                Object[] result = (Object[]) o;
 	                if (result != null) {
 	                    Integer gId = (Integer) result[0];
-	                    Integer nId = (Integer) result[1];
-	                    GidNidElement element = new GidNidElement(gId, nId);
+                        Integer nId = (Integer) result[1];
+                        String nVal = (String) result[2];
+	                    GidNidElement element = new GidNidElement(gId, nId, nVal);
 	                    toReturn.add(element);
 	                }
 	            }

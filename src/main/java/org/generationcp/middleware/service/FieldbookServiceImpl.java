@@ -14,7 +14,9 @@ package org.generationcp.middleware.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,7 +94,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     @Override 
     public List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException{
-        return getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
+    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
+        List<StudyDetails> newList = new ArrayList<StudyDetails>();
+    	for(StudyDetails detail : studyDetailList){
+    		if(detail.hasRows())
+    			newList.add(detail);
+    	}
+    	return newList;
     }
 
     @Override
@@ -659,5 +667,73 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
             throws MiddlewareQueryException {
 		return getStudyDataManager().getAllFieldMapsInBlockByBlockId(blockId);
+	}
+	
+	@Override
+	public List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException {
+		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+		setWorkingDatabase(Database.CENTRAL);
+		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		setWorkingDatabase(Database.LOCAL);
+		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		
+		for (Iterator<StandardVariableReference> iter = list.iterator(); iter.hasNext(); ) {
+			boolean hasPairInCentral = false, hasPairInLocal = false;
+			StandardVariableReference ref =  iter.next();
+			
+			setWorkingDatabase(Database.CENTRAL);
+			hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId());
+			if (!hasPairInCentral) {
+				setWorkingDatabase(Database.LOCAL);
+				hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId());
+			}
+			
+			if (!hasPairInCentral && !hasPairInLocal) {
+				iter.remove();
+			}
+		}
+		
+		Collections.sort(list);
+		return list;
+	}
+	
+	@Override
+	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
+		List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
+		
+		setWorkingDatabase(Database.CENTRAL);
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		setWorkingDatabase(Database.LOCAL);
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		
+		List<Integer> termIds = new ArrayList<Integer>();
+		Map<Integer, CVTerm> termMap = new HashMap<Integer, CVTerm>();
+		
+		for (StandardVariable pair : treatmentPairs) {
+			termIds.add(pair.getProperty().getId());
+			termIds.add(pair.getScale().getId());
+			termIds.add(pair.getMethod().getId());
+		}
+		
+		List<CVTerm> terms = new ArrayList<CVTerm>();
+		setWorkingDatabase(Database.CENTRAL);
+		terms.addAll(getCvTermDao().getByIds(termIds));
+		setWorkingDatabase(Database.LOCAL);
+		terms.addAll(getCvTermDao().getByIds(termIds));
+		
+		for (CVTerm term : terms) {
+			termMap.put(term.getCvTermId(), term);
+		}
+		
+		for (StandardVariable pair : treatmentPairs) {
+			pair.getProperty().setName(termMap.get(pair.getProperty().getId()).getName());
+			pair.getProperty().setDefinition(termMap.get(pair.getProperty().getId()).getDefinition());
+			pair.getScale().setName(termMap.get(pair.getScale().getId()).getName());
+			pair.getScale().setDefinition(termMap.get(pair.getScale().getId()).getDefinition());
+			pair.getMethod().setName(termMap.get(pair.getMethod().getId()).getName());
+			pair.getMethod().setDefinition(termMap.get(pair.getMethod().getId()).getDefinition());
+		}
+		
+		return treatmentPairs;
 	}
 }

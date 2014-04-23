@@ -49,6 +49,8 @@ public class MeasurementVariable {
 	
 	private Double maxRange;
 
+    private boolean required;
+
 	public MeasurementVariable() {
 	}
 
@@ -62,6 +64,7 @@ public class MeasurementVariable {
 		this.dataType = dataType;
 		this.value = value;
 		this.label = label;
+        this.required = false;
 	}
 
     public MeasurementVariable(int termId, String name, String description, String scale,
@@ -283,4 +286,11 @@ public class MeasurementVariable {
 	    }
 	}
 
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
 }

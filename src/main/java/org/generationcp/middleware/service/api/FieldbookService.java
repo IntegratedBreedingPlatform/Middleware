@@ -424,6 +424,30 @@ public interface FieldbookService {
      */
     int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId)throws MiddlewareQueryException;
     
+    /**
+     * Get all field maps in the same block.
+     * 
+     * @param blockId
+     * @return
+     * @throws MiddlewareQueryException
+     */
     List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
             throws MiddlewareQueryException;
+    
+    /**
+     * Get all Treatment Levels.
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException;
+    
+    /**
+     * Fetch all the possible pairs of the treatment level variable.
+     * 
+     * @param cvTermId
+     * @param propertyId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException;
 }

@@ -31,7 +31,11 @@ public class SSRDataRow{
     public SSRDataRow() {
     }
 
-
+    public SSRDataRow(AccMetadataSet accMetadataSet, AlleleValues alleleValues) {
+        this.accMetadataSet = accMetadataSet;
+        this.alleleValues = alleleValues;
+    }
+    
     public SSRDataRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
             AlleleValues alleleValues) {
         super();

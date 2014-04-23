@@ -99,6 +99,7 @@ public class AccMetadataSet implements Serializable{
     protected AccMetadataSetPK id;
 
     public AccMetadataSet() {
+        this.id = new AccMetadataSetPK();
     }
 
     public AccMetadataSet(AccMetadataSetPK id) {
@@ -120,28 +121,23 @@ public class AccMetadataSet implements Serializable{
     public Integer getDatasetId(){
         return id.getDatasetId();
     }
-    
 
     public void setDatasetId(Integer datasetId){
         id.setDatasetId(datasetId);
     }
-    
 
     public Integer getGermplasmId(){
         return id.getGermplasmId();
     }
-    
 
     public void setGermplasmId(Integer germplasmId){
         id.setGermplasmId(germplasmId);
     }
     
-
     public Integer getNameId(){
         return id.getNameId();
     }
     
-
     public void setNameId(Integer nameId){
         id.setNameId(nameId);
     }

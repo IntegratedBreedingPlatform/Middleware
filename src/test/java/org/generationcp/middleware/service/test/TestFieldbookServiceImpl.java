@@ -44,27 +44,19 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
-import org.junit.After;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class TestFieldbookServiceImpl {
+public class TestFieldbookServiceImpl extends TestOutputFormatter{
         
     private static ServiceFactory serviceFactory;
     private static FieldbookService fieldbookService;
     private static DataImportService dataImportService;
-
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -79,20 +71,14 @@ public class TestFieldbookServiceImpl {
         dataImportService = serviceFactory.getDataImportService();
     }
 
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-
     @Test
     public void testGetAllLocalNurseryDetails() throws MiddlewareQueryException {
 
         List<StudyDetails> nurseryStudyDetails = fieldbookService.getAllLocalNurseryDetails();
         for (StudyDetails study : nurseryStudyDetails){
-            study.print(3);
+            study.print(INDENT);
         }
-        Debug.println(3, "NUMBER OF RECORDS: " + nurseryStudyDetails.size());
+        Debug.println(INDENT, "#RECORDS: " + nurseryStudyDetails.size());
 
     }
 
@@ -101,9 +87,9 @@ public class TestFieldbookServiceImpl {
     public void testGetAllLocalTrialStudyDetails() throws MiddlewareQueryException {
         List<StudyDetails> studyDetails = fieldbookService.getAllLocalTrialStudyDetails();
         for (StudyDetails study : studyDetails){
-            study.print(3);
+            study.print(INDENT);
         }
-        Debug.println(3, "NUMBER OF RECORDS: " + studyDetails.size());
+        Debug.println(INDENT, "#RECORDS: " + studyDetails.size());
 
     }
     
@@ -113,7 +99,7 @@ public class TestFieldbookServiceImpl {
         trialIds.add(Integer.valueOf(1)); 
         List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
-            fieldMapInfo.print(3);
+            fieldMapInfo.print(INDENT);
         }
         //assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
@@ -124,7 +110,7 @@ public class TestFieldbookServiceImpl {
         nurseryIds.add(Integer.valueOf(5734)); 
         List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
-            fieldMapInfo.print(3);
+            fieldMapInfo.print(INDENT);
         }
        // assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
@@ -133,7 +119,7 @@ public class TestFieldbookServiceImpl {
     public void testGetAllFieldMapsInBlockByTrialInstanceId() throws MiddlewareQueryException{
         List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
-            fieldMapInfo.print(3);
+            fieldMapInfo.print(INDENT);
         }
         //assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
@@ -143,18 +129,18 @@ public class TestFieldbookServiceImpl {
     public void testGetAllLocations() throws MiddlewareQueryException {
     	List<Location> locations = fieldbookService.getAllLocations();
     	for (Location loc : locations){
-    		Debug.println(3, loc.toString());
+    		Debug.println(INDENT, loc.toString());
     	}
-    	Debug.println(3, "NUMBER OF RECORDS: " + locations.size());
+    	Debug.println(INDENT, "#RECORDS: " + locations.size());
     }
     
     @Test
     public void testGetNurseryDataSet() throws MiddlewareQueryException {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         int id = dataImportService.saveDataset(workbook);
         workbook = fieldbookService.getNurseryDataSet(id);
-        workbook.print(0);
+        workbook.print(INDENT);
     }
     
     @Test
@@ -163,18 +149,18 @@ public class TestFieldbookServiceImpl {
         // Assumption: there is at least 1 local nursery stored in the database
         int id = fieldbookService.getAllLocalNurseryDetails().get(0).getId();
         Workbook workbook = fieldbookService.getNurseryDataSet(id);
-        workbook.print(0);
+        workbook.print(INDENT);
         
         List<MeasurementRow> observations = workbook.getObservations();
         for (MeasurementRow observation : observations){
             List<MeasurementData> fields = observation.getDataList();
             for (MeasurementData field : fields){
                 try {
-                    //Debug.println(4, "Origina: " + field.toString());
+                    //Debug.println(INDENT, "Original: " + field.toString());
                     if (field.getValue() != null){
                         field.setValue(Double.valueOf(Double.valueOf(field.getValue()) + 1).toString());
                         field.setValue(Integer.valueOf(Integer.valueOf(field.getValue()) + 1).toString());
-                        //Debug.println(4, "Updated: " + field.toString());
+                        //Debug.println(INDENT, "Updated: " + field.toString());
                     }
                 } catch (NumberFormatException e){
                     // Ignore. Update only numeric values
@@ -184,7 +170,7 @@ public class TestFieldbookServiceImpl {
         
         fieldbookService.saveMeasurementRows(workbook);
         Workbook workbook2 = fieldbookService.getNurseryDataSet(id);
-        workbook2.print(0);
+        workbook2.print(INDENT);
         assertFalse(workbook.equals(workbook2));
     }
     
@@ -195,18 +181,15 @@ public class TestFieldbookServiceImpl {
         String method = "Enumerated";
         Integer termId = fieldbookService.getStandardVariableIdByPropertyScaleMethodRole(
                                     property, scale, method, PhenotypicType.GERMPLASM);
-        Debug.println(0, termId.toString());
+        Debug.println(INDENT, termId.toString());
         assertEquals((Integer) 8230, termId);
     }
 
     @Test
     public void testGetAllBreedingMethods() throws MiddlewareQueryException {
         List<Method> methods = fieldbookService.getAllBreedingMethods();
-        for (Method method : methods){
-            Debug.println(3, method.toString());
-        }
         assertFalse(methods.isEmpty());
-        Debug.println(3, "#Methods: " + methods.size());
+        Debug.printObjects(INDENT, methods);
     }
 
     @Test
@@ -219,16 +202,12 @@ public class TestFieldbookServiceImpl {
 
         assertTrue(listId != null && listId < 0);
         
-        Debug.println(3, "Germplasm List Added: ");
-        Debug.println(6, germplasmList.toString());
-        Debug.println(3, "Germplasms Added: ");
-        for (Germplasm germplasm: germplasms.keySet()){
-            Debug.println(6, germplasm.toString());
-        }
-        
+        Debug.println(INDENT, "Germplasm List Added: ");
+        Debug.println(INDENT*2, germplasmList.toString());
+        Debug.println(INDENT, "Germplasms Added: ");
+        Debug.printObjects(INDENT*2, new ArrayList<Germplasm>(germplasms.keySet()));
     }
     
-
     @Test
     public void testSaveNurseryAdvanceGermplasmListOtherCrop() throws MiddlewareQueryException {
         Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
@@ -239,57 +218,37 @@ public class TestFieldbookServiceImpl {
 
         assertTrue(listId != null && listId < 0);
         
-        Debug.println(3, "Germplasm List Added: ");
-        Debug.println(6, germplasmList.toString());
-        Debug.println(3, "Germplasms Added: ");
-        for (Germplasm germplasm: germplasms.keySet()){
-            Debug.println(6, germplasm.toString());
-        }
-        
+        Debug.println(INDENT, "Germplasm List Added: ");
+        Debug.println(INDENT*2, germplasmList.toString());
+        Debug.println(INDENT, "Germplasms Added: ");
+        Debug.printObjects(INDENT*2, new ArrayList<Germplasm>(germplasms.keySet()));
     }
-    
+
     @Test
     public void testGetDistinctStandardVariableValues() throws Exception {
     	int stdVarId = 8250;
-    	List<ValueReference> list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+    	getDistinctStandardVariableValues(stdVarId);
     	stdVarId = 8135;
-    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+        getDistinctStandardVariableValues(stdVarId);
     	stdVarId = 8170;
-    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+        getDistinctStandardVariableValues(stdVarId);
     	stdVarId = 8191;
-    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+        getDistinctStandardVariableValues(stdVarId);
     	stdVarId = 8192;
-    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+        getDistinctStandardVariableValues(stdVarId);
     	stdVarId = 8193;
-    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+        getDistinctStandardVariableValues(stdVarId);
     	stdVarId = 8194;
-    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+        getDistinctStandardVariableValues(stdVarId);
     	stdVarId = 8007;
-    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
-    	for (ValueReference ref : list) {
-    		Debug.println(1, ref.toString());
-    	}
+        getDistinctStandardVariableValues(stdVarId);
+    }
+
+    private void getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException{
+        List<ValueReference> list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+        Debug.println(INDENT, "StandardVariable ID: " + stdVarId);
+        Debug.printObjects(INDENT+2, list);
+        Debug.println("");
     }
     
     private GermplasmList createGermplasmsCimmytWheat(
@@ -326,11 +285,10 @@ public class TestFieldbookServiceImpl {
         }
         
         return germList;
-        
     }
         
     private GermplasmList createGermplasmsOtherCrop(
-            Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
+        Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
         
         int numberOfEntries = 3;
         
@@ -393,39 +351,31 @@ public class TestFieldbookServiceImpl {
     @Test
     public void testGetAllNurseryTypes() throws MiddlewareQueryException {
             List<ValueReference> nurseryTypes = fieldbookService.getAllNurseryTypes();
-            
-            for (ValueReference type : nurseryTypes){
-                Debug.println(3, type.toString());
-            }
-            Debug.println(3, "NUMBER OF RECORDS: " + nurseryTypes.size());
+            Debug.printObjects(INDENT, nurseryTypes);
     }
     
     @Test
     public void testGetAllPersons() throws MiddlewareQueryException {
             List<Person> persons = fieldbookService.getAllPersons();
-            
-            for (Person person : persons){
-                Debug.println(3, person.toString());
-            }
-            Debug.println(3, "NUMBER OF RECORDS: " + persons.size());
-            Debug.println(3, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(-146));
+            Debug.printObjects(INDENT, persons);
+            Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(-146));
     }
     
     @Test
     public void testCountPlotsWithPlantsSelectedofNursery() throws MiddlewareQueryException {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         int id = dataImportService.saveDataset(workbook);
-        Debug.println(3, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
+        Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
     }
     
     @Test
     public void testGetNurseryVariableSettings() throws MiddlewareQueryException {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
-        workbook.print(0);
+        workbook.print(INDENT);
         int id = dataImportService.saveDataset(workbook);
         workbook = fieldbookService.getStudyVariableSettings(id, true);
-        workbook.print(0);
+        workbook.print(INDENT);
     }
 
     @Test
@@ -433,7 +383,7 @@ public class TestFieldbookServiceImpl {
         String fieldName = "Test Field JUnit";
         Integer parentLocationId = 17649;
         int result = fieldbookService.addFieldLocation(fieldName, parentLocationId, -1);
-        Debug.println(3, "Added: Location with id = " + result);
+        Debug.println(INDENT, "Added: Location with id = " + result);
     }
     
     @Test
@@ -441,20 +391,8 @@ public class TestFieldbookServiceImpl {
         String blockName = "Test Block JUnit";
         Integer parentFieldId = -11;
         int result = fieldbookService.addBlockLocation(blockName, parentFieldId, -1);
-        Debug.println(3, "Added: Location with id = " + result);
+        Debug.println(INDENT, "Added: Location with id = " + result);
     }
-    
-    
-    
-    
-    
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime 
-                + " ns = " + ((double) elapsedTime / 1000000000) + " s");
-    }
-
 
     @AfterClass
     public static void tearDown() throws Exception {
@@ -462,4 +400,5 @@ public class TestFieldbookServiceImpl {
             serviceFactory.close();
         }
     }
+
 }

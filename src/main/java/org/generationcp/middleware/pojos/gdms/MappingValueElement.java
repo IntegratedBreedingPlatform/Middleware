@@ -33,18 +33,31 @@ public class MappingValueElement implements Serializable{
     
     private Integer parentBGid;
     
+    private Integer gid;
+
+    private Integer markerId;
+    
     private String markerType;
 
-    public MappingValueElement(Integer datasetId,
-                                String mappingType, 
-                                Integer parentAGid, 
-                                Integer parentBGid, 
-                                String markerType) {
-        
+    public MappingValueElement(Integer datasetId, String mappingType, Integer parentAGid, Integer parentBGid,
+            String markerType) {
+
         this.datasetId = datasetId;
         this.mappingPopType = mappingType;
         this.parentAGid = parentAGid;
         this.parentBGid = parentBGid;
+        this.markerType = markerType;
+    }
+
+    public MappingValueElement(Integer datasetId, String mappingType, Integer parentAGid, Integer parentBGid,
+            Integer gid, Integer markerId, String markerType) {
+
+        this.datasetId = datasetId;
+        this.mappingPopType = mappingType;
+        this.parentAGid = parentAGid;
+        this.parentBGid = parentBGid;
+        this.gid = gid;
+        this.markerId = markerId;
         this.markerType = markerType;
     }
 
@@ -80,6 +93,22 @@ public class MappingValueElement implements Serializable{
         this.parentBGid = parentBGid;
     }
 
+    public Integer getGid() {
+        return gid;
+    }
+
+    public void setGid(Integer gid) {
+        this.gid = gid;
+    }
+
+    public Integer getMarkerId() {
+        return markerId;
+    }
+
+    public void setMarkerId(Integer markerId) {
+        this.markerId = markerId;
+    }
+
     public String getMarkerType() {
         return markerType;
     }
@@ -99,6 +128,10 @@ public class MappingValueElement implements Serializable{
         builder.append(parentAGid);
         builder.append(", parentBGid=");
         builder.append(parentBGid);
+        builder.append(", gid=");
+        builder.append(gid);
+        builder.append(", markerId=");
+        builder.append(markerId);
         builder.append(", markerType=");
         builder.append(markerType);
         builder.append("]");
@@ -122,6 +155,8 @@ public class MappingValueElement implements Serializable{
                 .append(mappingPopType, rhs.mappingPopType)
                 .append(parentAGid, rhs.parentAGid)
                 .append(parentBGid, rhs.parentBGid)
+                .append(gid, rhs.gid)
+                .append(markerId, rhs.markerId)
                 .append(markerType, rhs.markerType).isEquals();
     }
     
@@ -131,6 +166,8 @@ public class MappingValueElement implements Serializable{
                 .append(mappingPopType)
                 .append(parentAGid)
                 .append(parentBGid)
+                .append(gid)
+                .append(markerId)
                 .append(markerType).toHashCode();
     }
 
