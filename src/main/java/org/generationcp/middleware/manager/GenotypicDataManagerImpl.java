@@ -385,29 +385,32 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
                                                                           int numOfRows) throws MiddlewareQueryException {
-		List<MappingValueElement> mappingValueElementList = new ArrayList<MappingValueElement>();
+        List<MappingValueElement> mappingValueElementList = new ArrayList<MappingValueElement>();
 
-		List<Marker> markers = super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getByNames"
-                , new Object[] { markerNames, start, numOfRows }, new Class[] { List.class,Integer.TYPE, Integer.TYPE });
-		
-		List<Integer> markerIds = new ArrayList<Integer>();
-		for (Marker marker : markers){
-		    markerIds.add(marker.getMarkerId());
-		}
+        List<Marker> markers = super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getByNames", new Object[] {
+                markerNames, start, numOfRows }, new Class[] { List.class, Integer.TYPE, Integer.TYPE });
 
-		mappingValueElementList = super.getAllFromCentralAndLocalByMethod(getMappingPopDao(), "getMappingValuesByGidAndMarkerIds",
-				new Object[] { gids, markerIds }, new Class[] { List.class, List.class });
-		
-		for (MappingValueElement element : mappingValueElementList){
-		    if (element.getMarkerId() >= 0 && element.getMarkerType() == null){
-		        for (Marker marker : markers){
-		            if (marker.getMarkerId().equals(element.getMarkerId())){
-		                element.setMarkerType(marker.getMarkerType());
-		                break;
-		            }
-		        }
-		    }
-		}
+        List<Integer> markerIds = new ArrayList<Integer>();
+        for (Marker marker : markers) {
+            markerIds.add(marker.getMarkerId());
+        }
+
+        mappingValueElementList = super.getAllFromCentralAndLocalByMethod(getMappingPopDao(),
+                "getMappingValuesByGidAndMarkerIds", new Object[] { gids, markerIds }, new Class[] { List.class,
+                        List.class });
+
+        for (MappingValueElement element : mappingValueElementList) {
+            if (element != null) {
+                if (element.getMarkerId() >= 0 && element.getMarkerType() == null) {
+                    for (Marker marker : markers) {
+                        if (marker.getMarkerId().equals(element.getMarkerId())) {
+                            element.setMarkerType(marker.getMarkerType());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
         return mappingValueElementList;
     }
