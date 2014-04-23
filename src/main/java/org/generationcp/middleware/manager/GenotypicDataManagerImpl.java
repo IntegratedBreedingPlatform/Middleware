@@ -385,15 +385,31 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
                                                                           int numOfRows) throws MiddlewareQueryException {
-		List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
+		List<MappingValueElement> mappingValueElementList = new ArrayList<MappingValueElement>();
 
-		List<Integer> markerIds = super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getIdsByNames"
-				, new Object[] { markerNames, start, numOfRows }, new Class[] { List.class,Integer.TYPE, Integer.TYPE });
+		List<Marker> markers = super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getByNames"
+                , new Object[] { markerNames, start, numOfRows }, new Class[] { List.class,Integer.TYPE, Integer.TYPE });
+		
+		List<Integer> markerIds = new ArrayList<Integer>();
+		for (Marker marker : markers){
+		    markerIds.add(marker.getMarkerId());
+		}
 
-		mappingValueElementLists = super.getAllFromCentralAndLocalByMethod(getMappingPopDao(), "getMappingValuesByGidAndMarkerIds",
+		mappingValueElementList = super.getAllFromCentralAndLocalByMethod(getMappingPopDao(), "getMappingValuesByGidAndMarkerIds",
 				new Object[] { gids, markerIds }, new Class[] { List.class, List.class });
+		
+		for (MappingValueElement element : mappingValueElementList){
+		    if (element.getMarkerId() >= 0 && element.getMarkerType() == null){
+		        for (Marker marker : markers){
+		            if (marker.getMarkerId().equals(element.getMarkerId())){
+		                element.setMarkerType(marker.getMarkerType());
+		                break;
+		            }
+		        }
+		    }
+		}
 
-        return mappingValueElementLists;
+        return mappingValueElementList;
     }
 
     @Override
@@ -1470,6 +1486,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
+    public Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
+            List<MarkerMetadataSet> markerMetadataSets, List<DartDataRow> rows) throws MiddlewareQueryException {
+        //TODO
+        return false;
+    }
+
+    @Deprecated
+    @Override
     public Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<SSRDataRow> rows) throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1506,6 +1530,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
     }
     
+    @Override
+    public Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
+            List<MarkerMetadataSet> markerMetadataSets, List<SSRDataRow> rows) throws MiddlewareQueryException {
+        //TODO
+        return false;
+    }
 
     @Deprecated
     @Override
@@ -1629,6 +1659,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
     }
 
+    @Deprecated
     @Override
     public Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingABHRow> rows)
             throws MiddlewareQueryException {
@@ -1664,7 +1695,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
     }
     
-
+    public Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<MappingABHRow> rows)
+            throws MiddlewareQueryException {
+        //TODO
+        return false;
+    }
+    
+    @Deprecated
     @Override
     public Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingAllelicSNPRow> rows)
             throws MiddlewareQueryException {
@@ -1701,8 +1739,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
     }
 
+    public Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<MappingAllelicSNPRow> rows)
+            throws MiddlewareQueryException {
+        //TODO
+        return false;
+    }
 
-
+    @Deprecated
     @Override
     public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
                                             List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException {
@@ -1739,6 +1783,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         } finally {
             session.flush();
         }
+    }
+    
+    @Override
+    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException {
+        //TODO
+        return false;
     }
         
     @Override

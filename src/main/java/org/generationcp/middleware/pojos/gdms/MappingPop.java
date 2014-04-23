@@ -44,6 +44,8 @@ public class MappingPop implements Serializable{
                 ", gdms_mapping_pop.mapping_type" +
                 ", gdms_mapping_pop.parent_a_nid" +
                 ", gdms_mapping_pop.parent_b_nid" +
+                ", gdms_mapping_pop_values.gid " +
+                ", gdms_marker.marker_id " +
                 ", CONCAT(gdms_marker.marker_type, '')" +
             " FROM gdms_mapping_pop_values " +
             	"JOIN gdms_mapping_pop ON gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id " +

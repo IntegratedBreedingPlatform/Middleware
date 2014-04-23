@@ -260,7 +260,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 //    	List<Integer> gids = Arrays.asList(-3785, -3786, -3787);
 //      List<String> markerNames = Arrays.asList("1_0085", "1_0319", "1_0312");
     	
-    	List<Integer> gids = Arrays.asList(2212, 2208, 1);
+    	List<Integer> gids = Arrays.asList(2212, 2208, 1, -1);
         List<String> markerNames = Arrays.asList("Ah26", "AC2C05", "Ah193", "Seq14H06", "SeqTEST843", "SeqTEST129", "SeqTEST564");
         
         // For test input, please run the following in central/local, and choose select gid / marker_ids
@@ -270,8 +270,8 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         //   LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id; 
 
         List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0, 100);
-        Debug.println("testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " 
-        		+ mappingValues.size() + " = " + mappingValues);
+        Debug.println("testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + "): ");
+        Debug.printFormattedObjects(INDENT, mappingValues);
     }
 
     @Test
