@@ -400,7 +400,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                         List.class });
 
         for (MappingValueElement element : mappingValueElementList) {
-            if (element != null) {
+            if (element != null && element.getMarkerId() != null) {
                 if (element.getMarkerId() >= 0 && element.getMarkerType() == null) {
                     for (Marker marker : markers) {
                         if (marker.getMarkerId().equals(element.getMarkerId())) {
