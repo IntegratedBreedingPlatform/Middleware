@@ -27,10 +27,13 @@ public class MappingABHRow{
     
     private MappingPopValues mappingPopValues;
 
-    
     public MappingABHRow() {
     }
 
+    public MappingABHRow(AccMetadataSet accMetadataSet, MappingPopValues mappingPopValues) {
+        this.accMetadataSet = accMetadataSet;
+        this.mappingPopValues = mappingPopValues;
+    }
 
     public MappingABHRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
             MappingPopValues mappingPopValues) {
@@ -40,21 +43,15 @@ public class MappingABHRow{
         this.markerMetadataSet = markerMetadataSet;
         this.mappingPopValues = mappingPopValues;
     }
-
-
     
     public Marker getMarker() {
         return marker;
     }
-
-
     
     public void setMarker(Marker marker) {
         this.marker = marker;
     }
 
-
-    
     public AccMetadataSet getAccMetadataSet() {
         return accMetadataSet;
     }

@@ -36,6 +36,14 @@ public class MappingAllelicSSRDArTRow{
     }
 
 
+    public MappingAllelicSSRDArTRow(AccMetadataSet accMetadataSet, 
+            MappingPopValues mappingPopValues, AlleleValues alleleValues, DartValues dartValues) {
+        this.accMetadataSet = accMetadataSet;
+        this.mappingPopValues = mappingPopValues;
+        this.alleleValues = alleleValues;
+        this.dartValues = dartValues;
+    }
+    
     public MappingAllelicSSRDArTRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
             MappingPopValues mappingPopValues, AlleleValues alleleValues, DartValues dartValues) {
         super();

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertFalse;
@@ -257,12 +256,9 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetMappingValuesByGidsAndMarkerNames() throws Exception {
-//    	List<Integer> gids = Arrays.asList(-3785, -3786, -3787);
-//      List<String> markerNames = Arrays.asList("1_0085", "1_0319", "1_0312");
-    	
     	List<Integer> gids = Arrays.asList(2212, 2208, 1, -1);
-        List<String> markerNames = Arrays.asList("Ah26", "AC2C05", "Ah193", "Seq14H06", "SeqTEST843", "SeqTEST129", "SeqTEST564");
-        
+        List<String> markerNames = Arrays.asList("Ah26", "AC2C05", "Ah193", "Seq14H06", "SeqTEST843", "GA1");
+
         // For test input, please run the following in central/local, and choose select gid / marker_ids
         // SELECT DISTINCT gid, gdms_mapping_pop_values.marker_id
         // FROM gdms_mapping_pop_values 

@@ -34,6 +34,14 @@ public class MappingAllelicSNPRow{
     }
 
 
+    public MappingAllelicSNPRow(AccMetadataSet accMetadataSet, 
+            MappingPopValues mappingPopValues, CharValues charValues) {
+        this.accMetadataSet = accMetadataSet;
+        this.mappingPopValues = mappingPopValues;
+        this.charValues = charValues;
+    }
+
+
     public MappingAllelicSNPRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
             MappingPopValues mappingPopValues, CharValues charValues) {
         super();
@@ -43,7 +51,6 @@ public class MappingAllelicSNPRow{
         this.mappingPopValues = mappingPopValues;
         this.charValues = charValues;
     }
-
 
     
     public Marker getMarker() {

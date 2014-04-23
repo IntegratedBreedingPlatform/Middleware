@@ -1471,9 +1471,13 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     Boolean updateDart(Dataset dataset, List<DartDataRow> rows) 
             throws MiddlewareQueryException, MiddlewareException;
     
+    Boolean updateDart(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+            List<DartDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
+
     
     /**
      * Sets SSR
@@ -1504,9 +1508,13 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     Boolean updateSSR(Dataset dataset, List<SSRDataRow> rows) 
             throws MiddlewareQueryException, MiddlewareException;
     
+    Boolean updateSSR(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+            List<SSRDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
+
     /**
      * Sets SNP
      * 
@@ -1552,8 +1560,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     Boolean updateSNP(Dataset dataset, List<SNPDataRow> rows) 
             throws MiddlewareQueryException, MiddlewareException;
+
+    Boolean updateSNP(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+            List<SNPDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * Sets Mapping Data of type ABH
@@ -1586,8 +1598,13 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop, List<MappingABHRow> rows) 
             throws MiddlewareQueryException, MiddlewareException;
+
+    Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop,  
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+            List<MappingABHRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * Sets Mapping Data of Allelic SNP
@@ -1621,7 +1638,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, 
+            List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException, MiddlewareException;
+
+    Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, 
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
     
@@ -1657,7 +1679,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     Boolean updateMappingAllelicSSRDArT(Dataset dataset, MappingPop mappingPop, 
+            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException, MiddlewareException;
+
+    Boolean updateMappingAllelicSSRDArT(Dataset dataset, MappingPop mappingPop, 
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
     /**
