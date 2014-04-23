@@ -81,9 +81,4 @@ public class Factor  implements Serializable {
 		this.termId = termId;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	
-	
  }
