@@ -81,8 +81,12 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectLocationMap"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
-  
-  <!-- Mapping classes for new OMS schema --> 
+  <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/> <!-- TODO: not sure if we're using this, just included as this is in the workbench schema -->
+  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting" /> <!-- TODO: same as above -->
+
+     <!-- Mapping classes for new OMS schema -->
   <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
   <mapping class="org.generationcp.middleware.pojos.oms.CVTerm"/>
   <mapping class="org.generationcp.middleware.pojos.oms.CVTermRelationship"/>
