@@ -427,7 +427,6 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         }
     }
     
-
     @Test
     public void testSetSNP2() throws Exception {
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
@@ -441,20 +440,16 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
-        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
-        List<CharValues> charValueList = new ArrayList<CharValues>();
         List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
         for (int i=0; i<210*260; i++){
             marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
             markers.add(marker);
             markerMetadataSet.setMarkerId(-1);
             markerMetadataSets.add(markerMetadataSet);
-            accMetadataSets.add(accMetadataSet);
-            dataRows.add(new SNPDataRow(charValues));
-            charValueList.add(charValues);
+            dataRows.add(new SNPDataRow(accMetadataSet, charValues));
         }
         
-        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, charValueList);
+        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, dataRows);
         assertTrue(addStatus);
     }
 

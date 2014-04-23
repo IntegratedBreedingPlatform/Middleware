@@ -32,10 +32,6 @@ public class SNPDataRow{
     }
 
 
-    public SNPDataRow(CharValues charValues) {
-        this.charValues = charValues;
-    }
-
     public SNPDataRow(AccMetadataSet accMetadataSet, CharValues charValues) {
         this.accMetadataSet = accMetadataSet;
         this.charValues = charValues;

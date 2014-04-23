@@ -1575,12 +1575,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
     }
     
-    //TODO
     @Override
-//    public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
-//                    List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<SNPDataRow> rows) 
     public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
-            List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<CharValues> charValues) 
+                    List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows) 
                     throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1602,39 +1599,25 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 saveMarkerMetadataSets(markerMetadataSets);
             }
 
-            if (accMetadataSets != null && accMetadataSets.size() > 0){
-                for (AccMetadataSet accMetadataSet : accMetadataSets){
+            // Save data rows
+            if (rows != null && rows.size() > 0) {
+                
+                List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+                List<CharValues> charValues = new ArrayList<CharValues>();
+
+                for (SNPDataRow row : rows) {
+                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
                     accMetadataSet.setDatasetId(datasetId);
-                }
-                saveAccMetadataSets(accMetadataSets);
-            }
+                    accMetadataSets.add(accMetadataSet);
 
-
-            if (charValues != null && charValues.size() > 0){
-                for (CharValues charValue : charValues){
+                    CharValues charValue = row.getCharValues();
                     charValue.setDatasetId(datasetId);
+                    charValues.add(charValue);
                 }
+                
+                saveAccMetadataSets(accMetadataSets);
                 saveCharValues(charValues);
             }
-            // Save data rows
-//            if (rows != null && rows.size() > 0) {
-//                
-//                List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
-//                List<CharValues> charValues = new ArrayList<CharValues>();
-//
-//                for (SNPDataRow row : rows) {
-//                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-//                    accMetadataSet.setDatasetId(datasetId);
-//                    accMetadataSets.add(accMetadataSet);
-//
-//                    CharValues charValue = row.getCharValues();
-//                    charValue.setDatasetId(datasetId);
-//                    charValues.add(charValue);
-//                }
-                
-//              saveAccMetadataSets(accMetadataSets);
-//                saveCharValues(charValues);
-//            }
             trans.commit();
             return true;
         } catch (Exception e) {
