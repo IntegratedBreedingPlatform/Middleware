@@ -87,6 +87,7 @@ public interface OntologyService{
      * @return the all standard variables
      * @throws MiddlewareQueryException the middleware query exception
      */
+    // Review: why do we need such a method? Can load a large portion of the DB.
     Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
     /**

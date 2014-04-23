@@ -69,10 +69,6 @@ public abstract class Builder extends DatabaseBroker {
     	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
-    protected final TermPropertyBuilder getTermPropertyBuilder() {
-        return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
-    }
-    
     protected final CvTermSaver getTermSaver() {
     	return new CvTermSaver(sessionProviderForLocal, sessionProviderForCentral);
     }

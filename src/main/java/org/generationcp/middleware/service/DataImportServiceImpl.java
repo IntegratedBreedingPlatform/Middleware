@@ -344,11 +344,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
     }
 
-    private boolean nameMatches(String name, Term term) {
+    private boolean nameMatches(String name, Term term) throws MiddlewareQueryException {
         String actualTermName = term.getName();
         boolean matches = actualTermName.equalsIgnoreCase(name);
         if (!matches) {
-            List<NameSynonym> synonyms = term.getNameSynonyms();
+            List<NameSynonym> synonyms = getStandardVariableBuilder().createSynonyms(term.getId());
             for (NameSynonym synonym : synonyms) {
                 if (name.equalsIgnoreCase(synonym.getName())) {
                     matches = true;

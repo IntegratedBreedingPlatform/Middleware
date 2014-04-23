@@ -12,9 +12,7 @@
 package org.generationcp.middleware.domain.oms;
 
 import java.io.Serializable;
-import java.util.List;
 
-import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.util.Debug;
 
 /** 
@@ -31,12 +29,8 @@ public class Term implements Serializable{
 	private String name;
 	
 	private String definition;
-	
-	private List<NameSynonym> nameSynonyms;
 
 	private Boolean obsolete;
-	
-	private List<TermProperty> properties;
 	
 	public Term() { }
 	
@@ -45,21 +39,6 @@ public class Term implements Serializable{
 		this.name = name;
 		this.definition = definition;
 	}
-
-	public Term(int id, String name, String definition, List<NameSynonym> nameSynonyms) {
-		this.id = id;
-		this.name = name;
-		this.definition = definition;
-		this.nameSynonyms = nameSynonyms;
-	}
-
-    public Term(int id, String name, String definition, List<NameSynonym> nameSynonyms, List<TermProperty> properties) {
-        this.id = id;
-        this.name = name;
-        this.definition = definition;
-        this.nameSynonyms = nameSynonyms;
-        this.properties = properties;
-    }
 
 	public int getId() {
 		return id;
@@ -92,34 +71,12 @@ public class Term implements Serializable{
 	public void setDefinition(String definition) {
 		this.definition = definition;
 	}
-	
-	public List<NameSynonym> getNameSynonyms() {
-		return nameSynonyms;
-	}
-
-	public void setNameSynonyms(List<NameSynonym> nameSynonyms) {
-		this.nameSynonyms = nameSynonyms;
-	}
-	
-	public List<TermProperty> getProperties() {
-        return properties;
-    }
-    
-    public void setProperties(List<TermProperty> properties) {
-        this.properties = properties;
-    }
 
     public void print(int indent) {
 		Debug.println(indent, "Id: " + getId());
 		Debug.println(indent, "Vocabulary: " + getVocabularyId());
 		Debug.println(indent, "Name: " + getName());
 	    Debug.println(indent, "Definition: " + getDefinition());
-        if (nameSynonyms != null) {
-            Debug.println(indent, "NameSynonyms: " + nameSynonyms);
-        }
-        if (properties != null) {
-            Debug.println(indent, "TermProperties: " + properties);
-        }
 	    Debug.println(indent, "Obsolete: " + obsolete);
 	}
 	
@@ -144,10 +101,6 @@ public class Term implements Serializable{
 		builder.append(name);
 		builder.append(", definition=");
 		builder.append(definition);
-		if (nameSynonyms != null) {
-			builder.append(", nameSynonyms=");
-			builder.append(nameSynonyms);
-		}
 		builder.append("]");
 		return builder.toString();
 	}

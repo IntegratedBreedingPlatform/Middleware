@@ -621,9 +621,6 @@ public class TestOntologyServiceImpl extends TestOutputFormatter {
         }
 
         stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
-        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
-        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
-        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
         stdVariable.setCropOntologyId("CROP-TEST");
 
         ontologyService.addStandardVariable(stdVariable);

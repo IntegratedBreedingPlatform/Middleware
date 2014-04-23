@@ -59,7 +59,8 @@ public class StandardVariableSaver extends Saver {
 	    deleteRelationship(stdVar.getId(), TermId.HAS_PROPERTY.getId(), stdVar.getProperty());
 	    deleteRelationship(stdVar.getId(), TermId.HAS_METHOD.getId(), stdVar.getMethod());
 	    
-	    deleteSynonyms(stdVar.getId(), stdVar.getNameSynonyms());
+	    List<NameSynonym> nameSynonyms = getStandardVariableBuilder().createSynonyms(stdVar.getId());	    
+	    deleteSynonyms(stdVar.getId(), nameSynonyms);
 	    
 	    if (stdVar.getConstraints() != null) {
                 deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
@@ -91,8 +92,6 @@ public class StandardVariableSaver extends Saver {
             stdVar.getConstraints().setMaxValueId(maxValueId);
         }
         
-		saveSynonyms(varId, stdVar.getNameSynonyms());
-
 		saveRelationship(varId, TermId.HAS_PROPERTY.getId(), stdVar.getProperty());
 		saveRelationship(varId, TermId.HAS_SCALE.getId(), stdVar.getScale());
 		saveRelationship(varId, TermId.HAS_METHOD.getId(), stdVar.getMethod());

@@ -47,11 +47,7 @@ public class TermBuilder extends Builder {
 			term = new Term(cVTerm.getCvTermId(), cVTerm.getName(), cVTerm.getDefinition());
 			term.setObsolete(cVTerm.isObsolete());
 			term.setVocabularyId(cVTerm.getCv());
-			
-			List<CVTermProperty> cvTermProperties = getTermPropertyBuilder().findProperties(cVTerm.getCvTermId());
-			List<TermProperty> properties = getTermPropertyBuilder().create(cvTermProperties);
-
-			term.setProperties(properties);
+			//No longer populate properties !! This is a major change. However, no caller was using properties anyway!
 		}
 		return term;
 	}

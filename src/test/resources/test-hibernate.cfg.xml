@@ -4,7 +4,7 @@
 <hibernate-configuration>
  <session-factory>
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/workbench_testdb</property>
+  <property name="hibernate.connection.url">jdbc:mysql://localhost:13306/workbench</property>
   <property name="hibernate.connection.username">root</property>
   <property name="hibernate.connection.password"></property>
   <property name="hibernate.default_schema">workbench</property>
@@ -81,12 +81,8 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectLocationMap"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/> <!-- TODO: not sure if we're using this, just included as this is in the workbench schema -->
-  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting" /> <!-- TODO: same as above -->
-
-     <!-- Mapping classes for new OMS schema -->
+  
+  <!-- Mapping classes for new OMS schema --> 
   <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
   <mapping class="org.generationcp.middleware.pojos.oms.CVTerm"/>
   <mapping class="org.generationcp.middleware.pojos.oms.CVTermRelationship"/>

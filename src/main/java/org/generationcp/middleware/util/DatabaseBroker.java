@@ -70,9 +70,11 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
+import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -461,6 +463,10 @@ public class DatabaseBroker {
 		return cvTermDao;
 	}
     
+    protected final StandardVariableDao getStandardVariableDao() {
+    	return new StandardVariableDao(getActiveSession());
+    }
+
     protected final CVTermRelationshipDao getCvTermRelationshipDao() {
     	CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
     	cvTermRelationshipDao.setSession(getActiveSession());
@@ -921,5 +927,9 @@ public class DatabaseBroker {
     	if (sessionForCentral != null) {
     		this.sessionForCentral.flush();
     	}
+    }
+    
+    protected final TermPropertyBuilder getTermPropertyBuilder() {
+        return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }
