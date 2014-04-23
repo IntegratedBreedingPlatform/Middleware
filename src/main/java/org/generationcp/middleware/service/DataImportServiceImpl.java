@@ -24,10 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.etl.Constants;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -493,13 +490,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 if (svar.getStoredIn() != null) {
                     if (svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
                         mvar.setRequired(true);
-                if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
-                    mvar.setRequired(true);
-                    return true;
+                        if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
+                            mvar.setRequired(true);
+                            return true;
+                        }
+                    }
                 }
-                }
-            }
 
+            }
         }
         return false;
     }
@@ -659,7 +657,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         isPlotExists(ontology, workbook.getFactors());
         isEntryExists(ontology, workbook.getFactors());
-        if (! workbook.isNursery()) {
+        if (!workbook.isNursery()) {
             isTrialInstanceNumberExists(ontology, workbook.getTrialVariables());
         }
 
