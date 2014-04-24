@@ -1212,7 +1212,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return list;
     }
     
-    public boolean hasPossibleTreatmentPairs(int cvTermId) throws MiddlewareQueryException {
+    public boolean hasPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
     	List<StandardVariable> list = new ArrayList<StandardVariable>();
     	
 		try {
@@ -1221,15 +1221,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append(" FROM cvterm c ")
 				.append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ").append(TermId.HAS_PROPERTY.getId())
 				.append("   AND pr.subject_id = c.cvterm_id ")
+				.append("   AND pr.object_id = ").append(propertyId)
 				.append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ").append(TermId.HAS_SCALE.getId())
 				.append("   AND sr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ").append(TermId.HAS_METHOD.getId())
 				.append("   AND mr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvterm_relationship stin ON stin.type_id = ").append(TermId.STORED_IN.getId())
 				.append("   AND stin.subject_id = c.cvterm_id AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
-				.append(" INNER JOIN cvterm_relationship pr1 ON pr1.subject_id = ").append(cvTermId)
-				.append("   AND pr1.type_id = ").append(TermId.HAS_PROPERTY.getId())
-				.append("   AND pr1.object_id = pr.object_id ")
 				.append(" WHERE c.cvterm_id <> ").append(cvTermId);
 			;
 			
