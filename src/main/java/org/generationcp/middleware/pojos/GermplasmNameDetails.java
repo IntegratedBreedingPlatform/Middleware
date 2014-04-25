@@ -22,7 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Joyce Avestro
  * 
  */
-public class GidNidElement implements Serializable{
+public class GermplasmNameDetails implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
@@ -32,12 +32,12 @@ public class GidNidElement implements Serializable{
     
     private String nVal;
     
-    public GidNidElement(Integer germplasmId, Integer nameId) {
+    public GermplasmNameDetails(Integer germplasmId, Integer nameId) {
         this.germplasmId = germplasmId;
         this.nameId = nameId;
     }
 
-    public GidNidElement(Integer germplasmId, Integer nameId, String nVal) {
+    public GermplasmNameDetails(Integer germplasmId, Integer nameId, String nVal) {
         this.germplasmId = germplasmId;
         this.nameId = nameId;
         this.nVal = nVal;
@@ -71,7 +71,7 @@ public class GidNidElement implements Serializable{
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("GidNidElement [germplasmId=");
+        builder.append("GermplasmNameDetails [germplasmId=");
         builder.append(germplasmId);
         builder.append(", nameId=");
         builder.append(nameId);
@@ -89,11 +89,11 @@ public class GidNidElement implements Serializable{
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof GidNidElement)) {
+        if (!(obj instanceof GermplasmNameDetails)) {
             return false;
         }
 
-        GidNidElement rhs = (GidNidElement) obj;
+        GermplasmNameDetails rhs = (GermplasmNameDetails) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(germplasmId, rhs.germplasmId)
                 .append(nameId, rhs.nameId).append(nVal, rhs.nVal).isEquals();
     }

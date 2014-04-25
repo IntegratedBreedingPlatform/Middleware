@@ -1445,18 +1445,17 @@ public interface GenotypicDataManager{
      * Sets DArT
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
-     * Also pass the DArT Genotyping data rows as a list of DartDataRow objects.
+     * Also pass the DArT Genotyping data rows as a list of DartDataRow objects. 
+     * For new values to be added, set the id to null.
      *
      * @param dataset - (Dataset) dataset_type = "DArT", datatype = "int"
      * @param datasetUser - (DatasetUser)
      * @param rows the rows
+     * @param markers - List of Markers to add
+     * @param markerMetadataSets - List of MarkerMetadataSets to add
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
-    Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<DartDataRow> rows) 
-            throws MiddlewareQueryException;
-
     Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
             List<MarkerMetadataSet> markerMetadataSets, List<DartDataRow> rows) 
             throws MiddlewareQueryException;
@@ -1464,17 +1463,16 @@ public interface GenotypicDataManager{
     
     /**
      * Update DArT Records.
+     * For new values to be added, set the id to null.
      *
      * @param dataset the Dataset
+     * @param markers - List of Markers to add/update
+     * @param markerMetadataSets - List of MarkerMetadataSets to add/update
      * @param rows the rows to update
      * @return true if successful
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
-    Boolean updateDart(Dataset dataset, List<DartDataRow> rows) 
-            throws MiddlewareQueryException, MiddlewareException;
-    
     Boolean updateDart(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<DartDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
@@ -1484,34 +1482,32 @@ public interface GenotypicDataManager{
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
      * Also pass the SSR Genotyping data rows as a list of SSRDataRow objects.
+     * For new values to be added, set the id to null.
      *
      * @param dataset - (Dataset) dataset_type = "SSR", datatype = "int"
      * @param datasetUser - (DatasetUser)
+     * @param markers - List of Markers to add
+     * @param markerMetadataSets - List of MarkerMetadataSets to add
      * @param rows the rows
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
-    Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<SSRDataRow> rows) 
-            throws MiddlewareQueryException;
-
     Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
             List<MarkerMetadataSet> markerMetadataSets, 
             List<SSRDataRow> rows) throws MiddlewareQueryException;
 
     /**
      * Update SSR Records.
+     * For new values to be added, set the id to null.
      *
      * @param dataset the Dataset
+     * @param markers - List of Markers to add/update
+     * @param markerMetadataSets - List of MarkerMetadataSets to add/update
      * @param rows the rows to update
      * @return true if successful
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
-    Boolean updateSSR(Dataset dataset, List<SSRDataRow> rows) 
-            throws MiddlewareQueryException, MiddlewareException;
-    
     Boolean updateSSR(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<SSRDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
@@ -1519,30 +1515,14 @@ public interface GenotypicDataManager{
      * Sets SNP
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
-     * Also pass the SNP Genotyping data rows as a list of SNPDataRow objects.
-     *
-     * @param dataset - (Dataset) dataset_type = "SNP", datatype = "int"
-     * @param datasetUser - (DatasetUser)
-     * @param rows the rows
-     * @return (boolean) - true if successful, exception or false if failed
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<SNPDataRow> rows) 
-            throws MiddlewareQueryException;
-    
-    /**
-     * Sets SNP
-     * 
-     * To use, supply the Dataset and DatasetUsers objects to save.
-     * 
      * Also pass the list of Markers and MarkerMetadataSets, 
      * and SNP Genotyping data rows as a list of SNPDataRow objects.
+     * For new values to be added, set the id to null.
      *
      * @param dataset - (Dataset) dataset_type = "SNP", datatype = "int"
      * @param datasetUser - (DatasetUser)
-     * @param markers
-     * @param markerMetadataSets
+     * @param markers - List of Markers to add
+     * @param markerMetadataSets - List of MarkerMetadataSets to add
      * @param rows the rows
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
@@ -1552,18 +1532,17 @@ public interface GenotypicDataManager{
                     throws MiddlewareQueryException;
 
     /**
-     * Update SNP Recrods.
+     * Update SNP Records.
+     * For new values to be added, set the id to null.
      *
      * @param dataset the Dataset
+     * @param markers - List of Markers to add/update
+     * @param markerMetadataSets - List of MarkerMetadataSets to add/update
      * @param rows the rows to update
      * @return true if successful
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
-    Boolean updateSNP(Dataset dataset, List<SNPDataRow> rows) 
-            throws MiddlewareQueryException, MiddlewareException;
-
     Boolean updateSNP(Dataset dataset, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<SNPDataRow> rows) throws MiddlewareQueryException, MiddlewareException;
 
@@ -1572,36 +1551,34 @@ public interface GenotypicDataManager{
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
      * Also pass the Mapping ABH Genotyping data rows as a list of MappingABHRow objects.
+     * For new values to be added, set the id to null.
      *
      * @param dataset - Dataset
      * @param datasetUser - Dataset Users
      * @param mappingPop - Mapping Population
+     * @param markers - List of Markers to add
+     * @param markerMetadataSets - List of MarkerMetadataSets to add
      * @param rows the rows
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
-    Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
-            List<MappingABHRow> rows) throws MiddlewareQueryException;
-
     Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<MappingABHRow> rows) 
             throws MiddlewareQueryException;
 
     /**
      * Update Mapping ABH Records.
+     * For new values to be added, set the id to null.
      *
      * @param dataset the dataset
      * @param mappingPop the mapping pop
+     * @param markers - List of Markers to add/update
+     * @param markerMetadataSets - List of MarkerMetadataSets to add/update
      * @param rows the rows to update
      * @return true if successful
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
-    Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop, List<MappingABHRow> rows) 
-            throws MiddlewareQueryException, MiddlewareException;
-
     Boolean updateMappingABH(Dataset dataset, MappingPop mappingPop,  
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<MappingABHRow> rows) throws MiddlewareQueryException, MiddlewareException;
@@ -1611,37 +1588,34 @@ public interface GenotypicDataManager{
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
      * Also pass the Mapping Allelic SNP Genotyping data rows as a list of MappingAllelicSNPRow objects.
+     * For new values to be added, set the id to null.
      *
      * @param dataset - Dataset
      * @param datasetUser - Dataset Users
      * @param mappingPop - Mapping Population
+     * @param markers - List of Markers to add
+     * @param markerMetadataSets - List of MarkerMetadataSets to add
      * @param rows the rows
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
-    Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, 
-            MappingPop mappingPop, List<MappingAllelicSNPRow> rows) 
-            throws MiddlewareQueryException;
-    
     Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException;
 
     /**
      * Update Mapping Allelic SNP Record.
+     * For new values to be added, set the id to null.
      *
      * @param dataset the Dataset
      * @param mappingPop the mapping pop
+     * @param markers - List of Markers to add/update
+     * @param markerMetadataSets - List of MarkerMetadataSets to add/update
      * @param rows the rows to update
      * @return true if successful
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
-    Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, 
-            List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException, MiddlewareException;
-
     Boolean updateMappingAllelicSNP(Dataset dataset, MappingPop mappingPop, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException, MiddlewareException;
@@ -1653,36 +1627,34 @@ public interface GenotypicDataManager{
      * To use, supply the Dataset and DatasetUsers objects to save.
      * Also pass the Mapping Allelic SSR DArT Genotyping data rows 
      * as a list of MappingAllelicSSRDArTRow objects.
+     * For new values to be added, set the id to null.
      *
      * @param dataset - Dataset
      * @param datasetUser - Dataset Users
      * @param mappingPop - Mapping Population
+     * @param markers - List of Markers to add
+     * @param markerMetadataSets - List of MarkerMetadataSets to add
      * @param rows the rows
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
-    Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser,MappingPop mappingPop, 
-            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException;
-    
     Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException;
 
     /**
      * Update Mapping Allelic SSR DArT records.
+     * For new values to be added, set the id to null.
      *
      * @param dataset the Dataset
      * @param mappingPop the mapping pop
+     * @param markers - List of Markers to add/update
+     * @param markerMetadataSets - List of MarkerMetadataSets to add/update
      * @param rows the rows to update
      * @return true if successful
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
-    Boolean updateMappingAllelicSSRDArT(Dataset dataset, MappingPop mappingPop, 
-            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException, MiddlewareException;
-
     Boolean updateMappingAllelicSSRDArT(Dataset dataset, MappingPop mappingPop, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException, MiddlewareException;
@@ -2230,7 +2202,8 @@ public interface GenotypicDataManager{
 
     
     /**
-     * Update marker info.
+     * Update marker info. 
+     * For new values to be added, set the id to null.
      *
      * @param marker the marker
      * @param markerAlias the marker alias

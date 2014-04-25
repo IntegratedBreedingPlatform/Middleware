@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.pojos.GidNidElement;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -169,8 +169,8 @@ public class NameDAO extends GenericDAO<Name, Integer>{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException {
-        List<GidNidElement> toReturn = new ArrayList<GidNidElement>();
+    public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(List<String> germplasmNames) throws MiddlewareQueryException {
+        List<GermplasmNameDetails> toReturn = new ArrayList<GermplasmNameDetails>();
 
         try {
             if (germplasmNames != null && !germplasmNames.isEmpty()) {
@@ -184,7 +184,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 	                    Integer gId = (Integer) result[0];
                         Integer nId = (Integer) result[1];
                         String nVal = (String) result[2];
-	                    GidNidElement element = new GidNidElement(gId, nId, nVal);
+	                    GermplasmNameDetails element = new GermplasmNameDetails(gId, nId, nVal);
 	                    toReturn.add(element);
 	                }
 	            }

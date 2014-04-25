@@ -30,7 +30,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GidNidElement;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Bibref;
@@ -541,12 +541,21 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
-    public void testGetGidAndNidByGermplasmNames() throws Exception {
-        List<String> germplasmNames = Arrays.asList("C 65 CU 79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65");
+    public void testGetGermplasmDetailsByGermplasmNames() throws Exception {
+        List<String> germplasmNames = Arrays.asList("C 65 CU   79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65");
         // SQL TO VERIFY (CENTRAL AND LOCAL): select gid, nid, nval from names where nval in (:germplasmNames);
         
-        List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
-        Debug.printObjects(results);
+        List<GermplasmNameDetails> results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.NORMAL);
+        Debug.println(INDENT, "GetGermplasmByNameModes.NORMAL:");
+        Debug.printObjects(INDENT, results);
+        
+        results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.SPACES_REMOVED);
+        Debug.println(INDENT, "GetGermplasmByNameModes.SPACES_REMOVED:");
+        Debug.printObjects(INDENT, results);
+
+        results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.STANDARDIZED);
+        Debug.println(INDENT, "GetGermplasmByNameModes.STANDARDIZED:");
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
