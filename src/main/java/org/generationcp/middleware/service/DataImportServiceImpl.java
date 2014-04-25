@@ -490,15 +490,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 if (svar.getStoredIn() != null) {
                     if (svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
                         mvar.setRequired(true);
-                        if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
-                            mvar.setRequired(true);
-                            return true;
-                        }
+                        return true;
                     }
                 }
-
             }
         }
+
         return false;
     }
 
@@ -511,6 +508,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 StandardVariable svar = ontology.getStandardVariable(varId);
 
                 if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
+                    mvar.setRequired(true);
                     return true;
                 }
 
