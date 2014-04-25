@@ -62,6 +62,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -680,12 +681,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		for (Iterator<StandardVariableReference> iter = list.iterator(); iter.hasNext(); ) {
 			boolean hasPairInCentral = false, hasPairInLocal = false;
 			StandardVariableReference ref =  iter.next();
+			setWorkingDatabase(ref.getId());
+			CVTermRelationship relationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(ref.getId(), TermId.HAS_PROPERTY.getId());
 			
-			setWorkingDatabase(Database.CENTRAL);
-			hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId());
-			if (!hasPairInCentral) {
-				setWorkingDatabase(Database.LOCAL);
-				hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId());
+			if (relationship != null) {
+				int propertyId = relationship.getObjectId();
+				setWorkingDatabase(Database.CENTRAL);
+				hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId);
+				if (!hasPairInCentral) {
+					setWorkingDatabase(Database.LOCAL);
+					hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId);
+				}
 			}
 			
 			if (!hasPairInCentral && !hasPairInLocal) {
