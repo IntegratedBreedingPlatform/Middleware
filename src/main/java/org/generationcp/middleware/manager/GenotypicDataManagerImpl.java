@@ -1465,6 +1465,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             if (rows != null && rows.size() > 0) {
                 
                 List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+                List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
                 List<DartValues> dartValues = new ArrayList<DartValues>();
 
                 for (DartDataRow row : rows) {
@@ -1472,12 +1473,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     accMetadataSet.setDatasetId(datasetId);
                     accMetadataSets.add(accMetadataSet);
 
-                    DartValues dartValue = row.getDartValues();
+                    AlleleValues alleleValue = row.getAlleleValues();
+                    alleleValue.setDatasetId(datasetId);
+                    alleleValues.add(alleleValue);
+
+                	DartValues dartValue = row.getDartValues();
                     dartValue.setDatasetId(datasetId);
                     dartValues.add(dartValue);
                 }
                 
                 saveAccMetadataSets(accMetadataSets);
+                saveAlleleValues(alleleValues);
                 saveDartValues(dartValues);
             }
             trans.commit();
