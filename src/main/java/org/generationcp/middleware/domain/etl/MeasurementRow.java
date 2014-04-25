@@ -107,6 +107,17 @@ public class MeasurementRow {
 		return null;
 	}
 
+	public MeasurementData getMeasurementData(String label) {
+		if(label!=null && dataList!=null && !dataList.isEmpty()) {
+			for (MeasurementData data : dataList) {
+				if(label!=null && data.getLabel()!=null && label.equals(data.getLabel())) {
+					return data;
+				}
+			}
+		}
+		return null;
+	}
+
 	public List<MeasurementData> getDataList() {
 		return dataList;
 	}

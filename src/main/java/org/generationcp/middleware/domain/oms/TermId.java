@@ -114,9 +114,10 @@ public enum TermId {
     , ENTRY_DESIGNATION_STORAGE(1046)
     , ENTRY_CODE_STORAGE(1047)
     
-    // Stock Plot / Fieldmap 
+    // Stock Plot / Fieldmap
     , PLOT_NO (8200)
     , PLOT_NNO (8380)
+    , PLOT_CODE (8350)
     , REP_NO (8210)
     , BLOCK_NO (8220)
     , COLUMN_NO (8400) //
