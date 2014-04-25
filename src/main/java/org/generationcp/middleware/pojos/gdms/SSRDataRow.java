@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 
@@ -19,12 +18,8 @@ package org.generationcp.middleware.pojos.gdms;
  */
 public class SSRDataRow{
     
-    private Marker marker;
-    
     private AccMetadataSet accMetadataSet;
-    
-    private MarkerMetadataSet markerMetadataSet;
-    
+
     private AlleleValues alleleValues;
 
     
@@ -36,63 +31,21 @@ public class SSRDataRow{
         this.alleleValues = alleleValues;
     }
     
-    public SSRDataRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
-            AlleleValues alleleValues) {
-        super();
-        this.marker = marker;
-        this.accMetadataSet = accMetadataSet;
-        this.markerMetadataSet = markerMetadataSet;
-        this.alleleValues = alleleValues;
-    }
-
-
-    
-    public Marker getMarker() {
-        return marker;
-    }
-
-
-    
-    public void setMarker(Marker marker) {
-        this.marker = marker;
-    }
-
-
-    
     public AccMetadataSet getAccMetadataSet() {
         return accMetadataSet;
     }
-
-
     
     public void setAccMetadataSet(AccMetadataSet accMetadataSet) {
         this.accMetadataSet = accMetadataSet;
     }
-
-
-    
-    public MarkerMetadataSet getMarkerMetadataSet() {
-        return markerMetadataSet;
-    }
-
-
-    
-    public void setMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) {
-        this.markerMetadataSet = markerMetadataSet;
-    }
-
-
     
     public AlleleValues getAlleleValues() {
         return alleleValues;
     }
-
-
     
     public void setAlleleValues(AlleleValues alleleValues) {
         this.alleleValues = alleleValues;
     }
-
 
     @Override
     public int hashCode() {
@@ -100,8 +53,6 @@ public class SSRDataRow{
         int result = 1;
         result = prime * result + ((accMetadataSet == null) ? 0 : accMetadataSet.hashCode());
         result = prime * result + ((alleleValues == null) ? 0 : alleleValues.hashCode());
-        result = prime * result + ((marker == null) ? 0 : marker.hashCode());
-        result = prime * result + ((markerMetadataSet == null) ? 0 : markerMetadataSet.hashCode());
         return result;
     }
 
@@ -125,16 +76,6 @@ public class SSRDataRow{
                 return false;
         } else if (!alleleValues.equals(other.alleleValues))
             return false;
-        if (marker == null) {
-            if (other.marker != null)
-                return false;
-        } else if (!marker.equals(other.marker))
-            return false;
-        if (markerMetadataSet == null) {
-            if (other.markerMetadataSet != null)
-                return false;
-        } else if (!markerMetadataSet.equals(other.markerMetadataSet))
-            return false;
         return true;
     }
 
@@ -142,12 +83,8 @@ public class SSRDataRow{
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("SSRDataRow [marker=");
-        builder.append(marker);
-        builder.append(", accMetadataSet=");
+        builder.append("SSRDataRow [accMetadataSet=");
         builder.append(accMetadataSet);
-        builder.append(", markerMetadataSet=");
-        builder.append(markerMetadataSet);
         builder.append(", alleleValues=");
         builder.append(alleleValues);
         builder.append("]");

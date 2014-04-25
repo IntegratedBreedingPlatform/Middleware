@@ -344,6 +344,25 @@ public class GermplasmDataManagerUtil{
         return nameToUse;
     }
 
+    public static List<String> getNamesToUseByMode(List<String> names, GetGermplasmByNameModes mode){
+    	List<String> namesToUse = new ArrayList<String>();
+
+    	for (String name : names){
+	    	String nameToUse = "";
+	        if (mode == GetGermplasmByNameModes.NORMAL) {
+	            nameToUse = name;
+	        } else if (mode == GetGermplasmByNameModes.SPACES_REMOVED) {
+	            String nameWithSpacesRemoved = GermplasmDataManagerUtil.removeSpaces(name);
+	            nameToUse = nameWithSpacesRemoved.toString();
+	        } else if (mode == GetGermplasmByNameModes.STANDARDIZED) {
+	            String standardizedName = GermplasmDataManagerUtil.standardizeName(name);
+	            nameToUse = standardizedName;
+	        }
+	        namesToUse.add(nameToUse);
+    	}
+        return namesToUse;
+    }
+
     public static List<String> createNamePermutations(String name){
         List<String> names = new ArrayList<String>();
         names.add(name);

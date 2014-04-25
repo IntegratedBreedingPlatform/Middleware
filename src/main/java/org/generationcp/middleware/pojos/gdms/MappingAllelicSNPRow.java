@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 
@@ -19,20 +18,14 @@ package org.generationcp.middleware.pojos.gdms;
  */
 public class MappingAllelicSNPRow{
     
-    private Marker marker;
-    
     private AccMetadataSet accMetadataSet;
-    
-    private MarkerMetadataSet markerMetadataSet;
-    
+
     private MappingPopValues mappingPopValues;
     
     private CharValues charValues;
 
-    
     public MappingAllelicSNPRow() {
     }
-
 
     public MappingAllelicSNPRow(AccMetadataSet accMetadataSet, 
             MappingPopValues mappingPopValues, CharValues charValues) {
@@ -41,71 +34,33 @@ public class MappingAllelicSNPRow{
         this.charValues = charValues;
     }
 
-
     public MappingAllelicSNPRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
             MappingPopValues mappingPopValues, CharValues charValues) {
-        super();
-        this.marker = marker;
         this.accMetadataSet = accMetadataSet;
-        this.markerMetadataSet = markerMetadataSet;
         this.mappingPopValues = mappingPopValues;
         this.charValues = charValues;
     }
 
-    
-    public Marker getMarker() {
-        return marker;
-    }
-
-
-    
-    public void setMarker(Marker marker) {
-        this.marker = marker;
-    }
-
-
-    
     public AccMetadataSet getAccMetadataSet() {
         return accMetadataSet;
     }
 
-
-    
     public void setAccMetadataSet(AccMetadataSet accMetadataSet) {
         this.accMetadataSet = accMetadataSet;
     }
 
-
-    
-    public MarkerMetadataSet getMarkerMetadataSet() {
-        return markerMetadataSet;
-    }
-
-
-    
-    public void setMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) {
-        this.markerMetadataSet = markerMetadataSet;
-    }
-
-
-    
     public MappingPopValues getMappingPopValues() {
         return mappingPopValues;
     }
 
-
-    
     public void setMappingPopValues(MappingPopValues mappingPopValues) {
         this.mappingPopValues = mappingPopValues;
     }
 
-    
     public CharValues getCharValues() {
         return charValues;
     }
 
-
-    
     public void setCharValues(CharValues charValues) {
         this.charValues = charValues;
     }
@@ -117,11 +72,8 @@ public class MappingAllelicSNPRow{
         result = prime * result + ((accMetadataSet == null) ? 0 : accMetadataSet.hashCode());
         result = prime * result + ((mappingPopValues == null) ? 0 : mappingPopValues.hashCode());
         result = prime * result + ((charValues == null) ? 0 : charValues.hashCode());
-        result = prime * result + ((marker == null) ? 0 : marker.hashCode());
-        result = prime * result + ((markerMetadataSet == null) ? 0 : markerMetadataSet.hashCode());
         return result;
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -147,16 +99,6 @@ public class MappingAllelicSNPRow{
                 return false;
         } else if (!charValues.equals(other.charValues))
             return false;
-        if (marker == null) {
-            if (other.marker != null)
-                return false;
-        } else if (!marker.equals(other.marker))
-            return false;
-        if (markerMetadataSet == null) {
-            if (other.markerMetadataSet != null)
-                return false;
-        } else if (!markerMetadataSet.equals(other.markerMetadataSet))
-            return false;
         return true;
     }
 
@@ -164,12 +106,8 @@ public class MappingAllelicSNPRow{
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("MappingAllelicSNPRow [marker=");
-        builder.append(marker);
-        builder.append(", accMetadataSet=");
+        builder.append("MappingAllelicSNPRow [accMetadataSet=");
         builder.append(accMetadataSet);
-        builder.append(", markerMetadataSet=");
-        builder.append(markerMetadataSet);
         builder.append(", mappingPopValues=");
         builder.append(mappingPopValues);
         builder.append(", charValues=");
