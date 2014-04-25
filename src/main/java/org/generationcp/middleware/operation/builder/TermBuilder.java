@@ -128,7 +128,14 @@ public class TermBuilder extends Builder {
         if (term == null) {
         	term = getTermSaver().save(name, name, cv);
         	//assign unclassified trait class
-        	getCvTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+        	setWorkingDatabase(Database.CENTRAL);
+        	CVTerm cvTerm = getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
+        	Integer typeClass = null;
+        	if(cvTerm != null)
+        		typeClass = TermId.GENERAL_TRAIT_CLASS.getId();
+        	else
+        		typeClass = TermId.ONTOLOGY_TRAIT_CLASS.getId();
+        	getCvTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), typeClass);
         }
         return term;
 	}
