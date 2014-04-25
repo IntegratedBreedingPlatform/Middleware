@@ -681,6 +681,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		for (Iterator<StandardVariableReference> iter = list.iterator(); iter.hasNext(); ) {
 			boolean hasPairInCentral = false, hasPairInLocal = false;
 			StandardVariableReference ref =  iter.next();
+			setWorkingDatabase(ref.getId());
 			CVTermRelationship relationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(ref.getId(), TermId.HAS_PROPERTY.getId());
 			
 			if (relationship != null) {
