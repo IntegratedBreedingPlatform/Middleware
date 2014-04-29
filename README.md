@@ -56,11 +56,11 @@ To add Middleware as a dependency to your project using Apache Maven, add the fo
 For the released version, add the following to your list of dependencies in your POM file:</br>
 
 <pre>
-<dependency>
-    <groupId>org.generationcp</groupId>
-    <artifactId>middleware</artifactId>
-    <version>2.1.0-RELEASE</version>
-</dependency>
+&lt;dependency>
+    &lt;groupId>org.generationcp&lt;/groupId>
+    &lt;artifactId>middleware&lt;/artifactId>
+    &lt;version>2.1.0-RELEASE&lt;/version>
+&lt;/dependency>
 </pre>
 
 Take note of the version.  Use of the latest version is recommended. 
@@ -68,31 +68,32 @@ Take note of the version.  Use of the latest version is recommended.
 The Middleware is deployed at the Maven Repository hosted on gcp.efficio.us.com. To use the repository, add the following to your POM file:
 
 <pre>
-<repositories>
-	<repository>
-		<id>gcp-efficio-repo</id>
-		<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/</url>
-	</repository>
-</repositories>
+&lt;repositories></br>
+	&lt;repository></br>
+		&lt;id>gcp-efficio-repo&lt;/id></br>
+		&lt;url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/&lt;/url></br>
+	&lt;/repository></br>
+&lt;/repositories></br>
 </pre>
 
 For the development version, add the following to your POM:
 
 <pre>
-<dependency>
-    <groupId>org.generationcp</groupId>
-    <artifactId>middleware</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
-</dependency>
+&lt;dependency>
+    &lt;groupId>org.generationcp&lt;/groupId>
+    &lt;artifactId>middleware&lt;/artifactId>
+    &lt;version>2.1.0-SNAPSHOT&lt;/version>
+&lt;/dependency>
 </pre>
 
 <pre>
 <repositories>
-	<repository>
-		<id>gcp-efficio-repo</id>
-		<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
-	</repository>
-</repositories>
+&lt;repositories></br>
+	&lt;repository></br>
+		&lt;id>gcp-efficio-repo&lt;/id></br>
+		&lt;url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/&lt;/url></br>
+	&lt;/repository></br>
+&lt;/repositories></br>
 </pre>
 
 
