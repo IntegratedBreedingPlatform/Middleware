@@ -1008,7 +1008,7 @@ public abstract class DataManager extends DatabaseBroker{
      * Retrieves the positive ids from the given list of ids
      * 
      * @param ids   The positive list of ids
-     * @return
+     * @return the positive ids from the given list
      */
     protected List<Integer> getPositiveIds(List<Integer> ids) {
         List<Integer> positiveIds = new ArrayList<Integer>();
@@ -1024,7 +1024,7 @@ public abstract class DataManager extends DatabaseBroker{
      * Retrieves the negative ids from the given list of ids
      * 
      * @param ids   The negative list of ids
-     * @return
+     * @return the negative ids from the given list
      */
     protected List<Integer> getNegativeIds(List<Integer> ids) {
         List<Integer> negativeIds = new ArrayList<Integer>();

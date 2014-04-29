@@ -800,7 +800,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	
 	/**
 	 * Retrieves all the study details 
-	 * @return
+	 * @return List of all nursery and trial study nodes
 	 * @throws MiddlewareQueryException
 	 */
 	

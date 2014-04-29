@@ -543,7 +543,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 * Returns standard variables associated to the given list of trait names or synonyms
 	 * 
 	 * @param propertyNameOrSynonyms
-	 * @return
+	 * @return Map of name-standard variable ids of the given trait name or synonyms
 	 * @throws MiddlewareQueryException
 	 */
 	public Map<String, Set<Integer>> getStandardVariableIdsByProperties(List<String> propertyNameOrSynonyms) throws MiddlewareQueryException {
@@ -782,8 +782,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     /**
      * Retrieves all the trait classes (id, name, definition, parent trait class)
      *
-     * @param traitClassIds
-     * @return
+     * @return List of trait class references
      */
     public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException{
         List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
@@ -1007,7 +1006,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
      * @param propertyId
      * @param methodId
      * @param scaleId
-     * @return
+     * @return List of standard variable ids
      * @throws MiddlewareQueryException
      */
     public List<Integer> getStandardVariableIds(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId) throws MiddlewareQueryException {

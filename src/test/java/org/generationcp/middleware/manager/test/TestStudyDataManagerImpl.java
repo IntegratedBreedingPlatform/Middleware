@@ -246,7 +246,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
     public void testGetRootFolders() throws Exception {
         List<FolderReference> rootFolders = manager.getRootFolders(Database.CENTRAL);
         assertNotNull(rootFolders);
-        assert (rootFolders.size() > 0);
+        assertTrue(rootFolders.size() > 0);
         Debug.println(INDENT, "testGetRootFolders(): " + rootFolders.size());
         for (FolderReference node : rootFolders) {
             Debug.println(INDENT, "   " + node);
@@ -259,7 +259,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
         for (Integer folderId : folderIds) {
             List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
             assertNotNull(childrenNodes);
-            assert (childrenNodes.size() > 0);
+            assertTrue(childrenNodes.size() > 0);
             Debug.println(INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
             for (Reference node : childrenNodes) {
                 Debug.println(INDENT, "   " + node);
@@ -272,7 +272,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
         Integer studyId = 10010;
         List<DatasetReference> datasetReferences = manager.getDatasetReferences(studyId);
         assertNotNull(datasetReferences);
-        assert (datasetReferences.size() > 0);
+        assertTrue(datasetReferences.size() > 0);
         Debug.println(INDENT, "Dataset Nodes By Study Id Count: " + datasetReferences.size());
         for (DatasetReference node : datasetReferences) {
             Debug.println(INDENT, "   " + node);

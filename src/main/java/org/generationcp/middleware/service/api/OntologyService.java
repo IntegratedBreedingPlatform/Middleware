@@ -84,7 +84,7 @@ public interface OntologyService{
     /**
      * Gets the all standard variables.
      *
-     * @return the all standard variables
+     * @return the standard variables
      * @throws MiddlewareQueryException the middleware query exception
      */
     // Review: why do we need such a method? Can load a large portion of the DB.
@@ -130,7 +130,7 @@ public interface OntologyService{
      * Gets the all terms by cv id.
      *
      * @param cvId the cv id
-     * @return the all terms by cv id
+     * @return the terms by cv id
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
@@ -168,7 +168,6 @@ public interface OntologyService{
      *
      * @param standardVariableId the standard variable id
      * @param constraints the constraints
-     * @return the variable constraints with the id set
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
@@ -519,7 +518,7 @@ public interface OntologyService{
      * Count the number of projects the variable was used.
      *
      * @param variableId the variable id
-     * @return the long
+     * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
@@ -529,7 +528,7 @@ public interface OntologyService{
      *
      * @param variableId the variable id
      * @param storedInId the stored in id
-     * @return the long
+     * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
@@ -579,7 +578,7 @@ public interface OntologyService{
     /**
      * Returns all Properties with its trait class.
      *
-     * @return the all properties with trait class
+     * @return the properties with trait class
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
@@ -590,7 +589,7 @@ public interface OntologyService{
      * 
      * @param standardVariableId
      * @param enumerationId
-     * @return
+     * @return true if valid
      * @throws MiddlewareQueryException
      */
     boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;

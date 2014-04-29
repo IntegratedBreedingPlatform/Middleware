@@ -68,7 +68,7 @@ public class AllelicValueElement implements Serializable{
      * @param datasetId
      * @param gid
      * @param markerId
-     * @param data
+     * @param alleleBinValue
      * @param peakHeight
      */
     public AllelicValueElement(Integer id, Integer datasetId, Integer gid, Integer markerId, String alleleBinValue, Integer peakHeight) {

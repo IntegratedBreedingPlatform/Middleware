@@ -42,7 +42,7 @@ public abstract class SessionFactoryUtil {
      * configuration file.
      *
      * @param params
-     * @return
+     * @return the SessionFactory
      * @throws FileNotFoundException
      */
     public static SessionFactory openSessionFactory(DatabaseConnectionParameters params) throws FileNotFoundException {
@@ -57,7 +57,7 @@ public abstract class SessionFactoryUtil {
      *                                   will use the default Middleware Hibernate configuration
      *                                   filename
      * @param params
-     * @return
+     * @return the SessionFactory
      * @throws FileNotFoundException
      */
     public static SessionFactory openSessionFactory(String hibernateConfigurationFile, DatabaseConnectionParameters params, String... additionalResourceFiles) throws FileNotFoundException {

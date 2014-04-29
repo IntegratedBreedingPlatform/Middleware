@@ -592,8 +592,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     
     /**
      * Search for germplasm lists given a search term Q
-     * @param q
-     * @param operation
+     * @param q String
+     * @param o operation
      * @return - List of germplasm lists
      * @throws MiddlewareQueryException
      */

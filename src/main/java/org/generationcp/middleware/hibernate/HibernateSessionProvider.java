@@ -24,7 +24,7 @@ public interface HibernateSessionProvider {
     /**
      * Get a Hibernate {@link Session}.
      * 
-     * @return
+     * @return the Session
      */
     Session getSession();
     

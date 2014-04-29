@@ -625,7 +625,7 @@ public class WorkbookSaver extends Saver {
 	/**
      * Saves project ontology creating entries in the following tables:
      * project, projectprop and project_relationship
-     * @param Workbook
+     * @param workbook
      * @return study id
      * @throws Exception
      */
@@ -666,8 +666,7 @@ public class WorkbookSaver extends Saver {
      * Saves experiments creating entries in the following tables:
      * nd_geolocation, nd_geolocationprop, nd_experiment, nd_experiment_project, nd_experimentprop
      * nd_experiment_stock, stock, stockprop, nd_experiment_phenotype and phenotype
-     * @param Workbook
-     * @return 
+     * @param workbook
      * @throws Exception
      */
 	@SuppressWarnings("unchecked")

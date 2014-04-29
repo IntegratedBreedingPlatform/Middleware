@@ -240,7 +240,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /**
      * Sets the columns in block.
      *
-     * @param columnsInBlock the columnsInBlock to set
+     * @param rowsInBlock the rowsInBlock to set
      */
     public void setRowsInBlock(Integer rowsInBlock) {
         this.rowsInBlock = rowsInBlock;

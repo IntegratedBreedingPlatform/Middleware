@@ -437,7 +437,6 @@ public interface OntologyDataManager {
      *
      * @param standardVariableId the standard variable id
      * @param constraints the constraints
-     * @return the variable constraints
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
@@ -557,7 +556,7 @@ public interface OntologyDataManager {
 	 * 
 	 * @param standardVariableId
 	 * @param enumerationId
-	 * @return
+	 * @return true if valid
 	 * @throws MiddlewareQueryException
 	 */
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;

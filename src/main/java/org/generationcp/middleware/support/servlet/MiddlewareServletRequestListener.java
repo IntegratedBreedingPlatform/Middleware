@@ -67,7 +67,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return The ManagerFactory for the given Servlet Request
      */
     public static ManagerFactory getManagerFactoryForRequest(ServletRequest request) {
         return (ManagerFactory) request.getAttribute(ATTR_MIDDLEWARE_SESSION_FACTORY);
@@ -82,7 +82,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return The GermplasmDataManager for the given request
      */
     public static GermplasmDataManager getGermplasmDataManagerForRequest(ServletRequest request) {
         return getManagerFactoryForRequest(request).getGermplasmDataManager();
@@ -93,7 +93,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * specified {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return The GermplasmListManager for the given request
      */
     public static GermplasmListManager getGermplasmListManagerForRequest(ServletRequest request) {
         return getManagerFactoryForRequest(request).getGermplasmListManager();
@@ -104,7 +104,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return The OntologyDataManager for the given request
      */
     public static OntologyDataManager getOntologyDataManagerForRequest(ServletRequest request) {
         return getManagerFactoryForRequest(request).getOntologyDataManager();
@@ -115,7 +115,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return The StudyDataManager for the given request
      * @throws ConfigException
      */
     public static StudyDataManager getStudyDataManagerForRequest(ServletRequest request) throws ConfigException {
@@ -127,7 +127,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return The InventoryDataManager for the given request
      * @throws ConfigException
      */
     public static InventoryDataManager getInventoryDataManagerForRequest(ServletRequest request) throws ConfigException {
@@ -139,7 +139,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return The GenotypicDataManager for the given request
      * @throws ConfigException
      */
     public static GenotypicDataManager getGenotypicDataManagerForRequest(ServletRequest request) throws ConfigException {
@@ -151,7 +151,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * {@link ServletRequest} instance.
      * 
      * @param request
-     * @return
+     * @return  The UserDataManager for the given request
      * @throws ConfigException
      */
     public static UserDataManager getUserDataManagerForRequest(ServletRequest request) {

@@ -112,7 +112,7 @@ public abstract class StringUtil{
      * 
      * @param string
      * @param defaultValue
-     * @return
+     * @return the double value
      */
     public static double parseDouble(String string, double defaultValue) {
         if (StringUtils.isBlank(string)) {
@@ -156,7 +156,7 @@ public abstract class StringUtil{
      * 
      * @param delimiter
      * @param objectList
-     * @return
+     * @return The joined value.
      */
     public static String joinIgnoreEmpty(Object delimiter, Object... objectList) {
         StringBuilder sb = new StringBuilder();
@@ -200,7 +200,7 @@ public abstract class StringUtil{
      * 
      * @param delimiter
      * @param objectList
-     * @return
+     * @return The joined value.
      */
     public static String joinIgnoreNull(Object delimiter, Object... objectList) {
         StringBuilder sb = new StringBuilder();
@@ -243,7 +243,7 @@ public abstract class StringUtil{
      * @param obj
      * @param prefix
      * @param maxLength
-     * @return
+     * @return The prepended value.
      */
     public static String prependWith(Object obj, String prefix, int maxLength) {
         if (obj == null) {
@@ -270,7 +270,7 @@ public abstract class StringUtil{
      * @param obj
      * @param suffix
      * @param maxLength
-     * @return
+     * @return The appended value.
      */
     public static String appendWith(Object obj, String suffix, int maxLength) {
         if (obj == null) {
@@ -295,7 +295,7 @@ public abstract class StringUtil{
      * 
      * @param ch
      * @param count
-     * @return
+     * @return String of ch concatenated count times
      */
     public static String stringOf(char ch, int count) {
         StringBuilder sb = new StringBuilder();
@@ -313,7 +313,7 @@ public abstract class StringUtil{
      * 
      * @param str
      * @param count
-     * @return
+     * @return String of str concatenated count times
      */
     public static String stringOf(String str, int count) {
         StringBuilder sb = new StringBuilder();

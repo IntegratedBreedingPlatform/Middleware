@@ -39,7 +39,7 @@ public class GermplasmPedigreeTreeNode{
      * Returns a List of GermplasmPedigreeTreeNode objects representing the
      * child nodes.
      * 
-     * @return
+     * @return linked nodes
      */
     public List<GermplasmPedigreeTreeNode> getLinkedNodes() {
         return linkedNodes;

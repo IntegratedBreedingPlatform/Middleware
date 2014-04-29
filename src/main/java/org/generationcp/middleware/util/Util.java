@@ -54,9 +54,8 @@ public class Util{
      * Test whether <code>obj</code> is equal to one of the specified objects.
      * 
      * @param obj
-     * @param obj1
      * @param objs
-     * @return
+     * @return true if the obj is one of the objects
      */
     public static boolean isOneOf(Object obj, Object... objs) {
         if (objs == null) {
@@ -75,7 +74,7 @@ public class Util{
     /**
      * Returns true if all values are null.
      * @param args
-     * @return
+     * @return true if all values are null.
      */
     public static boolean isAllNull(Object... args) {
         for (Object obj : args) {
@@ -91,7 +90,7 @@ public class Util{
      * 
      * @param value
      * @param values
-     * @return
+     * @return true if value is equal to all values.
      */
     public static boolean isAllEqualTo(Double value, Double... values) {
         if (values == null) {
@@ -112,7 +111,7 @@ public class Util{
      * considered "empty".
      * 
      * @param list
-     * @return
+     * @return true if the given list is empty.
      */
     public static boolean isEmpty(List<?> list) {
         return list == null || list.isEmpty();
@@ -122,7 +121,7 @@ public class Util{
      * Returns the maximum among the input values.
      * @param value1
      * @param values
-     * @return
+     * @return Maximum of the given values.
      */
     public static int max(int value1, int... values) {
         int max = value1;
@@ -139,7 +138,7 @@ public class Util{
     /**
      * Makes the given objects in the list unmodifiable.
      * @param objects
-     * @return
+     * @return the read-only list.
      */
     public static <T> List<T> makeReadOnlyList(T... objects) {
         if (objects == null) {

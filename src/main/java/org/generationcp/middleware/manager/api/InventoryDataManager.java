@@ -47,7 +47,7 @@ public interface InventoryDataManager{
      * parameter.
      * 
      * @param type
-     * @return
+     * @return count
      */
     long countLotsByEntityType(String type) throws MiddlewareQueryException;
 
@@ -73,7 +73,7 @@ public interface InventoryDataManager{
      * 
      * @param type
      * @param entityId
-     * @return
+     * @return the count
      */
     long countLotsByEntityTypeAndEntityId(String type, Integer entityId) throws MiddlewareQueryException;
 
@@ -99,7 +99,7 @@ public interface InventoryDataManager{
      * 
      * @param type
      * @param locationId
-     * @return
+     * @return the count
      */
     long countLotsByEntityTypeAndLocationId(String type, Integer locationId) throws MiddlewareQueryException;
 
@@ -127,7 +127,7 @@ public interface InventoryDataManager{
      * @param type
      * @param entityId
      * @param locationId
-     * @return
+     * @return the count
      */
     long countLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId) throws MiddlewareQueryException;
 
@@ -243,7 +243,7 @@ public interface InventoryDataManager{
      * the given id.
      * 
      * @param id
-     * @return
+     * @return the Transaction of the given id
      */
     Transaction getTransactionById(Integer id) throws MiddlewareQueryException;
 
@@ -265,7 +265,7 @@ public interface InventoryDataManager{
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
-     * @return
+     * @return list of all reserve transactions
      */
     List<Transaction> getAllReserveTransactions(int start, int numOfRows) throws MiddlewareQueryException;
 
@@ -273,7 +273,7 @@ public interface InventoryDataManager{
      * Returns the number of Transaction records which are classified as reserve
      * transactions. The records have status = 0 and negative quantities.
      * 
-     * @return
+     * @return the count
      */
     long countAllReserveTransactions() throws MiddlewareQueryException;
 
@@ -294,7 +294,7 @@ public interface InventoryDataManager{
      * Returns the number of Transaction records which are classified as deposit
      * transactions. The records have status = 0 and positive quantities.
      * 
-     * @return
+     * @return the count
      */
     long countAllDepositTransactions() throws MiddlewareQueryException;
 
@@ -319,7 +319,7 @@ public interface InventoryDataManager{
      * made by the person identified by the given id.
      * 
      * @param personId
-     * @return
+     * @return the count
      */
     long countAllReserveTransactionsByRequestor(Integer personId) throws MiddlewareQueryException;
 
@@ -344,7 +344,7 @@ public interface InventoryDataManager{
      * made by the person identified by the given id.
      * 
      * @param personId
-     * @return
+     * @return the count
      */
     long countAllDepositTransactionsByDonor(Integer personId) throws MiddlewareQueryException;
 
@@ -366,7 +366,7 @@ public interface InventoryDataManager{
      * Return the number of all Transaction records which are uncommitted
      * (status is equal to zero).
      * 
-     * @return
+     * @return the count
      */
     long countAllUncommittedTransactions() throws MiddlewareQueryException;
 
@@ -405,7 +405,7 @@ public interface InventoryDataManager{
      * Returns the number of Transaction records classified as withdrawal
      * transactions (quantity is negative).
      * 
-     * @return
+     * @return the count
      */
     long countAllWithdrawalTransactions() throws MiddlewareQueryException;
 
@@ -473,8 +473,13 @@ public interface InventoryDataManager{
      * Included information are: lot id of the lot, entity id of the lot, lot
      * balance, location of the lot, and scale of the lot.
      * 
-     * @param minAmount
+     * @param minimumAmount
      *            - value specified
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
      * @return List of LotReportRow objects
      * @throws MiddlewareQueryException
      */

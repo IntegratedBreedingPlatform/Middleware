@@ -52,7 +52,7 @@ public enum Season {
     /**
      * Returns the corresponding Season object based on the given string input
      * @param seasonStr
-     * @return
+     * @return the Season based on the given String
      */
     public static Season getSeason(String seasonStr){
         Season season = Season.GENERAL;

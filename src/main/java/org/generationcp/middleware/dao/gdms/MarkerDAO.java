@@ -107,7 +107,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      * Gets the marker_id of the first occurence of the marker_name
      *
      * @param names
-     * @return
+     * @return Map of markerId-markerName pairs
      * @throws MiddlewareQueryException
      */
     public Map<Integer, String> getFirstMarkerIdByMarkerName(List<String> names, Database instance) throws MiddlewareQueryException {

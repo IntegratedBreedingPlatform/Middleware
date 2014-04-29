@@ -174,7 +174,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 
         try {
             if (germplasmNames != null && !germplasmNames.isEmpty()) {
-	            SQLQuery query = getSession().createSQLQuery(Name.GET_GID_AND_NID_BY_GERMPLASM_NAME);
+	            SQLQuery query = getSession().createSQLQuery(Name.GET_NAME_DETAILS_BY_NAME);
 	            query.setParameterList("germplasmNameList", germplasmNames);
 	            List results = query.list();
 	

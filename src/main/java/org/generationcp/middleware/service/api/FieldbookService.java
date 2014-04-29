@@ -44,7 +44,7 @@ public interface FieldbookService {
     /**
      * Retrieves all the study details of the nurseries stored in local database.
      *
-     * @return the all local nursery details
+     * @return all local nursery details
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException;
@@ -52,7 +52,7 @@ public interface FieldbookService {
     /**
      * Retrieves all the details of the trial studies stored in local database.
      *
-     * @return the all local trial study details
+     * @return  all local trial study details
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException;
@@ -99,7 +99,7 @@ public interface FieldbookService {
      *
      * @param datasetId the dataset id
      * @param geolocationId the geolocation id
-     * @return the all field maps in block by trial instance id
+     * @return all field maps in block by trial instance id
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException;
@@ -327,7 +327,7 @@ public interface FieldbookService {
     /**
      * Gets the all persons.
      *
-     * @return the all persons
+     * @return all persons
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Person> getAllPersons() throws MiddlewareQueryException;
@@ -336,7 +336,7 @@ public interface FieldbookService {
      * Count plots with plants selectedof nursery.
      *
      * @param nurseryId the nursery id
-     * @return the int
+     * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
     int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException;
@@ -382,7 +382,7 @@ public interface FieldbookService {
      * Gets the all block locations.
      *
      * @param fieldId the field id
-     * @return the all block locations
+     * @return  all block locations
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Location> getAllBlockLocations(int fieldId) throws MiddlewareQueryException;
@@ -399,7 +399,7 @@ public interface FieldbookService {
     /**
      * Gets the all fields.
      *
-     * @return the all fields
+     * @return  all fields
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Location> getAllFields()throws MiddlewareQueryException;
@@ -408,8 +408,9 @@ public interface FieldbookService {
      * Adds the field location.
      *
      * @param fieldName the field name
-     * @param parentlocationId the parentlocation id
-     * @return the int
+     * @param parentLocationId the parentlocation id
+     * @param currentUserId 
+     * @return the id
      * @throws MiddlewareQueryException the middleware query exception
      */
     int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId)throws MiddlewareQueryException;
@@ -419,7 +420,7 @@ public interface FieldbookService {
      *
      * @param blockName the block name
      * @param parentFieldId the parent field id
-     * @return the int
+     * @return the id
      * @throws MiddlewareQueryException the middleware query exception
      */
     int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId)throws MiddlewareQueryException;
@@ -428,7 +429,7 @@ public interface FieldbookService {
      * Get all field maps in the same block.
      * 
      * @param blockId
-     * @return
+     * @return the field maps in the given block
      * @throws MiddlewareQueryException
      */
     List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
@@ -436,7 +437,7 @@ public interface FieldbookService {
     
     /**
      * Get all Treatment Levels.
-     * @return
+     * @return all treatment levels
      * @throws MiddlewareQueryException
      */
     List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException;
@@ -446,7 +447,7 @@ public interface FieldbookService {
      * 
      * @param cvTermId
      * @param propertyId
-     * @return
+     * @return list of all possible treatment pairs
      * @throws MiddlewareQueryException
      */
     List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException;

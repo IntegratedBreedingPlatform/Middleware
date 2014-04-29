@@ -521,7 +521,6 @@ public interface StudyDataManager{
      * Logically delete a folder by updating the folder's name and deleting its project relationships.
      *
      * @param id the id
-     * @return ID of the folder created
      * @throws MiddlewareQueryException the middleware query exception
      */
 	void deleteEmptyFolder(int id) throws MiddlewareQueryException;
@@ -700,7 +699,7 @@ public interface StudyDataManager{
     /**
      * 
      * @param blockId
-     * @return
+     * @return List of all field maps in the block
      * @throws MiddlewareQueryException
      */
     List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)

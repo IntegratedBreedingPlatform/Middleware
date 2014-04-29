@@ -104,7 +104,7 @@ public class Person implements Serializable{
      * Create a copy of this Person object.
      * Note that this method does not copy the {@link Person#id} field.
      * 
-     * @return
+     * @return the copy of this Person object.
      */
     public Person copy() {
         Person person = new Person();

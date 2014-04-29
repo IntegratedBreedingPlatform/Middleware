@@ -48,7 +48,7 @@ public interface CrossStudyDataManager{
     /**
      * Returns number of all central and local trial environments
      * 
-     * @return
+     * @return count
      */
     long countAllTrialEnvironments() throws MiddlewareQueryException;
     
@@ -123,10 +123,10 @@ public interface CrossStudyDataManager{
      *          - germplasm id
      *          - environment id
      *          - value observed (null if no observation)
-     * @param traitId
+     * @param traitIds
      * @param germplasmIds
      * @param environmentIds
-     * @return 
+     * @return  list of observations for traits on germplasms
      * @throws MiddlewareQueryException
      */
     List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds, 
@@ -143,7 +143,7 @@ public interface CrossStudyDataManager{
      * 
      * @param traitIds
      * @param environmentIds
-     * @return
+     * @return list of observations for traits
      * @throws MiddlewareQueryException
      */
 	List<Observation> getObservationsForTraits(List<Integer> traitIds,
@@ -172,9 +172,9 @@ public interface CrossStudyDataManager{
     /**
      * For each trait in given trial environments, the observed values from local and central databases are returned  
      * 
-     * @param traitID - phenotype ID
+     * @param traitId - phenotype ID
      * @param environmentIds - List of environment Ids
-     * @return
+     * @return list of trait observations
      * @throws MiddlewareQueryException
      */
     List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException;

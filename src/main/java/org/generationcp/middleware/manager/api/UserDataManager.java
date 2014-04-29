@@ -145,7 +145,7 @@ public interface UserDataManager {
      * Get the User with the specified username.
      * 
      * @param userName
-     * @return
+     * @return the user with the given user name
      * @throws MiddlewareQueryException
      */
     User getUserByUserName(String userName) throws MiddlewareQueryException;

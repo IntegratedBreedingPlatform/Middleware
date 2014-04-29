@@ -233,7 +233,7 @@ public class DatabaseBroker {
      * Utility method that returns the appropriate {@link Session} based on the given database instance.
      * 
      * @param instance
-     * @return
+     * @return The session based on the given database instance
      * @throws MiddlewareQueryException
      *             if a {@link Session} for the specified database instance is not available
      */
@@ -324,7 +324,7 @@ public class DatabaseBroker {
     /** 
      * Retrieves the current active session - either local or central database connection.
      * 
-     * @return
+     * @return The current active session
      */
     protected Session getActiveSession() {
         return activeSession;

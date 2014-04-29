@@ -316,7 +316,7 @@ public class GermplasmDataManagerUtil{
      * ICIS Germplasm Name standardization rules. Returns false otherwise.
      * 
      * @param c
-     * @return
+     * @return true if c is a special name character
      */
     public static boolean isGermplasmNameSpecialChar(char c) {
         char specialCharacters[] = { '-', '\'', '[', ']', '+', '.' };

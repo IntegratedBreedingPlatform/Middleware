@@ -89,7 +89,7 @@ public interface GermplasmListManager{
      * 
      * @param name
      * @param operation can be Operation.EQUAL or Operation.LIKE
-     * @param instance
+     * @param database
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return The count of Germplasm lists based on the given name and operation
      */
@@ -196,7 +196,7 @@ public interface GermplasmListManager{
      * parameters.
      * 
      * @param listId
-     * @param entryId
+     * @param lrecId
      * @return List of GermplasmListData POJOs
      */
     GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException;
@@ -510,27 +510,25 @@ public interface GermplasmListManager{
      * Return a List of UserDefinedField POJOs representing records from 
      * the udflds table of IBDB which are the types of germplasm lists.
      * 
-     * @return
+     * @return List of UserDefinedField values of the germplasm list types
      * @throws MiddlewareQueryException
      */
-    
-    List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException;    
+        List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException;    
 
     
     /**
      * Return a List of UserDefinedField POJOs representing records from 
      * the udflds table of IBDB which are the types of germplasm names.
      * 
-     * @return
+     * @return List of UserDefinedField values of the germplasm name types
      * @throws MiddlewareQueryException
      */
-    
     List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;    
     
     /**
      * Search for germplasm lists given a search term Q
-     * @param q
-     * @param operation
+     * @param q string
+     * @param o operation
      * @return - List of germplasm lists
      * @throws MiddlewareQueryException
      */
@@ -556,7 +554,7 @@ public interface GermplasmListManager{
      * Returns empty list if no related column found.
      * 
      * @param listId - id of list to retrieve columns for
-     * @return
+     * @return GermplasmListNewColumnsInfo of the additional columns for the given list
      * @throws MiddlewareQueryException
      */
     GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException;

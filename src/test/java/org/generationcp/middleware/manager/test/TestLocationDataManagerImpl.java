@@ -386,7 +386,7 @@ public class TestLocationDataManagerImpl extends TestOutputFormatter{
         List<Location> provinces = manager.getAllProvincesByCountry(101);
 
         assertNotNull(provinces);
-        assert(provinces.size() > 0);
+        assertTrue(provinces.size() > 0);
         Debug.printObjects(3, provinces);
     }
 
