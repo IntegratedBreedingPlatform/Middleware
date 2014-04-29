@@ -51,14 +51,49 @@ To run JUnit tests using Eclipse, right-click on the specific JUnit test suite i
  
 To Use
 -----------
-To add Middleware as a dependency to your project using Apache Maven, add the following to your list of dependencies:  
+To add Middleware as a dependency to your project using Apache Maven, add the following to the list of dependencies in your POM file:  
+
+For the released version, add the following to your list of dependencies in your POM file:</br>
+
 <pre>
-    groupId: org.generationcp
-    artifactId: middleware
-    version: 2.1.0
+<dependency>
+    <groupId>org.generationcp</groupId>
+    <artifactId>middleware</artifactId>
+    <version>2.1.0-RELEASE</version>
+</dependency>
 </pre>
 
-Take note of the version.  Use of the latest version is recommended.  
+Take note of the version.  Use of the latest version is recommended. 
+
+The Middleware is deployed at the Maven Repository hosted on gcp.efficio.us.com. To use the repository, add the following to your POM file:
+
+<pre>
+<repositories>
+	<repository>
+		<id>gcp-efficio-repo</id>
+		<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/</url>
+	</repository>
+</repositories>
+</pre>
+
+For the development version, add the following to your POM:
+
+<pre>
+<dependency>
+    <groupId>org.generationcp</groupId>
+    <artifactId>middleware</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+</dependency>
+</pre>
+
+<pre>
+<repositories>
+	<repository>
+		<id>gcp-efficio-repo</id>
+		<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
+	</repository>
+</repositories>
+</pre>
 
 
 API Documentation
