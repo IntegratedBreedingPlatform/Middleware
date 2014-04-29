@@ -50,6 +50,8 @@ public class MeasurementVariable {
 	private Double maxRange;
 
     private boolean required;
+    
+    private String treatmentLabel;
 
 	public MeasurementVariable() {
 	}
@@ -293,4 +295,12 @@ public class MeasurementVariable {
     public void setRequired(boolean required) {
         this.required = required;
     }
+
+	public String getTreatmentLabel() {
+		return treatmentLabel;
+	}
+
+	public void setTreatmentLabel(String treatmentLabel) {
+		this.treatmentLabel = treatmentLabel;
+	}
 }

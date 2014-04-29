@@ -13,6 +13,7 @@ public class Factor  implements Serializable {
 	private String role;
 	private String datatype;
 	private Integer termId;
+	private String treatmentLabel;
 	
 	public Factor(){
 		super();
@@ -79,6 +80,14 @@ public class Factor  implements Serializable {
 
 	public void setTermId(Integer termId) {
 		this.termId = termId;
+	}
+
+	public String getTreatmentLabel() {
+		return treatmentLabel;
+	}
+
+	public void setTreatmentLabel(String treatmentLabel) {
+		this.treatmentLabel = treatmentLabel;
 	}
 
  }
