@@ -122,6 +122,7 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false);
 		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
 		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates, isTrial);
+		List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
 		
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
@@ -129,6 +130,7 @@ public class WorkbookBuilder extends Builder {
 		workbook.setConditions(conditions);
 		workbook.setConstants(constants);
 		workbook.setObservations(observations);
+		workbook.setTreatmentFactors(treatmentFactors);
 		
 		//if (isTrial) {
 		List<MeasurementRow> trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
