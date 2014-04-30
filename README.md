@@ -96,6 +96,8 @@ For the development version, add the following to your POM:
 &lt;/repositories></br>
 </pre>
 
+If you prefer to download the jar file instead, you may get it from http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/org/generationcp/middleware/2.1.0-SNAPSHOT/
+
 
 API Documentation
 -------------------
