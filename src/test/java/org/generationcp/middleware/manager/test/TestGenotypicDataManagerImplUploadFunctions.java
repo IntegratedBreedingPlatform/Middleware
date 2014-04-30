@@ -70,7 +70,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     private static final String DART_VALUES         = "DartValues";
     private static final String MARKER              = "Marker";
     
-    private static final int NUMBER_OF_ROWS = 10 ; //210 * 260;
+    private static final int NUMBER_OF_ROWS = 10; //210 * 260; 
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -696,7 +696,11 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     		datasets = manager.getDatasetsByType(type);
 		}
     	if (datasets.size() > 0){
-			return datasets.get(0);
+    		for (Dataset dataset : datasets){
+    			if (dataset.getDatasetId() < 0){
+    				return dataset;
+    			}
+    		}
     	}
     	Debug.println("No dataset of type " + type + " found in the local database for testing");
     	return null;
@@ -842,6 +846,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	}
     	
        	Integer datasetId = dataset.getDatasetId();
+       	
     	updateDataset(dataset, updateId.toString());
     	
     	List<SNPDataRow> rows = manager.getSNPDataRows(datasetId);
