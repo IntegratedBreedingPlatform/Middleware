@@ -24,10 +24,32 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 public interface InventoryService {
 
 
+	/**
+	 * Gets the inventory details by germplasm list.
+	 *
+	 * @param listId the list id
+	 * @return the inventory details by germplasm list
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
 	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId) throws MiddlewareQueryException;
 	
+	/**
+	 * Gets the inventory details by gids.
+	 *
+	 * @param gids the gids
+	 * @return the inventory details by gids
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
 	List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException; 
 
+	/**
+	 * Gets the inventory details by study. Inventory details to retrieve are based on nd_experiment_id of the study 
+	 * matching ims_transaction.source_rec_id 
+	 *
+	 * @param studyId the study id
+	 * @return the inventory details by study
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
 	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException; 
 
 	

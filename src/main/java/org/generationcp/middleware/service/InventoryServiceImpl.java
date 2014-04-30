@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
@@ -37,22 +38,28 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
 			Integer listId) throws MiddlewareQueryException {
+		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
 		// TODO Auto-generated method stub
-		return null;
+		
+		return inventoryDetails;
 	}
 
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
 			throws MiddlewareQueryException {
+		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
 		// TODO Auto-generated method stub
-		return null;
+		
+		return inventoryDetails;
 	}
 
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId)
 			throws MiddlewareQueryException {
+		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
 		// TODO Auto-generated method stub
-		return null;
+		
+		return inventoryDetails;
 	}
 
 

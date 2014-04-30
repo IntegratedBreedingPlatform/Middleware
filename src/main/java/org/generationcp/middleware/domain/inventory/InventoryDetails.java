@@ -40,6 +40,27 @@ public class InventoryDetails {
 	Integer scaleId;
 	
 	String scaleName;
+	
+
+	public InventoryDetails() {
+	}
+	
+	public InventoryDetails(Integer gid, String germplasmName, Integer lotId,
+			Integer locationId, String locationName, Integer userId,
+			Integer amount, Integer sourceId, String sourceName,
+			Integer scaleId, String scaleName) {
+		this.gid = gid;
+		this.germplasmName = germplasmName;
+		this.lotId = lotId;
+		this.locationId = locationId;
+		this.locationName = locationName;
+		this.userId = userId;
+		this.amount = amount;
+		this.sourceId = sourceId;
+		this.sourceName = sourceName;
+		this.scaleId = scaleId;
+		this.scaleName = scaleName;
+	}
 
 	public Integer getGid() {
 		return gid;
