@@ -1458,6 +1458,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             trans = session.beginTransaction();
 
+            dataset.setDatasetType(TYPE_DART);
+            dataset.setDataType(DATA_TYPE_INT);
             Integer datasetId = saveDatasetDatasetUserMarkersAndMarkerMetadataSets(
                                         dataset, datasetUser, markers, markerMetadataSets);
 
@@ -1546,6 +1548,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         try {
             trans = session.beginTransaction();
+            dataset.setDatasetType(TYPE_SSR);
+            dataset.setDataType(DATA_TYPE_INT);
 
             Integer datasetId = saveDatasetDatasetUserMarkersAndMarkerMetadataSets(
                     dataset, datasetUser, markers, markerMetadataSets);
@@ -1628,6 +1632,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             trans = session.beginTransaction();
 
+            dataset.setDatasetType(TYPE_SNP);
+            dataset.setDataType(DATA_TYPE_INT);
             Integer datasetId = saveDatasetDatasetUserMarkersAndMarkerMetadataSets(
                     dataset, datasetUser, markers, markerMetadataSets);
 
@@ -2780,6 +2786,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     private Integer saveMappingData(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets) throws Exception {
 
+        dataset.setDatasetType(TYPE_MAPPING);
+        dataset.setDataType(DATA_TYPE_MAP);
         Integer datasetId = saveDatasetDatasetUserMarkersAndMarkerMetadataSets(
                 dataset, datasetUser, markers, markerMetadataSets);
         saveMappingPop(datasetId, mappingPop);

@@ -322,6 +322,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
             markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
             AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+            alleleValues.setMarkerId(marker.getMarkerId());
             alleleValues.setGid(accMetadataSet.getGermplasmId());
             DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
             dartValues.setMarkerId(marker.getMarkerId());
@@ -379,6 +380,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
             markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
             AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+            alleleValues.setMarkerId(marker.getMarkerId());
             alleleValues.setGid(accMetadataSet.getGermplasmId());
             dataRows.add(new SSRDataRow(accMetadataSet, alleleValues));
             id--;
@@ -632,6 +634,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
             mappingPopValues.setMarkerId(marker.getMarkerId());
             mappingPopValues.setGid(accMetadataSet.getGermplasmId());
             AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+            alleleValues.setMarkerId(marker.getMarkerId());
             alleleValues.setGid(accMetadataSet.getGermplasmId());
             DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
             dartValues.setMarkerId(marker.getMarkerId());
