@@ -11,23 +11,18 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.InventoryService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is the API for inventory management system.
  *  
  */
 public class InventoryServiceImpl extends Service implements InventoryService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     public InventoryServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -38,28 +33,19 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
 			Integer listId) throws MiddlewareQueryException {
-		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-		// TODO Auto-generated method stub
-		
-		return inventoryDetails;
+		return getInventoryDataManager().getInventoryDetailsByGermplasmList(listId);
 	}
 
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
 			throws MiddlewareQueryException {
-		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-		// TODO Auto-generated method stub
-		
-		return inventoryDetails;
+		return getInventoryDataManager().getInventoryDetailsByGids(gids);
 	}
 
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId)
 			throws MiddlewareQueryException {
-		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-		// TODO Auto-generated method stub
-		
-		return inventoryDetails;
+		return getInventoryDataManager().getInventoryDetailsByGermplasmList(studyId);
 	}
 
 

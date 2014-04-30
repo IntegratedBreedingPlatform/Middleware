@@ -2657,6 +2657,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             	List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
             	List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
             	List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
+            	List<DartValues> dartValues = new ArrayList<DartValues>();
 
             	for (MappingAllelicSSRDArTRow row : rows) {
 
@@ -2679,12 +2680,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             		AlleleValues alleleValue = row.getAlleleValues();
             		alleleValue.setDatasetId(datasetId);
             		alleleValues.add(alleleValue);
+            		
+            		DartValues dartValue = row.getDartValues();
+            		dartValue.setDatasetId(datasetId);
+            		dartValues.add(dartValue);
 
                 }
 
             	saveAccMetadataSets(accMetadataSets);
         		saveMappingPopValues(mappingPopValues);
         		saveAlleleValues(alleleValues);
+        		saveDartValues(dartValues);
             }
 
             trans.commit();
@@ -3875,6 +3881,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 alleleValuesDao.clear();
             }            
         }
+        
     }    
 
 //    private Integer saveAlleleValues(AlleleValues alleleValues) throws Exception {

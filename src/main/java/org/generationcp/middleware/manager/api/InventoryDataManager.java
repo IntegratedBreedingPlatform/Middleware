@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Transaction;
@@ -537,5 +538,33 @@ public interface InventoryDataManager{
      * @return List of LotReportRow objects
      */
     List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(String type, List<Integer> entityIds, int start, int numOfRows) throws MiddlewareQueryException;
+
+	/**
+	 * Gets the inventory details by germplasm list.
+	 *
+	 * @param listId the list id
+	 * @return the inventory details by germplasm list
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the inventory details by gids.
+	 *
+	 * @param gids the gids
+	 * @return the inventory details by gids
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException; 
+
+	/**
+	 * Gets the inventory details by study. Inventory details to retrieve are based on nd_experiment_id of the study 
+	 * matching ims_transaction.source_rec_id 
+	 *
+	 * @param studyId the study id
+	 * @return the inventory details by study
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException; 
 
 }

@@ -16,12 +16,14 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
+import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -74,6 +76,10 @@ public abstract class Service extends DatabaseBroker {
     
     protected final GermplasmListManager getGermplasmListManager() {
         return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final InventoryDataManager getInventoryDataManager() {
+        return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final LocationDataManager getLocationDataManager() {

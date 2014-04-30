@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.LotDAO;
 import org.generationcp.middleware.dao.TransactionDAO;
+import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -622,5 +623,34 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         }
         return report;
     }
+    
+    @Override
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
+			Integer listId) throws MiddlewareQueryException {
+		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
+		
+		
+		// TODO Auto-generated method stub
+		return inventoryDetails;
+		
+	}
 
+    
+    @Override
+	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
+			throws MiddlewareQueryException {
+		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
+		// TODO Auto-generated method stub
+		return inventoryDetails;
+		
+	}
+    
+    @Override
+	public List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId)
+			throws MiddlewareQueryException {
+		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
+		// TODO Auto-generated method stub
+		return inventoryDetails;
+		
+	}
 }

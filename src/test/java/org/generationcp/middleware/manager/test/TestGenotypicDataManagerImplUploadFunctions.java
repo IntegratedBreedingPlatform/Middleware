@@ -1084,7 +1084,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	Debug.printObject(0, "MAPPINGPOP AFTER: " + mappingPopAfter);
     	assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
     	
-    	List<MappingABHRow> rowsAfter = manager.getMappingABHRows(datasetId);
+    	List<MappingAllelicSNPRow> rowsAfter = manager.getMappingAllelicSNPRows(datasetId);
     	Debug.println("ROWS AFTER: ");
     	Debug.printObjects(INDENT, rowsAfter);
     }
@@ -1157,7 +1157,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	Debug.printObject(0, "MAPPINGPOP AFTER: " + mappingPopAfter);
     	assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
     	
-    	List<MappingABHRow> rowsAfter = manager.getMappingABHRows(datasetId);
+    	List<MappingAllelicSSRDArTRow> rowsAfter = manager.getMappingAllelicSSRDArTRows(datasetId);
     	Debug.println("ROWS AFTER: ");
     	Debug.printObjects(INDENT, rowsAfter);
     }

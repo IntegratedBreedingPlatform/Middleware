@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.inventory;
 
-// TODO: Auto-generated Javadoc
 /**
  * Row in Seed Inventory System that shows the details of ims_lot/transaction.
  * 
@@ -59,6 +58,8 @@ public class InventoryDetails {
 	/** The scale name. */
 	String scaleName;
 	
+	Integer status;
+	
 
 	/**
 	 * Instantiates a new inventory details.
@@ -84,7 +85,7 @@ public class InventoryDetails {
 	public InventoryDetails(Integer gid, String germplasmName, Integer lotId,
 			Integer locationId, String locationName, Integer userId,
 			Integer amount, Integer sourceId, String sourceName,
-			Integer scaleId, String scaleName) {
+			Integer scaleId, String scaleName, Integer status) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.lotId = lotId;
@@ -96,6 +97,7 @@ public class InventoryDetails {
 		this.sourceName = sourceName;
 		this.scaleId = scaleId;
 		this.scaleName = scaleName;
+		this.status = status;
 	}
 
 	/**
@@ -294,6 +296,14 @@ public class InventoryDetails {
 	 */
 	public void setScaleName(String scaleName) {
 		this.scaleName = scaleName;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	/* (non-Javadoc)
