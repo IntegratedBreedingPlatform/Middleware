@@ -36,9 +36,11 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
@@ -322,6 +324,10 @@ public class ManagerFactory implements Serializable {
     
     public FieldbookService getFieldbookMiddlewareService() throws ConfigException {
         return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public InventoryService getInventoryMiddlewareService() throws ConfigException {
+        return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     public DataImportService getDataImportService() throws ConfigException {

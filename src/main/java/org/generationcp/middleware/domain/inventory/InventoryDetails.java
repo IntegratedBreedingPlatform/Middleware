@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.inventory;
 
+// TODO: Auto-generated Javadoc
 /**
  * Row in Seed Inventory System that shows the details of ims_lot/transaction.
  * 
@@ -19,32 +20,67 @@ package org.generationcp.middleware.domain.inventory;
  */
 public class InventoryDetails {
 	
+	/** The index. */
+	Integer index;
+	
+	/** The gid. */
 	Integer gid;
 	
+	/** The germplasm name. */
 	String germplasmName;
 	
+	/** The lot id. */
 	Integer lotId;
 	
+	/** The location id. */
 	Integer locationId;
 	
+	/** The location name. */
 	String locationName;
 	
+	/** The user id. */
 	Integer userId;
 	
+	/** The user name. */
+	String userName;
+	
+	/** The amount. */
 	Integer amount;
 	
+	/** The source id. */
 	Integer sourceId;
 	
+	/** The source name. */
 	String sourceName;
 	
+	/** The scale id. */
 	Integer scaleId;
 	
+	/** The scale name. */
 	String scaleName;
 	
 
+	/**
+	 * Instantiates a new inventory details.
+	 */
 	public InventoryDetails() {
 	}
 	
+	/**
+	 * Instantiates a new inventory details.
+	 *
+	 * @param gid the gid
+	 * @param germplasmName the germplasm name
+	 * @param lotId the lot id
+	 * @param locationId the location id
+	 * @param locationName the location name
+	 * @param userId the user id
+	 * @param amount the amount
+	 * @param sourceId the source id
+	 * @param sourceName the source name
+	 * @param scaleId the scale id
+	 * @param scaleName the scale name
+	 */
 	public InventoryDetails(Integer gid, String germplasmName, Integer lotId,
 			Integer locationId, String locationName, Integer userId,
 			Integer amount, Integer sourceId, String sourceName,
@@ -62,94 +98,207 @@ public class InventoryDetails {
 		this.scaleName = scaleName;
 	}
 
+	/**
+	 * Gets the gid.
+	 *
+	 * @return the gid
+	 */
 	public Integer getGid() {
 		return gid;
 	}
 
+	/**
+	 * Sets the gid.
+	 *
+	 * @param gid the new gid
+	 */
 	public void setGid(Integer gid) {
 		this.gid = gid;
 	}
 
+	/**
+	 * Gets the germplasm name.
+	 *
+	 * @return the germplasm name
+	 */
 	public String getGermplasmName() {
 		return germplasmName;
 	}
 
+	/**
+	 * Sets the germplasm name.
+	 *
+	 * @param germplasmName the new germplasm name
+	 */
 	public void setGermplasmName(String germplasmName) {
 		this.germplasmName = germplasmName;
 	}
 
+	/**
+	 * Gets the lot id.
+	 *
+	 * @return the lot id
+	 */
 	public Integer getLotId() {
 		return lotId;
 	}
 
+	/**
+	 * Sets the lot id.
+	 *
+	 * @param lotId the new lot id
+	 */
 	public void setLotId(Integer lotId) {
 		this.lotId = lotId;
 	}
 
+	/**
+	 * Gets the location id.
+	 *
+	 * @return the location id
+	 */
 	public Integer getLocationId() {
 		return locationId;
 	}
 
+	/**
+	 * Sets the location id.
+	 *
+	 * @param locationId the new location id
+	 */
 	public void setLocationId(Integer locationId) {
 		this.locationId = locationId;
 	}
 
+	/**
+	 * Gets the location name.
+	 *
+	 * @return the location name
+	 */
 	public String getLocationName() {
 		return locationName;
 	}
 
+	/**
+	 * Sets the location name.
+	 *
+	 * @param locationName the new location name
+	 */
 	public void setLocationName(String locationName) {
 		this.locationName = locationName;
 	}
 
+	/**
+	 * Gets the user id.
+	 *
+	 * @return the user id
+	 */
 	public Integer getUserId() {
 		return userId;
 	}
 
+	/**
+	 * Sets the user id.
+	 *
+	 * @param userId the new user id
+	 */
 	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
+	/**
+	 * Gets the amount.
+	 *
+	 * @return the amount
+	 */
 	public Integer getAmount() {
 		return amount;
 	}
 
+	/**
+	 * Sets the amount.
+	 *
+	 * @param amount the new amount
+	 */
 	public void setAmount(Integer amount) {
 		this.amount = amount;
 	}
 
+	/**
+	 * Gets the source id.
+	 *
+	 * @return the source id
+	 */
 	public Integer getSourceId() {
 		return sourceId;
 	}
 
+	/**
+	 * Sets the source id.
+	 *
+	 * @param sourceId the new source id
+	 */
 	public void setSourceId(Integer sourceId) {
 		this.sourceId = sourceId;
 	}
 
+	/**
+	 * Gets the source name.
+	 *
+	 * @return the source name
+	 */
 	public String getSourceName() {
 		return sourceName;
 	}
 
+	/**
+	 * Sets the source name.
+	 *
+	 * @param sourceName the new source name
+	 */
 	public void setSourceName(String sourceName) {
 		this.sourceName = sourceName;
 	}
 
+	/**
+	 * Gets the scale id.
+	 *
+	 * @return the scale id
+	 */
 	public Integer getScaleId() {
 		return scaleId;
 	}
 
+	/**
+	 * Sets the scale id.
+	 *
+	 * @param scaleId the new scale id
+	 */
 	public void setScaleId(Integer scaleId) {
 		this.scaleId = scaleId;
 	}
 
+	/**
+	 * Gets the scale name.
+	 *
+	 * @return the scale name
+	 */
 	public String getScaleName() {
 		return scaleName;
 	}
 
+	/**
+	 * Sets the scale name.
+	 *
+	 * @param scaleName the new scale name
+	 */
 	public void setScaleName(String scaleName) {
 		this.scaleName = scaleName;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -174,6 +323,9 @@ public class InventoryDetails {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -241,6 +393,9 @@ public class InventoryDetails {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -270,4 +425,41 @@ public class InventoryDetails {
 		return builder.toString();
 	}
 
+	/**
+	 * Gets the index.
+	 *
+	 * @return the index
+	 */
+	public Integer getIndex() {
+		return index;
+	}
+
+	/**
+	 * Sets the index.
+	 *
+	 * @param index the new index
+	 */
+	public void setIndex(Integer index) {
+		this.index = index;
+	}
+
+	/**
+	 * Gets the user name.
+	 *
+	 * @return the user name
+	 */
+	public String getUserName() {
+		return userName;
+	}
+
+	/**
+	 * Sets the user name.
+	 *
+	 * @param userName the new user name
+	 */
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	
 }
