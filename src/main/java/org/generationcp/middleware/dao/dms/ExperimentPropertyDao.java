@@ -387,7 +387,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             String season = (String) row[16];
             
             FieldMapLabel label = new FieldMapLabel(experimentId 
-                                , (entryNumber == null || entryNumber.equals("null")? null : Integer.parseInt(entryNumber))
+                                , (entryNumber == null || entryNumber.equals("null") || entryNumber.equals("") 
+                                        ? null : Integer.parseInt(entryNumber))
                                 , germplasmName
                                 , (rep == null || rep.equals("null") ? 1 : Integer.parseInt(rep))
                                 , (plotNo == null || plotNo.equals("null") ? 0 : Integer.parseInt(plotNo)));
