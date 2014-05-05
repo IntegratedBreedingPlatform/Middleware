@@ -159,7 +159,7 @@ public class WorkbookSaver extends Saver {
 //		boolean error = false;
 //		for (VariableType ev : effectVariables.getVariableTypes()) {
 //			if(ev.getStandardVariable().getStoredIn() == null) {
-//				LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
+//		c○		LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
 //				error = true;
 //			}
 //			else LOG.info("Role for : " + ev.getStandardVariable().getName() + " : " + ev.getStandardVariable().getStoredIn().getId());
@@ -384,11 +384,7 @@ public class WorkbookSaver extends Saver {
 	
 	private int createStudyIfNecessary(Workbook workbook, int studyLocationId, boolean saveStudyExperiment) throws Exception {
 		TimerWatch watch = new TimerWatch("find study", LOG);
-	
-		Integer studyId = null;
-		if (workbook.getStudyDetails() != null){
-		    studyId = getStudyId(workbook.getStudyDetails().getStudyName());
-		}
+		Integer studyId = getStudyId(workbook.getStudyDetails().getStudyName());
 
 		if (studyId == null) {
 			watch.restart("transform variables for study");

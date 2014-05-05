@@ -90,7 +90,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid != grplce AND ");
+            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=grplce AND ");
 
             if (operation == null || operation == Operation.EQUAL) {
                 queryString.append("n.nval = :name ");
@@ -750,6 +750,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     @SuppressWarnings("unchecked")
     public List<Germplasm> getByGIDList(List<Integer> gids) throws MiddlewareQueryException {
         
+    	if(gids.size()==0){
+    		return new ArrayList<Germplasm>();
+    	}
+    	
         try{
             StringBuilder queryString = new StringBuilder();
             queryString.append("SELECT {g.*} FROM germplsm g WHERE ");

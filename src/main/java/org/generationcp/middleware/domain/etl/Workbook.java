@@ -147,7 +147,7 @@ public class Workbook {
 	}
 	
 	public boolean isNursery() {
-	    return this.studyDetails.isNursery();
+		return this.studyDetails.isNursery();
 	}
 	
 	public List<MeasurementVariable> getMeasurementDatasetVariables() {
@@ -155,9 +155,7 @@ public class Workbook {
 			measurementDatasetVariables = new ArrayList<MeasurementVariable>();
 			
 			measurementDatasetVariables.addAll(getNonTrialFactors());
-			if (variates != null && variates.size() > 0){
-			    measurementDatasetVariables.addAll(variates);
-			}
+			measurementDatasetVariables.addAll(variates);						
 		}
 		return measurementDatasetVariables;
 	}

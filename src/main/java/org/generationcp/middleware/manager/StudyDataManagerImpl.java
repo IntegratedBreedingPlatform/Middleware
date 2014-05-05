@@ -73,7 +73,7 @@ import org.slf4j.LoggerFactory;
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
     private GermplasmDataManagerImpl germplasmDataManager;
-
+    
     private LocationDataManager locationDataManager;
 
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
@@ -84,7 +84,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
                                 HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal,
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, 
                 sessionProviderForCentral);
         locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
@@ -99,15 +99,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public Study getStudy(int studyId) throws MiddlewareQueryException {
         return getStudyBuilder().createStudy(studyId);
     }
-
-
-    @Override
-    public Study getStudy(int studyId, boolean hasVariableType)
-            throws MiddlewareQueryException {
-        return getStudyBuilder().createStudy(studyId, hasVariableType);
-    }
+    
+    
 
     @Override
+	public Study getStudy(int studyId, boolean hasVariableType)
+			throws MiddlewareQueryException {
+    	 return getStudyBuilder().createStudy(studyId, hasVariableType);
+	}
+
+	@Override
     public int getStudyIdByName(String studyName) throws MiddlewareQueryException {
         Integer id = null;
         setWorkingDatabase(Database.CENTRAL);
@@ -171,25 +172,25 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows)
+    public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) 
             throws MiddlewareQueryException {
         if (filter instanceof ParentFolderStudyQueryFilter) {
-            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows,
+            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, 
                     this.sessionProviderForLocal, this.sessionProviderForCentral);
         } else if (filter instanceof GidStudyQueryFilter) {
-            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows,
+            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, 
                     this.sessionProviderForLocal, this.sessionProviderForCentral);
         } else if (filter instanceof BrowseStudyQueryFilter) {
             return new StudyResultSetByNameStartDateSeasonCountry(
-                    (BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal,
+                    (BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, 
                     this.sessionProviderForCentral);
         }
         return null;
     }
 
     @Override
-    public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList,
-                                   StudyValues studyValues) throws MiddlewareQueryException {
+    public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, 
+            StudyValues studyValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -213,8 +214,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 
     @Override
-    public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList,
-                                       DatasetValues datasetValues) throws MiddlewareQueryException {
+    public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, 
+            DatasetValues datasetValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -224,7 +225,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             DmsProject datasetProject = getDatasetProjectSaver()
                     .addDataSet(studyId, variableTypeList, datasetValues);
             trans.commit();
-            return new DatasetReference(datasetProject.getProjectId(),
+            return new DatasetReference(datasetProject.getProjectId(), 
                     datasetProject.getName(), datasetProject.getDescription());
 
         } catch (Exception e) {
@@ -234,7 +235,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Experiment> getExperiments(int dataSetId, int start, int numRows)
+    public List<Experiment> getExperiments(int dataSetId, int start, int numRows) 
             throws MiddlewareQueryException {
         clearSessions();
         VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
@@ -248,8 +249,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public void addExperiment(int dataSetId, ExperimentType experimentType,
-                              ExperimentValues experimentValues) throws MiddlewareQueryException {
+    public void addExperiment(int dataSetId, ExperimentType experimentType, 
+            ExperimentValues experimentValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -264,10 +265,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
         }
     }
-
+    
     @Override
-    public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType,
-                                      ExperimentValues experimentValues) throws MiddlewareQueryException {
+    public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, 
+            ExperimentValues experimentValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -321,7 +322,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType)
+    public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) 
             throws MiddlewareQueryException {
         setWorkingDatabase(studyId);
 
@@ -348,7 +349,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public void addDataSetVariableType(int datasetId, VariableType variableType)
+    public void addDataSetVariableType(int datasetId, VariableType variableType) 
             throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
@@ -366,7 +367,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public void setExperimentValue(int experimentId, int variableId, String value)
+    public void setExperimentValue(int experimentId, int variableId, String value) 
             throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
@@ -384,7 +385,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId)
+    public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) 
             throws MiddlewareQueryException {
         return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(datasetId);
     }
@@ -395,7 +396,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId)
+    public long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) 
             throws MiddlewareQueryException {
         if (this.setWorkingDatabase(datasetId)) {
             return getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
@@ -404,7 +405,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId)
+    public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) 
             throws MiddlewareQueryException {
         if (this.setWorkingDatabase(datasetId)) {
             return getStockDao().countObservations(datasetId, trialEnvironmentId, variateStdVarId);
@@ -413,7 +414,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType)
+    public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) 
             throws MiddlewareQueryException {
         List<DataSet> datasets = getDataSetsByType(studyId, dataSetType);
         if (datasets != null && datasets.size() >= 1) {
@@ -455,7 +456,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId)
+    public String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) 
             throws MiddlewareQueryException {
         setWorkingDatabase(projectId);
         Session session = getActiveSession();
@@ -482,7 +483,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 
     @Override
-    public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType)
+    public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) 
             throws MiddlewareQueryException {
         setWorkingDatabase(instance);
         List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType);
@@ -527,7 +528,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType)
+    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) 
             throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
 
@@ -573,14 +574,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
             fieldMapInfos.add(fieldMapInfo);
         }
-
+        
         updateFieldMapInfoWithBlockInfo(fieldMapInfos);
 
         return fieldMapInfos;
     }
 
     @Override
-    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew)
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
             throws MiddlewareQueryException {
 
         if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
@@ -594,8 +595,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
                 if (isNew) {
                     getLocdesSaver().saveLocationDescriptions(info, userId);
-                } else {
-                    getLocdesSaver().updateDeletedPlots(info, userId);
+                }
+                else {
+	                getLocdesSaver().updateDeletedPlots(info, userId);
                 }
                 getGeolocationPropertySaver().saveFieldmapProperties(info);
                 getExperimentPropertySaver().saveFieldmapProperties(info);
@@ -604,7 +606,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
             } catch (Exception e) {
                 rollbackTransaction(trans);
-                logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): "
+                logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " 
                         + e.getMessage(), e, LOG);
             }
         }
@@ -613,17 +615,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public void saveTrialDatasetSummary(
-            DmsProject project, VariableTypeList variableTypeList,
-            List<ExperimentValues> experimentValues, List<Integer> locationIds)
-            throws MiddlewareQueryException {
+            DmsProject project, VariableTypeList variableTypeList, 
+            List<ExperimentValues> experimentValues, List<Integer> locationIds) 
+                    throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         try {
             trans = session.beginTransaction();
-            if (variableTypeList != null
-                    && variableTypeList.getVariableTypes() != null
+            if (variableTypeList != null 
+                    && variableTypeList.getVariableTypes() != null 
                     && !variableTypeList.getVariableTypes().isEmpty()) {
                 getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
             }
@@ -656,18 +658,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
         setWorkingDatabase(datasetId);
-
+        
         fieldMapInfos = getExperimentPropertyDao()
                 .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
-
+        
         int blockId = getBlockId(fieldMapInfos);
         FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
         updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo, true);
-
+        
         // Filter those belonging to the given geolocationId
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
-            if (datasetInfoList != null) {
+            if (datasetInfoList != null){
                 for (FieldMapDatasetInfo fieldMapDatasetInfo : datasetInfoList) {
                     List<FieldMapTrialInstanceInfo> trialInstances =
                             fieldMapDatasetInfo.getTrialInstances();
@@ -699,17 +701,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
         setWorkingDatabase(Database.LOCAL);
-
+        
         fieldMapInfos = getExperimentPropertyDao()
                 .getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
-
+        
         FieldmapBlockInfo blockInfo = locationDataManager.getBlockInformation(blockId);
         updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo);
 
         return fieldMapInfos;
     }
-
-
+    
+    
     @Override
     public boolean isStudy(int id) throws MiddlewareQueryException {
         setWorkingDatabase(id);
@@ -782,7 +784,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
     }
 
-    public boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy)
+    public boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) 
             throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         DmsProject source = getDmsProjectDao().getById(sourceId);
@@ -858,7 +860,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 .getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
         DmsProject studyParentFolder = getProjectRelationshipDao()
                 .getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
-        if (studyParentFolder != null) {
+        if (studyParentFolder != null){
             return studyParentFolder;
         }
         return folderParentFolder;
@@ -872,7 +874,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows)
+    public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) 
             throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countAllStudyDetails", "getAllStudyDetails");
         Object[] parameters = new Object[]{studyType};
@@ -889,7 +891,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         populateSiteAndPersonIfNecessary(details);
         return details;
     }
-
+    
     @Override
     public StudyDetails getStudyDetails(Database instance, StudyType studyType, int studyId) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
@@ -933,9 +935,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 list.addAll(centralList);
             }
         }
-
+        
         populateSiteAndPersonIfNecessary(list);
-
+        
         return list;
     }
 
@@ -979,9 +981,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 list.addAll(centralList);
             }
         }
-
+        
         populateSiteAndPersonIfNecessary(list);
-
+        
         return list;
     }
 
@@ -1012,7 +1014,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<FolderReference> getFolderTree() throws MiddlewareQueryException {
         return getFolderBuilder().buildFolderTree();
     }
-
+    
     @Override
     public int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException {
         if (setWorkingDatabase(Database.LOCAL)) {
@@ -1020,151 +1022,153 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         return 0;
     }
-
+    
     @Override
     public String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
         return getGeolocationPropertyDao().getGeolocationPropValue(stdVarId, studyId);
     }
-
+    
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
-        if (detail != null) {
-            if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
-                setWorkingDatabase(detail.getSiteId());
-                Location loc = getLocationDao().getById(detail.getSiteId());
-                if (loc != null) {
-                    detail.setSiteName(loc.getLname());
-                }
-            }
-            if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
-                setWorkingDatabase(detail.getPiId());
-                Person person = getPersonDao().getById(detail.getPiId());
-                if (person != null) {
-                    detail.setPiName(person.getDisplayName());
-                }
-            }
-        }
+    	if (detail != null) {
+			if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
+				setWorkingDatabase(detail.getSiteId());
+				Location loc = getLocationDao().getById(detail.getSiteId());
+				if (loc != null) {
+					detail.setSiteName(loc.getLname());
+				}
+			}    	
+			if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
+				setWorkingDatabase(detail.getPiId());
+				Person person = getPersonDao().getById(detail.getPiId());
+				if (person != null) {
+					detail.setPiName(person.getDisplayName());
+				}
+			}
+    	}
     }
-
+    
     private void populateSiteAndPersonIfNecessary(List<StudyDetails> studyDetails) throws MiddlewareQueryException {
-        if (studyDetails != null && !studyDetails.isEmpty()) {
-            List<Integer> centralSite = new ArrayList<Integer>();
-            List<Integer> localSite = new ArrayList<Integer>();
-            List<Integer> centralPerson = new ArrayList<Integer>();
-            List<Integer> localPerson = new ArrayList<Integer>();
-
-            for (StudyDetails detail : studyDetails) {
-                if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
-                    if (detail.getSiteId() > 0) {
-                        centralSite.add(detail.getSiteId());
-                    } else {
-                        localSite.add(detail.getSiteId());
-                    }
-                }
-                if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
-                    if (detail.getPiId() > 0) {
-                        centralPerson.add(detail.getPiId());
-                    } else {
-                        localPerson.add(detail.getPiId());
-                    }
-                }
-            }
-
-            Map<Integer, String> siteMap = new HashMap<Integer, String>();
-            Map<Integer, String> personMap = new HashMap<Integer, String>();
-
-            if (!centralSite.isEmpty()) {
-                setWorkingDatabase(Database.CENTRAL);
-                siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(centralSite));
-            }
-            if (!localSite.isEmpty()) {
-                setWorkingDatabase(Database.LOCAL);
-                siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(localSite));
-            }
-            if (!centralPerson.isEmpty()) {
-                setWorkingDatabase(Database.CENTRAL);
-                personMap.putAll(getPersonDao().getPersonNamesByPersonIds(centralPerson));
-            }
-            if (!localPerson.isEmpty()) {
-                setWorkingDatabase(Database.LOCAL);
-                personMap.putAll(getPersonDao().getPersonNamesByPersonIds(localPerson));
-            }
-
-            for (StudyDetails detail : studyDetails) {
-                if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
-                    detail.setSiteName(siteMap.get(detail.getSiteId()));
-                }
-                if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
-                    detail.setPiName(personMap.get(detail.getPiId()));
-                }
-            }
-        }
+    	if (studyDetails != null && !studyDetails.isEmpty()) {
+	    	List<Integer> centralSite = new ArrayList<Integer>();
+	    	List<Integer> localSite = new ArrayList<Integer>();
+	    	List<Integer> centralPerson = new ArrayList<Integer>();
+	    	List<Integer> localPerson = new ArrayList<Integer>();
+	    	
+	    	for (StudyDetails detail : studyDetails) {
+	    		if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
+	    			if (detail.getSiteId() > 0) {
+	    				centralSite.add(detail.getSiteId());
+	    			}
+	    			else {
+	    				localSite.add(detail.getSiteId());
+	    			}
+	    		}
+	    		if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
+	    			if (detail.getPiId() > 0) {
+	    				centralPerson.add(detail.getPiId());
+	    			}
+	    			else {
+	    				localPerson.add(detail.getPiId());
+	    			}
+	    		}
+	    	}
+	    	
+	    	Map<Integer, String> siteMap = new HashMap<Integer, String>();
+	    	Map<Integer, String> personMap = new HashMap<Integer, String>();
+	    	
+	    	if (!centralSite.isEmpty()) {
+	    		setWorkingDatabase(Database.CENTRAL);
+	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(centralSite));
+	    	}
+	    	if (!localSite.isEmpty()) {
+	    		setWorkingDatabase(Database.LOCAL);
+	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(localSite));
+	    	}
+	    	if (!centralPerson.isEmpty()) {
+	    		setWorkingDatabase(Database.CENTRAL);
+	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(centralPerson));
+	    	}
+	    	if (!localPerson.isEmpty()) {
+	    		setWorkingDatabase(Database.LOCAL);
+	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(localPerson));
+	    	}
+	    	
+	    	for (StudyDetails detail : studyDetails) {
+	    		if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
+	    			detail.setSiteName(siteMap.get(detail.getSiteId()));
+	    		}
+	    		if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
+	    			detail.setPiName(personMap.get(detail.getPiId()));
+	    		}
+	    	}
+    	}
     }
-
+    
     private Integer getBlockId(List<FieldMapInfo> infos) {
-        if (infos != null) {
-            for (FieldMapInfo info : infos) {
-                if (info.getDatasets() != null) {
-                    for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-                        if (dataset.getTrialInstances() != null) {
-                            for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-                                return trial.getBlockId();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+    	if (infos != null) { 
+    		for (FieldMapInfo info : infos) {
+    			if (info.getDatasets() != null) {
+    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+    					if (dataset.getTrialInstances() != null) {
+    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+    							return trial.getBlockId();
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return null;
     }
-
+    
     private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo) throws MiddlewareQueryException {
-        updateFieldMapWithBlockInformation(infos, blockInfo, false);
+    	updateFieldMapWithBlockInformation(infos, blockInfo, false);
     }
-
+    
     private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
-        Map<Integer, String> locationMap = new HashMap<Integer, String>();
-        if (infos != null) {
-            for (FieldMapInfo info : infos) {
-                if (info.getDatasets() != null) {
-                    for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-                        if (dataset.getTrialInstances() != null) {
-                            for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+    	Map<Integer, String> locationMap = new HashMap<Integer, String>();
+    	if (infos != null) {
+    		for (FieldMapInfo info : infos) {
+    			if (info.getDatasets() != null) {
+    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+    					if (dataset.getTrialInstances() != null) {
+    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
                             	if (blockInfo == null && trial.getBlockId() != null) {
                             		blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
                             	}
-                                trial.updateBlockInformation(blockInfo);
-                                if (isGetLocation) {
-                                    trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
+    							trial.updateBlockInformation(blockInfo);
+    							if (isGetLocation) {
+	    							trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
                                     trial.setSiteName(trial.getLocationName());
-                                    trial.setFieldName(getLocationName(locationMap, trial.getFieldId()));
-                                    trial.setBlockName(getLocationName(locationMap, trial.getBlockId()));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+	    							trial.setFieldName(getLocationName(locationMap, trial.getFieldId()));
+	    							trial.setBlockName(getLocationName(locationMap, trial.getBlockId()));
+    							}
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
     }
-
+    
     private void updateFieldMapInfoWithBlockInfo(List<FieldMapInfo> fieldMapInfos) throws MiddlewareQueryException {
         updateFieldMapWithBlockInformation(fieldMapInfos, null, true);
     }
 
     private String getLocationName(Map<Integer, String> locationMap, Integer id) throws MiddlewareQueryException {
-        if (id != null) {
-            String name = locationMap.get(id);
-            if (name != null) {
-                return name;
-            }
-            setWorkingDatabase(id);
-            Location location = getLocationDAO().getById(id);
-            if (location != null) {
-                locationMap.put(id, location.getLname());
-                return location.getLname();
-            }
-        }
-        return null;
+    	if (id != null) {
+	    	String name = locationMap.get(id);
+	    	if (name != null) {
+	    		return name;
+	    	}
+	    	setWorkingDatabase(id);
+	    	Location location = getLocationDAO().getById(id);
+	    	if (location != null) {
+	    		locationMap.put(id, location.getLname());
+	    		return location.getLname();
+	    	}
+    	}
+    	return null;
     }
 }

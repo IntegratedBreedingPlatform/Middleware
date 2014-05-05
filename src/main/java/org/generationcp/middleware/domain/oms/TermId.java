@@ -185,12 +185,6 @@ public enum TermId {
 	
 	//Manage Settings
 	, NURSERY_TYPE (77777)
-
-    //Experimental Design
-    , EXPERIMENT_DESIGN_FACTOR (8135)
-    , NUMBER_OF_REPLICATES (77793)
-    , BLOCK_SIZE (77795)
-    , BLOCKS_PER_REPLICATE (77797)
 	;
 	
 	private final int id;
