@@ -95,7 +95,12 @@ public class MeasurementRow {
 		if(label!=null && dataList!=null && !dataList.isEmpty()) {
 			for (MeasurementData data : dataList) {
 				if(label!=null && data.getLabel()!=null && label.equals(data.getLabel())) {
-					return data.getValue();
+					if (data.getcValueId() != null) {
+						return data.getcValueId().toString();
+					}
+					else {
+						return data.getValue();
+					}
 				}
 			}
 		}

@@ -522,10 +522,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
         StandardVariable stdVar = getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId());
         List<Enumeration> validValues = stdVar.getEnumerations();
-        
-        for (Enumeration value : validValues){
-            if (value != null){
-                nurseryTypes.add(new ValueReference(value.getId(), value.getName(), value.getDescription()));
+
+        if (validValues != null){
+            for (Enumeration value : validValues){
+                if (value != null){
+                    nurseryTypes.add(new ValueReference(value.getId(), value.getName(), value.getDescription()));
+                }
             }
         }
         
@@ -554,7 +556,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         
         //if not found in the list using the name, get dataset with Plot Data type
         if (dataSetId == 0) {
-            dataSetId = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA).getId();
+            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
+            if (dataset != null){
+                dataSetId = dataset.getId();
+            }
         }
         
         return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
