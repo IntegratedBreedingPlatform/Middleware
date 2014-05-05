@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
@@ -32,36 +31,22 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 @SuppressWarnings("rawtypes")
-public class PojosSimpleTest{
+public class PojosSimpleTest extends TestOutputFormatter{
 
     private static HibernateUtil hibernateUtil;
-
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
-    }
-
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
     }
 
     @Test
@@ -75,7 +60,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Attribute);
             Assert.assertTrue(obj != null);
             Attribute atributs = (Attribute) obj;
-            Debug.println(0, "  " + atributs);
+            Debug.println(INDENT, atributs);
         }
     }
 
@@ -90,7 +75,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Bibref);
             Assert.assertTrue(obj != null);
             Bibref holder = (Bibref) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -105,7 +90,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Country);
             Assert.assertTrue(obj != null);
             Country holder = (Country) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -120,7 +105,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Georef);
             Assert.assertTrue(obj != null);
             Georef holder = (Georef) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -135,7 +120,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Germplasm);
             Assert.assertTrue(obj != null);
             Germplasm holder = (Germplasm) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -150,7 +135,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Location);
             Assert.assertTrue(obj != null);
             Location holder = (Location) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -165,7 +150,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Locdes);
             Assert.assertTrue(obj != null);
             Locdes holder = (Locdes) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -180,7 +165,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Method);
             Assert.assertTrue(obj != null);
             Method holder = (Method) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -195,7 +180,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Name);
             Assert.assertTrue(obj != null);
             Name holder = (Name) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -210,7 +195,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Progenitor);
             Assert.assertTrue(obj != null);
             Progenitor holder = (Progenitor) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -225,7 +210,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof UserDefinedField);
             Assert.assertTrue(obj != null);
             UserDefinedField holder = (UserDefinedField) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -240,7 +225,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof User);
             Assert.assertTrue(obj != null);
             User holder = (User) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -249,6 +234,7 @@ public class PojosSimpleTest{
         Integer gid = Integer.valueOf(50533);
         Session session = hibernateUtil.getCurrentSession();
         Germplasm g = (Germplasm) session.load(Germplasm.class, gid);
+        Debug.println(INDENT, g);
     }
 
     @Test
@@ -262,7 +248,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof GermplasmList);
             Assert.assertTrue(obj != null);
             GermplasmList holder = (GermplasmList) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -277,7 +263,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof GermplasmListData);
             Assert.assertTrue(obj != null);
             GermplasmListData holder = (GermplasmListData) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
 
@@ -292,7 +278,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Installation);
             Assert.assertTrue(obj != null);
             Installation holder = (Installation) obj;
-            Debug.println(0, "  " + holder);
+            Debug.println(INDENT, holder);
         }
     }
     
@@ -308,14 +294,8 @@ public class PojosSimpleTest{
         	Assert.assertTrue(obj instanceof GermplasmListData);
         	Assert.assertTrue(obj != null);
         	GermplasmListData data = (GermplasmListData) obj;
-        	data.print(0);
+        	data.print(INDENT);
         }
-    }
-
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
     }
 
     @AfterClass

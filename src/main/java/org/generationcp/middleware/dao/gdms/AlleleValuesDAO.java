@@ -156,8 +156,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         return new ArrayList<Integer>();
     }
     
-    @SuppressWarnings("unchecked")
-    public List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+    public List<AllelicValueElement> getByMarkersAndAlleleValues(
+            List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+        List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
+        
         if (markerIdList.size() == 0 || alleleValueList.size() == 0) {
             throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
         }
@@ -171,10 +173,11 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         }
         String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
         
-        String sql =
-            "SELECT gid"
-            + " FROM gdms_allele_values"
-            + " WHERE (marker_id, allele_bin_value) IN (" + placeholders + ")";
+        String sql = new StringBuffer()
+            .append("SELECT dataset_id, gid, marker_id, CONCAT(allele_bin_value,'') ")
+            .append("FROM gdms_allele_values ")
+            .append("WHERE (marker_id, allele_bin_value) IN (" + placeholders + ") ")
+            .toString();
 
         try {
             SQLQuery query = getSession().createSQLQuery(sql);
@@ -185,12 +188,27 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                 query.setString(baseIndex + 1, alleleValueList.get(i));
             }
             
-            return (List<Integer>) query.list();
+            List results = query.list();
+            
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer datasetId = (Integer) result[0];
+                    Integer gid = (Integer) result[1];
+                    Integer markerId = (Integer) result[2];
+                    String alleleBinValue = (String) result[3];
+                    AllelicValueElement allelicValueElement =
+                            new AllelicValueElement(null, datasetId, gid, markerId, alleleBinValue);
+                    values.add(allelicValueElement);
+                }
+            }
+
         } catch (HibernateException e) {
-            logAndThrowException("Error with getGidsByMarkersAndAlleleValues(markerIdList=" + markerIdList + " alleleValueList=" + alleleValueList + "): " + e.getMessage(), e);
+            logAndThrowException("Error with getByMarkersAndAlleleValues(markerIdList=" + markerIdList 
+                    + ", alleleValueList=" + alleleValueList + "): " + e.getMessage(), e);
         }
         
-        return new ArrayList<Integer>();
+        return values;
     }
 
     /**
@@ -233,8 +251,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
     }
 
 
-    public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start,
-                                                                                      int numOfRows) throws MiddlewareQueryException {
+    public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(
+            List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
+        List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
         try {
             if (gids != null && !gids.isEmpty()) {
                 SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
@@ -243,8 +262,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                 query.setMaxResults(numOfRows);
                 List results = query.list();
 
-                List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
-
+                
                 for (Object o : results) {
                     Object[] result = (Object[]) o;
                     if (result != null) {
@@ -259,14 +277,13 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     }
                 }
 
-                return values;
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getIntAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
-        return new ArrayList<AllelicValueElement>();
+        return values;
     }
-
+    
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
         try {
             if (gids != null && !gids.isEmpty()) {
@@ -284,8 +301,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         return 0;
     }
 
-    public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start,
-                                                                                       int numOfRows) throws MiddlewareQueryException {
+    public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(
+            List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
+        List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
         try {
             if (gids != null && !gids.isEmpty()) {
                 SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
@@ -294,7 +312,6 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                 query.setMaxResults(numOfRows);
                 List results = query.list();
 
-                List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
 
                 for (Object o : results) {
                     Object[] result = (Object[]) o;
@@ -307,13 +324,11 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                         values.add(allelicValueElement);
                     }
                 }
-
-                return values;
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
-        return new ArrayList<AllelicValueElement>();
+        return values;
     }
 
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {

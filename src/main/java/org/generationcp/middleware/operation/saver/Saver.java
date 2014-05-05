@@ -113,10 +113,6 @@ public abstract class Saver extends DatabaseBroker{
 	    return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	protected final TermPropertyBuilder getTermPropertyBuilder() {
-	    return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
-	}
-
     protected final ExperimentBuilder getExperimentBuilder() {
         return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }

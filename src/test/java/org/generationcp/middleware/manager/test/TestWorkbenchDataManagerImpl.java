@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
-
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertFalse;
@@ -54,18 +53,15 @@ import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestWorkbenchDataManagerImpl{
+public class TestWorkbenchDataManagerImpl extends TestOutputFormatter{
 
     private static WorkbenchDataManager manager;
     private static HibernateUtil hibernateUtil;
@@ -80,26 +76,6 @@ public class TestWorkbenchDataManagerImpl{
         manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
   
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
-
-
-
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
-    }
-
-
     @Test
     public void testAddUser() throws MiddlewareQueryException {
         User user = new User();
@@ -117,14 +93,12 @@ public class TestWorkbenchDataManagerImpl{
 
         // add user
         manager.addUser(user);
-        Debug.println(0, "testAddUser(): " + user);
-
+        Debug.println(INDENT, "testAddUser(): " + user);
     }
 
     @Test
     public void testAddPerson() throws MiddlewareQueryException {
         Person person = new Person();
-        
         //person.setId(1000);
         person.setInstituteId(1);
         person.setFirstName("Lich");
@@ -142,8 +116,7 @@ public class TestWorkbenchDataManagerImpl{
 
         // add the person
         manager.addPerson(person);
-        Debug.println(0, "testAddPerson(): " + person);
-
+        Debug.println(INDENT, "testAddPerson(): " + person);
     }
 
     @Test
@@ -162,14 +135,12 @@ public class TestWorkbenchDataManagerImpl{
 
         // add the project
         manager.addProject(project);
-        Debug.println(0, "testAddProject(): " + project);
-
+        Debug.println(INDENT, "testAddProject(): " + project);
     }
 
     @Test
     public void testAddProjectActivity() throws MiddlewareQueryException {
         ProjectActivity projectActivity = new ProjectActivity();
-
         projectActivity.setProject(manager.getProjectById(41L));
         projectActivity.setName("Fieldbook");
         projectActivity.setDescription("Launch FieldBook");
@@ -178,24 +149,19 @@ public class TestWorkbenchDataManagerImpl{
 
         // add the project activity
         manager.addProjectActivity(projectActivity);
-        Debug.println(0, "testAddProjectActivity(): " + projectActivity);
-
+        Debug.println(INDENT, "testAddProjectActivity(): " + projectActivity);
     }
 
     @Test
     public void testAddIbdbUserMap() throws MiddlewareQueryException {
 
         User u = manager.getAllUsers().get(0);
-
-        Assert.assertNotNull("there should be at least 1 user",u);
+        Assert.assertNotNull("there should be at least 1 user", u);
 
         Project p = manager.getProjectsByUser(u).get(0);
-
-        Assert.assertNotNull("there should be at least 1 project in user_id " + u.getUserid(),p);
-
+        Assert.assertNotNull("there should be at least 1 project in user_id " + u.getUserid(), p);
 
         IbdbUserMap userMap = new IbdbUserMap();
-
     	userMap.setProjectId(p.getProjectId());
         userMap.setIbdbUserId(u.getUserid() * -1);
     	userMap.setWorkbenchUserId(u.getUserid());
@@ -204,62 +170,54 @@ public class TestWorkbenchDataManagerImpl{
         Integer result = manager.addIbdbUserMap(userMap);
         Assert.assertNotNull("Should return a new user_map id",result);
 
-        Debug.println(0, "testAddIbdbUserMap(): " + userMap);
-
+        Debug.println(INDENT, "testAddIbdbUserMap(): " + userMap);
     }
 
     @Test
     public void testAddProjectLocationMap() throws MiddlewareQueryException {
         ProjectLocationMap projectLocationMap = new ProjectLocationMap();
-
     	projectLocationMap.setLocationId(1L);
     	projectLocationMap.setProject(manager.getProjectById(1L));
 
         // add the Add Project Location Map
         Integer result = manager.addProjectLocationMap(projectLocationMap);
-
         Assert.assertNotNull("Should return a result, id of the newly added projectlocationmap",result);
 
-        Debug.println(0, "testAddProjectLocationMap(): " + projectLocationMap);
-
+        Debug.println(INDENT, "testAddProjectLocationMap(): " + projectLocationMap);
     }
     
     @Test
     public void testGetProjects() throws MiddlewareQueryException {
         List<Project> projects = manager.getProjects();
-
-        Debug.println(0, "testGetProjects(): ");
-        for (Project project : projects) {
-            Debug.println(0, "  " + project);
-        }
+        Debug.printObjects(INDENT, projects);
     }
 
     @Test
     public void testGetToolWithName() throws MiddlewareQueryException {
         String toolName = "fieldbook";
         Tool tool = manager.getToolWithName(toolName);
-        Debug.println(0, "testGetToolWithName(" + toolName + "): " + tool);
+        Debug.println(INDENT, "testGetToolWithName(" + toolName + "): " + tool);
     }
 
     @Test
     public void testGetProjectById() throws MiddlewareQueryException {
         Long id = manager.getProjects().get(0).getProjectId();
         Project project = manager.getProjectById(id);
-        Debug.println(0, "testGetProjectById(" + id + "): " + project);
+        Debug.println(INDENT, "testGetProjectById(" + id + "): " + project);
     }
 
     @Test
     public void testGetProjectByName() throws MiddlewareQueryException {
         String name = "Test Cowpea 1";// "Replace with project name to search";
         Project project = manager.getProjectByName(name);
-        Debug.println(0, "testGetProjectByName(" + name + "): " + project);
+        Debug.println(INDENT, "testGetProjectByName(" + name + "): " + project);
     }
 
     @Test
     public void testGetUserByName() throws MiddlewareQueryException {
         String name = "user_test";
         User user = (User) manager.getUserByName(name, 0, 1, Operation.EQUAL).get(0);
-        Debug.println(0, "testGetUserByName(name=" + name + "):" + user);
+        Debug.println(INDENT, "testGetUserByName(name=" + name + "):" + user);
     }
 
     @Test
@@ -273,22 +231,21 @@ public class TestWorkbenchDataManagerImpl{
         dataset.setCreationDate(new Date(System.currentTimeMillis()));
         dataset.setProject(project);
         manager.addWorkbenchDataset(dataset);
-        Debug.println(0, "testAddWorkbenchDataset(): " + dataset);
-
+        Debug.println(INDENT, "testAddWorkbenchDataset(): " + dataset);
     }
 
     @Test
     public void testGetWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         List<WorkbenchDataset> list = manager.getWorkbenchDatasetByProjectId(projectId, 0, 10);
-        Debug.println(0, "testGetWorkbenchDatasetByProjectId(" + projectId + "): ");
+        Debug.println(INDENT, "testGetWorkbenchDatasetByProjectId(" + projectId + "): ");
 
         if (list.isEmpty()) {
-            Debug.println(0, "  No records found.");
+            Debug.println(INDENT, "  No records found.");
         }
 
         for (WorkbenchDataset d : list) {
-            Debug.println(0, "  " + d.getDatasetId() + ": " + d.getName());
+            Debug.println(INDENT, d.getDatasetId() + ": " + d.getName());
         }
     }
 
@@ -296,21 +253,21 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         long result = manager.countWorkbenchDatasetByProjectId(projectId);
-        Debug.println(0, "testCountWorkbenchDatasetByProjectId(" + projectId + "): " + result);
+        Debug.println(INDENT, "testCountWorkbenchDatasetByProjectId(" + projectId + "): " + result);
     }
 
     @Test
     public void testGetWorkbenchDatasetByName() throws MiddlewareQueryException {
         String name = "D";
         List<WorkbenchDataset> list = manager.getWorkbenchDatasetByName(name, Operation.EQUAL, 0, 10);
-        Debug.println(0, "testGetWorkbenchDatasetByName(name=" + name + "): ");
+        Debug.println(INDENT, "testGetWorkbenchDatasetByName(name=" + name + "): ");
 
         if (list.isEmpty()) {
-            Debug.println(0, "  No records found.");
+            Debug.println(INDENT, "  No records found.");
         }
 
         for (WorkbenchDataset d : list) {
-            Debug.println(0, "  " + d.getDatasetId() + ": " + d.getName());
+            Debug.println(INDENT, d.getDatasetId() + ": " + d.getName());
         }
     }
 
@@ -318,35 +275,35 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountWorkbenchDatasetByName() throws MiddlewareQueryException {
         String name = "a";
         long result = manager.countWorkbenchDatasetByName(name, Operation.EQUAL);
-        Debug.println(0, "testCountWorkbenchDatasetByName(name=" + name + "): " + result);
+        Debug.println(INDENT, "testCountWorkbenchDatasetByName(name=" + name + "): " + result);
     }
 
     @Test
     public void testGetLocationIdsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         List<Long> ids = manager.getLocationIdsByProjectId(projectId, 0, 10);
-        Debug.println(0, "testgetLocationIdsByProjectId(" + projectId + "): " + ids);
+        Debug.println(INDENT, "testgetLocationIdsByProjectId(" + projectId + "): " + ids);
     }
 
     @Test
     public void testCountLocationIdsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         long result = manager.countLocationIdsByProjectId(projectId);
-        Debug.println(0, "testCountLocationIdsByProjectId(" + projectId + "): " + result);
+        Debug.println(INDENT, "testCountLocationIdsByProjectId(" + projectId + "): " + result);
     }
 
     @Test
     public void testGetMethodsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         List<Integer> list = manager.getMethodIdsByProjectId(projectId, 0, 10);
-        Debug.println(0, "testGetMethodsByProjectId(" + projectId + "): ");
+        Debug.println(INDENT, "testGetMethodsByProjectId(" + projectId + "): ");
 
         if (list.isEmpty()) {
-            Debug.println(0, "  No records found.");
+            Debug.println(INDENT, "  No records found.");
         }
 
         for (Integer m : list) {
-            Debug.println(0, "  " + m);
+            Debug.println(INDENT, m);
         }
     }
 
@@ -354,7 +311,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountMethodsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         long result = manager.countMethodIdsByProjectId(projectId);
-        Debug.println(0, "testCountMethodsByProjectId(" + projectId + "): " + result);
+        Debug.println(INDENT, "testCountMethodsByProjectId(" + projectId + "): " + result);
     }
 
     @Test
@@ -378,21 +335,21 @@ public class TestWorkbenchDataManagerImpl{
         // add the projectUsers
         List<Integer> projectUsersAdded = manager.addProjectUserRole(projectUsers);
 
-        Debug.println(0, "testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded.size());
+        Debug.println(INDENT, "testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded.size());
     }
 
     @Test
     public void testGetUsersByProjectId() throws MiddlewareQueryException {
         Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         List<User> users = manager.getUsersByProjectId(projectId);
-        Debug.println(0, "testGetUsersByProjectId(" + projectId + "): ");
+        Debug.println(INDENT, "testGetUsersByProjectId(" + projectId + "): ");
 
         if (users.isEmpty()) {
-            Debug.println(0, "  No records found.");
+            Debug.println(INDENT, "  No records found.");
         }
 
         for (User u : users) {
-            Debug.println(0, "  " + u.getUserid() + ": " + u.getName());
+            Debug.println(INDENT, u.getUserid() + ": " + u.getName());
         }
     }
 
@@ -400,21 +357,21 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountUsersByProjectId() throws MiddlewareQueryException {
     	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         long result = manager.countUsersByProjectId(projectId);
-        Debug.println(0, "testCountUsersByProjectId(" + projectId + "): " + result);
+        Debug.println(INDENT, "testCountUsersByProjectId(" + projectId + "): " + result);
     }
 
     @Test
     public void testGetActivitiesByProjectId() throws MiddlewareQueryException {
     	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         List<ProjectActivity> list = manager.getProjectActivitiesByProjectId(projectId, 0, 10);
-        Debug.println(0, "testGetActivitiesByProjectId(" + projectId + "): ");
+        Debug.println(INDENT, "testGetActivitiesByProjectId(" + projectId + "): ");
 
         if (list.isEmpty()) {
-            Debug.println(0, "  No records found.");
+            Debug.println(INDENT, "  No records found.");
         }
 
         for (ProjectActivity m : list) {
-            Debug.println(0, "  " + m);
+            Debug.println(INDENT, m);
         }
     }
 
@@ -422,7 +379,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountActivitiesByProjectId() throws MiddlewareQueryException {
     	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         long result = manager.countProjectActivitiesByProjectId(projectId);
-        Debug.println(0, "testCountActivitiesByProjectId(" + projectId + "): " + result);
+        Debug.println(INDENT, "testCountActivitiesByProjectId(" + projectId + "): " + result);
     }
 
     @Test
@@ -437,11 +394,10 @@ public class TestWorkbenchDataManagerImpl{
         toolConfig.setConfigValue("test value");
 
         manager.addToolConfiguration(toolConfig);
-        Debug.println(0, "testAddToolConfiguration(toolId=" + toolId + "): " + toolConfig);
+        Debug.println(INDENT, "testAddToolConfiguration(toolId=" + toolId + "): " + toolConfig);
 
         // clean up
         manager.deleteToolConfiguration(toolConfig);
-
     }
 
     @Test
@@ -459,14 +415,13 @@ public class TestWorkbenchDataManagerImpl{
             dao.setSession(hibernateUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
-            Debug.println(0, "testUpdateToolConfiguration(toolId=" + toolId + "): ");
-            Debug.println(0, "  FROM: " + oldToolConfigValue);
-            Debug.println(0, "    TO: " + result);
+            Debug.println(INDENT, "testUpdateToolConfiguration(toolId=" + toolId + "): ");
+            Debug.println(INDENT, "  FROM: " + oldToolConfigValue);
+            Debug.println(INDENT, "    TO: " + result);
         } else {
-            Debug.println(0, "testUpdateToolConfiguration(toolId=" + toolId + "): Tool configuration not found.");
+            Debug.println(INDENT, "testUpdateToolConfiguration(toolId=" + toolId + "): Tool configuration not found.");
         }
     }
-
 
     @Test
     public void testDeleteToolConfiguration() throws MiddlewareQueryException {
@@ -479,24 +434,23 @@ public class TestWorkbenchDataManagerImpl{
             dao.setSession(hibernateUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
-            Debug.println(0, "testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
+            Debug.println(INDENT, "testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
         } else {
-            Debug.println(0, "testDeleteToolConfiguration(toolId=" + toolId + "): Tool Configuration not found");
+            Debug.println(INDENT, "testDeleteToolConfiguration(toolId=" + toolId + "): Tool Configuration not found");
         }
-
     }
 
     @Test
     public void testGetListOfToolConfigurationsByToolId() throws MiddlewareQueryException {
         Long toolId = 1L;
         List<ToolConfiguration> result = manager.getListOfToolConfigurationsByToolId(toolId);
-        Debug.println(0, "testGetListOfToolConfigurationsByToolId(" + toolId + "): ");
+        Debug.println(INDENT, "testGetListOfToolConfigurationsByToolId(" + toolId + "): ");
 
         if (result.isEmpty()) {
-            Debug.println(0, "  No records found.");
+            Debug.println(INDENT, "  No records found.");
         } else {
             for (ToolConfiguration t : result) {
-                Debug.println(0, "  " + t);
+                Debug.println(INDENT, t);
             }
         }
     }
@@ -506,8 +460,8 @@ public class TestWorkbenchDataManagerImpl{
         Long toolId = 1L;
         String configKey = "test";
         ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
-        Debug.println(0, "testGetToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey=" + configKey + "): "
-                + toolConfig);
+        Debug.println(INDENT, "testGetToolConfigurationByToolIdAndConfigKey(toolId=" + toolId 
+                + ", configKey=" + configKey + "): " + toolConfig);
     }
 
  @Test
@@ -517,22 +471,21 @@ public class TestWorkbenchDataManagerImpl{
         try{
             String added = manager.addCropType(cropType);
             Assert.assertNotNull(added);            
-            Debug.println(0, "testAddCropType(" + cropType + "): records added = " + added);
+            Debug.println(INDENT, "testAddCropType(" + cropType + "): records added = " + added);
         }catch(MiddlewareQueryException e){
             if (e.getMessage().equals("Crop type already exists.")){
-                Debug.println(0, e.getMessage());
+                Debug.println(INDENT, e.getMessage());
             } else {
                 throw e;
             }
         }
-
     }
 
     @Test
     public void testGetInstalledCentralCrops() throws MiddlewareQueryException {
         ArrayList<CropType> cropTypes = (ArrayList<CropType>) manager.getInstalledCentralCrops();
         Assert.assertNotNull(cropTypes);
-        Debug.println(0, "testGetInstalledCentralCrops(): " + cropTypes);
+        Debug.println(INDENT, "testGetInstalledCentralCrops(): " + cropTypes);
     }
 
     @Test
@@ -540,9 +493,8 @@ public class TestWorkbenchDataManagerImpl{
         String cropName = CropType.CHICKPEA;
         CropType cropType = manager.getCropTypeByName(cropName);
         Assert.assertNotNull(cropName);      
-        Debug.println(0, "testGetCropTypeByName(" + cropName + "): " + cropType);
+        Debug.println(INDENT, "testGetCropTypeByName(" + cropName + "): " + cropType);
     }
-
 
     @Test
     public void testGetLocalIbdbUserId() throws MiddlewareQueryException {
@@ -550,7 +502,7 @@ public class TestWorkbenchDataManagerImpl{
         Long projectId = Long.valueOf(3);
         Integer localIbdbUserId = manager.getLocalIbdbUserId(workbenchUserId, projectId);
         Assert.assertNotNull(localIbdbUserId); 
-        Debug.println(0, "testGetLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId=" + projectId + "): "
+        Debug.println(INDENT, "testGetLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId=" + projectId + "): "
                 + localIbdbUserId);
     }
 
@@ -559,7 +511,7 @@ public class TestWorkbenchDataManagerImpl{
         Integer id = Integer.valueOf(1); // Assumption: there is a role with id 1
         Role role = manager.getRoleById(id);
         Assert.assertNotNull(role); 
-        Debug.println(0, "testGetRoleById(id=" + id + "): \n  " + role);
+        Debug.println(INDENT, "testGetRoleById(id=" + id + "): \n  " + role);
     }
 
     @Test
@@ -569,8 +521,8 @@ public class TestWorkbenchDataManagerImpl{
         WorkflowTemplate workflowTemplate = manager.getWorkflowTemplateByName(templateName).get(0);
         Role role = manager.getRoleByNameAndWorkflowTemplate(roleName, workflowTemplate);
         Assert.assertNotNull(role); 
-        Debug.println(0, "testGetRoleByNameAndWorkflowTemplate(name=" + roleName + ", workflowTemplate=" + workflowTemplate.getName()
-                + "): \n  " + role);
+        Debug.println(INDENT, "testGetRoleByNameAndWorkflowTemplate(name=" + roleName 
+                + ", workflowTemplate=" + workflowTemplate.getName() + "): \n  " + role);
     }
 
     @Test
@@ -579,9 +531,9 @@ public class TestWorkbenchDataManagerImpl{
         List<Role> roles = manager.getRolesByWorkflowTemplate(workflowTemplate);
         Assert.assertNotNull(roles); 
         Assert.assertTrue(!roles.isEmpty());
-        Debug.println(0, "testGetRolesByWorkflowTemplate(workflowTemplate=" + workflowTemplate.getName() + "): " + roles.size());
+        Debug.println(INDENT, "testGetRolesByWorkflowTemplate(workflowTemplate=" + workflowTemplate.getName() + "): " + roles.size());
         for (Role role: roles){
-            Debug.println(0, "  "+role);
+            Debug.println(INDENT, "  "+role);
         }
     }
 
@@ -590,7 +542,7 @@ public class TestWorkbenchDataManagerImpl{
         Role role = manager.getRoleById(manager.getAllRoles().get(0).getRoleId());
         WorkflowTemplate template = manager.getWorkflowTemplateByRole(role);
         Assert.assertNotNull(template);
-        Debug.println(0, "testGetWorkflowTemplateByRole(role=" + role.getName() + "): \n  " + template);
+        Debug.println(INDENT, "testGetWorkflowTemplateByRole(role=" + role.getName() + "): \n  " + template);
     }
 
     @Test
@@ -605,9 +557,11 @@ public class TestWorkbenchDataManagerImpl{
             ProjectUserRole projectUser = projectUsers.get(0); // get the first user of the project
             User user = manager.getUserById(projectUser.getUserId());
             List<Role> roles = manager.getRolesByProjectAndUser(project, user); // get the roles
-            Debug.println(0, "testGetRoleByProjectAndUser(project=" + project.getProjectName() + ", user=" + user.getName() + "): \n  " + roles);
+            Debug.println(INDENT, "testGetRoleByProjectAndUser(project=" + project.getProjectName() 
+                    + ", user=" + user.getName() + "): \n  " + roles);
         } else {
-            Debug.println(0, "testGetRoleByProjectAndUser(project=" + project.getProjectName() + "): Error in data - Project has no users. ");
+            Debug.println(INDENT, "testGetRoleByProjectAndUser(project=" + project.getProjectName() 
+                    + "): Error in data - Project has no users. ");
         }
     }
 
@@ -618,7 +572,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!roles.isEmpty());
         
         for(Role role : roles) {
-            Debug.println(0, role.toString());
+            Debug.println(INDENT, role.toString());
         }
     }
 
@@ -635,7 +589,7 @@ public class TestWorkbenchDataManagerImpl{
 
         Integer idSaved = manager.addProjectUserMysqlAccount(recordToSave);
         Assert.assertNotNull(idSaved);
-        Debug.println(0, "Id of record saved: " + idSaved);
+        Debug.println(INDENT, "Id of record saved: " + idSaved);
 
     }
 
@@ -687,9 +641,9 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertNotNull(idsSaved);
         Assert.assertTrue(!idsSaved.isEmpty());
 
-        Debug.println(0, "Ids of records saved:");
+        Debug.println(INDENT, "Ids of records saved:");
         for(Integer id : idsSaved){
-            Debug.println(0, id.toString());
+            Debug.println(INDENT, id.toString());
         }
 
         manager.deleteProject(project1);
@@ -700,9 +654,10 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetProjectUserMysqlAccountByProjectIdAndUserId() throws MiddlewareQueryException {
         //This test assumes that there is a record in workbench_project_user_mysql_account
         //with project id = 1 and user id = 1
-        ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(Integer.valueOf(1), Integer.valueOf(1));
+        ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(
+                Integer.valueOf(1), Integer.valueOf(1));
         Assert.assertNotNull(record);
-        Debug.println(0, record.toString());
+        Debug.println(INDENT, record.toString());
     }
 
     @Test
@@ -711,9 +666,9 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertNotNull(projectBackups);
         Assert.assertTrue(!projectBackups.isEmpty());
         
-        Debug.println(0, "testGetProjectBackups(): ");
+        Debug.println(INDENT, "testGetProjectBackups(): ");
         for (ProjectBackup project : projectBackups) {
-            Debug.println(0, "  " + project);
+            Debug.println(INDENT, project);
         }
     }
 
@@ -729,7 +684,7 @@ public class TestWorkbenchDataManagerImpl{
         manager.saveOrUpdateProjectBackup(projectBackup);
         Assert.assertNotNull(projectBackup);
         
-        Debug.println(0, "testAddProjectBackup(): " + projectBackup);
+        Debug.println(INDENT, "testAddProjectBackup(): " + projectBackup);
 
     }
 
@@ -741,7 +696,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!projectBackups.isEmpty());
         
         for (ProjectBackup backup : projectBackups) {
-            Debug.println(0, "  " + backup);
+            Debug.println(INDENT, backup);
         }
     }
 
@@ -749,14 +704,14 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountAllPersons() throws MiddlewareQueryException {
     	long count = manager.countAllPersons();
     	Assert.assertNotNull(count);
-        Debug.println(0, "testCountAllPersons: " + count );
+        Debug.println(INDENT, "testCountAllPersons: " + count );
     }
 
     @Test
     public void testCountAllUsers() throws MiddlewareQueryException {
     	long count = manager.countAllUsers();
     	Assert.assertNotNull(count);
-        Debug.println(0, "testCountAllUsers: " + count );
+        Debug.println(INDENT, "testCountAllUsers: " + count );
     }
 
     @Test
@@ -766,7 +721,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (Person result : results){
-    	   Debug.println(0, result.toString());
+    	   Debug.println(INDENT, result.toString());
        }
     }
 
@@ -777,7 +732,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (Role result : results){
-    	   Debug.println(0, result.toString());
+    	   Debug.println(INDENT, result.toString());
        }
     }
 
@@ -788,7 +743,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (Role result : results){
-    	   Debug.println(0, result.toString());
+    	   Debug.println(INDENT, result.toString());
        }
     }
 
@@ -799,7 +754,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (Tool result : results) {
-    	   Debug.println(0, result.toString());
+    	   Debug.println(INDENT, result.toString());
        }
     }
 
@@ -810,7 +765,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (User result : results){
-        	Debug.println(0, result.toString());
+        	Debug.println(INDENT, result.toString());
         }
     }
 
@@ -821,7 +776,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (User result : results) {
-        	Debug.println(0, result.toString());
+        	Debug.println(INDENT, result.toString());
        }
     }
 
@@ -830,7 +785,7 @@ public class TestWorkbenchDataManagerImpl{
     	Integer userId = manager.getAllUsers().get(0).getUserid();
     	Project results = manager.getLastOpenedProject(userId);
         Assert.assertNotNull(results);
-        Debug.println(0, results.toString());
+        Debug.println(INDENT, results.toString());
     }
 
     @Test
@@ -838,7 +793,7 @@ public class TestWorkbenchDataManagerImpl{
     	int id = manager.getAllPersons().get(0).getId();
     	Person results = manager.getPersonById(id);
         Assert.assertNotNull(results);
-        Debug.println(0, results.toString());
+        Debug.println(INDENT, results.toString());
     }
 
     @Test
@@ -849,7 +804,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (ProjectActivity result : results){
-        	Debug.println(0, result.toString());
+        	Debug.println(INDENT, result.toString());
        }
     }
 
@@ -861,7 +816,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (ProjectLocationMap result : results){
-        	Debug.println(0, result.toString());
+        	Debug.println(INDENT, result.toString());
        }
     }
 
@@ -870,7 +825,7 @@ public class TestWorkbenchDataManagerImpl{
     	Integer id = manager.getProjects().get(0).getUserId();
     	ProjectUserRole userrole = manager.getProjectUserRoleById(id);
     	Assert.assertNotNull(userrole);
-        Debug.println(0, userrole.toString());
+        Debug.println(INDENT, userrole.toString());
     }
 
     @Test
@@ -883,7 +838,7 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertTrue(!results.isEmpty());
         
         for (SecurityQuestion result : results) {
-        	Debug.println(0, result.toString());
+        	Debug.println(INDENT, result.toString());
         }
     }
 
@@ -892,12 +847,7 @@ public class TestWorkbenchDataManagerImpl{
     	List<Project> results = manager.getProjects(0, 100);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-        Debug.println(0, "testGetProjectsList(): ");
-        for (Project result : results) {
-            Debug.println(0, "  " + result);
-
-        }
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -906,12 +856,7 @@ public class TestWorkbenchDataManagerImpl{
     	List<ProjectMethod> results = manager.getProjectMethodByProject(project, 0, 100);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-        Debug.println(0, "testGetProjectMethodByProject(): ");
-        for (ProjectMethod result : results) {
-            Debug.println(0, "  " + result);
-
-        }
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -920,13 +865,7 @@ public class TestWorkbenchDataManagerImpl{
     	List<Project> results = manager.getProjectsByUser(user);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-        Debug.println(0, "testGetProjectsByUser(): ");
-        for (Project result : results) {
-            Debug.println(0, "  " + result);
-
-        }
-        Debug.println(0, "Number of record/s: "+results.size());
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -935,12 +874,7 @@ public class TestWorkbenchDataManagerImpl{
     	List<ProjectUserRole> results = manager.getProjectUserRolesByProject(project);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-    	Debug.println(0, "testGetProjectUserRolesByProject(): ");
-        for (ProjectUserRole result : results) {
-            Debug.println(0, "  " + result);
-        }
-        Debug.println(0, "Number of record/s: "+results.size());
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -948,8 +882,8 @@ public class TestWorkbenchDataManagerImpl{
     	int id = 1;
     	User user = manager.getUserById(id);
     	Assert.assertNotNull(user);
-    	Debug.println(0, "testGetUserById("+id+"): ");
-    	Debug.println(0, user.toString());
+    	Debug.println(INDENT, "testGetUserById("+id+"): ");
+    	Debug.println(INDENT, user.toString());
     }
 
     @Test
@@ -957,25 +891,22 @@ public class TestWorkbenchDataManagerImpl{
     	Long datasetId = 1L; //change datasetId value
     	WorkbenchDataset result = manager.getWorkbenchDatasetById(datasetId);
     	Assert.assertNotNull(result);
-    	
-    	Debug.println(0, "testGetWorkbenchDatasetById("+datasetId+"): ");
-    	Debug.println(0, result.toString());
+    	Debug.println(INDENT, "testGetWorkbenchDatasetById("+datasetId+"): ");
+    	Debug.println(INDENT, result.toString());
     }
 
     @Test
     public void testGetWorkbenchRuntimeData() throws MiddlewareQueryException  {
     	WorkbenchRuntimeData result = manager.getWorkbenchRuntimeData();
     	Assert.assertNotNull(result);
-    	
-    	Debug.println(0, result.toString());
+    	Debug.println(INDENT, result.toString());
     }
 
     @Test
     public void testGetWorkbenchSetting() throws MiddlewareQueryException  {
     	WorkbenchSetting result = manager.getWorkbenchSetting();
     	Assert.assertNotNull(result);
-    	
-    	Debug.println(0, result.toString());
+    	Debug.println(INDENT, result.toString());
     }
 
     @Test
@@ -984,10 +915,7 @@ public class TestWorkbenchDataManagerImpl{
     	List<WorkflowTemplate> results = manager.getWorkflowTemplateByName(name);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-        for (WorkflowTemplate result : results) {
-        	Debug.println(0, result.toString());
-        }
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -995,19 +923,14 @@ public class TestWorkbenchDataManagerImpl{
     	List<WorkflowTemplate> results = manager.getWorkflowTemplates();
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-        for (WorkflowTemplate result : results) {
-        	Debug.println(0, result.toString());
-        }
-        Debug.println(0, "Number of record/s: "+results.size());
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
     public void testDeletePerson() throws MiddlewareQueryException  {
         Person person = manager.getAllPersons().get((manager.getAllPersons().size())-1);
-
     	manager.deletePerson(person);
-        Debug.println(0, "Record is successfully deleted");
+        Debug.println(INDENT, "Record is successfully deleted");
     }
 
     /* TODO: Lets disable this test case for the meantime as the delete fxn left behind by abro differs from the ff transaction, (Please add a separate jira ticket for this) */
@@ -1017,14 +940,13 @@ public class TestWorkbenchDataManagerImpl{
         Project project = manager.getProjects().get((manager.getProjects().size())-1);
 
     	manager.deleteProject(project);
-        Debug.println(0, "Record is successfully deleted");
+        Debug.println(INDENT, "Record is successfully deleted");
     } */
 
     @Test
     public void testDeleteProjectActivity() throws MiddlewareQueryException  {
     	
         ProjectActivity projectActivity = new ProjectActivity();
-
         projectActivity.setProject(manager.getProjectById(1L));
         projectActivity.setName("Fieldbook");
         projectActivity.setDescription("Launch FieldBook");
@@ -1034,7 +956,7 @@ public class TestWorkbenchDataManagerImpl{
         // add the project activity
         manager.addProjectActivity(projectActivity);
     	manager.deleteProjectActivity(projectActivity);
-        Debug.println(0, "Record is successfully deleted");
+        Debug.println(INDENT, "Record is successfully deleted");
     }
 
     @Test
@@ -1042,34 +964,28 @@ public class TestWorkbenchDataManagerImpl{
     	List<WorkflowTemplate> results = manager.getWorkflowTemplates(0, 100);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-        for (WorkflowTemplate result : results) {
-        	Debug.println(0, result.toString());
-        }
-        Debug.println(0, "Number of record/s: "+results.size());
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
     public void testGetProjectUserInfoDao() throws MiddlewareQueryException  {
     	ProjectUserInfoDAO results = manager.getProjectUserInfoDao();
     	Assert.assertNotNull(results);
-    	
-        Debug.println(0, results.toString());
-
+    	Debug.println(INDENT, results.toString());
     }
 
     @Test
     public void testGetToolDao() throws MiddlewareQueryException  {
     	ToolDAO results = manager.getToolDao();
     	Assert.assertNotNull(results);
-    	Debug.println(0, results.toString());
+    	Debug.println(INDENT, results.toString());
     }
 
     @Test
     public void testGetUserInfo() throws MiddlewareQueryException  {
     	UserInfo results = manager.getUserInfo(manager.getAllUsers().get(0).getUserid());
     	Assert.assertNotNull(results);
-        Debug.println(0, results.toString());
+        Debug.println(INDENT, results.toString());
     }
 
     @Test
@@ -1077,27 +993,22 @@ public class TestWorkbenchDataManagerImpl{
     	List<Tool> results = manager.getToolsWithType(ToolType.NATIVE);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        
-        for (Tool result : results) {
-        	Debug.println(0, result.toString());
-        }
-        Debug.println(0, "Number of record/s: "+results.size());
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
     public void testGetBreedingMethodIdsByWorkbenchProjectId() throws MiddlewareQueryException {
         Integer projectId = 1;
         List<Integer> ids = manager.getBreedingMethodIdsByWorkbenchProjectId(projectId);
-        Debug.println(0, "testGetBreedingMethodIdsByWorkbenchProjectId(projectId=" + projectId + "): " + ids.size());
+        Debug.println(INDENT, "testGetBreedingMethodIdsByWorkbenchProjectId(projectId=" + projectId + "): " + ids.size());
         for (Integer id : ids){
-            Debug.println(0, " ID = " + id);
+            Debug.println(INDENT, " ID = " + id);
         }
     }
 
     @Test
     public void testSaveProject() throws MiddlewareQueryException {
       Project project1 = new Project();
-
       project1.setProjectId((long)manager.getProjects().get(manager.getProjects().size()-1).getProjectId()+1);
       project1.setUserId(1);
       project1.setProjectName("Project Name " + new Random().nextInt(10000));
@@ -1187,8 +1098,8 @@ public class TestWorkbenchDataManagerImpl{
 
       manager.addProjectActivity(projectActivityList);
 
-      Debug.println(0, "  " + project1);
-      Debug.println(0, "  " + project2);
+      Debug.println(INDENT, project1);
+      Debug.println(INDENT, project2);
 
     }
 
@@ -1231,7 +1142,7 @@ public class TestWorkbenchDataManagerImpl{
             manager.deleteProject(project);
 
         } catch (MiddlewareQueryException e) {
-            Debug.println(0, "Error in deleteProject(): " + e.getMessage());
+            Debug.println(INDENT, "Error in deleteProject(): " + e.getMessage());
         }
 
     }
@@ -1251,7 +1162,7 @@ public class TestWorkbenchDataManagerImpl{
         TemplateSetting templateSetting = createTemplateSetting();
 
         manager.addTemplateSetting(templateSetting);
-        Debug.println(3, "Added TemplateSetting: " + templateSetting);
+        Debug.println(INDENT, "Added TemplateSetting: " + templateSetting);
         
         Integer projectId = templateSetting.getProjectId();
         String name = templateSetting.getName();
@@ -1266,22 +1177,14 @@ public class TestWorkbenchDataManagerImpl{
         getTemplateSetting("name, tool, configuration", new TemplateSetting(null, null, name, tool, configuration, null));
         
         manager.deleteTemplateSetting(templateSetting);
-        Debug.println(3, "Database cleanup: templateSetting deleted.");
-
-
+        Debug.println(INDENT, "Database cleanup: templateSetting deleted.");
     }
     
     private void getTemplateSetting(String filterDescription, TemplateSetting templateSettingFilter) throws MiddlewareQueryException{
-
         List<TemplateSetting> settings = manager.getTemplateSettings(templateSettingFilter);
-        
         assertTrue(settings.size() > 0);
-        
-        Debug.println(3, "Retrieve records by " + filterDescription + ": #records = " + settings.size());
-        for (TemplateSetting setting : settings){
-            Debug.println(6, setting.toString());
-        }
-
+        Debug.println(INDENT, "Retrieve records by " + filterDescription + ": #records = " + settings.size());
+        Debug.printObjects(INDENT*2, settings);
     }
     
     
@@ -1291,12 +1194,12 @@ public class TestWorkbenchDataManagerImpl{
         TemplateSetting templateSetting = createTemplateSetting();
 
         manager.addTemplateSetting(templateSetting);
-        Debug.println(3, "testAddTemplateSettings: " + templateSetting);
+        Debug.println(INDENT, "testAddTemplateSettings: " + templateSetting);
         
         assertNotNull(templateSetting.getTemplateSettingId());
         
         manager.deleteTemplateSetting(templateSetting);
-        Debug.println(3, "testDeleteTemplateSettings: " + templateSetting);
+        Debug.println(INDENT, "testDeleteTemplateSettings: " + templateSetting);
     }
     
 
@@ -1306,12 +1209,12 @@ public class TestWorkbenchDataManagerImpl{
         TemplateSetting templateSetting = createTemplateSetting();
 
         manager.addTemplateSetting(templateSetting);
-        Debug.println(3, "TemplateSetting Added: " + templateSetting);
+        Debug.println(INDENT, "TemplateSetting Added: " + templateSetting);
         
         assertNotNull(templateSetting.getTemplateSettingId());
         
         manager.deleteTemplateSetting(templateSetting.getTemplateSettingId());
-        Debug.println(3, "TemplateSetting Deleted: " + templateSetting);
+        Debug.println(INDENT, "TemplateSetting Deleted: " + templateSetting);
     }
     
     @Test
@@ -1320,7 +1223,7 @@ public class TestWorkbenchDataManagerImpl{
         TemplateSetting templateSetting = createTemplateSetting();
 
         manager.addTemplateSetting(templateSetting);
-        Debug.println(3, "TemplateSetting added: " + templateSetting);
+        Debug.println(INDENT, "TemplateSetting added: " + templateSetting);
         
         assertNotNull(templateSetting.getTemplateSettingId());
         
@@ -1328,10 +1231,10 @@ public class TestWorkbenchDataManagerImpl{
         templateSetting.setName(templateSetting.getName() + (int) (Math.random() * 100));
         
         manager.updateTemplateSetting(templateSetting);
-        Debug.println(3, "TemplateSetting updated: " + templateSetting);
+        Debug.println(INDENT, "TemplateSetting updated: " + templateSetting);
         
         manager.deleteTemplateSetting(templateSetting);
-        Debug.println(3, "Database cleanup: templateSetting deleted.");
+        Debug.println(INDENT, "Database cleanup: templateSetting deleted.");
 
     }
     
@@ -1345,17 +1248,17 @@ public class TestWorkbenchDataManagerImpl{
         templateSetting2.setIsDefault(Boolean.TRUE);
 
         manager.addTemplateSetting(templateSetting1);
-        Debug.println(3, "TemplateSetting1 added: " + templateSetting1);
+        Debug.println(INDENT, "TemplateSetting1 added: " + templateSetting1);
         manager.addTemplateSetting(templateSetting2);
-        Debug.println(3, "TemplateSetting2 added: " + templateSetting2);
-        Debug.println(3, "TemplateSetting1 updated: " + templateSetting1);
+        Debug.println(INDENT, "TemplateSetting2 added: " + templateSetting2);
+        Debug.println(INDENT, "TemplateSetting1 updated: " + templateSetting1);
         
         assertFalse(templateSetting1.isDefault());
         assertTrue(templateSetting2.isDefault());
 
         manager.deleteTemplateSetting(templateSetting1);
         manager.deleteTemplateSetting(templateSetting2);
-        Debug.println(3, "Database cleanup: template settings deleted.");
+        Debug.println(INDENT, "Database cleanup: template settings deleted.");
 
     }
 
@@ -1369,21 +1272,21 @@ public class TestWorkbenchDataManagerImpl{
         templateSetting2.setIsDefault(Boolean.TRUE);
 
         manager.addTemplateSetting(templateSetting1);
-        Debug.println(3, "TemplateSetting1 added: " + templateSetting1);
+        Debug.println(INDENT, "TemplateSetting1 added: " + templateSetting1);
         manager.addTemplateSetting(templateSetting2);
-        Debug.println(3, "TemplateSetting2 added: " + templateSetting2);
+        Debug.println(INDENT, "TemplateSetting2 added: " + templateSetting2);
         
         templateSetting1.setIsDefault(Boolean.TRUE);
         manager.updateTemplateSetting(templateSetting1);
-        Debug.println(3, "TemplateSetting1 update: " + templateSetting1);
-        Debug.println(3, "TemplateSetting2 update: " + templateSetting2);
+        Debug.println(INDENT, "TemplateSetting1 update: " + templateSetting1);
+        Debug.println(INDENT, "TemplateSetting2 update: " + templateSetting2);
         
         assertTrue(templateSetting1.isDefault());
         assertFalse(templateSetting2.isDefault());
 
         manager.deleteTemplateSetting(templateSetting1);
         manager.deleteTemplateSetting(templateSetting2);
-        Debug.println(3, "Database cleanup: template settings deleted.");
+        Debug.println(INDENT, "Database cleanup: template settings deleted.");
 
     }
 

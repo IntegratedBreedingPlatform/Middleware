@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.etl.Constants;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -172,7 +170,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             throw new WorkbookParserException(messages);
         }
 
+        // this version of the workbookparser method is also capable of throwing a workbookparserexception with a list of messages containing validation errors inside
         parser.parseAndSetObservationRows(file, workbook);
+
+        // separated the validation of observations from the parsing so that it can be used even in other parsing implementations (e.g., the one for Wizard style)
+        messages.addAll(checkForEmptyRequiredVariables(workbook));
 
         //moved checking below as this needs to parse the contents of the observation sheet for multi-locations
         checkForDuplicateStudyName(ontology, workbook, messages);
@@ -185,6 +187,41 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         checkForInvalidLabel(workbook, messages);
 
         return workbook;
+    }
+
+    private List<Message> checkForEmptyRequiredVariables(Workbook workbook) {
+        List<Message> returnVal = new ArrayList<Message>();
+
+        List<MeasurementVariable> requiredMeasurementVariables = retrieveRequiredMeasurementVariables(workbook);
+
+        int i = 1;
+
+        for (MeasurementRow measurementRow : workbook.getObservations()) {
+            for (MeasurementData measurementData : measurementRow.getDataList()) {
+                for (MeasurementVariable requiredMeasurementVariable : requiredMeasurementVariables) {
+                    if (measurementData.getLabel().equals(requiredMeasurementVariable.getName()) && StringUtils.isEmpty(measurementData.getValue())) {
+                        returnVal.add(new Message("empty.required.variable", measurementData.getLabel(), Integer.toString(i)));
+                    }
+                }
+            }
+
+            i++;
+        }
+
+        return returnVal;
+    }
+
+    private List<MeasurementVariable> retrieveRequiredMeasurementVariables(Workbook workbook) {
+        // current implem leverages the setting of the required variable in earlier checks
+        List<MeasurementVariable> returnVal = new ArrayList<MeasurementVariable>();
+
+        for (MeasurementVariable measurementVariable : workbook.getAllVariables()) {
+            if (measurementVariable.isRequired()) {
+                returnVal.add(measurementVariable);
+            }
+        }
+
+        return returnVal;
     }
 
     private void checkForDuplicateStudyName(OntologyDataManager ontology, Workbook workbook, List<Message> messages)
@@ -317,11 +354,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
     }
 
-    private boolean nameMatches(String name, Term term) {
+    private boolean nameMatches(String name, Term term) throws MiddlewareQueryException {
         String actualTermName = term.getName();
         boolean matches = actualTermName.equalsIgnoreCase(name);
         if (!matches) {
-            List<NameSynonym> synonyms = term.getNameSynonyms();
+            List<NameSynonym> synonyms = getStandardVariableBuilder().createSynonyms(term.getId());
             for (NameSynonym synonym : synonyms) {
                 if (name.equalsIgnoreCase(synonym.getName())) {
                     matches = true;
@@ -425,11 +462,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 StandardVariable svar = ontology.getStandardVariable(varId);
                 if (svar.getStoredIn() != null) {
                     if (svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
-                        return true;
+                        mvar.setRequired(true);
+                        if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
+                            mvar.setRequired(true);
+                            return true;
+                        }
                     }
                 }
-            }
 
+            }
         }
         return false;
     }
@@ -459,6 +500,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             if (svar != null) {
                 if (svar.getStoredIn() != null) {
                     if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+                        mvar.setRequired(true);
                         return true;
                     }
                 }
@@ -582,6 +624,22 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
                 getSessionProviderForLocal(), getSessionProviderForCentral());
         checkForExistingTrialInstance(ontology, workbook, errors);
+
+        // the following code is a workaround versus the current state management in the ETL Wizard
+        // to re-set the "required" fields to true for checking later on
+
+        isPlotExists(ontology, workbook.getFactors());
+        isEntryExists(ontology, workbook.getFactors());
+        if (!workbook.isNursery()) {
+            isTrialInstanceNumberExists(ontology, workbook.getTrialVariables());
+        }
+
+        List<Message> requiredVariableValueErrors = checkForEmptyRequiredVariables(workbook);
+
+        if (requiredVariableValueErrors.size() > 0) {
+            errors.put(Constants.OBSERVATION_DATA_ERRORS, requiredVariableValueErrors);
+        }
+
         return errors;
     }
 

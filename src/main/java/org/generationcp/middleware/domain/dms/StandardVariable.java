@@ -255,14 +255,6 @@ public class StandardVariable implements Serializable{
 		return new StandardVariable(this);
 	}
 	
-	public List<NameSynonym> getNameSynonyms() {
-		return term.getNameSynonyms();
-	}
-	
-	public void setNameSynonyms(List<NameSynonym> nameSynonyms) {
-		this.term.setNameSynonyms(nameSynonyms);
-	}
-
 	public void print(int indent) {
 		Debug.println(indent, "Standard Variable: ");
 		indent += 3;

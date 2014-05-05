@@ -272,7 +272,7 @@ public class GermplasmListData implements Serializable{
     }
     
     public void print(int indent){
-    	Debug.println(0, toString());
+    	Debug.println(indent, toString());
     	for (ListDataProperty property : properties){
     		property.print(indent + 3);
     	}

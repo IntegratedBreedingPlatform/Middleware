@@ -32,7 +32,7 @@ public class Name implements Serializable{
 
     // For getGidAndNidByGermplasmNames()
     public static final String GET_GID_AND_NID_BY_GERMPLASM_NAME = 
-            "SELECT gid, nid " +
+            "SELECT gid, nid, nval " +
             "FROM names " +
             "WHERE nval IN (:germplasmNameList)";
     

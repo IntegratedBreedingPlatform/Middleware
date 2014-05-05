@@ -44,18 +44,18 @@ public class MappingPop implements Serializable{
                 ", gdms_mapping_pop.mapping_type" +
                 ", gdms_mapping_pop.parent_a_nid" +
                 ", gdms_mapping_pop.parent_b_nid" +
+                ", gdms_mapping_pop_values.gid " +
+                ", gdms_mapping_pop_values.marker_id " +
                 ", CONCAT(gdms_marker.marker_type, '')" +
-            " FROM gdms_mapping_pop_values" +
-                ", gdms_mapping_pop" +
-                ", gdms_marker" +
-            " WHERE gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id" +
-                " and gdms_mapping_pop_values.marker_id = gdms_marker.marker_id" +
-                " and gdms_mapping_pop_values.marker_id IN (:markerIdList)" +
-                " and gdms_mapping_pop_values.gid IN (:gidList)" +
+            " FROM gdms_mapping_pop_values " +
+                "JOIN gdms_mapping_pop ON gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id " +
+                "LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
+            " WHERE gdms_mapping_pop_values.marker_id IN (:markerIdList)" +
+                " AND gdms_mapping_pop_values.gid IN (:gidList)" +
             " ORDER BY" +
                 " gdms_mapping_pop_values.gid DESC" +
                 ", gdms_marker.marker_name";
-    
+
     public static final String GET_ALL_PARENTS_FROM_MAPPING_POPULATION = 
             "SELECT parent_a_nid, parent_b_nid " +
             "FROM gdms_mapping_pop";

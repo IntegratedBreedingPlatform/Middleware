@@ -36,7 +36,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
     private GermplasmDataManagerImpl germplasmDataManager;
     
-
     public PedigreeDataManagerImpl() {
     }
 

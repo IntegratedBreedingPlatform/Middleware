@@ -34,6 +34,12 @@ public class DartDataRow{
     }
 
 
+    public DartDataRow(AccMetadataSet accMetadataSet, AlleleValues alleleValues, DartValues dartValues) {
+        this.accMetadataSet = accMetadataSet;
+        this.alleleValues = alleleValues;
+        this.dartValues = dartValues;
+    }
+
     public DartDataRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
             AlleleValues alleleValues, DartValues dartValues) {
         super();

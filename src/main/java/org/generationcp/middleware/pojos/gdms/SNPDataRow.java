@@ -32,9 +32,13 @@ public class SNPDataRow{
     }
 
 
+    public SNPDataRow(AccMetadataSet accMetadataSet, CharValues charValues) {
+        this.accMetadataSet = accMetadataSet;
+        this.charValues = charValues;
+    }
+
     public SNPDataRow(Marker marker, AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet,
             CharValues charValues) {
-        super();
         this.marker = marker;
         this.accMetadataSet = accMetadataSet;
         this.markerMetadataSet = markerMetadataSet;

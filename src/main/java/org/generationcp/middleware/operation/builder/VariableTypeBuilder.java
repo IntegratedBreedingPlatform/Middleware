@@ -45,6 +45,8 @@ public class VariableTypeBuilder extends Builder {
 		variableType.setLocalDescription(variableInfo.getLocalDescription());
 		variableType.setRank(variableInfo.getRank());
 		variableType.setStandardVariable(getStandardVariableBuilder().create(variableInfo.getStdVariableId()));
+		variableType.setTreatmentLabel(variableInfo.getTreatmentLabel());
+		
 		return variableType;
 	}
 }

@@ -63,27 +63,19 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
-public class TestStudyDataManagerImpl{
+public class TestStudyDataManagerImpl extends TestOutputFormatter{
 
-    private static final Integer       STUDY_ID   = 10010;
-    private static final Integer       DATASET_ID = 10045;
+    private static final Integer STUDY_ID   = 10010;
+    private static final Integer DATASET_ID = 10045;
 
-    private static ManagerFactory      factory;
-    private static StudyDataManager    manager;
+    private static ManagerFactory factory;
+    private static StudyDataManager manager;
     private static OntologyDataManager ontologyManager;
-
-    private long                       startTime;
-
-    @Rule
-    public TestName                    name       = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -95,31 +87,18 @@ public class TestStudyDataManagerImpl{
         ontologyManager = factory.getNewOntologyDataManager();
     }
 
-    @Before
-    public void beforeEachTest() {
-        startTime = System.nanoTime();
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-    }
-
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = "
-                + ((double) elapsedTime / 1000000000) + " s");
-    }
-
     @Test
     public void testGetStudyDetails() throws Exception {
         Study study = manager.getStudy(STUDY_ID);
         assertNotNull(study);
-        Debug.println(0, "ID: " + study.getId());
-        Debug.println(0, "Name: " + study.getName());
-        Debug.println(0, "Title:" + study.getTitle());
-        Debug.println(0, "PI: " + study.getPrimaryInvestigator());
-        Debug.println(0, "Start Date:" + study.getStartDate());
-        Debug.println(0, "Creation Date: " + study.getCreationDate());
-        Debug.println(0, "Study status: " + study.getStatus());
-        Debug.println(0, "Study type: " + study.getType());
+        Debug.println(INDENT, "ID: " + study.getId());
+        Debug.println(INDENT, "Name: " + study.getName());
+        Debug.println(INDENT, "Title: " + study.getTitle());
+        Debug.println(INDENT, "PI: " + study.getPrimaryInvestigator());
+        Debug.println(INDENT, "Start Date:" + study.getStartDate());
+        Debug.println(INDENT, "Creation Date: " + study.getCreationDate());
+        Debug.println(INDENT, "Study status: " + study.getStatus());
+        Debug.println(INDENT, "Study type: " + study.getType());
     }
 
     @Test
@@ -129,19 +108,19 @@ public class TestStudyDataManagerImpl{
         VariableList vList = study.getConditions();
         for (Variable v : vList.getVariables()) {
             Debug.print(0, "name[" + v.getVariableType().getStandardVariable().getName() + "]=");
-            Debug.println(0, v.getDisplayValue());
+            Debug.println(INDENT, v.getDisplayValue());
         }
     }
 
     @Test
     public void testGetAllStudyFactor() throws Exception {
-        Debug.println(0, "testGetFactorDetails");
+        Debug.println(INDENT, "testGetFactorDetails");
         int studyId = 10010;
         VariableTypeList factors = manager.getAllStudyFactors(studyId);
         assertNotNull(factors);
         assertTrue(factors.getVariableTypes().size() > 0);
-        Debug.println(0, "FACTORS RETRIEVED " + factors.getVariableTypes().size());
-        factors.print(0);
+        Debug.println(INDENT, "FACTORS RETRIEVED " + factors.getVariableTypes().size());
+        factors.print(INDENT);
     }
 
     @Test
@@ -150,24 +129,24 @@ public class TestStudyDataManagerImpl{
         VariableTypeList variates = manager.getAllStudyVariates(studyId);
         assertNotNull(variates);
         assertTrue(variates.getVariableTypes().size() > 0);
-        variates.print(0);
+        variates.print(INDENT);
     }
 
     @Test
     public void testGetStudiesByFolder() throws Exception {
         int folderId = 1030;
         StudyResultSet resultSet = manager.searchStudies(new ParentFolderStudyQueryFilter(folderId), 5);
-        Debug.println(0, "testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
+        Debug.println(INDENT, "testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
         assertTrue(resultSet.size() > 0);
         while (resultSet.hasMore()) {
             StudyReference studyRef = resultSet.next();
-            Debug.println(0, studyRef.toString());
+            Debug.println(INDENT, studyRef.toString());
         }
     }
 
     @Test
     public void testSearchStudiesForName() throws Exception {
-        Debug.println(0, "testSearchStudiesForName");
+        Debug.println(INDENT, "testSearchStudiesForName");
         BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
 
         filter.setName("FooFoo"); // INVALID: Not a study, should not find any
@@ -178,10 +157,10 @@ public class TestStudyDataManagerImpl{
         filter.setName("RYT2000WS"); // VALID: is a study
 
         resultSet = manager.searchStudies(filter, 10);
-        Debug.println(0, "INPUT: " + filter);
-        Debug.println(0, "Size: " + resultSet.size());
+        Debug.println(INDENT, "INPUT: " + filter);
+        Debug.println(INDENT, "Size: " + resultSet.size());
         while (resultSet.hasMore()) {
-            Debug.println(0, "\t" + resultSet.next());
+            Debug.println(INDENT, "\t" + resultSet.next());
             System.out.flush();
         }
         /*
@@ -199,10 +178,10 @@ public class TestStudyDataManagerImpl{
 
         StudyResultSet resultSet = manager.searchStudies(filter, 10);
 
-        Debug.println(0, "INPUT: " + filter);
-        Debug.println(0, "Size: " + resultSet.size());
+        Debug.println(INDENT, "INPUT: " + filter);
+        Debug.println(INDENT, "Size: " + resultSet.size());
         while (resultSet.hasMore()) {
-            Debug.println(0, "\t" + resultSet.next());
+            Debug.println(INDENT, "\t" + resultSet.next());
             System.out.flush();
         }
         // long before = resultSet.size();
@@ -219,13 +198,13 @@ public class TestStudyDataManagerImpl{
     public void testSearchStudiesForSeason() throws Exception {
         Season seasons[] = { Season.GENERAL, Season.DRY, Season.WET };
         for (Season season : seasons) {
-            Debug.println(0, "Season: " + season);
+            Debug.println(INDENT, "Season: " + season);
             BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
             filter.setSeason(season);
             StudyResultSet resultSet = manager.searchStudies(filter, 10);
-            Debug.println(0, "Size: " + resultSet.size());
+            Debug.println(INDENT, "Size: " + resultSet.size());
             while (resultSet.hasMore()) {
-                Debug.println(0, "\t" + resultSet.next());
+                Debug.println(INDENT, "\t" + resultSet.next());
                 System.out.flush();
             }
         }
@@ -238,10 +217,10 @@ public class TestStudyDataManagerImpl{
         filter.setCountry("Republic of the Philippines");
 
         StudyResultSet resultSet = manager.searchStudies(filter, 10);
-        Debug.println(0, "INPUT: " + filter);
-        Debug.println(0, "Size: " + resultSet.size());
+        Debug.println(INDENT, "INPUT: " + filter);
+        Debug.println(INDENT, "Size: " + resultSet.size());
         while (resultSet.hasMore()) {
-            Debug.println(0, "\t" + resultSet.next());
+            Debug.println(INDENT, "\t" + resultSet.next());
             System.out.flush();
         }
     }
@@ -255,10 +234,10 @@ public class TestStudyDataManagerImpl{
         filter.setSeason(Season.DRY);
 
         StudyResultSet resultSet = manager.searchStudies(filter, 10);
-        Debug.println(0, "INPUT: " + filter);
-        Debug.println(0, "Size: " + resultSet.size());
+        Debug.println(INDENT, "INPUT: " + filter);
+        Debug.println(INDENT, "Size: " + resultSet.size());
         while (resultSet.hasMore()) {
-            Debug.println(0, "\t" + resultSet.next());
+            Debug.println(INDENT, "\t" + resultSet.next());
             System.out.flush();
         }
     }
@@ -268,9 +247,9 @@ public class TestStudyDataManagerImpl{
         List<FolderReference> rootFolders = manager.getRootFolders(Database.CENTRAL);
         assertNotNull(rootFolders);
         assert (rootFolders.size() > 0);
-        Debug.println(0, "testGetRootFolders(): " + rootFolders.size());
+        Debug.println(INDENT, "testGetRootFolders(): " + rootFolders.size());
         for (FolderReference node : rootFolders) {
-            Debug.println(0, "   " + node);
+            Debug.println(INDENT, "   " + node);
         }
     }
 
@@ -281,9 +260,9 @@ public class TestStudyDataManagerImpl{
             List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
             assertNotNull(childrenNodes);
             assert (childrenNodes.size() > 0);
-            Debug.println(0, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
+            Debug.println(INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
             for (Reference node : childrenNodes) {
-                Debug.println(0, "   " + node);
+                Debug.println(INDENT, "   " + node);
             }
         }
     }
@@ -294,9 +273,9 @@ public class TestStudyDataManagerImpl{
         List<DatasetReference> datasetReferences = manager.getDatasetReferences(studyId);
         assertNotNull(datasetReferences);
         assert (datasetReferences.size() > 0);
-        Debug.println(0, "Dataset Nodes By Study Id Count: " + datasetReferences.size());
+        Debug.println(INDENT, "Dataset Nodes By Study Id Count: " + datasetReferences.size());
         for (DatasetReference node : datasetReferences) {
-            Debug.println(0, "   " + node);
+            Debug.println(INDENT, "   " + node);
         }
     }
 
@@ -306,10 +285,10 @@ public class TestStudyDataManagerImpl{
         GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
         StudyResultSet resultSet = manager.searchStudies(filter, 50);
         assertNotNull(resultSet);
-        Debug.println(0, "Study Count: " + resultSet.size());
+        Debug.println(INDENT, "Study Count: " + resultSet.size());
         while (resultSet.hasMore()) {
             StudyReference studyRef = resultSet.next();
-            Debug.println(0, studyRef.toString());
+            Debug.println(INDENT, studyRef.toString());
         }
     }
 
@@ -343,7 +322,7 @@ public class TestStudyDataManagerImpl{
         StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
 
         assertTrue(studyRef.getId() < 0);
-        Debug.println(0, "testAddStudy(): " + studyRef);
+        Debug.println(INDENT, "testAddStudy(): " + studyRef);
     }
 
     @Test
@@ -377,14 +356,14 @@ public class TestStudyDataManagerImpl{
 
         assertTrue(studyRef.getId() < 0);
         Study study = manager.getStudy(studyRef.getId());
-        study.print(0);
+        study.print(INDENT);
     }
 
     @Test
     public void testGetDataSet() throws Exception {
         for (int i = 10015; i <= 10075; i += 10) {
             DataSet dataSet = manager.getDataSet(i);
-            dataSet.print(0);
+            dataSet.print(INDENT);
         }
     }
 
@@ -392,11 +371,11 @@ public class TestStudyDataManagerImpl{
     public void testGetDataSetOfSorghum() throws Exception { // GCP-4986
         int dataSetId = -4; // Local sorghum
         DataSet dataSet = manager.getDataSet(dataSetId);
-        dataSet.print(0);
+        dataSet.print(INDENT);
         List<Experiment> experiments = manager.getExperiments(dataSetId, 0, (int) manager.countExperiments(dataSetId));
-        Debug.println(0, " Experiments: " + experiments.size());
+        Debug.println(INDENT, " Experiments: " + experiments.size());
 
-        Debug.println(0, " Variables.getDisplayValue(): " + experiments.size());
+        Debug.println(INDENT, " Variables.getDisplayValue(): " + experiments.size());
         for (Experiment experiment : experiments) {
             List<Variable> variables = new ArrayList<Variable>();
 
@@ -413,9 +392,9 @@ public class TestStudyDataManagerImpl{
             for (Variable variable : variables)
                 if (!("GID".equals(variable.getVariableType().getLocalName().trim()))) {
                     String value = variable.getDisplayValue();
-                    Debug.println(0, "Data Type is "
+                    Debug.println(INDENT, "Data Type is "
                             + variable.getVariableType().getStandardVariable().getDataType().getName());
-                    Debug.println(0, "\t" + experiment.getId() + "  :  "
+                    Debug.println(INDENT, "\t" + experiment.getId() + "  :  "
                             + variable.getVariableType().getStandardVariable().getName() + "  :  " + value);
                 }
         }
@@ -423,7 +402,7 @@ public class TestStudyDataManagerImpl{
 
     @Test
     public void testCountExperiments() throws Exception {
-        Debug.println(0, "Dataset Experiment Count: " + manager.countExperiments(DATASET_ID));
+        Debug.println(INDENT, "Dataset Experiment Count: " + manager.countExperiments(DATASET_ID));
     }
 
     @Test
@@ -431,7 +410,7 @@ public class TestStudyDataManagerImpl{
         for (int i = 0; i < 2; i++) {
             List<Experiment> experiments = manager.getExperiments(DATASET_ID, 50 * i, 50);
             for (Experiment experiment : experiments) {
-                experiment.print(0);
+                experiment.print(INDENT);
             }
         }
     }
@@ -440,7 +419,7 @@ public class TestStudyDataManagerImpl{
     public void testGetExperimentsWithAverage() throws Exception {
         List<Experiment> experiments = manager.getExperiments(5803, 0, 50);
         for (Experiment experiment : experiments) {
-            experiment.print(0);
+            experiment.print(INDENT);
         }
     }
 
@@ -477,13 +456,13 @@ public class TestStudyDataManagerImpl{
         datasetValues.setVariables(variableList);
 
         DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
-        Debug.println(0, "Dataset added : " + datasetReference);
+        Debug.println(INDENT, "Dataset added : " + datasetReference);
 
     }
 
     @Test
     public void testAddDatasetWithNoDataType() throws Exception {
-        Debug.println(0, "Test addDatasetWithNoCoreValues");
+        Debug.println(INDENT, "Test addDatasetWithNoCoreValues");
         StudyReference studyRef = this.addTestStudy();
         VariableTypeList typeList = new VariableTypeList();
 
@@ -503,7 +482,7 @@ public class TestStudyDataManagerImpl{
         DatasetReference dataSetRef = manager.addDataSet(studyRef.getId(), typeList, datasetValues);
 
         DataSet dataSet = manager.getDataSet(dataSetRef.getId());
-        dataSet.print(0);
+        dataSet.print(INDENT);
     }
 
     @Test
@@ -539,10 +518,10 @@ public class TestStudyDataManagerImpl{
         datasetValues.setVariables(variableList);
 
         DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
-        Debug.println(0, "Dataset added : " + datasetReference);
+        Debug.println(INDENT, "Dataset added : " + datasetReference);
 
         DataSet dataSet = manager.getDataSet(datasetReference.getId());
-        Debug.println(0, "Original Dataset");
+        Debug.println(INDENT, "Original Dataset");
         dataSet.print(3);
 
         VariableType variableType = new VariableType();
@@ -553,7 +532,7 @@ public class TestStudyDataManagerImpl{
         manager.addDataSetVariableType(dataSet.getId(), variableType);
 
         dataSet = manager.getDataSet(datasetReference.getId());
-        Debug.println(0, "Modified Dataset");
+        Debug.println(INDENT, "Modified Dataset");
         dataSet.print(3);
 
     }
@@ -592,19 +571,19 @@ public class TestStudyDataManagerImpl{
 
     @Test
     public void testGetTrialEnvironmentsInDataset() throws Exception {
-        Debug.println(0, "Test getTrialEnvironmentsInDataset");
+        Debug.println(INDENT, "Test getTrialEnvironmentsInDataset");
         TrialEnvironments trialEnvironments = manager.getTrialEnvironmentsInDataset(10085);
-        trialEnvironments.print(0);
+        trialEnvironments.print(INDENT);
     }
 
     @Test
     public void testGetStocksInDataset() throws Exception {
         Stocks stocks = manager.getStocksInDataset(10085);
-        stocks.print(0);
+        stocks.print(INDENT);
     }
 
     private void printExperiments(String title, int datasetId) throws Exception {
-        Debug.println(0, title);
+        Debug.println(INDENT, title);
         List<Experiment> experiments = manager.getExperiments(datasetId, 0, 4);
         for (Experiment experiment : experiments) {
             experiment.print(3);
@@ -627,15 +606,15 @@ public class TestStudyDataManagerImpl{
     public void testGetFactorsByProperty() throws Exception {
         int propertyId = 2205;
         int datasetId = 10015;
-        Debug.println(0, "testGetFactorsByProperty (dataset=" + datasetId + ", property=" + propertyId);
+        Debug.println(INDENT, "testGetFactorsByProperty (dataset=" + datasetId + ", property=" + propertyId);
         DataSet dataset = manager.getDataSet(datasetId);
         VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
         if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
             for (VariableType factor : factors.getVariableTypes()) {
-                factor.print(0);
+                factor.print(INDENT);
             }
         } else {
-            Debug.println(0, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = " + propertyId);
+            Debug.println(INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = " + propertyId);
         }
     }
 
@@ -643,21 +622,21 @@ public class TestStudyDataManagerImpl{
     public void testGetFactorsByPhenotypicType() throws Exception {
         PhenotypicType phenotypicType = PhenotypicType.DATASET;
         int datasetId = 10087;
-        Debug.println(0, "testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + phenotypicType + ")");
+        Debug.println(INDENT, "testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + phenotypicType + ")");
         DataSet dataset = manager.getDataSet(datasetId);
         if (dataset != null) {
             VariableTypeList factors = dataset.getFactorsByPhenotypicType(phenotypicType);
 
             if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
                 for (VariableType factor : factors.getVariableTypes()) {
-                    factor.print(0);
+                    factor.print(INDENT);
                 }
             } else {
-                Debug.println(0, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = "
+                Debug.println(INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = "
                         + phenotypicType);
             }
         } else {
-            Debug.println(0, "DATASET = " + datasetId + " NOT FOUND. ");
+            Debug.println(INDENT, "DATASET = " + datasetId + " NOT FOUND. ");
         }
     }
 
@@ -665,23 +644,23 @@ public class TestStudyDataManagerImpl{
     public void testGetDataSetsByType() throws Exception {
         int studyId = 10010;
         DataSetType dataSetType = DataSetType.MEANS_DATA;
-        Debug.println(0, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+        Debug.println(INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
         List<DataSet> datasets = manager.getDataSetsByType(studyId, dataSetType);
         for (DataSet dataset : datasets) {
-            Debug.println(0, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+            Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
         }
 
         studyId = 10080;
         dataSetType = DataSetType.MEANS_DATA;
-        Debug.println(0, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+        Debug.println(INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
         datasets = manager.getDataSetsByType(studyId, dataSetType);
         for (DataSet dataset : datasets) {
-            Debug.println(0, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+            Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
         }
 
-        Debug.println(0, "Display data set type in getDataSet");
+        Debug.println(INDENT, "Display data set type in getDataSet");
         DataSet dataSet = manager.getDataSet(10087);
-        Debug.println(0, "DataSet = " + dataSet.getId() + ", name = " + dataSet.getName() + ", description = "
+        Debug.println(INDENT, "DataSet = " + dataSet.getId() + ", name = " + dataSet.getName() + ", description = "
                 + dataSet.getDescription() + ", type = " + dataSet.getDataSetType());
     }
 
@@ -689,22 +668,22 @@ public class TestStudyDataManagerImpl{
     public void testFindOneDataSetByType() throws Exception {
         int studyId = 10010;
         DataSetType dataSetType = DataSetType.MEANS_DATA;
-        Debug.println(0, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+        Debug.println(INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
         DataSet dataset = manager.findOneDataSetByType(studyId, dataSetType);
         if (dataset != null) {
-            Debug.println(0, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+            Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
         }
 
         studyId = 10080;
         dataSetType = DataSetType.MEANS_DATA;
-        Debug.println(0, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+        Debug.println(INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
         dataset = manager.findOneDataSetByType(studyId, dataSetType);
         if (dataset != null) {
-            Debug.println(0, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+            Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
         }
 
         dataSetType = DataSetType.SUMMARY_DATA;
-        Debug.println(0, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+        Debug.println(INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
         dataset = manager.findOneDataSetByType(studyId, dataSetType);
         assertNull(dataset);
     }
@@ -712,13 +691,13 @@ public class TestStudyDataManagerImpl{
     @Test
     public void testCountExperimentsByTrialEnvironmentAndVariate() throws Exception {
         long count = manager.countExperimentsByTrialEnvironmentAndVariate(10070, 20870);
-        Debug.println(0, "Count of Experiments By TE and Variate: " + count);
+        Debug.println(INDENT, "Count of Experiments By TE and Variate: " + count);
     }
 
     @Test
     public void testCountStocks() throws Exception {
         long count = manager.countStocks(10087, 10081, 18190);
-        Debug.println(0, "Test CountStocks: " + count);
+        Debug.println(INDENT, "Test CountStocks: " + count);
     }
 
     @Test
@@ -727,7 +706,7 @@ public class TestStudyDataManagerImpl{
         DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
         this.addTestExperiments(datasetRef.getId(), 10);
 
-        Debug.println(0, "Test Delete DataSet: " + datasetRef.getId());
+        Debug.println(INDENT, "Test Delete DataSet: " + datasetRef.getId());
         manager.deleteDataSet(datasetRef.getId());
     }
 
@@ -738,8 +717,8 @@ public class TestStudyDataManagerImpl{
         int locationId = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
         int locationId2 = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
 
-        Debug.println(0, "Test Delete ExperimentsByLocation: " + datasetRef.getId() + ", " + locationId);
-        Debug.println(0, "Location id of " + locationId2 + " will NOT be deleted");
+        Debug.println(INDENT, "Test Delete ExperimentsByLocation: " + datasetRef.getId() + ", " + locationId);
+        Debug.println(INDENT, "Location id of " + locationId2 + " will NOT be deleted");
         manager.deleteExperimentsByLocation(datasetRef.getId(), locationId);
     }
 
@@ -748,35 +727,28 @@ public class TestStudyDataManagerImpl{
         Integer projectId = 10085;
         Integer standardVariableId = 8230;
         String localName = manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
-        Debug.println(0, "testGetLocalNameByStandardVariableId(" + projectId + ", " + standardVariableId + "): "
+        Debug.println(INDENT, "testGetLocalNameByStandardVariableId(" + projectId + ", " + standardVariableId + "): "
                 + localName);
     }
 
     @Test
     public void testGetAllStudyDetails() throws Exception {
-
         List<StudyDetails> nurseryStudyDetails = manager.getAllStudyDetails(Database.LOCAL, StudyType.N);
-
-        Debug.println(0, "testGetAllStudyDetails(Database.LOCAL, StudyType.N)");
-        for (StudyDetails study : nurseryStudyDetails) {
-            study.print(3);
-        }
+        Debug.println(INDENT, "testGetAllStudyDetails(Database.LOCAL, StudyType.N)");
+        Debug.printFormattedObjects(INDENT, nurseryStudyDetails);
     }
 
     @Test
     public void testGetAllNurseryAndTrialStudyNodes() throws Exception {
         List<StudyNode> studyNodes = manager.getAllNurseryAndTrialStudyNodes();
-        for (StudyNode study : studyNodes) {
-            study.print(3);
-        }
-        Debug.println(3, "Number of Records: " + studyNodes.size());
+        Debug.printFormattedObjects(INDENT, studyNodes);
     }
 
     @Test
     public void testCountProjectsByVariable() throws Exception {
         int variableId = 8050;
         long count = manager.countProjectsByVariable(variableId);
-        Debug.println(0, "countProjectsByVariable on " + variableId + " = " + count);
+        Debug.println(INDENT, "countProjectsByVariable on " + variableId + " = " + count);
     }
 
     @Test
@@ -784,7 +756,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 8050;
         int storedInId = 1010;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @Test
@@ -792,7 +764,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 8005;
         int storedInId = 1011;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @Test
@@ -800,7 +772,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 8200;
         int storedInId = 1030;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @Test
@@ -808,7 +780,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 8170;
         int storedInId = 1021;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @Test
@@ -816,7 +788,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 8370;
         int storedInId = 1020;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @Test
@@ -824,7 +796,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 8230;
         int storedInId = 1041;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @Test
@@ -832,7 +804,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 8255;
         int storedInId = 1040;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @Test
@@ -840,7 +812,7 @@ public class TestStudyDataManagerImpl{
         int variableId = 18000;
         int storedInId = 1043;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
-        Debug.println(0, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+        Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
     }
 
     @AfterClass
@@ -1051,12 +1023,12 @@ public class TestStudyDataManagerImpl{
     public void testCheckIfProjectNameIsExisting() throws Exception {
         Study study = manager.getStudy(10010);
         String name = study.getName();
-        Debug.println(0, "Name: " + name);
+        Debug.println(INDENT, "Name: " + name);
         boolean isExisting = manager.checkIfProjectNameIsExisting(name);
         assertTrue(isExisting);
 
         name = "SHOULDNOTEXISTSTUDY";
-        Debug.println(0, "Name: " + name);
+        Debug.println(INDENT, "Name: " + name);
         isExisting = manager.checkIfProjectNameIsExisting(name);
         assertFalse(isExisting);
     }
@@ -1067,9 +1039,9 @@ public class TestStudyDataManagerImpl{
         trialIdList.addAll(Arrays.asList(Integer.valueOf(-4)));  
         List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
-            Debug.println(0, fieldMapInfo.getFieldbookName());
+            Debug.println(INDENT, fieldMapInfo.getFieldbookName());
             if (fieldMapInfo.getDatasets() != null){
-                Debug.println(0, fieldMapInfo.getDatasets().toString());
+                Debug.println(INDENT, fieldMapInfo.getDatasets().toString());
             }
         }
         //assertTrue(fieldMapCount.getEntryCount() > 0);
@@ -1079,9 +1051,9 @@ public class TestStudyDataManagerImpl{
     public void testGetParentFolder() throws MiddlewareQueryException{
     	DmsProject proj = manager.getParentFolder(10010);
     	if(proj==null)
-    		Debug.println(0, "Parent is null");
+    		Debug.println(INDENT, "Parent is null");
     	else
-    		Debug.println(0, "Parent is NOT null");
+    		Debug.println(INDENT, "Parent is NOT null");
     }
     
     @Test
@@ -1106,9 +1078,9 @@ public class TestStudyDataManagerImpl{
             
             List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
             for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
-                Debug.println(0, fieldMapInfo.getFieldbookName());
+                Debug.println(INDENT, fieldMapInfo.getFieldbookName());
                 if (fieldMapInfo.getDatasets() != null){
-                    Debug.println(0, fieldMapInfo.getDatasets().toString());
+                    Debug.println(INDENT, fieldMapInfo.getDatasets().toString());
                 }
             }
             //assertTrue(fieldMapCount.getEntryCount() > 0);
@@ -1118,7 +1090,7 @@ public class TestStudyDataManagerImpl{
     @Test
     public void testGetGeolocationPropValue() throws MiddlewareQueryException {
         String value = manager.getGeolocationPropValue(Database.LOCAL, TermId.LOCATION_ID.getId(), -1);
-        Debug.println(0, value);
+        Debug.println(INDENT, value);
     }
     
     @Test
@@ -1170,55 +1142,55 @@ public class TestStudyDataManagerImpl{
     
     @Test
     public void testGetStudyDetailsWithPaging() throws MiddlewareQueryException {
-    	Debug.println(0, "testGetStudyDetailsWithPaging");
-    	Debug.println(0, "List of Nurseries");
+    	Debug.println(INDENT, "testGetStudyDetailsWithPaging");
+    	Debug.println(INDENT, "List of Nurseries");
     	List<StudyDetails> nlist = manager.getStudyDetails(StudyType.N, 0,Integer.MAX_VALUE);
         for (StudyDetails s : nlist) {
-            Debug.println(0, s.toString());
+            Debug.println(INDENT, s.toString());
         }
-        Debug.println(0, "List of Trials");
+        Debug.println(INDENT, "List of Trials");
         List<StudyDetails> tlist = manager.getStudyDetails(StudyType.T, 0,Integer.MAX_VALUE);
         for (StudyDetails s : tlist) {
-            Debug.println(0, s.toString());
+            Debug.println(INDENT, s.toString());
         }
-        Debug.println(0, "List of Trials and Nurseries");
+        Debug.println(INDENT, "List of Trials and Nurseries");
         List<StudyDetails> slist = manager.getNurseryAndTrialStudyDetails(0,Integer.MAX_VALUE);
         for (StudyDetails s : slist) {
-            Debug.println(0, s.toString());
+            Debug.println(INDENT, s.toString());
         }
-        Debug.println(0, "List ALL Trials and Nurseries");
+        Debug.println(INDENT, "List ALL Trials and Nurseries");
         List<StudyDetails> list = manager.getAllNurseryAndTrialStudyDetails();
         for (StudyDetails s : list) {
-            Debug.println(0, s.toString());
+            Debug.println(INDENT, s.toString());
         }
-        Debug.println(0, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
-        Debug.println(0, "List ALL Trials and Nurseries");
+        Debug.println(INDENT, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
+        Debug.println(INDENT, "List ALL Trials and Nurseries");
         list = manager.getAllNurseryAndTrialStudyDetails();
         for (StudyDetails s : list) {
-            Debug.println(0, s.toString());
+            Debug.println(INDENT, s.toString());
         }
-        Debug.println(0, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
+        Debug.println(INDENT, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
         
-        Debug.println(0, "List ALL Trials");
+        Debug.println(INDENT, "List ALL Trials");
         list = manager.getAllStudyDetails(StudyType.T);
         for (StudyDetails s : list) {
-            Debug.println(0, s.toString());
+            Debug.println(INDENT, s.toString());
         }
-        Debug.println(0, String.valueOf(manager.countAllStudyDetails(StudyType.T)));
+        Debug.println(INDENT, String.valueOf(manager.countAllStudyDetails(StudyType.T)));
         
-        Debug.println(0, "List ALL Nurseries");
+        Debug.println(INDENT, "List ALL Nurseries");
         list = manager.getAllStudyDetails(StudyType.T);
         for (StudyDetails s : list) {
-            Debug.println(0, s.toString());
+            Debug.println(INDENT, s.toString());
         }
-        Debug.println(0, String.valueOf(manager.countAllStudyDetails(StudyType.N)));
+        Debug.println(INDENT, String.valueOf(manager.countAllStudyDetails(StudyType.N)));
         
     }
     
     @Test
     public void testGetFolderTree() throws MiddlewareQueryException {
         List<FolderReference> tree = manager.getFolderTree();
-        Debug.println(0, "GetFolderTree Test");
+        Debug.println(INDENT, "GetFolderTree Test");
         printFolderTree(tree, 1);
     }
     
@@ -1228,7 +1200,7 @@ public class TestStudyDataManagerImpl{
                 for (int i = 0; i < tab; i++) {
                 	Debug.print(0, "\t");
                 }
-                Debug.println(0, folder.getId() + " - " + folder.getName());
+                Debug.println(INDENT, folder.getId() + " - " + folder.getName());
                 printFolderTree(folder.getSubFolders(), tab+1);
             }
         }

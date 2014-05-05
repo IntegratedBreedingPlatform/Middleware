@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013, All Rights Reserved.
+ *
+ * Generation Challenge Programme (GCP)
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
+ *******************************************************************************/
 package org.generationcp.middleware.operation.transformer.etl.test;
 
 import java.util.ArrayList;
@@ -12,32 +23,19 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.mockito.Mockito;
 
-public class TestExperimentValuesTransformer {
-	private long startTime;
-	
-	private static ExperimentValuesTransformer transformer;	
+public class TestExperimentValuesTransformer extends TestOutputFormatter {
 
-	@Rule
-	public TestName name = new TestName();
+    private static ExperimentValuesTransformer transformer;	
 
-	@BeforeClass
+    @BeforeClass
 	public static void setUp() throws Exception {
 		transformer = new ExperimentValuesTransformer(Mockito.mock(HibernateSessionProvider.class), Mockito.mock(HibernateSessionProvider.class));
-	}
-
-	@Before
-	public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
 	}
 	
 	@Test
@@ -48,14 +46,8 @@ public class TestExperimentValuesTransformer {
 		ExperimentValues expVal = transformer.transform(mRow,varTypeList,null);
 		
 		Assert.assertNotNull(expVal);
-		Debug.println(0, expVal.toString());
+		Debug.println(INDENT, expVal.toString());
 		
-	}
-	
-	@After
-	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - startTime;
-		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	private VariableTypeList createVariableTypeListTestData() {

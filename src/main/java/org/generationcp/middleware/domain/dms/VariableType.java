@@ -30,6 +30,8 @@ public class VariableType implements Serializable, Comparable<VariableType>{
     
     private StandardVariable standardVariable;
     
+    private String treatmentLabel;
+    
     public VariableType() { } 
     
     public VariableType(String localName, String localDescription, StandardVariable standardVariable, int rank) {
@@ -73,6 +75,14 @@ public class VariableType implements Serializable, Comparable<VariableType>{
 
 	public void setStandardVariable(StandardVariable standardVariable) {
 		this.standardVariable = standardVariable;
+	}
+
+	public String getTreatmentLabel() {
+		return treatmentLabel;
+	}
+
+	public void setTreatmentLabel(String treatmentLabel) {
+		this.treatmentLabel = treatmentLabel;
 	}
 
 	public void print(int indent) {

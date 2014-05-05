@@ -85,6 +85,5 @@ public class Factor  implements Serializable {
 	public void setTermId(Integer termId) {
 		this.termId = termId;
 	}
-	
-	
+
  }

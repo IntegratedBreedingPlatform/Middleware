@@ -50,6 +50,7 @@ public class Workbook {
 	private List<MeasurementVariable> studyConstants;
 	private List<MeasurementVariable> trialConditions;
 	private List<MeasurementVariable> trialConstants;
+	private List<TreatmentVariable> treatmentFactors; 
 	private Map<String, ?> variableMap;
 	
 	private boolean isCheckFactorAddedOnly;
@@ -75,6 +76,7 @@ public class Workbook {
 		studyConstants = null;
 		trialConditions = null;
 		trialConstants = null;
+		treatmentFactors = null;
 	}
 	
 	public Workbook(){
@@ -722,5 +724,13 @@ public class Workbook {
 			}
 		}
 		return null;
+	}
+
+	public List<TreatmentVariable> getTreatmentFactors() {
+		return treatmentFactors;
+	}
+
+	public void setTreatmentFactors(List<TreatmentVariable> treatmentFactors) {
+		this.treatmentFactors = treatmentFactors;
 	}
 }

@@ -22,6 +22,8 @@ public class VariableInfo {
 	private int rank;
 	
 	private int stdVariableId;
+	
+	private String treatmentLabel;
 
 	public String getLocalName() {
 		return localName;
@@ -53,6 +55,14 @@ public class VariableInfo {
 
 	public void setRank(int rank) {
 		this.rank = rank;
+	}
+
+	public String getTreatmentLabel() {
+		return treatmentLabel;
+	}
+
+	public void setTreatmentLabel(String treatmentLabel) {
+		this.treatmentLabel = treatmentLabel;
 	}
 
 	public void print(int indent) {

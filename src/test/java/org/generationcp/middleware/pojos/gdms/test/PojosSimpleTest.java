@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms.test;
 
 import java.util.List;
@@ -27,38 +26,24 @@ import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 @SuppressWarnings("rawtypes")
-public class PojosSimpleTest{
+public class PojosSimpleTest extends TestOutputFormatter{
 
     private static HibernateUtil hibernateUtil;
-
-    private long startTime;
-
-    @Rule
-    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
     }
-
-    @Before
-    public void beforeEachTest() {
-        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-        startTime = System.nanoTime();
-    }
-
+    
     @Test
     public void testAccMetadataSet() {
         Session session = hibernateUtil.getCurrentSession();
@@ -70,7 +55,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof AccMetadataSet);
             Assert.assertTrue(obj != null);
             AccMetadataSet element = (AccMetadataSet) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -85,7 +70,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof AlleleValues);
             Assert.assertTrue(obj != null);
             AlleleValues element = (AlleleValues) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -100,7 +85,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof CharValues);
             Assert.assertTrue(obj != null);
             CharValues element = (CharValues) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -115,7 +100,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Dataset);
             Assert.assertTrue(obj != null);
             Dataset element = (Dataset) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -130,7 +115,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Map);
             Assert.assertTrue(obj != null);
             Map element = (Map) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -145,7 +130,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof MappingData);
             Assert.assertTrue(obj != null);
             MappingData element = (MappingData) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -160,7 +145,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof MappingPop);
             Assert.assertTrue(obj != null);
             MappingPop element = (MappingPop) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -175,7 +160,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof MappingPopValues);
             Assert.assertTrue(obj != null);
             MappingPopValues element = (MappingPopValues) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -190,7 +175,7 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof Marker);
             Assert.assertTrue(obj != null);
             Marker element = (Marker) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
     }
 
@@ -205,15 +190,9 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof MarkerMetadataSet);
             Assert.assertTrue(obj != null);
             MarkerMetadataSet element = (MarkerMetadataSet) obj;
-            Debug.println(0, "  " + element);
+            Debug.println(INDENT, element);
         }
-    }
-
-    @After
-    public void afterEachTest() {
-        long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
-    }
+    } 
 
     @AfterClass
     public static void tearDown() throws Exception {

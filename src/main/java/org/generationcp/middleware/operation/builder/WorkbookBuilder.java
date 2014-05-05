@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -32,6 +33,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -167,6 +169,7 @@ public class WorkbookBuilder extends Builder {
             List<MeasurementVariable> factors = buildFactors(variables);
             List<MeasurementVariable> variates = buildVariates(variables);
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
+            List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
             
             for (ProjectProperty projectProperty : projectProperties) {
@@ -198,6 +201,7 @@ public class WorkbookBuilder extends Builder {
             workbook.setFactors(factors);
             workbook.setVariates(variates);
             workbook.setConditions(conditions);
+            workbook.setTreatmentFactors(treatmentFactors);
             return workbook;
 	}
 	
@@ -303,12 +307,51 @@ public class WorkbookBuilder extends Builder {
 	    return factors;
 	}
 	
+	private List<TreatmentVariable> buildTreatmentFactors(VariableTypeList variables) {
+		List<TreatmentVariable> treatmentFactors = new ArrayList<TreatmentVariable>();
+	    List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+	    Map<String, VariableTypeList> treatmentMap = new HashMap<String, VariableTypeList>(); 
+        if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
+            for (VariableType variable : variables.getFactors().getVariableTypes()) {
+                if (variable.getStandardVariable().getStoredIn().getId() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()
+                		&& variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
+                	
+                    VariableTypeList list = treatmentMap.get(variable.getTreatmentLabel());
+                    if (list == null) {
+                    	list = new VariableTypeList();
+                    	treatmentMap.put(variable.getTreatmentLabel(), list);
+                    }
+                    list.add(variable);
+                }
+            }
+            
+            Set<String> keys = treatmentMap.keySet();
+            for (String key : keys) {
+            	factors = getMeasurementVariableTransformer().transform(treatmentMap.get(key), false);
+            	TreatmentVariable treatment = new TreatmentVariable();
+            	for (MeasurementVariable factor : factors) {
+            		if (factor.getName().equals(key)) {
+            			treatment.setLevelVariable(factor);
+            		}
+            		else {
+            			treatment.setValueVariable(factor);
+            		}
+            	}
+                treatmentFactors.add(treatment);
+            }
+        }
+		
+		return treatmentFactors;
+	}
+	
 	private List<MeasurementVariable> buildFactors(VariableTypeList variables) {
             List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
             VariableTypeList factorList = new VariableTypeList();
             if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
                 for (VariableType variable : variables.getFactors().getVariableTypes()) {
-                    if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))) {
+                    if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
+                    		&& (variable.getTreatmentLabel() == null || variable.getTreatmentLabel().isEmpty())) {
+                    	
                         factorList.add(variable);
                     }
                 }
