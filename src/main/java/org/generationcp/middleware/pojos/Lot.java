@@ -23,6 +23,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -32,7 +33,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * 
  */
 @Entity
-@Table(name = "ims_lot")
+@Table(name = "ims_lot", uniqueConstraints = {@UniqueConstraint(columnNames = {"etype", "eid", "locid", "scaleid"})})
 public class Lot implements Serializable{
 
     private static final long serialVersionUID = -7110592680243974512L;

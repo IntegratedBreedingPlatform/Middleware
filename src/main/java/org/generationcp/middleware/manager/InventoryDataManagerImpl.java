@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,12 +204,54 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots + ", operation="
-                    + operation + "): " + e.getMessage(), e, LOG);
+            if (e.getCause() instanceof ConstraintViolationException && e instanceof MiddlewareQueryException) {
+            	throw (MiddlewareQueryException) e;
+            }
+            else {
+	            logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots + ", operation="
+	                    + operation + "): " + e.getMessage(), e, LOG);
+            }
+        	
         } finally {
             session.flush();
         }
 
+        return idLotsSaved;
+    }
+
+    public List<Integer> addIndividualLots(List<Lot> lots) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        List<Integer> idLotsSaved = new ArrayList<Integer>();
+        // begin save transaction
+        LotDAO dao = getLotDao();
+        dao.flush();
+        dao.clear();
+
+        for (Lot lot : lots) {
+            Session session = getCurrentSessionForLocal();
+            Transaction trans = null;
+            try {
+                trans = session.beginTransaction();
+                // Auto-assign negative IDs for new local DB records
+                Integer negativeId = dao.getNegativeId("id");
+                lot.setId(negativeId);
+                Lot recordSaved = dao.save(lot);
+                trans.commit();
+                if (recordSaved != null && recordSaved.getId() != null) {
+                    lot.setId(negativeId);
+	                idLotsSaved.add(recordSaved.getId());
+                }
+            } catch (Exception e) {
+                rollbackTransaction(trans);
+                dao.flush();
+                dao.clear();
+                lot.setId(null);
+            } finally {
+                session.flush();
+            }
+        }
+            
         return idLotsSaved;
     }
 

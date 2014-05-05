@@ -567,4 +567,5 @@ public interface InventoryDataManager{
 	 */
 	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException; 
 
+	List<Integer> addIndividualLots(List<Lot> lots) throws MiddlewareQueryException;
 }

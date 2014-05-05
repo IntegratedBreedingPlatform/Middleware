@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.LotsResult;
 
 /**
  * This is the API for inventory management system.
@@ -52,5 +53,16 @@ public interface InventoryService {
 	 */
 	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException; 
 
+	/**
+	 * Used for creating Lot record(s).
+	 * 
+	 * @param gids
+	 * @param locationId
+	 * @param scaleId
+	 * @param comment
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId) throws MiddlewareQueryException;
 	
 }

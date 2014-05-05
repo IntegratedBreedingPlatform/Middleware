@@ -208,4 +208,23 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     	    logAndThrowException("Error with validateId(lot=" + lot + "): lot is null)", new Throwable());
         }
     }
+
+    @SuppressWarnings("unchecked")
+    public List<Lot> getByEntityTypeEntityIdsLocationIdAndScaleId(String type, List<Integer> entityIds, Integer locationId, Integer scaleId)
+            throws MiddlewareQueryException {
+        try {
+        	if (entityIds != null && !entityIds.isEmpty() && locationId != null){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.in("entityId", entityIds));
+	            criteria.add(Restrictions.eq("locationId", locationId));
+	            criteria.add(Restrictions.eq("scaleId", scaleId));
+	            return criteria.list();
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByEntityTypeEntityIdLocationIdAndScaleId(type=" + type + ", entityIds=" + entityIds
+                    + ", locationId=" + locationId + ", scaleId=" + scaleId + ") query from Lot: " + e.getMessage(), e);
+        }
+        return new ArrayList<Lot>();
+    }
 }
