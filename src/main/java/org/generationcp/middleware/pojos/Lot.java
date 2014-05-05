@@ -95,8 +95,8 @@ public class Lot implements Serializable{
         this.id = id;
     }
 
-    public Lot(Integer id, Integer userId, String entityType, Integer entityId, Integer locationId, Integer scaleId, Integer status,
-            String comments) {
+    public Lot(Integer id, Integer userId, String entityType, Integer entityId, Integer locationId, 
+    		Integer scaleId, Integer status, String comments) {
         super();
         this.id = id;
         this.userId = userId;

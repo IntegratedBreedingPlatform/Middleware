@@ -562,5 +562,22 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         }
         return map;
     }
+    
+    public List<Location> getByIds(List<Integer> ids) throws MiddlewareQueryException {
+    	List<Location> locations = new ArrayList<Location>();
+    	
+    	if (ids == null || ids.isEmpty()){
+    		return locations;
+    	}
+    	
+        try {
+            Criteria criteria = getSession().createCriteria(Location.class);
+            criteria.add(Restrictions.in("locid", ids));
+            locations = criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByIds() query from Location: " + e.getMessage(), e);
+        }    	
+    	return locations;
+    }
 
 }

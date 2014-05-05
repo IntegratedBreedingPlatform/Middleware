@@ -194,4 +194,22 @@ public class UserDAO extends GenericDAO<User, Integer>{
     	return new ArrayList<Integer>();
     }
     
+    @SuppressWarnings("unchecked")
+	public List<User> getByIds(List<Integer> ids) throws MiddlewareQueryException {
+    	List<User> toReturn = new ArrayList<User>();
+    	
+    	if (ids == null || ids.isEmpty()){
+    		return toReturn;
+    	}
+
+        try {
+            Criteria criteria = getSession().createCriteria(User.class);
+            criteria.add(Restrictions.in("userid", ids));
+            toReturn = criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByIds() query from User: " + e.getMessage(), e);
+        }    	
+    	return toReturn;
+    }
+
 }

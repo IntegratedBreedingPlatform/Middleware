@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 
+import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -138,7 +139,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
         lot.setEntityId(Integer.valueOf(50533));
         lot.setEntityType("GERMPLSM");
         lot.setLocationId(Integer.valueOf(9001));
-        lot.setScaleId(Integer.valueOf(1538));
+        lot.setScaleId(Integer.valueOf(6088));
         lot.setSource(null);
         lot.setStatus(Integer.valueOf(0));
         lot.setUserId(Integer.valueOf(1));
@@ -480,6 +481,13 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 		Assert.assertNotNull(transactionid);
 		Debug.println(INDENT, "testGetTransactionById(" + id + "): ");
 		Debug.println(transactionid.toString());
+    }
+    
+    @Test
+    public void testGetInventoryDetailsByGermplasmList() throws Exception{
+    	Integer listId = 1426;
+    	List<InventoryDetails> result = manager.getInventoryDetailsByGermplasmList(listId);
+    	Debug.printObjects(INDENT, result);
     }
     
     @AfterClass
