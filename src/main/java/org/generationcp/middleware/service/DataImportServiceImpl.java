@@ -160,6 +160,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             messages.add(new Message("error.entry.doesnt.exist"));
         }
 
+        if (!isPlotExists(ontology, workbook.getFactors())) {
+            messages.add(new Message("error.plot.doesnt.exist"));
+        }
+
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
             messages.add(new Message("error.missing.trial.condition"));
         }

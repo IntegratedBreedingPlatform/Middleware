@@ -272,23 +272,23 @@ public class StudyDetails implements Serializable{
 		this.siteId = siteId;
 	}
 
-	/**
-	 * @return the rowCount
-	 */
-	public Integer getRowCount() {
-		return rowCount;
-	}
+    /**
+     * @return the rowCount
+     */
+    public Integer getRowCount() {
+        return rowCount;
+    }
 
-	/**
-	 * @param rowCount the rowCount to set
-	 */
-	public void setRowCount(Integer rowCount) {
-		this.rowCount = rowCount;
-	}
-	
-	public boolean hasRows() {
-		return rowCount != null && rowCount > 0;
-	}
+    /**
+     * @param rowCount the rowCount to set
+     */
+    public void setRowCount(Integer rowCount) {
+        this.rowCount = rowCount;
+    }
+    
+    public boolean hasRows() {
+        return rowCount != null && rowCount > 0;
+    }
 
 	@Override
     public int hashCode() {

@@ -750,6 +750,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     @SuppressWarnings("unchecked")
     public List<Germplasm> getByGIDList(List<Integer> gids) throws MiddlewareQueryException {
         
+    	if(gids.size()==0){
+    		return new ArrayList<Germplasm>();
+    	}
+    	
         try{
             StringBuilder queryString = new StringBuilder();
             queryString.append("SELECT {g.*} FROM germplsm g WHERE ");

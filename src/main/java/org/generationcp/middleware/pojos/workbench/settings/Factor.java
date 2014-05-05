@@ -12,11 +12,17 @@ public class Factor  implements Serializable {
 	private String method;
 	private String role;
 	private String datatype;
+	private Integer termId;
 	
 	public Factor(){
 		super();
 	}
 	
+	public Factor(String name, String description, String property,
+			String scale, String method, String role, String datatype, Integer termId) {
+		this(name, description, property, scale, method, role, datatype);
+		this.termId = termId;
+	}
 	public Factor(String name, String description, String property,
 			String scale, String method, String role, String datatype) {
 		super();
@@ -27,6 +33,7 @@ public class Factor  implements Serializable {
 		this.method = method;
 		this.role = role;
 		this.datatype = datatype;
+//		this.termId = termId;
 	}
 	public String getName() {
 		return name;
@@ -69,6 +76,14 @@ public class Factor  implements Serializable {
 	}
 	public void setDatatype(String datatype) {
 		this.datatype = datatype;
+	}
+
+	public Integer getTermId() {
+		return termId;
+	}
+
+	public void setTermId(Integer termId) {
+		this.termId = termId;
 	}
 	
 	

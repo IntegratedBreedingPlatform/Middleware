@@ -642,13 +642,15 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	 * @param blockInfo the blockInfo to set
 	 */
 	public void updateBlockInformation(FieldmapBlockInfo blockInfo) {
-		this.rowsInBlock = blockInfo.getRowsInBlock();
-		this.rangesInBlock = blockInfo.getRangesInBlock();
-		this.rowsPerPlot = blockInfo.getNumberOfRowsInPlot();
-		this.plantingOrder = blockInfo.getPlantingOrder();
-		this.machineRowCapacity = blockInfo.getMachineRowCapacity();
-		this.deletedPlots = blockInfo.getDeletedPlots();
-		this.fieldId = blockInfo.getFieldId();
+		if (blockInfo != null) {
+			this.rowsInBlock = blockInfo.getRowsInBlock();
+			this.rangesInBlock = blockInfo.getRangesInBlock();
+			this.rowsPerPlot = blockInfo.getNumberOfRowsInPlot();
+			this.plantingOrder = blockInfo.getPlantingOrder();
+			this.machineRowCapacity = blockInfo.getMachineRowCapacity();
+			this.deletedPlots = blockInfo.getDeletedPlots();
+			this.fieldId = blockInfo.getFieldId();
+		}
 	}
 
 

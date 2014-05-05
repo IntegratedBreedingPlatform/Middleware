@@ -40,6 +40,7 @@ import org.generationcp.middleware.util.PropertyReader;
     , IBDB_CLASS
     , ONTOLOGY_TRAIT_CLASS
     , ONTOLOGY_RESEARCH_CLASS
+	, GENERAL_TRAIT_CLASS
     , UNCLASSIFIED_TRAIT_CLASS
     
     //Study Fields

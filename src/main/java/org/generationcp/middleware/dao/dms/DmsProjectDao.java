@@ -525,7 +525,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("       LEFT JOIN nd_experiment_project de ON de.project_id = pr.subject_project_id ")
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990
-            .append("	GROUP BY p.name, p.description, ppObjective.value, ppStartDate.value, ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppPIid.value, ")
+            .append("    GROUP BY p.name, p.description, ppObjective.value, ppStartDate.value, ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppPIid.value, ")
             .append("   gpSiteId.value ")
             .append("               ORDER BY p.name ") // 12990 
             ;
@@ -563,7 +563,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     
                     StudyDetails study = new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
                     if (row[10] != null) {
-                    	study.setRowCount(rowCount.intValue());
+                        study.setRowCount(rowCount.intValue());
                     }
                     studyDetails.add(study);
                 }
@@ -800,7 +800,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	
 	/**
 	 * Retrieves all the study details 
-	 * @return
+	 * @return List of all nursery and trial study nodes
 	 * @throws MiddlewareQueryException
 	 */
 	

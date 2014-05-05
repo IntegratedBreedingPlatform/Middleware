@@ -31,6 +31,10 @@ public class GeolocationPropertySaver extends Saver {
                 		locationId = getExperimentModelSaver().moveStudyToNewGeolocation(info.getFieldbookId());
                 	}
                 	
+                	if (trial.getLocationId() != null) {
+                		saveOrUpdate(locationId, TermId.LOCATION_ID.getId(), trial.getLocationId().toString());
+                	}
+                	
                 	if (trial.getBlockId() != null) {
                 		saveOrUpdate(locationId, TermId.BLOCK_ID.getId(), trial.getBlockId().toString());
                 	}
@@ -41,25 +45,18 @@ public class GeolocationPropertySaver extends Saver {
 
 	private void saveOrUpdate(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
 		Geolocation geolocation = getGeolocationDao().getById(geolocationId);
-		boolean createProperty = false;
 		GeolocationProperty property = null;
 		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
 			property = findProperty(geolocation.getProperties(), typeId);
-			if (property == null) {
-				createProperty = true;
-			}
 		}
-		else {
-			createProperty = true;
-		}
-		if (createProperty) {
+		if (property == null) {
 			property = new GeolocationProperty();
 			property.setGeolocationPropertyId(getGeolocationPropertyDao().getNegativeId("geolocationPropertyId"));
 			property.setRank(getMaxRank(geolocation.getProperties()));
 			property.setGeolocation(geolocation);
 			property.setType(typeId);
-			property.setValue(value);
 		}
+		property.setValue(value);
 		getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 	

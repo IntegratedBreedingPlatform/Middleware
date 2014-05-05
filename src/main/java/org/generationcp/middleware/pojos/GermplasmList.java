@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.NotFound;
@@ -91,6 +92,7 @@ public class GermplasmList implements Serializable{
     private String notes;
     
     @OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("entryId asc")
     private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 
     public static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE'";
@@ -102,7 +104,7 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+            "WHERE liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
 		    "      OR desig LIKE :q OR listname LIKE :q " +
 		    "      OR desig LIKE :qNoSpaces " +
 		    "      OR desig LIKE :qStandardized " +
@@ -113,7 +115,7 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND (listdata.gid LIKE :gid " +
+            "WHERE liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid " +
             "      OR desig LIKE :q OR listname LIKE :q" +
             "      OR desig LIKE :qNoSpaces " +
             "      OR desig LIKE :qStandardized " +
@@ -124,7 +126,7 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+            "WHERE liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
             "      OR desig = :q OR listname = :q " +
             "      OR desig = :qNoSpaces " +
             "      OR desig = :qStandardized " +

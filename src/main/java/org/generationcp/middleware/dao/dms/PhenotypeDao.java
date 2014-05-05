@@ -744,7 +744,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("observableId", typeId));
 			if (isEnumeration) {
-				criteria.add(Restrictions.eq("cValueId", Integer.parseInt(value)));
+                criteria.add(Restrictions.eq("cValueId", Integer.parseInt(value)));
 			}
 			else {
 				criteria.add(Restrictions.eq("value", value));
