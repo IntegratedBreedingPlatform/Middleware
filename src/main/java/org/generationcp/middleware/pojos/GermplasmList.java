@@ -95,9 +95,15 @@ public class GermplasmList implements Serializable{
     @OrderBy("entryId asc")
     private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 
-    public static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE'";
+    public static final String GET_GERMPLASM_LIST_TYPES = 
+    		"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " +
+    		"FROM udflds " +
+    		"WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE'";
 
-    public static final String GET_GERMPLASM_NAME_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'NAMES' AND ftype = 'NAME'";
+    public static final String GET_GERMPLASM_NAME_TYPES = 
+    		"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " +
+    		"FROM udflds " +
+    		"WHERE ftable = 'NAMES' AND ftype = 'NAME'";
     
     public static final String SEARCH_FOR_GERMPLASM_LIST =
     		"SELECT DISTINCT listnms.* " +

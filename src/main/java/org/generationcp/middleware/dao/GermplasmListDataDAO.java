@@ -19,6 +19,8 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -184,4 +186,20 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
                     + "): GermplasmListData is null", new Throwable());
     	}
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getGidsByListId(Integer listId) throws MiddlewareQueryException {
+    	List<Integer> gids = new ArrayList<Integer>();
+    	
+        try {
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery("SELECT gid FROM listdata WHERE listid = :listId "); 
+        	query.setParameter("listId", listId);
+            return query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidsByListId() query from GermplasmList: " + e.getMessage(), e);
+        }    	
+    	return gids;    	
+    }
+
 }

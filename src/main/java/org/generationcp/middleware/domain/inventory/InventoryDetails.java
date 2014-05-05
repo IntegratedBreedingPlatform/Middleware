@@ -44,7 +44,7 @@ public class InventoryDetails {
 	String userName;
 	
 	/** The amount. */
-	Integer amount;
+	Double amount;
 	
 	/** The source id. */
 	Integer sourceId;
@@ -58,9 +58,6 @@ public class InventoryDetails {
 	/** The scale name. */
 	String scaleName;
 	
-	Integer status;
-	
-
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -84,8 +81,8 @@ public class InventoryDetails {
 	 */
 	public InventoryDetails(Integer gid, String germplasmName, Integer lotId,
 			Integer locationId, String locationName, Integer userId,
-			Integer amount, Integer sourceId, String sourceName,
-			Integer scaleId, String scaleName, Integer status) {
+			Double amount, Integer sourceId, String sourceName,
+			Integer scaleId, String scaleName) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.lotId = lotId;
@@ -97,7 +94,6 @@ public class InventoryDetails {
 		this.sourceName = sourceName;
 		this.scaleId = scaleId;
 		this.scaleName = scaleName;
-		this.status = status;
 	}
 
 	/**
@@ -213,7 +209,7 @@ public class InventoryDetails {
 	 *
 	 * @return the amount
 	 */
-	public Integer getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
@@ -222,7 +218,7 @@ public class InventoryDetails {
 	 *
 	 * @param amount the new amount
 	 */
-	public void setAmount(Integer amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 
@@ -298,17 +294,42 @@ public class InventoryDetails {
 		this.scaleName = scaleName;
 	}
 
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	/**
+	 * Gets the index.
+	 *
+	 * @return the index
 	 */
+	public Integer getIndex() {
+		return index;
+	}
+
+	/**
+	 * Sets the index.
+	 *
+	 * @param index the new index
+	 */
+	public void setIndex(Integer index) {
+		this.index = index;
+	}
+
+	/**
+	 * Gets the user name.
+	 *
+	 * @return the user name
+	 */
+	public String getUserName() {
+		return userName;
+	}
+
+	/**
+	 * Sets the user name.
+	 *
+	 * @param userName the new user name
+	 */
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -317,6 +338,7 @@ public class InventoryDetails {
 		result = prime * result
 				+ ((germplasmName == null) ? 0 : germplasmName.hashCode());
 		result = prime * result + ((gid == null) ? 0 : gid.hashCode());
+		result = prime * result + ((index == null) ? 0 : index.hashCode());
 		result = prime * result
 				+ ((locationId == null) ? 0 : locationId.hashCode());
 		result = prime * result
@@ -330,12 +352,11 @@ public class InventoryDetails {
 		result = prime * result
 				+ ((sourceName == null) ? 0 : sourceName.hashCode());
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		result = prime * result
+				+ ((userName == null) ? 0 : userName.hashCode());
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -359,6 +380,11 @@ public class InventoryDetails {
 			if (other.gid != null)
 				return false;
 		} else if (!gid.equals(other.gid))
+			return false;
+		if (index == null) {
+			if (other.index != null)
+				return false;
+		} else if (!index.equals(other.index))
 			return false;
 		if (locationId == null) {
 			if (other.locationId != null)
@@ -400,16 +426,20 @@ public class InventoryDetails {
 				return false;
 		} else if (!userId.equals(other.userId))
 			return false;
+		if (userName == null) {
+			if (other.userName != null)
+				return false;
+		} else if (!userName.equals(other.userName))
+			return false;
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("InventoryDetails [gid=");
+		builder.append("InventoryDetails [index=");
+		builder.append(index);
+		builder.append(", gid=");
 		builder.append(gid);
 		builder.append(", germplasmName=");
 		builder.append(germplasmName);
@@ -421,6 +451,8 @@ public class InventoryDetails {
 		builder.append(locationName);
 		builder.append(", userId=");
 		builder.append(userId);
+		builder.append(", userName=");
+		builder.append(userName);
 		builder.append(", amount=");
 		builder.append(amount);
 		builder.append(", sourceId=");
@@ -434,42 +466,5 @@ public class InventoryDetails {
 		builder.append("]");
 		return builder.toString();
 	}
-
-	/**
-	 * Gets the index.
-	 *
-	 * @return the index
-	 */
-	public Integer getIndex() {
-		return index;
-	}
-
-	/**
-	 * Sets the index.
-	 *
-	 * @param index the new index
-	 */
-	public void setIndex(Integer index) {
-		this.index = index;
-	}
-
-	/**
-	 * Gets the user name.
-	 *
-	 * @return the user name
-	 */
-	public String getUserName() {
-		return userName;
-	}
-
-	/**
-	 * Sets the user name.
-	 *
-	 * @param userName the new user name
-	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
 	
 }

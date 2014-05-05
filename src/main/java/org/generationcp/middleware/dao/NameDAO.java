@@ -245,4 +245,28 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         
         return toreturn;
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<Name> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException {
+    	List<Name> toReturn = new ArrayList<Name>();
+    	
+    	if (gids == null || gids.isEmpty()){
+    		return toReturn;
+    	}
+    	
+        try{
+            Criteria criteria = getSession().createCriteria(Name.class);
+			criteria.add(Restrictions.in("germplasmId", gids));
+
+			toReturn = (List<Name>)  criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getNamesByGids(gids=" + gids + ") query from Name " + e.getMessage(), e);
+        }
+        
+        return toReturn;
+    }
+    
+    
+    
+    
 }

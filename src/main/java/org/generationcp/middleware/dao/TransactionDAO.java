@@ -14,11 +14,14 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Transaction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -251,4 +254,49 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         }
         return new ArrayList<Transaction>();
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException {
+    	List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
+    	
+    	if (gids == null || gids.isEmpty()){
+    		return inventoryDetails;
+    	}
+    	
+        try {
+        	Session session = getSession();
+        	
+        	StringBuffer sql = new StringBuffer()
+        		.append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
+        		.append("tran.sourceid, tran.trnqty ")
+        		.append("FROM ims_lot lot ")
+        		.append("JOIN ims_transaction tran ON lot.lotid = tran.lotid ")
+        		.append("WHERE lot.status = 0 AND lot.eid IN (:gids) ");
+        	SQLQuery query = session.createSQLQuery(sql.toString()); 
+        	query.setParameterList("gids", gids);
+        	
+			List<Object[]> results = query.list();
+
+	        if (results.size() > 0){
+	        	for (Object[] row: results){
+		        	Integer lotId = (Integer) row[0];
+		        	Integer userId = (Integer) row[1];
+		        	Integer gid = (Integer) row[2];
+		        	Integer locationId = (Integer) row[3];
+		        	Integer scaleId = (Integer) row[4];
+		        	Integer sourceId = (Integer) row[5];
+		        	Double amount = (Double) row[6];
+		        	
+					inventoryDetails.add(new InventoryDetails(gid, null, lotId, locationId, null, 
+													userId, amount, sourceId, null, scaleId, null));
+	        	}
+	        }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidsByListId() query from GermplasmList: " + e.getMessage(), e);
+        }    	
+
+    	return inventoryDetails;
+    }
+    
 }

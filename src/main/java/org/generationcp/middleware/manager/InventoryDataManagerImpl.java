@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,9 +23,13 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Lot;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.hibernate.SQLQuery;
@@ -670,20 +675,155 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
 			Integer listId) throws MiddlewareQueryException {
-		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
 		
+		// Get gids from listdata (from db instance based on listId):
+		// SELECT gid FROM listdata WHERE listid = :listId;
+		setWorkingDatabase(listId);
+		List<Integer> gids = getGermplasmListDataDAO().getGidsByListId(listId);
 		
-		// TODO Auto-generated method stub
-		return inventoryDetails;
+		// Get sourceName from listnms (from db instance based on listId):
+		// SELECT listname FROM listnms WHERE listid = :listId;
+		GermplasmList germplasmList = getGermplasmListDAO().getById(listId);
 		
-	}
+		List<InventoryDetails> inventoryDetails = getInventoryDetailsByGids(gids);
 
+		// Set source name
+		for (InventoryDetails detail : inventoryDetails){
+			if (detail != null && germplasmList != null) {
+				detail.setSourceId(listId);
+				detail.setSourceName(germplasmList.getName());
+			}
+		}
+
+		return inventoryDetails;
+	}
     
-    @Override
+    
+    @SuppressWarnings("unchecked")
+	@Override
 	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
 			throws MiddlewareQueryException {
-		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-		// TODO Auto-generated method stub
+
+		// Get from ims_lot and ims_transaction (local):
+		// SELECT lot.lotid, lot.userid, lot.eid as gid, lot.locid, lot.scaleid,
+		// tran.sourceid, tran.amount
+		// FROM ims_lot lot
+		// JOIN ims_transaction tran ON lot.lotid = tran.lotid
+		// WHERE lot.status = 0 AND lot.eid in (:gids) ;
+
+		setWorkingDatabase(Database.LOCAL);
+		List<InventoryDetails> inventoryDetails = getTransactionDao().getInventoryDetailsByGids(gids);
+		
+		// Get germplasmName from names (both local and central);
+		// SELECT gid, nval FROM names WHERE gid IN (:gids);
+		
+		List<Name> gidNames = super.getAllFromCentralAndLocalByMethod(getNameDao(), 
+									"getNamesByGids", new Object[]{gids}, new Class[]{List.class});
+		
+		
+		// Get location name, user name, scale name of inventory details from the databases
+		
+			// Get locationName from location (from db instance based on locationId):
+			// SELECT lname FROM location WHERE locid = :locationId;
+			
+			// Get userName from users (from db instance based on userId):
+			// SELECT uname FROM users where userid = :userId;
+			
+			// Get scaleName from cvterm (from db instance based on scaleId):
+			// SELECT name FROM cvterm where cvterm_id = scaleId;
+		
+		Set<Integer> centralLocationIds = new HashSet<Integer>();
+		Set<Integer> centralUserIds = new HashSet<Integer>();
+		Set<Integer> centralScaleIds = new HashSet<Integer>();
+		Set<Integer> localLocationIds = new HashSet<Integer>();
+		Set<Integer> localUserIds = new HashSet<Integer>();
+		Set<Integer> localScaleIds = new HashSet<Integer>();
+		
+		for (InventoryDetails detail : inventoryDetails){
+			
+			if (detail != null) {
+				
+				Integer locationId = detail.getLocationId();
+				if (locationId != null){
+					if (locationId < 0){
+						localLocationIds.add(locationId);
+					} else {
+						centralLocationIds.add(locationId);
+					}
+				}
+
+				Integer userId = detail.getUserId();
+				if (userId != null){
+					if (userId < 0){
+						localUserIds.add(userId);
+					} else {
+						centralUserIds.add(userId);
+					}
+				}
+
+				Integer scaleId = detail.getScaleId();
+				if (scaleId != null){
+					if (scaleId < 0){
+						localScaleIds.add(scaleId);
+					} else {
+						centralScaleIds.add(scaleId);
+					}
+				}
+			}
+		}
+		
+		List<Location> locations = new ArrayList<Location>();
+		List<User> users = new ArrayList<User>();
+		List<CVTerm> scales = new ArrayList<CVTerm>();
+		
+		setWorkingDatabase(Database.LOCAL);
+		locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(localLocationIds)));
+		users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(localUserIds)));
+		scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(localScaleIds)));
+
+		setWorkingDatabase(Database.CENTRAL);
+		locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(centralLocationIds)));
+		users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(centralUserIds)));
+		scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(centralScaleIds)));
+
+
+		// Build List<InventoryDetails>
+		
+		for (InventoryDetails detail : inventoryDetails){
+			
+			if (detail != null) {
+				
+				for (Name name: gidNames){
+					if (detail.getGid() != null && detail.getGid().equals(name.getGermplasmId())){
+						detail.setGermplasmName(name.getNval());
+						break;
+					}
+				}
+				
+				for (Location location: locations){
+					if (detail.getLocationId() != null && detail.getLocationId().equals(location.getLocid())){
+						detail.setLocationName(location.getLname());
+						break;
+					}
+				}
+
+				for (User user: users){
+					if (detail.getUserId() != null && detail.getUserId().equals(user.getUserid())){
+						detail.setUserName(user.getName());
+						break;
+					}
+				}
+
+				for (CVTerm scale: scales){
+					if (detail.getScaleId() != null && detail.getScaleId().equals(scale.getCvTermId())){
+						detail.setScaleName(scale.getName());
+						break;
+					}
+				}
+				
+			}
+		}		
+
 		return inventoryDetails;
 		
 	}
@@ -692,7 +832,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId)
 			throws MiddlewareQueryException {
 		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-		// TODO Auto-generated method stub
+
+		// TODO - get gids from study/nd_experiment, call getInventoryDetailsByGids, set sourceName
+
 		return inventoryDetails;
 		
 	}
