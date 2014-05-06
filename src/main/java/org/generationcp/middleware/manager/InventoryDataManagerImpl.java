@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -720,7 +721,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		List<Name> gidNames = super.getAllFromCentralAndLocalByMethod(getNameDao(), 
 									"getNamesByGids", new Object[]{gids}, new Class[]{List.class});
 		
-		
 		// Get location name, user name, scale name of inventory details from the databases
 		
 			// Get locationName from location (from db instance based on locationId):
@@ -823,6 +823,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 				
 			}
 		}		
+		
+		Collections.sort(inventoryDetails);
 
 		return inventoryDetails;
 		

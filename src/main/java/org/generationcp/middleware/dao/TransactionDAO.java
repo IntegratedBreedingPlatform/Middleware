@@ -293,6 +293,13 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 													userId, amount, sourceId, null, scaleId, null));
 	        	}
 	        }
+	        
+			for (Integer gid: gids){
+				if (!isGidInInventoryList(inventoryDetails, gid)){
+					inventoryDetails.add(new InventoryDetails(gid, null, null, null, null, null, null, null, null, null, null));
+				}
+			}
+
 
         } catch (HibernateException e) {
             logAndThrowException("Error with getGidsByListId() query from GermplasmList: " + e.getMessage(), e);
@@ -300,5 +307,16 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 
     	return inventoryDetails;
     }
+    
+    private boolean isGidInInventoryList(List<InventoryDetails> inventoryDetails, Integer gid){
+    	for (InventoryDetails detail: inventoryDetails){
+    		if (detail.getGid().equals(gid)){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+
     
 }

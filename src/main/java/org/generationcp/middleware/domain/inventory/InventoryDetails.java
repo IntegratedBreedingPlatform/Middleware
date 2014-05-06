@@ -11,14 +11,18 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.inventory;
 
+import java.io.Serializable;
+
 /**
  * Row in Seed Inventory System that shows the details of ims_lot/transaction.
  * 
  * @author Joyce Avestro
  *
  */
-public class InventoryDetails {
+public class InventoryDetails implements Comparable<InventoryDetails>, Serializable{
 	
+	private static final long serialVersionUID = 1L;
+
 	/** The index. */
 	Integer index;
 	
@@ -465,6 +469,14 @@ public class InventoryDetails {
 		builder.append(scaleName);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public int compareTo(InventoryDetails o) {
+        if (this.gid != null && o != null) {
+            return this.getGid().compareTo(o.getGid());
+        }
+        return 0;
 	}
 	
 }
