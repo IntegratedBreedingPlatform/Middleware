@@ -271,7 +271,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         		.append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
         		.append("tran.sourceid, tran.trnqty ")
         		.append("FROM ims_lot lot ")
-        		.append("JOIN ims_transaction tran ON lot.lotid = tran.lotid ")
+        		.append("LEFT JOIN ims_transaction tran ON lot.lotid = tran.lotid ")
         		.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
         		.append("		 AND lot.eid IN (:gids) ");
         	SQLQuery query = session.createSQLQuery(sql.toString()); 
