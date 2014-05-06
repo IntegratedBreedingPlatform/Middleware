@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.LotStatus;
 import org.generationcp.middleware.pojos.Transaction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -271,7 +272,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         		.append("tran.sourceid, tran.trnqty ")
         		.append("FROM ims_lot lot ")
         		.append("JOIN ims_transaction tran ON lot.lotid = tran.lotid ")
-        		.append("WHERE lot.status = 0 AND lot.eid IN (:gids) ");
+        		.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
+        		.append("		 AND lot.eid IN (:gids) ");
         	SQLQuery query = session.createSQLQuery(sql.toString()); 
         	query.setParameterList("gids", gids);
         	
