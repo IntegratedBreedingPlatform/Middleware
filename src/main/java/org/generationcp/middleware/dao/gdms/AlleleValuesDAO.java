@@ -210,6 +210,49 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         
         return values;
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getGidsByMarkersAndAlleleValues(
+            List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+        List<Integer> values = new ArrayList<Integer>();
+        
+        if (markerIdList.size() == 0 || alleleValueList.size() == 0) {
+            throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
+        }
+        if (markerIdList.size() != alleleValueList.size()) {
+            throw new MiddlewareQueryException("markerIdList and alleleValueList must have the same size");
+        }
+        
+        List<String> placeholderList = new ArrayList<String>();
+        for (int i=0; i < markerIdList.size(); i++) {
+            placeholderList.add("(?,?)");
+        }
+        String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
+        
+        String sql = new StringBuffer()
+            .append("SELECT gid ")
+            .append("FROM gdms_allele_values ")
+            .append("WHERE (marker_id, allele_bin_value) IN (" + placeholders + ") ")
+            .toString();
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(sql);
+            for (int i=0; i < markerIdList.size(); i++) {
+                int baseIndex = i * 2;
+
+                query.setInteger(baseIndex, markerIdList.get(i));
+                query.setString(baseIndex + 1, alleleValueList.get(i));
+            }
+
+            values = (List<Integer>) query.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidsByMarkersAndAlleleValues(markerIdList=" + markerIdList 
+                    + ", alleleValueList=" + alleleValueList + "): " + e.getMessage(), e);
+        }
+        
+        return values;
+    }
 
     /**
      * Count gids by marker id.

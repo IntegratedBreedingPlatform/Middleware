@@ -633,8 +633,21 @@ public interface GenotypicDataManager{
      * @return the all gids by markers and allele values
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValue(
+    List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValues(
             List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the gids by markers and allele values.
+     *
+     * @param markerIdList the marker id list
+     * @param alleleValueList the allele value list
+     * @return the gids by markers and allele values
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) 
+    		throws MiddlewareQueryException;
+    
     
     /**
      * Counts the number of germplasm ids matching the given marker id
@@ -1445,14 +1458,14 @@ public interface GenotypicDataManager{
      * Sets DArT
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
-     * Also pass the DArT Genotyping data rows as a list of DartDataRow objects. 
+     * Also pass the DArT Genotyping data rows as a list of DartDataRow objects.
      * For new values to be added, set the id to null.
      *
      * @param dataset - (Dataset) dataset_type = "DArT", datatype = "int"
      * @param datasetUser - (DatasetUser)
-     * @param rows the rows
      * @param markers - List of Markers to add
      * @param markerMetadataSets - List of MarkerMetadataSets to add
+     * @param rows the rows
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
      */

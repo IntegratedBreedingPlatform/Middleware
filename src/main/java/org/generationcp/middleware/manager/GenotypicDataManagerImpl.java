@@ -618,11 +618,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValue(List<Integer> markerIdList, List<String> alleleValueList) 
+    public List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) 
             throws MiddlewareQueryException {
         List<AllelicValueElement> elements =  getAllelicValuesByMarkersAndAlleleValues(Database.LOCAL, markerIdList, alleleValueList);
         elements.addAll(getAllelicValuesByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList));
         return elements;
+    }
+    
+    @Override
+    public List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) throws MiddlewareQueryException {
+    	return super.getAllFromCentralAndLocalByMethod(getAlleleValuesDao(), "getGidsByMarkersAndAlleleValues", 
+    			new Object[]{markerIdList, alleleValueList}, new Class[]{List.class, List.class});    	
     }
 
     @Override

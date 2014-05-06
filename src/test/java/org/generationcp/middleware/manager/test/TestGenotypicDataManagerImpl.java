@@ -440,8 +440,16 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     public void testGetAllAllelicValuesByMarkersAndAlleleValues() throws Exception {
         List<Integer> markerIdList = Arrays.asList(2325);
         List<String> alleleValueList = Arrays.asList("238/238");
-        List<AllelicValueElement> values = manager.getAllAllelicValuesByMarkersAndAlleleValue(
+        List<AllelicValueElement> values = manager.getAllAllelicValuesByMarkersAndAlleleValues(
                 markerIdList, alleleValueList);
+        Debug.printObjects(INDENT, values);
+    }
+
+    @Test
+    public void testGetGidsByMarkersAndAlleleValues() throws Exception {
+        List<Integer> markerIdList = Arrays.asList(2325);
+        List<String> alleleValueList = Arrays.asList("238/238");
+        List<Integer> values = manager.getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
         Debug.printObjects(INDENT, values);
     }
 
