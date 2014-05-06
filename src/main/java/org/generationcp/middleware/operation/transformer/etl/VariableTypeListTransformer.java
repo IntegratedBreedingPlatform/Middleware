@@ -48,6 +48,7 @@ public class VariableTypeListTransformer extends Transformer {
     						measurementVariable.getName(), 
     						measurementVariable.getDescription(), 
     						standardVariable, rank++);
+    			variableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
     			
     			variableTypeList.add(variableType);
 				

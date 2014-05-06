@@ -45,8 +45,9 @@ public class ProjectPropertySaver extends Saver {
 		if (variableTypes != null && variableTypes.size() > 0) {
 			int index = getProjectPropertyDao().getNegativeId("projectPropertyId");
 			for (VariableType variableType : variableTypes) {
-				properties.addAll(createVariableProperties(index, project, variableType));
-				index = index - 3;
+				List<ProjectProperty> list = createVariableProperties(index, project, variableType);
+				properties.addAll(list);
+				index = index - list.size();
 			}
 		}
 		
@@ -75,6 +76,9 @@ public class ProjectPropertySaver extends Saver {
 		properties.add(new ProjectProperty(index--, project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
+		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+			properties.add(new ProjectProperty(index--, project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType.getRank()));
+		}
 		
 		return properties;
 	}

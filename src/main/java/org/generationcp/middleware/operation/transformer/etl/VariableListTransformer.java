@@ -124,6 +124,7 @@ public class VariableListTransformer extends Transformer {
 		}
 		List<MeasurementData> trialMD = mRow.getTrialDataList(trialHeaders);
 		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			
 			if (trialMD.size() == variableTypeList.getVariableTypes().size()) {
 				List<VariableType> varTypes = variableTypeList.getVariableTypes();
 				int varTypeSize = varTypes.size();
