@@ -13,8 +13,10 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.LotDAO;
@@ -29,7 +31,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
@@ -773,19 +774,19 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		}
 		
 		List<Location> locations = new ArrayList<Location>();
-		List<User> users = new ArrayList<User>();
 		List<CVTerm> scales = new ArrayList<CVTerm>();
+		Map<Integer, String> userNames = new HashMap<Integer, String>();
 		
 		setWorkingDatabase(Database.LOCAL);
-		if (localLocationIds.size() > 0) locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(localLocationIds)));
-		if (localUserIds.size() > 0) users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(localUserIds)));
-		if (localScaleIds.size() > 0) scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(localScaleIds)));
+		if (localLocationIds.size() > 0) locations.addAll(getLocationDao().getByIds(new ArrayList<Integer>(localLocationIds)));
+		if (localUserIds.size() > 0) userNames.putAll(getPersonDao().getPersonNamesByUserIds(new ArrayList<Integer>(localUserIds)));
+		if (localScaleIds.size() > 0) scales.addAll(getCvTermDao().getByIds(new ArrayList<Integer>(localScaleIds)));
 
 		setWorkingDatabase(Database.CENTRAL);
-		if (centralLocationIds.size() > 0) locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(centralLocationIds)));
-		if (centralUserIds.size() > 0) users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(centralUserIds)));
-		if (centralScaleIds.size() > 0) scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(centralScaleIds)));
-
+		if (centralLocationIds.size() > 0) locations.addAll(getLocationDao().getByIds(new ArrayList<Integer>(centralLocationIds)));
+		if (centralUserIds.size() > 0) userNames.putAll(getPersonDao().getPersonNamesByUserIds(new ArrayList<Integer>(centralUserIds)));
+		if (centralScaleIds.size() > 0) scales.addAll(getCvTermDao().getByIds(new ArrayList<Integer>(centralScaleIds)));
+		
 		// Build List<InventoryDetails>
 		
 		for (InventoryDetails detail : inventoryDetails){
@@ -806,11 +807,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 					}
 				}
 
-				for (User user: users){
-					if (detail.getUserId() != null && detail.getUserId().equals(user.getUserid())){
-						detail.setUserName(user.getName());
-						break;
-					}
+				if (detail.getUserId() != null && userNames.containsKey(detail.getUserId())){
+					detail.setUserName(userNames.get(detail.getUserId()));
 				}
 
 				for (CVTerm scale: scales){

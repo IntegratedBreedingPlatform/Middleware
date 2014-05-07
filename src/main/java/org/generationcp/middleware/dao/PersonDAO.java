@@ -65,4 +65,34 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
         }
         return map;
     }
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, String> getPersonNamesByUserIds(List<Integer> userIds) throws MiddlewareQueryException {
+    	Map<Integer, String> map = new HashMap<Integer, String>();
+        try {
+			StringBuffer sqlString = new StringBuffer()
+				.append("SELECT DISTINCT users.userid, persons.fname, persons.ioname, persons.lname ")
+				.append("FROM persons JOIN users ON persons.personid = users.personid ")
+				.append("WHERE users.userid = :userIds ");
+		    
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+			query.setParameterList("userIds", userIds);
+					             
+	        List<Object[]> results = query.list();
+	
+	        for (Object[] row : results){
+	        	Integer userId = (Integer) row[0];
+	        	String firstName = (String) row[1];
+	        	String middleName = (String) row[2];
+	        	String lastName = (String) row[3];
+	        	
+	        	map.put(userId, new Person(firstName, middleName, lastName).getDisplayName());
+	        }
+        
+        } catch (HibernateException e) {
+            logAndThrowException(String.format("Error with getPersonNamesByUserIds(id=[%s])", StringUtils.join(userIds, ",")),e);
+        }
+        return map;
+    }
+
 }

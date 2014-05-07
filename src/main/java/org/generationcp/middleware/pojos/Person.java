@@ -100,6 +100,12 @@ public class Person implements Serializable{
         this.notes = notes;
     }
     
+    public Person(String firstName, String lastName, String middleName){
+    	this.firstName = firstName;
+    	this.middleName = middleName;
+    	this.lastName = lastName;
+    }
+    
     /**
      * Create a copy of this Person object.
      * Note that this method does not copy the {@link Person#id} field.
