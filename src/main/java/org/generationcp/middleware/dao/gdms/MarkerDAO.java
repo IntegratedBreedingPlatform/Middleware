@@ -740,6 +740,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
         return 0L;
     }
+    
+    public List<Marker> getMarkersByIds(List<Integer> markerIds) throws MiddlewareQueryException {
+    	return getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
+    }
 
     public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
         if ((markerIds == null) || (markerIds.isEmpty())) {
@@ -830,6 +834,30 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         return dataValues;
     }
 
+    public List<Marker> getMarkersByType(String markerType) throws MiddlewareQueryException {
+    	List<Marker> dataValues = new ArrayList<Marker>();
+        if (StringUtils.isEmpty(markerType)) {
+            return dataValues;
+        }
+
+        try {
+                SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_TYPE);
+                query.setParameter("markerType", markerType);
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        dataValues.add(convertToMarker(result));
+                    }
+                }
+                return dataValues;
+            } catch (HibernateException e) {
+                logAndThrowException("Error with getMarkersByIds() query from Marker: " + e.getMessage(), e);
+            }
+
+        return dataValues;
+    }
+
     protected Marker convertToMarker(Object[] result) {
     	
         Integer markerId = (Integer) result[0];
@@ -875,7 +903,9 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         return 0L;
     }
 
-    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos, int start, int numOfRows) throws MiddlewareQueryException {
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, 
+    		double startPos, double endPos, int start, int numOfRows) 
+    		throws MiddlewareQueryException {
         try {
 
             SQLQuery query;
@@ -892,13 +922,15 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             return markerIDSet;
 
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" + linkageGroup + ", start=" + start + ", numOfRows=" + numOfRows + ") query from Marker: "
+            logAndThrowException("Error with getMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" 
+            		+ linkageGroup + ", start=" + start + ", numOfRows=" + numOfRows + ") query from Marker: "
                     + e.getMessage(), e);
         }
         return new TreeSet<Integer>();
     }
 
-    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException {
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) 
+    		throws MiddlewareQueryException {
         try {
 
             SQLQuery query;

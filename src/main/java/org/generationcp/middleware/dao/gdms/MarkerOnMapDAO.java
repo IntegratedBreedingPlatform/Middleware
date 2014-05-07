@@ -149,5 +149,39 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
         return markersOnMap;
         
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getMarkerIdsByPositionAndLinkageGroup(double startPos, double endPos, String linkageGroup) 
+    		throws MiddlewareQueryException {
+    	List<Integer> toReturn = new ArrayList<Integer>();
+        try {
+
+            SQLQuery query;
+
+            StringBuffer sql = new StringBuffer()
+            .append("SELECT marker_id ")
+            .append("FROM gdms_markers_onmap ")
+            .append("WHERE linkage_group = :linkage_group ")
+    		.append("AND start_position ")
+			.append("BETWEEN :start_position ")
+			.append("AND :end_position ") 
+			.append("ORDER BY marker_id ")
+			;
+            
+            query = getSession().createSQLQuery(sql.toString());
+            query.setParameter("linkage_group", linkageGroup);
+            query.setParameter("start_position", startPos);
+            query.setParameter("end_position", endPos);
+            
+            toReturn = (List<Integer>)query.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkersByPositionAndLinkageGroup(linkageGroup=" 
+            		+ linkageGroup + ", startPos=" + startPos + ", endPos=" + endPos + ") query from gdms_markers_onmap: "
+                    + e.getMessage(), e);
+        }
+        return toReturn;
+    }
+
 
 }

@@ -54,7 +54,7 @@ public class MarkerInfo implements Serializable{
                     ", institute " +
                     ", genotypes_count " +
             "FROM gdms_marker_retrieval_info " +
-            "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
+            "WHERE LOWER(marker_name) = LOWER(:markerName)";
 
     public static final String GET_BY_MARKER_ID =
                 "SELECT marker_id " +

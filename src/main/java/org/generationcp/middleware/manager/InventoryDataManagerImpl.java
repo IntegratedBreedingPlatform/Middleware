@@ -777,15 +777,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		List<CVTerm> scales = new ArrayList<CVTerm>();
 		
 		setWorkingDatabase(Database.LOCAL);
-		locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(localLocationIds)));
-		users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(localUserIds)));
-		scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(localScaleIds)));
+		if (localLocationIds.size() > 0) locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(localLocationIds)));
+		if (localUserIds.size() > 0) users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(localUserIds)));
+		if (localScaleIds.size() > 0) scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(localScaleIds)));
 
 		setWorkingDatabase(Database.CENTRAL);
-		locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(centralLocationIds)));
-		users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(centralUserIds)));
-		scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(centralScaleIds)));
-
+		if (centralLocationIds.size() > 0) locations.addAll(super.getLocationDao().getByIds(new ArrayList<Integer>(centralLocationIds)));
+		if (centralUserIds.size() > 0) users.addAll(super.getUserDao().getByIds(new ArrayList<Integer>(centralUserIds)));
+		if (centralScaleIds.size() > 0) scales.addAll(super.getCvTermDao().getByIds(new ArrayList<Integer>(centralScaleIds)));
 
 		// Build List<InventoryDetails>
 		

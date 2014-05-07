@@ -1486,6 +1486,17 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
+    public void testGetMarkersByPositionAndLinkageGroup() throws Exception {
+        String linkage = "LG01";
+        double startPos = 0;
+        double endPos = 2.2;
+        List<Marker> markers = manager.getMarkersByPositionAndLinkageGroup(startPos, endPos, linkage);
+        assertTrue(markers.size() > 0);
+        Debug.printObjects(INDENT, markers);
+    }
+    
+    
+    @Test
     public void testCountMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
         int mapID = 1;
         String linkage = "LG01";
@@ -1689,6 +1700,15 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         assertNotNull(results);
         assertFalse(results.isEmpty());
         Debug.println("testGetMarkersByIds(" + markerIds + ") Results: ");
+        Debug.printObjects(INDENT, results);
+    }
+
+    @Test
+    public void testGetMarkersByType() throws Exception {
+        String type = "DART";
+        List<Marker> results = manager.getMarkersByType(type);
+        assertNotNull(results);
+        assertFalse(results.isEmpty());
         Debug.printObjects(INDENT, results);
     }
     

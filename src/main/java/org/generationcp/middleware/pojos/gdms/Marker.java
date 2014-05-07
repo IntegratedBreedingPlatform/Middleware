@@ -121,27 +121,6 @@ public class Marker implements Serializable{
                     + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
                     + "WHERE track_name = (:trackName)";
 
-    public static final String GET_SNP_MARKERS_BY_HAPLOTYPE = "SELECT gdms.marker_id  "
-                        + ", CONCAT(marker_type, '') "
-                        + ", CONCAT(marker_name, '') "
-                        + ", CONCAT(species, '') "
-                        + ", db_accession_id "
-                        + ", reference "
-                        + ", CONCAT(genotype, '') "
-                        + ", ploidy  "
-                        + ", primer_id  "
-                        + ", remarks  "
-                        + ", assay_type "
-                        + ", motif  "
-                        + ", forward_primer  "
-                        + ", reverse_primer  "
-                        + ", product_size  "
-                        + ", annealing_temp "
-                        + ", amplification "
-                + "FROM (gdms_marker gdms INNER JOIN gdms_track_markers track ON(track.marker_id = gdms.marker_id)) "
-                + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
-                + "WHERE track_name = (:trackName) and gdms.marker_type = 'SNP'";
-    
     public static final String GET_ALL_DB_ACCESSION_IDS = 
             "SELECT DISTINCT (db_accession_id) " +
             "FROM gdms_marker " +
@@ -154,7 +133,7 @@ public class Marker implements Serializable{
             "WHERE db_accession_id is not null " +
             "OR db_accession_id != ''";
 
-    public static final String GET_MARKERS_BY_IDS = 
+    public static final String GET_MARKERS_SELECT_CLAUSE =
             "SELECT marker_id  "
                     + ", CONCAT(marker_type, '') "
                     + ", CONCAT(marker_name, '') "
@@ -172,8 +151,22 @@ public class Marker implements Serializable{
                     + ", product_size  "
                     + ", annealing_temp " 
                     + ", amplification " 
+            ;    
+    public static final String GET_MARKERS_BY_IDS = 
+    		GET_MARKERS_SELECT_CLAUSE
             + "FROM gdms_marker "
             + "WHERE marker_id IN (:markerIdList) ";
+
+    public static final String GET_SNP_MARKERS_BY_HAPLOTYPE = 
+    		GET_MARKERS_SELECT_CLAUSE
+                + "FROM (gdms_marker gdms INNER JOIN gdms_track_markers track ON(track.marker_id = gdms.marker_id)) "
+                + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
+                + "WHERE track_name = (:trackName) and gdms.marker_type = 'SNP'";
+    
+    public static final String GET_MARKERS_BY_TYPE = 
+    		GET_MARKERS_SELECT_CLAUSE
+            + "FROM gdms_marker "
+            + "WHERE marker_type = :markerType ";
 
     public static final String COUNT_MARKERS_BY_IDS = 
             "SELECT COUNT(marker_id)  "

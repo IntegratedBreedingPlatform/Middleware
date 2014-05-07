@@ -1440,6 +1440,19 @@ public interface GenotypicDataManager{
             MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
 
     /**
+     * Sets the d ar t markers.
+     *
+     * @param marker the marker
+     * @param markerAlias the marker alias
+     * @param markerDetails the marker details
+     * @param markerUserInfo the marker user info
+     * @return the boolean
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Boolean setDArTMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, 
+    		MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
+
+    /**
      * Sets QTL.
      * 
      * To use, supply the Dataset and DatasetUsers objects to save.
@@ -1720,6 +1733,20 @@ public interface GenotypicDataManager{
         String linkageGroup, double startPos, double endPos, int start,
         int numOfRows) throws MiddlewareQueryException;
 
+    
+    /**
+     * Gets the markers by position and linkage group.
+     *
+     * @param startPos the start pos
+     * @param endPos the end pos
+     * @param linkageGroup the linkage group
+     * @return the markers by position and linkage group
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Marker> getMarkersByPositionAndLinkageGroup(double startPos, double endPos, String linkageGroup) 
+    		throws MiddlewareQueryException;
+
+    	
     /**
      * Counts Marker IDs from Map ID, Linkage Group and Between start position values.
      *
@@ -2121,6 +2148,15 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Marker> getAllSNPMarkers() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the markers by type.
+     *
+     * @param type the type
+     * @return the markers by type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Marker> getMarkersByType(String type) throws MiddlewareQueryException;
 
     // GCP-7874
     /**
