@@ -674,37 +674,22 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         return report;
     }
     
-    @Override
+	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
 			Integer listId) throws MiddlewareQueryException {
 		
 		// Get gids from listdata (from db instance based on listId):
 		// SELECT gid FROM listdata WHERE listid = :listId;
 		setWorkingDatabase(listId);
-		List<Integer> gids = getGermplasmListDataDAO().getGidsByListId(listId);
+//		List<Integer> gids = getGermplasmListDataDAO().getGidsByListId(listId);
+		
+		Map<Integer, String> gidNames = getGermplasmListDataDAO().getGidAndDesigByListId(listId);
 		
 		// Get sourceName from listnms (from db instance based on listId):
 		// SELECT listname FROM listnms WHERE listid = :listId;
 		GermplasmList germplasmList = getGermplasmListDAO().getById(listId);
 		
-		List<InventoryDetails> inventoryDetails = getInventoryDetailsByGids(gids);
-
-		// Set source name
-		for (InventoryDetails detail : inventoryDetails){
-			if (detail != null && germplasmList != null) {
-				detail.setSourceId(listId);
-				detail.setSourceName(germplasmList.getName());
-			}
-		}
-
-		return inventoryDetails;
-	}
-    
-    
-    @SuppressWarnings("unchecked")
-	@Override
-	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
-			throws MiddlewareQueryException {
+		List<Integer> gids = new ArrayList<Integer>(gidNames.keySet());
 
 		// Get from ims_lot and ims_transaction (local):
 		// SELECT lot.lotid, lot.userid, lot.eid as gid, lot.locid, lot.scaleid,
@@ -716,11 +701,135 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		setWorkingDatabase(Database.LOCAL);
 		List<InventoryDetails> inventoryDetails = getTransactionDao().getInventoryDetailsByGids(gids);
 		
+		// Get location name, user name, scale name of inventory details from the databases
+		
+			// Get locationName from location (from db instance based on locationId):
+			// SELECT lname FROM location WHERE locid = :locationId;
+			
+			// Get userName from users (from db instance based on userId):
+			// SELECT uname FROM users where userid = :userId;
+			
+			// Get scaleName from cvterm (from db instance based on scaleId):
+			// SELECT name FROM cvterm where cvterm_id = scaleId;
+		
+		Set<Integer> centralLocationIds = new HashSet<Integer>();
+		Set<Integer> centralUserIds = new HashSet<Integer>();
+		Set<Integer> centralScaleIds = new HashSet<Integer>();
+		Set<Integer> localLocationIds = new HashSet<Integer>();
+		Set<Integer> localUserIds = new HashSet<Integer>();
+		Set<Integer> localScaleIds = new HashSet<Integer>();
+		
+		for (InventoryDetails detail : inventoryDetails){
+			
+			if (detail != null) {
+				
+				Integer locationId = detail.getLocationId();
+				if (locationId != null){
+					if (locationId < 0){
+						localLocationIds.add(locationId);
+					} else {
+						centralLocationIds.add(locationId);
+					}
+				}
+
+				Integer userId = detail.getUserId();
+				if (userId != null){
+					if (userId < 0){
+						localUserIds.add(userId);
+					} else {
+						centralUserIds.add(userId);
+					}
+				}
+
+				Integer scaleId = detail.getScaleId();
+				if (scaleId != null){
+					if (scaleId < 0){
+						localScaleIds.add(scaleId);
+					} else {
+						centralScaleIds.add(scaleId);
+					}
+				}
+			}
+		}
+		
+		List<Location> locations = new ArrayList<Location>();
+		List<CVTerm> scales = new ArrayList<CVTerm>();
+		Map<Integer, String> userNames = new HashMap<Integer, String>();
+		
+		setWorkingDatabase(Database.LOCAL);
+		if (localLocationIds.size() > 0) locations.addAll(getLocationDao().getByIds(new ArrayList<Integer>(localLocationIds)));
+		if (localUserIds.size() > 0) userNames.putAll(getPersonDao().getPersonNamesByUserIds(new ArrayList<Integer>(localUserIds)));
+		if (localScaleIds.size() > 0) scales.addAll(getCvTermDao().getByIds(new ArrayList<Integer>(localScaleIds)));
+
+		setWorkingDatabase(Database.CENTRAL);
+		if (centralLocationIds.size() > 0) locations.addAll(getLocationDao().getByIds(new ArrayList<Integer>(centralLocationIds)));
+		if (centralUserIds.size() > 0) userNames.putAll(getPersonDao().getPersonNamesByUserIds(new ArrayList<Integer>(centralUserIds)));
+		if (centralScaleIds.size() > 0) scales.addAll(getCvTermDao().getByIds(new ArrayList<Integer>(centralScaleIds)));
+		
+		// Build List<InventoryDetails>
+		
+		for (InventoryDetails detail : inventoryDetails){
+			
+			if (detail != null) {
+
+				detail.setGermplasmName(gidNames.get(detail.getGid()));
+				
+				for (Location location: locations){
+					if (detail.getLocationId() != null && detail.getLocationId().equals(location.getLocid())){
+						detail.setLocationName(location.getLname());
+						break;
+					}
+				}
+
+				if (detail.getUserId() != null && userNames.containsKey(detail.getUserId())){
+					detail.setUserName(userNames.get(detail.getUserId()));
+				}
+
+				for (CVTerm scale: scales){
+					if (detail.getScaleId() != null && detail.getScaleId().equals(scale.getCvTermId())){
+						detail.setScaleName(scale.getName());
+						break;
+					}
+				}
+				
+			}
+		}	
+		
+		// Set source name
+		for (InventoryDetails detail : inventoryDetails){
+			if (detail != null && germplasmList != null) {
+				detail.setSourceId(listId);
+				detail.setSourceName(germplasmList.getName());
+			}
+		}
+
+
+		
+		Collections.sort(inventoryDetails);
+
+		return inventoryDetails;
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
+			throws MiddlewareQueryException {
+
 		// Get germplasmName from names (both local and central);
 		// SELECT gid, nval FROM names WHERE gid IN (:gids);
 		
 		List<Name> gidNames = super.getAllFromCentralAndLocalByMethod(getNameDao(), 
 									"getNamesByGids", new Object[]{gids}, new Class[]{List.class});
+
+		// Get from ims_lot and ims_transaction (local):
+		// SELECT lot.lotid, lot.userid, lot.eid as gid, lot.locid, lot.scaleid,
+		// tran.sourceid, tran.amount
+		// FROM ims_lot lot
+		// JOIN ims_transaction tran ON lot.lotid = tran.lotid
+		// WHERE lot.status = 0 AND lot.eid in (:gids) ;
+
+		setWorkingDatabase(Database.LOCAL);
+		List<InventoryDetails> inventoryDetails = getTransactionDao().getInventoryDetailsByGids(gids);
 		
 		// Get location name, user name, scale name of inventory details from the databases
 		

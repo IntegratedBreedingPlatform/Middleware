@@ -474,7 +474,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	@Override
 	public int compareTo(InventoryDetails o) {
         if (this.gid != null && o != null) {
-            return this.getGid().compareTo(o.getGid());
+            return this.getGermplasmName().compareTo(o.getGermplasmName());
         }
         return 0;
 	}

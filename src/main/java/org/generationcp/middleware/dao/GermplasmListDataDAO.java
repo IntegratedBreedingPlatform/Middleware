@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -201,5 +203,30 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
         }    	
     	return gids;    	
     }
+    
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, String> getGidAndDesigByListId(Integer listId) throws MiddlewareQueryException {
+    	Map<Integer, String> toReturn = new HashMap<Integer, String>();
+    	
+        try {
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery("SELECT DISTINCT gid, desig FROM listdata WHERE listid = :listId "); 
+        	query.setParameter("listId", listId);
+        	
+	        List<Object[]> results = query.list();
+	    	
+	        for (Object[] row : results){
+	        	Integer gid = (Integer) row[0];
+	        	String desig = (String) row[1];
+	        	toReturn.put(gid, desig);
+	        }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidAndDesigByListId() query from GermplasmList: " + e.getMessage(), e);
+        }    	
+    	return toReturn;    	
+    }
+
 
 }
