@@ -100,7 +100,7 @@ public class Person implements Serializable{
         this.notes = notes;
     }
     
-    public Person(String firstName, String lastName, String middleName){
+    public Person(String firstName, String middleName, String lastName){
     	this.firstName = firstName;
     	this.middleName = middleName;
     	this.lastName = lastName;
