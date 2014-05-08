@@ -51,7 +51,8 @@ public class CropType implements Serializable{
     	WHEAT,
     	LENTIL,
     	SOYBEAN,
-    	BEAN;
+    	BEAN,
+    	PEARLMILLET;
     	
     	@Override
 		public String toString(){
