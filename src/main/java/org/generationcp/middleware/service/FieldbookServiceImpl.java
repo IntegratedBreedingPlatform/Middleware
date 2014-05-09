@@ -29,7 +29,9 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -753,4 +755,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		return null;
 	}
+
+	@Override
+	public List<FolderReference> getRootFolders(Database instance)
+			throws MiddlewareQueryException {
+		return getStudyDataManager().getRootFolders(instance);
+	}
+
+	@Override
+	public List<Reference> getChildrenOfFolder(int folderId)
+			throws MiddlewareQueryException {
+		return getStudyDataManager().getChildrenOfFolder(folderId);
+	}
+
+	@Override
+	public boolean isStudy(int id) throws MiddlewareQueryException {
+		return getStudyDataManager().isStudy(id);
+	}
+	
+	
 }
