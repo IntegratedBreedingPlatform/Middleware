@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -451,4 +452,13 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException;
+
+    /**
+     * Returns the study type.
+     * 
+     * @param studyId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    TermId getStudyType(int studyId) throws MiddlewareQueryException;
 }

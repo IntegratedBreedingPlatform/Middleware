@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -741,5 +742,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		
 		return treatmentPairs;
+	}
+	
+	@Override
+	public TermId getStudyType(int studyId) throws MiddlewareQueryException {
+		setWorkingDatabase(studyId);
+		String value = getProjectPropertyDao().getValueByProjectIdAndTypeId(studyId, TermId.STUDY_TYPE.getId());
+		if (value != null && NumberUtils.isNumber(value)) {
+			return TermId.getById(Integer.valueOf(value));
+		}
+		return null;
 	}
 }
