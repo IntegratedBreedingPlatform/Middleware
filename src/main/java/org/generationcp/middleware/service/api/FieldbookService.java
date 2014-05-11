@@ -461,4 +461,53 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     TermId getStudyType(int studyId) throws MiddlewareQueryException;
+    
+    /**
+     * Get lOcation by id.
+     * @param id
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Location getLocationById(int id) throws MiddlewareQueryException;
+    
+    /**
+     * Get person by id.
+     * @param id
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Person getPersonById(int id) throws MiddlewareQueryException;
+    
+	/**
+	 * get the dataset id of the measurement dataset of the study.
+	 * @param studyId
+	 * @param studyName
+	 * @return
+	 */
+	int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareQueryException;
+	
+	/**
+	 * count the number of observations.
+	 * @param datasetId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	long countObservations(int datasetId) throws MiddlewareQueryException;
+	
+	/**
+	 * Counts the number of stocks.
+	 * @param datasetId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	long countStocks(int datasetId) throws MiddlewareQueryException;
+	
+	/**
+	 * Determines if fieldmap exists.
+	 * @param datasetId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	boolean hasFieldMap(int datasetId) throws MiddlewareQueryException;
+
 }

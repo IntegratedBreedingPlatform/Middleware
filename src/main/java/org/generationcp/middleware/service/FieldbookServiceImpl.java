@@ -753,4 +753,34 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		return null;
 	}
+	
+	@Override
+	public Location getLocationById(int id) throws MiddlewareQueryException {
+		return getLocationDataManager().getLocationByID(id);
+	}
+	
+	@Override
+	public Person getPersonById(int id) throws MiddlewareQueryException {
+		return getUserDataManager().getPersonById(id);
+	}
+	
+	@Override
+	public int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareQueryException {
+		return getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+	}
+	
+	@Override
+	public long countObservations(int datasetId) throws MiddlewareQueryException {
+		return getExperimentBuilder().count(datasetId);
+	}
+	
+	@Override
+	public long countStocks(int datasetId) throws MiddlewareQueryException {
+		return getStockBuilder().countStocks(datasetId);
+	}
+	
+	@Override
+	public boolean hasFieldMap(int datasetId) throws MiddlewareQueryException {
+		return getExperimentBuilder().hasFieldmap(datasetId);
+	}
 }
