@@ -39,6 +39,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -93,6 +94,8 @@ public interface FieldbookService {
      * Save or update Field Map Properties like row, column, block, total rows, total columns, planting order.
      *
      * @param info the info
+     * @param userId the user id
+     * @param isNew the is new
      * @throws MiddlewareQueryException the middleware query exception
      */
     void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) throws MiddlewareQueryException;
@@ -358,6 +361,7 @@ public interface FieldbookService {
      * Gets the nursery variable settings.
      *
      * @param id the id
+     * @param isNursery the is nursery
      * @return the nursery variable settings
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -413,7 +417,7 @@ public interface FieldbookService {
      *
      * @param fieldName the field name
      * @param parentLocationId the parentlocation id
-     * @param currentUserId 
+     * @param currentUserId the current user id
      * @return the id
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -424,6 +428,7 @@ public interface FieldbookService {
      *
      * @param blockName the block name
      * @param parentFieldId the parent field id
+     * @param currentUserId the current user id
      * @return the id
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -431,37 +436,38 @@ public interface FieldbookService {
     
     /**
      * Get all field maps in the same block.
-     * 
-     * @param blockId
+     *
+     * @param blockId the block id
      * @return the field maps in the given block
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
             throws MiddlewareQueryException;
     
     /**
      * Get all Treatment Levels.
+     *
      * @return all treatment levels
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException;
     
     /**
      * Fetch all the possible pairs of the treatment level variable.
-     * 
-     * @param cvTermId
-     * @param propertyId
+     *
+     * @param cvTermId the cv term id
+     * @param propertyId the property id
      * @return list of all possible treatment pairs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException;
 
     /**
      * Returns the study type.
-     * 
-     * @param studyId
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param studyId the study id
+     * @return the study type
+     * @throws MiddlewareQueryException the middleware query exception
      */
     TermId getStudyType(int studyId) throws MiddlewareQueryException;
     
@@ -495,49 +501,74 @@ public interface FieldbookService {
 
     /**
      * Get lOcation by id.
-     * @param id
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param id the id
+     * @return the location by id
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Location getLocationById(int id) throws MiddlewareQueryException;
     
     /**
      * Get person by id.
-     * @param id
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param id the id
+     * @return the person by id
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Person getPersonById(int id) throws MiddlewareQueryException;
     
 	/**
 	 * get the dataset id of the measurement dataset of the study.
-	 * @param studyId
-	 * @param studyName
-	 * @return
+	 *
+	 * @param studyId the study id
+	 * @param studyName the study name
+	 * @return the measurement dataset id
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareQueryException;
 	
 	/**
 	 * count the number of observations.
-	 * @param datasetId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param datasetId the dataset id
+	 * @return the long
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	long countObservations(int datasetId) throws MiddlewareQueryException;
 	
 	/**
 	 * Counts the number of stocks.
-	 * @param datasetId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param datasetId the dataset id
+	 * @return the long
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	long countStocks(int datasetId) throws MiddlewareQueryException;
 	
 	/**
 	 * Determines if fieldmap exists.
-	 * @param datasetId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param datasetId the dataset id
+	 * @return true, if successful
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	boolean hasFieldMap(int datasetId) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the germplasm list by id.
+	 *
+	 * @param listIs the list is
+	 * @return the germplasm list by id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	GermplasmList getGermplasmListById(Integer listId) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the owner.
+	 *
+	 * @param pId the id
+	 * @return the owner
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	String getOwnerListName(Integer userId)  throws MiddlewareQueryException;
 }

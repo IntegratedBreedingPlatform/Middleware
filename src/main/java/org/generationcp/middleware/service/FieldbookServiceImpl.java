@@ -63,6 +63,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -802,4 +803,30 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public boolean hasFieldMap(int datasetId) throws MiddlewareQueryException {
 		return getExperimentBuilder().hasFieldmap(datasetId);
 	}
+
+	@Override
+	public GermplasmList getGermplasmListById(Integer listId)
+			throws MiddlewareQueryException {
+		return getGermplasmListManager().getGermplasmListById(listId);
+	}
+
+	@Override
+	public String getOwnerListName(Integer userId) throws MiddlewareQueryException {
+		
+		 User user=getUserDataManager().getUserById(userId);
+        if(user != null){
+            int personId=user.getPersonid();
+            Person p =getUserDataManager().getPersonById(personId);
+    
+            if(p!=null){
+                return p.getFirstName()+" "+p.getMiddleName() + " "+p.getLastName();
+            }else{
+                return user.getName();
+            }
+        } else {
+            return "";
+        }
+	}
+	
+	
 }
