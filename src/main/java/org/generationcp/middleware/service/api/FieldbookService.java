@@ -355,7 +355,7 @@ public interface FieldbookService {
      * @return the list
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) throws MiddlewareQueryException;
+    List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds, List<Integer> propertyIds, boolean isRemoveProperties) throws MiddlewareQueryException;
     
     /**
      * Gets the nursery variable settings.
@@ -557,7 +557,7 @@ public interface FieldbookService {
 	/**
 	 * Gets the germplasm list by id.
 	 *
-	 * @param listIs the list is
+	 * @param listId the list id
 	 * @return the germplasm list by id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -566,7 +566,7 @@ public interface FieldbookService {
 	/**
 	 * Gets the owner.
 	 *
-	 * @param pId the id
+	 * @param userId the user id
 	 * @return the owner
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */

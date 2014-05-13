@@ -571,16 +571,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) 
+    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds, List<Integer> propertyIds, boolean isRemoveProperties) 
             throws MiddlewareQueryException {
     	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
     	
     	List<CVTerm> variables = new ArrayList<CVTerm>();
     	
     	Set<Integer> variableIds = new HashSet<Integer>();
-
+    	
     	addAllVariableIdsInMode(variableIds, storedInIds, Database.CENTRAL);
     	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
+    	
+    	if (propertyIds != null && propertyIds.size() > 0) {
+    	        Set<Integer> propertyVariableList = new HashSet<Integer>(); 
+    	        createPropertyList(propertyVariableList, propertyIds, Database.CENTRAL);
+    	        createPropertyList(propertyVariableList, propertyIds, Database.LOCAL);
+    	        filterByProperty(variableIds, propertyVariableList, isRemoveProperties);
+    	}
     	
     	List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
     	setWorkingDatabase(Database.CENTRAL);
@@ -595,6 +602,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	
     	return list;
     }
+    
 
     private void addAllVariableIdsInMode(Set<Integer> variableIds
             , List<Integer> storedInIds, Database database) 
@@ -604,6 +612,49 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     		variableIds.addAll(getCvTermRelationshipDao()
     		        .getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
     	}
+    }
+    
+    private void createPropertyList(Set<Integer> propertyVariableList
+            , List<Integer> propertyIds, Database database) throws MiddlewareQueryException{
+        setWorkingDatabase(database);
+        for (Integer propertyId : propertyIds) {
+            propertyVariableList.addAll(getCvTermRelationshipDao()
+                        .getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
+        }
+    }
+    
+    private void filterByProperty(Set<Integer> variableIds
+            , Set<Integer> variableListByProperty, boolean isRemoveProperties) 
+                    throws MiddlewareQueryException{        
+        //delete variables not in the list of filtered variables by property
+        Iterator<Integer> iter = variableIds.iterator();
+        boolean inList = false;
+        
+        if (isRemoveProperties) {
+            //remove variables having the specified properties from the list
+            while (iter.hasNext()) {
+                Integer id = iter.next();
+                for (Integer variable : variableListByProperty) {
+                    if (id.equals(variable)) {
+                        iter.remove();
+                    }
+                }
+            }
+        } else {
+            //remove variables not in the property list
+            while (iter.hasNext()) {
+                inList = false;
+                Integer id = iter.next();
+                for (Integer variable : variableListByProperty) {
+                    if (id.equals(variable)) {
+                        inList = true;
+                    }
+                }
+                if (inList == false) {
+                    iter.remove();
+                }
+            }
+        }
     }
     
     public Workbook getStudyVariableSettings(int id, boolean isNursery)  throws MiddlewareQueryException {
