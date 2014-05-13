@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -571,4 +572,14 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	String getOwnerListName(Integer userId)  throws MiddlewareQueryException;
+	
+	/**
+	 * Get study details.
+	 * @param database
+	 * @param studyType
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException;
 }

@@ -879,5 +879,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
 	}
 	
+	@Override
+	public StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException {
+		return getStudyDataManager().getStudyDetails(database, studyType, studyId);
+	}
 	
 }
