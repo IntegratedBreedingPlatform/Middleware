@@ -157,4 +157,21 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		}
 		return new ArrayList<ProjectProperty>();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public String getValueByProjectIdAndTypeId(int projectId, int typeId) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT value FROM projectprop WHERE project_id = " + projectId + " AND type_id = " + typeId;
+			Query query = getSession().createSQLQuery(sql);
+			List<String> results = query.list();
+			if (results != null && !results.isEmpty()) {
+				return results.get(0);
+			}
+			
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getByProjectIdAndTypeId("    + projectId + ", " + typeId + ") in ProjectPropertyDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
 }

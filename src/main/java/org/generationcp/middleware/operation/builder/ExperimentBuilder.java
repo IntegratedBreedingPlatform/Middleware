@@ -339,4 +339,9 @@ public class ExperimentBuilder extends Builder {
         setWorkingDatabase(experimentId);
         return getExperimentDao().getById(experimentId);
 	}
+	
+	public boolean hasFieldmap(int datasetId) throws MiddlewareQueryException {
+		setWorkingDatabase(datasetId);
+		return getExperimentDao().hasFieldmap(datasetId);
+	}
 }

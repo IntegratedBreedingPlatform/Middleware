@@ -201,4 +201,20 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return list;
 	}
 	
+	public boolean hasFieldmap(int datasetId) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT COUNT(eprop.value) "
+					+ " FROM nd_experiment_project ep "
+					+ " INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = ep.nd_experiment_id "
+					+ "    AND eprop.type_id = " + TermId.RANGE_NO.getId() + " AND eprop.value <> '' "
+					+ " WHERE ep.project_id = " + datasetId + "  LIMIT 1 ";
+			SQLQuery query = getSession().createSQLQuery(sql);
+			BigInteger count = (BigInteger) query.uniqueResult();
+			return count != null && count.longValue() > 0;
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error at countExperimentsByDatasetId=" + datasetId + " query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return false;
+	}
 }

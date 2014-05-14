@@ -439,9 +439,12 @@ public class WorkbookParser {
             List<MeasurementVariable> variables = new ArrayList<MeasurementVariable>();
 
             for (int col = 0; col < factors.size() + variates.size(); col++) {
+                String columnName = getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col);
                 if (col < factors.size()) {
 
-                    if (!factors.get(col).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
+
+
+                    if (columnName == null || !factors.get(col).getName().toUpperCase().equals(columnName.toUpperCase())) {
                         // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
                     } else {
@@ -450,7 +453,7 @@ public class WorkbookParser {
 
                 } else {
 
-                    if (!variates.get(col - factors.size()).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
+                    if (columnName == null || !variates.get(col - factors.size()).getName().toUpperCase().equals(columnName.toUpperCase())) {
                         // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
                     } else {

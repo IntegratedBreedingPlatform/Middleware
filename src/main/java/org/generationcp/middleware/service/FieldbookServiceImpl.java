@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -28,7 +29,9 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -60,6 +63,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -567,16 +571,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) 
+    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds, List<Integer> propertyIds, boolean isRemoveProperties) 
             throws MiddlewareQueryException {
     	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
     	
     	List<CVTerm> variables = new ArrayList<CVTerm>();
     	
     	Set<Integer> variableIds = new HashSet<Integer>();
-
+    	
     	addAllVariableIdsInMode(variableIds, storedInIds, Database.CENTRAL);
     	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
+    	
+    	if (propertyIds != null && propertyIds.size() > 0) {
+    	        Set<Integer> propertyVariableList = new HashSet<Integer>(); 
+    	        createPropertyList(propertyVariableList, propertyIds, Database.CENTRAL);
+    	        createPropertyList(propertyVariableList, propertyIds, Database.LOCAL);
+    	        filterByProperty(variableIds, propertyVariableList, isRemoveProperties);
+    	}
     	
     	List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
     	setWorkingDatabase(Database.CENTRAL);
@@ -591,6 +602,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	
     	return list;
     }
+    
 
     private void addAllVariableIdsInMode(Set<Integer> variableIds
             , List<Integer> storedInIds, Database database) 
@@ -600,6 +612,49 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     		variableIds.addAll(getCvTermRelationshipDao()
     		        .getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
     	}
+    }
+    
+    private void createPropertyList(Set<Integer> propertyVariableList
+            , List<Integer> propertyIds, Database database) throws MiddlewareQueryException{
+        setWorkingDatabase(database);
+        for (Integer propertyId : propertyIds) {
+            propertyVariableList.addAll(getCvTermRelationshipDao()
+                        .getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
+        }
+    }
+    
+    private void filterByProperty(Set<Integer> variableIds
+            , Set<Integer> variableListByProperty, boolean isRemoveProperties) 
+                    throws MiddlewareQueryException{        
+        //delete variables not in the list of filtered variables by property
+        Iterator<Integer> iter = variableIds.iterator();
+        boolean inList = false;
+        
+        if (isRemoveProperties) {
+            //remove variables having the specified properties from the list
+            while (iter.hasNext()) {
+                Integer id = iter.next();
+                for (Integer variable : variableListByProperty) {
+                    if (id.equals(variable)) {
+                        iter.remove();
+                    }
+                }
+            }
+        } else {
+            //remove variables not in the property list
+            while (iter.hasNext()) {
+                inList = false;
+                Integer id = iter.next();
+                for (Integer variable : variableListByProperty) {
+                    if (id.equals(variable)) {
+                        inList = true;
+                    }
+                }
+                if (inList == false) {
+                    iter.remove();
+                }
+            }
+        }
     }
     
     public Workbook getStudyVariableSettings(int id, boolean isNursery)  throws MiddlewareQueryException {
@@ -742,4 +797,91 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		
 		return treatmentPairs;
 	}
+	
+	@Override
+	public TermId getStudyType(int studyId) throws MiddlewareQueryException {
+		setWorkingDatabase(studyId);
+		String value = getProjectPropertyDao().getValueByProjectIdAndTypeId(studyId, TermId.STUDY_TYPE.getId());
+		if (value != null && NumberUtils.isNumber(value)) {
+			return TermId.getById(Integer.valueOf(value));
+		}
+		return null;
+	}
+
+	@Override
+	public List<FolderReference> getRootFolders(Database instance)
+			throws MiddlewareQueryException {
+		return getStudyDataManager().getRootFolders(instance);
+	}
+
+	@Override
+	public List<Reference> getChildrenOfFolder(int folderId)
+			throws MiddlewareQueryException {
+		return getStudyDataManager().getChildrenOfFolder(folderId);
+	}
+
+	@Override
+	public boolean isStudy(int id) throws MiddlewareQueryException {
+		return getStudyDataManager().isStudy(id);
+	}
+	
+	@Override
+	public Location getLocationById(int id) throws MiddlewareQueryException {
+		return getLocationDataManager().getLocationByID(id);
+	}
+	
+	@Override
+	public Person getPersonById(int id) throws MiddlewareQueryException {
+		return getUserDataManager().getPersonById(id);
+	}
+	
+	@Override
+	public int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareQueryException {
+		return getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+	}
+	
+	@Override
+	public long countObservations(int datasetId) throws MiddlewareQueryException {
+		return getExperimentBuilder().count(datasetId);
+	}
+	
+	@Override
+	public long countStocks(int datasetId) throws MiddlewareQueryException {
+		return getStockBuilder().countStocks(datasetId);
+	}
+	
+	@Override
+	public boolean hasFieldMap(int datasetId) throws MiddlewareQueryException {
+		return getExperimentBuilder().hasFieldmap(datasetId);
+	}
+
+	@Override
+	public GermplasmList getGermplasmListById(Integer listId)
+			throws MiddlewareQueryException {
+		return getGermplasmListManager().getGermplasmListById(listId);
+	}
+
+	@Override
+	public String getOwnerListName(Integer userId) throws MiddlewareQueryException {
+		
+		 User user=getUserDataManager().getUserById(userId);
+        if(user != null){
+            int personId=user.getPersonid();
+            Person p =getUserDataManager().getPersonById(personId);
+    
+            if(p!=null){
+                return p.getFirstName()+" "+p.getMiddleName() + " "+p.getLastName();
+            }else{
+                return user.getName();
+            }
+        } else {
+            return "";
+        }
+	}
+	
+	@Override
+	public StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException {
+		return getStudyDataManager().getStudyDetails(database, studyType, studyId);
+	}
+	
 }

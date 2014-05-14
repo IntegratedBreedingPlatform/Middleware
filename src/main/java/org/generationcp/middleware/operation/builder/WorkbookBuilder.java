@@ -77,23 +77,7 @@ public class WorkbookBuilder extends Builder {
 		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
 		Study study = getStudyBuilder().createStudy(id);
 		
-		int dataSetId = 0;
-		
-		//get observation dataset
-		List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
-		if (datasetRefList != null) {
-		    for (DatasetReference datasetRef : datasetRefList) {
-		        if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
-		                datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
-		            dataSetId = datasetRef.getId();
-		        }
-		    }
-		}
-		
-		//if not found in the list using the name, get dataset with Plot Data type
-		if (dataSetId == 0) {
-		    dataSetId = getStudyDataManager().findOneDataSetByType(id, DataSetType.PLOT_DATA).getId();
-		}
+		int dataSetId = getMeasurementDataSetId(id, studyDetails.getStudyName());
 		
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
 		
@@ -545,5 +529,19 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 		return list;
+	}
+	
+	public int getMeasurementDataSetId(int studyId, String studyName) throws MiddlewareQueryException {
+		List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
+		if (datasetRefList != null) {
+		    for (DatasetReference datasetRef : datasetRefList) {
+		        if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyName) || 
+		                datasetRef.getName().equals("MEASUREMENT EFECT_" + studyName)) {
+		            return datasetRef.getId();
+		        }
+		    }
+		}
+		//if not found in the list using the name, get dataset with Plot Data type
+	    return getStudyDataManager().findOneDataSetByType(studyId, DataSetType.PLOT_DATA).getId();
 	}
 }

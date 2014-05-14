@@ -42,6 +42,9 @@ public class MeasurementVariableTransformer extends Transformer {
 	            	measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
 	            	measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
 	            }
+	            if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+	            	measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
+	            }
 	            measurementVariables.add(measurementVariable);
 	        }
 	    }
@@ -71,6 +74,9 @@ public class MeasurementVariableTransformer extends Transformer {
 	            if (stdVariable.getConstraints() != null) {
 	            	measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
 	            	measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
+	            }
+	            if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+	            	measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
 	            }
 	            measurementVariables.add(measurementVariable);
 	        }

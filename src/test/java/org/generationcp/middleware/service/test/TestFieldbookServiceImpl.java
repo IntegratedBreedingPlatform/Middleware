@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -392,6 +393,13 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         Integer parentFieldId = -11;
         int result = fieldbookService.addBlockLocation(blockName, parentFieldId, -1);
         Debug.println(INDENT, "Added: Location with id = " + result);
+    }
+    
+    @Test
+    public void testGetStudyType() throws MiddlewareQueryException  {
+    	int studyId = -74;
+    	TermId studyType = fieldbookService.getStudyType(studyId);
+    	System.out.println("STUDY TYPE IS " + studyType.name());
     }
 
     @AfterClass

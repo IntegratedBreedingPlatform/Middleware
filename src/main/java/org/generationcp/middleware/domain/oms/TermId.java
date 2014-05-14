@@ -203,4 +203,13 @@ public enum TermId {
 	public int getId() {
 		return this.id;
 	}
+	
+	public static TermId getById(int id) {
+		for (TermId term : values()) {
+			if (term.getId() == id) {
+				return term;
+			}
+		}
+		return null;
+	}
 }

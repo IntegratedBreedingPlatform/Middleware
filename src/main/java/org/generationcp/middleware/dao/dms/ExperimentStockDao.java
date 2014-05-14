@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -94,4 +96,19 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 
     }
    
+	public long countStocksByDatasetId(int datasetId) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT COUNT(DISTINCT es.stock_id) FROM nd_experiment_project ep "
+					+ " INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = ep.nd_experiment_id "
+					+ " WHERE ep.project_id = " + datasetId;
+			SQLQuery query = getSession().createSQLQuery(sql);
+			BigInteger count = (BigInteger) query.uniqueResult();
+			return count.longValue();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error at countStocksByDatasetId=" + datasetId + " query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return 0;
+	}
+
 }

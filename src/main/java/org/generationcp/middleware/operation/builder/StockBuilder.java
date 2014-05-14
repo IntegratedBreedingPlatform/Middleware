@@ -106,4 +106,9 @@ public class StockBuilder extends Builder {
 		}
 		return value;
 	}
+	
+	public long countStocks(int datasetId) throws MiddlewareQueryException {
+		setWorkingDatabase(datasetId);
+		return getExperimentStockDao().countStocksByDatasetId(datasetId);
+	}
 }

@@ -28,8 +28,10 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
@@ -111,4 +113,11 @@ public abstract class Service extends DatabaseBroker {
     	return new LotBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
+    protected final ExperimentBuilder getExperimentBuilder() {
+    	return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final StockBuilder getStockBuilder() {
+    	return new StockBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }
