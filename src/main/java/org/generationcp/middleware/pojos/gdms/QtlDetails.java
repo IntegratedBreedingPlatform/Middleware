@@ -13,9 +13,10 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
@@ -30,115 +31,14 @@ public class QtlDetails implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    public static final String GET_MARKER_IDS_BY_QTL = 
-            "SELECT marker_id "
-            + "FROM gdms_markers_onmap, gdms_qtl_details, gdms_qtl "
-            + "WHERE gdms_markers_onmap.map_id = gdms_qtl_details.map_id " 
-            + "        AND gdms_qtl_details.qtl_id = gdms_qtl.qtl_id "
-            + "        AND gdms_qtl.qtl_name = :qtlName "
-            + "        AND gdms_markers_onmap.linkage_group = :chromosome " 
-            + "        AND gdms_markers_onmap.start_position between :min AND :max "
-            ;
+    @Id
+    @Column(name = "qtl_id")
+    private Integer qtlId;
 
-    
-    public static final String COUNT_MARKER_IDS_BY_QTL = 
-            "SELECT COUNT(marker_id)  "
-            + "FROM gdms_markers_onmap, gdms_qtl_details, gdms_qtl "
-            + "WHERE gdms_markers_onmap.map_id = gdms_qtl_details.map_id " 
-            + "        AND gdms_qtl_details.qtl_id = gdms_qtl.qtl_id "
-            + "        AND gdms_qtl.qtl_name = :qtlName "
-            + "        AND gdms_markers_onmap.linkage_group = :chromosome " 
-            + "        AND gdms_markers_onmap.start_position between :min AND :max "
-            ;
+    @Basic(optional = false)
+    @Column(name = "map_id")
+    private Integer mapId;
 
-    public static final String GET_MAP_IDS_BY_QTL = 
-            "SELECT DISTINCT map_id " 
-            + "FROM gdms_qtl_details "
-            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
-
-    public static final String COUNT_MAP_IDS_BY_QTL = 
-            "SELECT COUNT(DISTINCT map_id) " 
-            + "FROM gdms_qtl_details "
-            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
-
-    public static final String GET_MARKER_IDS_BY_QTL_AND_MAP_ID = 
-          "SELECT DISTINCT gm.marker_id " 
-          + "FROM gdms_marker gm "
-          + "    INNER JOIN gdms_markers_onmap gmo ON gm.marker_id = gmo.marker_id " 
-          + "    INNER JOIN gdms_qtl_details gqd ON gqd.map_id = gmo.map_id " 
-          + "    INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id " 
-          + "    WHERE gmo.linkage_group = :chromosome "
-          + "         AND gmo.start_position BETWEEN :min AND :max " 
-          + "         AND gmo.map_id = :mapId "
-          + "         AND gq.qtl_name like :qtlName "
-          ;
-
-    public static final String COUNT_MARKER_IDS_BY_QTL_AND_MAP_ID = 
-            "SELECT COUNT(DISTINCT gm.marker_id) " 
-            + "FROM gdms_marker gm "
-            + "    INNER JOIN gdms_markers_onmap gmo ON gm.marker_id = gmo.marker_id " 
-            + "    INNER JOIN gdms_qtl_details gqd ON gqd.map_id = gmo.map_id " 
-            + "    INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id " 
-            + "    WHERE gmo.linkage_group = :chromosome "
-            + "         AND gmo.start_position BETWEEN :min AND :max " 
-            + "         AND gmo.map_id = :mapId "
-            + "         AND gq.qtl_name like :qtlName "
-            ;
-
-    public static final String GET_MAP_ID_BY_QTL =
-            "SELECT DISTINCT map_id " 
-            + "FROM gdms_qtl_details "
-            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
-    		;
-    		
-    public static final String GET_QTL_TRAITS_BY_DATASET_ID = 
-    		"SELECT DISTINCT gqd.tid " 
-    		+ "FROM gdms_qtl gq  "
-    		+ "INNER JOIN gdms_qtl_details gqd  " 
-    		+ "ON gq.qtl_id = gqd.qtl_id  "
-    		+ "WHERE gq.dataset_id = :datasetId  "
-    		;
-
-    public static final String COUNT_QTL_TRAITS_BY_DATASET_ID = 
-    		"SELECT COUNT(DISTINCT gqd.tid) " 
-    		+ "FROM gdms_qtl gq  "
-    		+ "INNER JOIN gdms_qtl_details gqd  " 
-    		+ "ON gq.qtl_id = gqd.qtl_id  "
-    		+ "WHERE gq.dataset_id = :datasetId  "
-    		;
-    
-    public static final String GET_QTL_DATA_BY_QTL_TRAITS =
-    		"SELECT CONCAT(gq.qtl_name,'') " 
-			+ "		, gqd.linkage_group " 
-    		+ "		, gqd.position " 
-    		+ "		, gqd.min_position " 
-    		+ "		, gqd.max_position " 
-    		+ "		, gqd.tid " 
-    		+ "		, CONCAT(gqd.experiment,'') " 
-    		+ "		, gqd.left_flanking_marker " 
-    		+ "		, gqd.right_flanking_marker " 
-    		+ "		, gqd.effect " 
-    		+ "		, gqd.score_value "
-    		+ "		, gqd.r_square "
-    		+ "FROM gdms_qtl_details gqd " 
-    		+ "INNER JOIN gdms_qtl gq "
-    		+ "ON gqd.qtl_id = gq.qtl_id " 
-    		+ "AND gqd.tid "
-    		+ "IN (:qtlTraits) " 
-    		;
-
-    public static final String COUNT_QTL_DATA_BY_QTL_TRAITS =
-    		"SELECT COUNT(*) "
-    		+ "FROM gdms_qtl_details gqd " 
-    		+ "INNER JOIN gdms_qtl gq "
-    		+ "ON gqd.qtl_id = gq.qtl_id " 
-    		+ "AND gqd.tid "
-    		+ "IN (:qtlTraits) " 
-    		;
-    
-    @EmbeddedId
-    protected QtlDetailsPK id;
-    
     @Column(name = "min_position")
     private Float minPosition;
     
@@ -152,7 +52,7 @@ public class QtlDetails implements Serializable{
     private String experiment;
 
     @Column(name = "effect")
-    private Integer effect;
+    private Float effect;
 
     @Column(name = "score_value")
     private Float scoreValue;
@@ -198,12 +98,13 @@ public class QtlDetails implements Serializable{
         
     }
 
-    public QtlDetails(Integer qtlId, Integer mapId, Float minPosition, Float maxPosition, Integer traitId, String experiment, Integer effect,
+    public QtlDetails(Integer qtlId, Integer mapId, Float minPosition, Float maxPosition, Integer traitId, String experiment, Float effect,
             Float scoreValue, Float rSquare, String linkageGroup, String interactions, String leftFlankingMarker,
             String rightFlankingMarker, Float position, Float clen, String seAdditive, String hvParent, String hvAllele, String lvParent,
             String lvAllele) {
         super();
-        this.id = new QtlDetailsPK(qtlId, mapId);
+        this.qtlId = qtlId;
+        this.mapId = mapId;
         this.minPosition = minPosition;
         this.maxPosition = maxPosition;
         this.traitId = traitId;
@@ -224,21 +125,20 @@ public class QtlDetails implements Serializable{
         this.lvAllele = lvAllele;
     }
 
-    
-    public QtlDetailsPK getId() {
-        return id;
-    }
-    
     public Integer getQtlId() {
-        return id.getQtlId();
+        return this.qtlId;
+    }
+
+    public void setQtlId(Integer qtlId) {
+        this.qtlId = qtlId;
     }
 
     public Integer getMapId() {
-        return id.getMapId();
+        return this.mapId;
     }
     
-    public void setQtlId(QtlDetailsPK id) {
-        this.id = id;
+    public void setMapId(Integer mapId) {
+        this.mapId = mapId;
     }
         
     public Float getMinPosition() {
@@ -273,11 +173,11 @@ public class QtlDetails implements Serializable{
         this.experiment = experiment;
     }
     
-    public Integer getEffect() {
+    public Float getEffect() {
         return effect;
     }
     
-    public void setEffect(Integer effect) {
+    public void setEffect(Float effect) {
         this.effect = effect;
     }
     
@@ -394,7 +294,8 @@ public class QtlDetails implements Serializable{
         result = prime * result + ((experiment == null) ? 0 : experiment.hashCode());
         result = prime * result + ((hvAllele == null) ? 0 : hvAllele.hashCode());
         result = prime * result + ((hvParent == null) ? 0 : hvParent.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((qtlId == null) ? 0 : qtlId.hashCode());
+        result = prime * result + ((mapId == null) ? 0 : mapId.hashCode());
         result = prime * result + ((interactions == null) ? 0 : interactions.hashCode());
         result = prime * result + ((leftFlankingMarker == null) ? 0 : leftFlankingMarker.hashCode());
         result = prime * result + ((linkageGroup == null) ? 0 : linkageGroup.hashCode());
@@ -445,10 +346,15 @@ public class QtlDetails implements Serializable{
                 return false;
         } else if (!hvParent.equals(other.hvParent))
             return false;
-        if (id == null) {
-            if (other.id != null)
+        if (qtlId == null) {
+            if (other.qtlId != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!qtlId.equals(other.qtlId))
+            return false;
+        if (mapId == null) {
+            if (other.mapId != null)
+                return false;
+        } else if (!mapId.equals(other.mapId))
             return false;
         if (interactions == null) {
             if (other.interactions != null)
@@ -522,9 +428,9 @@ public class QtlDetails implements Serializable{
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("QtlDetails [qtlId=");
-        builder.append(id.getQtlId());
+        builder.append(qtlId);
         builder.append(", mapId=");
-        builder.append(id.getMapId());
+        builder.append(mapId);
         builder.append(", minPosition=");
         builder.append(minPosition);
         builder.append(", maxPosition=");

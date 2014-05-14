@@ -19,9 +19,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 /**
  * POJO for gdms_mapping_pop_values table.
  * 
@@ -32,95 +29,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class MappingPopValues implements Serializable{
 
     private static final long serialVersionUID = 1L;
-    
-    // For getMarkerNamesByGIds()
-    public static final String GET_MAPPING_COUNT_BY_GID = 
-            "SELECT COUNT(*) " +
-            "FROM gdms_mapping_pop_values " +
-            "WHERE gid IN (:gIdList)";
-
-    // For getGermplasmNamesByMarkerNames()
-    public static final String GET_MAPPING_COUNT_BY_MARKER_ID = 
-            "SELECT count(*) " +
-            "FROM gdms_mapping_pop_values " +
-            "WHERE marker_id IN (:markerIdList)";
-
-    // For getGermplasmNamesByMarkerNames()
-    public static final String GET_MAPPING_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
-            "SELECT n.nval, CONCAT(m.marker_name, '') " +  
-            "FROM names n JOIN gdms_mapping_pop_values mp ON n.gid = mp.gid " +  
-            "           JOIN gdms_marker m ON mp.marker_id = m.marker_id " +
-            "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " +
-            "ORDER BY n.nval, m.marker_name";
-    
-    // For getAllelicValues by gid and marker names
-    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
-            "SELECT DISTINCT " +
-                "gdms_mapping_pop_values.gid, " +
-                "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
-                "CONCAT(gdms_marker.marker_name, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
-            "FROM gdms_mapping_pop_values, " +
-                "gdms_marker " +
-            "WHERE gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
-                "AND gdms_mapping_pop_values.gid IN (:gidList) " +
-                "AND gdms_mapping_pop_values.marker_id IN (:markerIdList) " +
-            "ORDER BY gdms_mapping_pop_values.gid DESC, gdms_marker.marker_name";
-
-    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS =
-            "SELECT DISTINCT " +
-                "gmpv.gid, " +
-                "gmpv.marker_id, " +
-                "CONCAT(gmpv.map_char_value, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
-            "FROM gdms_mapping_pop_values gmpv " +
-            "WHERE gmpv.gid IN (:gidList) " +
-                "AND gmpv.marker_id IN (:markerIdList) " +
-            "ORDER BY gmpv.gid DESC ";
-
-
-    public static final String GET_ALLELIC_VALUES_BY_GID_LOCAL =
-            "SELECT DISTINCT " +
-                "gdms_mapping_pop_values.gid, " +
-                "gdms_mapping_pop_values.marker_id, " +
-                "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
-            "FROM gdms_mapping_pop_values " +
-            "WHERE gdms_mapping_pop_values.gid IN (:gidList) " +
-            "ORDER BY gdms_mapping_pop_values.gid ASC ";
-    
-    // For getAllelicValues by datasetId
-    public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
-            "SELECT gid, marker_id, CONCAT(map_char_value, '') " +
-            "FROM gdms_mapping_pop_values " +
-            "WHERE dataset_id = :datasetId " +
-            "ORDER BY gid ASC, marker_id ASC";
-
-    public static final String COUNT_BY_DATASET_ID = 
-            "SELECT COUNT(*) " +
-            "FROM gdms_mapping_pop_values " +
-            "WHERE dataset_id = :datasetId";
-    
-    public static final String GET_GIDS_BY_MARKER_ID = 
-        "SELECT DISTINCT gid " +
-        "FROM gdms_mapping_pop_values " +
-        "WHERE marker_id = :markerId";
-
-    public static final String COUNT_GIDS_BY_MARKER_ID = 
-        "SELECT COUNT(distinct gid) " +
-        "FROM gdms_mapping_pop_values " +
-        "WHERE marker_id = :markerId";
-    
-    public static final String COUNT_BY_GIDS = 
-    "SELECT COUNT(distinct mp_id) " +
-    "FROM gdms_mapping_pop_values " +
-    "WHERE gid in (:gIdList)";
-    
-    public static final String GET_MARKER_IDS_BY_GIDS = 
-        "SELECT DISTINCT marker_id " +
-        "FROM gdms_mapping_pop_values " +
-        "WHERE gid IN (:gids)";
-    
     
     @Id
     @Basic(optional = false)
@@ -138,25 +46,30 @@ public class MappingPopValues implements Serializable{
     
     @Column(name = "marker_id")
     private Integer markerId;
+   
+    @Column(name = "acc_sample_id")
+    private Integer accSampleId;
+
+    @Column(name = "marker_sample_id")
+    private Integer markerSampleId;
+
     
     public MappingPopValues() {
-        
     }
 
-    public MappingPopValues(Integer mpId,
-                            String mapCharValue,
-                            Integer datasetId,
-                            Integer gid,
-                            Integer markerId) {
-        
-        this.mpId = mpId;
-        this.mapCharValue = mapCharValue;
-        this.datasetId = datasetId;
-        this.gid = gid;
-        this.markerId = markerId;
-    }
+    public MappingPopValues(Integer mpId, String mapCharValue,
+			Integer datasetId, Integer gid, Integer markerId,
+			Integer accSampleId, Integer markerSampleId) {
+		this.mpId = mpId;
+		this.mapCharValue = mapCharValue;
+		this.datasetId = datasetId;
+		this.gid = gid;
+		this.markerId = markerId;
+		this.accSampleId = accSampleId;
+		this.markerSampleId = markerSampleId;
+	}
 
-    public Integer getMpId() {
+	public Integer getMpId() {
         return mpId;
     }
 
@@ -195,43 +108,109 @@ public class MappingPopValues implements Serializable{
     public void setMarkerId(Integer markerId) {
         this.markerId = markerId;
     }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof MappingPopValues)) {
-            return false;
-        }
 
-        MappingPopValues rhs = (MappingPopValues) obj;
-        return new EqualsBuilder().append(mpId, rhs.mpId).isEquals();
-    }
+	public Integer getAccSampleId() {
+		return accSampleId;
+	}
+
+	public void setAccSampleId(Integer accSampleId) {
+		this.accSampleId = accSampleId;
+	}
+
+	public Integer getMarkerSampleId() {
+		return markerSampleId;
+	}
+
+	public void setMarkerSampleId(Integer markerSampleId) {
+		this.markerSampleId = markerSampleId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((accSampleId == null) ? 0 : accSampleId.hashCode());
+		result = prime * result
+				+ ((datasetId == null) ? 0 : datasetId.hashCode());
+		result = prime * result + ((gid == null) ? 0 : gid.hashCode());
+		result = prime * result
+				+ ((mapCharValue == null) ? 0 : mapCharValue.hashCode());
+		result = prime * result
+				+ ((markerId == null) ? 0 : markerId.hashCode());
+		result = prime * result
+				+ ((markerSampleId == null) ? 0 : markerSampleId.hashCode());
+		result = prime * result + ((mpId == null) ? 0 : mpId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MappingPopValues other = (MappingPopValues) obj;
+		if (accSampleId == null) {
+			if (other.accSampleId != null)
+				return false;
+		} else if (!accSampleId.equals(other.accSampleId))
+			return false;
+		if (datasetId == null) {
+			if (other.datasetId != null)
+				return false;
+		} else if (!datasetId.equals(other.datasetId))
+			return false;
+		if (gid == null) {
+			if (other.gid != null)
+				return false;
+		} else if (!gid.equals(other.gid))
+			return false;
+		if (mapCharValue == null) {
+			if (other.mapCharValue != null)
+				return false;
+		} else if (!mapCharValue.equals(other.mapCharValue))
+			return false;
+		if (markerId == null) {
+			if (other.markerId != null)
+				return false;
+		} else if (!markerId.equals(other.markerId))
+			return false;
+		if (markerSampleId == null) {
+			if (other.markerSampleId != null)
+				return false;
+		} else if (!markerSampleId.equals(other.markerSampleId))
+			return false;
+		if (mpId == null) {
+			if (other.mpId != null)
+				return false;
+		} else if (!mpId.equals(other.mpId))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MappingPopValues [mpId=");
+		builder.append(mpId);
+		builder.append(", mapCharValue=");
+		builder.append(mapCharValue);
+		builder.append(", datasetId=");
+		builder.append(datasetId);
+		builder.append(", gid=");
+		builder.append(gid);
+		builder.append(", markerId=");
+		builder.append(markerId);
+		builder.append(", accSampleId=");
+		builder.append(accSampleId);
+		builder.append(", markerSampleId=");
+		builder.append(markerSampleId);
+		builder.append("]");
+		return builder.toString();
+	}
     
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(markerId).toHashCode();
-    }
-    
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("MappingPopValues [mpId=");
-        builder.append(mpId);
-        builder.append(", mapCharValue=");
-        builder.append(mapCharValue);
-        builder.append(", datasetId=");
-        builder.append(datasetId);
-        builder.append(", gid=");
-        builder.append(gid);
-        builder.append(", markerId=");
-        builder.append(markerId);
-        builder.append("]");
-        return builder.toString();
-    }
     
 }

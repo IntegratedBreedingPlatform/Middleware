@@ -53,115 +53,15 @@ public class Map implements Serializable{
     @Column(name = "map_unit")
     private String mapUnit;
     
-    private static final String GET_MAP_DETAILS_SELECT = 
-            "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count " +
-            "       , MAX(gdms_mapping_data.start_position) AS max " +
-            "       , gdms_mapping_data.linkage_group AS Linkage_group " +
-            "       , concat(gdms_mapping_data.map_name,'') AS map " +
-            "       , concat(gdms_map.map_type,'') AS map_type " +
-            "       , gdms_map.map_desc AS map_desc " +
-            "       , gdms_map.map_unit AS map_unit " +
-            "FROM gdms_mapping_data, gdms_map " +
-            "WHERE gdms_mapping_data.map_id=gdms_map.map_id " 
-            ;
-
-    private static final String GET_MAP_DETAILS_WHERE = 
-            "       AND lower(gdms_mapping_data.map_name) LIKE (:nameLike) " ;
-
-    private static final String GET_MAP_DETAILS_GROUP_ORDER = 
-            "GROUP BY gdms_mapping_data.linkage_group, gdms_mapping_data.map_name " +
-                    "ORDER BY gdms_mapping_data.map_name, gdms_mapping_data.linkage_group "
-                    ;
-
-    public static final String GET_MAP_DETAILS = 
-            GET_MAP_DETAILS_SELECT + GET_MAP_DETAILS_GROUP_ORDER;
+    @Column(name = "genus", columnDefinition = "char(25)")
+    private String genus;
     
-    public static final String GET_MAP_DETAILS_BY_NAME = 
-            GET_MAP_DETAILS_SELECT + GET_MAP_DETAILS_WHERE + GET_MAP_DETAILS_GROUP_ORDER;
-
-    public static final String COUNT_MAP_DETAILS = 
-            "SELECT COUNT(DISTINCT gdms_mapping_data.linkage_group, gdms_mapping_data.map_name) " +
-            "FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id "
-            ;
-
-    public static final String COUNT_MAP_DETAILS_BY_NAME = 
-            COUNT_MAP_DETAILS + "WHERE lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
+    @Column(name = "species", columnDefinition = "char(25)")
+    private String species;
     
-    public static final String GET_MAP_ID_BY_NAME = 
-    		"SELECT map_id FROM gdms_map WHERE map_name = :mapName LIMIT 0,1";
-
-    public static final String GET_MAP_AND_MARKER_COUNT_BY_MARKERS = 
-    		"SELECT CONCAT(m.map_name, ''), COUNT(k.marker_id) " +
-    		"FROM gdms_map m " +
-    		"INNER JOIN gdms_markers_onmap k ON k.map_id = m.map_id " +
-    		"WHERE k.marker_id IN (:markerIds) " +
-    		"GROUP BY m.map_name";
-    
-    public static final String GET_MAP_INFO_BY_MAP_AND_CHROMOSOME =
-            "SELECT DISTINCT "
-            + "  gdms_markers_onmap.marker_id"
-            + " ,gdms_marker.marker_name"
-            + " ,gdms_map.map_name"
-            + " ,gdms_map.map_type"
-            + " ,gdms_markers_onmap.start_position"
-            + " ,gdms_markers_onmap.linkage_group"
-            + " ,gdms_map.map_unit"
-            + " FROM gdms_map"
-            + "     INNER JOIN gdms_markers_onmap ON"
-            + "         gdms_map.map_id = gdms_markers_onmap.map_id"
-            + "     LEFT JOIN gdms_marker ON"
-            + "         gdms_marker.marker_id = gdms_markers_onmap.marker_id"
-            + " WHERE"
-            + "     gdms_markers_onmap.map_id = :mapId"
-            + "     AND gdms_markers_onmap.linkage_group = :chromosome"
-            ;
-    
-    public static final String GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION =
-            "SELECT DISTINCT "
-            + "  gdms_markers_onmap.marker_id"
-            + " ,gdms_marker.marker_name"
-            + " ,gdms_map.map_name"
-            + " ,gdms_map.map_type"
-            + " ,gdms_markers_onmap.linkage_group"
-            + " ,gdms_map.map_unit"
-            + " FROM gdms_map"
-            + "     INNER JOIN gdms_markers_onmap ON"
-            + "         gdms_map.map_id = gdms_markers_onmap.map_id"
-            + "     LEFT JOIN gdms_marker ON"
-            + "         gdms_marker.marker_id = gdms_markers_onmap.marker_id"
-            + " WHERE"
-            + "     gdms_markers_onmap.map_id = :mapId"
-            + "     AND gdms_markers_onmap.linkage_group = :chromosome"
-            + "     AND gdms_markers_onmap.start_position = :startPosition"
-            + " ORDER BY"
-            + "      gdms_map.map_name"
-            + "     ,gdms_markers_onmap.linkage_group"
-            + "     ,gdms_markers_onmap.start_position ASC"
-            ;
-    
-    public static final String GET_MAP_INFO_BY_MARKERS_AND_MAP =
-            "SELECT DISTINCT "
-            + "  gdms_markers_onmap.marker_id"
-            + " ,gdms_marker.marker_name"
-            + " ,gdms_map.map_name"
-            + " ,gdms_map.map_type"
-            + " ,gdms_markers_onmap.start_position"
-            + " ,gdms_markers_onmap.linkage_group"
-            + " ,gdms_map.map_unit"
-            + " FROM gdms_map"
-            + "     INNER JOIN gdms_markers_onmap ON"
-            + "         gdms_map.map_id = gdms_markers_onmap.map_id"
-            + "     LEFT JOIN gdms_marker ON"
-            + "         gdms_marker.marker_id = gdms_markers_onmap.marker_id"
-            + " WHERE"
-            + "     gdms_markers_onmap.marker_id IN (:markerIdList)"
-            + "     AND gdms_markers_onmap.map_id = :mapId"
-            + " ORDER BY"
-            + "     gdms_map.map_name"
-            + "     ,gdms_markers_onmap.linkage_group"
-            + "     ,gdms_markers_onmap.start_position ASC"
-            ;
-    
+    @Column(name = "institute")
+    private String institue;
+       
     public Map() {        
     }
 
@@ -235,28 +135,105 @@ public class Map implements Serializable{
 		this.mapUnit = mapUnit;
 	}
 
+	public String getGenus() {
+		return genus;
+	}
+
+	public void setGenus(String genus) {
+		this.genus = genus;
+	}
+
+	public String getSpecies() {
+		return species;
+	}
+
+	public void setSpecies(String species) {
+		this.species = species;
+	}
+
+	public String getInstitue() {
+		return institue;
+	}
+
+	public void setInstitue(String institue) {
+		this.institue = institue;
+	}
+
 	@Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((genus == null) ? 0 : genus.hashCode());
+		result = prime * result
+				+ ((institue == null) ? 0 : institue.hashCode());
+		result = prime * result + ((mapDesc == null) ? 0 : mapDesc.hashCode());
+		result = prime * result + ((mapId == null) ? 0 : mapId.hashCode());
+		result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
+		result = prime * result + ((mapType == null) ? 0 : mapType.hashCode());
+		result = prime * result + ((mapUnit == null) ? 0 : mapUnit.hashCode());
+		result = prime * result + ((mpId == null) ? 0 : mpId.hashCode());
+		result = prime * result + ((species == null) ? 0 : species.hashCode());
+		return result;
+	}
 
-        if (obj instanceof Map) {
-            Map param = (Map) obj;
-            if (this.getMapId().equals(param.getMapId())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
-    @Override
-    public int hashCode() {
-        return this.mapId;
-    }
-
-    @Override
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Map other = (Map) obj;
+		if (genus == null) {
+			if (other.genus != null)
+				return false;
+		} else if (!genus.equals(other.genus))
+			return false;
+		if (institue == null) {
+			if (other.institue != null)
+				return false;
+		} else if (!institue.equals(other.institue))
+			return false;
+		if (mapDesc == null) {
+			if (other.mapDesc != null)
+				return false;
+		} else if (!mapDesc.equals(other.mapDesc))
+			return false;
+		if (mapId == null) {
+			if (other.mapId != null)
+				return false;
+		} else if (!mapId.equals(other.mapId))
+			return false;
+		if (mapName == null) {
+			if (other.mapName != null)
+				return false;
+		} else if (!mapName.equals(other.mapName))
+			return false;
+		if (mapType == null) {
+			if (other.mapType != null)
+				return false;
+		} else if (!mapType.equals(other.mapType))
+			return false;
+		if (mapUnit == null) {
+			if (other.mapUnit != null)
+				return false;
+		} else if (!mapUnit.equals(other.mapUnit))
+			return false;
+		if (mpId == null) {
+			if (other.mpId != null)
+				return false;
+		} else if (!mpId.equals(other.mpId))
+			return false;
+		if (species == null) {
+			if (other.species != null)
+				return false;
+		} else if (!species.equals(other.species))
+			return false;
+		return true;
+	}
+	
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Map [mapId=");
@@ -271,9 +248,17 @@ public class Map implements Serializable{
 		builder.append(mapDesc);
 		builder.append(", mapUnit=");
 		builder.append(mapUnit);
+		builder.append(", genus=");
+		builder.append(genus);
+		builder.append(", species=");
+		builder.append(species);
+		builder.append(", institue=");
+		builder.append(institue);
 		builder.append("]");
 		return builder.toString();
 	}
+
+
     
 }
 

@@ -22,7 +22,6 @@ import org.generationcp.middleware.manager.GdmsType;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -48,7 +47,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
-import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
@@ -59,7 +57,6 @@ import org.generationcp.middleware.pojos.gdms.QtlDataElement;
 import org.generationcp.middleware.pojos.gdms.QtlDataRow;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
-import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 
@@ -763,7 +760,7 @@ public interface GenotypicDataManager{
      * @return List of the corresponding details of entries in gdms_acc_metadataset given a set of GIDs
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, 
+    List<AccMetadataSet> getGdmsAccMetadatasetByGid(List<Integer> gids, 
             int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
@@ -1226,7 +1223,7 @@ public interface GenotypicDataManager{
      * @return the id of the item added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    QtlDetailsPK addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException;
+    Integer addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException;
     
 
     /**
@@ -1263,7 +1260,7 @@ public interface GenotypicDataManager{
      * @return the id of the item added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    AccMetadataSetPK addAccMetadataSet(AccMetadataSet accMetadataSet) 
+    Integer addAccMetadataSet(AccMetadataSet accMetadataSet) 
             throws MiddlewareQueryException;
 
     /**
@@ -1273,7 +1270,7 @@ public interface GenotypicDataManager{
      * @return the id of the item added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    MarkerMetadataSetPK addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) 
+    Integer addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) 
             throws MiddlewareQueryException;
 
     /**
@@ -1986,7 +1983,7 @@ public interface GenotypicDataManager{
      * @return the all from acc metadataset
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AccMetadataSetPK> getAllFromAccMetadataset(List<Integer> gIds, Integer datasetId, 
+    List<AccMetadataSet> getAllFromAccMetadataset(List<Integer> gIds, Integer datasetId, 
             SetOperation operation) throws MiddlewareQueryException;
     
     /**

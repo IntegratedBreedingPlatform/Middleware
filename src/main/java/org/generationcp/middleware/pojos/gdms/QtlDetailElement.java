@@ -128,11 +128,11 @@ public class QtlDetailElement implements Serializable{
         qtlDetails.setRightFlankingMarker(rightFlankingMarker);
     }
     
-    public Integer getEffect() {
+    public Float getEffect() {
         return qtlDetails.getEffect();
     }
     
-    public void setEffect(Integer effect) {
+    public void setEffect(Float effect) {
         qtlDetails.setEffect(effect);
     }
     

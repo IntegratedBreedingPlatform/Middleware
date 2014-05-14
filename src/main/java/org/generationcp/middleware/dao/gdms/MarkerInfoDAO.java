@@ -28,6 +28,116 @@ import org.hibernate.SQLQuery;
  */
 public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
 
+    
+    /* Used by MarkerInfoDAO.getByMarkerName() */
+    public static final String GET_BY_MARKER_NAME = 
+            "SELECT marker_id " +
+                    ", CONCAT(marker_type, '') " + 
+                    ", CONCAT(marker_name, '')  " +
+                    ", CONCAT(species, '')  " +
+                    ", db_accession_id " +
+                    ", reference " +
+                    ", CONCAT(genotype, '') " + 
+                    ", ploidy " +
+                    ", motif " +
+                    ", forward_primer " +
+                    ", reverse_primer " +
+                    ", product_size " +
+                    ", annealing_temp " +
+                    ", amplification " +
+                    ", CONCAT(principal_investigator, '') " + 
+                    ", contact " +
+                    ", institute " +
+                    ", genotypes_count " +
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(marker_name) = LOWER(:markerName)";
+
+    public static final String GET_BY_MARKER_ID =
+                "SELECT marker_id " +
+                        ", CONCAT(marker_type, '') " +
+                        ", CONCAT(marker_name, '')  " +
+                        ", CONCAT(species, '')  " +
+                        ", db_accession_id " +
+                        ", reference " +
+                        ", CONCAT(genotype, '') " +
+                        ", ploidy " +
+                        ", motif " +
+                        ", forward_primer " +
+                        ", reverse_primer " +
+                        ", product_size " +
+                        ", annealing_temp " +
+                        ", amplification " +
+                        ", CONCAT(principal_investigator, '') " +
+                        ", contact " +
+                        ", institute " +
+                        ", genotypes_count " +
+                "FROM gdms_marker_retrieval_info " +
+                "WHERE marker_id in(:markerList)";
+
+    /* Used by MarkerInfoDAO.countByMarkerName() */
+    public static final String COUNT_BY_MARKER_NAME = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
+
+    /* Used by MarkerInfoDAO.getByGenotype() */
+    public static final String GET_BY_GENOTYPE = 
+            "SELECT marker_id " +
+                    ", CONCAT(marker_type, '') " + 
+                    ", CONCAT(marker_name, '')  " +
+                    ", CONCAT(species, '')  " +
+                    ", db_accession_id " +
+                    ", reference " +
+                    ", CONCAT(genotype, '') " + 
+                    ", ploidy " +
+                    ", motif " +
+                    ", forward_primer " +
+                    ", reverse_primer " +
+                    ", product_size " +
+                    ", annealing_temp " +
+                    ", amplification " +
+                    ", CONCAT(principal_investigator, '') " + 
+                    ", contact " +
+                    ", institute " +
+                    ", genotypes_count " +
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(genotype) LIKE LOWER(:genotype)";
+    
+    /* Used by MarkerInfoDAO.countByGenotype() */
+    public static final String COUNT_BY_GENOTYPE = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(genotype) LIKE LOWER(:genotype)";
+
+    /* Used by MarkerInfoDAO.getByDbAccessionId() */
+    public static final String GET_BY_DB_ACCESSION_ID = 
+            "SELECT marker_id " +
+                    ", CONCAT(marker_type, '') " + 
+                    ", CONCAT(marker_name, '')  " +
+                    ", CONCAT(species, '')  " +
+                    ", db_accession_id " +
+                    ", reference " +
+                    ", CONCAT(genotype, '') " + 
+                    ", ploidy " +
+                    ", motif " +
+                    ", forward_primer " +
+                    ", reverse_primer " +
+                    ", product_size " +
+                    ", annealing_temp " +
+                    ", amplification " +
+                    ", CONCAT(principal_investigator, '') " + 
+                    ", contact " +
+                    ", institute " +
+                    ", genotypes_count " +
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(db_accession_id) LIKE LOWER(:dbAccessionId)";
+    
+    /* Used by MarkerInfoDAO.countByDbAccessionId() */
+    public static final String COUNT_BY_DB_ACCESSION_ID = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(db_accession_id) LIKE LOWER(:dbAccessionId)";
+    
     /**
      * Gets the list of marker info objects corresponding to the given marker name.
      *
@@ -45,7 +155,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_MARKER_NAME);
+            SQLQuery query = getSession().createSQLQuery(GET_BY_MARKER_NAME);
             query.setParameter("markerName", markerName);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -74,7 +184,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_MARKER_ID);
+            SQLQuery query = getSession().createSQLQuery(GET_BY_MARKER_ID);
             query.setParameterList("markerList", markerList);
 
             List results = query.list();
@@ -133,7 +243,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.COUNT_BY_MARKER_NAME);
+            SQLQuery query = getSession().createSQLQuery(COUNT_BY_MARKER_NAME);
             query.setParameter("markerName", markerName);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
@@ -163,7 +273,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_GENOTYPE);
+            SQLQuery query = getSession().createSQLQuery(GET_BY_GENOTYPE);
             query.setParameter("genotype", genotype);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -218,7 +328,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.COUNT_BY_GENOTYPE);
+            SQLQuery query = getSession().createSQLQuery(COUNT_BY_GENOTYPE);
             query.setParameter("genotype", genotype);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
@@ -249,7 +359,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_DB_ACCESSION_ID);
+            SQLQuery query = getSession().createSQLQuery(GET_BY_DB_ACCESSION_ID);
             query.setParameter("dbAccessionId", dbAccessionId);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -304,7 +414,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MarkerInfo.COUNT_BY_DB_ACCESSION_ID);
+            SQLQuery query = getSession().createSQLQuery(COUNT_BY_DB_ACCESSION_ID);
             query.setParameter("dbAccessionId", dbAccessionId);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
