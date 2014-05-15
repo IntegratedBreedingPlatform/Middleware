@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermProperty;
@@ -610,4 +611,17 @@ public class StandardVariableBuilder extends Builder {
 		return !phenotypes.isEmpty();
 	}
 	
+	public List<StandardVariableReference> findAllByProperty(int propertyId) throws MiddlewareQueryException {
+		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+		
+		setWorkingDatabase(Database.LOCAL);
+		list.addAll(getCvTermDao().getStandardVariablesOfProperty(propertyId));
+		
+		if (propertyId > 0) {
+			setWorkingDatabase(Database.CENTRAL);
+			list.addAll(getCvTermDao().getStandardVariablesOfProperty(propertyId));
+		}
+		
+		return list;
+	}
 }
