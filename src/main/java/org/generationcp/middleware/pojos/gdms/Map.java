@@ -65,18 +65,23 @@ public class Map implements Serializable{
     public Map() {        
     }
 
+
     public Map(Integer mapId, String mapName, String mapType, Integer mpId,
-			String mapDesc, String mapUnit) {
-		super();
+			String mapDesc, String mapUnit, String genus, String species,
+			String institue) {
 		this.mapId = mapId;
 		this.mapName = mapName;
 		this.mapType = mapType;
 		this.mpId = mpId;
 		this.mapDesc = mapDesc;
 		this.mapUnit = mapUnit;
+		this.genus = genus;
+		this.species = species;
+		this.institue = institue;
 	}
 
-    public Map(Integer mapId) {
+
+	public Map(Integer mapId) {
         this.mapId = mapId;
     }
     
@@ -232,7 +237,7 @@ public class Map implements Serializable{
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -257,8 +262,6 @@ public class Map implements Serializable{
 		builder.append("]");
 		return builder.toString();
 	}
-
-
     
 }
 

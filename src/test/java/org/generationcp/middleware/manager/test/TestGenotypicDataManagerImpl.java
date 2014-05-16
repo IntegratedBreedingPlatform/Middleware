@@ -1168,7 +1168,10 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         Integer mpId = 0;
         String mapDesc = null;
         String mapUnit = null;
-        Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit);
+        String genus = "Genus";
+        String species = "Groundnut";
+        String institute = "ICRISAT";
+        Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit, genus, species, institute);
 
         Integer idAdded = manager.addMap(map);
         Debug.println("testAddMap() Added: " + (idAdded != null ? map : null));
@@ -1456,6 +1459,8 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         String mapType = "genetic";
         Integer mpId = 0;
         String mapDesc = null;
+        String genus = "Genus";
+        String institute = "ICRISAT";
 
         // MarkerOnMap Fields
         Float startPosition = new Float(0);
@@ -1463,7 +1468,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         String mapUnit = "CM";
         String linkageGroup = "LG23";
 
-        Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit);
+        Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit, genus, species, institute);
 
         MarkerOnMap markerOnMap = new MarkerOnMap(markerOnMapId, mapId, markerId, startPosition, endPosition, linkageGroup);
 
