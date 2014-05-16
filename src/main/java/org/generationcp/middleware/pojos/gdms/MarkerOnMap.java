@@ -70,7 +70,7 @@ public class MarkerOnMap implements Serializable{
         return markerOnMapId;
     }
     
-    public void setMarkerOnMpId(Integer markerOnMapId) {
+    public void setMarkerOnMapId(Integer markerOnMapId) {
         this.markerOnMapId = markerOnMapId;
     }
 
