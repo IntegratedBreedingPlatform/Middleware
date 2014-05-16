@@ -60,7 +60,7 @@ public class Map implements Serializable{
     private String species;
     
     @Column(name = "institute")
-    private String institue;
+    private String institute;
        
     public Map() {        
     }
@@ -68,7 +68,7 @@ public class Map implements Serializable{
 
     public Map(Integer mapId, String mapName, String mapType, Integer mpId,
 			String mapDesc, String mapUnit, String genus, String species,
-			String institue) {
+			String institute) {
 		this.mapId = mapId;
 		this.mapName = mapName;
 		this.mapType = mapType;
@@ -77,7 +77,7 @@ public class Map implements Serializable{
 		this.mapUnit = mapUnit;
 		this.genus = genus;
 		this.species = species;
-		this.institue = institue;
+		this.institute = institute;
 	}
 
 
@@ -156,12 +156,12 @@ public class Map implements Serializable{
 		this.species = species;
 	}
 
-	public String getInstitue() {
-		return institue;
+	public String getInstitute() {
+		return institute;
 	}
 
-	public void setInstitue(String institue) {
-		this.institue = institue;
+	public void setInstitute(String institute) {
+		this.institute = institute;
 	}
 
 	@Override
@@ -170,7 +170,7 @@ public class Map implements Serializable{
 		int result = 1;
 		result = prime * result + ((genus == null) ? 0 : genus.hashCode());
 		result = prime * result
-				+ ((institue == null) ? 0 : institue.hashCode());
+				+ ((institute == null) ? 0 : institute.hashCode());
 		result = prime * result + ((mapDesc == null) ? 0 : mapDesc.hashCode());
 		result = prime * result + ((mapId == null) ? 0 : mapId.hashCode());
 		result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
@@ -195,10 +195,10 @@ public class Map implements Serializable{
 				return false;
 		} else if (!genus.equals(other.genus))
 			return false;
-		if (institue == null) {
-			if (other.institue != null)
+		if (institute == null) {
+			if (other.institute != null)
 				return false;
-		} else if (!institue.equals(other.institue))
+		} else if (!institute.equals(other.institute))
 			return false;
 		if (mapDesc == null) {
 			if (other.mapDesc != null)
@@ -257,8 +257,8 @@ public class Map implements Serializable{
 		builder.append(genus);
 		builder.append(", species=");
 		builder.append(species);
-		builder.append(", institue=");
-		builder.append(institue);
+		builder.append(", institute=");
+		builder.append(institute);
 		builder.append("]");
 		return builder.toString();
 	}
