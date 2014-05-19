@@ -78,6 +78,7 @@ public class WorkbookBuilder extends Builder {
 		Study study = getStudyBuilder().createStudy(id);
 		
 		int dataSetId = getMeasurementDataSetId(id, studyDetails.getStudyName());
+		workbook.setMeasurementDatesetId(dataSetId);
 		
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
 		
