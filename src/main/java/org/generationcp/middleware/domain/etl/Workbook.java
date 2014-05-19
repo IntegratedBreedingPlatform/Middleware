@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -37,8 +38,8 @@ public class Workbook {
 	
 	private List<MeasurementVariable> variates; 
 	
-	private List<MeasurementRow> observations;
-	private List<MeasurementRow> exportArrangedObservations; //to be use for ordering when exporting only
+	private List<MeasurementRow> observations; 
+	private List<MeasurementRow> exportArrangedObservations; //for exporting only
 	
 	//derived variables used to improve performance
 	private List<String> trialHeaders;
@@ -733,6 +734,25 @@ public class Workbook {
 
 	public void setTreatmentFactors(List<TreatmentVariable> treatmentFactors) {
 		this.treatmentFactors = treatmentFactors;
+	}
+	
+	public Integer getFieldMapBlockIdByTrialInstance(String trialInstance) {
+		Integer blockId = null;
+    	if (trialObservations != null && !trialObservations.isEmpty()) {
+    		String strBlockId = null;
+    		for (MeasurementRow row : trialObservations) {
+    			String value = row.getMeasurementDataValue(TermId.TRIAL_INSTANCE_FACTOR.getId());
+    			if (value == null || value != null && value.equals(trialInstance)) {
+    				strBlockId = row.getMeasurementDataValue(TermId.BLOCK_ID.getId());
+    				break;
+    			}
+    		}
+    		if (strBlockId != null && NumberUtils.isNumber(strBlockId)) {
+    			blockId = Double.valueOf(strBlockId).intValue();
+    		}
+    	}
+    	return blockId;
+		
 	}
 
 	public List<MeasurementRow> getExportArrangedObservations() {
