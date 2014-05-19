@@ -37,7 +37,8 @@ public class Workbook {
 	
 	private List<MeasurementVariable> variates; 
 	
-	private List<MeasurementRow> observations; 
+	private List<MeasurementRow> observations;
+	private List<MeasurementRow> exportArrangedObservations; //to be use for ordering when exporting only
 	
 	//derived variables used to improve performance
 	private List<String> trialHeaders;
@@ -733,4 +734,15 @@ public class Workbook {
 	public void setTreatmentFactors(List<TreatmentVariable> treatmentFactors) {
 		this.treatmentFactors = treatmentFactors;
 	}
+
+	public List<MeasurementRow> getExportArrangedObservations() {
+		return exportArrangedObservations;
+	}
+
+	public void setExportArrangedObservations(
+			List<MeasurementRow> exportArrangedObservations) {
+		this.exportArrangedObservations = exportArrangedObservations;
+	}
+	
+	
 }
