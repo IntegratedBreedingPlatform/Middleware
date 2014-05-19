@@ -582,4 +582,13 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Get the block id of a particular trial instance in a dataset.
+	 * @param datasetId
+	 * @param trialInstance
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	String getBlockId(int datasetId, String trialInstance) throws MiddlewareQueryException;
 }

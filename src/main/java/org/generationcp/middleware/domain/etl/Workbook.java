@@ -736,25 +736,6 @@ public class Workbook {
 		this.treatmentFactors = treatmentFactors;
 	}
 	
-	public Integer getFieldMapBlockIdByTrialInstance(String trialInstance) {
-		Integer blockId = null;
-    	if (trialObservations != null && !trialObservations.isEmpty()) {
-    		String strBlockId = null;
-    		for (MeasurementRow row : trialObservations) {
-    			String value = row.getMeasurementDataValue(TermId.TRIAL_INSTANCE_FACTOR.getId());
-    			if (value == null || value != null && value.equals(trialInstance)) {
-    				strBlockId = row.getMeasurementDataValue(TermId.BLOCK_ID.getId());
-    				break;
-    			}
-    		}
-    		if (strBlockId != null && NumberUtils.isNumber(strBlockId)) {
-    			blockId = Double.valueOf(strBlockId).intValue();
-    		}
-    	}
-    	return blockId;
-		
-	}
-
 	public List<MeasurementRow> getExportArrangedObservations() {
 		return exportArrangedObservations;
 	}

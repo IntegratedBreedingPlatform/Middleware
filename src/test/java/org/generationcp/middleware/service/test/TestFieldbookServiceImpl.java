@@ -378,6 +378,13 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         workbook = fieldbookService.getStudyVariableSettings(id, true);
         workbook.print(INDENT);
     }
+    
+    @Test
+    public void testGetBlockId() throws MiddlewareQueryException {
+    	int datasetId = -167;
+    	String trialInstance = "1";
+    	System.out.println(fieldbookService.getBlockId(datasetId, trialInstance));
+    }
 
     @Test
     public void testAddFieldLocation() throws MiddlewareQueryException {

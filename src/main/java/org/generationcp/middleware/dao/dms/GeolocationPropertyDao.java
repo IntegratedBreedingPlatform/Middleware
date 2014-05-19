@@ -62,7 +62,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			}
 			
 		} catch (HibernateException e) {
-			logAndThrowException("Error at getDistinctPropertyValues=" + stdVarId + " query on GeolocationDao: " + e.getMessage(), e);
+			logAndThrowException("Error at getDistinctPropertyValues=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
 		}
 		return results;
 	}
@@ -85,4 +85,24 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
                 return "";
         }
 	
+   	@SuppressWarnings("unchecked")
+   	public String getValueOfTrialInstance(int datasetId, int typeId, String trialInstance) throws MiddlewareQueryException {
+   		try {
+   			StringBuilder sql = new StringBuilder()
+   				.append("SELECT gp.value FROM nd_geolocationprop gp ")
+   				.append(" INNER JOIN nd_geolocation g ON g.nd_geolocation_id = gp.nd_geolocation_id ")
+   				.append("   AND g.description = ").append(trialInstance)
+   				.append(" INNER JOIN nd_experiment e ON e.nd_geolocation_id = g.nd_geolocation_id ")
+   				.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
+   				.append("   AND ep.project_id = ").append(datasetId)
+   				.append(" WHERE gp.type_id = ").append(typeId);
+   			
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+            return (String) query.uniqueResult();
+
+   		} catch (HibernateException e) {
+			logAndThrowException("Error at getValueOfTrialInstance=" + datasetId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+   		}
+   		return null;
+   	}
 }
