@@ -314,6 +314,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return new TreeSet<Integer>();
     }
 
+    //GCP-8567
     @Override
     public List<Marker> getMarkersByPositionAndLinkageGroup(double startPos, double endPos, String linkageGroup) throws MiddlewareQueryException {
     	//TODO FOR VERIFICATION WITH GDMS TEAM - ITEM#9
@@ -3167,6 +3168,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return returnVal;
     }
     
+    //GCP-8568
     @Override
     public List<Marker> getMarkersByType(String type) throws MiddlewareQueryException {
     	//TODO FOR VERIFICATION WITH GDMS - ITEM#15

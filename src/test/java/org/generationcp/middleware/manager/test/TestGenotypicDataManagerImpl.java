@@ -1734,9 +1734,19 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetMarkersByType() throws Exception {
-        String type = "SNP";
-        List<Marker> results = manager.getMarkersByType(type);
-        assertNotNull(results);
+        List<Marker> results = manager.getMarkersByType(GdmsType.TYPE_SNP.getValue());
+        assertFalse(results.isEmpty());
+        Debug.printObjects(INDENT, results);
+        results = manager.getMarkersByType(GdmsType.TYPE_SSR.getValue());
+        assertFalse(results.isEmpty());
+        Debug.printObjects(INDENT, results);
+        results = manager.getMarkersByType(GdmsType.TYPE_CISR.getValue());
+        assertFalse(results.isEmpty());
+        Debug.printObjects(INDENT, results);
+        results = manager.getMarkersByType(GdmsType.TYPE_DART.getValue());
+        assertFalse(results.isEmpty());
+        Debug.printObjects(INDENT, results);
+        results = manager.getMarkersByType(GdmsType.TYPE_CAP.getValue());
         assertFalse(results.isEmpty());
         Debug.printObjects(INDENT, results);
     }
