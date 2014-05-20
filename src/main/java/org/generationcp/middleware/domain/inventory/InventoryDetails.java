@@ -62,6 +62,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The scale name. */
 	String scaleName;
 	
+	String comment;
+	
+	String parentage;
+	String entryId;
+	String source;
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -477,6 +482,38 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
             return this.getGermplasmName().compareTo(o.getGermplasmName());
         }
         return 0;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public String getParentage() {
+		return parentage;
+	}
+
+	public void setParentage(String parentage) {
+		this.parentage = parentage;
+	}
+
+	public String getEntryId() {
+		return entryId;
+	}
+
+	public void setEntryId(String entryId) {
+		this.entryId = entryId;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 	
 }
