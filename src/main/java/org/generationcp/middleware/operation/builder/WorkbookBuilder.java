@@ -235,7 +235,6 @@ public class WorkbookBuilder extends Builder {
                     MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                             variable.getValue(), true,  
                             getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                            variable.getVariableType().getStandardVariable().getDataType().getId(),
                             getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
                     measurementData.setPhenotypeId(variable.getPhenotypeId());
                     measurementDataList.add(measurementData);
