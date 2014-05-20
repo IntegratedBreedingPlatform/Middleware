@@ -9,6 +9,7 @@ public class Dataset extends ParentDataset {
 	private List<Condition> conditions;
 	private List<Factor> factors;
 	private List<Variate> variates;
+	private List<Constant> constants;
 	
 	public Dataset(){
 		super();
@@ -44,5 +45,11 @@ public class Dataset extends ParentDataset {
 	}
 	public void setVariates(List<Variate> variates) {
 		this.variates = variates;
+	}
+	public List<Constant> getConstants() {
+	        return constants;
+	}
+	public void setConstants(List<Constant> constants) {
+	        this.constants = constants;
 	}
 }

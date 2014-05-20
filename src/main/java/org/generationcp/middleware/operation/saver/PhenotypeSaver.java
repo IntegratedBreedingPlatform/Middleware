@@ -112,6 +112,10 @@ public class PhenotypeSaver extends Saver{
 	            	Term dataType = variable.getVariableType().getStandardVariable().getDataType();
 	            	if(dataType.getId()==TermId.CATEGORICAL_VARIABLE.getId()) {//categorical variable
 	            		Enumeration enumeration = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
+	            		//in case the value entered is the id and not the enumeration code/name
+	            		if (enumeration == null && NumberUtils.isNumber(variable.getValue())) {
+	            			enumeration = variable.getVariableType().getStandardVariable().getEnumeration(Double.valueOf(variable.getValue()).intValue());
+	            		}
 		            	if(enumeration!=null) {
 		            		phenotype.setcValue(enumeration.getId());	
 		            	} else {

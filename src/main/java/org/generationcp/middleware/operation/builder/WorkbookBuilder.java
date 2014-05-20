@@ -78,6 +78,7 @@ public class WorkbookBuilder extends Builder {
 		Study study = getStudyBuilder().createStudy(id);
 		
 		int dataSetId = getMeasurementDataSetId(id, studyDetails.getStudyName());
+		workbook.setMeasurementDatesetId(dataSetId);
 		
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
 		
@@ -155,6 +156,7 @@ public class WorkbookBuilder extends Builder {
             List<MeasurementVariable> factors = buildFactors(variables);
             List<MeasurementVariable> variates = buildVariates(variables);
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
+            List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
             List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
             
@@ -187,6 +189,7 @@ public class WorkbookBuilder extends Builder {
             workbook.setFactors(factors);
             workbook.setVariates(variates);
             workbook.setConditions(conditions);
+            workbook.setConstants(constants);
             workbook.setTreatmentFactors(treatmentFactors);
             return workbook;
 	}
@@ -232,7 +235,6 @@ public class WorkbookBuilder extends Builder {
                     MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                             variable.getValue(), true,  
                             getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                            variable.getVariableType().getStandardVariable().getDataType().getId(),
                             getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
                     measurementData.setPhenotypeId(variable.getPhenotypeId());
                     measurementDataList.add(measurementData);

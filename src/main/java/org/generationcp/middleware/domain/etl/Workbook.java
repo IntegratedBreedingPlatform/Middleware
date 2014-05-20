@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -38,6 +39,7 @@ public class Workbook {
 	private List<MeasurementVariable> variates; 
 	
 	private List<MeasurementRow> observations; 
+	private List<MeasurementRow> exportArrangedObservations; //for exporting only
 	
 	//derived variables used to improve performance
 	private List<String> trialHeaders;
@@ -733,4 +735,15 @@ public class Workbook {
 	public void setTreatmentFactors(List<TreatmentVariable> treatmentFactors) {
 		this.treatmentFactors = treatmentFactors;
 	}
+	
+	public List<MeasurementRow> getExportArrangedObservations() {
+		return exportArrangedObservations;
+	}
+
+	public void setExportArrangedObservations(
+			List<MeasurementRow> exportArrangedObservations) {
+		this.exportArrangedObservations = exportArrangedObservations;
+	}
+	
+	
 }

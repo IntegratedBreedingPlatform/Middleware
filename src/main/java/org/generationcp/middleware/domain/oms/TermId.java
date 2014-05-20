@@ -192,6 +192,9 @@ public enum TermId {
     , BLOCK_SIZE (77795)
     , BLOCKS_PER_REPLICATE (77797)
 
+    //Selection Variates Properties
+    , BREEDING_METHOD_PROP (2670)
+    , PLANTS_SELECTED_PROP (2660)
 	;
 	
 	private final int id;

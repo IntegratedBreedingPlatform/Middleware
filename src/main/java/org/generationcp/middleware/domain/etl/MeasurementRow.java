@@ -14,6 +14,8 @@ package org.generationcp.middleware.domain.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementRow {
@@ -136,6 +138,28 @@ public class MeasurementRow {
 			}
 		}
 		return variables;
+	}
+	
+	public String getMeasurementDataValue(Integer id) {
+		List<MeasurementVariable> variables = getMeasurementVariables();
+		String label = null;
+		for (MeasurementVariable variable : variables) {
+			if (variable.getTermId() == id) {
+				label = variable.getName();
+			}
+		}
+		
+		return label != null ? getMeasurementDataValue(label) : null;
+	}
+	
+	public Integer getRange() {
+		String strRange = getMeasurementDataValue(TermId.RANGE_NO.getId());
+		return strRange != null && NumberUtils.isNumber(strRange) ? Double.valueOf(strRange).intValue() : null;
+	}
+	
+	public Integer getColumn() {
+		String strRange = getMeasurementDataValue(TermId.COLUMN_NO.getId());
+		return strRange != null && NumberUtils.isNumber(strRange) ? Double.valueOf(strRange).intValue() : null;
 	}
 	
 	@Override

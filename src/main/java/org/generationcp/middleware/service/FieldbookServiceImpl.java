@@ -884,4 +884,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return getStudyDataManager().getStudyDetails(database, studyType, studyId);
 	}
 	
+	@Override
+	public String getBlockId(int datasetId, String trialInstance) throws MiddlewareQueryException {
+		setWorkingDatabase(datasetId);
+		return getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+	}
 }
