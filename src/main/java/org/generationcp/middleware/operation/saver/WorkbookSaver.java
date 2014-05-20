@@ -253,9 +253,11 @@ public class WorkbookSaver extends Saver {
 				row.setLocationId(studyLocationId);
 			}
 		}
-    	for(MeasurementRow row : workbook.getObservations()) {
-   			row.setLocationId(studyLocationId);
-        }
+	if (workbook.getObservations() != null) {
+            for(MeasurementRow row : workbook.getObservations()) {
+       		row.setLocationId(studyLocationId);
+            }
+	}
     	watch.stop();
     	
     	return studyLocationId;
@@ -495,22 +497,24 @@ public class WorkbookSaver extends Saver {
 			MeasurementRow row = workbook.getObservations().get(0);
 			variableIndexesList  = getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
 		}
-		for (MeasurementRow row : workbook.getObservations()) {
-												
-			VariableList stock = getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
-			String stockFactor = getStockFactor(stock);
-			Integer stockId = stockMap.get(stockFactor);
-			if (stockId == null) {
-				//rowWatch.restart("--save 1 stock");
-				stockId = getStockSaver().saveStock(stock);
-				stockMap.put(stockFactor, stockId);
-			}
-			row.setStockId(stockId);
-			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
-				session.flush();
-				session.clear();
-			}
-			i++;
+		if (workbook.getObservations() != null) {
+        	    for (MeasurementRow row : workbook.getObservations()) {
+        												
+        		VariableList stock = getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
+        		String stockFactor = getStockFactor(stock);
+        		Integer stockId = stockMap.get(stockFactor);
+        		if (stockId == null) {
+        		      //rowWatch.restart("--save 1 stock");
+        			stockId = getStockSaver().saveStock(stock);
+        			stockMap.put(stockFactor, stockId);
+        		}
+        		row.setStockId(stockId);
+        		if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        		      session.flush();
+        		      session.clear();
+        		}
+        		i++;
+        	    }
 		}
 		
 		//rowWatch.stop();
@@ -528,35 +532,37 @@ public class WorkbookSaver extends Saver {
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
 		Map<Integer,PhenotypeExceptionDto> exceptions = null;
-		for(MeasurementRow row : observations) {
-			rowWatch.restart("saving row "+(i++));
-			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-			VariableList trialVariates = trialVariatesMap.get((int)row.getLocationId());
-			if(trialVariates!=null) {
-				experimentValues.getVariableList().addAll(trialVariates);
-			}
-			try {
-				experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
-			} catch(PhenotypeException e) {
-				if(exceptions==null) {
-					exceptions = e.getExceptions();
-				} else {
-					for (Integer standardVariableId : e.getExceptions().keySet()) {
-						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-						if(exceptions.get(standardVariableId)==null) {
-							exceptions.put(standardVariableId, exception);//add exception
-						} else {//add invalid values to the existing map of exceptions for each phenotype
-							for(String invalidValue : exception.getInvalidValues()) {
-								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
-							}
-						}
-					}
-				}
-			}
-			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
-				session.flush();
-				session.clear();
-			}
+		if (observations != null) {
+        		for(MeasurementRow row : observations) {
+        			rowWatch.restart("saving row "+(i++));
+        			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
+        			VariableList trialVariates = trialVariatesMap.get((int)row.getLocationId());
+        			if(trialVariates!=null) {
+        				experimentValues.getVariableList().addAll(trialVariates);
+        			}
+        			try {
+        				experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+        			} catch(PhenotypeException e) {
+        				if(exceptions==null) {
+        					exceptions = e.getExceptions();
+        				} else {
+        					for (Integer standardVariableId : e.getExceptions().keySet()) {
+        						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+        						if(exceptions.get(standardVariableId)==null) {
+        							exceptions.put(standardVariableId, exception);//add exception
+        						} else {//add invalid values to the existing map of exceptions for each phenotype
+        							for(String invalidValue : exception.getInvalidValues()) {
+        								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+        							}
+        						}
+        					}
+        				}
+        			}
+        			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        				session.flush();
+        				session.clear();
+        			}
+        		}
 		}
 		rowWatch.stop();
 		watch.stop();

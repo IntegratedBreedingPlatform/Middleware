@@ -353,6 +353,8 @@ public interface FieldbookService {
      * Filter standard variables by mode.
      *
      * @param storedInIds the stored in ids
+     * @param propertyIds the property ids
+     * @param isRemoveProperties the is remove properties
      * @return the list
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -575,20 +577,31 @@ public interface FieldbookService {
 	
 	/**
 	 * Get study details.
-	 * @param database
-	 * @param studyType
-	 * @param studyId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param database the database
+	 * @param studyType the study type
+	 * @param studyId the study id
+	 * @return the study details
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * Get the block id of a particular trial instance in a dataset.
-	 * @param datasetId
-	 * @param trialInstance
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param datasetId the dataset id
+	 * @param trialInstance the trial instance
+	 * @return the block id
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	String getBlockId(int datasetId, String trialInstance) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the folder name by id.
+	 *
+	 * @param folderId the folder id
+	 * @return the folder name by id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
 }

@@ -41,6 +41,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets
  * from the CHADO schema.
@@ -459,6 +460,8 @@ public interface StudyDataManager{
      * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
      *
      * @param info the info
+     * @param userId the user id
+     * @param isNew the is new
      * @throws MiddlewareQueryException the middleware query exception
      */
     void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) throws MiddlewareQueryException;
@@ -697,11 +700,21 @@ public interface StudyDataManager{
     String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException;
     
     /**
-     * 
-     * @param blockId
+     * Gets the all field maps in block by block id.
+     *
+     * @param blockId the block id
      * @return List of all field maps in the block
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
             throws MiddlewareQueryException;
+    
+    /**
+     * Gets the folder name by id.
+     *
+     * @param folderId the folder id
+     * @return the folder name by id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
 }

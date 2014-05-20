@@ -73,7 +73,6 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
@@ -888,5 +887,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public String getBlockId(int datasetId, String trialInstance) throws MiddlewareQueryException {
 		setWorkingDatabase(datasetId);
 		return getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+	}
+	
+	@Override
+	public String getFolderNameById(Integer folderId) throws MiddlewareQueryException {
+	    return getStudyDataManager().getFolderNameById(folderId);
 	}
 }

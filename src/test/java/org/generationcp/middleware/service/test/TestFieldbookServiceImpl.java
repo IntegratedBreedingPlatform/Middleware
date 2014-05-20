@@ -408,6 +408,12 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
     	TermId studyType = fieldbookService.getStudyType(studyId);
     	System.out.println("STUDY TYPE IS " + studyType.name());
     }
+    
+    @Test
+    public void testGetFolderNameById() throws MiddlewareQueryException  {
+        String folderName = fieldbookService.getFolderNameById(1);
+        System.out.println("Folder Name is: " + folderName);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {
