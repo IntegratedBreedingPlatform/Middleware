@@ -85,11 +85,18 @@ public class DatabaseConnectionParameters{
             throw new ConfigException("Missing property: " + key + ".password from file: " + propertyFile);
         }
 
+        String driverName = prop.getProperty(key + ".driverName", null);
+
+        String url = prop.getProperty(key + ".url", null);
+
         this.host = host;
         this.port = port;
         this.dbName = dbname;
         this.username = username;
         this.password = password;
+        this.driverName = driverName;
+        this.url = url;
+
     }
 
     public String getHost() {

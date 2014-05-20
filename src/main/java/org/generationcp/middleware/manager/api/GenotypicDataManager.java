@@ -504,6 +504,8 @@ public interface GenotypicDataManager{
     List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
+    public List<AllelicValueElement> getAllelicValuesByGid(Integer targetGID) throws MiddlewareQueryException;
+
     /**
      * Counts the marker info entries corresponding to the given marker name.
      *
