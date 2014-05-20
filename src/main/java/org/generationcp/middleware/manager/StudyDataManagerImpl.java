@@ -1029,6 +1029,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getGeolocationPropertyDao().getGeolocationPropValue(stdVarId, studyId);
     }
     
+    @Override
+    public String getFolderNameById(Integer folderId) throws MiddlewareQueryException {
+        setWorkingDatabase(folderId);
+        DmsProject currentFolder = getDmsProjectDao().getById(folderId);
+        return currentFolder.getName();
+    }
+    
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
     	if (detail != null) {
 			if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
