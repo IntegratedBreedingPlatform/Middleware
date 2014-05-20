@@ -584,11 +584,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	            StringBuilder sqlString = new StringBuilder()
 	            .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
 	            .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-	            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId ")
+	            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId, ppFolder.object_project_id AS folderId ")
 	            .append("FROM project p ")
 	            .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
 	            .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
 	            .append("                   AND ppNursery.value = ").append(studyType.getId()).append(" ") // 10000 for Nursery
+	            .append("   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id ")
 	            .append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
 	            .append("                   AND ppObjective.type_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ") // 8030
 	            .append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
@@ -619,6 +620,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	                        .addScalar("id")
 	                        .addScalar("piId")
 	                        .addScalar("siteId")
+	                        .addScalar("folderId")
 	                        ;
 	            
 	            List<Object[]> list =  query.list();
@@ -635,8 +637,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	                    Integer id = (Integer) row[7];
 	                    String piId = (String) row[8];
 	                    String siteId = (String) row[9];
+	                    Integer folderId = (Integer) row[10];
 	                    
 	                    studyDetails = new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
+	                    studyDetails.setParentFolderId(Long.valueOf(folderId));
 	                }
 	            }
 
