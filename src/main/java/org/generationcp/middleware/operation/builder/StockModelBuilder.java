@@ -54,11 +54,15 @@ public class StockModelBuilder extends Builder {
 		 
 		 StockDao dao = getStockDao();
 		 
-		 setWorkingDatabase(Database.CENTRAL);
-		 stockModels.putAll(dao.getStocksByIds(positiveIds));
+		 if (!positiveIds.isEmpty()){
+			 setWorkingDatabase(Database.CENTRAL);
+			 stockModels.putAll(dao.getStocksByIds(positiveIds));
+		 }
 		 
-		 setWorkingDatabase(Database.CENTRAL);
-		 stockModels.putAll(dao.getStocksByIds(negativeIds));
+		 if (!negativeIds.isEmpty()){
+			 setWorkingDatabase(Database.LOCAL);
+			 stockModels.putAll(dao.getStocksByIds(negativeIds));
+		 }
 
 		return stockModels;
 	}
