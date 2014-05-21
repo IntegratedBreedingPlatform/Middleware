@@ -81,9 +81,10 @@ public class WorkbookBuilder extends Builder {
 		workbook.setMeasurementDatesetId(dataSetId);
 		
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
-		
-		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
 		VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
+		//List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
+		//for optimization
+		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount, variables);
 		
 		VariableList conditionVariables = null, constantVariables = null;
 		if (isTrial) {
