@@ -118,5 +118,21 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
         }
         return null;
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<DmsProject> getSubjectsByObjectIdAndTypeId(Integer objectId, Integer typeId) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("typeId", typeId));
+            criteria.add(Restrictions.eq("objectProject.projectId", objectId));
+            criteria.setProjection(Projections.property("subjectProject"));
+            return criteria.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getObjectBySubjectIdAndTypeId=" + objectId + ", " + typeId
+                    + ") query from ProjectRelationship: " + e.getMessage(), e);
+        }
+        return null;
+    }
 
 }

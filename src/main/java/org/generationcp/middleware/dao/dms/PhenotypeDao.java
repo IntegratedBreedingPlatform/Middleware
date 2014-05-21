@@ -757,4 +757,27 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 		return new ArrayList<Phenotype>();
 	}
+	
+	public void deletePhenotypesInProjectByTerm(List<Integer> ids, int termId) throws MiddlewareQueryException {
+		try {
+			StringBuilder sql = new StringBuilder()
+				.append("DELETE FROM phenotype ph ")
+				.append(" WHERE ph.phenotype_id IN ( ")
+				.append(" SELECT eph.phenotype_id ")
+				.append(" FROM nd_experiment_phenotype eph ")
+				.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
+				.append(" AND ep.project_id IN (:ids)) ")
+				.append(" AND ph.observable_id = :termId ");
+
+  			SQLQuery query = getSession().createSQLQuery(sql.toString());
+  			query.setParameter("ids", ids);
+  			query.setParameter("termId", termId);
+  			query.executeUpdate();
+				
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in deletePhenotypesInProjectByTerm("    + ids + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
+		}
+	}
+	
 }

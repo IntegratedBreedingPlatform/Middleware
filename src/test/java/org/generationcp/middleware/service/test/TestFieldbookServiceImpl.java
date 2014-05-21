@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -149,6 +151,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
         // Assumption: there is at least 1 local nursery stored in the database
         int id = fieldbookService.getAllLocalNurseryDetails().get(0).getId();
+//    	int id = -167;
         Workbook workbook = fieldbookService.getNurseryDataSet(id);
         workbook.print(INDENT);
         
@@ -168,6 +171,28 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
                 }
             }
         }
+        
+//        MeasurementVariable bhtrait = new MeasurementVariable(22448, "BH-LOCAL", "BH-LOCAL DESC", null, null, null, null, null, null);
+//        bhtrait.setOperation(Operation.ADD);
+//        bhtrait.setStoredIn(TermId.OBSERVATION_VARIATE.getId());
+//        workbook.getVariates().add(bhtrait);
+//        for (MeasurementVariable var : workbook.getVariates()) {
+//        	if (var.getTermId() == 8390) { //NOTES trait
+//        		var.setName("LOCAL " + var.getName());
+//        		var.setDescription("LOCAL " + var.getDescription());
+//        		var.setOperation(Operation.UPDATE);
+//        	}
+//        }
+//        for (MeasurementVariable var : workbook.getConditions()) {
+//        	if (var.getTermId() == -160) {
+//        		var.setOperation(Operation.DELETE);
+//        	}
+//        	else if (var.getTermId() == 8100) {
+//        		var.setOperation(Operation.UPDATE);
+//        		var.setName("INVESTIGATOR_NAME");
+//        		var.setDescription("INVESTIGATOR_DESCRIPTION");
+//        	}
+//        }
         
         fieldbookService.saveMeasurementRows(workbook);
         Workbook workbook2 = fieldbookService.getNurseryDataSet(id);

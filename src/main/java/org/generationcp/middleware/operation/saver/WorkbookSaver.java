@@ -742,4 +742,28 @@ public class WorkbookSaver extends Saver {
 		
 		return list;
 	}
+	
+	public void saveWorkbookVariables(Workbook workbook) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		DmsProject study = getDmsProjectDao().getById(workbook.getStudyDetails().getId());
+		Integer trialDatasetId = workbook.getTrialDatasetId(), measurementDatasetId = workbook.getMeasurementDatesetId();
+		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
+			measurementDatasetId = getWorkbookBuilder().getMeasurementDataSetId(study.getProjectId(), workbook.getStudyName());
+			List<DmsProject> datasets = getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
+			if (datasets != null) {
+				for (DmsProject dataset : datasets) {
+					if (dataset.getProjectId() != measurementDatasetId) {
+						trialDatasetId = dataset.getProjectId();
+						break;
+					}
+				}
+			}
+		}
+		DmsProject trialDataset = getDmsProjectDao().getById(trialDatasetId);
+		DmsProject measurementDataset = getDmsProjectDao().getById(measurementDatasetId);
+		
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
+	}
 }

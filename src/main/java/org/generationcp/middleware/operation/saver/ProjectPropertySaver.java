@@ -12,19 +12,24 @@
 package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
@@ -135,4 +140,169 @@ public class ProjectPropertySaver extends Saver {
         }
 	}
 	
+	public void saveProjectProperties(DmsProject study, DmsProject trialDataset, DmsProject measurementDataset, 
+			List<MeasurementVariable> variables, boolean isConstant) throws MiddlewareQueryException {
+		
+		if (study.getProjectId() > 0) {
+			throw new MiddlewareQueryException("can not update central projectproperty values");
+		}
+		setWorkingDatabase(Database.LOCAL);
+		if (variables != null) {
+			
+			int rank = getNextRank(study);
+			for (MeasurementVariable variable : variables) {
+				if (variable.getOperation() == Operation.ADD) {
+					insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant);
+					rank++;
+				}
+				else if (variable.getOperation() == Operation.UPDATE) {
+					updateVariable(study, trialDataset, measurementDataset, variable);
+				}
+				else if (variable.getOperation() == Operation.DELETE) {
+					deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId());
+				}
+			}
+		}
+	}
+	
+	private int getNextRank(DmsProject project) {
+		int nextRank = 1;
+		if (project.getProperties() != null) {
+			for (ProjectProperty property : project.getProperties()) {
+				if (property.getRank() >= nextRank) {
+					nextRank = property.getRank() + 1;
+				}
+			}
+		}
+		return nextRank;
+	}
+	private void insertVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
+			MeasurementVariable variable, int rank, boolean isConstant) throws MiddlewareQueryException {
+		
+		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+			int datasetRank = getNextRank(trialDataset);
+			insertVariable(project, variable, rank);
+			insertVariable(trialDataset, variable, datasetRank);
+			insertVariable(measurementDataset, variable, datasetRank);
+		}
+		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
+				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
+			
+			int datasetRank = getNextRank(measurementDataset);
+			if (isConstant) {
+				insertVariable(project, variable, rank);
+			}
+			else {
+				insertVariable(measurementDataset, variable, datasetRank);
+			}
+		}
+		else { //study
+			insertVariable(project, variable, rank);
+		}
+	}
+	private void insertVariable(DmsProject project, MeasurementVariable variable, int rank) throws MiddlewareQueryException {
+		if (project.getProperties() == null) {
+			project.setProperties(new ArrayList<ProjectProperty>());
+		}
+		saveVariableType(project, createVariableType(variable, rank));
+	}
+	
+	private VariableType createVariableType(MeasurementVariable variable, int rank) {
+		VariableType varType = new VariableType();
+		StandardVariable stdvar = new StandardVariable();
+		varType.setStandardVariable(stdvar);
+
+		stdvar.setId(variable.getTermId());
+		stdvar.setStoredIn(new Term(variable.getStoredIn(), null, null));
+		
+		varType.setLocalName(variable.getName());
+		varType.setLocalDescription(variable.getDescription());
+		varType.setRank(rank);
+		
+		return varType;
+	}
+	
+	private void updateVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
+			MeasurementVariable variable) throws MiddlewareQueryException {
+		
+		updateVariable(project, variable);
+		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+			updateVariable(trialDataset, variable);
+		}
+		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() 
+				|| variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
+				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
+			
+			updateVariable(measurementDataset, variable);
+		}
+	}
+	private void updateVariable(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
+		if (project.getProperties() != null) {
+			List<Integer> allTypeStorages = PhenotypicType.getAllTypeStorages();
+			int rank = getRank(project, variable.getTermId());
+			for (ProjectProperty property : project.getProperties()) {
+				if (rank == property.getRank()) {
+					if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId()) {
+						property.setValue(variable.getDescription());
+					}
+					else if (property.getTypeId().intValue() == variable.getTermId()) {
+						property.setValue(variable.getValue());
+					}
+					else if (allTypeStorages.contains(property.getTypeId().intValue())) {
+						property.setValue(variable.getName());
+					}
+					getProjectPropertyDao().update(property);
+				}
+			}
+		}
+	}
+	
+	private int getRank(DmsProject project, int termId) {
+		int rank = -1;
+		if (project.getProperties() != null) {
+			for (ProjectProperty property : project.getProperties()) {
+				if (property.getTypeId().intValue() == TermId.STANDARD_VARIABLE.getId()
+						&& property.getValue().equals(String.valueOf(termId))) {
+					rank = property.getRank();
+					break;
+				}
+			}
+		}
+		return rank;
+	}
+	
+	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
+			int storedInId, int termId) throws MiddlewareQueryException {
+		
+		deleteVariable(project, termId);
+		if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+			deleteVariable(trialDataset, termId);
+			deleteVariable(measurementDataset, termId);
+			//remove geolocation prop value
+			setWorkingDatabase(Database.LOCAL);
+			getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
+		}
+		else if (storedInId == TermId.OBSERVATION_VARIATE.getId()
+				|| storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
+			deleteVariable(project, termId); //for constants
+			deleteVariable(measurementDataset, termId); //for variates
+			//remove phoenotype value
+			List<Integer> ids = Arrays.asList(project.getProjectId(), trialDataset.getProjectId(), measurementDataset.getProjectId());
+			setWorkingDatabase(Database.LOCAL);
+			getPhenotypeDao().deletePhenotypesInProjectByTerm(ids, termId);
+			getExperimentPhenotypeDao().deleteByStudyIdAndTermId(ids, termId);
+		}
+	}
+	private void deleteVariable(DmsProject project, int termId) throws MiddlewareQueryException {
+		int rank = getRank(project, termId);
+		if (project.getProperties() != null && !project.getProperties().isEmpty()) {
+			for (Iterator<ProjectProperty> iterator = project.getProperties().iterator(); iterator.hasNext();) {
+				ProjectProperty property = iterator.next(); 
+				if (rank == property.getRank()) {
+					getProjectPropertyDao().makeTransient(property);
+					iterator.remove();
+				}
+			}
+		}
+	}
 }
