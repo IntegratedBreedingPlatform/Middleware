@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
+import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,5 +258,101 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         	criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);	
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+	public <Type> Type callStoredProcedureForObject(
+            final String procedureName,
+            final Map<String,Object> params,
+            final Class<Type> returnType) {
+
+        final String sql = buildSQLQuery(procedureName, params);
+        LOG.debug("sql = " + sql);
+        SQLQuery query = session.createSQLQuery(sql);
+        if (params != null && params.size() > 0) {
+        	for (Map.Entry<String,Object> entry : params.entrySet()) {
+                LOG.debug(entry.getKey() + " = " + entry.getValue());
+                query.setParameter(entry.getKey().toString(), entry.getValue());
+            }
+        }
+        if(returnType!=null && !(returnType.getName().equals(Integer.class.getName()))) {
+        	query.addEntity(returnType);
+        }
+        
+        Object object = query.uniqueResult();
+        if(object instanceof BigInteger && returnType.getName().equals(Integer.class.getName())) {
+        	BigInteger b = (BigInteger) object;
+        	Integer i = b.intValue();
+        	return (Type) i;
+        } else {
+        	return (Type) object;
+        }
+
+        
+    }
+
+    @SuppressWarnings("unchecked")
+	public void callStoredProcedure(
+            final String procedureName,
+            final Map<String,Object> params) {
+
+        final String sql = buildSQLQuery(procedureName, params);
+        LOG.debug("sql = " + sql);
+        SQLQuery query = session.createSQLQuery(sql);
+        if (params != null && params.size() > 0) {
+        	for (Map.Entry<String,Object> entry : params.entrySet()) {
+                LOG.debug(entry.getKey() + " = " + entry.getValue());
+                query.setParameter(entry.getKey().toString(), entry.getValue());
+            }
+        }
+        
+        query.executeUpdate();
+        
+
+        
+    }
+    @SuppressWarnings("unchecked")
+	public <Type> List<Type> callStoredProcedureForList(
+            final String procedureName,
+            final Map<String,Object> params,
+            final Class<Type> returnType) {
+
+        final String sql = buildSQLQuery(procedureName, params);
+        LOG.debug("sql = " + sql);
+        SQLQuery query = session.createSQLQuery(sql);
+        if (params != null && params.size() > 0) {
+        	for (Map.Entry<String,Object> entry : params.entrySet()) {
+                LOG.debug(entry.getKey() + " = " + entry.getValue());
+                query.setParameter(entry.getKey().toString(), entry.getValue());
+            }
+        }
+        if(returnType!=null && !(returnType.getName().equals(Integer.class.getName()))) {
+        	query.addEntity(returnType);
+        }
+
+        return query.list();
+    }
+
+    private String buildSQLQuery(String procedureName, Map<String,Object> params) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("CALL ");
+        sql.append(procedureName);
+        sql.append("(");
+
+        if (params != null && !params.isEmpty()) {
+            boolean start = true;
+            for (String paramName : params.keySet()) {
+                if (!start) {
+                    sql.append(", ");
+                } else {
+                    start = false;
+                }
+                sql.append(":");
+                sql.append(paramName);
+            }
+        }
+
+        sql.append(")");
+        return sql.toString();
     }
 }

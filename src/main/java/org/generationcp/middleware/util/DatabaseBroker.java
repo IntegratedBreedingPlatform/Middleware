@@ -110,6 +110,16 @@ public class DatabaseBroker {
      * Hibernate {@link Session} for central.
      */
     private Session sessionForCentral;
+    
+    /**
+     * The local database name
+     */
+    protected String localDatabaseName;
+
+    /**
+     * The central database name
+     */
+    protected String centralDatabaseName;
 
     /** The Constant JDBC_BATCH_SIZE. */
     protected static final int JDBC_BATCH_SIZE = 50;
@@ -180,6 +190,16 @@ public class DatabaseBroker {
         this.sessionProviderForCentral = sessionProviderForCentral;
     }
 
+    /**
+     * Instantiates a new data manager given session providers for local and central.
+     */
+    protected DatabaseBroker(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, String localDatabaseName, String centralDatabaseName) {
+        this.sessionProviderForLocal = sessionProviderForLocal;
+        this.sessionProviderForCentral = sessionProviderForCentral;
+        this.localDatabaseName = localDatabaseName;
+        this.centralDatabaseName = centralDatabaseName;
+    }
+    
     public DatabaseBroker(Session sessionForLocal, Session sessionForCentral) {
         this.sessionForLocal = sessionForLocal;
         this.sessionForCentral = sessionForCentral;

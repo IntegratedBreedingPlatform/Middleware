@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataColumn;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
@@ -29,6 +30,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -38,6 +40,8 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /* The add/update/delete tests are highly dependent on the tests before it 
    Therefore the order of execution is important.
@@ -54,6 +58,8 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     private static List<Integer> testDataIds;
     private static final Integer STATUS_DELETED = 9;
 
+    private static final Logger LOG = LoggerFactory.getLogger(TestGermplasmListManagerImpl.class);
+    
     @BeforeClass
     public static void setUp() throws Exception {
         DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
@@ -138,8 +144,8 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetGermplasmListDataByListId() throws Exception {
-        Integer listId = Integer.valueOf(28781);       
-        List<GermplasmListData> results = manager.getGermplasmListDataByListId(listId, 0, 5);
+        Integer listId = Integer.valueOf(3434);       
+        List<GermplasmListData> results = manager.getGermplasmListDataByListId(listId, 0, Integer.MAX_VALUE);
 
         Debug.println(INDENT, "testGetGermplasmListDataByListId(" + listId + "): ");
         Debug.printObjects(INDENT, results);
@@ -612,6 +618,22 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     	Session session = ((DataManager) manager).getCurrentSessionForLocal();
     	Query query = session.createSQLQuery("SELECT lrstatus FROM listdata WHERE lrecid = " + id);
     	return (Integer) query.uniqueResult();
+    }
+    
+    @Test
+    public void testGetUpdatedGermplasmListDataByListId_1() throws Exception {
+        Integer id = Integer.valueOf(3434);
+        List<GermplasmListData> list = manager.getUpdatedGermplasmListDataByListId_1(id);
+        Debug.println(INDENT, "testGetUpdatedGermplasmListDataByListId_1(" + id + "): ");
+        Debug.printObjects(INDENT, list);
+    }
+    
+    @Test
+    public void testGetUpdatedGermplasmListDataByListId_2() throws Exception {
+        Integer id = Integer.valueOf(3434);
+        List<GermplasmListData> list = manager.getUpdatedGermplasmListDataByListId_2(id);
+        Debug.println(INDENT, "testGetUpdatedGermplasmListDataByListId_2(" + id + "): ");
+        Debug.printObjects(INDENT, list);
     }
 
 }
