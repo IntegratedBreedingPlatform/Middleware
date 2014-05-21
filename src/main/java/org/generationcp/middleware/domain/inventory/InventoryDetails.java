@@ -51,10 +51,10 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	Double amount;
 	
 	/** The source id. */
-	Integer sourceId;
+	Integer sourceId;	//ims_transaction.source_id
 	
 	/** The source name. */
-	String sourceName;
+	String sourceName;  // if list, listnms.listname
 	
 	/** The scale id. */
 	Integer scaleId;
@@ -64,9 +64,12 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	
 	String comment;
 	
-	String parentage;
-	String entryId;
-	String source;
+	String parentage; // listdata.grpname
+	
+	Integer entryId; // listdata.entryid
+	
+	String source; // listdata.source
+
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -339,11 +342,46 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.userName = userName;
 	}
 
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public String getParentage() {
+		return parentage;
+	}
+
+	public void setParentage(String parentage) {
+		this.parentage = parentage;
+	}
+
+	public Integer getEntryId() {
+		return entryId;
+	}
+
+	public void setEntryId(Integer entryId) {
+		this.entryId = entryId;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+		result = prime * result + ((comment == null) ? 0 : comment.hashCode());
+		result = prime * result + ((entryId == null) ? 0 : entryId.hashCode());
 		result = prime * result
 				+ ((germplasmName == null) ? 0 : germplasmName.hashCode());
 		result = prime * result + ((gid == null) ? 0 : gid.hashCode());
@@ -353,9 +391,12 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		result = prime * result
 				+ ((locationName == null) ? 0 : locationName.hashCode());
 		result = prime * result + ((lotId == null) ? 0 : lotId.hashCode());
+		result = prime * result
+				+ ((parentage == null) ? 0 : parentage.hashCode());
 		result = prime * result + ((scaleId == null) ? 0 : scaleId.hashCode());
 		result = prime * result
 				+ ((scaleName == null) ? 0 : scaleName.hashCode());
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
 		result = prime * result
 				+ ((sourceId == null) ? 0 : sourceId.hashCode());
 		result = prime * result
@@ -379,6 +420,16 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 			if (other.amount != null)
 				return false;
 		} else if (!amount.equals(other.amount))
+			return false;
+		if (comment == null) {
+			if (other.comment != null)
+				return false;
+		} else if (!comment.equals(other.comment))
+			return false;
+		if (entryId == null) {
+			if (other.entryId != null)
+				return false;
+		} else if (!entryId.equals(other.entryId))
 			return false;
 		if (germplasmName == null) {
 			if (other.germplasmName != null)
@@ -410,6 +461,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 				return false;
 		} else if (!lotId.equals(other.lotId))
 			return false;
+		if (parentage == null) {
+			if (other.parentage != null)
+				return false;
+		} else if (!parentage.equals(other.parentage))
+			return false;
 		if (scaleId == null) {
 			if (other.scaleId != null)
 				return false;
@@ -419,6 +475,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 			if (other.scaleName != null)
 				return false;
 		} else if (!scaleName.equals(other.scaleName))
+			return false;
+		if (source == null) {
+			if (other.source != null)
+				return false;
+		} else if (!source.equals(other.source))
 			return false;
 		if (sourceId == null) {
 			if (other.sourceId != null)
@@ -442,7 +503,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 			return false;
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -472,10 +533,18 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		builder.append(scaleId);
 		builder.append(", scaleName=");
 		builder.append(scaleName);
+		builder.append(", comment=");
+		builder.append(comment);
+		builder.append(", parentage=");
+		builder.append(parentage);
+		builder.append(", entryId=");
+		builder.append(entryId);
+		builder.append(", source=");
+		builder.append(source);
 		builder.append("]");
 		return builder.toString();
 	}
-
+/*
 	@Override
 	public int compareTo(InventoryDetails o) {
         if (this.gid != null && o != null) {
@@ -483,37 +552,14 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
         }
         return 0;
 	}
-
-	public String getComment() {
-		return comment;
+*/
+	@Override
+	public int compareTo(InventoryDetails o) {
+        if (this.gid != null && o != null) {
+            //return this.getGermplasmName().compareTo(o.getGermplasmName());
+        	return this.entryId.compareTo(o.entryId);
+        }
+        return 0;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-	public String getParentage() {
-		return parentage;
-	}
-
-	public void setParentage(String parentage) {
-		this.parentage = parentage;
-	}
-
-	public String getEntryId() {
-		return entryId;
-	}
-
-	public void setEntryId(String entryId) {
-		this.entryId = entryId;
-	}
-
-	public String getSource() {
-		return source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-	
 }

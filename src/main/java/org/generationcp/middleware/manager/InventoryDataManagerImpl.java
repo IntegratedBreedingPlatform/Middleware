@@ -27,6 +27,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Name;
@@ -679,17 +680,21 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			Integer listId) throws MiddlewareQueryException {
 		
 		// Get gids from listdata (from db instance based on listId):
-		// SELECT gid FROM listdata WHERE listid = :listId;
+		// SELECT * FROM listdata WHERE listid = :listId;
 		setWorkingDatabase(listId);
-//		List<Integer> gids = getGermplasmListDataDAO().getGidsByListId(listId);
-		
-		Map<Integer, String> gidNames = getGermplasmListDataDAO().getGidAndDesigByListId(listId);
+		List<GermplasmListData> listData = getGermplasmListDataDAO().getByListId(listId, 0, Integer.MAX_VALUE);
 		
 		// Get sourceName from listnms (from db instance based on listId):
 		// SELECT listname FROM listnms WHERE listid = :listId;
 		GermplasmList germplasmList = getGermplasmListDAO().getById(listId);
 		
-		List<Integer> gids = new ArrayList<Integer>(gidNames.keySet());
+		// Get gids
+		List<Integer> gids = new ArrayList<Integer>();
+		for (GermplasmListData datum : listData){
+			if (datum != null){
+				gids.add(datum.getGid());
+			}
+		}
 
 		// Get from ims_lot and ims_transaction (local):
 		// SELECT lot.lotid, lot.userid, lot.eid as gid, lot.locid, lot.scaleid,
@@ -772,7 +777,15 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			
 			if (detail != null) {
 
-				detail.setGermplasmName(gidNames.get(detail.getGid()));
+				// Set germplasm name, entry id, parentage, source
+				for (GermplasmListData datum : listData){
+					if (datum != null && datum.getGid().equals(detail.getGid())){
+						detail.setGermplasmName(datum.getDesignation());
+						detail.setEntryId(datum.getEntryId());
+						detail.setParentage(datum.getGroupName());
+						detail.setSource(datum.getSeedSource());
+					}
+				}
 				
 				for (Location location: locations){
 					if (detail.getLocationId() != null && detail.getLocationId().equals(location.getLocid())){
