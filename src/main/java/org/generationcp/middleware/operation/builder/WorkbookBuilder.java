@@ -12,6 +12,8 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
@@ -40,6 +43,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
@@ -107,6 +111,15 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementVariable> factors = buildFactors(experiments, isTrial);
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false);
 		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
+		
+		//set possible values of breeding method
+		for (MeasurementVariable variable : variates) {
+		    if (variable.getTermId() == TermId.BREEDING_METHOD_VARIATE.getId()) {
+		        variable.setPossibleValues(getAllBreedingMethods());
+		        break;
+		    }
+		}
+		
 		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates, isTrial);
 		List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
 		
@@ -250,6 +263,33 @@ public class WorkbookBuilder extends Builder {
 	    
 	    return observations;
 	}
+	
+	private List<ValueReference> getAllBreedingMethods() throws MiddlewareQueryException{
+            List<ValueReference> list = new ArrayList<ValueReference>();
+            List<Method> methodList = getGermplasmDataManager().getAllMethods();
+            
+            Collections.sort(methodList, new Comparator<Method>(){
+
+                    @Override
+                    public int compare(Method o1, Method o2) {
+                             String methodName1 = o1.getMname().toUpperCase();
+                          String methodName2 = o2.getMname().toUpperCase();
+             
+                          //ascending order
+                          return methodName1.compareTo(methodName2);
+                    }
+                    
+            });
+            
+            if (methodList != null && !methodList.isEmpty()) {
+                for (Method method : methodList) {
+                    if (method != null) {
+                        list.add(new ValueReference(method.getMid(), method.getMname(), method.getMname()));
+                    }
+                }
+            }
+            return list;
+        }
 	
 	private String getDataType(int dataTypeId) {
 	    //datatype ids: 1120, 1125, 1128, 1130
@@ -433,7 +473,7 @@ public class WorkbookBuilder extends Builder {
 	
 	private String getLocalName(int rank, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
-			if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId() && rank == property.getRank()) {
+			if (PhenotypicType.getAllTypeStorages().contains(property.getTypeId()) && rank == property.getRank()) {
 				return property.getValue();
 			}
 		}
