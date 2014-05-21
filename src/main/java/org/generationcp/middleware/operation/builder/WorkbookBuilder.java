@@ -432,7 +432,7 @@ public class WorkbookBuilder extends Builder {
 	
 	private String getLocalName(int rank, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
-			if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId() && rank == property.getRank()) {
+			if (PhenotypicType.getAllTypeStorages().contains(property.getTypeId()) && rank == property.getRank()) {
 				return property.getValue();
 			}
 		}

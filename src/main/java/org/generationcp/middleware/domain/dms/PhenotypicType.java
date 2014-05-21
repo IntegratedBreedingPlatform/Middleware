@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -111,5 +112,11 @@ public enum PhenotypicType {
         return null;
     }
     
-    
+    public static List<Integer> getAllTypeStorages() {
+    	List<Integer> storages = new ArrayList<Integer>();
+    	for (PhenotypicType type : values()) {
+    		storages.addAll(type.getTypeStorages());
+    	}
+    	return storages;
+    }
 }
