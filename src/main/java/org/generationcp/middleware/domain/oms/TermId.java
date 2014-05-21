@@ -195,6 +195,8 @@ public enum TermId {
     //Selection Variates Properties
     , BREEDING_METHOD_PROP (2670)
     , PLANTS_SELECTED_PROP (2660)
+    
+    , BREEDING_METHOD_VARIATE (8262)
 	;
 	
 	private final int id;
