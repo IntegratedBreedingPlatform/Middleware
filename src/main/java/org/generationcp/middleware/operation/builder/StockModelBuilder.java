@@ -11,12 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.StockModel;
 
 public class StockModelBuilder extends Builder {
@@ -32,6 +36,35 @@ public class StockModelBuilder extends Builder {
 			stockModel = getStockDao().getById(stockId);
 		}
 		return stockModel;
+	}
+
+	public Map<Integer, StockModel> get(List<Integer> stockIds) throws MiddlewareQueryException {
+		 Map<Integer, StockModel> stockModels = new HashMap<Integer, StockModel>();
+		 
+		 List<Integer> positiveIds = new ArrayList<Integer>();
+		 List<Integer> negativeIds = new ArrayList<Integer>();
+		 
+		 for (Integer stockId : stockIds){
+			 if (stockId >= 0) {
+				 positiveIds.add(stockId);
+			 } else {
+				 negativeIds.add(stockId);
+			 }
+		 }
+		 
+		 StockDao dao = getStockDao();
+		 
+		 if (!positiveIds.isEmpty()){
+			 setWorkingDatabase(Database.CENTRAL);
+			 stockModels.putAll(dao.getStocksByIds(positiveIds));
+		 }
+		 
+		 if (!negativeIds.isEmpty()){
+			 setWorkingDatabase(Database.LOCAL);
+			 stockModels.putAll(dao.getStocksByIds(negativeIds));
+		 }
+
+		return stockModels;
 	}
 	
 	public Map<String, Integer> getStockMapForDataset(int datasetId) throws MiddlewareQueryException {
