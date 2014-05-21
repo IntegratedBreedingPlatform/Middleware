@@ -14,7 +14,9 @@ package org.generationcp.middleware.domain.dms;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
@@ -26,9 +28,15 @@ public class VariableTypeList implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private List<VariableType> variableTypes = new ArrayList<VariableType>();
+	private Map<String, VariableType> idVarTypeMap = new HashMap();
+	private Map<String, VariableType> nameVarTypeMap = new HashMap();
 	
 	public void add(VariableType variableType) {
 		variableTypes.add(variableType);
+		
+			idVarTypeMap.put(Integer.toString(variableType.getId()), variableType);
+		if(variableType.getLocalName() != null)
+			nameVarTypeMap.put(variableType.getLocalName(), variableType);
 	}
 	
 	public void addAll(VariableTypeList variableTypes) {
@@ -36,6 +44,11 @@ public class VariableTypeList implements Serializable{
 			if (findByLocalName(variableType.getLocalName()) == null) {
 //			if (findById(variableType.getId()) == null) { //causing an error bec some templates have multiple variables with same id (erroneous template, but..
 		        this.variableTypes.add(variableType);
+		        
+		        	idVarTypeMap.put(Integer.toString(variableType.getId()), variableType);
+				if(variableType.getLocalName() != null)
+					nameVarTypeMap.put(variableType.getLocalName(), variableType);
+				
 			}
 		}
 	}
@@ -45,6 +58,12 @@ public class VariableTypeList implements Serializable{
 	}
 		
     public VariableType findById(int id) {
+    	
+    	//added for optimization
+    	if(idVarTypeMap != null && idVarTypeMap.get(Integer.toString(id)) != null){
+    		return idVarTypeMap.get(Integer.toString(id));
+    	}
+    	
 		if (variableTypes != null) {
 			for (VariableType variableType : variableTypes) {
 				if (variableType.getId() == id) {
@@ -56,6 +75,12 @@ public class VariableTypeList implements Serializable{
 	}
     
     public VariableType findByLocalName(String localName) {
+    	
+    	//added for optimization
+    	if(nameVarTypeMap != null && nameVarTypeMap.get(localName) != null){
+    		return nameVarTypeMap.get(localName);
+    	}
+    	
     	if (variableTypes != null) {
 			for (VariableType variableType : variableTypes) {
 				if (variableType.getLocalName().equals(localName)) {
