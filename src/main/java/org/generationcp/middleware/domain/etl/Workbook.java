@@ -745,5 +745,15 @@ public class Workbook {
 		this.exportArrangedObservations = exportArrangedObservations;
 	}
 	
+	public String getStudyName() {
+		if (getStudyConditions() != null) {
+			for (MeasurementVariable condition : getStudyConditions()) {
+				if (condition.getTermId() == TermId.STUDY_NAME.getId()) {
+					return condition.getValue();
+				}
+			}
+		}
+		return null;
+	}
 	
 }

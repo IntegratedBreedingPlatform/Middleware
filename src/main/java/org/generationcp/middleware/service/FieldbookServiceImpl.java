@@ -233,6 +233,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         try {
             trans = session.beginTransaction();
             
+            getWorkbookSaver().saveWorkbookVariables(workbook);
+            
             saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
