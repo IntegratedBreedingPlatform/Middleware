@@ -1,6 +1,7 @@
 package org.generationcp.middleware.operation.saver;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -77,5 +78,13 @@ public class GeolocationPropertySaver extends Saver {
 			}
 		}
 		return null;
+	}
+
+	public void saveOrUpdateByProject(int projectId, int typeId, String value) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		Set<Integer> geolocations = getGeolocationDao().getLocationIds(projectId);
+		if (geolocations != null && !geolocations.isEmpty()) {
+			saveOrUpdate(geolocations.iterator().next(), typeId, value);
+		}
 	}
 }

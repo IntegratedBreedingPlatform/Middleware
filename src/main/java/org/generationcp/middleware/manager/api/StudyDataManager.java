@@ -697,7 +697,7 @@ public interface StudyDataManager{
      * @return the int
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException;
+    int countPlotsWithPlantsSelectedofDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException;
     
     /**
      * Gets the geolocation prop value.

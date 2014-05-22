@@ -544,7 +544,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return getUserDataManager().getAllPersons();
     }
     
-    public int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException {
+    public int countPlotsWithPlantsSelectedofNursery(int nurseryId, List<Integer> variateIds) throws MiddlewareQueryException {
         StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
         
         int dataSetId = 0;
@@ -568,7 +568,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             }
         }
         
-        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
+        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId, variateIds);
     }
     
     @Override

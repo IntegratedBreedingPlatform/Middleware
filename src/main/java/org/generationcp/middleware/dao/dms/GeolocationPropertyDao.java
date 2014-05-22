@@ -110,8 +110,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
    	public void deleteGeolocationPropertyValueInProject(int studyId, int termId) throws MiddlewareQueryException {
   		try {
   			StringBuilder sql = new StringBuilder()
-  				.append("DELETE FROM nd_geolocationprop gp ")
-  				.append(" WHERE gp.nd_geolocation_id IN ( ")
+  				.append("DELETE FROM nd_geolocationprop  ")
+  				.append(" WHERE nd_geolocation_id IN ( ")
   				.append("   SELECT e.nd_geolocation_id ")
   				.append("   FROM nd_experiment e ")
   				.append("   INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")

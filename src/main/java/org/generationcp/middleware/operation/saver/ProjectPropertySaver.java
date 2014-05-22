@@ -181,23 +181,28 @@ public class ProjectPropertySaver extends Saver {
 		
 		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			int datasetRank = getNextRank(trialDataset);
+			int measurementRank = getNextRank(measurementDataset);
 			insertVariable(project, variable, rank);
 			insertVariable(trialDataset, variable, datasetRank);
-			insertVariable(measurementDataset, variable, datasetRank);
+			insertVariable(measurementDataset, variable, measurementRank);
+			getGeolocationPropertySaver().saveOrUpdateByProject(project.getProjectId(), variable.getTermId(), variable.getValue());
 		}
 		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
-			int datasetRank = getNextRank(measurementDataset);
 			if (isConstant) {
 				insertVariable(project, variable, rank);
 			}
 			else {
-				insertVariable(measurementDataset, variable, datasetRank);
+				int measurementRank = getNextRank(measurementDataset);
+				insertVariable(measurementDataset, variable, measurementRank);
 			}
 		}
 		else { //study
 			insertVariable(project, variable, rank);
+			VariableList variableList = new VariableList();
+			variableList.add(new Variable(createVariableType(variable, rank), variable.getValue()));
+			saveProjectPropValues(project.getProjectId(), variableList);
 		}
 	}
 	private void insertVariable(DmsProject project, MeasurementVariable variable, int rank) throws MiddlewareQueryException {
@@ -253,6 +258,9 @@ public class ProjectPropertySaver extends Saver {
 					}
 					getProjectPropertyDao().update(property);
 				}
+			}
+			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+				getGeolocationPropertySaver().saveOrUpdateByProject(project.getProjectId(), variable.getTermId(), variable.getValue());
 			}
 		}
 	}

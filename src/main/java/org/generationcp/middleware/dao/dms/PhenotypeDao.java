@@ -717,20 +717,22 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 	
-	public int countPlantsSelectedOfNursery(Integer projectId) throws MiddlewareQueryException {
+	public int countPlantsSelectedOfNursery(Integer projectId, List<Integer> variateIds) throws MiddlewareQueryException {
 	    try {
 	        
+	    	if (variateIds != null && !variateIds.isEmpty()) {
                 StringBuilder sql = new StringBuilder();
 
                 sql.append("SELECT COUNT(p.phenotype_id) FROM phenotype p ")
                    .append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
                    .append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
-                   .append("WHERE e.project_id = :projectId AND p.observable_id = :observableId AND p.value <> ''");
+                   .append("WHERE e.project_id = :projectId AND p.observable_id IN (:variateIds) AND p.value <> ''");
                 Query query = getSession().createSQLQuery(sql.toString())
                         .setParameter("projectId", projectId)
-                        .setParameter("observableId", TermId.PLANTS_SELECTED.getId());
+                        .setParameter("variateIds", variateIds);
         
                 return ((BigInteger) query.uniqueResult()).intValue();
+	    	}
 	    } catch (HibernateException e) {
 	            logAndThrowException(
 	                    "Error at countPlantsSelectedOfNursery() query on PhenotypeDao: "
@@ -761,13 +763,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public void deletePhenotypesInProjectByTerm(List<Integer> ids, int termId) throws MiddlewareQueryException {
 		try {
 			StringBuilder sql = new StringBuilder()
-				.append("DELETE FROM phenotype ph ")
-				.append(" WHERE ph.phenotype_id IN ( ")
+				.append("DELETE FROM phenotype ")
+				.append(" WHERE phenotype_id IN ( ")
 				.append(" SELECT eph.phenotype_id ")
 				.append(" FROM nd_experiment_phenotype eph ")
 				.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
 				.append(" AND ep.project_id IN (:ids)) ")
-				.append(" AND ph.observable_id = :termId ");
+				.append(" AND observable_id = :termId ");
 
   			SQLQuery query = getSession().createSQLQuery(sql.toString());
   			query.setParameter("ids", ids);
