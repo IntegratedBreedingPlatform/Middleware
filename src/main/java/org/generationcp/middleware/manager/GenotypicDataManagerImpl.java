@@ -2579,6 +2579,31 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             logAndThrowException("Error in GenotypicDataManager.addMTA: " + e.getMessage(), e);
         }
     }
+    
+    @Override
+    public void deleteMTA(List<Integer> datasetIds) throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            for (Integer datasetId : datasetIds){
+            	
+	            //delete mta, dataset users and dataset
+            	getMtaDao().deleteByDatasetId(datasetId);
+	            getDatasetUsersDao().deleteByDatasetId(datasetId);
+	            getDatasetDao().deleteByDatasetId(datasetId);
+            }
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete MTAs and Dataset: GenotypicDataManager.deleteMTA(datasetIds="
+                    + datasetIds + "):  " + e.getMessage(), e);
+        }
+
+    	
+    }
 
 
     // --------------------------------- COMMON SAVER METHODS ------------------------------------------//

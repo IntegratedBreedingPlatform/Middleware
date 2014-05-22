@@ -2042,6 +2042,22 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
     
     @Test
+    public void testDeleteMTA() throws Exception {
+    	List<Mta> mtas = manager.getAllMTAs();
+    	
+    	if (mtas != null && !mtas.isEmpty()){
+    		
+    		List<Integer> datasetIds = new ArrayList<Integer>();
+    		datasetIds.add(mtas.get(0).getDatasetId());
+    		manager.deleteMTA(datasetIds);
+    		Debug.println(INDENT, "datasetId deleted = " + datasetIds);
+    		
+    	}
+    	
+    	
+    }
+    
+    @Test
     public void testGetDartMarkerDetails() throws Exception {
     	List<Integer> markerIds = Arrays.asList(-1, -2);
         List<DartValues> result = manager.getDartMarkerDetails(markerIds);
