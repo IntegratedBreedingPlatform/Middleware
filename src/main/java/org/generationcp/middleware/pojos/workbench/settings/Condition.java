@@ -2,6 +2,8 @@ package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.manager.Operation;
+
 public class Condition  implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -16,6 +18,7 @@ public class Condition  implements Serializable {
 	private Integer dataTypeId;
 	private Double minRange;
 	private Double maxRange;
+	private Operation operation;
 	
 	public Condition(){
 		super();
@@ -110,5 +113,19 @@ public class Condition  implements Serializable {
 	public void setMaxRange(Double maxRange) {
 		this.maxRange = maxRange;
 	}
+
+    /**
+     * @return the operation
+     */
+    public Operation getOperation() {
+        return operation;
+    }
+
+    /**
+     * @param operation the operation to set
+     */
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
 
 }

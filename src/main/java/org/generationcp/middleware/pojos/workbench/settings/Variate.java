@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.manager.Operation;
 
 public class Variate  implements Serializable {
 
@@ -19,6 +20,7 @@ public class Variate  implements Serializable {
 	private List<ValueReference> possibleValues;
 	private Double minRange;
 	private Double maxRange;
+	private Operation operation;
 	
 	public Variate(){
 		super();
@@ -139,5 +141,19 @@ public class Variate  implements Serializable {
 	public void setMaxRange(Double maxRange) {
 		this.maxRange = maxRange;
 	}
+
+    /**
+     * @return the operation
+     */
+    public Operation getOperation() {
+        return operation;
+    }
+
+    /**
+     * @param operation the operation to set
+     */
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
 
  }

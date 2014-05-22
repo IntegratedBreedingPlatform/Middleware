@@ -46,6 +46,8 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.util.TimerWatch;
 
 public class WorkbookBuilder extends Builder {
 	
@@ -62,7 +64,7 @@ public class WorkbookBuilder extends Builder {
 	
 	public Workbook create(int id, StudyType studyType) throws MiddlewareQueryException {
 		boolean isTrial = studyType == StudyType.T;
-		
+		//TimerWatch watch = new TimerWatch("Workbook create 1");
 		Workbook workbook = new Workbook();
 		
 		/*
@@ -79,16 +81,25 @@ public class WorkbookBuilder extends Builder {
                  * */
 		
 		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
+		
 		Study study = getStudyBuilder().createStudy(id);
+		//watch.stop();
 		
 		int dataSetId = getMeasurementDataSetId(id, studyDetails.getStudyName());
 		workbook.setMeasurementDatesetId(dataSetId);
+		//watch.stop();
 		
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
-		
-		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
 		VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
+		//watch.stop();
+		//List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
+		//for optimization
+		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount, variables);
 		
+		//watch.stop();
+		//watch.stop();
+		
+		//watch = new TimerWatch("Workbook create 2");
 		VariableList conditionVariables = null, constantVariables = null;
 		if (isTrial) {
 			conditionVariables = new VariableList();
@@ -110,6 +121,8 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementVariable> factors = buildFactors(experiments, isTrial);
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false);
 		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
+		
+		//watch.stop();
 		
 		//set possible values of breeding method
 		for (MeasurementVariable variable : variates) {
@@ -134,7 +147,7 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementRow> trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
 		workbook.setTrialObservations(trialObservations);
 		//}
-		
+		//watch.stop();
 		return workbook;
 	}
 	
