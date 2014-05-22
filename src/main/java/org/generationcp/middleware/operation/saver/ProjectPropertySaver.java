@@ -181,19 +181,20 @@ public class ProjectPropertySaver extends Saver {
 		
 		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			int datasetRank = getNextRank(trialDataset);
+			int measurementRank = getNextRank(measurementDataset);
 			insertVariable(project, variable, rank);
 			insertVariable(trialDataset, variable, datasetRank);
-			insertVariable(measurementDataset, variable, datasetRank);
+			insertVariable(measurementDataset, variable, measurementRank);
 		}
 		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
-			int datasetRank = getNextRank(measurementDataset);
 			if (isConstant) {
 				insertVariable(project, variable, rank);
 			}
 			else {
-				insertVariable(measurementDataset, variable, datasetRank);
+				int measurementRank = getNextRank(measurementDataset);
+				insertVariable(measurementDataset, variable, measurementRank);
 			}
 		}
 		else { //study
