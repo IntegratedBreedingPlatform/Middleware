@@ -86,8 +86,11 @@ public class DatabaseConnectionParameters{
         }
 
         String driverName = prop.getProperty(key + ".driverName", null);
+        if (driverName == null) {
+            driverName = "com.mysql.jdbc.Driver";
+        }
 
-        String url = prop.getProperty(key + ".url", null);
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + dbname;
 
         this.host = host;
         this.port = port;

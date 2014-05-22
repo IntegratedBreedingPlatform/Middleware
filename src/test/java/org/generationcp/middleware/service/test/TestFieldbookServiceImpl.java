@@ -384,7 +384,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
     public void testGetAllPersons() throws MiddlewareQueryException {
             List<Person> persons = fieldbookService.getAllPersons();
             Debug.printObjects(INDENT, persons);
-            Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(-146));
+            //Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(-146));
     }
     
     @Test
@@ -392,7 +392,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
         workbook.print(INDENT);
         int id = dataImportService.saveDataset(workbook);
-        Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
+        //Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
     }
     
     @Test
