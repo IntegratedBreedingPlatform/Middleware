@@ -2,6 +2,7 @@ package org.generationcp.middleware.pojos.mbdt;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,6 +46,9 @@ public class MBDTProjectData implements Serializable {
 
     @Column(name = "institute")
     private String institute;
+
+    @OneToMany(targetEntity = MBDTGeneration.class, mappedBy = "project", fetch = FetchType.LAZY)
+    private List<MBDTGeneration> generations;
 
 
     public MBDTProjectData() {

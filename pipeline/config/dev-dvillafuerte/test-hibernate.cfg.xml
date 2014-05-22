@@ -109,7 +109,14 @@
         <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProject"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
+
+        <!--MBDT ITEMS-->
+
         <mapping class="org.generationcp.middleware.pojos.mbdt.MBDTProjectData"/>
+        <mapping class="org.generationcp.middleware.pojos.mbdt.MBDTGeneration"/>
+        <mapping class="org.generationcp.middleware.pojos.mbdt.SelectedGenotype"/>
+        <mapping class="org.generationcp.middleware.pojos.mbdt.SelectedMarker"/>
+
 
     </session-factory>
 </hibernate-configuration>

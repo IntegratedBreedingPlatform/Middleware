@@ -1,7 +1,11 @@
 package org.generationcp.middleware.manager.api;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.mbdt.MBDTGeneration;
 import org.generationcp.middleware.pojos.mbdt.MBDTProjectData;
+import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,4 +16,14 @@ public interface MBDTDataManager {
     public Integer setProjectData(MBDTProjectData projectData) throws MiddlewareQueryException;
 
     public MBDTProjectData getProjectData(Integer projectID) throws MiddlewareQueryException;
+
+    public MBDTGeneration addGeneration(Integer projectID, String generationName, Integer datasetID) throws MiddlewareQueryException;
+
+    public MBDTGeneration getGeneration(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
+
+    public void setSelectedMarkers(Integer projectID, Integer datasetID, List<Integer> markerIDs) throws MiddlewareQueryException;
+
+    public List<Integer> getSelectedMarkers(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
+
+    public List<SelectedGenotype> getSelectedAccession(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
 }
