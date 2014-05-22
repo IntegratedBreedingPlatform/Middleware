@@ -59,6 +59,8 @@ import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
+import org.generationcp.middleware.pojos.gdms.TrackData;
+import org.generationcp.middleware.pojos.gdms.TrackMarker;
 
 /**
  * This is the API for retrieving and storing genotypic data.
@@ -2173,6 +2175,16 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Marker> getSNPsByHaplotype(String haplotype) throws MiddlewareQueryException;
+    
+    // GCP-8566
+    /**
+     * Adds the haplotype.
+     *
+     * @param trackData the track data
+     * @param trackMarkers the track markers
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void addHaplotype(TrackData trackData,  List<TrackMarker> trackMarkers) throws MiddlewareQueryException;
 
     // GCP-7881
     /**

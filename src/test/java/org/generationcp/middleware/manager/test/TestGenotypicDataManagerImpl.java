@@ -62,6 +62,8 @@ import org.generationcp.middleware.pojos.gdms.QtlDataElement;
 import org.generationcp.middleware.pojos.gdms.QtlDataRow;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
+import org.generationcp.middleware.pojos.gdms.TrackData;
+import org.generationcp.middleware.pojos.gdms.TrackMarker;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
@@ -1748,6 +1750,29 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         Debug.println("testGetSNPsByHaplotype(" + haplotype + ") Results: ");
         Debug.printObjects(INDENT, results);
     }
+    
+    
+    @Test
+    public void testAddHaplotype() throws Exception {
+    	
+    	TrackData trackData = new TrackData(null, "TEST Track Data", 1);
+    	
+    	List<TrackMarker> trackMarkers = new ArrayList<TrackMarker>();
+    	trackMarkers.add(new TrackMarker(null, null, 1, 1));
+    	trackMarkers.add(new TrackMarker(null, null, 2, 2));
+    	trackMarkers.add(new TrackMarker(null, null, 3, 3));
+    	
+    	manager.addHaplotype(trackData, trackMarkers);
+    	
+    	// INSERT INTO gdms_track_data(track_id, track_name, user_id) VALUES (generatedTrackId, haplotype, userId);
+    	// INSERT INTO gdms_track_markers(tmarker_id, track_id, marker_id, marker_sample_id) 
+    	//    VALUES (generatedTrackId, generatedTrackId, markerId, markerSampleId);
+        
+    	Debug.println(INDENT, "Added:");
+    	Debug.printObject(INDENT * 2, trackData);
+    	Debug.printObjects(INDENT*2, trackMarkers);
+    }
+
 
     @Test
     public void testCountAllMaps() throws Exception {

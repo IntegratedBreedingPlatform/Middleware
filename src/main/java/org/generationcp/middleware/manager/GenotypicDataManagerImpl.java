@@ -82,6 +82,8 @@ import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
+import org.generationcp.middleware.pojos.gdms.TrackData;
+import org.generationcp.middleware.pojos.gdms.TrackMarker;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Session;
@@ -3206,6 +3208,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 , "getMarkerIDsByHaplotype", new Object[]{haplotype}, new Class[]{String.class});
         return getAllFromCentralAndLocalByMethod(getMarkerDao()
                 , "getMarkersByIdsAndType", new Object[]{markerIds, GdmsType.TYPE_SNP.getValue()}, new Class[]{List.class, String.class});
+    }
+    
+    // GCP-8566
+    @Override
+    public void addHaplotype(TrackData trackData,  List<TrackMarker> trackMarkers) throws MiddlewareQueryException{
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            trackData.setTrackId(getTrackDataDao().getNegativeId("trackId"));
+            getTrackDataDao().save(trackData);
+            
+            for (TrackMarker trackMarker : trackMarkers){
+            	trackMarker.setTrackId(trackData.getTrackId());
+            	trackMarker.setTrackMarkerId(getTrackMarkerDao().getNegativeId("trackMarkerId"));
+                getTrackMarkerDao().save(trackMarker);
+            }
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error in GenotypicDataManager.addHaplotype(trackData=" + trackData 
+            		+ ", trackMarkers=" + trackMarkers + "): " + e.getMessage(), e);
+        }
+    	
     }
 
     // GCP-7881

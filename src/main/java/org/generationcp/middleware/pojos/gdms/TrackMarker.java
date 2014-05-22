@@ -26,7 +26,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "gdms_track_markers")
-public class TrackMarkers implements Serializable{
+public class TrackMarker implements Serializable{
 
     private static final long serialVersionUID = 1L;   
     
@@ -43,10 +43,10 @@ public class TrackMarkers implements Serializable{
 	@Column(name = "marker_sample_id")
 	private Integer markerSampleId;
 
-	public TrackMarkers(){
+	public TrackMarker(){
 	}
 	
-	public TrackMarkers(Integer trackMarkerId, Integer trackId,
+	public TrackMarker(Integer trackMarkerId, Integer trackId,
 			Integer markerId, Integer markerSampleId) {
 		this.trackMarkerId = trackMarkerId;
 		this.trackId = trackId;
@@ -108,7 +108,7 @@ public class TrackMarkers implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TrackMarkers other = (TrackMarkers) obj;
+		TrackMarker other = (TrackMarker) obj;
 		if (markerId == null) {
 			if (other.markerId != null)
 				return false;
