@@ -21,6 +21,8 @@ public class Variate  implements Serializable {
 	private Double minRange;
 	private Double maxRange;
 	private Operation operation;
+	private int id;
+	private int storedIn;
 	
 	public Variate(){
 		super();
@@ -154,6 +156,34 @@ public class Variate  implements Serializable {
      */
     public void setOperation(Operation operation) {
         this.operation = operation;
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the storedIn
+     */
+    public int getStoredIn() {
+        return storedIn;
+    }
+
+    /**
+     * @param storedIn the storedIn to set
+     */
+    public void setStoredIn(int storedIn) {
+        this.storedIn = storedIn;
     }
 
  }
