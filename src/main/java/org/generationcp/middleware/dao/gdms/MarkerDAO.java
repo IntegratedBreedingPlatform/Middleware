@@ -1108,6 +1108,24 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         return null;
     }
     
+    public List<String> getMarkerNamesByIds(List<Integer> markerIds) throws MiddlewareQueryException {
+        if ((markerIds == null) || (markerIds.isEmpty())) {
+            return new ArrayList<String>();
+        }
+
+        try {
+        	StringBuffer sql = new StringBuffer()
+        		.append("SELECT marker_name FROM gdms_marker WHERE marker_id IN (:markerIds) ");
+        	
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+            query.setParameterList("markerIds", markerIds);
+            return query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkerNamesByIds() query from Marker: " + e.getMessage(), e);
+        }
+        return new ArrayList<String>();
+    }
+    
 /*    @SuppressWarnings("rawtypes")
     public Set<Integer> getMarkersByMarkerIDs(List<Integer> markerIDs, int start, int numOfRows) throws MiddlewareQueryException{
         try {

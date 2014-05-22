@@ -191,9 +191,27 @@ public interface GenotypicDataManager{
      * @return the marker on maps
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, 
+    List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, 
     		double startPosition, double endPosition)  throws MiddlewareQueryException;
 
+    //GCP-8571
+    /**
+     * Gets the markers on map by marker ids.
+     *
+     * @param markerIds the marker ids
+     * @return the markers on map by marker ids
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<MarkerOnMap> getMarkersOnMapByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
+
+    //GCP-8573
+    /**
+     * Gets the all marker names from markers on map.
+     *
+     * @return the all marker names from markers on map
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<String> getAllMarkerNamesFromMarkersOnMap() throws MiddlewareQueryException;
     
     /**
      * Counts all the dataset names.

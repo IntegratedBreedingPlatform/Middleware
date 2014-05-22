@@ -273,15 +273,28 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     
     
     //GCP-8572
+    @Override
     public List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, double startPos, double endPos)  
     		throws MiddlewareQueryException{
-    	List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
-    	//TODO
-    	markersOnMap = super.getAllFromCentralAndLocalByMethod(getMarkerOnMapDao(), "getMarkersOnMap", 
+    	return super.getAllFromCentralAndLocalByMethod(getMarkerOnMapDao(), "getMarkersOnMap", 
     			new Object[]{mapIds, linkageGroup, startPos, endPos}, 
     			new Class[]{List.class, String.class, Double.TYPE, Double.TYPE});
+    }
 
-    	return markersOnMap;
+    //GCP-8571
+    @Override
+    public List<MarkerOnMap> getMarkersOnMapByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
+    	return super.getAllFromCentralAndLocalByMethod(getMarkerOnMapDao(), "getMarkersOnMapByMarkerIds", 
+    			new Object[]{markerIds}, new Class[]{List.class});
+    }
+    
+    //GCP-8573
+    @Override
+    public List<String> getAllMarkerNamesFromMarkersOnMap() throws MiddlewareQueryException {
+    	List<Integer> markerIds = super.getAllFromCentralAndLocalByMethod(getMarkerOnMapDao(), "getAllMarkerIds", 
+    			new Object[]{}, new Class[]{});
+    	return super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getMarkerNamesByIds", 
+    			new Object[]{markerIds}, new Class[]{List.class});
     }
     
     
@@ -523,7 +536,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<AllelicValueElement> getAllelicValuesByGid(Integer targetGID) throws MiddlewareQueryException {
-            List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
             List<Integer> inputList = new ArrayList<Integer>();
             inputList.add(targetGID);
 
