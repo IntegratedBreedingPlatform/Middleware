@@ -581,13 +581,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Integer>) super.getFromInstanceByIdAndMethod(getCharValuesDao(), markerId, "getGIDsByMarkerId",
-                new Object[]{markerId, start, numOfRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+    	List<String> methods = new ArrayList<String>(Arrays.asList("countGIDsByMarkerId", "getGIDsByMarkerId"));
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getCharValuesDao(), methods, start, numOfRows,
+                new Object[]{markerId}, new Class[]{Integer.class});
     }
-
+    
     @Override
     public long countGIDsFromCharValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getCharValuesDao(), markerId, "countGIDsByMarkerId", new Object[]{markerId},
+        return super.countAllFromCentralAndLocalByMethod(getCharValuesDao(), "countGIDsByMarkerId", new Object[]{markerId},
                 new Class[]{Integer.class});
     }
 

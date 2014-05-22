@@ -351,7 +351,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetMarkerNamesByMarkerType() throws Exception {
         String markerType = "asdf";
-        List<String> markerNames = manager.getMarkerNamesByMarkerType(markerType, 1, 10);
+        List<String> markerNames = manager.getMarkerNamesByMarkerType(markerType, 0, 10);
         Debug.println("testGetMarkerNamesByMarkerType(" + markerType + ") RESULTS: " + markerNames);
     }
 
@@ -392,7 +392,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetGidsFromCharValuesByMarkerId() throws Exception {
         Integer markerId = 1;
-        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(markerId, 1, 10);
+        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(markerId, 0, 10);
         Debug.println("testGetGidsFromCharValuesByMarkerId(" + markerId + ") RESULTS: " + gids);
     }
 
@@ -406,7 +406,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetGidsFromAlleleValuesByMarkerId() throws Exception {
         Integer markerId = 1;
-        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(markerId, 1, 10);
+        List<Integer> gids = manager.getGIDsFromAlleleValuesByMarkerId(markerId, 0, 10);
         Debug.println("testGetGidsFromAlleleValuesByMarkerId(" + markerId + ") RESULTS: " + gids);
     }
 
@@ -420,7 +420,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetGidsFromMappingPopValuesByMarkerId() throws Exception {
         Integer markerId = 1;
-        List<Integer> gids = manager.getGIDsFromMappingPopValuesByMarkerId(markerId, 1, 10);
+        List<Integer> gids = manager.getGIDsFromMappingPopValuesByMarkerId(markerId, 0, 10);
         Debug.println("testGetGidsFromMappingPopValuesByMarkerId(" + markerId + ") RESULTS: " + gids);
     }
     
@@ -459,7 +459,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllDbAccessionIdsFromMarker() throws Exception {
-        List<String> dbAccessionIds = manager.getAllDbAccessionIdsFromMarker(1, 10);
+        List<String> dbAccessionIds = manager.getAllDbAccessionIdsFromMarker(0, 10);
         Debug.println("testGetAllDbAccessionIdsFromMarker(1,10) RESULTS: " + dbAccessionIds);
     }
 
