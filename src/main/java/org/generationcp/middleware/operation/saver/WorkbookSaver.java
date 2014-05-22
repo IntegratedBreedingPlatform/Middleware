@@ -755,7 +755,7 @@ public class WorkbookSaver extends Saver {
 			List<DmsProject> datasets = getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
 			if (datasets != null) {
 				for (DmsProject dataset : datasets) {
-					if (dataset.getProjectId() != measurementDatasetId) {
+					if (!dataset.getProjectId().equals(measurementDatasetId)) {
 						trialDatasetId = dataset.getProjectId();
 						break;
 					}

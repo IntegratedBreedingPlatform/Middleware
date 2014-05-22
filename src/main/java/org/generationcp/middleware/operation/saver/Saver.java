@@ -128,4 +128,9 @@ public abstract class Saver extends DatabaseBroker{
     protected final WorkbookBuilder getWorkbookBuilder() {
         return new WorkbookBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+
+    protected final GeolocationPropertySaver getGeolocationPropertySaver() {
+    	return new GeolocationPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }
