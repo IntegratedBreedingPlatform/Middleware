@@ -58,7 +58,7 @@ public class MarkerOnMap implements Serializable{
     }
 
     public MarkerOnMap(Integer markerOnMapId, Integer mapId, Integer markerId, Float startPosition, Float endPosition, String linkageGroup) {
-        super();
+        this.markerOnMapId = markerOnMapId;
         this.mapId = mapId;
         this.markerId = markerId;
         this.startPosition = startPosition;

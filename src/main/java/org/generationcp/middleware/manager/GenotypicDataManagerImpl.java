@@ -269,6 +269,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return mapInfoList;
     }
     
+    
+    //GCP-8572
+    public List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, double startPos, double endPos)  
+    		throws MiddlewareQueryException{
+    	List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
+    	//TODO
+    	markersOnMap = super.getAllFromCentralAndLocalByMethod(getMarkerOnMapDao(), "getMarkersOnMap", 
+    			new Object[]{mapIds, linkageGroup, startPos, endPos}, 
+    			new Class[]{List.class, String.class, Double.TYPE, Double.TYPE});
+
+    	return markersOnMap;
+    }
+    
+    
     @Override
     public long countDatasetNames(Database instance) throws MiddlewareQueryException {
         return super.countFromInstanceByMethod(getDatasetDao(), instance, "countByName", new Object[]{}, new Class[]{});
