@@ -747,6 +747,7 @@ public class WorkbookSaver extends Saver {
 		setWorkingDatabase(Database.LOCAL);
 		getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(), 
 				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
+		setWorkingDatabase(Database.LOCAL);
 		DmsProject study = getDmsProjectDao().getById(workbook.getStudyDetails().getId());
 		Integer trialDatasetId = workbook.getTrialDatasetId(), measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
