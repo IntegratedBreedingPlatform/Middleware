@@ -48,11 +48,11 @@ public class ExperimentPhenotypeDao extends GenericDAO<ExperimentPhenotype, Inte
         try {
         	StringBuilder sql = new StringBuilder()
         		.append("DELETE FROM nd_experiment_phenotype ")
-        		.append(" WHERE eph.nd_experiment_id IN ( ")
+        		.append(" WHERE nd_experiment_id IN ( ")
         		.append(" SELECT ep.nd_experiment_id ")
         		.append(" FROM nd_experiment_project ep ")
         		.append(" WHERE ep.project_id IN (:ids)) ")
-        		.append(" AND eph.phenotype_id NOT IN (SELECT phenotype_id FROM phenotype) ");
+        		.append(" AND phenotype_id NOT IN (SELECT phenotype_id FROM phenotype) ");
 
         	SQLQuery query = getSession().createSQLQuery(sql.toString());
   			query.setParameter("ids", ids);
