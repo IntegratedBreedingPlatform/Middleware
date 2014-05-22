@@ -19,6 +19,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Mta;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -59,5 +60,22 @@ public class MtaDAO extends GenericDAO<Mta, Integer>{
         }
         return toReturn; 
     }
+    
+    public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
+        try {
+            this.flush();
+
+            SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_mta WHERE dataset_id = " + datasetId);
+            statement.executeUpdate();
+
+            this.flush();
+            this.clear();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in MtaDAO: " + e.getMessage(), e);
+        }
+    }
+
+
 
 }

@@ -2137,6 +2137,15 @@ public interface GenotypicDataManager{
      */
     void addMTA(Dataset dataset, Mta mta, DatasetUsers users) throws MiddlewareQueryException;
 
+    //GCP-8565
+    /**
+     * Delete mta.
+     *
+     * @param datasetIds the dataset ids
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteMTA(List<Integer> datasetIds) throws MiddlewareQueryException;
+    
     // GCP-7873
     /**
      * Gets the all snp markers.
