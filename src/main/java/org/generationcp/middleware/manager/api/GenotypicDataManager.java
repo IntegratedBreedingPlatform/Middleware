@@ -180,6 +180,21 @@ public interface GenotypicDataManager{
     List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) 
             throws MiddlewareQueryException;
     
+    //GCP-8572
+    /**
+     * Gets the marker on maps.
+     *
+     * @param mapIds the map ids
+     * @param linkageGroup the linkage group
+     * @param startPosition the start position
+     * @param endPosition the end position
+     * @return the marker on maps
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, 
+    		double startPosition, double endPosition)  throws MiddlewareQueryException;
+
+    
     /**
      * Counts all the dataset names.
      *

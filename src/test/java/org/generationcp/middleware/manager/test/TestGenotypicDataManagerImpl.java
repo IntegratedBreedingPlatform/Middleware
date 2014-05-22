@@ -171,6 +171,18 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
     
     @Test
+    public void testGetMarkerOnMaps() throws Exception {
+    	List<Integer> mapIds = Arrays.asList(-2, 2, 3, 4);
+    	String linkageGroup = "LG23";
+    	double startPos = 0d;
+    	double endPos = 100d;
+
+        List<MarkerOnMap> markersOnMap = manager.getMarkerOnMaps(mapIds, linkageGroup, startPos, endPos);
+
+        Debug.printObjects(INDENT, markersOnMap);
+    }
+    
+    @Test
     public void testCountDatasetNames() throws Exception {
         long results = manager.countDatasetNames(Database.LOCAL);
         Debug.println("testCountDatasetNames(Database.LOCAL) RESULTS: " + results);
