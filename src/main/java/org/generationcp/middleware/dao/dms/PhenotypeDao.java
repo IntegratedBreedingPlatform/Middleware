@@ -725,12 +725,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                 StringBuilder sql = new StringBuilder();
 
                 sql.append("SELECT COUNT(p.phenotype_id) FROM phenotype p ")
-                   .append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-                   .append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
-                   .append("WHERE e.project_id = :projectId AND p.observable_id IN (:variateIds) AND p.value <> ''");
-                Query query = getSession().createSQLQuery(sql.toString())
-                        .setParameter("projectId", projectId)
-                        .setParameter("variateIds", variateIds);
+                .append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+                .append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
+                .append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
+                for (int i = 0; i < variateIds.size(); i++) {
+                	if (i > 0) {
+                		sql.append(",");
+                	}
+                	sql.append(variateIds.get(i));
+                }
+                sql.append(") AND p.value <> ''");
+             Query query = getSession().createSQLQuery(sql.toString());
         
                 return ((BigInteger) query.uniqueResult()).intValue();
 	    	}

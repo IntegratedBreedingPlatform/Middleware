@@ -553,30 +553,31 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     public int countPlotsWithPlantsSelectedofNursery(int nurseryId, List<Integer> variateIds) throws MiddlewareQueryException {
-        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
+//        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
         
-        int dataSetId = 0;
+//        int dataSetId = 0;
+//        
+//        //get observation dataset
+//        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
+//        if (datasetRefList != null) {
+//            for (DatasetReference datasetRef : datasetRefList) {
+//                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
+//                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
+//                    dataSetId = datasetRef.getId();
+//                }
+//            }
+//        }
+//        
+//        //if not found in the list using the name, get dataset with Plot Data type
+//        if (dataSetId == 0) {
+//            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
+//            if (dataset != null){
+//                dataSetId = dataset.getId();
+//            }
+//        }
         
-        //get observation dataset
-        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
-        if (datasetRefList != null) {
-            for (DatasetReference datasetRef : datasetRefList) {
-                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
-                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
-                    dataSetId = datasetRef.getId();
-                }
-            }
-        }
-        
-        //if not found in the list using the name, get dataset with Plot Data type
-        if (dataSetId == 0) {
-            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
-            if (dataset != null){
-                dataSetId = dataset.getId();
-            }
-        }
-        
-        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId, variateIds);
+//        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId, variateIds);
+        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(nurseryId, variateIds);
     }
     
     @Override
