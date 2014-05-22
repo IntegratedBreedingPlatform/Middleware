@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
+ * Copyright (c) 2014, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
@@ -13,63 +13,61 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * POJO for gdms_marker_metadataset table.
- *
+ * POJO for the gdms_track_markers table.
+ * 
  * @author Joyce Avestro
+ * 
  */
 @Entity
-@Table(name = "gdms_marker_metadataset")
-public class MarkerMetadataSet implements Serializable{
+@Table(name = "gdms_track_markers")
+public class TrackMarkers implements Serializable{
 
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 1L;   
+    
     @Id
-    @Column(name = "marker_metadataset_id")
-    private Integer markerMetadataSetId;
+    @Column(name = "tmarker_id")
+    private Integer trackMarkerId;
     
-    @Basic(optional = false)
-    @Column(name = "dataset_id")
-    private Integer datasetId;
+	@Column(name = "track_id")
+	private Integer trackId;
+    		
+	@Column(name = "marker_id")
+	private Integer markerId;
+	
+	@Column(name = "marker_sample_id")
+	private Integer markerSampleId;
 
-    @Basic(optional = false)
-    @Column(name = "marker_id")
-    private Integer markerId;
-
-    @Column(name = "marker_sample_id")
-    private Integer markerSampleId;
-    
-    public MarkerMetadataSet() {
-    }
-
-	public MarkerMetadataSet(Integer markerMetadataSetId,
-			Integer datasetId, Integer markerId, Integer markerSampleId) {
-		this.markerMetadataSetId = markerMetadataSetId;
-		this.datasetId = datasetId;
+	public TrackMarkers(){
+	}
+	
+	public TrackMarkers(Integer trackMarkerId, Integer trackId,
+			Integer markerId, Integer markerSampleId) {
+		this.trackMarkerId = trackMarkerId;
+		this.trackId = trackId;
 		this.markerId = markerId;
 		this.markerSampleId = markerSampleId;
 	}
 
-	public Integer getMarkerMetadataSetId() {
-		return markerMetadataSetId;
+	public Integer getTrackMarkerId() {
+		return trackMarkerId;
 	}
 
-	public void setMarkerMetadataSetId(Integer markerMetadataSetId) {
-		this.markerMetadataSetId = markerMetadataSetId;
+	public void setTrackMarkerId(Integer trackMarkerId) {
+		this.trackMarkerId = trackMarkerId;
 	}
 
-	public Integer getDatasetId() {
-		return datasetId;
+	public Integer getTrackId() {
+		return trackId;
 	}
 
-	public void setDatasetId(Integer datasetId) {
-		this.datasetId = datasetId;
+	public void setTrackId(Integer trackId) {
+		this.trackId = trackId;
 	}
 
 	public Integer getMarkerId() {
@@ -93,15 +91,12 @@ public class MarkerMetadataSet implements Serializable{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((datasetId == null) ? 0 : datasetId.hashCode());
-		result = prime * result
 				+ ((markerId == null) ? 0 : markerId.hashCode());
-		result = prime
-				* result
-				+ ((markerMetadataSetId == null) ? 0 : markerMetadataSetId
-						.hashCode());
 		result = prime * result
 				+ ((markerSampleId == null) ? 0 : markerSampleId.hashCode());
+		result = prime * result + ((trackId == null) ? 0 : trackId.hashCode());
+		result = prime * result
+				+ ((trackMarkerId == null) ? 0 : trackMarkerId.hashCode());
 		return result;
 	}
 
@@ -113,26 +108,26 @@ public class MarkerMetadataSet implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		MarkerMetadataSet other = (MarkerMetadataSet) obj;
-		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+		TrackMarkers other = (TrackMarkers) obj;
 		if (markerId == null) {
 			if (other.markerId != null)
 				return false;
 		} else if (!markerId.equals(other.markerId))
 			return false;
-		if (markerMetadataSetId == null) {
-			if (other.markerMetadataSetId != null)
-				return false;
-		} else if (!markerMetadataSetId.equals(other.markerMetadataSetId))
-			return false;
 		if (markerSampleId == null) {
 			if (other.markerSampleId != null)
 				return false;
 		} else if (!markerSampleId.equals(other.markerSampleId))
+			return false;
+		if (trackId == null) {
+			if (other.trackId != null)
+				return false;
+		} else if (!trackId.equals(other.trackId))
+			return false;
+		if (trackMarkerId == null) {
+			if (other.trackMarkerId != null)
+				return false;
+		} else if (!trackMarkerId.equals(other.trackMarkerId))
 			return false;
 		return true;
 	}
@@ -140,16 +135,16 @@ public class MarkerMetadataSet implements Serializable{
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("MarkerMetadataSet [markerMetadataSetId=");
-		builder.append(markerMetadataSetId);
-		builder.append(", markerSampleId=");
-		builder.append(markerSampleId);
-		builder.append(", datasetId=");
-		builder.append(datasetId);
+		builder.append("TrackMarkers [trackMarkerId=");
+		builder.append(trackMarkerId);
+		builder.append(", trackId=");
+		builder.append(trackId);
 		builder.append(", markerId=");
 		builder.append(markerId);
+		builder.append(", markerSampleId=");
+		builder.append(markerSampleId);
 		builder.append("]");
 		return builder.toString();
 	}
-
+    
 }

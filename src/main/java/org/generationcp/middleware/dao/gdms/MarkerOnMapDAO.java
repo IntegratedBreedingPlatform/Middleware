@@ -118,11 +118,11 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
             // SELECT * FROM gdms_markers_onmap WHERE map_id = -2 ORDER BY linkage_group, start_position;
 
             StringBuilder sqlString = new StringBuilder()
-            .append("SELECT * FROM gdms_markers_onmap  ")
+            .append("SELECT markeronmap_id, map_id, marker_id, start_position, end_position, linkage_group ")
+            .append("FROM gdms_markers_onmap  ")
             .append("WHERE map_id = :mapId  ")
             .append("ORDER BY linkage_group, start_position ")
             ;
-        
             Query query = getSession().createSQLQuery(sqlString.toString());
             query.setParameter("mapId", mapId);
 
@@ -130,13 +130,14 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
             
             if (list != null && list.size() > 0) {
                 for (Object[] row : list){
-                    Integer mapId2 = (Integer) row[0];
-                    Integer markerId = (Integer) row[1];
-                    Double startPosition = (Double) row[2];
-                    Double endPosition = (Double) row[3];
-                    String linkageGroup = (String) row [4]; 
+                    Integer markerOnMapId = (Integer) row[0];
+                    Integer mapId2 = (Integer) row[1];
+                    Integer markerId = (Integer) row[2];
+                    Double startPosition = (Double) row[3];
+                    Double endPosition = (Double) row[4];
+                    String linkageGroup = (String) row [5]; 
                     
-                    markersOnMap.add(new MarkerOnMap(mapId2, markerId, startPosition.floatValue(), 
+                    markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, markerId, startPosition.floatValue(), 
                                             endPosition.floatValue(), linkageGroup));
 
                 }

@@ -19,9 +19,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 /**
  * POJO for allele_values table.
  *
@@ -33,100 +30,6 @@ public class CharValues implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    // For getMarkerNamesByGIds()
-    public static final String GET_CHAR_COUNT_BY_GID = 
-            "SELECT COUNT(*) " +
-            "FROM gdms_char_values " +
-            "WHERE gid IN (:gIdList)";
-
-    // For getGermplasmNamesByMarkerNames()
-    public static final String GET_CHAR_COUNT_BY_MARKER_ID = 
-            "SELECT COUNT(*) " +
-            "FROM gdms_char_values " +
-            "WHERE marker_id IN (:markerIdList)";
-    
-    // For getGermplasmNamesByMarkerNames()
-    public static final String GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
-            "SELECT n.nval, CONCAT(m.marker_name, '') " +  
-            "FROM names n JOIN gdms_char_values c ON n.gid = c.gid " +  
-            "           JOIN gdms_marker m ON c.marker_id = m.marker_id " +
-            "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " +
-            "ORDER BY n.nval, m.marker_name";
-    
-    // For getAllelicValues by gid and marker names
-    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
-            "SELECT DISTINCT " +
-                "gdms_char_values.gid, " +
-                "CONCAT(gdms_char_values.char_value, ''), " +
-                "CONCAT(gdms_marker.marker_name, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
-            "FROM gdms_char_values, " +
-                "gdms_marker " +
-            "WHERE gdms_char_values.marker_id = gdms_marker.marker_id " +
-                "AND gdms_char_values.gid IN (:gidList) " +
-                "AND gdms_char_values.marker_id IN (:markerIdList) " +
-            "ORDER BY gdms_char_values.gid DESC, gdms_marker.marker_name";
-    
-    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS =
-            "SELECT DISTINCT " +
-                    "gcv.gid, " +
-                    "gcv.marker_id, " +
-                "CONCAT(gcv.char_value, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
-            "FROM gdms_char_values gcv " +
-            "WHERE gcv.gid IN (:gidList) " +
-                "AND gcv.marker_id IN (:markerIdList) " +
-            "ORDER BY gcv.gid DESC ";
-    
-    public static final String GET_ALLELIC_VALUES_BY_GID_LOCAL = 
-            "SELECT DISTINCT " +
-                    "gdms_char_values.gid, " +
-                    "gdms_char_values.marker_id, " +
-                    "CONCAT(gdms_char_values.char_value, ''), " +
-                    "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
-            "FROM gdms_char_values " +
-            "WHERE gdms_char_values.gid IN (:gidList) " +
-            "ORDER BY gdms_char_values.gid ASC ";
-
-    // For getAllelicValues by datasetId
-    public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
-            "SELECT gid, marker_id,  CONCAT(char_value, '') " +
-            "FROM gdms_char_values " +
-            "WHERE dataset_id = :datasetId " +
-            "ORDER BY gid ASC, marker_id ASC";
-
-    public static final String COUNT_BY_DATASET_ID = 
-            "SELECT COUNT(*) " +
-            "FROM gdms_char_values " +
-            "WHERE dataset_id = :datasetId";
-    
-    public static final String GET_GIDS_BY_MARKER_ID = 
-            "SELECT DISTINCT gid " +
-            "FROM gdms_char_values " +
-            "WHERE marker_id = :markerId";
-    
-    public static final String COUNT_GIDS_BY_MARKER_ID = 
-            "SELECT COUNT(distinct gid) " +
-            "FROM gdms_char_values " +
-            "WHERE marker_id = :markerId";
-
-    public static final String COUNT_CHAR_VALUES_BY_GIDS = 
-            "SELECT COUNT(*) " +
-            "FROM gdms_char_values " +
-            "WHERE gid in (:gids)";
-    
-    public static final String GET_MARKER_IDS_BY_GIDS = 
-        "SELECT DISTINCT marker_id " +
-        "FROM gdms_char_values " +
-        "WHERE gid IN (:gids)";
-	
-    public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
-    		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') "
-    		+ "FROM gdms_char_values cv " 
-    		+ "WHERE  cv.marker_id IN (:markerIdList) " 
-    		+ "ORDER BY cv.gid DESC ";
-
-
     @Id
     @Basic(optional = false)
     @Column(name = "ac_id")
@@ -147,16 +50,23 @@ public class CharValues implements Serializable{
     @Column(name = "char_value")
     String charValue;
     
+    @Column(name = "marker_sample_id")
+    Integer markerSampleId;
+
+    @Column(name = "acc_sample_id")
+    Integer accSampleId;
+ 
     public CharValues() {
     }
 
-    public CharValues(Integer acId, Integer datasetId, Integer markerId, Integer gId, String charValue) {
-        super();
+    public CharValues(Integer acId, Integer datasetId, Integer markerId, Integer gId, String charValue, Integer markerSampleId, Integer accSampleId) {
         this.acId = acId;
         this.datasetId = datasetId;
         this.markerId = markerId;
         this.gId = gId;
         this.charValue = charValue;
+        this.markerSampleId = markerSampleId;
+        this.accSampleId = accSampleId;
     }
     
     public Integer getAcId() {
@@ -199,42 +109,107 @@ public class CharValues implements Serializable{
         this.charValue = charValue;
     }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(3, 139).append(acId).toHashCode();
+    public Integer getMarkerSampleId() {
+        return markerSampleId;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof CharValues)) {
-            return false;
-        }
-
-        CharValues rhs = (CharValues) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(acId, rhs.acId).isEquals();
+    public void setMarkerSampleId(Integer markerSampleId) {
+        this.markerSampleId = markerSampleId;
+    }
+    
+    public Integer getAccSampleId() {
+        return accSampleId;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("CharValues [acId=");
-        builder.append(acId);
-        builder.append(", datasetId=");
-        builder.append(datasetId);
-        builder.append(", markerId=");
-        builder.append(markerId);
-        builder.append(", gId=");
-        builder.append(gId);
-        builder.append(", charValue=");
-        builder.append(charValue);
-        builder.append("]");
-        return builder.toString();
+    public void setAccSampleId(Integer accSampleId) {
+        this.accSampleId = accSampleId;
     }
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((acId == null) ? 0 : acId.hashCode());
+		result = prime * result
+				+ ((accSampleId == null) ? 0 : accSampleId.hashCode());
+		result = prime * result
+				+ ((charValue == null) ? 0 : charValue.hashCode());
+		result = prime * result
+				+ ((datasetId == null) ? 0 : datasetId.hashCode());
+		result = prime * result + ((gId == null) ? 0 : gId.hashCode());
+		result = prime * result
+				+ ((markerId == null) ? 0 : markerId.hashCode());
+		result = prime * result
+				+ ((markerSampleId == null) ? 0 : markerSampleId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CharValues other = (CharValues) obj;
+		if (acId == null) {
+			if (other.acId != null)
+				return false;
+		} else if (!acId.equals(other.acId))
+			return false;
+		if (accSampleId == null) {
+			if (other.accSampleId != null)
+				return false;
+		} else if (!accSampleId.equals(other.accSampleId))
+			return false;
+		if (charValue == null) {
+			if (other.charValue != null)
+				return false;
+		} else if (!charValue.equals(other.charValue))
+			return false;
+		if (datasetId == null) {
+			if (other.datasetId != null)
+				return false;
+		} else if (!datasetId.equals(other.datasetId))
+			return false;
+		if (gId == null) {
+			if (other.gId != null)
+				return false;
+		} else if (!gId.equals(other.gId))
+			return false;
+		if (markerId == null) {
+			if (other.markerId != null)
+				return false;
+		} else if (!markerId.equals(other.markerId))
+			return false;
+		if (markerSampleId == null) {
+			if (other.markerSampleId != null)
+				return false;
+		} else if (!markerSampleId.equals(other.markerSampleId))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CharValues [acId=");
+		builder.append(acId);
+		builder.append(", datasetId=");
+		builder.append(datasetId);
+		builder.append(", markerId=");
+		builder.append(markerId);
+		builder.append(", gId=");
+		builder.append(gId);
+		builder.append(", charValue=");
+		builder.append(charValue);
+		builder.append(", markerSampleId=");
+		builder.append(markerSampleId);
+		builder.append(", accSampleId=");
+		builder.append(accSampleId);
+		builder.append("]");
+		return builder.toString();
+	}
+    
 }

@@ -35,10 +35,12 @@ public class MarkerOnMap implements Serializable{
     private static final long serialVersionUID = 1L;
     
     @Id
+    @Column(name = "markeronmap_id")
+    private Integer markerOnMapId;  
+    
     @Column(name = "map_id")
     private Integer mapId;  
     
-    @Id
     @Column(name = "marker_id")
     private Integer markerId;
 
@@ -55,7 +57,7 @@ public class MarkerOnMap implements Serializable{
         super();
     }
 
-    public MarkerOnMap(Integer mapId, Integer markerId, Float startPosition, Float endPosition, String linkageGroup) {
+    public MarkerOnMap(Integer markerOnMapId, Integer mapId, Integer markerId, Float startPosition, Float endPosition, String linkageGroup) {
         super();
         this.mapId = mapId;
         this.markerId = markerId;
@@ -64,6 +66,14 @@ public class MarkerOnMap implements Serializable{
         this.linkageGroup = linkageGroup;
     }
     
+    public Integer getMarkerOnMapId() {
+        return markerOnMapId;
+    }
+    
+    public void setMarkerOnMapId(Integer markerOnMapId) {
+        this.markerOnMapId = markerOnMapId;
+    }
+
     public Integer getMapId() {
         return mapId;
     }
@@ -106,7 +116,7 @@ public class MarkerOnMap implements Serializable{
     
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(13, 127).append(markerId).toHashCode();
+        return new HashCodeBuilder(13, 127).append(markerOnMapId).toHashCode();
     }
 
     @Override
@@ -122,13 +132,15 @@ public class MarkerOnMap implements Serializable{
         }
 
         MarkerOnMap rhs = (MarkerOnMap) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(markerId, rhs.markerId).isEquals();
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(markerOnMapId, rhs.markerOnMapId).isEquals();
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("MarkerOnMap [mapId=");
+        builder.append("MarkerOnMap [markerOnMapId=");
+        builder.append(markerOnMapId);
+        builder.append(", mapId=");
         builder.append(mapId);
         builder.append(", markerId=");
         builder.append(markerId);

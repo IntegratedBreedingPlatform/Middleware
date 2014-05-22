@@ -33,6 +33,99 @@ import org.hibernate.SQLQuery;
  */
 public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 
+    // For getMarkerNamesByGIds()
+    public static final String GET_CHAR_COUNT_BY_GID = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_char_values " +
+            "WHERE gid IN (:gIdList)";
+
+    // For getGermplasmNamesByMarkerNames()
+    public static final String GET_CHAR_COUNT_BY_MARKER_ID = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_char_values " +
+            "WHERE marker_id IN (:markerIdList)";
+    
+    // For getGermplasmNamesByMarkerNames()
+    public static final String GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
+            "SELECT n.nval, CONCAT(m.marker_name, '') " +  
+            "FROM names n JOIN gdms_char_values c ON n.gid = c.gid " +  
+            "           JOIN gdms_marker m ON c.marker_id = m.marker_id " +
+            "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " +
+            "ORDER BY n.nval, m.marker_name";
+    
+    // For getAllelicValues by gid and marker names
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
+            "SELECT DISTINCT " +
+                "gdms_char_values.gid, " +
+                "CONCAT(gdms_char_values.char_value, ''), " +
+                "CONCAT(gdms_marker.marker_name, ''), " +
+                "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
+            "FROM gdms_char_values, " +
+                "gdms_marker " +
+            "WHERE gdms_char_values.marker_id = gdms_marker.marker_id " +
+                "AND gdms_char_values.gid IN (:gidList) " +
+                "AND gdms_char_values.marker_id IN (:markerIdList) " +
+            "ORDER BY gdms_char_values.gid DESC, gdms_marker.marker_name";
+    
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS =
+            "SELECT DISTINCT " +
+                    "gcv.gid, " +
+                    "gcv.marker_id, " +
+                "CONCAT(gcv.char_value, ''), " +
+                "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
+            "FROM gdms_char_values gcv " +
+            "WHERE gcv.gid IN (:gidList) " +
+                "AND gcv.marker_id IN (:markerIdList) " +
+            "ORDER BY gcv.gid DESC ";
+    
+    public static final String GET_ALLELIC_VALUES_BY_GID_LOCAL = 
+            "SELECT DISTINCT " +
+                    "gdms_char_values.gid, " +
+                    "gdms_char_values.marker_id, " +
+                    "CONCAT(gdms_char_values.char_value, ''), " +
+                    "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
+            "FROM gdms_char_values " +
+            "WHERE gdms_char_values.gid IN (:gidList) " +
+            "ORDER BY gdms_char_values.gid ASC ";
+
+    // For getAllelicValues by datasetId
+    public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
+            "SELECT gid, marker_id,  CONCAT(char_value, '') " +
+            "FROM gdms_char_values " +
+            "WHERE dataset_id = :datasetId " +
+            "ORDER BY gid ASC, marker_id ASC";
+
+    public static final String COUNT_BY_DATASET_ID = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_char_values " +
+            "WHERE dataset_id = :datasetId";
+    
+    public static final String GET_GIDS_BY_MARKER_ID = 
+            "SELECT DISTINCT gid " +
+            "FROM gdms_char_values " +
+            "WHERE marker_id = :markerId";
+    
+    public static final String COUNT_GIDS_BY_MARKER_ID = 
+            "SELECT COUNT(distinct gid) " +
+            "FROM gdms_char_values " +
+            "WHERE marker_id = :markerId";
+
+    public static final String COUNT_CHAR_VALUES_BY_GIDS = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_char_values " +
+            "WHERE gid in (:gids)";
+    
+    public static final String GET_MARKER_IDS_BY_GIDS = 
+        "SELECT DISTINCT marker_id " +
+        "FROM gdms_char_values " +
+        "WHERE gid IN (:gids)";
+	
+    public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
+    		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') "
+    		+ "FROM gdms_char_values cv " 
+    		+ "WHERE  cv.marker_id IN (:markerIdList) " 
+    		+ "ORDER BY cv.gid DESC ";
+
     /**
      * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.
      * 
@@ -49,7 +142,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 
         try {
             if (datasetId != null) {
-	            SQLQuery query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_DATASET_ID);
+	            SQLQuery query = getSession().createSQLQuery(GET_ALLELIC_VALUES_BY_DATASET_ID);
 	            query.setParameter("datasetId", datasetId);
 	            query.setFirstResult(start);
 	            query.setMaxResults(numOfRows);
@@ -83,7 +176,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
     public long countByDatasetId(Integer datasetId) throws MiddlewareQueryException {
         try {
             if (datasetId != null) {
-	            Query query = getSession().createSQLQuery(CharValues.COUNT_BY_DATASET_ID);
+	            Query query = getSession().createSQLQuery(COUNT_BY_DATASET_ID);
 	            query.setParameter("datasetId", datasetId);
 	            BigInteger result = (BigInteger) query.uniqueResult();
 	            if (result != null) {
@@ -102,7 +195,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 
         try {
             if (markerId != null) {
-	            SQLQuery query = getSession().createSQLQuery(CharValues.GET_GIDS_BY_MARKER_ID);
+	            SQLQuery query = getSession().createSQLQuery(GET_GIDS_BY_MARKER_ID);
 	            query.setParameter("markerId", markerId);
 	            query.setFirstResult(start);
 	            query.setMaxResults(numOfRows);
@@ -117,7 +210,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
     public long countGIDsByMarkerId(Integer markerId) throws MiddlewareQueryException {
         try {
         	if (markerId != null){
-	            SQLQuery query = getSession().createSQLQuery(CharValues.COUNT_GIDS_BY_MARKER_ID);
+	            SQLQuery query = getSession().createSQLQuery(COUNT_GIDS_BY_MARKER_ID);
 	            query.setParameter("markerId", markerId);
 	            BigInteger result = (BigInteger) query.uniqueResult();
 	            if (result != null) {
@@ -133,7 +226,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
     public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
         try {
         	if (gids != null && !gids.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(CharValues.COUNT_CHAR_VALUES_BY_GIDS);
+	            SQLQuery query = getSession().createSQLQuery(COUNT_CHAR_VALUES_BY_GIDS);
 	            query.setParameterList("gids", gids);
 	            BigInteger result = (BigInteger) query.uniqueResult();
 	            if (result != null) {
@@ -166,7 +259,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 
         try {
             if (gIds != null && gIds.size() > 0) {
-                SQLQuery query = getSession().createSQLQuery(CharValues.GET_MARKER_IDS_BY_GIDS);
+                SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_GIDS);
                 query.setParameterList("gids", gIds);
                 
                 return query.list();
@@ -185,7 +278,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         try {
             if (datasetId != null){
                 SQLQuery query = getSession().createSQLQuery(
-                		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') " +
+                		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, ''), marker_sample_id, acc_sample_id " +
                 		" FROM gdms_char_values where dataset_id = :datasetId "); 
                 query.setParameter("datasetId", datasetId);
 
@@ -198,8 +291,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
                         Integer markerId = (Integer) result[2];
                         Integer gId = (Integer) result[3];
                         String charValue  = (String) result[4];
+                        Integer markerSampleId = (Integer) result[5];
+                        Integer accSampleId = (Integer) result[6];
                         
-                        CharValues dataElement = new CharValues(acId, datasetId2, markerId, gId, charValue);
+                        CharValues dataElement = new CharValues(acId, datasetId2, markerId, gId, charValue, markerSampleId, accSampleId);
                         toReturn.add(dataElement);
                     }
                 }
@@ -219,7 +314,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 	        }
 
 	        try {
-	            SQLQuery query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_MARKER_IDS);
+	            SQLQuery query = getSession().createSQLQuery(GET_ALLELIC_VALUES_BY_MARKER_IDS);
 	            query.setParameterList("markerIdList", markerIdList);
 
 	            List results = query.list();

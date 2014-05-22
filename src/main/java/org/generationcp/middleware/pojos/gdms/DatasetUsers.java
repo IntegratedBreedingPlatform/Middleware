@@ -47,7 +47,6 @@ public class DatasetUsers implements Serializable{
 
     public DatasetUsers(Integer datasetId,
                     Integer userId) {
-        
         this.datasetId = datasetId;
         this.userId = userId;
     }

@@ -62,6 +62,7 @@ import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MtaDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
@@ -141,6 +142,7 @@ public class DatabaseBroker {
     private MarkerMetadataSetDAO markerMetadataSetDao;
     private MarkerOnMapDAO markerOnMapDao;
     private MarkerUserInfoDAO markerUserInfoDao;
+    private MarkerUserInfoDetailsDAO markerUserInfoDetailsDao;
     private QtlDAO qtlDao;
     private QtlDetailsDAO qtlDetailsDao;
     private MtaDAO mtaDao;
@@ -731,6 +733,14 @@ public class DatabaseBroker {
         }
         markerUserInfoDao.setSession(getActiveSession());
         return markerUserInfoDao;
+    }
+    
+    protected final MarkerUserInfoDetailsDAO getMarkerUserInfoDetailsDao() {
+        if (markerUserInfoDetailsDao == null) {
+        	markerUserInfoDetailsDao = new MarkerUserInfoDetailsDAO();
+        }
+        markerUserInfoDetailsDao.setSession(getActiveSession());
+        return markerUserInfoDetailsDao;
     }
 
     protected final QtlDAO getQtlDao() {

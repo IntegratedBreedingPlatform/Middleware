@@ -24,11 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
-import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
-import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
@@ -46,6 +43,150 @@ import org.hibernate.criterion.Restrictions;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
+    public static final String GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION = 
+            "SELECT marker_id "
+            + "FROM gdms_markers_onmap "
+            + "WHERE map_id = :map_id "
+            + "AND linkage_group = :linkage_group "
+            + "AND start_position "
+            + "BETWEEN :start_position "
+            + "AND :end_position " 
+            + "ORDER BY marker_id";
+        
+        public static final String COUNT_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION = 
+            "SELECT COUNT(marker_id) "
+            + "FROM gdms_markers_onmap "
+            + "WHERE map_id = :map_id "
+            + "AND linkage_group = :linkage_group "
+            + "AND start_position "
+            + "BETWEEN :start_position "
+            + "AND :end_position";
+                
+        public static final String GET_MARKER_TYPE_BY_MARKER_IDS = 
+                "SELECT DISTINCT CONCAT(marker_type, '') " +
+                "FROM gdms_marker " +
+                "WHERE marker_id IN (:markerIdList)";
+
+        public static final String GET_IDS_BY_NAMES = 
+                "SELECT marker_id " +
+                "FROM gdms_marker " +
+                "WHERE marker_name IN (:markerNameList)";
+
+        public static final String GET_ID_AND_NAME_BY_NAMES = 
+                "SELECT marker_id, CONCAT(marker_name,'') " +
+                "FROM gdms_marker " +
+                "WHERE marker_name IN (:markerNameList) " +
+                "ORDER BY marker_id ";
+        
+        public static final String GET_NAMES_BY_IDS = 
+                "SELECT marker_id, CONCAT(marker_name, '') AS marker_name " +
+                "FROM gdms_marker " +
+                "WHERE marker_id IN (:markerIdList) " +
+                "ORDER BY marker_id asc";
+        
+        public static final String GET_ALL_MARKER_TYPES = 
+                "SELECT DISTINCT CONCAT(marker_type, '') " +
+                "FROM gdms_marker " +
+                "WHERE UPPER(marker_type) != 'UA'";
+        
+        public static final String GET_NAMES_BY_TYPE = 
+                "SELECT DISTINCT CONCAT(marker_name, '') " +
+                "FROM gdms_marker " +
+                "WHERE UPPER(marker_type) = UPPER(:markerType)";
+        
+        public static final String COUNT_ALL_MARKER_TYPES = 
+                "SELECT COUNT(DISTINCT marker_type) " +
+                "FROM gdms_marker " +
+                "WHERE UPPER(marker_type) != 'UA'";
+        
+        public static final String COUNT_MARKER_NAMES_BY_MARKER_TYPE = 
+                "SELECT COUNT(DISTINCT marker_name) " +
+                "FROM gdms_marker " +
+                "WHERE UPPER(marker_type) = UPPER(:markerType)";
+        
+        // For getMarkerNamesByGIds()
+        public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 
+        		"SELECT DISTINCT gdms_allele_values.gid, gdms_allele_values.marker_id, CONCAT(gdms_marker.marker_name,'') " +
+    			"FROM gdms_allele_values LEFT JOIN gdms_marker ON gdms_allele_values.marker_id = gdms_marker.marker_id " +
+                "WHERE gdms_allele_values.gid IN (:gIdList) " +
+                "ORDER BY gid, marker_name";
+
+        public static final String GET_CHAR_MARKER_NAMES_BY_GID =         
+    			"SELECT DISTINCT gdms_char_values.gid, gdms_char_values.marker_id, CONCAT(gdms_marker.marker_name,'') " +
+    			"FROM gdms_char_values LEFT JOIN gdms_marker ON gdms_char_values.marker_id = gdms_marker.marker_id " +
+                "WHERE gdms_char_values.gid IN (:gIdList) " +
+                "ORDER BY gid, marker_name";
+
+        public static final String GET_MAPPING_MARKER_NAMES_BY_GID = 
+        		"SELECT DISTINCT gdms_mapping_pop_values.gid, gdms_mapping_pop_values.marker_id, CONCAT(gdms_marker.marker_name,'') " + 
+                "FROM gdms_mapping_pop_values LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
+                "WHERE gdms_mapping_pop_values.gid IN (:gIdList) " +
+                "ORDER BY gid, marker_name";
+
+        public static final String GET_MARKER_IDS_BY_HAPLOTYPE = "SELECT track.marker_id  "
+                        + "FROM gdms_track_markers track "
+                        + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
+                        + "WHERE track_name = (:trackName)";
+
+        public static final String GET_ALL_DB_ACCESSION_IDS = 
+                "SELECT DISTINCT (db_accession_id) " +
+                "FROM gdms_marker " +
+                "WHERE db_accession_id is not null " +
+                "OR db_accession_id != ''";
+        
+        public static final String COUNT_ALL_DB_ACCESSION_IDS = 
+                "SELECT COUNT(DISTINCT db_accession_id) " +
+                "FROM gdms_marker " +
+                "WHERE db_accession_id is not null " +
+                "OR db_accession_id != ''";
+
+        public static final String GET_MARKERS_SELECT_CLAUSE =
+                "SELECT marker_id  "
+                        + ", CONCAT(marker_type, '') "
+                        + ", CONCAT(marker_name, '') "
+                        + ", CONCAT(species, '') "
+                        + ", db_accession_id "
+                        + ", reference "
+                        + ", CONCAT(genotype, '') "
+                        + ", ploidy  "
+                        + ", primer_id  "
+                        + ", remarks  "
+                        + ", assay_type " 
+                        + ", motif  "
+                        + ", forward_primer  "
+                        + ", reverse_primer  "
+                        + ", product_size  "
+                        + ", annealing_temp " 
+                        + ", amplification " 
+                ;    
+        public static final String GET_MARKERS_BY_IDS = 
+        		GET_MARKERS_SELECT_CLAUSE
+                + "FROM gdms_marker "
+                + "WHERE marker_id IN (:markerIdList) ";
+
+        public static final String GET_SNP_MARKERS_BY_HAPLOTYPE = 
+        		GET_MARKERS_SELECT_CLAUSE
+                    + "FROM (gdms_marker gdms INNER JOIN gdms_track_markers track ON(track.marker_id = gdms.marker_id)) "
+                    + "INNER JOIN gdms_track_data tdata ON (tdata.track_id = track.track_id) "
+                    + "WHERE track_name = (:trackName) and gdms.marker_type = 'SNP'";
+        
+        public static final String GET_MARKERS_BY_TYPE = 
+        		GET_MARKERS_SELECT_CLAUSE
+                + "FROM gdms_marker "
+                + "WHERE marker_type = :markerType ";
+
+        public static final String COUNT_MARKERS_BY_IDS = 
+                "SELECT COUNT(marker_id)  "
+                + "FROM gdms_marker "
+                + "WHERE marker_id IN (:markerIdList) " 
+                ;
+        
+        public static final String GET_ID_BY_NAME =
+        		"SELECT marker_id "
+        		+ "FROM gdms_marker "
+        		+ "WHERE marker_name = :markerName "
+        		+ "LIMIT 0,1";
+      
     /**
      * Gets the ids by names.
      *
@@ -62,7 +203,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_IDS_BY_NAMES);
+            SQLQuery query = getSession().createSQLQuery(GET_IDS_BY_NAMES);
             query.setParameterList("markerNameList", names);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -117,9 +258,9 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_ID_AND_NAME_BY_NAMES);
+            SQLQuery query = getSession().createSQLQuery(GET_ID_AND_NAME_BY_NAMES);
             if (instance == Database.LOCAL) {
-                query = getSession().createSQLQuery(Marker.GET_ID_AND_NAME_BY_NAMES + "DESC");
+                query = getSession().createSQLQuery(GET_ID_AND_NAME_BY_NAMES + "DESC");
             }
             query.setParameterList("markerNameList", names);
             List<Object> results = query.list();
@@ -159,7 +300,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
         try {
 
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKER_TYPE_BY_MARKER_IDS);
+            SQLQuery query = getSession().createSQLQuery(GET_MARKER_TYPE_BY_MARKER_IDS);
             query.setParameterList("markerIdList", markerIds);
             return (List<String>) query.list();
 
@@ -193,35 +334,35 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             // Search the allele_values, char_values, mapping_pop_values tables for the existence of gids.
             // by getting alleleCount, charCount and mappingCount
 
-            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_COUNT_BY_GID);
+            SQLQuery query = getSession().createSQLQuery(AlleleValuesDAO.GET_ALLELE_COUNT_BY_GID);
             query.setParameterList("gIdList", gIds);
             BigInteger alleleCount = (BigInteger) query.uniqueResult();
 
-            query = getSession().createSQLQuery(CharValues.GET_CHAR_COUNT_BY_GID);
+            query = getSession().createSQLQuery(CharValuesDAO.GET_CHAR_COUNT_BY_GID);
             query.setParameterList("gIdList", gIds);
             BigInteger charCount = (BigInteger) query.uniqueResult();
 
-            query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_COUNT_BY_GID);
+            query = getSession().createSQLQuery(MappingPopValuesDAO.GET_MAPPING_COUNT_BY_GID);
             query.setParameterList("gIdList", gIds);
             BigInteger mappingCount = (BigInteger) query.uniqueResult();
 
             // Retrieves markers that are being genotyped
             if (alleleCount.intValue() > 0) {
-                query = getSession().createSQLQuery(Marker.GET_ALLELE_MARKER_NAMES_BY_GID);
+                query = getSession().createSQLQuery(GET_ALLELE_MARKER_NAMES_BY_GID);
                 query.setParameterList("gIdList", gIds);
                 List results = query.list();
                 dataValues.addAll(createMarkerNameElementList(results));
             }
 
             if (charCount.intValue() > 0) {
-                query = getSession().createSQLQuery(Marker.GET_CHAR_MARKER_NAMES_BY_GID);
+                query = getSession().createSQLQuery(GET_CHAR_MARKER_NAMES_BY_GID);
                 query.setParameterList("gIdList", gIds);
                 List results = query.list();
                 dataValues.addAll(createMarkerNameElementList(results));
             }
 
             if (mappingCount.intValue() > 0) {
-                query = getSession().createSQLQuery(Marker.GET_MAPPING_MARKER_NAMES_BY_GID);
+                query = getSession().createSQLQuery(GET_MAPPING_MARKER_NAMES_BY_GID);
                 query.setParameterList("gIdList", gIds);
                 List results = query.list();
                 dataValues.addAll(createMarkerNameElementList(results));
@@ -318,21 +459,21 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             // Search the allele_values, char_values, mapping_pop_values tables for the existence of marker_ids.
             // by getting alleleCount, charCount and mappingCount
 
-            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_COUNT_BY_MARKER_ID);
+            SQLQuery query = getSession().createSQLQuery(AlleleValuesDAO.GET_ALLELE_COUNT_BY_MARKER_ID);
             query.setParameterList("markerIdList", markerIds);
             BigInteger alleleCount = (BigInteger) query.uniqueResult();
 
-            query = getSession().createSQLQuery(CharValues.GET_CHAR_COUNT_BY_MARKER_ID);
+            query = getSession().createSQLQuery(CharValuesDAO.GET_CHAR_COUNT_BY_MARKER_ID);
             query.setParameterList("markerIdList", markerIds);
             BigInteger charCount = (BigInteger) query.uniqueResult();
 
-            query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_COUNT_BY_MARKER_ID);
+            query = getSession().createSQLQuery(MappingPopValuesDAO.GET_MAPPING_COUNT_BY_MARKER_ID);
             query.setParameterList("markerIdList", markerIds);
             BigInteger mappingCount = (BigInteger) query.uniqueResult();
 
             // Get marker name, germplasm name from allele_values given the marker names
             if (alleleCount.intValue() > 0) {
-                query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
+                query = getSession().createSQLQuery(AlleleValuesDAO.GET_ALLELE_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
                 query.setParameterList("markerNameList", markerNames);
                 List results = query.list();
                 dataValues.addAll(getGermplasmMarkerElementsFromList(results));
@@ -340,7 +481,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
             // Get marker name, germplasm name from char_values given the marker names
             if (charCount.intValue() > 0) {
-                query = getSession().createSQLQuery(CharValues.GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
+                query = getSession().createSQLQuery(CharValuesDAO.GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
                 query.setParameterList("markerNameList", markerNames);
                 List results = query.list();
                 dataValues.addAll(getGermplasmMarkerElementsFromList(results));
@@ -348,7 +489,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
             // Get marker name, germplasm name from mapping_pop_values given the marker names
             if (mappingCount.intValue() > 0) {
-                query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
+                query = getSession().createSQLQuery(MappingPopValuesDAO.GET_MAPPING_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
                 query.setParameterList("markerNameList", markerNames);
                 List results = query.list();
                 dataValues.addAll(getGermplasmMarkerElementsFromList(results));
@@ -454,21 +595,21 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         try {
 
             //retrieve allelic values from allele_values
-            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
+            SQLQuery query = getSession().createSQLQuery(AlleleValuesDAO.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             List results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromList(results));
 
             //retrieve allelic values from char_values
-            query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
+            query = getSession().createSQLQuery(CharValuesDAO.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromList(results));
 
             //retrieve allelic values from mapping_pop_values
-            query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
+            query = getSession().createSQLQuery(MappingPopValuesDAO.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             results = query.list();
@@ -494,19 +635,19 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         try {
 
             //retrieve allelic values from allele_values
-            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_GID_LOCAL);
+            SQLQuery query = getSession().createSQLQuery(AlleleValuesDAO.GET_ALLELIC_VALUES_BY_GID_LOCAL);
             query.setParameterList("gidList", gids);
             List results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromListLocal(results));
 
             //retrieve allelic values from char_values
-            query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_GID_LOCAL);
+            query = getSession().createSQLQuery(CharValuesDAO.GET_ALLELIC_VALUES_BY_GID_LOCAL);
             query.setParameterList("gidList", gids);
             results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromListLocal(results));
 
             //retrieve allelic values from mapping_pop_values
-            query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_GID_LOCAL);
+            query = getSession().createSQLQuery(MappingPopValuesDAO.GET_ALLELIC_VALUES_BY_GID_LOCAL);
             query.setParameterList("gidList", gids);
             results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromListLocal(results));
@@ -533,7 +674,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_NAMES_BY_IDS);
+            SQLQuery query = getSession().createSQLQuery(GET_NAMES_BY_IDS);
             query.setParameterList("markerIdList", ids);
 
             List<MarkerIdMarkerNameElement> dataValues = new ArrayList<MarkerIdMarkerNameElement>();
@@ -564,7 +705,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_NAMES_BY_IDS);
+            SQLQuery query = getSession().createSQLQuery(GET_NAMES_BY_IDS);
             query.setParameterList("markerIdList", ids);
 
             List<Object> results = query.list();
@@ -614,7 +755,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      */
     public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_ALL_MARKER_TYPES);
+            SQLQuery query = getSession().createSQLQuery(GET_ALL_MARKER_TYPES);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
@@ -636,7 +777,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      */
     public long countAllMarkerTypes() throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_ALL_MARKER_TYPES);
+            SQLQuery query = getSession().createSQLQuery(COUNT_ALL_MARKER_TYPES);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
                 return result.longValue();
@@ -661,7 +802,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
     public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws MiddlewareQueryException {
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_NAMES_BY_TYPE);
+            SQLQuery query = getSession().createSQLQuery(GET_NAMES_BY_TYPE);
             query.setParameter("markerType", markerType);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -685,7 +826,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      */
     public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_MARKER_NAMES_BY_MARKER_TYPE);
+            SQLQuery query = getSession().createSQLQuery(COUNT_MARKER_NAMES_BY_MARKER_TYPE);
             query.setParameter("markerType", markerType);
             BigInteger result = (BigInteger) query.uniqueResult();
 
@@ -710,7 +851,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      */
     public List<String> getAllDbAccessionIds(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_ALL_DB_ACCESSION_IDS);
+            SQLQuery query = getSession().createSQLQuery(GET_ALL_DB_ACCESSION_IDS);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             return (List<String>) query.list();
@@ -728,7 +869,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
      */
     public long countAllDbAccessionIds() throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_ALL_DB_ACCESSION_IDS);
+            SQLQuery query = getSession().createSQLQuery(COUNT_ALL_DB_ACCESSION_IDS);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
                 return result.longValue();
@@ -751,7 +892,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_IDS);
+            SQLQuery query = getSession().createSQLQuery(GET_MARKERS_BY_IDS);
             query.setParameterList("markerIdList", markerIds);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -778,7 +919,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_SNP_MARKERS_BY_HAPLOTYPE);
+            SQLQuery query = getSession().createSQLQuery(GET_SNP_MARKERS_BY_HAPLOTYPE);
             query.setParameter("trackName", haplotype);
             List results = query.list();
 
@@ -803,7 +944,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKER_IDS_BY_HAPLOTYPE);
+            SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_HAPLOTYPE);
             query.setParameter("trackName", haplotype);
             return query.list();
         } catch (HibernateException e) {
@@ -841,7 +982,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
 
         try {
-                SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_TYPE);
+                SQLQuery query = getSession().createSQLQuery(GET_MARKERS_BY_TYPE);
                 query.setParameter("markerType", markerType);
                 List results = query.list();
                 for (Object o : results) {
@@ -889,7 +1030,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             return 0;
         }
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_MARKERS_BY_IDS);
+            SQLQuery query = getSession().createSQLQuery(COUNT_MARKERS_BY_IDS);
             query.setParameterList("markerIdList", markerIds);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
@@ -910,7 +1051,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
             SQLQuery query;
 
-            query = getSession().createSQLQuery(Marker.GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
+            query = getSession().createSQLQuery(GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
             query.setParameter("map_id", mapID);
             query.setParameter("linkage_group", linkageGroup);
             query.setParameter("start_position", startPos);
@@ -935,7 +1076,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
             SQLQuery query;
 
-            query = getSession().createSQLQuery(Marker.COUNT_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
+            query = getSession().createSQLQuery(COUNT_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
             query.setParameter("map_id", mapID);
             query.setParameter("linkage_group", linkageGroup);
             query.setParameter("start_position", startPos);
@@ -956,7 +1097,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
     public Integer getIdByName(String name) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_ID_BY_NAME);
+            SQLQuery query = getSession().createSQLQuery(GET_ID_BY_NAME);
             query.setParameter("markerName", name);
             return (Integer) query.uniqueResult();
 
@@ -973,7 +1114,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             
             SQLQuery query;
 
-            query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_MARKER_IDS);
+            query = getSession().createSQLQuery(GET_MARKERS_BY_MARKER_IDS);
             query.setParameterList("map_id", markerIDs);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -993,7 +1134,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             
             SQLQuery query;
 
-            query = getSession().createSQLQuery(Marker.COUNT_MARKERS_BY_MARKER_IDS);
+            query = getSession().createSQLQuery(COUNT_MARKERS_BY_MARKER_IDS);
             query.setParameterList("map_id", markerIDs);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {

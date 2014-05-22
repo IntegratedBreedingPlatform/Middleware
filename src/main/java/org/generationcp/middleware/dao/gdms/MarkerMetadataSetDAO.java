@@ -29,6 +29,38 @@ import org.hibernate.SQLQuery;
  */
 public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>{
     
+    public static final String GET_MARKER_ID_BY_DATASET_ID = 
+            "SELECT marker_id " +
+            "FROM gdms_marker_metadataset " +
+            "WHERE dataset_id = :datasetId " +
+            "ORDER BY marker_id;";
+
+    public static final String GET_MARKERS_BY_GID_AND_DATASETS = 
+            "SELECT DISTINCT marker_id " + 
+            "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset " +
+            "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id " + 
+            "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " +
+            "    AND gdms_acc_metadataset.gid = :gid " + 
+            "ORDER BY gdms_marker_metadataset.marker_id ";
+    
+    public static final String COUNT_MARKERS_BY_GID_AND_DATASETS = 
+            "SELECT COUNT(DISTINCT marker_id) " + 
+            "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset " +
+            "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id " + 
+            "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " +
+            "    AND gdms_acc_metadataset.gid = :gid " + 
+            "ORDER BY gdms_marker_metadataset.marker_id ";
+    
+    public static final String GET_BY_MARKER_IDS = 
+            "SELECT marker_metadataset_id, dataset_id, marker_id, marker_sample_id " +
+            "FROM gdms_marker_metadataset " +
+            "WHERE  marker_id IN (:markerIdList) ";
+   
+    public static final String COUNT_MARKER_BY_DATASET_IDS = 
+            "SELECT COUNT(DISTINCT marker_id) " 
+            + "FROM gdms_marker_metadataset "
+            + "WHERE dataset_id IN (:datasetIds)";
+
     /**
      * Gets the marker id by dataset id.
      *
@@ -40,7 +72,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
     public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws MiddlewareQueryException{
     	try{
     		if (datasetId != null){
-    			SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.GET_MARKER_ID_BY_DATASET_ID); 
+    			SQLQuery query = getSession().createSQLQuery(GET_MARKER_ID_BY_DATASET_ID); 
     			query.setParameter("datasetId", datasetId);
     			return (List<Integer>) query.list();
     		}
@@ -59,7 +91,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 
         try {
             if ((gid != null) && (datasetIds != null)) {
-                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.GET_MARKERS_BY_GID_AND_DATASETS);
+                SQLQuery query = getSession().createSQLQuery(GET_MARKERS_BY_GID_AND_DATASETS);
                 query.setParameterList("datasetids", datasetIds);
                 query.setParameter("gid", gid);
                 query.setFirstResult(start);
@@ -80,7 +112,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
         long count = 0;
         try {
             if (gid != null) {
-                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.COUNT_MARKERS_BY_GID_AND_DATASETS);
+                SQLQuery query = getSession().createSQLQuery(COUNT_MARKERS_BY_GID_AND_DATASETS);
                 query.setParameterList("datasetids", datasetIds);
                 query.setParameter("gid", gid);
                 BigInteger result = (BigInteger) query.uniqueResult();
@@ -99,7 +131,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
         long count = 0;
         try {
             if (datasetIds != null && !datasetIds.isEmpty()) {
-                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.COUNT_MARKER_BY_DATASET_IDS);
+                SQLQuery query = getSession().createSQLQuery(COUNT_MARKER_BY_DATASET_IDS);
                 query.setParameterList("datasetIds", datasetIds);
                 BigInteger result = (BigInteger) query.uniqueResult();
                 if (result != null) {
@@ -121,17 +153,19 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
         List<MarkerMetadataSet> toReturn = new ArrayList<MarkerMetadataSet>();
         try{
             if (markerIds != null && markerIds.size() > 0){
-                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.GET_BY_MARKER_IDS); 
+                SQLQuery query = getSession().createSQLQuery(GET_BY_MARKER_IDS); 
                 query.setParameterList("markerIdList", markerIds);
 
                 List results = query.list();
                 for (Object o : results) {
                     Object[] result = (Object[]) o;
                     if (result != null) {
-                        Integer datasetId =  (Integer) result[0];
-                        Integer markerId2 = (Integer) result[1];
+                        Integer markerMetadatasetId =  (Integer) result[0];
+                        Integer datasetId = (Integer) result[1];
+                        Integer markerId2 =  (Integer) result[2];
+                        Integer markerSampleId = (Integer) result[3];
 
-                        MarkerMetadataSet dataElement = new MarkerMetadataSet(datasetId, markerId2);
+                        MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, datasetId, markerId2, markerSampleId);
                         toReturn.add(dataElement);
                     }
                 }
@@ -165,17 +199,20 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	    List<MarkerMetadataSet> toReturn = new ArrayList<MarkerMetadataSet>();
         try {
             if (datasetId != null){
-                SQLQuery query = getSession().createSQLQuery("SELECT * FROM gdms_marker_metadataset where dataset_id = :datasetId "); 
+                SQLQuery query = getSession().createSQLQuery("SELECT  marker_metadataset_id, dataset_id, marker_id, marker_sample_id" +
+                		" FROM gdms_marker_metadataset where dataset_id = :datasetId "); 
                 query.setParameter("datasetId", datasetId);
 
                 List results = query.list();
                 for (Object o : results) {
                     Object[] result = (Object[]) o;
                     if (result != null) {
-                        Integer datasetId2 =  (Integer) result[0];
-                        Integer markerId = (Integer) result[1];
+                        Integer markerMetadatasetId =  (Integer) result[0];
+                        Integer datasetId2 = (Integer) result[1];
+                        Integer markerId =  (Integer) result[0];
+                        Integer markerSampleId = (Integer) result[1];
 
-                        MarkerMetadataSet dataElement = new MarkerMetadataSet(datasetId2, markerId);
+                        MarkerMetadataSet dataElement = new MarkerMetadataSet(markerMetadatasetId, datasetId2, markerId, markerSampleId);
                         toReturn.add(dataElement);
                     }
                 }

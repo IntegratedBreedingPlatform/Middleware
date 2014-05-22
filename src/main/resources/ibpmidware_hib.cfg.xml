@@ -18,10 +18,10 @@
   <property name="hibernate.c3p0.max_statements">50</property> 
   <property name="hibernate.c3p0.idle_test_period">3000</property>
  
-<!-- optional query to validate pooled connections:--> 
-<property name="hibernate.c3p0.idleConnectionTestPeriod">300</property> 
-<property name="hibernate.c3p0.preferredTestQuery">select 1</property>
-<property name="hibernate.c3p0.validate">true</property> 
+  <!-- optional query to validate pooled connections:--> 
+  <property name="hibernate.c3p0.idleConnectionTestPeriod">300</property> 
+  <property name="hibernate.c3p0.preferredTestQuery">select 1</property>
+  <property name="hibernate.c3p0.validate">true</property> 
   
   <mapping class="org.generationcp.middleware.pojos.Attribute"/>
   <mapping class="org.generationcp.middleware.pojos.Bibref"/>
@@ -59,12 +59,17 @@
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerAlias"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerDetails"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerUserInfo"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.MarkerUserInfoDetails"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerMetadataSet"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerOnMap"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Mta"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.MtaMetadata"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Qtl"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.QtlDetails"/>
-    
+  <mapping class="org.generationcp.middleware.pojos.gdms.TrackAccession"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.TrackData"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.TrackMarkers"/>
+          
   <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.CropType"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchDataset"/>

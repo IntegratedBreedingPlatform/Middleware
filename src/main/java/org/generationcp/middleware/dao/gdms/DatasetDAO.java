@@ -35,9 +35,97 @@ import org.hibernate.criterion.Restrictions;
  */
 @SuppressWarnings("unchecked")
 public class DatasetDAO extends GenericDAO<Dataset, Integer>{
+	
+    public static final String COUNT_BY_NAME = 
+            "SELECT COUNT(dataset_name) " 
+    		+ "FROM gdms_dataset " 
+    		+ "WHERE dataset_type != 'QTL' "
+            ;
+
+    public static final String GET_DATASET_NAMES_NOT_QTL_AND_MTA = 
+            "SELECT CONCAT(dataset_name, '') " 
+    		+ "FROM gdms_dataset "
+            + "WHERE dataset_type != 'QTL' AND dataset_type != 'MTA' "
+    		;
+
+    public static final String GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL = 
+            "SELECT dataset_id " 
+    		+ "FROM gdms_dataset " 
+    		+ "WHERE dataset_type != 'mapping' " 
+    		+ "AND dataset_type != 'QTL' "
+            ;
+
+    public static final String COUNT_DATASET_ID_NOT_MAPPING_AND_NOT_QTL = 
+            "SELECT COUNT(dataset_id) " 
+    		+ "FROM gdms_dataset " 
+    		+ "WHERE dataset_type != 'mapping' " 
+            + "AND dataset_type != 'QTL' "
+            ;
+
+    public static final String GET_DATASET_ID_BY_MAPPING_AND_NOT_QTL = 
+            "SELECT dataset_id "
+    		+ "FROM gdms_dataset "
+            + "WHERE dataset_type = 'mapping' "
+            + "AND dataset_type != 'QTL' "
+            ;    
+
+    public static final String COUNT_DATASET_ID_BY_MAPPING_AND_NOT_QTL = 
+            "SELECT COUNT(dataset_id) " 
+            + "FROM gdms_dataset " 
+            + "WHERE dataset_type = 'mapping' " 
+            + "AND dataset_type != 'QTL' "
+            ;
+
+    public static final String GET_DETAILS_BY_NAME = 
+            "SELECT dataset_id, CONCAT(dataset_type, '') " 
+            + "FROM gdms_dataset "
+            + "WHERE dataset_name = :datasetName"
+            ;
+    
+    public static final String GET_DATASET_NAMES_BY_QTL_ID = 
+    		"SELECT DISTINCT CONCAT(dataset_name,'') "
+			+ "FROM gdms_dataset gd "
+    		+ "INNER JOIN "
+    		+ "gdms_qtl gq ON gd.dataset_id = gq.dataset_id " 
+    		+ "WHERE gq.qtl_id = :qtlId "
+    		;
+    
+    public static final String COUNT_DATASET_NAMES_BY_QTL_ID = 
+            "SELECT COUNT(DISTINCT CONCAT(dataset_name,'')) "
+            + "FROM gdms_dataset gd "
+            + "INNER JOIN "
+            + "gdms_qtl gq ON gd.dataset_id = gq.dataset_id " 
+            + "WHERE gq.qtl_id = :qtlId "
+            ;
+    
+    public static final String GET_DATASETS_SELECT = 
+            "SELECT d.dataset_id "
+                    + ", CONCAT(dataset_name, '')  "
+                    + ", dataset_desc  "
+                    + ", CONCAT(dataset_type, '')  "
+                    + ", CONCAT(genus, '')  "
+                    + ", CONCAT(species, '')  "
+                    + ", upload_template_date  "
+                    + ", remarks  "
+                    + ", CONCAT(datatype, '')  "
+                    + ", missing_data  "
+                    + ", method  "
+                    + ", score  "
+                    + ", institute  "
+                    + ", principal_investigator  "
+                    + ", email  "
+                    + ", purpose_of_study  " 
+                    ;
+    
+    public static final String GET_DATASETS_BY_IDS = 
+    		GET_DATASETS_SELECT
+            + "FROM gdms_dataset d "
+            + "WHERE dataset_id in (:datasetIds) "
+            ;
+
 
     public long countByName() throws MiddlewareQueryException {
-        Query query = getSession().createSQLQuery(Dataset.COUNT_BY_NAME);
+        Query query = getSession().createSQLQuery(COUNT_BY_NAME);
         BigInteger result = (BigInteger) query.uniqueResult();
         if (result != null) {
             return result.longValue();
@@ -47,7 +135,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 
     public List<String> getDatasetNames(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_NOT_QTL_AND_MTA);
+            SQLQuery query = getSession().createSQLQuery(GET_DATASET_NAMES_NOT_QTL_AND_MTA);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             return (List<String>) query.list();
@@ -64,7 +152,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
         try {
         	if (name != null){
 				SQLQuery query = getSession().createSQLQuery(
-						Dataset.GET_DETAILS_BY_NAME);
+						GET_DETAILS_BY_NAME);
 				query.setParameter("datasetName", name);
 				List results = query.list();
 
@@ -87,7 +175,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 
     public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
+            SQLQuery query = getSession().createSQLQuery(GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();
@@ -98,7 +186,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
     }
     
     public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException {
-        Query query = getSession().createSQLQuery(Dataset.COUNT_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
+        Query query = getSession().createSQLQuery(COUNT_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
         BigInteger result = (BigInteger) query.uniqueResult();
         if (result != null) {
             return result.longValue();
@@ -108,7 +196,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 
     public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
+            SQLQuery query = getSession().createSQLQuery(GET_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();
@@ -119,7 +207,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
     }
     
     public long countDatasetIdsForMapping() throws MiddlewareQueryException {
-        Query query = getSession().createSQLQuery(Dataset.COUNT_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
+        Query query = getSession().createSQLQuery(COUNT_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
         BigInteger result = (BigInteger) query.uniqueResult();
         if (result != null) {
             return result.longValue();
@@ -130,7 +218,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
     public List<String> getDatasetNamesByQtlId(Integer qtlId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
         	if (qtlId != null){
-	            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_BY_QTL_ID);
+	            SQLQuery query = getSession().createSQLQuery(GET_DATASET_NAMES_BY_QTL_ID);
 	            query.setParameter("qtlId", qtlId);
 	            query.setFirstResult(start);
 	            query.setMaxResults(numOfRows);
@@ -146,7 +234,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 			throws MiddlewareQueryException {
 		try {
 			if (qtlId != null){
-				Query query = getSession().createSQLQuery(Dataset.COUNT_DATASET_NAMES_BY_QTL_ID);
+				Query query = getSession().createSQLQuery(COUNT_DATASET_NAMES_BY_QTL_ID);
 				query.setParameter("qtlId", qtlId);
 				BigInteger result = (BigInteger) query.uniqueResult();
 				if (result != null) {
@@ -179,7 +267,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 	    List<Dataset> dataValues = new ArrayList<Dataset>();
         try {
             if (datasetIds != null && datasetIds.get(0) != null){
-                SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASETS_BY_IDS);
+                SQLQuery query = getSession().createSQLQuery(GET_DATASETS_BY_IDS);
                 query.setParameterList("datasetIds", datasetIds);
                 List results = query.list();
                 dataValues = buildDatasetList(results);
@@ -210,7 +298,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
         try {
         		// MappingABH
             	StringBuffer sqlString =  new StringBuffer()
-            		.append(Dataset.GET_DATASETS_SELECT)
+            		.append(GET_DATASETS_SELECT)
             		.append("FROM gdms_mapping_pop_values m JOIN gdms_dataset d ON m.dataset_id = d.dataset_id ")
             		.append("WHERE d.dataset_type = '").append(GdmsType.TYPE_MAPPING.getValue()).append("' ")
             	    .append("AND m.dataset_id NOT IN (SELECT a.dataset_id FROM gdms_allele_values a ")
@@ -223,13 +311,13 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             		 
             	if (type == GdmsType.TYPE_SNP){ // MappingSSR (with char values)
            		 sqlString =  new StringBuffer()
-           		 	.append(Dataset.GET_DATASETS_SELECT)
+           		 	.append(GET_DATASETS_SELECT)
            		 	.append("FROM gdms_char_values c JOIN gdms_dataset d ON c.dataset_id = d.dataset_id ")
            		 	.append("WHERE d.dataset_type =  '").append(GdmsType.TYPE_MAPPING.getValue()).append("' ");
             		
             	} else if (type == GdmsType.TYPE_SSR){ // MappingAllelicSSRDArT (with allele values)
               		 sqlString =  new StringBuffer()
-              		 	.append(Dataset.GET_DATASETS_SELECT)
+              		 	.append(GET_DATASETS_SELECT)
             		 	.append("FROM gdms_allele_values a JOIN gdms_dataset d ON a.dataset_id = d.dataset_id ")
             		 	.append("WHERE d.dataset_type =  '").append(GdmsType.TYPE_MAPPING.getValue()).append("' ");
             	}
