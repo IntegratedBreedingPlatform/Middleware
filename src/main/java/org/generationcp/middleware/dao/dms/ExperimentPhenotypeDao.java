@@ -44,23 +44,4 @@ public class ExperimentPhenotypeDao extends GenericDAO<ExperimentPhenotype, Inte
         return null;
     }
 
-    public void deleteByStudyIdAndTermId(List<Integer> ids, int termId) throws MiddlewareQueryException {
-        try {
-        	StringBuilder sql = new StringBuilder()
-        		.append("DELETE FROM nd_experiment_phenotype ")
-        		.append(" WHERE nd_experiment_id IN ( ")
-        		.append(" SELECT ep.nd_experiment_id ")
-        		.append(" FROM nd_experiment_project ep ")
-        		.append(" WHERE ep.project_id IN (:ids)) ")
-        		.append(" AND phenotype_id NOT IN (SELECT phenotype_id FROM phenotype) ");
-
-        	SQLQuery query = getSession().createSQLQuery(sql.toString());
-  			query.setParameter("ids", ids);
-  			query.executeUpdate();
-    	
-        } catch (HibernateException e) {
-            logAndThrowException("Error at deleteByStudyIdAndTermId=" + ids + "," + termId 
-                    + " query at ExperimentPhenotypeDao: " + e.getMessage(), e);
-        }
-    }
 }

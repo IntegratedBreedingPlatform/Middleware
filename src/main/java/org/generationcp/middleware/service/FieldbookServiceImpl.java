@@ -234,7 +234,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             trans = session.beginTransaction();
             
             getWorkbookSaver().saveWorkbookVariables(workbook);
-            
+            List<Integer> deletedVariateIds = getDeletedVariateIds(workbook.getVariates());
+
             saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
@@ -244,35 +245,42 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             if (variates != null){
                 for (MeasurementVariable variate : variates){
-                    for (MeasurementRow row : observations){
-                        for (MeasurementData field : row.getDataList()){
-                            if (variate.getName().equals(field.getLabel())){
-                            	Phenotype phenotype = null;
-                                if (field.getValue() != null) {
-                                	field.setValue(field.getValue().trim());
-                                }
-                                if (field.getPhenotypeId() != null) {
-	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
-                                }
-                                if (phenotype == null && field.getValue() != null 
-                                        && !"".equals(field.getValue().trim())){
-                                    phenotype = new Phenotype();
-                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
-                                }
-                                if (phenotype != null) {
-	                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
-	                                        , variate.getTermId(), variate.getStoredIn()
-	                                        , field.getValue(), phenotype);
-	
-	                                i++;
-	                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
-	                                    session.flush();
-	                                    session.clear();
+                	if (deletedVariateIds != null && !deletedVariateIds.isEmpty()
+                			&& deletedVariateIds.contains(variate.getTermId())) {
+                		//skip this was already deleted.
+                	}
+                	else {
+	                    for (MeasurementRow row : observations){
+	                        for (MeasurementData field : row.getDataList()){
+	                            if (variate.getName().equals(field.getLabel())){
+	                            	Phenotype phenotype = null;
+	                                if (field.getValue() != null) {
+	                                	field.setValue(field.getValue().trim());
 	                                }
-                                }
-                            }
-                        }
-                    }
+	                                if (field.getPhenotypeId() != null) {
+	                                	System.out.println("fetching " + field.getPhenotypeId());
+		                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
+	                                }
+	                                if (phenotype == null && field.getValue() != null 
+	                                        && !"".equals(field.getValue().trim())){
+	                                    phenotype = new Phenotype();
+	                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+	                                }
+	                                if (phenotype != null) {
+		                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
+		                                        , variate.getTermId(), variate.getStoredIn()
+		                                        , field.getValue(), phenotype);
+		
+		                                i++;
+		                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
+		                                    session.flush();
+		                                    session.clear();
+		                                }
+	                                }
+	                            }
+	                        }
+	                    }
+                	}
                 }
             }
             
@@ -894,5 +902,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public String getFolderNameById(Integer folderId) throws MiddlewareQueryException {
 	    return getStudyDataManager().getFolderNameById(folderId);
+	}
+	
+	private List<Integer> getDeletedVariateIds(List<MeasurementVariable> variables) {
+		List<Integer> ids = new ArrayList<Integer>();
+		if (variables != null) {
+			for (MeasurementVariable variable : variables) {
+				if (variable.getOperation() == Operation.DELETE) {
+					ids.add(variable.getTermId());
+				}
+			}
+		}
+		return ids;
 	}
 }

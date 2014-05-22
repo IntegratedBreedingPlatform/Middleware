@@ -316,7 +316,6 @@ public class ProjectPropertySaver extends Saver {
 			List<Integer> ids = Arrays.asList(project.getProjectId(), trialDataset.getProjectId(), measurementDataset.getProjectId());
 			setWorkingDatabase(Database.LOCAL);
 			getPhenotypeDao().deletePhenotypesInProjectByTerm(ids, termId);
-			getExperimentPhenotypeDao().deleteByStudyIdAndTermId(ids, termId);
 		}
 	}
 	private void deleteVariable(DmsProject project, int termId) throws MiddlewareQueryException {
@@ -331,4 +330,5 @@ public class ProjectPropertySaver extends Saver {
 			}
 		}
 	}
+	
 }
