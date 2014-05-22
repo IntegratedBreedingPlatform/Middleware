@@ -1199,8 +1199,8 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
             Debug.println(INDENT, markerUserInfo.toString());
         }
     }
-
-    private List<Object> createMarkerRecords() {
+    
+    private Marker createMarker(){
         Integer markerId = null; // Will be set/overridden by the function
         String markerType = null; // Will be set/overridden by the function
         String markerName = "SeqTEST" + (int) (Math.random() * 1000);
@@ -1218,6 +1218,16 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         String productSize = null;
         Float annealingTemp = Float.valueOf(0);
         String amplification = null;
+
+        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
+                ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
+                amplification);
+        
+        return marker;
+
+    }
+
+    private List<Object> createMarkerRecords() {
 
         String alias = "testalias";
         Integer noOfRepeats = 0;
@@ -1239,9 +1249,9 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         String contact = "juan@irri.com.ph";
         String institute = "IRRI";
 
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
-                ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
-                amplification);
+        Marker marker = createMarker();
+        Integer markerId = marker.getMarkerId();
+        
         MarkerAlias markerAlias = new MarkerAlias(null, markerId, alias);
         MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
                 minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
@@ -1736,9 +1746,39 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetMarkersByType() throws Exception {
-        String type = "SNP";
-        List<Marker> results = manager.getMarkersByType(type);
-        assertNotNull(results);
+    	
+    	Marker marker = createMarker();
+    	marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
+    	manager.addMarker(marker);
+        List<Marker> results = manager.getMarkersByType(GdmsType.TYPE_SNP.getValue());
+        assertFalse(results.isEmpty());
+        
+        marker = createMarker();
+    	marker.setMarkerType(GdmsType.TYPE_SSR.getValue());
+    	manager.addMarker(marker);
+        Debug.printObjects(INDENT, results);
+        results = manager.getMarkersByType(GdmsType.TYPE_SSR.getValue());
+        assertFalse(results.isEmpty());
+        Debug.printObjects(INDENT, results);
+        
+        marker = createMarker();
+    	marker.setMarkerType(GdmsType.TYPE_CISR.getValue());
+    	manager.addMarker(marker);
+        results = manager.getMarkersByType(GdmsType.TYPE_CISR.getValue());
+        assertFalse(results.isEmpty());
+        Debug.printObjects(INDENT, results);
+        
+        marker = createMarker();
+    	marker.setMarkerType(GdmsType.TYPE_DART.getValue());
+    	manager.addMarker(marker);
+        results = manager.getMarkersByType(GdmsType.TYPE_DART.getValue());
+        assertFalse(results.isEmpty());
+        Debug.printObjects(INDENT, results);
+        
+        marker = createMarker();
+    	marker.setMarkerType(GdmsType.TYPE_CAP.getValue());
+    	manager.addMarker(marker);
+        results = manager.getMarkersByType(GdmsType.TYPE_CAP.getValue());
         assertFalse(results.isEmpty());
         Debug.printObjects(INDENT, results);
     }
