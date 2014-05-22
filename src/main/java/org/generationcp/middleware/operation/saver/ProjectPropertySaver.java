@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -31,6 +32,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class ProjectPropertySaver extends Saver {
@@ -150,13 +152,15 @@ public class ProjectPropertySaver extends Saver {
 		if (variables != null) {
 			
 			int rank = getNextRank(study);
+			Set<Integer> geoIds = getGeolocationDao().getLocationIds(study.getProjectId());
+			Geolocation geolocation = getGeolocationDao().getById(geoIds.iterator().next()); 
 			for (MeasurementVariable variable : variables) {
 				if (variable.getOperation() == Operation.ADD) {
-					insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant);
+					insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, geolocation);
 					rank++;
 				}
 				else if (variable.getOperation() == Operation.UPDATE) {
-					updateVariable(study, trialDataset, measurementDataset, variable);
+					updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
 				}
 				else if (variable.getOperation() == Operation.DELETE) {
 					deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId());
@@ -177,7 +181,7 @@ public class ProjectPropertySaver extends Saver {
 		return nextRank;
 	}
 	private void insertVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
-			MeasurementVariable variable, int rank, boolean isConstant) throws MiddlewareQueryException {
+			MeasurementVariable variable, int rank, boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
 		
 		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			int datasetRank = getNextRank(trialDataset);
@@ -185,7 +189,7 @@ public class ProjectPropertySaver extends Saver {
 			insertVariable(project, variable, rank);
 			insertVariable(trialDataset, variable, datasetRank);
 			insertVariable(measurementDataset, variable, measurementRank);
-			getGeolocationPropertySaver().saveOrUpdateByProject(project.getProjectId(), variable.getTermId(), variable.getValue());
+			getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 		}
 		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
@@ -228,17 +232,34 @@ public class ProjectPropertySaver extends Saver {
 	}
 	
 	private void updateVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
-			MeasurementVariable variable) throws MiddlewareQueryException {
+			MeasurementVariable variable, boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
 		
-		updateVariable(project, variable);
 		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+			updateVariable(project, variable);
 			updateVariable(trialDataset, variable);
+			updateVariable(measurementDataset, variable);
+			getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 		}
-		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() 
-				|| variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
+		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
-			updateVariable(measurementDataset, variable);
+			if (isConstant) {
+				updateVariable(project, variable);
+			}
+			else {
+				updateVariable(measurementDataset, variable);
+			}
+		}
+		else { //study
+			updateVariable(project, variable);
+			if (variable.getStoredIn() == TermId.STUDY_NAME_STORAGE.getId()) {
+				project.setName(variable.getValue());
+				getDmsProjectDao().saveOrUpdate(project);
+			}
+			else if (variable.getStoredIn() == TermId.STUDY_TITLE_STORAGE.getId()) {
+				project.setDescription(variable.getValue());
+				getDmsProjectDao().saveOrUpdate(project);
+			}
 		}
 	}
 	private void updateVariable(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
@@ -258,9 +279,6 @@ public class ProjectPropertySaver extends Saver {
 					}
 					getProjectPropertyDao().update(property);
 				}
-			}
-			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-				getGeolocationPropertySaver().saveOrUpdateByProject(project.getProjectId(), variable.getTermId(), variable.getValue());
 			}
 		}
 	}

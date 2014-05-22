@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -768,13 +769,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				.append(" SELECT eph.phenotype_id ")
 				.append(" FROM nd_experiment_phenotype eph ")
 				.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
-				.append(" AND ep.project_id IN (:ids)) ")
-				.append(" AND observable_id = :termId ");
+				.append(" AND ep.project_id IN (");
+			for (int i = 0; i < ids.size(); i++) {
+				if (i > 0) {
+					sql.append(",");
+				}
+				sql.append(ids.get(i));
+			}
+			sql.append(")) ").append(" AND observable_id = ").append(termId);
 
   			SQLQuery query = getSession().createSQLQuery(sql.toString());
-  			query.setParameter("ids", ids);
-  			query.setParameter("termId", termId);
-  			query.executeUpdate();
+  			Debug.println("DELETE PHENOTYPE ROWS FOR " + termId + " : " + query.executeUpdate());
 				
 		} catch (HibernateException e) {
             logAndThrowException(
