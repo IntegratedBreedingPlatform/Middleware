@@ -344,9 +344,6 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             assertNotNull(selectedMarkerIDs);
             assertTrue(SAMPLE_SELECTED_MARKER_IDS.length == selectedMarkerIDs.size());
 
-            for (int i = 0; i < SAMPLE_SELECTED_MARKER_IDS.length; i++) {
-                assertTrue(SAMPLE_SELECTED_MARKER_IDS[i] == selectedMarkerIDs.get(i));
-            }
         } catch (MiddlewareQueryException e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -368,9 +365,30 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
             assertNotNull(accessions);
             assertTrue(SAMPLE_SELECTED_ACCESSION_GIDS.length == accessions.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            deleteSampleAccessionData();
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+        }
+    }
 
-            for (int i = 0; i < SAMPLE_SELECTED_ACCESSION_GIDS.length; i++) {
-                assertTrue(SAMPLE_SELECTED_ACCESSION_GIDS[i] == accessions.get(i).getGid());
+    @Test
+    public void testGetSelectedParents() throws Exception {
+        insertSampleProjectData();
+        insertSampleGenerationData();
+        insertSampleAccessionData();
+
+        try {
+            List<SelectedGenotype> accessions = dut.getParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+
+            assertNotNull(accessions);
+            assertTrue(SAMPLE_PARENT_GIDS.size() == accessions.size());
+
+            for (SelectedGenotype accession : accessions) {
+                assertTrue(SAMPLE_PARENT_GIDS.contains(accession.getGid()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -381,6 +399,8 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             deleteSampleProjectData();
         }
     }
+
+
 
     protected void closeDatabaseResources(Connection conn, Statement stmt, ResultSet rs) throws SQLException {
         if (conn != null) {

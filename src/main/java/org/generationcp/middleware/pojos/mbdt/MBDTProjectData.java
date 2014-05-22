@@ -52,7 +52,6 @@ public class MBDTProjectData implements Serializable {
 
 
     public MBDTProjectData() {
-
     }
 
     public MBDTProjectData(Integer projectID, String projectName, Integer userID,

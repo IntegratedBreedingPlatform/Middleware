@@ -32,6 +32,9 @@ public class SelectedGenotype implements Serializable {
     @Basic(optional = false)
     private Integer gid;
 
+    public SelectedGenotype() {
+    }
+
     public SelectedGenotype(MBDTGeneration generation, SelectedGenotypeEnum type, Integer gid) {
         this.generation = generation;
         this.type = type;

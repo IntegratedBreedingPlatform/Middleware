@@ -4,6 +4,7 @@ import org.generationcp.middleware.dao.mbdt.MBDTGenerationDAO;
 import org.generationcp.middleware.dao.mbdt.MBDTProjectDAO;
 import org.generationcp.middleware.dao.mbdt.SelectedGenotypeDAO;
 import org.generationcp.middleware.dao.mbdt.SelectedMarkerDAO;
+import org.generationcp.middleware.domain.mbdt.SelectedGenotypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.MBDTDataManager;
@@ -85,23 +86,14 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         prepareGenerationDAO();
         prepareSelectedMarkerDAO();
         MBDTGeneration generation = getGeneration(projectID, datasetID);
-        List<SelectedMarker> selectedMarkers = generation.getSelectedMarkers();
-        if (selectedMarkers == null) {
-            selectedMarkers = new ArrayList<SelectedMarker>();
-            generation.setSelectedMarkers(selectedMarkers);
-        }
-
 
         for (Integer markerID : markerIDs) {
             SelectedMarker sm = new SelectedMarker(generation, markerID);
-            Integer newId =  selectedMarkerDAO.getNegativeId("id");
+            Integer newId = selectedMarkerDAO.getNegativeId("id");
             sm.setId(newId);
 
             selectedMarkerDAO.saveOrUpdate(sm);
-            selectedMarkers.add(sm);
         }
-
-        generationDAO.saveOrUpdate(generation);
     }
 
     @Override
@@ -129,6 +121,60 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         } catch (Exception e) {
             e.printStackTrace();
             throw new MiddlewareQueryException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<SelectedGenotype> getParent(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
+        prepareSelectedGenotypeDAO();
+
+        try {
+            return selectedGenotypeDAO.getParentGenotypes(projectID, datasetID);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MiddlewareQueryException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void setSelectedAccessions(Integer projectID, Integer datasetID, List<Integer> gids) throws MiddlewareQueryException {
+        prepareGenerationDAO();
+        prepareSelectedGenotypeDAO();
+        MBDTGeneration generation = getGeneration(projectID, datasetID);
+
+        for (Integer gid : gids) {
+            SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SA, gid);
+            Integer newId = selectedGenotypeDAO.getNegativeId("id");
+            genotype.setId(newId);
+
+            selectedGenotypeDAO.saveOrUpdate(genotype);
+
+        }
+    }
+
+    @Override
+    public void setParent(Integer projectID, Integer datasetID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
+        prepareGenerationDAO();
+        prepareSelectedGenotypeDAO();
+        MBDTGeneration generation = getGeneration(projectID, datasetID);
+
+        List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getAccessionsByIds(gids);
+
+        if (existingAccession != null && existingAccession.size() > 0) {
+            for (SelectedGenotype genotype : existingAccession) {
+                gids.remove(genotype.getGid());
+                genotype.setType(genotypeEnum);
+                selectedGenotypeDAO.saveOrUpdate(genotype);
+            }
+        }
+
+        for (Integer gid : gids) {
+            SelectedGenotype genotype = new SelectedGenotype(generation, genotypeEnum, gid);
+            Integer newId = selectedGenotypeDAO.getNegativeId("id");
+            genotype.setId(newId);
+
+            selectedGenotypeDAO.saveOrUpdate(genotype);
+
         }
     }
 
@@ -171,6 +217,4 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
         return selectedGenotypeDAO;
     }
-
-
 }

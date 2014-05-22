@@ -28,6 +28,9 @@ public class SelectedMarker implements Serializable {
     @Column(name = "marker_id")
     private Integer markerID;
 
+    public SelectedMarker() {
+    }
+
     public SelectedMarker(MBDTGeneration generation, Integer markerID) {
         this.generation = generation;
         this.markerID = markerID;

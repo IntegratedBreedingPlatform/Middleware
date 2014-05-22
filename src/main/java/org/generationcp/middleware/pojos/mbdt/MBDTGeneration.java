@@ -37,6 +37,9 @@ public class MBDTGeneration implements Serializable{
     @Column(name = "genotypedataset_id")
     private Integer genotypeDatasetID;
 
+    public MBDTGeneration() {
+    }
+
     public MBDTGeneration(String generationName, MBDTProjectData project, Integer genotypeDatasetID) {
         this.generationName = generationName;
         this.project = project;

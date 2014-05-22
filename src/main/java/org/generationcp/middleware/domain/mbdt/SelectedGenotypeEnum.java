@@ -7,17 +7,11 @@ package org.generationcp.middleware.domain.mbdt;
  * Time: 9:23 AM
  */
 public enum SelectedGenotypeEnum {
-    ACCESSION("SA"),
-    DONOR("SD"),
-    RECURRENT("SR");
+    SA,
+    SD,
+    SR;
 
-    private String dbValue;
-
-    SelectedGenotypeEnum(String dbValue) {
-        this.dbValue = dbValue;
-    }
-
-    public String getDbValue() {
-        return dbValue;
+    public boolean isParentType() {
+        return (this.name().equals("SD") || this.name().equals("SR"));
     }
 }
