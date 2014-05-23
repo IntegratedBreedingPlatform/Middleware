@@ -118,7 +118,7 @@ public class WorkbookBuilder extends Builder {
 			constantVariables = study.getConstants();
 		}
 		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true);
-		List<MeasurementVariable> factors = buildFactors(experiments, isTrial);
+		List<MeasurementVariable> factors = buildFactors(variables);
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false);
 		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
 		
