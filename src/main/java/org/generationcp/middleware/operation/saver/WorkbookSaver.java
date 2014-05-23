@@ -166,6 +166,7 @@ public class WorkbookSaver extends Saver {
 //		}
 //		if(error) return -1;
 		
+		boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
 		
         //GCP-6091 start
         int studyLocationId;
@@ -212,6 +213,10 @@ public class WorkbookSaver extends Saver {
    		
    		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
         
+   		if (isUpdate) {
+   			saveWorkbookVariables(workbook);
+   		}
+   		
    		return studyId;
 	}
 	
