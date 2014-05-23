@@ -7,11 +7,8 @@ package org.generationcp.middleware.domain.mbdt;
  * Time: 9:23 AM
  */
 public enum SelectedGenotypeEnum {
-    SA,
+    R,
+    D,
     SD,
     SR;
-
-    public boolean isParentType() {
-        return (this.name().equals("SD") || this.name().equals("SR"));
-    }
 }
