@@ -187,7 +187,7 @@ public class ProjectPropertySaver extends Saver {
 		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			int datasetRank = getNextRank(trialDataset);
 			int measurementRank = getNextRank(measurementDataset);
-			insertVariable(project, variable, rank);
+			//insertVariable(project, variable, rank);
 			insertVariable(trialDataset, variable, datasetRank);
 			insertVariable(measurementDataset, variable, measurementRank);
 			getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
