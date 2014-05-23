@@ -134,6 +134,33 @@ public class WorkbookBuilder extends Builder {
 		
 		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates, isTrial);
 		List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
+		List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
+		
+		for (ProjectProperty projectProperty : projectProperties) {
+	                if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
+	                    StandardVariable stdVariable = getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
+	                    if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
+	                        String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+	                        
+	                        Double minRange = null, maxRange = null;
+	                        if (stdVariable.getConstraints() != null) {
+	                                minRange = stdVariable.getConstraints().getMaxValue();
+	                                maxRange = stdVariable.getConstraints().getMaxValue();
+	                        }
+	                        
+	                        MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), getLocalName(projectProperty.getRank(), projectProperties),//projectProperty.getValue(), 
+	                                stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+	                                stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), 
+	                                getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id), 
+	                                label, minRange, maxRange);
+	                        measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+	                        measurementVariable.setFactor(true);
+	                        measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+	                        
+	                        conditions.add(measurementVariable);
+	                    }
+	                }
+	        }
 		
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
