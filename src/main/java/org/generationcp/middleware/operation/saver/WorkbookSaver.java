@@ -779,5 +779,6 @@ public class WorkbookSaver extends Saver {
 		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
 		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
 		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
+		getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
 	}
 }

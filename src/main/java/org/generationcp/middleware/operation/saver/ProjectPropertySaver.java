@@ -339,4 +339,17 @@ public class ProjectPropertySaver extends Saver {
 		}
 	}
 	
+	public void saveFactors(DmsProject measurementDataset, List<MeasurementVariable> variables) throws MiddlewareQueryException {
+		if (variables != null && !variables.isEmpty()) {
+			for (MeasurementVariable variable : variables) {
+				if (variable.getOperation() == Operation.ADD) {
+					int measurementRank = getNextRank(measurementDataset);
+					insertVariable(measurementDataset, variable, measurementRank);
+				}
+				else if (variable.getOperation() == Operation.DELETE) {
+					deleteVariable(measurementDataset, variable.getTermId());
+				} // update operation is not allowed with factors
+			}
+		}
+	}
 }
