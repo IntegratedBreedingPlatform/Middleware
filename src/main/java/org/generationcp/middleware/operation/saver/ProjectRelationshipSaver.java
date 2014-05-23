@@ -74,6 +74,7 @@ public class ProjectRelationshipSaver extends Saver {
 		ProjectRelationship relationship = getProjectRelationshipDao().getParentFolderRelationship(studyId);
 		if (relationship != null && relationship.getObjectProject().getProjectId() != null 
 				&& !relationship.getObjectProject().getProjectId().equals(folderId)) {
+			relationship.setObjectProject(getDmsProjectDao().getById(folderId));
 			getProjectRelationshipDao().saveOrUpdate(relationship);
 		}
 	}

@@ -196,6 +196,10 @@ public class ProjectPropertySaver extends Saver {
 			
 			if (isConstant) {
 				insertVariable(project, variable, rank);
+				Variable var = new Variable(createVariableType(variable, rank), variable.getValue());
+				setWorkingDatabase(Database.LOCAL);
+				int experimentId = getExperimentProjectDao().getExperimentIdByProjectId(project.getProjectId());
+				getPhenotypeSaver().save(experimentId, var);
 			}
 			else {
 				int measurementRank = getNextRank(measurementDataset);
