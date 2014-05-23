@@ -144,4 +144,26 @@ public class MBDTProjectData implements Serializable {
     public String getProjectName() {
         return projectName;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (! (obj instanceof MBDTProjectData)) {
+            return false;
+        }
+
+        MBDTProjectData other = (MBDTProjectData) obj;
+
+        if (! other.getProjectID().equals(this.getProjectID())) {
+            return false;
+        }
+
+        if (! other.getProjectName().equals(this.getProjectName())) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -1,6 +1,7 @@
 package org.generationcp.middleware.manager.test;
 
 import com.mchange.v2.c3p0.DriverManagerDataSourceFactory;
+import org.generationcp.middleware.domain.mbdt.SelectedGenotypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -14,13 +15,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.sql.DataSource;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -89,7 +88,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
     }
 
     protected void insertSampleGenerationData() throws Exception {
-        executeUpdate("INSERT INTO mbdt_generations VALUES (" + SAMPLE_GENERATION_ID + ", '" + SAMPLE_PROJECT_NAME + "', " + SAMPLE_PROJECT_ID + ", " + SAMPLE_DATASET_ID + ")");
+        executeUpdate("INSERT INTO mbdt_generations VALUES (" + SAMPLE_GENERATION_ID + ", '" + SAMPLE_GENERATION_NAME + "', " + SAMPLE_PROJECT_ID + ", " + SAMPLE_DATASET_ID + ")");
     }
 
     protected void deleteSampleGenerationData() throws Exception {
@@ -163,6 +162,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
         MBDTProjectData newProject = new MBDTProjectData(null, SAMPLE_PROJECT_NAME, 0, null, null, null);
 
+        dut.clear();
         Integer generatedId = dut.setProjectData(newProject);
         assertNotNull(generatedId);
         assertTrue(generatedId < 0);
@@ -216,14 +216,6 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
     @Test
     public void testAddGeneration() throws Exception {
 
-        insertSampleProjectData();
-        MBDTGeneration generation = dut.addGeneration(SAMPLE_PROJECT_ID, SAMPLE_GENERATION_NAME, SAMPLE_DATASET_ID);
-
-        assertNotNull(generation);
-        assertEquals(SAMPLE_GENERATION_NAME, generation.getGenerationName());
-        assertNotNull(generation.getGenerationID());
-        assertTrue(generation.getGenerationID() < 0);
-
         // check the database for correct retrieval
 
         Connection conn = null;
@@ -231,6 +223,17 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
         ResultSet rs = null;
 
         try {
+            insertSampleProjectData();
+            MBDTGeneration generation = new MBDTGeneration();
+            generation.setGenotypeDatasetID(SAMPLE_DATASET_ID);
+            generation.setGenerationName(SAMPLE_GENERATION_NAME);
+            generation = dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
+            assertNotNull(generation);
+            assertEquals(SAMPLE_GENERATION_NAME, generation.getGenerationName());
+            assertNotNull(generation.getGenerationID());
+            assertTrue(generation.getGenerationID() < 0);
+
             conn = dataSource.getConnection();
             stmt = conn.createStatement();
 
@@ -258,10 +261,9 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
     @Test
     public void testRetrieveGeneration() throws Exception {
-        insertSampleProjectData();
-        insertSampleGenerationData();
-
         try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
             MBDTGeneration generation = dut.getGeneration(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
 
             assertNotNull(generation);
@@ -279,50 +281,71 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
     @Test
     public void testSetSelectedMarker() throws Exception {
-        insertSampleProjectData();
-        insertSampleGenerationData();
-
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
 
         List<Integer> testMarkerIDs = new ArrayList<Integer>();
 
-        for (int sampleSelectedMarkerId : SAMPLE_SELECTED_MARKER_IDS) {
-            testMarkerIDs.add(sampleSelectedMarkerId);
+        StringBuffer sqlString = new StringBuffer("SELECT marker_id, sm_id FROM mbdt_selected_markers mark INNER JOIN mbdt_generations")
+                .append(" gen ON (mark.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
+                .append(" WHERE marker_id in (");
+
+        for (int i = 0; i < SAMPLE_SELECTED_MARKER_IDS.length; i++) {
+            testMarkerIDs.add(SAMPLE_SELECTED_MARKER_IDS[i]);
+
+            if (i != 0) {
+                sqlString.append(",");
+            }
+
+            sqlString.append(SAMPLE_SELECTED_MARKER_IDS[i]);
         }
 
+        sqlString.append(")");
+
+
         try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+
+            // workaround for Hibernate
+            MBDTProjectData proj = dut.getProjectData(SAMPLE_PROJECT_ID);
+            dut.setProjectData(proj);
+            MBDTGeneration generation = dut.getGeneration(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+            dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
             dut.setSelectedMarkers(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, testMarkerIDs);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT marker_id FROM mbdt_selected_markers mark INNER JOIN mbdt_generations " +
-                    "gen ON (mark.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)");
+
+            rs = stmt.executeQuery(sqlString.toString());
 
             int recordCount = 0;
 
+            // clear list to make way for storage of ids
+            testMarkerIDs.clear();
+
             while (rs.next()) {
-                int value = rs.getInt("marker_id");
-                assertTrue(SAMPLE_SELECTED_MARKER_IDS[recordCount] == value);
+                testMarkerIDs.add(rs.getInt("sm_id"));
                 recordCount++;
             }
 
             assertTrue(recordCount == SAMPLE_SELECTED_MARKER_IDS.length);
 
-            StringBuffer buffer = new StringBuffer("DELETE FROM mbdt_selected_markers where marker_id IN(");
+            sqlString = new StringBuffer("DELETE FROM mbdt_selected_markers where sm_id IN(");
 
-            for (int i = 0; i < SAMPLE_SELECTED_MARKER_IDS.length; i++) {
+            for (int i = 0; i < testMarkerIDs.size(); i++) {
                 if (i != 0) {
-                    buffer.append(",");
+                    sqlString.append(",");
                 }
 
-                buffer.append(SAMPLE_SELECTED_MARKER_IDS[i]);
+                sqlString.append(testMarkerIDs.get(i));
             }
 
-            buffer.append(")");
+            sqlString.append(")");
 
-            stmt.executeUpdate(buffer.toString());
+            stmt.executeUpdate(sqlString.toString());
         } catch (MiddlewareQueryException e) {
             e.printStackTrace();
         } finally {
@@ -334,12 +357,12 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
     @Test
     public void testGetSelectedMarker() throws Exception {
-        insertSampleProjectData();
-        insertSampleGenerationData();
-        insertSampleMarkerData();
-
         try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+            insertSampleMarkerData();
             List<Integer> selectedMarkerIDs = dut.getSelectedMarkers(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+
 
             assertNotNull(selectedMarkerIDs);
             assertTrue(SAMPLE_SELECTED_MARKER_IDS.length == selectedMarkerIDs.size());
@@ -356,11 +379,10 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
     @Test
     public void testGetSelectedAccessions() throws Exception {
-        insertSampleProjectData();
-        insertSampleGenerationData();
-        insertSampleAccessionData();
-
         try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+            insertSampleAccessionData();
             List<SelectedGenotype> accessions = dut.getSelectedAccession(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
 
             assertNotNull(accessions);
@@ -377,11 +399,10 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
     @Test
     public void testGetSelectedParents() throws Exception {
-        insertSampleProjectData();
-        insertSampleGenerationData();
-        insertSampleAccessionData();
-
         try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+            insertSampleAccessionData();
             List<SelectedGenotype> accessions = dut.getParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
 
             assertNotNull(accessions);
@@ -400,6 +421,255 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
         }
     }
 
+    @Test
+    public void testSetSelectedAccession() throws Exception {
+
+        List<Integer> gidList = new ArrayList<Integer>();
+
+        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
+                .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
+                .append(" WHERE gid in(");
+
+        for (int i = 0; i < SAMPLE_SELECTED_ACCESSION_GIDS.length; i++) {
+            gidList.add(SAMPLE_SELECTED_ACCESSION_GIDS[i]);
+
+            if (i != 0) {
+                sqlString.append(",");
+            }
+
+            sqlString.append(SAMPLE_SELECTED_ACCESSION_GIDS[i]);
+        }
+
+        sqlString.append(")");
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            // workaround for Hibernate : associate inserted data to Hibernate session to avoid problems later on
+            dut.clear();
+            MBDTProjectData newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
+            dut.setProjectData(newProject);
+
+            MBDTGeneration generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
+            generation.setGenerationID(SAMPLE_GENERATION_ID);
+            dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
+
+            dut.setSelectedAccessions(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, gidList);
+
+            conn = dataSource.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sqlString.toString());
+
+            int recordCount = 0;
+            gidList.clear();
+
+            while (rs.next()) {
+                recordCount++;
+                gidList.add(rs.getInt("sg_id"));
+            }
+
+            assertTrue(recordCount == SAMPLE_SELECTED_ACCESSION_GIDS.length);
+
+            // clean up
+            sqlString = new StringBuffer("DELETE FROM mbdt_selected_genotypes WHERE sg_id IN (");
+
+            for (int i = 0; i < gidList.size(); i++) {
+                if (i != 0) {
+                    sqlString.append(",");
+                }
+
+                sqlString.append(gidList.get(i));
+            }
+
+            sqlString.append(")");
+            stmt.executeUpdate(sqlString.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, rs);
+        }
+
+    }
+
+    @Test
+    public void testSetParent() throws Exception {
+
+
+        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
+                .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
+                .append(" WHERE gid in(");
+
+        List<Integer> gidList = new ArrayList<Integer>();
+        for (int i = 0; i < SAMPLE_PARENT_GIDS.size(); i++) {
+            gidList.add(SAMPLE_PARENT_GIDS.get(i));
+
+            if (i != 0) {
+                sqlString.append(",");
+            }
+
+            sqlString.append(SAMPLE_PARENT_GIDS.get(i));
+        }
+
+        sqlString.append(")");
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            dut.clear();
+            MBDTProjectData newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
+            dut.setProjectData(newProject);
+
+            MBDTGeneration generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
+            generation.setGenerationID(SAMPLE_GENERATION_ID);
+            dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
+
+            dut.setParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, SelectedGenotypeEnum.SR, gidList);
+
+            conn = dataSource.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sqlString.toString());
+
+            int recordCount = 0;
+            gidList.clear();
+
+            while (rs.next()) {
+                recordCount++;
+                gidList.add(rs.getInt("sg_id"));
+            }
+
+            assertTrue(recordCount == SAMPLE_PARENT_GIDS.size());
+
+            // clean up
+            sqlString = new StringBuffer("DELETE FROM mbdt_selected_genotypes WHERE sg_id IN (");
+
+            for (int i = 0; i < gidList.size(); i++) {
+                if (i != 0) {
+                    sqlString.append(",");
+                }
+
+                sqlString.append(gidList.get(i));
+            }
+
+            sqlString.append(")");
+            stmt.executeUpdate(sqlString.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, rs);
+        }
+
+    }
+
+    @Test
+    public void testSetParentNegativeNonParentEnumType() throws Exception {
+
+        List<Integer> gidList = new ArrayList<Integer>();
+        for (int i = 0; i < SAMPLE_PARENT_GIDS.size(); i++) {
+            gidList.add(SAMPLE_PARENT_GIDS.get(i));
+
+        }
+
+        try {
+            dut.clear();
+            MBDTProjectData newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
+            dut.setProjectData(newProject);
+
+            MBDTGeneration generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
+            dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
+            dut.setParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, SelectedGenotypeEnum.SA, gidList);
+            fail("Not able to catch error, setting parent with non parent genotype type");
+        } catch (MiddlewareQueryException e) {
+
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+        }
+    }
+
+    @Test
+    public void testSetParentAlreadyPresentAsAccession() throws Exception {
+        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid, sg_type FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
+                .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
+                .append(" WHERE gid in(");
+        List<Integer> gidList = new ArrayList<Integer>();
+        for (int i = 0; i < SAMPLE_PARENT_GIDS.size(); i++) {
+            gidList.add(SAMPLE_PARENT_GIDS.get(i));
+
+            if (i != 0) {
+                sqlString.append(",");
+            }
+
+            sqlString.append(SAMPLE_PARENT_GIDS.get(i));
+
+        }
+
+        sqlString.append(")");
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            dut.clear();
+            MBDTProjectData newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
+            dut.setProjectData(newProject);
+
+            MBDTGeneration generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
+            dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
+            // insert GIDs as accession
+            dut.setSelectedAccessions(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, gidList);
+
+            dut.setParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, SelectedGenotypeEnum.SR, SAMPLE_PARENT_GIDS);
+
+            conn = dataSource.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sqlString.toString());
+
+            int recordCount = 0;
+
+            while (rs.next()) {
+                recordCount++;
+                String type = rs.getString("sg_type");
+
+                assertEquals("SR", type);
+            }
+
+            // clean up
+            sqlString = new StringBuffer("DELETE FROM mbdt_selected_genotypes WHERE sg_id IN (");
+
+            for (int i = 0; i < gidList.size(); i++) {
+                if (i != 0) {
+                    sqlString.append(",");
+                }
+
+                sqlString.append(gidList.get(i));
+            }
+
+            sqlString.append(")");
+            stmt.executeUpdate(sqlString.toString());
+        } catch (MiddlewareQueryException e) {
+            fail(e.getMessage());
+        } finally {
+            deleteSampleAccessionData();
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+        }
+    }
 
 
     protected void closeDatabaseResources(Connection conn, Statement stmt, ResultSet rs) throws SQLException {

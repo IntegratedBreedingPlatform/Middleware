@@ -23,14 +23,13 @@ public class MBDTProjectDAO extends GenericDAO<MBDTProjectData, Integer> {
     @Override
     public MBDTProjectData save(MBDTProjectData entity) throws MiddlewareQueryException {
         Session session = getSession();
-        session.clear();
         Transaction transaction = session.beginTransaction();
         try {
 
             MBDTProjectData returnVal = super.save(entity);
             transaction.commit();
             session.flush();
-
+            session.clear();
             return returnVal;
         } catch (HibernateException e) {
             transaction.rollback();

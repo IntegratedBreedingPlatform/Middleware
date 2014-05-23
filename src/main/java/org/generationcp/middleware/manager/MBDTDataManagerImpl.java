@@ -36,6 +36,8 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         requireLocalDatabaseInstance();
         projectDAO = prepareProjectDAO();
 
+
+        // TODO ask if its required to check for duplicate project name
         if (projectData.getProjectID() == null || projectData.getProjectID() == 0) {
             projectData.setProjectID(projectDAO.getNegativeId());
         }
@@ -61,18 +63,25 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public MBDTGeneration addGeneration(Integer projectID, String generationName, Integer datasetID) throws MiddlewareQueryException {
-        MBDTProjectData project = getProjectData(projectID);
-        MBDTGeneration newGeneration = new MBDTGeneration(generationName, project, datasetID);
+    public MBDTGeneration setGeneration(Integer projectID, MBDTGeneration generation) throws MiddlewareQueryException {
+
+        requireLocalDatabaseInstance();
+        if (generation.getProject() == null) {
+            MBDTProjectData project = getProjectData(projectID);
+            generation.setProject(project);
+        }
 
         prepareGenerationDAO();
 
-        Integer newId = generationDAO.getNegativeId("generationID");
-        newGeneration.setGenerationID(newId);
+        if (generation.getGenerationID() == null) {
+            Integer newId = generationDAO.getNegativeId("generationID");
+            generation.setGenerationID(newId);
+        }
 
-        generationDAO.saveOrUpdate(newGeneration);
 
-        return newGeneration;
+        generationDAO.saveOrUpdate(generation);
+
+        return generation;
     }
 
     @Override
@@ -83,8 +92,20 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public void setSelectedMarkers(Integer projectID, Integer datasetID, List<Integer> markerIDs) throws MiddlewareQueryException {
+
+        requireLocalDatabaseInstance();
+
         prepareGenerationDAO();
         prepareSelectedMarkerDAO();
+
+        List<SelectedMarker> markers = selectedMarkerDAO.getMarkersByProjectAndDatasetID(projectID, datasetID);
+
+        if (markers != null && markers.size() > 0) {
+            for (SelectedMarker marker : markers) {
+                markerIDs.remove(marker.getMarkerID());
+            }
+        }
+
         MBDTGeneration generation = getGeneration(projectID, datasetID);
 
         for (Integer markerID : markerIDs) {
@@ -138,6 +159,9 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public void setSelectedAccessions(Integer projectID, Integer datasetID, List<Integer> gids) throws MiddlewareQueryException {
+
+        requireLocalDatabaseInstance();
+
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(projectID, datasetID);
@@ -154,6 +178,12 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public void setParent(Integer projectID, Integer datasetID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
+        if (!genotypeEnum.isParentType()) {
+            throw new MiddlewareQueryException("Provided type is not valid for parent entries");
+        }
+
+        requireLocalDatabaseInstance();
+
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(projectID, datasetID);
@@ -216,5 +246,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         selectedGenotypeDAO.setSession(getActiveSession());
 
         return selectedGenotypeDAO;
+    }
+
+    @Override
+    public void clear() {
+        getActiveSession().clear();
     }
 }

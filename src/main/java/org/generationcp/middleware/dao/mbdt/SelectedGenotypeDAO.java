@@ -5,6 +5,8 @@ import org.generationcp.middleware.domain.mbdt.SelectedGenotypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
 import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
@@ -48,4 +50,21 @@ public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
         return criteria.list();
     }
 
+    @Override
+    public SelectedGenotype saveOrUpdate(SelectedGenotype entity) throws MiddlewareQueryException {
+        Session session = getSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            SelectedGenotype genotype = super.saveOrUpdate(entity);
+            transaction.commit();
+            session.flush();
+            session.clear();
+
+            return genotype;
+        } catch (MiddlewareQueryException e) {
+            e.printStackTrace();
+            transaction.rollback();
+            throw e;
+        }
+    }
 }

@@ -18,7 +18,7 @@ public interface MBDTDataManager {
 
     public MBDTProjectData getProjectData(Integer projectID) throws MiddlewareQueryException;
 
-    public MBDTGeneration addGeneration(Integer projectID, String generationName, Integer datasetID) throws MiddlewareQueryException;
+    public MBDTGeneration setGeneration(Integer projectID, MBDTGeneration generation) throws MiddlewareQueryException;
 
     public MBDTGeneration getGeneration(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
 
@@ -33,4 +33,7 @@ public interface MBDTDataManager {
     public void setSelectedAccessions(Integer projectID, Integer datasetID, List<Integer> gids) throws MiddlewareQueryException;
 
     public void setParent(Integer projectID, Integer datasetID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException;
+
+    // for test purposes
+    public void clear();
 }
