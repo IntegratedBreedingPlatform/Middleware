@@ -1115,7 +1115,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
         try {
         	StringBuffer sql = new StringBuffer()
-        		.append("SELECT marker_name FROM gdms_marker WHERE marker_id IN (:markerIds) ");
+        		.append("SELECT CONCAT(marker_name, '') FROM gdms_marker WHERE marker_id IN (:markerIds) ");
         	
             SQLQuery query = getSession().createSQLQuery(sql.toString());
             query.setParameterList("markerIds", markerIds);
