@@ -1029,9 +1029,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public int countPlotsWithPlantsSelectedofDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException {
+    public int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException {
         if (setWorkingDatabase(Database.LOCAL)) {
-            return getPhenotypeDao().countPlantsSelectedOfNursery(dataSetId, variateIds);
+            return getPhenotypeDao().countRecordedVariatesOfStudy(dataSetId, variateIds);
         }
         return 0;
     }

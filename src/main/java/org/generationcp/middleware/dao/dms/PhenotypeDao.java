@@ -718,7 +718,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 	
-	public int countPlantsSelectedOfNursery(Integer projectId, List<Integer> variateIds) throws MiddlewareQueryException {
+	public int countRecordedVariatesOfStudy(Integer projectId, List<Integer> variateIds) throws MiddlewareQueryException {
 	    try {
 	        
 	    	if (variateIds != null && !variateIds.isEmpty()) {
@@ -790,6 +790,28 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             logAndThrowException(
                     "Error in deletePhenotypesInProjectByTerm("    + ids + ", " + termId + ") in PhenotypeDao: " + e.getMessage(), e);
 		}
+	}
+	
+	public Integer getPhenotypeIdByProjectAndType(int projectId, int typeId) throws MiddlewareQueryException {
+		try {
+			StringBuilder sql = new StringBuilder()
+				.append(" SELECT p.phenotype_id ")
+				.append(" FROM phenotype p ")
+				.append(" INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ")
+				.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
+				.append("   AND ep.project_id = ").append(projectId)
+				.append(" WHERE p.observable_id = ").append(typeId);
+			SQLQuery query = getSession().createSQLQuery(sql.toString());
+			List<Integer> list = query.list();
+			if (list != null && !list.isEmpty()) {
+				return list.get(0);
+			}
+
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getPhenotypeIdByProjectAndType("    + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(), e);
+		}
+		return null;
 	}
 	
 }

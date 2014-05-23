@@ -223,4 +223,20 @@ public class PhenotypeSaver extends Saver{
 
     }
 
+    public void saveOrUpdatePhenotypeValue(int projectId, int variableId, int storedIn, String value) throws MiddlewareQueryException {
+    	if (value != null) {
+			setWorkingDatabase(Database.LOCAL);
+			Integer phenotypeId = getPhenotypeDao().getPhenotypeIdByProjectAndType(projectId, variableId);
+			if (phenotypeId != null) {
+				Phenotype phenotype = getPhenotypeDao().getById(phenotypeId);
+				if (storedIn == TermId.CATEGORICAL_VARIATE.getId() && NumberUtils.isNumber(value))	{
+					phenotype.setcValue(Double.valueOf(value).intValue());
+				}
+				else {
+					phenotype.setValue(value);
+				}
+				getPhenotypeDao().saveOrUpdate(phenotype);
+			}
+    	}
+    }
 }

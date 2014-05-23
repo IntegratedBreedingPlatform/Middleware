@@ -181,7 +181,13 @@ public class WorkbookSaver extends Saver {
         }
 		//GCP-6091 end
 		
-		int studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
+		int studyId = 0;
+		if (!isUpdate) {
+			studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
+		}
+		else {
+			studyId = workbook.getStudyDetails().getId();
+		}
    		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
    		
    		if(trialVariableTypeList!=null || workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {//multi-location

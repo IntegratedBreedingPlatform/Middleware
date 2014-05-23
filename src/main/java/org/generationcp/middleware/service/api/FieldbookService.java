@@ -347,7 +347,7 @@ public interface FieldbookService {
      * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int countPlotsWithPlantsSelectedofNursery(int nurseryId, List<Integer> variateIds) throws MiddlewareQueryException;
+    int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds) throws MiddlewareQueryException;
     
     /**
      * Filter standard variables by mode.

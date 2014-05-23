@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -249,6 +250,7 @@ public class ProjectPropertySaver extends Saver {
 			
 			if (isConstant) {
 				updateVariable(project, variable);
+				getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
 			}
 			else {
 				updateVariable(measurementDataset, variable);
@@ -258,11 +260,13 @@ public class ProjectPropertySaver extends Saver {
 			updateVariable(project, variable);
 			if (variable.getStoredIn() == TermId.STUDY_NAME_STORAGE.getId()) {
 				project.setName(variable.getValue());
-				getDmsProjectDao().saveOrUpdate(project);
+				getDmsProjectDao().merge(project);
+				//getDmsProjectDao().saveOrUpdate(project);
 			}
 			else if (variable.getStoredIn() == TermId.STUDY_TITLE_STORAGE.getId()) {
 				project.setDescription(variable.getValue());
-				getDmsProjectDao().saveOrUpdate(project);
+				getDmsProjectDao().merge(project);
+				//getDmsProjectDao().saveOrUpdate(project);
 			}
 		}
 	}
