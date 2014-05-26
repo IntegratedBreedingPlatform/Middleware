@@ -46,8 +46,6 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.util.TimerWatch;
 
 public class WorkbookBuilder extends Builder {
 	
@@ -118,7 +116,7 @@ public class WorkbookBuilder extends Builder {
 			constantVariables = study.getConstants();
 		}
 		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true);
-		List<MeasurementVariable> factors = buildFactors(experiments, isTrial);
+		List<MeasurementVariable> factors = buildFactors(variables, isTrial);		
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false);
 		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
 		
@@ -206,7 +204,7 @@ public class WorkbookBuilder extends Builder {
             
             VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
             
-            List<MeasurementVariable> factors = buildFactors(variables);
+            List<MeasurementVariable> factors = buildFactors(variables, !isNursery);
             List<MeasurementVariable> variates = buildVariates(variables);
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
             List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
@@ -252,7 +250,6 @@ public class WorkbookBuilder extends Builder {
 		
 	    List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 	    for (Experiment experiment : experiments) {
-	   
 	        int experimentId = experiment.getId();
 	        VariableList factors = experiment.getFactors();
 	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes); //experiment.getVariates();
@@ -361,6 +358,7 @@ public class WorkbookBuilder extends Builder {
 	private List<MeasurementVariable> buildFactors(List<Experiment> experiments, boolean isTrial) {
 	    List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 	    VariableTypeList factorList = new VariableTypeList();
+	    
             for (Experiment experiment : experiments) {
                 for (Variable variable : experiment.getFactors().getVariables()) {
                     if (isTrial && 
@@ -412,18 +410,22 @@ public class WorkbookBuilder extends Builder {
 		return treatmentFactors;
 	}
 	
-	private List<MeasurementVariable> buildFactors(VariableTypeList variables) {
+	private List<MeasurementVariable> buildFactors(VariableTypeList variables, boolean isTrial) {
             List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
             VariableTypeList factorList = new VariableTypeList();
             if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
                 for (VariableType variable : variables.getFactors().getVariableTypes()) {
-                    if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
+                    if (((isTrial && 
+                            variable.getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) ||
+                            (PhenotypicType.TRIAL_DESIGN.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
+                            || PhenotypicType.GERMPLASM.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
+                            || PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))))
                     		&& (variable.getTreatmentLabel() == null || variable.getTreatmentLabel().isEmpty())) {
                     	
                         factorList.add(variable);
                     }
                 }
-                factors = getMeasurementVariableTransformer().transform(factorList, false);
+                factors = getMeasurementVariableTransformer().transform(factorList, true);
             }
             
             return factors;
