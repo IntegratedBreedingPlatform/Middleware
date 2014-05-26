@@ -20,19 +20,19 @@ public interface MBDTDataManager {
 
     public MBDTGeneration setGeneration(Integer projectID, MBDTGeneration generation) throws MiddlewareQueryException;
 
-    public MBDTGeneration getGeneration(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
+    public MBDTGeneration getGeneration(Integer generationID) throws MiddlewareQueryException;
 
-    public void setSelectedMarkers(Integer projectID, Integer datasetID, List<Integer> markerIDs) throws MiddlewareQueryException;
+    public void setMarkerStatus(Integer generationID, List<Integer> markerIDs) throws MiddlewareQueryException;
 
-    public List<Integer> getSelectedMarkers(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
+    public List<Integer> getMarkerStatus(Integer generationID) throws MiddlewareQueryException;
 
-    public List<SelectedGenotype> getSelectedAccession(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
+    public List<SelectedGenotype> getSelectedAccession(Integer generationID) throws MiddlewareQueryException;
 
-    public List<SelectedGenotype> getParent(Integer projectID, Integer datasetID) throws MiddlewareQueryException;
+    public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException;
 
-    public void setSelectedAccessions(Integer projectID, Integer datasetID, List<Integer> gids) throws MiddlewareQueryException;
+    public void setSelectedAccessions(Integer generationID, List<Integer> gids) throws MiddlewareQueryException;
 
-    public void setParent(Integer projectID, Integer datasetID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException;
+    public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException;
 
     // for test purposes
     public void clear();

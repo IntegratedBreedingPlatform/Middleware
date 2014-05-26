@@ -27,6 +27,14 @@ public class SelectedMarkerDAO extends GenericDAO<SelectedMarker, Integer> {
         return criteria.list();
     }
 
+    public List<SelectedMarker> getMarkersByGenerationID(Integer generationID) throws MiddlewareQueryException {
+        Criteria criteria = getSession().createCriteria(getPersistentClass());
+
+        criteria.add(Restrictions.eq("generation.generationID", generationID));
+
+        return criteria.list();
+    }
+
     @Override
     public SelectedMarker saveOrUpdate(SelectedMarker entity) throws MiddlewareQueryException {
         Session session = getSession();

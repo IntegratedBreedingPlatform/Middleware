@@ -110,15 +110,17 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
     protected void insertSampleAccessionData() throws Exception {
         int i = -1;
         for (int sampleSelectedAccessionGid : SAMPLE_SELECTED_ACCESSION_GIDS) {
-            if (SAMPLE_PARENT_GIDS.contains(sampleSelectedAccessionGid)) {
-                executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'SR')");
-            } else {
-                executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'SA')");
-            }
+            executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'R')");
             i--;
         }
+    }
 
-
+    protected void insertSampleParentData() throws Exception {
+        int i = -1;
+        for (int sampleSelectedAccessionGid : SAMPLE_PARENT_GIDS) {
+            executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'SD')");
+            i--;
+        }
     }
 
     protected void deleteSampleMarkerData() throws Exception {
@@ -264,7 +266,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
         try {
             insertSampleProjectData();
             insertSampleGenerationData();
-            MBDTGeneration generation = dut.getGeneration(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+            MBDTGeneration generation = dut.getGeneration(SAMPLE_GENERATION_ID);
 
             assertNotNull(generation);
             assertEquals(SAMPLE_GENERATION_NAME, generation.getGenerationName());
@@ -311,10 +313,10 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             // workaround for Hibernate
             MBDTProjectData proj = dut.getProjectData(SAMPLE_PROJECT_ID);
             dut.setProjectData(proj);
-            MBDTGeneration generation = dut.getGeneration(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+            MBDTGeneration generation = dut.getGeneration(SAMPLE_GENERATION_ID);
             dut.setGeneration(SAMPLE_PROJECT_ID, generation);
 
-            dut.setSelectedMarkers(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, testMarkerIDs);
+            dut.setMarkerStatus(SAMPLE_DATASET_ID, testMarkerIDs);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();
@@ -361,7 +363,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             insertSampleProjectData();
             insertSampleGenerationData();
             insertSampleMarkerData();
-            List<Integer> selectedMarkerIDs = dut.getSelectedMarkers(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+            List<Integer> selectedMarkerIDs = dut.getMarkerStatus(SAMPLE_GENERATION_ID);
 
 
             assertNotNull(selectedMarkerIDs);
@@ -383,10 +385,15 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             insertSampleProjectData();
             insertSampleGenerationData();
             insertSampleAccessionData();
-            List<SelectedGenotype> accessions = dut.getSelectedAccession(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+            List<SelectedGenotype> accessions = dut.getSelectedAccession(SAMPLE_GENERATION_ID);
 
             assertNotNull(accessions);
             assertTrue(SAMPLE_SELECTED_ACCESSION_GIDS.length == accessions.size());
+
+            for (SelectedGenotype accession : accessions) {
+                assertEquals(SelectedGenotypeEnum.R, accession.getType());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -402,8 +409,8 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
         try {
             insertSampleProjectData();
             insertSampleGenerationData();
-            insertSampleAccessionData();
-            List<SelectedGenotype> accessions = dut.getParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID);
+            insertSampleParentData();
+            List<SelectedGenotype> accessions = dut.getParentData(SAMPLE_GENERATION_ID);
 
             assertNotNull(accessions);
             assertTrue(SAMPLE_PARENT_GIDS.size() == accessions.size());
@@ -457,7 +464,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             dut.setGeneration(SAMPLE_PROJECT_ID, generation);
 
 
-            dut.setSelectedAccessions(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, gidList);
+            dut.setSelectedAccessions(SAMPLE_GENERATION_ID, gidList);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();
@@ -533,7 +540,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             dut.setGeneration(SAMPLE_PROJECT_ID, generation);
 
 
-            dut.setParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, SelectedGenotypeEnum.SR, gidList);
+            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.SR, gidList);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();
@@ -573,6 +580,8 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
     }
 
+    /*
+    No longer applicable with the change to the selected genotype
     @Test
     public void testSetParentNegativeNonParentEnumType() throws Exception {
 
@@ -590,7 +599,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             MBDTGeneration generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
             dut.setGeneration(SAMPLE_PROJECT_ID, generation);
 
-            dut.setParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, SelectedGenotypeEnum.SA, gidList);
+            dut.setParentData(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, SelectedGenotypeEnum.SA, gidList);
             fail("Not able to catch error, setting parent with non parent genotype type");
         } catch (MiddlewareQueryException e) {
 
@@ -598,7 +607,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             deleteSampleGenerationData();
             deleteSampleProjectData();
         }
-    }
+    }*/
 
     @Test
     public void testSetParentAlreadyPresentAsAccession() throws Exception {
@@ -632,9 +641,9 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             dut.setGeneration(SAMPLE_PROJECT_ID, generation);
 
             // insert GIDs as accession
-            dut.setSelectedAccessions(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, gidList);
+            dut.setSelectedAccessions(SAMPLE_GENERATION_ID, gidList);
 
-            dut.setParent(SAMPLE_PROJECT_ID, SAMPLE_DATASET_ID, SelectedGenotypeEnum.SR, SAMPLE_PARENT_GIDS);
+            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.SR, SAMPLE_PARENT_GIDS);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();

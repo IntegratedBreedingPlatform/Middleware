@@ -18,6 +18,7 @@ import java.util.List;
 
 public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
 
+    @Deprecated
     public List<SelectedGenotype> retrieveAllAccessions(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
         Criteria crit = getSession().createCriteria(getPersistentClass());
         crit.createAlias("generation", "g")
@@ -28,6 +29,22 @@ public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
         return crit.list();
     }
 
+    public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException {
+        Criteria crit = getSession().createCriteria(getPersistentClass());
+        crit.add(Restrictions.eq("generation.generationID", generationID));
+
+        return crit.list();
+    }
+
+    public List<SelectedGenotype> getAccessions(Integer generationID) throws MiddlewareQueryException {
+        Criteria crit = getSession().createCriteria(getPersistentClass());
+
+        crit.add(Restrictions.eq("type", SelectedGenotypeEnum.R));
+
+        return crit.list();
+    }
+
+    @Deprecated
     public List<SelectedGenotype> getParentGenotypes(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
         Criteria crit = getSession().createCriteria(getPersistentClass());
         crit.createAlias("generation", "g")

@@ -85,20 +85,20 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public MBDTGeneration getGeneration(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
+    public MBDTGeneration getGeneration(Integer generationID) throws MiddlewareQueryException {
         prepareGenerationDAO();
-        return generationDAO.getByProjectAndDatasetID(projectID, datasetID);
+        return generationDAO.getById(generationID);
     }
 
     @Override
-    public void setSelectedMarkers(Integer projectID, Integer datasetID, List<Integer> markerIDs) throws MiddlewareQueryException {
+    public void setMarkerStatus(Integer generatonID, List<Integer> markerIDs) throws MiddlewareQueryException {
 
         requireLocalDatabaseInstance();
 
         prepareGenerationDAO();
         prepareSelectedMarkerDAO();
 
-        List<SelectedMarker> markers = selectedMarkerDAO.getMarkersByProjectAndDatasetID(projectID, datasetID);
+        List<SelectedMarker> markers = selectedMarkerDAO.getMarkersByGenerationID(generatonID);
 
         if (markers != null && markers.size() > 0) {
             for (SelectedMarker marker : markers) {
@@ -106,7 +106,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
             }
         }
 
-        MBDTGeneration generation = getGeneration(projectID, datasetID);
+        MBDTGeneration generation = generationDAO.getById(generatonID);
 
         for (Integer markerID : markerIDs) {
             SelectedMarker sm = new SelectedMarker(generation, markerID);
@@ -118,9 +118,9 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public List<Integer> getSelectedMarkers(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
+    public List<Integer> getMarkerStatus(Integer generationID) throws MiddlewareQueryException {
         prepareGenerationDAO();
-        MBDTGeneration generation = generationDAO.getByProjectAndDatasetID(datasetID, projectID);
+        MBDTGeneration generation = generationDAO.getById(generationID);
 
         List<SelectedMarker> markers = generation.getSelectedMarkers();
 
@@ -134,11 +134,11 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public List<SelectedGenotype> getSelectedAccession(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
+    public List<SelectedGenotype> getSelectedAccession(Integer generationID) throws MiddlewareQueryException {
         prepareSelectedGenotypeDAO();
 
         try {
-            return selectedGenotypeDAO.retrieveAllAccessions(projectID, datasetID);
+            return selectedGenotypeDAO.getAccessions(generationID);
         } catch (Exception e) {
             e.printStackTrace();
             throw new MiddlewareQueryException(e.getMessage());
@@ -146,11 +146,11 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public List<SelectedGenotype> getParent(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
+    public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException {
         prepareSelectedGenotypeDAO();
 
         try {
-            return selectedGenotypeDAO.getParentGenotypes(projectID, datasetID);
+            return selectedGenotypeDAO.getParentData(generationID);
         } catch (Exception e) {
             e.printStackTrace();
             throw new MiddlewareQueryException(e.getMessage());
@@ -158,16 +158,16 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public void setSelectedAccessions(Integer projectID, Integer datasetID, List<Integer> gids) throws MiddlewareQueryException {
+    public void setSelectedAccessions(Integer generationID, List<Integer> gids) throws MiddlewareQueryException {
 
         requireLocalDatabaseInstance();
 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
-        MBDTGeneration generation = getGeneration(projectID, datasetID);
+        MBDTGeneration generation = getGeneration(generationID);
 
         for (Integer gid : gids) {
-            SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SA, gid);
+            SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.R, gid);
             Integer newId = selectedGenotypeDAO.getNegativeId("id");
             genotype.setId(newId);
 
@@ -177,16 +177,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public void setParent(Integer projectID, Integer datasetID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
-        if (!genotypeEnum.isParentType()) {
-            throw new MiddlewareQueryException("Provided type is not valid for parent entries");
-        }
+    public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
 
         requireLocalDatabaseInstance();
 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
-        MBDTGeneration generation = getGeneration(projectID, datasetID);
+        MBDTGeneration generation = getGeneration(generationID);
 
         List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getAccessionsByIds(gids);
 
