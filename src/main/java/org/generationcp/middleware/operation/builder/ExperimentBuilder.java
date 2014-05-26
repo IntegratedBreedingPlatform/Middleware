@@ -35,7 +35,6 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-import org.generationcp.middleware.util.TimerWatch;
 
 public class ExperimentBuilder extends Builder {
 
@@ -372,5 +371,12 @@ public class ExperimentBuilder extends Builder {
 	public boolean hasFieldmap(int datasetId) throws MiddlewareQueryException {
 		setWorkingDatabase(datasetId);
 		return getExperimentDao().hasFieldmap(datasetId);
+	}
+	
+	public boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException {
+		setWorkingDatabase(studyId);
+		List<Integer> geolocationIdsOfStudy = getExperimentDao().getLocationIdsOfStudy(studyId);
+		List<Integer> geolocationIdsOfStudyWithFieldmap = getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
+		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
 	}
 }

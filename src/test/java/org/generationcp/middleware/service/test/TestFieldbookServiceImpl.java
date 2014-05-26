@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -34,7 +33,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -438,6 +436,14 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
     public void testGetFolderNameById() throws MiddlewareQueryException  {
         String folderName = fieldbookService.getFolderNameById(1);
         System.out.println("Folder Name is: " + folderName);
+    }
+    
+    @Test
+    public void testCheckIfStudyHasFieldmap()	throws MiddlewareQueryException {
+    	int studyId = -12;
+    	System.out.println("RESULT1 = " + fieldbookService.checkIfStudyHasFieldmap(studyId));
+    	studyId = -18;
+    	System.out.println("RESULT2 = " + fieldbookService.checkIfStudyHasFieldmap(studyId));
     }
 
     @AfterClass
