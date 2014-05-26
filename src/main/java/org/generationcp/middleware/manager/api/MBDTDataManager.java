@@ -22,6 +22,8 @@ public interface MBDTDataManager {
 
     public MBDTGeneration getGeneration(Integer generationID) throws MiddlewareQueryException;
 
+    public List<MBDTGeneration> getGenerations(Integer projectID) throws MiddlewareQueryException;
+
     public void setMarkerStatus(Integer generationID, List<Integer> markerIDs) throws MiddlewareQueryException;
 
     public List<Integer> getMarkerStatus(Integer generationID) throws MiddlewareQueryException;

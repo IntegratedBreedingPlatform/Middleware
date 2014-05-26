@@ -26,29 +26,19 @@ public class MBDTGenerationDAO extends GenericDAO<MBDTGeneration, Integer> {
 
             generation = (MBDTGeneration) criteria.uniqueResult();
 
-            /*String sql = "SELECT generation_id, gname, project_id, genotypedataset_id FROM mbdt_generations WHERE genotypedataset_id = :datasetID AND project_id = :projectID";
-
-            SQLQuery query = getSession().createSQLQuery(sql);
-            query.setParameter("datasetID", datasetID);
-            query.setParameter("projectID", projectID);
-
-            List<Object[]> result =  query.list();
-            if (result != null && result.size() > 0) {
-                // there should only be one item retrieved given the parameters
-                assert(result.size() == 1);
-                Object[] row = result.get(0);
-
-                Integer id = (Integer) row[0];
-                String gname = (String) row[1];
-                projectID = (Integer) row[2];
-                datasetID = (Integer) row[3];
-            }*/
-
         } catch (HibernateException e) {
             logAndThrowException("Error at getByDatasetID=" + datasetID + " query on MBDTGenerationDAO: " + e.getMessage(), e);
         }
 
         return generation;
+    }
+
+    public List<MBDTGeneration> getByProjectID(Integer projectID) throws MiddlewareQueryException {
+        Criteria crit = getSession().createCriteria(getPersistentClass());
+
+        crit.add(Restrictions.eq("project.projectID", projectID));
+
+        return crit.list();
     }
 
     @Override

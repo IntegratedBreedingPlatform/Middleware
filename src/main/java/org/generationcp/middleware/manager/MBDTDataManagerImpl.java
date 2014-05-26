@@ -91,6 +91,12 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
+    public List<MBDTGeneration> getGenerations(Integer projectID) throws MiddlewareQueryException {
+        prepareGenerationDAO();
+        return generationDAO.getByProjectID(projectID);
+    }
+
+    @Override
     public void setMarkerStatus(Integer generatonID, List<Integer> markerIDs) throws MiddlewareQueryException {
 
         requireLocalDatabaseInstance();
@@ -138,7 +144,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         prepareSelectedGenotypeDAO();
 
         try {
-            return selectedGenotypeDAO.getAccessions(generationID);
+            return selectedGenotypeDAO.getSelectedAccessions(generationID);
         } catch (Exception e) {
             e.printStackTrace();
             throw new MiddlewareQueryException(e.getMessage());
@@ -166,8 +172,39 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(generationID);
 
+        List<SelectedGenotype> existing = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
+
+
+        // find existing instances and toggle their selected status appropriately
+        if (existing != null) {
+            for (SelectedGenotype genotype : existing) {
+                switch (genotype.getType()) {
+                    case SR:
+                        genotype.setType(SelectedGenotypeEnum.R);
+                        break;
+                    case SD:
+                        genotype.setType(SelectedGenotypeEnum.D);
+                        break;
+                    case R:
+                        genotype.setType(SelectedGenotypeEnum.SR);
+                        break;
+                    case D:
+                        genotype.setType(SelectedGenotypeEnum.SD);
+                        break;
+                }
+
+                selectedGenotypeDAO.saveOrUpdate(genotype);
+
+                gids.remove(genotype.getGid());
+            }
+
+
+        }
+
+
+        // create new entries with the default type
         for (Integer gid : gids) {
-            SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.R, gid);
+            SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SR, gid);
             Integer newId = selectedGenotypeDAO.getNegativeId("id");
             genotype.setId(newId);
 
@@ -179,18 +216,48 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     @Override
     public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
 
+        if (genotypeEnum.equals(SelectedGenotypeEnum.SD) || genotypeEnum.equals(SelectedGenotypeEnum.SR)) {
+            throw new MiddlewareQueryException("Set Parent Data only takes in Recurrent or Donor as possible types. Use setSelectedAccession to mark / create entries as Selected Recurrent / Selected Donor");
+        }
+
         requireLocalDatabaseInstance();
 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(generationID);
 
-        List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getAccessionsByIds(gids);
+        List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
 
         if (existingAccession != null && existingAccession.size() > 0) {
             for (SelectedGenotype genotype : existingAccession) {
+
+                switch (genotype.getType()) {
+                    case SR:
+                        if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
+                            genotype.setType(SelectedGenotypeEnum.SD);
+                        }
+
+                        break;
+                    case SD:
+                        if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
+                            genotype.setType(SelectedGenotypeEnum.SR);
+                        }
+
+                        break;
+                    case R:
+                        if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
+                            genotype.setType(SelectedGenotypeEnum.R);
+                        }
+                        break;
+                    case D:
+                        if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
+                            genotype.setType(SelectedGenotypeEnum.D);
+                        }
+                        break;
+                }
+
                 gids.remove(genotype.getGid());
-                genotype.setType(genotypeEnum);
+
                 selectedGenotypeDAO.saveOrUpdate(genotype);
             }
         }
