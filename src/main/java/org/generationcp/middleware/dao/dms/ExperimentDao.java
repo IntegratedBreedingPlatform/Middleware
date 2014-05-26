@@ -248,7 +248,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 					+ "   AND pr.subject_project_id = ep.project_id "
 					+ " WHERE EXISTS (SELECT 1 FROM nd_experimentprop eprop "
 					+ "   WHERE eprop.type_id = " + TermId.COLUMN_NO.getId()
-					+ "     AND eprop.nd_experiment_id = e.nd_experiment_id) ";
+					+ "     AND eprop.nd_experiment_id = e.nd_experiment_id  AND eprop.value <> '') ";
 
 			SQLQuery query = getSession().createSQLQuery(sql);
 			return query.list();
