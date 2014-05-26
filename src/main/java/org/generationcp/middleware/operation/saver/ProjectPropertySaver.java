@@ -25,7 +25,6 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -184,13 +183,20 @@ public class ProjectPropertySaver extends Saver {
 	private void insertVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
 			MeasurementVariable variable, int rank, boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
 		
-		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStoredIn())) {
 			int datasetRank = getNextRank(trialDataset);
 			int measurementRank = getNextRank(measurementDataset);
 			//insertVariable(project, variable, rank);
 			insertVariable(trialDataset, variable, datasetRank);
 			insertVariable(measurementDataset, variable, measurementRank);
-			getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
+			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
+			}
+			else {
+				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				setWorkingDatabase(Database.LOCAL);
+				getGeolocationDao().saveOrUpdate(geolocation);
+			}
 		}
 		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
@@ -240,11 +246,18 @@ public class ProjectPropertySaver extends Saver {
 	private void updateVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
 			MeasurementVariable variable, boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
 		
-		if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStoredIn())) {
 			updateVariable(project, variable);
 			updateVariable(trialDataset, variable);
 			updateVariable(measurementDataset, variable);
-			getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
+			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
+			}
+			else {
+				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				setWorkingDatabase(Database.LOCAL);
+				getGeolocationDao().saveOrUpdate(geolocation);
+			}
 		}
 		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
