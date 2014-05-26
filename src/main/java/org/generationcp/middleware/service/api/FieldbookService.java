@@ -604,4 +604,13 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns true if all instances in the study has fieldmap.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException;
 }
