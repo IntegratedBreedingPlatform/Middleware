@@ -558,16 +558,4 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException
      */
     GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException;
- 
-    /**
-     * Gets list of GermplasmListData objects by listId through Hibernate query
-     * Then updates the list based on Germplsm.grplce and entries in local Changes records through stored procedure call 
-     */
-    List<GermplasmListData> getUpdatedGermplasmListDataByListId_1(Integer id) throws MiddlewareQueryException; 
-    /**
-     * Calls a stored procedure that iterates over a list of listdata records by listId
-     * Then returns an updated list based on Germplsm.grplce and entries in local Changes records
-     * (PURE STORED PROCEDURE CALLS) 
-     */
-    List<GermplasmListData> getUpdatedGermplasmListDataByListId_2(Integer id) throws MiddlewareQueryException;
 }

@@ -145,7 +145,7 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetGermplasmListDataByListId() throws Exception {
         Integer listId = Integer.valueOf(3434);       
-        List<GermplasmListData> results = manager.getGermplasmListDataByListId(listId, 0, Integer.MAX_VALUE);
+        List<GermplasmListData> results = manager.getGermplasmListDataByListId(listId, 0, 2);
 
         Debug.println(INDENT, "testGetGermplasmListDataByListId(" + listId + "): ");
         Debug.printObjects(INDENT, results);
@@ -153,7 +153,7 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testCountGermplasmListDataByListId() throws Exception {
-        Integer listId = Integer.valueOf(28781);       
+        Integer listId = Integer.valueOf(2648);       
         Debug.println(INDENT, "testCountGermplasmListDataByListId(" + listId + "): " 
                 + manager.countGermplasmListDataByListId(listId));
     }
@@ -618,22 +618,6 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     	Session session = ((DataManager) manager).getCurrentSessionForLocal();
     	Query query = session.createSQLQuery("SELECT lrstatus FROM listdata WHERE lrecid = " + id);
     	return (Integer) query.uniqueResult();
-    }
-    
-    @Test
-    public void testGetUpdatedGermplasmListDataByListId_1() throws Exception {
-        Integer id = Integer.valueOf(3434);
-        List<GermplasmListData> list = manager.getUpdatedGermplasmListDataByListId_1(id);
-        Debug.println(INDENT, "testGetUpdatedGermplasmListDataByListId_1(" + id + "): ");
-        Debug.printObjects(INDENT, list);
-    }
-    
-    @Test
-    public void testGetUpdatedGermplasmListDataByListId_2() throws Exception {
-        Integer id = Integer.valueOf(3434);
-        List<GermplasmListData> list = manager.getUpdatedGermplasmListDataByListId_2(id);
-        Debug.println(INDENT, "testGetUpdatedGermplasmListDataByListId_2(" + id + "): ");
-        Debug.printObjects(INDENT, list);
     }
 
 }

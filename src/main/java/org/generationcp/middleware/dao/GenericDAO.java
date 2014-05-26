@@ -13,9 +13,12 @@ package org.generationcp.middleware.dao;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -27,14 +30,14 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
-import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class GenericDAO<T, ID extends Serializable> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericDAO.class);
-
+    private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
+    
     private Class<T> persistentClass;
     private Session session;
 
@@ -275,23 +278,32 @@ public abstract class GenericDAO<T, ID extends Serializable> {
                 query.setParameter(entry.getKey().toString(), entry.getValue());
             }
         }
-        if(returnType!=null && !(returnType.getName().equals(Integer.class.getName()))) {
+        if(returnType!=null && !isWrapperType(returnType)) {
         	query.addEntity(returnType);
         }
         
         Object object = query.uniqueResult();
-        if(object instanceof BigInteger && returnType.getName().equals(Integer.class.getName())) {
+        if(object!=null && object instanceof BigInteger) {
         	BigInteger b = (BigInteger) object;
-        	Integer i = b.intValue();
-        	return (Type) i;
+        	if(returnType.getName().equals(Integer.class.getName())) {
+        		return (Type)(Integer)b.intValue();
+        	} else if(returnType.getName().equals(Long.class.getName())) {
+        		return (Type)(Long)b.longValue();
+        	}
+        	return (Type) b;
+        } else if(object!=null && object instanceof BigDecimal) {
+        	BigDecimal b = (BigDecimal) object;
+        	if(returnType.getName().equals(Float.class.getName())) {
+        		return (Type)(Float)b.floatValue();
+        	} else if(returnType.getName().equals(Double.class.getName())) {
+        		return (Type)(Double)b.doubleValue();
+        	}
+        	return (Type) b;
         } else {
         	return (Type) object;
         }
-
-        
     }
-
-    @SuppressWarnings("unchecked")
+    
 	public void callStoredProcedure(
             final String procedureName,
             final Map<String,Object> params) {
@@ -311,7 +323,8 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
         
     }
-    @SuppressWarnings("unchecked")
+	
+	@SuppressWarnings("unchecked")
 	public <Type> List<Type> callStoredProcedureForList(
             final String procedureName,
             final Map<String,Object> params,
@@ -326,7 +339,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
                 query.setParameter(entry.getKey().toString(), entry.getValue());
             }
         }
-        if(returnType!=null && !(returnType.getName().equals(Integer.class.getName()))) {
+        if(returnType!=null && !isWrapperType(returnType)) {
         	query.addEntity(returnType);
         }
 
@@ -354,5 +367,25 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
         sql.append(")");
         return sql.toString();
+    }
+    
+    private static boolean isWrapperType(Class<?> clazz)
+    {
+        return WRAPPER_TYPES.contains(clazz);
+    }
+    
+    private static Set<Class<?>> getWrapperTypes()
+    {
+        Set<Class<?>> ret = new HashSet<Class<?>>();
+        ret.add(Boolean.class);
+        ret.add(Character.class);
+        ret.add(Byte.class);
+        ret.add(Short.class);
+        ret.add(Integer.class);
+        ret.add(Long.class);
+        ret.add(Float.class);
+        ret.add(Double.class);
+        ret.add(Void.class);
+        return ret;
     }
 }
