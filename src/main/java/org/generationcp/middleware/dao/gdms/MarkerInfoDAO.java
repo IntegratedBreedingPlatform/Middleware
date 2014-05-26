@@ -53,7 +53,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer> {
             "WHERE LOWER(marker_name) = LOWER(:markerName)";
 
     public static final String GET_BY_MARKER_ID =
-                "SELECT marker_id " +
+                "SELECT DISTINCT marker_id " +
                         ", CONCAT(marker_type, '') " +
                         ", CONCAT(marker_name, '')  " +
                         ", CONCAT(species, '')  " +

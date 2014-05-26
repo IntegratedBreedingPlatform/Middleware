@@ -142,7 +142,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     		+ "IN (:qtlTraits) " 
     		;
     
-    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max
+    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, float min, float max
             , int start, int numOfRows) throws MiddlewareQueryException{
         try {
             SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_QTL);
@@ -160,7 +160,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         return new ArrayList<Integer>();
     }
     
-    public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException{
+    public long countMarkerIdsByQtl(String qtlName, String chromosome, float min, float max) throws MiddlewareQueryException{
         try {
             SQLQuery query = getSession().createSQLQuery(COUNT_MARKER_IDS_BY_QTL);
             query.setParameter("qtlName", qtlName);

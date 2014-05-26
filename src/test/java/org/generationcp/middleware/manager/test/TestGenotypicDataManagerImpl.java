@@ -296,9 +296,15 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllelicValuesByGidsAndMarkerNames() throws Exception {
-        List<String> markerNames = Arrays.asList("CaM0038", "CaM0463", "CaM0539", "CaM0639",
-        		"CaM0658", "1_0001", "1_0007","1_0013", "1_0025", "1_0031");
-        List<Integer> gids = Arrays.asList(-5276, -5287, -5484, -5485, -6786, -6785, -3785, -3786);
+//        List<String> markerNames = Arrays.asList("CaM0038", "CaM0463", "CaM0539", "CaM0639",
+//        		"CaM0658", "1_0001", "1_0007","1_0013", "1_0025", "1_0031");
+//        List<Integer> gids = Arrays.asList(-5276, -5287, -5484, -5485, -6786, -6785, -3785, -3786);
+        
+        
+        
+        List<String> markerNames = Arrays.asList("Xtxp25");
+        List<Integer> gids = Arrays.asList(10, 28);
+        
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
         Debug.println("testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
     }
@@ -799,21 +805,23 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetMarkersByQtl() throws Exception {
         String qtlName = "HI Control 08_AhI"; 
-        String chromosome = "LG01";
-        int min = 0;
-        int max = 10;
+        String chromosome = "RIL-3 _LG01";
+        float min = 0.0f;
+        float max = 10f;
         List<Integer> results = manager.getMarkerIdsByQtl(qtlName, chromosome, min, max, 0,
                 (int) manager.countMarkerIdsByQtl(qtlName, chromosome, min, max));
+        assertTrue(results.size() > 0);
         Debug.println("testGetMarkersByQtl() RESULTS: " + results);
     }
 
     @Test
     public void testCountMarkersByQtl() throws Exception {
         String qtlName = "HI Control 08_AhI"; 
-        String chromosome = "LG01";
-        int min = 0;
-        int max = 10;
+        String chromosome = "RIL-3 _LG01";
+        float min = 0f;
+        float max = 10f;
         long count = manager.countMarkerIdsByQtl(qtlName, chromosome, min, max);
+        assertTrue(count > 0);
         Debug.println("testCountMarkersByQtl() RESULTS: " + count);
     }
 

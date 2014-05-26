@@ -239,7 +239,6 @@ public interface GenotypicDataManager{
     List<String> getDatasetNames(int start, int numOfRows, Database instance) 
             throws MiddlewareQueryException;
 
-
     /**
      * Gets the dataset names from the dataset table based on the given qtl id.
      * Retrieves from both local and central database instances.
@@ -254,7 +253,6 @@ public interface GenotypicDataManager{
      */
     List<String> getDatasetNamesByQtlId(Integer qtlId, int start, int numOfRows) 
             throws MiddlewareQueryException;
-
 
     /**
      * Counts the dataset names from the dataset table based on the given qtl id.
@@ -1223,7 +1221,7 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, 
-            int min, int max, int start, int numOfRows) throws MiddlewareQueryException;
+            float min, float max, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of marker ids matching the given QTL name, chromosome, 
@@ -1236,7 +1234,7 @@ public interface GenotypicDataManager{
      * @return Count of marker id entries
      * @throws MiddlewareQueryException the middleware query exception
      */
-    long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) 
+    long countMarkerIdsByQtl(String qtlName, String chromosome, float min, float max) 
             throws MiddlewareQueryException;
     
 

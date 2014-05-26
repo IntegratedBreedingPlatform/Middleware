@@ -1215,18 +1215,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows)
+    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, float min, float max, int start, int numOfRows)
             throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countMarkerIdsByQtl", "getMarkerIdsByQtl");
         return super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows,
                 new Object[]{qtlName, chromosome, min, max},
-                new Class[]{String.class, String.class, Integer.TYPE, Integer.TYPE});
+                new Class[]{String.class, String.class, Float.TYPE, Float.TYPE});
     }
 
     @Override
-    public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException {
+    public long countMarkerIdsByQtl(String qtlName, String chromosome, float min, float max) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countMarkerIdsByQtl",
-                new Object[]{qtlName, chromosome, min, max}, new Class[]{String.class, String.class, Integer.TYPE, Integer.TYPE});
+                new Object[]{qtlName, chromosome, min, max}, new Class[]{String.class, String.class, Float.TYPE, Float.TYPE});
     }
 
     @Override
@@ -2568,7 +2568,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             getDatasetUsersDao().deleteByDatasetId(datasetId);
             getAccMetadataSetDao().deleteByDatasetId(datasetId);
             getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
+            
+            //TODO
+//            markerType = this.getMarkerIdsByDatasetId(datasetId);
+//
+//            		
+//            if (marktype == snp)
+//            		delete from charvalues
+//            	ssr || dart
+//            		delete from allevalues	
+
             getDatasetDao().deleteByDatasetId(datasetId);
+
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
