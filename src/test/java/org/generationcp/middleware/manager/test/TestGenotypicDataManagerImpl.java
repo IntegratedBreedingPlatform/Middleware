@@ -2052,14 +2052,50 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     	// Insert test data to delete
     	TestGenotypicDataManagerImplUploadFunctions.setUp();
     	TestGenotypicDataManagerImplUploadFunctions uploadTest = new TestGenotypicDataManagerImplUploadFunctions();
+
+    	// Test deleting Mapping ABH Data
     	uploadTest.testSetMappingABH();
-    	
     	List<Dataset> dataset = manager.getDatasetsByType(GdmsType.TYPE_MAPPING);
     	Integer datasetId = dataset.get(0).getDatasetId();
-
-        Debug.println("testDeleteMappingPopulationDatasets(" + datasetId + ")");
         manager.deleteMappingPopulationDatasets(datasetId);
-        Debug.println("done with testDeleteMappingPopulationDatasets");
+        Debug.println("Deleted MappingPopulationDataset:MappingABH(datasetId=" + datasetId + ")");
+        
+    }
+
+    @Test
+    public void testDeleteMappingPopulationDatasetsSNP() throws Exception {
+
+    	// Insert test data to delete
+    	TestGenotypicDataManagerImplUploadFunctions.setUp();
+    	TestGenotypicDataManagerImplUploadFunctions uploadTest = new TestGenotypicDataManagerImplUploadFunctions();
+
+		// Test deleting Mapping Allelic SNP Data
+		uploadTest.testSetMappingAllelicSNP(); // should also delete from gdms_char_values
+		List<Dataset> dataset = manager.getDatasetsByType(GdmsType.TYPE_MAPPING);
+		Integer datasetId = dataset.get(0).getDatasetId();
+	    manager.deleteMappingPopulationDatasets(datasetId);
+	    Debug.println("Deleted MappingPopulationDataset:MappingAllelicSNP(datasetId=" + datasetId + ")");
+    }
+    
+    @Test
+    public void testDeleteMappingPopulationDatasetsSSRDArT() throws Exception {
+
+    	// Insert test data to delete
+    	TestGenotypicDataManagerImplUploadFunctions.setUp();
+    	TestGenotypicDataManagerImplUploadFunctions uploadTest = new TestGenotypicDataManagerImplUploadFunctions();
+
+		// Test deleting Mapping Allelic SNP Data
+	    uploadTest.testSetMappingAllelicSSRDArT(); // should also delete from gdms_allele_values / gdms_dart_values
+		List<Dataset> dataset = manager.getDatasetsByType(GdmsType.TYPE_MAPPING);
+		Integer datasetId = dataset.get(0).getDatasetId();
+	    manager.deleteMappingPopulationDatasets(datasetId);
+	    Debug.println("Deleted MappingPopulationDataset:MappingAllelicSSRDArT(datasetId=" + datasetId + ")");
+    }
+
+    @Test
+    public void testGetDatasetsByType() throws Exception {
+    	List<Dataset> datasets = manager.getDatasetsByType(GdmsType.TYPE_MAPPING);
+        Debug.printObjects(INDENT, datasets);
     }
 
     @Test
