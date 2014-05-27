@@ -1551,12 +1551,12 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
-        int mapID = 1;
-        String linkage = "LG01";
+        int mapID = 1; // Groundnut central
+        String linkage = "BC-1_b11";
         double startPos = 0;
-        double endPos = 2.2;
+        double endPos = 100;
         Set<Integer> markerIDs = manager.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(
-                mapID, linkage, startPos, endPos, 0, 1);
+                mapID, linkage, startPos, endPos, 0, Integer.MAX_VALUE);
         Debug.printObjects(INDENT, new ArrayList<Integer>(markerIDs));
     }
 

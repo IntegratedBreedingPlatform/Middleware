@@ -46,11 +46,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
     public static final String GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION = 
             "SELECT marker_id "
             + "FROM gdms_markers_onmap "
-            + "WHERE map_id = :map_id "
-            + "AND linkage_group = :linkage_group "
-            + "AND start_position "
-            + "BETWEEN :start_position "
-            + "AND :end_position " 
+            + "WHERE map_id = :mapId "
+            + "AND linkage_group = :linkageGroup "
+            + "AND start_position >= :startPosition "
+            + "AND end_position <= :endPosition " 
             + "ORDER BY marker_id";
         
         public static final String COUNT_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION = 
@@ -1091,10 +1090,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             SQLQuery query;
 
             query = getSession().createSQLQuery(GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
-            query.setParameter("map_id", mapID);
-            query.setParameter("linkage_group", linkageGroup);
-            query.setParameter("start_position", startPos);
-            query.setParameter("end_position", endPos);
+            query.setParameter("mapId", mapID);
+            query.setParameter("linkageGroup", linkageGroup);
+            query.setParameter("startPosition", startPos);
+            query.setParameter("endPosition", endPos);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             Set<Integer> markerIDSet = new TreeSet<Integer>(query.list());
@@ -1103,7 +1102,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
 
         } catch (HibernateException e) {
             logAndThrowException("Error with getMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" 
-            		+ linkageGroup + ", start=" + start + ", numOfRows=" + numOfRows + ") query from Marker: "
+            		+ linkageGroup + ", start=" + start + ", numOfRows=" + numOfRows + ") query from MarkerOnMap: "
                     + e.getMessage(), e);
         }
         return new TreeSet<Integer>();
