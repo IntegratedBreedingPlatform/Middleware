@@ -2589,27 +2589,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             getAccMetadataSetDao().deleteByDatasetId(datasetId);
             getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
             
-            // Get the marker type of the markers of the dataset. 
-            // Based on the type, delete from gdms_char_char_values if type = SNP 
-            //		OR from gdms_allele_values if type = SSR or DART 
-            List<Integer> markerIds = this.getMarkerIdsByDatasetId(datasetId);
-            java.util.Map<Integer, String> markerTypes = getMarkerTypeMapByIds(markerIds);
-            
-            if (markerTypes != null && !markerTypes.isEmpty()){
-            	for (Integer markerId : markerIds){
-            		String markerType = markerTypes.get(markerId);
-            		
-            		if (markerType.equals(GdmsType.TYPE_SNP.getValue())){
-            			getCharValuesDao().deleteByDatasetId(datasetId);
-            			break;
-            		} else if (markerType.equals(GdmsType.TYPE_SSR.getValue()) 
-            				|| markerType.equals(GdmsType.TYPE_DART.getValue())){
-            			getAlleleValuesDao().deleteByDatasetId(datasetId);
-            			break;
-            		}
-            	}
-            }
+            // DELETE from char_values - there will be entries for the given datasetId if markerType = SNP
+            getCharValuesDao().deleteByDatasetId(datasetId); 
 
+            // DELETE from allele_values - there will be entries for the given datasetId if markerType = SSR or DART
+            getAlleleValuesDao().deleteByDatasetId(datasetId); 
+
+            // DELETE from dart_values - there will be entries for the given datasetId if markerType = DART
+            getDartValuesDao().deleteByDatasetId(datasetId); 
+            
             getDatasetDao().deleteByDatasetId(datasetId);
 
             trans.commit();
