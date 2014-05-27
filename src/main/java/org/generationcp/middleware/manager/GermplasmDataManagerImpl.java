@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
@@ -66,9 +68,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     public GermplasmDataManagerImpl() {
     }
-
+    
     public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral,
+    		String localDatabaseName, String centralDatabaseName) {
+        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public GermplasmDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
@@ -297,6 +304,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return (Germplasm) getGermplasmDao().getById(gid, false);
         }
         return null;
+    	
     }
 
     @Override
@@ -333,13 +341,23 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Name getPreferredNameByGID(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
+    	LOG.debug("in getPreferredNameByGID("+gid+")");
+    	/*if (setWorkingDatabase(gid)) {
             List<Name> names = getNameDao().getByGIDWithFilters(gid, 1, null);
             if (!names.isEmpty()) {
                 return names.get(0);
             }
         }
         return null;
+        */
+    	setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("gid",gid);
+		return getNameDao().
+				callStoredProcedureForObject("getPreferredNamesRecordByGid",
+						params,Name.class);
+    	
     }
     
     @Override

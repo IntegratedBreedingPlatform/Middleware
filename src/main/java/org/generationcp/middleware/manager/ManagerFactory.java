@@ -279,7 +279,7 @@ public class ManagerFactory implements Serializable {
     }
 
     public GermplasmDataManager getGermplasmDataManager() {
-        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public PedigreeDataManager getPedigreeDataManager() {
