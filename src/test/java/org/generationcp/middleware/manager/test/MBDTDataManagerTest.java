@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -110,7 +111,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
     protected void insertSampleAccessionData() throws Exception {
         int i = -1;
         for (int sampleSelectedAccessionGid : SAMPLE_SELECTED_ACCESSION_GIDS) {
-            executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'R')");
+            executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'SR')");
             i--;
         }
     }
@@ -118,7 +119,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
     protected void insertSampleParentData() throws Exception {
         int i = -1;
         for (int sampleSelectedAccessionGid : SAMPLE_PARENT_GIDS) {
-            executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'SD')");
+            executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'D')");
             i--;
         }
     }
@@ -210,7 +211,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
 
             fail("Should not allow saving of null project name");
         } catch (MiddlewareQueryException e) {
-            e.printStackTrace();
+            // an exception is actually the expected flow
         }
 
     }
@@ -272,13 +273,38 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             assertEquals(SAMPLE_GENERATION_NAME, generation.getGenerationName());
             assertTrue(SAMPLE_DATASET_ID == generation.getGenotypeDatasetID());
         } catch (MiddlewareQueryException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         } finally {
             deleteSampleGenerationData();
             deleteSampleProjectData();
         }
+    }
 
 
+    // added a test case for retrieving multiple generations
+    @Test
+    public void testRetrieveGenerations() throws Exception {
+        try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+
+            List<MBDTGeneration> generations = dut.getGenerations(SAMPLE_PROJECT_ID);
+
+            assertNotNull(generations);
+            assertTrue(generations.size() == 1);
+
+            MBDTGeneration generation = generations.get(0);
+
+            assertEquals(SAMPLE_GENERATION_NAME, generation.getGenerationName());
+            assertTrue(SAMPLE_DATASET_ID == generation.getGenotypeDatasetID());
+        } catch (MiddlewareQueryException e) {
+            fail(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+        }
     }
 
     @Test
@@ -391,7 +417,10 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             assertTrue(SAMPLE_SELECTED_ACCESSION_GIDS.length == accessions.size());
 
             for (SelectedGenotype accession : accessions) {
-                assertEquals(SelectedGenotypeEnum.R, accession.getType());
+                /*assertEquals(SelectedGenotypeEnum.SR, accession.getType());*/
+
+                // selected accessions are now entries that have the S prefix to them
+                assertTrue(accession.getType().equals(SelectedGenotypeEnum.SR) || accession.getType().equals(SelectedGenotypeEnum.SD));
             }
 
         } catch (Exception e) {
@@ -405,19 +434,20 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
     }
 
     @Test
-    public void testGetSelectedParents() throws Exception {
+    public void testGetParents() throws Exception {
         try {
             insertSampleProjectData();
             insertSampleGenerationData();
             insertSampleParentData();
-            List<SelectedGenotype> accessions = dut.getParentData(SAMPLE_GENERATION_ID);
+            List<SelectedGenotype> parents = dut.getParentData(SAMPLE_GENERATION_ID);
 
-            assertNotNull(accessions);
-            assertTrue(SAMPLE_PARENT_GIDS.size() == accessions.size());
+            assertNotNull(parents);
+            assertTrue(SAMPLE_PARENT_GIDS.size() == parents.size());
 
-            for (SelectedGenotype accession : accessions) {
+            for (SelectedGenotype accession : parents) {
                 assertTrue(SAMPLE_PARENT_GIDS.contains(accession.getGid()));
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -429,11 +459,11 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
     }
 
     @Test
-    public void testSetSelectedAccession() throws Exception {
+    public void testSetSelectedAccessionNonExisting() throws Exception {
 
         List<Integer> gidList = new ArrayList<Integer>();
 
-        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
+        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid, sg_type FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
                 .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
                 .append(" WHERE gid in(");
 
@@ -476,6 +506,8 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             while (rs.next()) {
                 recordCount++;
                 gidList.add(rs.getInt("sg_id"));
+
+                assertEquals("SR", rs.getString("sg_type"));
             }
 
             assertTrue(recordCount == SAMPLE_SELECTED_ACCESSION_GIDS.length);
@@ -501,14 +533,99 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             deleteSampleProjectData();
             closeDatabaseResources(conn, stmt, rs);
         }
-
     }
 
     @Test
-    public void testSetParent() throws Exception {
+    public void testSetSelectedAccessionCurrentlyExistingOnly() throws Exception {
+
+        List<Integer> gidList = new ArrayList<Integer>();
+
+        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid, sg_type FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
+                .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
+                .append(" WHERE gid in(");
+
+        for (int i = 0; i < SAMPLE_PARENT_GIDS.size(); i++) {
+            gidList.add(SAMPLE_PARENT_GIDS.get(i));
+
+            if (i != 0) {
+                sqlString.append(",");
+            }
+
+            sqlString.append(SAMPLE_PARENT_GIDS.get(i));
+        }
+
+        sqlString.append(")");
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
 
 
-        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
+        try {
+            // workaround for Hibernate : associate inserted data to Hibernate session to avoid problems later on
+            dut.clear();
+            MBDTProjectData newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
+            dut.setProjectData(newProject);
+
+            MBDTGeneration generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
+            generation.setGenerationID(SAMPLE_GENERATION_ID);
+            dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
+            // insert parent data into mbdt_selected_genotypes table
+            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.D, gidList);
+
+            // using the same gid list, pass them into the setSelectedAccessions method
+            dut.setSelectedAccessions(SAMPLE_GENERATION_ID, gidList);
+
+            conn = dataSource.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sqlString.toString());
+
+            int recordCount = 0;
+            gidList.clear();
+
+            while (rs.next()) {
+                recordCount++;
+                gidList.add(rs.getInt("sg_id"));
+
+                // the set selected accessions method must have changed the sg type of the provided gids from the previous D to something with the selected prefix 'S'
+                assertEquals("SD", rs.getString("sg_type"));
+
+                Integer gid = rs.getInt("gid");
+                assertTrue(SAMPLE_PARENT_GIDS.contains(gid));
+            }
+
+            assertTrue(SAMPLE_PARENT_GIDS.size() == recordCount);
+
+            // clean up
+            sqlString = new StringBuffer("DELETE FROM mbdt_selected_genotypes WHERE sg_id IN (");
+
+            for (int i = 0; i < gidList.size(); i++) {
+                if (i != 0) {
+                    sqlString.append(",");
+                }
+
+                sqlString.append(gidList.get(i));
+            }
+
+            sqlString.append(")");
+            stmt.executeUpdate(sqlString.toString());
+
+        } catch (MiddlewareQueryException e) {
+            fail(e.getMessage());
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, rs);
+        }
+    }
+
+
+    @Test
+    public void testSetParentNonExisting() throws Exception {
+
+
+        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid, sg_type FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
                 .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
                 .append(" WHERE gid in(");
 
@@ -540,7 +657,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             dut.setGeneration(SAMPLE_PROJECT_ID, generation);
 
 
-            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.SR, gidList);
+            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.R, gidList);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();
@@ -552,6 +669,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             while (rs.next()) {
                 recordCount++;
                 gidList.add(rs.getInt("sg_id"));
+                assertEquals("R", rs.getString("sg_type"));
             }
 
             assertTrue(recordCount == SAMPLE_PARENT_GIDS.size());
@@ -643,7 +761,7 @@ public class MBDTDataManagerTest extends TestOutputFormatter {
             // insert GIDs as accession
             dut.setSelectedAccessions(SAMPLE_GENERATION_ID, gidList);
 
-            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.SR, SAMPLE_PARENT_GIDS);
+            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.R, SAMPLE_PARENT_GIDS);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();

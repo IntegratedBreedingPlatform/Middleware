@@ -12,6 +12,9 @@ import org.generationcp.middleware.pojos.mbdt.MBDTGeneration;
 import org.generationcp.middleware.pojos.mbdt.MBDTProjectData;
 import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
 import org.generationcp.middleware.pojos.mbdt.SelectedMarker;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,45 +174,58 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(generationID);
+        Session session = getActiveSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            List<SelectedGenotype> existing = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
 
-        List<SelectedGenotype> existing = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
 
+            // find existing instances and toggle their selected status appropriately
+            if (existing != null) {
+                for (SelectedGenotype genotype : existing) {
+                    switch (genotype.getType()) {
+                        case SR:
+                            genotype.setType(SelectedGenotypeEnum.R);
+                            break;
+                        case SD:
+                            genotype.setType(SelectedGenotypeEnum.D);
+                            break;
+                        case R:
+                            genotype.setType(SelectedGenotypeEnum.SR);
+                            break;
+                        case D:
+                            genotype.setType(SelectedGenotypeEnum.SD);
+                            break;
+                    }
 
-        // find existing instances and toggle their selected status appropriately
-        if (existing != null) {
-            for (SelectedGenotype genotype : existing) {
-                switch (genotype.getType()) {
-                    case SR:
-                        genotype.setType(SelectedGenotypeEnum.R);
-                        break;
-                    case SD:
-                        genotype.setType(SelectedGenotypeEnum.D);
-                        break;
-                    case R:
-                        genotype.setType(SelectedGenotypeEnum.SR);
-                        break;
-                    case D:
-                        genotype.setType(SelectedGenotypeEnum.SD);
-                        break;
+                    selectedGenotypeDAO.saveOrUpdate(genotype);
+
+                    gids.remove(genotype.getGid());
                 }
 
-                selectedGenotypeDAO.saveOrUpdate(genotype);
-
-                gids.remove(genotype.getGid());
+                // perform batch operation on update commands first
+                session.flush();
+                session.clear();
             }
 
 
-        }
+            // create new entries with the default type
+            for (Integer gid : gids) {
+                SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SR, gid);
+                Integer newId = selectedGenotypeDAO.getNegativeId("id");
+                genotype.setId(newId);
 
+                selectedGenotypeDAO.saveOrUpdate(genotype);
 
-        // create new entries with the default type
-        for (Integer gid : gids) {
-            SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SR, gid);
-            Integer newId = selectedGenotypeDAO.getNegativeId("id");
-            genotype.setId(newId);
+            }
 
-            selectedGenotypeDAO.saveOrUpdate(genotype);
-
+            // perform batch update on creation of new entries
+            session.flush();
+            session.clear();
+            transaction.commit();
+        } catch (MiddlewareQueryException e) {
+            e.printStackTrace();
+            transaction.rollback();
         }
     }
 
@@ -228,47 +244,67 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
         List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
 
-        if (existingAccession != null && existingAccession.size() > 0) {
-            for (SelectedGenotype genotype : existingAccession) {
+        Session session = getActiveSession();
+        Transaction transaction = session.beginTransaction();
 
-                switch (genotype.getType()) {
-                    case SR:
-                        if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
-                            genotype.setType(SelectedGenotypeEnum.SD);
-                        }
+        try {
+            if (existingAccession != null && existingAccession.size() > 0) {
+                for (SelectedGenotype genotype : existingAccession) {
 
-                        break;
-                    case SD:
-                        if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
-                            genotype.setType(SelectedGenotypeEnum.SR);
-                        }
+                    switch (genotype.getType()) {
+                        case SR:
+                            if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
+                                genotype.setType(SelectedGenotypeEnum.SD);
+                            }
 
-                        break;
-                    case R:
-                        if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
-                            genotype.setType(SelectedGenotypeEnum.R);
-                        }
-                        break;
-                    case D:
-                        if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
-                            genotype.setType(SelectedGenotypeEnum.D);
-                        }
-                        break;
+                            break;
+                        case SD:
+                            if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
+                                genotype.setType(SelectedGenotypeEnum.SR);
+                            }
+
+                            break;
+                        case R:
+                            if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
+                                genotype.setType(SelectedGenotypeEnum.R);
+                            }
+                            break;
+                        case D:
+                            if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
+                                genotype.setType(SelectedGenotypeEnum.D);
+                            }
+                            break;
+                    }
+
+                    gids.remove(genotype.getGid());
+
+                    selectedGenotypeDAO.saveOrUpdate(genotype);
                 }
 
-                gids.remove(genotype.getGid());
+                session.flush();
+                session.clear();
+            }
+
+            for (Integer gid : gids) {
+                SelectedGenotype genotype = new SelectedGenotype(generation, genotypeEnum, gid);
+                Integer newId = selectedGenotypeDAO.getNegativeId("id");
+                genotype.setId(newId);
 
                 selectedGenotypeDAO.saveOrUpdate(genotype);
+
             }
-        }
 
-        for (Integer gid : gids) {
-            SelectedGenotype genotype = new SelectedGenotype(generation, genotypeEnum, gid);
-            Integer newId = selectedGenotypeDAO.getNegativeId("id");
-            genotype.setId(newId);
-
-            selectedGenotypeDAO.saveOrUpdate(genotype);
-
+            session.flush();
+            session.clear();
+            transaction.commit();
+        } catch (MiddlewareQueryException e) {
+            e.printStackTrace();
+            transaction.rollback();
+            throw e;
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            transaction.rollback();
+            throw e;
         }
     }
 
