@@ -683,6 +683,38 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return methodId;
     }
 
+
+    @Override
+    public Method editMethod(Method method) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Method recordSaved = null;
+
+        try {
+
+            if (method.getMid() == null || method.getMid() > 0)
+                throw new Exception("method has no Id or is not a local method");
+
+            trans = session.beginTransaction();
+            MethodDAO dao = getMethodDao();
+
+            recordSaved = dao.saveOrUpdate(method);
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
+                    LOG);
+        } finally {
+            session.flush();
+        }
+
+        return recordSaved;
+    }
+
     @Override
     public List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
