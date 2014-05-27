@@ -296,6 +296,31 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
         }
     }
+    
+    @Override
+	public void addOrUpdateExperiment(int dataSetId,
+			ExperimentType experimentType,
+			List<ExperimentValues> experimentValuesList)
+			throws MiddlewareQueryException {
+    	  requireLocalDatabaseInstance();
+          Session session = getCurrentSessionForLocal();
+          Transaction trans = null;
+
+          try {
+              trans = session.beginTransaction();
+              
+              for (ExperimentValues experimentValues : experimentValuesList){
+            	  getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
+              }
+              
+              trans.commit();
+
+          } catch (Exception e) {
+              rollbackTransaction(trans);
+              throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+          }
+		
+	}
 
     @Override
     public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
@@ -1191,4 +1216,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	}
     	return null;
     }
+
+	
 }

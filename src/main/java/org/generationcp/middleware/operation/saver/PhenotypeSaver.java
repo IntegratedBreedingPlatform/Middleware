@@ -47,6 +47,9 @@ public class PhenotypeSaver extends Saver{
         Map<Integer,PhenotypeExceptionDto> exceptions = null;
         if (variates != null && variates.getVariables() != null && variates.getVariables().size() > 0) {
             for (Variable variable : variates.getVariables()) {
+            	
+            	i++;
+            	
             	try {
             		save(experimentModel.getNdExperimentId(), variable);
             	} catch(PhenotypeException e) {
@@ -59,7 +62,11 @@ public class PhenotypeSaver extends Saver{
                     getPhenotypeDao().flush();
                     getPhenotypeDao().clear();
                 }
+                
             }
+            
+            getPhenotypeDao().flush();
+            getPhenotypeDao().clear();
         }
         if(exceptions!=null) {
         	throw new PhenotypeException(exceptions);
