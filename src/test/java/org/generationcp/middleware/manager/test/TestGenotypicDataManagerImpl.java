@@ -541,7 +541,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetGdmsAccMetadatasetByGid() throws Exception {
-        List<Integer> germplasmIds = Arrays.asList(956, 1042, -2213, -2215);;
+        List<Integer> germplasmIds = Arrays.asList(1, -1, -2);
         List<AccMetadataSet> accMetadataSets = manager.getGdmsAccMetadatasetByGid(germplasmIds, 0,
                 (int) manager.countGdmsAccMetadatasetByGid(germplasmIds));
         Debug.println("testGetGdmsAccMetadatasetByGid() RESULTS: ");
