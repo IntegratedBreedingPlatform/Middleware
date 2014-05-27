@@ -127,7 +127,6 @@ public class WorkbookBuilder extends Builder {
 		for (MeasurementVariable variable : variates) {
 		    if (getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP.getId()) {
 		        variable.setPossibleValues(getAllBreedingMethods());
-		        break;
 		    }
 		}
 		
