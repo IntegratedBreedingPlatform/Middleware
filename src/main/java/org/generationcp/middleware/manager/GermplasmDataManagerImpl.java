@@ -700,7 +700,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans = session.beginTransaction();
             MethodDAO dao = getMethodDao();
 
-            recordSaved = dao.saveOrUpdate(method);
+            recordSaved = dao.merge(method);
 
             trans.commit();
         } catch (Exception e) {
