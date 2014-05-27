@@ -310,6 +310,45 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
         }
         return new ArrayList<String>();
     }
+    
+    
+    public Map<Integer, String> getMarkerTypeMapByIds(List<Integer> markerIds) throws MiddlewareQueryException{
+    	Map<Integer, String> markerTypes = new HashMap<Integer, String>();
+    	
+        if (markerIds == null || markerIds.isEmpty()) {
+        	return markerTypes;
+        }
+    	
+        try {
+
+        	StringBuffer sql = new StringBuffer()
+        		.append("SELECT DISTINCT marker_id, CONCAT(marker_type, '') ")
+				.append("FROM gdms_marker ")
+				.append("WHERE marker_id IN (:markerIdList)")
+				;
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+            query.setParameterList("markerIdList", markerIds);
+            
+            List<Object> results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer id = (Integer) result[0];
+                    String type = (String) result[1];
+                    markerTypes.put(id, type);
+                }
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkerTypeByMarkerIds(markerIds=" + markerIds + ") query from Marker: " 
+            		+ e.getMessage(), e);
+        }
+    	
+    	
+    	return markerTypes;    	
+    }
+    
 
     /**
      * Gets the marker names by gids.

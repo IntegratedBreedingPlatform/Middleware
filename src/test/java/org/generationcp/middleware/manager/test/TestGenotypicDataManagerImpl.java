@@ -2061,6 +2061,21 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         manager.deleteMappingPopulationDatasets(datasetId);
         Debug.println("done with testDeleteMappingPopulationDatasets");
     }
+    
+
+    @Test
+    public void testGetDatasetsByType() throws Exception {
+    	List<Dataset> datasets = manager.getDatasetsByType(GdmsType.TYPE_MAPPING);
+        Debug.printObjects(INDENT, datasets);
+    }
+
+    @Test
+    public void testGetMarkerTypeMapByIds() throws Exception {
+    	List<Dataset> datasets = manager.getDatasetsByType(GdmsType.TYPE_MAPPING);
+    	Integer datasetId = datasets.get(0).getDatasetId();
+    	java.util.Map<Integer, String> markerTypes = manager.getMarkerTypeMapByIds(manager.getMarkerIdsByDatasetId(datasetId));
+        Debug.printObjects(INDENT, datasets);
+    }
 
     @Test
     public void testGetQtlDetailsByMapId() throws Exception {

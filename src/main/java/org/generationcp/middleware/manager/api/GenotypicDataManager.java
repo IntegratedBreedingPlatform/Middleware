@@ -304,6 +304,7 @@ public interface GenotypicDataManager{
      */
     List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException;
 
+    
     /**
      * Gets the germplasm id of parents and the mapping type
      * from the mapping_pop table based on the given dataset id.
@@ -537,6 +538,13 @@ public interface GenotypicDataManager{
     List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
+    /**
+     * Gets the allelic values by gid.
+     *
+     * @param targetGID the target gid
+     * @return the allelic values by gid
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     public List<AllelicValueElement> getAllelicValuesByGid(Integer targetGID) throws MiddlewareQueryException;
 
     /**
@@ -1250,6 +1258,16 @@ public interface GenotypicDataManager{
      */
     List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) 
             throws MiddlewareQueryException;
+
+	/**
+	 * Gets the marker type map by ids.
+	 *
+	 * @param markerIds the marker ids
+	 * @return the marker type map by ids
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	java.util.Map<Integer, String> getMarkerTypeMapByIds(List<Integer> markerIds)
+			throws MiddlewareQueryException;
 
     /**
      * Adds a QtlDetails entry to the database.

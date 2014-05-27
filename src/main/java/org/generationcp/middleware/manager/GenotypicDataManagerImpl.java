@@ -1243,6 +1243,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return markers;
     }
+    
+    @Override
+    public java.util.Map<Integer, String> getMarkerTypeMapByIds(List<Integer> markerIds) throws MiddlewareQueryException{
+    	java.util.Map<Integer, String> markerTypes = new HashMap<Integer, String>();
+        List<Integer> positiveIds = getPositiveIds(markerIds);
+        List<Integer> negativeIds = getNegativeIds(markerIds);
+
+        if ((setWorkingDatabase(Database.LOCAL)) && (negativeIds != null) && (!negativeIds.isEmpty())) {
+        	markerTypes.putAll(getMarkerDao().getMarkerTypeMapByIds(negativeIds));
+        }
+        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveIds != null) && (!positiveIds.isEmpty())) {
+        	markerTypes.putAll(getMarkerDao().getMarkerTypeMapByIds(positiveIds));
+        }
+        return markerTypes;
+    	
+    }
 
     @Override
     public Integer addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException {
@@ -1495,7 +1511,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Boolean setDArTMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
             throws MiddlewareQueryException {
-    	//TODO FOR VERIFICATION WITH GDMS TEAM
     	return setMarker(marker, TYPE_DART, markerAlias, markerDetails, markerUserInfo);
     	
     }
@@ -2558,6 +2573,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException {
+    	
+    	if (datasetId >= 0){
+    		throw new MiddlewareQueryException("Cannot delete dataset from central database. Dataset Id = " + datasetId);
+    	}
+    	
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
 
@@ -2569,14 +2589,26 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             getAccMetadataSetDao().deleteByDatasetId(datasetId);
             getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
             
-            //TODO
-//            markerType = this.getMarkerIdsByDatasetId(datasetId);
-//
-//            		
-//            if (marktype == snp)
-//            		delete from charvalues
-//            	ssr || dart
-//            		delete from allevalues	
+            // Get the marker type of the markers of the dataset. 
+            // Based on the type, delete from gdms_char_char_values if type = SNP 
+            //		OR from gdms_allele_values if type = SSR or DART 
+            List<Integer> markerIds = this.getMarkerIdsByDatasetId(datasetId);
+            java.util.Map<Integer, String> markerTypes = getMarkerTypeMapByIds(markerIds);
+            
+            if (markerTypes != null && !markerTypes.isEmpty()){
+            	for (Integer markerId : markerIds){
+            		String markerType = markerTypes.get(markerId);
+            		
+            		if (markerType.equals(GdmsType.TYPE_SNP.getValue())){
+            			getCharValuesDao().deleteByDatasetId(datasetId);
+            			break;
+            		} else if (markerType.equals(GdmsType.TYPE_SSR.getValue()) 
+            				|| markerType.equals(GdmsType.TYPE_DART.getValue())){
+            			getAlleleValuesDao().deleteByDatasetId(datasetId);
+            			break;
+            		}
+            	}
+            }
 
             getDatasetDao().deleteByDatasetId(datasetId);
 
