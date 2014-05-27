@@ -11,6 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.util.List;
+
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementData {
@@ -173,4 +177,21 @@ public class MeasurementData {
 		this.cValueId = cValueId;
 	}
 	
+	public String getDisplayValue() {
+		if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getPossibleValues() != null
+				&& !this.getMeasurementVariable().getPossibleValues().isEmpty() 
+				&& NumberUtils.isNumber(this.value)) {
+			
+			List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
+			for (ValueReference possibleValue : possibleValues) {
+				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
+					return possibleValue.getDescription();
+				}
+			}
+		}
+		else {
+			return this.value;
+		}
+		return "";
+	}
 }

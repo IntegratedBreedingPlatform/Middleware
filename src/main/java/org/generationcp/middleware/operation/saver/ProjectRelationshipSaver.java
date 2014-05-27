@@ -68,6 +68,16 @@ public class ProjectRelationshipSaver extends Saver {
 		}
 		return relationships;
 	}
+	
+	public void saveOrUpdateStudyToFolder(int studyId, int folderId) throws MiddlewareQueryException {
+		setWorkingDatabase(studyId);
+		ProjectRelationship relationship = getProjectRelationshipDao().getParentFolderRelationship(studyId);
+		if (relationship != null && relationship.getObjectProject().getProjectId() != null 
+				&& !relationship.getObjectProject().getProjectId().equals(folderId)) {
+			relationship.setObjectProject(getDmsProjectDao().getById(folderId));
+			getProjectRelationshipDao().saveOrUpdate(relationship);
+		}
+	}
 
 	
 }

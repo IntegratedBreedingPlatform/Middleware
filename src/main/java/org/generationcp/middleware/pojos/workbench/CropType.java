@@ -68,6 +68,9 @@ public class CropType implements Serializable{
     @Column(name = "central_db_name")
     private String centralDbName;
 
+    @Column(name = "schema_version")
+    private String version;
+
     public CropType() {
     }
 
@@ -124,6 +127,15 @@ public class CropType implements Serializable{
         return true;
     }
 
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -131,6 +143,8 @@ public class CropType implements Serializable{
         builder.append(cropName);
         builder.append(", centralDbName=");
         builder.append(centralDbName);
+        builder.append(", version=");
+        builder.append(version);
         builder.append("]");
         return builder.toString();
     }

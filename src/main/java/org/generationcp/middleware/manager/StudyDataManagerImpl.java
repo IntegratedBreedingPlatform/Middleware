@@ -244,6 +244,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
+	public List<Experiment> getExperiments(int dataSetId, int start,
+			int numOfRows, VariableTypeList varTypeList)
+			throws MiddlewareQueryException {
+    	clearSessions();
+		if(varTypeList == null)
+			return getExperiments(dataSetId, start, numOfRows);
+		else{
+			return getExperimentBuilder().build(
+	                dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, varTypeList);
+		}
+	}
+
+	@Override
     public long countExperiments(int dataSetId) throws MiddlewareQueryException {
         return getExperimentBuilder().count(dataSetId);
     }
@@ -1041,9 +1054,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException {
+    public int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException {
         if (setWorkingDatabase(Database.LOCAL)) {
-            return getPhenotypeDao().countPlantsSelectedOfNursery(dataSetId);
+            return getPhenotypeDao().countRecordedVariatesOfStudy(dataSetId, variateIds);
         }
         return 0;
     }

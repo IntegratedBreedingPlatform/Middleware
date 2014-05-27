@@ -13,8 +13,10 @@ package org.generationcp.middleware.dao.dms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -224,6 +226,25 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
         }
    	    
    	    return stocks;
+   	}
+   	
+   	@SuppressWarnings("unchecked")
+	public Map<Integer, StockModel> getStocksByIds(List<Integer> ids) throws MiddlewareQueryException{
+   		Map<Integer, StockModel> stockModels = new HashMap<Integer, StockModel>();
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.in("stockId", ids));
+			List<StockModel> stocks = criteria.list();
+			
+			for (StockModel stock : stocks){
+				stockModels.put(stock.getStockId(), stock);
+			}
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
+		}
+		
+		return stockModels;
    	}
 
 }

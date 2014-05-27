@@ -347,7 +347,7 @@ public interface FieldbookService {
      * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException;
+    int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds) throws MiddlewareQueryException;
     
     /**
      * Filter standard variables by mode.
@@ -604,4 +604,13 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns true if all instances in the study has fieldmap.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException;
 }

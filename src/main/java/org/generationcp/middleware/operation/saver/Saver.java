@@ -16,8 +16,8 @@ import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
-import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
@@ -124,4 +124,13 @@ public abstract class Saver extends DatabaseBroker{
     protected final ListDataPropertySaver getListDataPropertySaver() {
         return new ListDataPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
+
+    protected final WorkbookBuilder getWorkbookBuilder() {
+        return new WorkbookBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final GeolocationPropertySaver getGeolocationPropertySaver() {
+    	return new GeolocationPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }

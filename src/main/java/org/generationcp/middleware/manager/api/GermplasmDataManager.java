@@ -903,15 +903,28 @@ public interface GermplasmDataManager {
     @Deprecated
     void deleteLocation(Location location) throws MiddlewareQueryException;
 
+
     /**
-     * Inserts a single {@code Method} object into the database.
+     * Updates the {@code Method} object into the database.
      *
      * @param method - The {@code Method} object to be persisted to the database.
      * Must be a valid {@code Method} object.
-     * @return Returns the id of the {@code Method} record inserted in the
-     * database.
+     * @return Returns the updated {@code Method} record
+     *
      * @throws MiddlewareQueryException the middleware query exception
      */
+    Method editMethod(Method method) throws MiddlewareQueryException;
+
+
+        /**
+         * Inserts a single {@code Method} object into the database.
+         *
+         * @param method - The {@code Method} object to be persisted to the database.
+         * Must be a valid {@code Method} object.
+         * @return Returns the id of the {@code Method} record inserted in the
+         * database.
+         * @throws MiddlewareQueryException the middleware query exception
+         */
     Integer addMethod(Method method) throws MiddlewareQueryException;
     
     /**

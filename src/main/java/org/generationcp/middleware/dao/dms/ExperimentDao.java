@@ -217,4 +217,45 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 		return false;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getLocationIdsOfStudy(int studyId) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT DISTINCT e.nd_geolocation_id "
+					+ " FROM nd_experiment e "
+					+ " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
+					+ " INNER JOIN project_relationship pr ON pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() 
+					+ "   AND pr.object_project_id = " + studyId
+					+ "   AND pr.subject_project_id = ep.project_id ";
+
+			SQLQuery query = getSession().createSQLQuery(sql);
+			return query.list();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return new ArrayList<Integer>();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Integer> getLocationIdsOfStudyWithFieldmap(int studyId) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT DISTINCT e.nd_geolocation_id "
+					+ " FROM nd_experiment e "
+					+ " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
+					+ " INNER JOIN project_relationship pr ON pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() 
+					+ "   AND pr.object_project_id = " + studyId
+					+ "   AND pr.subject_project_id = ep.project_id "
+					+ " WHERE EXISTS (SELECT 1 FROM nd_experimentprop eprop "
+					+ "   WHERE eprop.type_id = " + TermId.COLUMN_NO.getId()
+					+ "     AND eprop.nd_experiment_id = e.nd_experiment_id  AND eprop.value <> '') ";
+
+			SQLQuery query = getSession().createSQLQuery(sql);
+			return query.list();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return new ArrayList<Integer>();
+	}
 }

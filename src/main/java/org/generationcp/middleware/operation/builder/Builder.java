@@ -13,7 +13,11 @@ package org.generationcp.middleware.operation.builder;
 
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
@@ -92,4 +96,12 @@ public abstract class Builder extends DatabaseBroker {
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
 	    return new MeasurementVariableTransformer(sessionProviderForLocal, sessionProviderForCentral);
 	}
+	
+    protected final GermplasmDataManager getGermplasmDataManager() {
+        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final OntologyDataManager getOntologyDataManager() {
+        return new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }

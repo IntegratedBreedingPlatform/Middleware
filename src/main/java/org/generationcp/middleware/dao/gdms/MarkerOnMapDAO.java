@@ -118,11 +118,11 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
             // SELECT * FROM gdms_markers_onmap WHERE map_id = -2 ORDER BY linkage_group, start_position;
 
             StringBuilder sqlString = new StringBuilder()
-            .append("SELECT * FROM gdms_markers_onmap  ")
+            .append("SELECT markeronmap_id, map_id, marker_id, start_position, end_position, linkage_group ")
+            .append("FROM gdms_markers_onmap  ")
             .append("WHERE map_id = :mapId  ")
             .append("ORDER BY linkage_group, start_position ")
             ;
-        
             Query query = getSession().createSQLQuery(sqlString.toString());
             query.setParameter("mapId", mapId);
 
@@ -130,13 +130,14 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
             
             if (list != null && list.size() > 0) {
                 for (Object[] row : list){
-                    Integer mapId2 = (Integer) row[0];
-                    Integer markerId = (Integer) row[1];
-                    Double startPosition = (Double) row[2];
-                    Double endPosition = (Double) row[3];
-                    String linkageGroup = (String) row [4]; 
+                    Integer markerOnMapId = (Integer) row[0];
+                    Integer mapId2 = (Integer) row[1];
+                    Integer markerId = (Integer) row[2];
+                    Double startPosition = (Double) row[3];
+                    Double endPosition = (Double) row[4];
+                    String linkageGroup = (String) row [5]; 
                     
-                    markersOnMap.add(new MarkerOnMap(mapId2, markerId, startPosition.floatValue(), 
+                    markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, markerId, startPosition.floatValue(), 
                                             endPosition.floatValue(), linkageGroup));
 
                 }
@@ -183,5 +184,127 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
         return toReturn;
     }
 
+    
+    @SuppressWarnings("unchecked")
+    public List<MarkerOnMap> getMarkersOnMap(List<Integer> mapIds, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException {
+        List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
 
+        try {
+        	/*
+		     	SELECT gdms_markers_onmap.* 
+		     	FROM gdms_markers_onmap 
+		   		WHERE map_id IN (:mapIds) AND linkage_group = :linkageGroup AND start_position BETWEEN :startPos AND :endPos 
+		   		ORDER BY map_id, Linkage_group, start_position
+        	 */
+
+            StringBuilder sqlString = new StringBuilder()
+            	.append("SELECT gdms_markers_onmap.* ") 
+            	.append("FROM gdms_markers_onmap ") 
+        		.append("WHERE map_id IN (:mapIds) AND linkage_group = :linkageGroup ")
+        		.append("		AND start_position BETWEEN :startPos AND :endPos ") 
+        		.append("ORDER BY map_id, Linkage_group, start_position ")
+            ;
+            Query query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameterList("mapIds", mapIds);
+            query.setParameter("linkageGroup", linkageGroup);
+            query.setParameter("startPos", startPos);
+            query.setParameter("endPos", endPos);
+
+            List<Object[]> list =  query.list();
+            
+            if (list != null && list.size() > 0) {
+                for (Object[] row : list){
+                    Integer markerOnMapId = (Integer) row[0];
+                    Integer mapId2 = (Integer) row[1];
+                    Integer markerId = (Integer) row[2];
+                    Double startPosition = (Double) row[3];
+                    Double endPosition = (Double) row[4];
+                    String linkageGroup2 = (String) row [5]; 
+                    
+                    markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, markerId, startPosition.floatValue(), 
+                                            endPosition.floatValue(), linkageGroup2));
+
+                }
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error with getMarkersOnMap query from MarkerOnMap: " + e.getMessage(), e);
+        }
+    
+        return markersOnMap;
+        
+    }
+
+	@SuppressWarnings("unchecked")
+	public List<MarkerOnMap> getMarkersOnMapByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+        List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
+
+        try {
+        	/*
+		     	SELECT markeronmap_id, map_id, marker_id, start_position, end_position, linkage_group 
+		     	FROM gdms_markers_onmap 
+		   		WHERE marker_id IN (:markerIds) 
+		   		ORDER BY map_id, Linkage_group, start_position
+        	 */
+
+            StringBuilder sqlString = new StringBuilder()
+            	.append("SELECT markeronmap_id, map_id, marker_id, start_position, end_position, linkage_group ") 
+            	.append("FROM gdms_markers_onmap ") 
+        		.append("WHERE marker_id IN (:markerIds) ")
+        		.append("ORDER BY map_id, Linkage_group, start_position ")
+            ;
+            Query query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameterList("markerIds", markerIds);
+
+            List<Object[]> list =  query.list();
+            
+            if (list != null && list.size() > 0) {
+                for (Object[] row : list){
+                    Integer markerOnMapId = (Integer) row[0];
+                    Integer mapId2 = (Integer) row[1];
+                    Integer markerId = (Integer) row[2];
+                    Double startPosition = (Double) row[3];
+                    Double endPosition = (Double) row[4];
+                    String linkageGroup2 = (String) row [5]; 
+                    
+                    markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, markerId, startPosition.floatValue(), 
+                                            endPosition.floatValue(), linkageGroup2));
+                }
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error with getMarkersOnMapByMarkerIds query from MarkerOnMap: " + e.getMessage(), e);
+        }
+    
+        return markersOnMap;	
+    }
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getAllMarkerIds() throws MiddlewareQueryException{
+        List<Integer> toReturn = new ArrayList<Integer>();
+
+        try {
+        	/*
+		     	SELECT marker_id   
+		     	FROM gdms_markers_onmap 
+        	 */
+
+            StringBuilder sqlString = new StringBuilder()
+            	.append("SELECT marker_id ") 
+            	.append("FROM gdms_markers_onmap ") 
+            ;
+            Query query = getSession().createSQLQuery(sqlString.toString());
+
+            return query.list();
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error with getAllMarkerIds query from MarkerOnMap: " + e.getMessage(), e);
+        }
+    
+        return toReturn;	
+	}
+	
+	
+	
+    
 }

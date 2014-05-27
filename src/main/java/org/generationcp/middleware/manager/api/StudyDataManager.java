@@ -130,7 +130,18 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareQueryException;
-
+    
+    /**
+     * Gets the experiments.
+     *
+     * @param dataSetId the data set id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @param varTypeList the var type list
+     * @return the experiments
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList) throws MiddlewareQueryException;
     /**
      * Get the number of experiments in a dataset. Retrieves from central if the
      * given ID is positive, otherwise retrieves from local.
@@ -699,7 +710,7 @@ public interface StudyDataManager{
      * @return the int
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException;
+    int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException;
     
     /**
      * Gets the geolocation prop value.

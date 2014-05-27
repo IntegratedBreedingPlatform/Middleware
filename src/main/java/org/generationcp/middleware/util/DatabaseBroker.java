@@ -62,9 +62,12 @@ import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MtaDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.dao.gdms.TrackDataDAO;
+import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
@@ -141,9 +144,13 @@ public class DatabaseBroker {
     private MarkerMetadataSetDAO markerMetadataSetDao;
     private MarkerOnMapDAO markerOnMapDao;
     private MarkerUserInfoDAO markerUserInfoDao;
+    private MarkerUserInfoDetailsDAO markerUserInfoDetailsDao;
     private QtlDAO qtlDao;
     private QtlDetailsDAO qtlDetailsDao;
     private MtaDAO mtaDao;
+    private TrackDataDAO trackDataDao;
+    private TrackMarkerDAO trackMarkerDao;
+
     
     // GermplasmDataManager DAOs
     private AttributeDAO attributeDao;
@@ -732,6 +739,14 @@ public class DatabaseBroker {
         markerUserInfoDao.setSession(getActiveSession());
         return markerUserInfoDao;
     }
+    
+    protected final MarkerUserInfoDetailsDAO getMarkerUserInfoDetailsDao() {
+        if (markerUserInfoDetailsDao == null) {
+        	markerUserInfoDetailsDao = new MarkerUserInfoDetailsDAO();
+        }
+        markerUserInfoDetailsDao.setSession(getActiveSession());
+        return markerUserInfoDetailsDao;
+    }
 
     protected final QtlDAO getQtlDao() {
         if (qtlDao == null) {
@@ -756,6 +771,23 @@ public class DatabaseBroker {
         mtaDao.setSession(getActiveSession());
         return mtaDao;
     }
+
+    protected final TrackDataDAO getTrackDataDao() {
+        if (trackDataDao == null) {
+        	trackDataDao = new TrackDataDAO();
+        }
+        trackDataDao.setSession(getActiveSession());
+        return trackDataDao;
+    }
+
+    protected final TrackMarkerDAO getTrackMarkerDao() {
+        if (trackMarkerDao == null) {
+        	trackMarkerDao = new TrackMarkerDAO();
+        }
+        trackMarkerDao.setSession(getActiveSession());
+        return trackMarkerDao;
+    }
+
 
 
 

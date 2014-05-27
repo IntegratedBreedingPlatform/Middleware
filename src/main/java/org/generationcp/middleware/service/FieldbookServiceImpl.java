@@ -25,8 +25,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -233,6 +231,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         try {
             trans = session.beginTransaction();
             
+            getWorkbookSaver().saveWorkbookVariables(workbook);
+            List<Integer> deletedVariateIds = getDeletedVariateIds(workbook.getVariates());
+
             saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
@@ -242,35 +243,42 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             if (variates != null){
                 for (MeasurementVariable variate : variates){
-                    for (MeasurementRow row : observations){
-                        for (MeasurementData field : row.getDataList()){
-                            if (variate.getName().equals(field.getLabel())){
-                            	Phenotype phenotype = null;
-                                if (field.getValue() != null) {
-                                	field.setValue(field.getValue().trim());
-                                }
-                                if (field.getPhenotypeId() != null) {
-	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
-                                }
-                                if (phenotype == null && field.getValue() != null 
-                                        && !"".equals(field.getValue().trim())){
-                                    phenotype = new Phenotype();
-                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
-                                }
-                                if (phenotype != null) {
-	                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
-	                                        , variate.getTermId(), variate.getStoredIn()
-	                                        , field.getValue(), phenotype);
-	
-	                                i++;
-	                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
-	                                    session.flush();
-	                                    session.clear();
+                	if (deletedVariateIds != null && !deletedVariateIds.isEmpty()
+                			&& deletedVariateIds.contains(variate.getTermId())) {
+                		//skip this was already deleted.
+                	}
+                	else {
+	                    for (MeasurementRow row : observations){
+	                        for (MeasurementData field : row.getDataList()){
+	                            if (variate.getName().equals(field.getLabel())){
+	                            	Phenotype phenotype = null;
+	                                if (field.getValue() != null) {
+	                                	field.setValue(field.getValue().trim());
 	                                }
-                                }
-                            }
-                        }
-                    }
+	                                if (field.getPhenotypeId() != null) {
+	                                	System.out.println("fetching " + field.getPhenotypeId());
+		                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
+	                                }
+	                                if (phenotype == null && field.getValue() != null 
+	                                        && !"".equals(field.getValue().trim())){
+	                                    phenotype = new Phenotype();
+	                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+	                                }
+	                                if (phenotype != null) {
+		                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
+		                                        , variate.getTermId(), variate.getStoredIn()
+		                                        , field.getValue(), phenotype);
+		
+		                                i++;
+		                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
+		                                    session.flush();
+		                                    session.clear();
+		                                }
+	                                }
+	                            }
+	                        }
+	                    }
+                	}
                 }
             }
             
@@ -542,31 +550,32 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return getUserDataManager().getAllPersons();
     }
     
-    public int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException {
-        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
+    public int countPlotsWithRecordedVariatesInDataset(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+//        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
         
-        int dataSetId = 0;
+//        int dataSetId = 0;
+//        
+//        //get observation dataset
+//        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
+//        if (datasetRefList != null) {
+//            for (DatasetReference datasetRef : datasetRefList) {
+//                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
+//                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
+//                    dataSetId = datasetRef.getId();
+//                }
+//            }
+//        }
+//        
+//        //if not found in the list using the name, get dataset with Plot Data type
+//        if (dataSetId == 0) {
+//            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
+//            if (dataset != null){
+//                dataSetId = dataset.getId();
+//            }
+//        }
         
-        //get observation dataset
-        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
-        if (datasetRefList != null) {
-            for (DatasetReference datasetRef : datasetRefList) {
-                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
-                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
-                    dataSetId = datasetRef.getId();
-                }
-            }
-        }
-        
-        //if not found in the list using the name, get dataset with Plot Data type
-        if (dataSetId == 0) {
-            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
-            if (dataset != null){
-                dataSetId = dataset.getId();
-            }
-        }
-        
-        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
+//        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId, variateIds);
+        return getStudyDataManager().countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
     }
     
     @Override
@@ -892,5 +901,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public String getFolderNameById(Integer folderId) throws MiddlewareQueryException {
 	    return getStudyDataManager().getFolderNameById(folderId);
+	}
+	
+	private List<Integer> getDeletedVariateIds(List<MeasurementVariable> variables) {
+		List<Integer> ids = new ArrayList<Integer>();
+		if (variables != null) {
+			for (MeasurementVariable variable : variables) {
+				if (variable.getOperation() == Operation.DELETE) {
+					ids.add(variable.getTermId());
+				}
+			}
+		}
+		return ids;
+	}
+	
+	@Override
+	public boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException {
+		return getExperimentBuilder().checkIfStudyHasFieldmap(studyId);
 	}
 }

@@ -33,37 +33,6 @@ public class MappingPop implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    public static final String GET_PARENTS_BY_DATASET_ID =
-            "SELECT parent_a_nid, parent_b_nid, mapping_type " +
-            "FROM gdms_mapping_pop " +
-            "WHERE dataset_id = :datasetId";
-
-    public static final String GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS =
-            "SELECT DISTINCT" +
-                " gdms_mapping_pop_values.dataset_id" +
-                ", gdms_mapping_pop.mapping_type" +
-                ", gdms_mapping_pop.parent_a_nid" +
-                ", gdms_mapping_pop.parent_b_nid" +
-                ", gdms_mapping_pop_values.gid " +
-                ", gdms_mapping_pop_values.marker_id " +
-                ", CONCAT(gdms_marker.marker_type, '')" +
-            " FROM gdms_mapping_pop_values " +
-                "JOIN gdms_mapping_pop ON gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id " +
-                "LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
-            " WHERE gdms_mapping_pop_values.marker_id IN (:markerIdList)" +
-                " AND gdms_mapping_pop_values.gid IN (:gidList)" +
-            " ORDER BY" +
-                " gdms_mapping_pop_values.gid DESC" +
-                ", gdms_marker.marker_name";
-
-    public static final String GET_ALL_PARENTS_FROM_MAPPING_POPULATION = 
-            "SELECT parent_a_nid, parent_b_nid " +
-            "FROM gdms_mapping_pop";
-        
-    public static final String COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION = 
-            "SELECT count(parent_a_nid) " +
-            "FROM gdms_mapping_pop";
-
     @Id
     @Basic(optional = false)
     @Column(name = "dataset_id")

@@ -166,6 +166,7 @@ public class WorkbookSaver extends Saver {
 //		}
 //		if(error) return -1;
 		
+		boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
 		
         //GCP-6091 start
         int studyLocationId;
@@ -180,7 +181,13 @@ public class WorkbookSaver extends Saver {
         }
 		//GCP-6091 end
 		
-		int studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
+		int studyId = 0;
+		if (!isUpdate) {
+			studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
+		}
+		else {
+			studyId = workbook.getStudyDetails().getId();
+		}
    		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
    		
    		if(trialVariableTypeList!=null || workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {//multi-location
@@ -212,6 +219,10 @@ public class WorkbookSaver extends Saver {
    		
    		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
         
+   		if (isUpdate) {
+   			saveWorkbookVariables(workbook);
+   		}
+   		
    		return studyId;
 	}
 	
@@ -741,5 +752,33 @@ public class WorkbookSaver extends Saver {
 		list.add(variable);
 		
 		return list;
+	}
+	
+	public void saveWorkbookVariables(Workbook workbook) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(), 
+				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
+		setWorkingDatabase(Database.LOCAL);
+		DmsProject study = getDmsProjectDao().getById(workbook.getStudyDetails().getId());
+		Integer trialDatasetId = workbook.getTrialDatasetId(), measurementDatasetId = workbook.getMeasurementDatesetId();
+		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
+			measurementDatasetId = getWorkbookBuilder().getMeasurementDataSetId(study.getProjectId(), workbook.getStudyName());
+			List<DmsProject> datasets = getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
+			if (datasets != null) {
+				for (DmsProject dataset : datasets) {
+					if (!dataset.getProjectId().equals(measurementDatasetId)) {
+						trialDatasetId = dataset.getProjectId();
+						break;
+					}
+				}
+			}
+		}
+		DmsProject trialDataset = getDmsProjectDao().getById(trialDatasetId);
+		DmsProject measurementDataset = getDmsProjectDao().getById(measurementDatasetId);
+		
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
+		getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
 	}
 }
