@@ -28,9 +28,10 @@ public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
     public List<SelectedGenotype> getSelectedAccessions(Integer generationID) throws MiddlewareQueryException {
         Criteria crit = getSession().createCriteria(getPersistentClass());
 
-        crit.add(Restrictions.eq("type", SelectedGenotypeEnum.SR))
-                .add(Restrictions.eq("type", SelectedGenotypeEnum.SD))
-                .add(Restrictions.eq("generation.generationID", generationID));
+        crit.add(Restrictions.eq("generation.generationID", generationID))
+            .add(Restrictions.disjunction()
+                .add(Restrictions.eq("type", SelectedGenotypeEnum.SR))
+                .add(Restrictions.eq("type", SelectedGenotypeEnum.SD)));
 
         return crit.list();
     }
@@ -45,20 +46,15 @@ public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
         return criteria.list();
     }
 
+
+    // moved transaction to the manager level so as to support batch operations
     @Override
     public SelectedGenotype saveOrUpdate(SelectedGenotype entity) throws MiddlewareQueryException {
-        Session session = getSession();
-        Transaction transaction = session.beginTransaction();
         try {
             SelectedGenotype genotype = super.saveOrUpdate(entity);
-            transaction.commit();
-            session.flush();
-            session.clear();
-
             return genotype;
         } catch (MiddlewareQueryException e) {
             e.printStackTrace();
-            transaction.rollback();
             throw e;
         }
     }
