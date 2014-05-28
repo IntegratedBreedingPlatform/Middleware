@@ -51,4 +51,13 @@ public class SelectedMarker implements Serializable {
     public Integer getMarkerID() {
         return markerID;
     }
+
+    @Override
+    public String toString() {
+        return "SelectedMarker{" +
+                "id=" + id +
+                ", generation=" + generation +
+                ", markerID=" + markerID +
+                '}';
+    }
 }

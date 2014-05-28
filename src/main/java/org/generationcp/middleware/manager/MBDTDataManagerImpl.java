@@ -89,12 +89,25 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public MBDTGeneration getGeneration(Integer generationID) throws MiddlewareQueryException {
+
+        if (generationID < 0) {
+            requireLocalDatabaseInstance();
+        } else {
+            requireCentralDatabaseInstance();
+        }
+
         prepareGenerationDAO();
         return generationDAO.getById(generationID);
     }
 
     @Override
     public List<MBDTGeneration> getGenerations(Integer projectID) throws MiddlewareQueryException {
+        if (projectID < 0) {
+            requireLocalDatabaseInstance();
+        } else {
+            requireCentralDatabaseInstance();
+        }
+
         prepareGenerationDAO();
         return generationDAO.getByProjectID(projectID);
     }
@@ -128,7 +141,14 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<Integer> getMarkerStatus(Integer generationID) throws MiddlewareQueryException {
+        if (generationID < 0) {
+            requireLocalDatabaseInstance();
+        } else {
+            requireCentralDatabaseInstance();
+        }
+
         prepareGenerationDAO();
+
         MBDTGeneration generation = generationDAO.getById(generationID);
 
         List<SelectedMarker> markers = generation.getSelectedMarkers();
@@ -144,6 +164,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<SelectedGenotype> getSelectedAccession(Integer generationID) throws MiddlewareQueryException {
+        if (generationID < 0) {
+            requireLocalDatabaseInstance();
+        } else {
+            requireCentralDatabaseInstance();
+        }
+
+
         prepareSelectedGenotypeDAO();
 
         try {
@@ -156,8 +183,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException {
-        prepareSelectedGenotypeDAO();
+        if (generationID < 0) {
+            requireLocalDatabaseInstance();
+        } else {
+            requireCentralDatabaseInstance();
+        }
 
+        prepareSelectedGenotypeDAO();
         try {
             return selectedGenotypeDAO.getParentData(generationID);
         } catch (Exception e) {
@@ -266,12 +298,12 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
                             break;
                         case R:
                             if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
-                                genotype.setType(SelectedGenotypeEnum.R);
+                                genotype.setType(SelectedGenotypeEnum.D);
                             }
                             break;
                         case D:
                             if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
-                                genotype.setType(SelectedGenotypeEnum.D);
+                                genotype.setType(SelectedGenotypeEnum.R);
                             }
                             break;
                     }

@@ -166,4 +166,19 @@ public class MBDTProjectData implements Serializable {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "MBDTProjectData{" +
+                "projectID=" + projectID +
+                ", projectName='" + projectName + '\'' +
+                ", userID=" + userID +
+                ", mapID=" + mapID +
+                ", qtlID=" + qtlID +
+                ", phenoDatasetID=" + phenoDatasetID +
+                ", principalInvestigator='" + principalInvestigator + '\'' +
+                ", email='" + email + '\'' +
+                ", institute='" + institute + '\'' +
+                '}';
+    }
 }
