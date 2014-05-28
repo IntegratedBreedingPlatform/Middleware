@@ -194,4 +194,11 @@ public class MeasurementData {
 		}
 		return "";
 	}
+	
+	public MeasurementData copy() {
+		MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
+		data.setPhenotypeId(this.phenotypeId);
+		data.setcValueId(this.cValueId);
+		return data;
+	}
 }

@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -66,6 +65,8 @@ public class Workbook {
 	private Integer measurementDatesetId;
 	
 	private List<MeasurementRow> trialObservations;
+	
+	private List<MeasurementRow> originalObservations;
 
 	public void reset() {
 		trialHeaders = null;
@@ -754,6 +755,20 @@ public class Workbook {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return the originalObservations
+	 */
+	public List<MeasurementRow> getOriginalObservations() {
+		return originalObservations;
+	}
+
+	/**
+	 * @param originalObservations the originalObservations to set
+	 */
+	public void setOriginalObservations(List<MeasurementRow> originalObservations) {
+		this.originalObservations = originalObservations;
 	}
 	
 }

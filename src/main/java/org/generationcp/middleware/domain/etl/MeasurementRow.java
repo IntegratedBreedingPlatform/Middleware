@@ -120,6 +120,17 @@ public class MeasurementRow {
 		return null;
 	}
 
+	public MeasurementData getMeasurementData(Integer termId) {
+		if (termId != null && dataList != null && !dataList.isEmpty()) {
+			for (MeasurementData data : dataList) {
+				if (data.getMeasurementVariable() != null && data.getMeasurementVariable().getTermId() == termId) {
+					return data;
+				}
+			}
+		}
+		return null;
+	}
+
 	public List<MeasurementData> getDataList() {
 		return dataList;
 	}
@@ -162,6 +173,19 @@ public class MeasurementRow {
 		return strRange != null && NumberUtils.isNumber(strRange) ? Double.valueOf(strRange).intValue() : null;
 	}
 	
+	public String getKeyIdentifier() {
+		String trialInstanceNumber = getMeasurementDataValue(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		if (trialInstanceNumber == null) {
+			trialInstanceNumber = "1";
+		}
+		String plotNumber = getMeasurementDataValue(TermId.PLOT_NO.getId());
+		if (plotNumber == null || plotNumber.isEmpty()) {
+			plotNumber = getMeasurementDataValue(TermId.PLOT_NNO.getId());
+		}
+		String entryNumber = getMeasurementDataValue(TermId.ENTRY_NO.getId());
+		return trialInstanceNumber + "-" + plotNumber + "-" + entryNumber;
+	}
+	
 	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -188,5 +212,16 @@ public class MeasurementRow {
 		}
 	}
 	
-	
+	public MeasurementRow copy() {
+		List<MeasurementData> newDataList = null;
+		if (this.dataList != null && !this.dataList.isEmpty()) {
+			newDataList = new ArrayList<MeasurementData>();
+			for (MeasurementData data : this.dataList) {
+				newDataList.add(data.copy());
+			}
+		}
+		MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
+		row.setExperimentId(this.experimentId);
+		return row;
+	}
 }
