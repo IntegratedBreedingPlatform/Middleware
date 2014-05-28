@@ -734,7 +734,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                 	}
                 	sql.append(variateIds.get(i));
                 }
-                sql.append(") AND p.value <> ''");
+                sql.append(") AND (p.value <> '' or p.cvalue_id <> '')");
              Query query = getSession().createSQLQuery(sql.toString());
         
                 return ((BigInteger) query.uniqueResult()).intValue();
