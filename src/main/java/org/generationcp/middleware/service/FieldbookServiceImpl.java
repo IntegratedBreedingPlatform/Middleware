@@ -256,7 +256,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	                                	field.setValue(field.getValue().trim());
 	                                }
 	                                if (field.getPhenotypeId() != null) {
-	                                	System.out.println("fetching " + field.getPhenotypeId());
 		                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
 	                                }
 	                                if (phenotype == null && field.getValue() != null 
@@ -281,6 +280,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 	}
                 }
             }
+            
+            applyDeletedObservations(workbook);
             
             trans.commit();
         } catch (Exception e) {
@@ -918,5 +919,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException {
 		return getExperimentBuilder().checkIfStudyHasFieldmap(studyId);
+	}
+	
+	private void applyDeletedObservations(Workbook workbook) throws MiddlewareQueryException {
+		if (workbook.getOriginalObservations() != null && !workbook.getOriginalObservations().isEmpty()) {
+			List<Integer> experimentIds = new ArrayList<Integer>();
+			for (MeasurementRow observation : workbook.getObservations()) {
+				if (observation.getExperimentId() < 0) {
+					experimentIds.add(observation.getExperimentId());
+				}
+			}
+			List<Integer> deletedExperimentIds = new ArrayList<Integer>();
+			for (MeasurementRow observation : workbook.getOriginalObservations()) {
+				if (!experimentIds.contains(observation.getExperimentId())) {
+					deletedExperimentIds.add(observation.getExperimentId());
+				}
+			}
+		
+			getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
+		}
 	}
 }

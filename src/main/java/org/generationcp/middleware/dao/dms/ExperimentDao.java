@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -257,5 +258,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			logAndThrowException("Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<Integer>();
+	}
+	
+	public void deleteExperimentsByIds(List<Integer> experimentIdList) throws MiddlewareQueryException {
+		String experimentIds = StringUtils.join(experimentIdList, ",");
+		
+		try {
+			this.flush();
+			
+			// Delete experiments
+			SQLQuery statement = getSession().createSQLQuery("delete e, ep, es, epheno, pheno, eprop " +
+                       "from nd_experiment e " + 
+					   "left join nd_experiment_project ep on e.nd_experiment_id = ep.nd_experiment_id " +
+					   "left join nd_experiment_stock es on e.nd_experiment_id = es.nd_experiment_id " + 
+					   "left join nd_experiment_phenotype epheno on e.nd_experiment_id = epheno.nd_experiment_id " +
+					   "left join phenotype pheno on epheno.phenotype_id = pheno.phenotype_id " +
+					   "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id " +
+	                   "where ep.nd_experiment_id in (" + experimentIds + ") ");
+			statement.executeUpdate();	   
+			
+            this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteExperimentsByLocation=" + experimentIds + " in DataSetDao: " + e.getMessage(), e);
+		}
 	}
 }

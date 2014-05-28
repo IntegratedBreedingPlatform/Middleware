@@ -34,6 +34,7 @@ import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
+import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
@@ -119,5 +120,9 @@ public abstract class Service extends DatabaseBroker {
 
     protected final StockBuilder getStockBuilder() {
     	return new StockBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ExperimentDestroyer getExperimentDestroyer() {
+    	return new ExperimentDestroyer(sessionProviderForLocal, sessionProviderForCentral);
     }
 }
