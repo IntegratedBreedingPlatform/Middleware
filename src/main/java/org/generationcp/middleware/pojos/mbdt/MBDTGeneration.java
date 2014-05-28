@@ -93,4 +93,13 @@ public class MBDTGeneration implements Serializable{
     public void setGenotypeDatasetID(Integer genotypeDatasetID) {
         this.genotypeDatasetID = genotypeDatasetID;
     }
+
+    @Override
+    public String toString() {
+        return "MBDTGeneration{" +
+                "generationID=" + generationID +
+                ", generationName='" + generationName + '\'' +
+                ", genotypeDatasetID=" + genotypeDatasetID +
+                '}';
+    }
 }

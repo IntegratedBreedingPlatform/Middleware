@@ -72,4 +72,14 @@ public class SelectedGenotype implements Serializable {
     public void setGid(Integer gid) {
         this.gid = gid;
     }
+
+    @Override
+    public String toString() {
+        return "SelectedGenotype{" +
+                "id=" + id +
+                ", generation=" + generation +
+                ", type=" + type +
+                ", gid=" + gid +
+                '}';
+    }
 }
