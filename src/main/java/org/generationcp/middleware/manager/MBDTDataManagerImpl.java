@@ -183,6 +183,12 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException {
         prepareSelectedGenotypeDAO();
 
+        if (generationID < 0) {
+            requireLocalDatabaseInstance();
+        } else {
+            requireCentralDatabaseInstance();
+        }
+
         try {
             return selectedGenotypeDAO.getParentData(generationID);
         } catch (Exception e) {
