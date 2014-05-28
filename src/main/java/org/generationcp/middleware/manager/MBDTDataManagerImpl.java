@@ -266,12 +266,12 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
                             break;
                         case R:
                             if (genotypeEnum.equals(SelectedGenotypeEnum.D)) {
-                                genotype.setType(SelectedGenotypeEnum.R);
+                                genotype.setType(SelectedGenotypeEnum.D);
                             }
                             break;
                         case D:
                             if (genotypeEnum.equals(SelectedGenotypeEnum.R)) {
-                                genotype.setType(SelectedGenotypeEnum.D);
+                                genotype.setType(SelectedGenotypeEnum.R);
                             }
                             break;
                     }
