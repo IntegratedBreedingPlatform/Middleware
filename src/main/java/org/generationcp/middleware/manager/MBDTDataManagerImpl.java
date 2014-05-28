@@ -89,25 +89,26 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public MBDTGeneration getGeneration(Integer generationID) throws MiddlewareQueryException {
-        prepareGenerationDAO();
+
         if (generationID < 0) {
             requireLocalDatabaseInstance();
         } else {
             requireCentralDatabaseInstance();
         }
+
+        prepareGenerationDAO();
         return generationDAO.getById(generationID);
     }
 
     @Override
     public List<MBDTGeneration> getGenerations(Integer projectID) throws MiddlewareQueryException {
-        prepareGenerationDAO();
-
         if (projectID < 0) {
             requireLocalDatabaseInstance();
         } else {
             requireCentralDatabaseInstance();
         }
 
+        prepareGenerationDAO();
         return generationDAO.getByProjectID(projectID);
     }
 
@@ -140,13 +141,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<Integer> getMarkerStatus(Integer generationID) throws MiddlewareQueryException {
-        prepareGenerationDAO();
-
         if (generationID < 0) {
             requireLocalDatabaseInstance();
         } else {
             requireCentralDatabaseInstance();
         }
+
+        prepareGenerationDAO();
 
         MBDTGeneration generation = generationDAO.getById(generationID);
 
@@ -163,13 +164,14 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<SelectedGenotype> getSelectedAccession(Integer generationID) throws MiddlewareQueryException {
-        prepareSelectedGenotypeDAO();
-
         if (generationID < 0) {
             requireLocalDatabaseInstance();
         } else {
             requireCentralDatabaseInstance();
         }
+
+
+        prepareSelectedGenotypeDAO();
 
         try {
             return selectedGenotypeDAO.getSelectedAccessions(generationID);
@@ -181,14 +183,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException {
-        prepareSelectedGenotypeDAO();
-
         if (generationID < 0) {
             requireLocalDatabaseInstance();
         } else {
             requireCentralDatabaseInstance();
         }
 
+        prepareSelectedGenotypeDAO();
         try {
             return selectedGenotypeDAO.getParentData(generationID);
         } catch (Exception e) {
