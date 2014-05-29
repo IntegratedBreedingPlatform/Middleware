@@ -24,7 +24,7 @@ public class SelectedGenotype implements Serializable {
     @JoinColumn(name = "generation_id")
     private MBDTGeneration generation;
 
-    @Column(name = "sg_type", columnDefinition = "enum('SA', 'SR', 'SD')")
+    @Column(name = "sg_type", columnDefinition = "enum('R', 'D', 'SD', 'SR')")
     @Enumerated(EnumType.STRING)
     private SelectedGenotypeEnum type;
 
