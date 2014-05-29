@@ -257,6 +257,7 @@ public class TestMBDTDataManager
 
         } catch (Exception e) {
             e.printStackTrace();
+            fail(e.getMessage());
         } finally {
             deleteSampleProjectData();
             closeDatabaseResources(conn, stmt, rs);
@@ -376,6 +377,7 @@ public class TestMBDTDataManager
 
             stmt.executeUpdate(sqlString.toString());
         } catch (MiddlewareQueryException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         } finally {
             deleteSampleGenerationData();
