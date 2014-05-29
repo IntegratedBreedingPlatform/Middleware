@@ -922,7 +922,7 @@ public class TestMBDTDataManager
     }
 
     @Test
-    public void setSetParentDuplicateGIDInParameterList() throws Exception {
+    public void testSetParentDuplicateGIDInParameterList() throws Exception {
         StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid, sg_type FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
                 .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
                 .append(" WHERE gid in(");
