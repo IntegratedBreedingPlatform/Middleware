@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +38,7 @@ public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
     }
 
 
-    public List<SelectedGenotype> getSelectedGenotypeByIds(List<Integer> gids) throws MiddlewareQueryException {
+    public List<SelectedGenotype> getSelectedGenotypeByIds(Set<Integer> gids) throws MiddlewareQueryException {
         Integer[] idArray = new Integer[gids.size()];
         idArray = gids.toArray(idArray);
         Criteria criteria = getSession().createCriteria(getPersistentClass());

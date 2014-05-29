@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 public class TestMBDTDataManager
         extends TestOutputFormatter {
 
-    private static MBDTDataManager dut;
+    private MBDTDataManager dut;
     private DataSource dataSource;
 
     public static final Integer SAMPLE_PROJECT_ID = -1;
@@ -45,7 +45,7 @@ public class TestMBDTDataManager
     public static final int[] SAMPLE_SELECTED_MARKER_IDS = new int[]{-1, -2, -3};
     public static final int[] SAMPLE_SELECTED_ACCESSION_GIDS = new int[]{1, 2, 3, 4, 5, 6};
     public static final List<Integer> SAMPLE_PARENT_GIDS = new ArrayList<Integer>();
-
+    private static ManagerFactory managerFactory;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -54,8 +54,8 @@ public class TestMBDTDataManager
 
         DatabaseConnectionParameters central = new DatabaseConnectionParameters(
                 "testDatabaseConfig.properties", "central");
-        ManagerFactory managerFactory = new ManagerFactory(local, central);
-        dut = managerFactory.getMbdtDataManager();
+        managerFactory = new ManagerFactory(local, central);
+
         SAMPLE_PARENT_GIDS.add(4);
         SAMPLE_PARENT_GIDS.add(5);
         SAMPLE_PARENT_GIDS.add(6);
@@ -63,6 +63,7 @@ public class TestMBDTDataManager
 
     @Before
     public void prepareDatabaseItems() throws Exception {
+        dut = managerFactory.getMbdtDataManager();
         DatabaseConnectionParameters local = new DatabaseConnectionParameters(
                 "testDatabaseConfig.properties", "local");
 
@@ -561,7 +562,7 @@ public class TestMBDTDataManager
     public void testSetParentDataNonExistingGenerationID() throws Exception {
         try {
             dut.setParentData(Integer.MAX_VALUE, SelectedGenotypeEnum.R, SAMPLE_PARENT_GIDS);
-            fail ("Unable to catch non existing generation ID");
+            fail("Unable to catch non existing generation ID");
         } catch (MiddlewareQueryException e) {
             e.printStackTrace();
         }
@@ -921,6 +922,88 @@ public class TestMBDTDataManager
     }
 
     @Test
+    public void setSetParentDuplicateGIDInParameterList() throws Exception {
+        StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid, sg_type FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
+                .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
+                .append(" WHERE gid in(");
+
+        List<Integer> gidList = new ArrayList<Integer>();
+        for (int i = 0; i < SAMPLE_PARENT_GIDS.size(); i++) {
+            gidList.add(SAMPLE_PARENT_GIDS.get(i));
+
+            if (i != 0) {
+                sqlString.append(",");
+            }
+
+            sqlString.append(SAMPLE_PARENT_GIDS.get(i));
+        }
+
+        // add a duplicate gid to the list
+        gidList.add(gidList.get(0));
+
+        sqlString.append(")");
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            dut.clear();
+            MBDTProjectData newProject = dut.getProjectData(SAMPLE_PROJECT_ID);
+            if (newProject == null) {
+                newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
+                dut.setProjectData(newProject);
+            }
+
+            MBDTGeneration generation = dut.getGeneration(SAMPLE_GENERATION_ID);
+            if (generation == null) {
+                generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
+                generation.setGenerationID(SAMPLE_GENERATION_ID);
+                dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+            }
+
+            dut.setParentData(SAMPLE_GENERATION_ID, SelectedGenotypeEnum.R, gidList);
+
+            conn = dataSource.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sqlString.toString());
+
+            int recordCount = 0;
+            gidList.clear();
+
+            while (rs.next()) {
+                recordCount++;
+                gidList.add(rs.getInt("sg_id"));
+                assertEquals("R", rs.getString("sg_type"));
+            }
+
+            assertTrue(recordCount == SAMPLE_PARENT_GIDS.size());
+
+            // clean up
+            sqlString = new StringBuffer("DELETE FROM mbdt_selected_genotypes WHERE sg_id IN (");
+
+            for (int i = 0; i < gidList.size(); i++) {
+                if (i != 0) {
+                    sqlString.append(",");
+                }
+
+                sqlString.append(gidList.get(i));
+            }
+
+            sqlString.append(")");
+            stmt.executeUpdate(sqlString.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, rs);
+        }
+    }
+
+    @Test
     public void testSetParentAlreadyExistingSelected() throws Exception {
         StringBuffer sqlString = new StringBuffer("SELECT sg_id, gid, sg_type FROM mbdt_selected_genotypes geno INNER JOIN mbdt_generations")
                 .append(" gen ON (geno.generation_id = gen.generation_id) INNER JOIN mbdt_project proj ON (gen.project_id = proj.project_id)")
@@ -944,7 +1027,9 @@ public class TestMBDTDataManager
         ResultSet rs = null;
 
         try {
+
             dut.clear();
+
             MBDTProjectData newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
             dut.setProjectData(newProject);
 

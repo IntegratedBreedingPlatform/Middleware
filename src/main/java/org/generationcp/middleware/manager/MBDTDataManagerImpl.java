@@ -17,7 +17,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -223,6 +225,8 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
         requireLocalDatabaseInstance();
 
+        Set<Integer> gidSet = new HashSet<Integer>(gids);
+
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(generationID);
@@ -234,7 +238,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         Session session = getActiveSession();
         Transaction transaction = session.beginTransaction();
         try {
-            List<SelectedGenotype> existing = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
+            List<SelectedGenotype> existing = selectedGenotypeDAO.getSelectedGenotypeByIds(gidSet);
 
 
             // find existing instances and toggle their selected status appropriately
@@ -257,7 +261,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
                     selectedGenotypeDAO.saveOrUpdate(genotype);
 
-                    gids.remove(genotype.getGid());
+                    gidSet.remove(genotype.getGid());
                 }
 
                 // perform batch operation on update commands first
@@ -267,7 +271,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 
             // create new entries with the default type
-            for (Integer gid : gids) {
+            for (Integer gid : gidSet) {
                 SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SR, gid);
                 Integer newId = selectedGenotypeDAO.getNegativeId("id");
                 genotype.setId(newId);
@@ -289,6 +293,8 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     @Override
     public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
 
+        Set<Integer> gidSet = new HashSet<Integer>(gids);
+
         if (genotypeEnum.equals(SelectedGenotypeEnum.SD) || genotypeEnum.equals(SelectedGenotypeEnum.SR)) {
             throw new MiddlewareQueryException("Set Parent Data only takes in Recurrent or Donor as possible types. Use setSelectedAccession to mark / create entries as Selected Recurrent / Selected Donor");
         }
@@ -303,7 +309,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
             throw new MiddlewareQueryException("Generation with given ID does not exist");
         }
 
-        List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
+        List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getSelectedGenotypeByIds(gidSet);
 
         Session session = getActiveSession();
         Transaction transaction = session.beginTransaction();
@@ -337,7 +343,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
                             break;
                     }
 
-                    gids.remove(genotype.getGid());
+                    gidSet.remove(genotype.getGid());
 
                     selectedGenotypeDAO.saveOrUpdate(genotype);
                 }
@@ -346,7 +352,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
                 session.clear();
             }
 
-            for (Integer gid : gids) {
+            for (Integer gid : gidSet) {
                 SelectedGenotype genotype = new SelectedGenotype(generation, genotypeEnum, gid);
                 Integer newId = selectedGenotypeDAO.getNegativeId("id");
                 genotype.setId(newId);
@@ -411,6 +417,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public void clear() {
+        if (getActiveSession() == null) {
+            setWorkingDatabase(Database.LOCAL);
+        }
+
         getActiveSession().clear();
     }
 }
