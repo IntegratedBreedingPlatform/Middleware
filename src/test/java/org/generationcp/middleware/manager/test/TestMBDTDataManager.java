@@ -31,7 +31,8 @@ import static org.junit.Assert.assertEquals;
  */
 
 
-public class MBDTDataManagerTest extends TestOutputFormatter {
+public class TestMBDTDataManager
+        extends TestOutputFormatter {
 
     private static MBDTDataManager dut;
     private DataSource dataSource;
