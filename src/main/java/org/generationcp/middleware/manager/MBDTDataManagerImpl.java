@@ -130,6 +130,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
         MBDTGeneration generation = generationDAO.getById(generatonID);
 
+        if (generation == null) {
+            throw new MiddlewareQueryException("Generation with given ID does not exist");
+        }
+
         for (Integer markerID : markerIDs) {
             SelectedMarker sm = new SelectedMarker(generation, markerID);
             Integer newId = selectedMarkerDAO.getNegativeId("id");
@@ -151,6 +155,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
         MBDTGeneration generation = generationDAO.getById(generationID);
 
+        if (generation == null) {
+            throw new MiddlewareQueryException("Generation with given ID does not exist");
+        }
+
         List<SelectedMarker> markers = generation.getSelectedMarkers();
 
         List<Integer> returnValues = new ArrayList<Integer>();
@@ -170,8 +178,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
             requireCentralDatabaseInstance();
         }
 
-
+        prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
+
+        MBDTGeneration generation = generationDAO.getById(generationID);
+        if (generation == null) {
+            throw new MiddlewareQueryException("Generation with given ID does not exist");
+        }
 
         try {
             return selectedGenotypeDAO.getSelectedAccessions(generationID);
@@ -190,6 +203,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         }
 
         prepareSelectedGenotypeDAO();
+        prepareGenerationDAO();
+
+        MBDTGeneration generation = generationDAO.getById(generationID);
+        if (generation == null) {
+            throw new MiddlewareQueryException("Generation with given ID does not exist");
+        }
+
         try {
             return selectedGenotypeDAO.getParentData(generationID);
         } catch (Exception e) {
@@ -206,6 +226,11 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(generationID);
+
+        if (generation == null) {
+            throw new MiddlewareQueryException("Generation with given ID does not exist");
+        }
+
         Session session = getActiveSession();
         Transaction transaction = session.beginTransaction();
         try {
@@ -273,6 +298,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
         MBDTGeneration generation = getGeneration(generationID);
+
+        if (generation == null) {
+            throw new MiddlewareQueryException("Generation with given ID does not exist");
+        }
 
         List<SelectedGenotype> existingAccession = selectedGenotypeDAO.getSelectedGenotypeByIds(gids);
 
