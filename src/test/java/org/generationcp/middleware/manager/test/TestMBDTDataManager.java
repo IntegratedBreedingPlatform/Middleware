@@ -343,7 +343,7 @@ public class TestMBDTDataManager
             MBDTGeneration generation = dut.getGeneration(SAMPLE_GENERATION_ID);
             dut.setGeneration(SAMPLE_PROJECT_ID, generation);
 
-            dut.setMarkerStatus(SAMPLE_DATASET_ID, testMarkerIDs);
+            dut.setMarkerStatus(SAMPLE_GENERATION_ID, testMarkerIDs);
 
             conn = dataSource.getConnection();
             stmt = conn.createStatement();
