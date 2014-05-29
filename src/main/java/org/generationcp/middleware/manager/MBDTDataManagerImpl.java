@@ -73,6 +73,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         requireLocalDatabaseInstance();
         if (generation.getProject() == null) {
             MBDTProjectData project = getProjectData(projectID);
+
+            if (project == null) {
+                throw new MiddlewareQueryException("Project with given ID does not exist");
+            }
             generation.setProject(project);
         }
 
@@ -116,6 +120,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public void setMarkerStatus(Integer generatonID, List<Integer> markerIDs) throws MiddlewareQueryException {
+
+        if (markerIDs == null || markerIDs.size() == 0 ) {
+            return;
+        }
 
         requireLocalDatabaseInstance();
 
@@ -223,6 +231,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     @Override
     public void setSelectedAccessions(Integer generationID, List<Integer> gids) throws MiddlewareQueryException {
 
+        if (gids == null || gids.size() == 0) {
+            return;
+        }
+
         requireLocalDatabaseInstance();
 
         Set<Integer> gidSet = new HashSet<Integer>(gids);
@@ -293,11 +305,16 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     @Override
     public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
 
+        if (gids == null || gids.size() == 0) {
+            return;
+        }
+
         Set<Integer> gidSet = new HashSet<Integer>(gids);
 
         if (genotypeEnum.equals(SelectedGenotypeEnum.SD) || genotypeEnum.equals(SelectedGenotypeEnum.SR)) {
             throw new MiddlewareQueryException("Set Parent Data only takes in Recurrent or Donor as possible types. Use setSelectedAccession to mark / create entries as Selected Recurrent / Selected Donor");
         }
+
 
         requireLocalDatabaseInstance();
 

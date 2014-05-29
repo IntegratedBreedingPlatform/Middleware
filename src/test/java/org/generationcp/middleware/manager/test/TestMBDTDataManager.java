@@ -559,6 +559,48 @@ public class TestMBDTDataManager
     }
 
     @Test
+    public void testSetParentDataEmptyList() throws Exception {
+        List<Integer> gidList = new ArrayList<Integer>();
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            // workaround for Hibernate : associate inserted data to Hibernate session to avoid problems later on
+            dut.clear();
+            MBDTProjectData newProject = new MBDTProjectData(SAMPLE_PROJECT_ID, SAMPLE_PROJECT_NAME, 0, null, null, null);
+            dut.setProjectData(newProject);
+
+            MBDTGeneration generation = new MBDTGeneration(SAMPLE_GENERATION_NAME, newProject, SAMPLE_DATASET_ID);
+            generation.setGenerationID(SAMPLE_GENERATION_ID);
+            dut.setGeneration(SAMPLE_PROJECT_ID, generation);
+
+            conn = dataSource.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT count(*) as genotypeCount from mbdt_selected_genotypes");
+
+            assert(rs.next());
+            int genotypeCount = rs.getInt("genotypeCount");
+
+            dut.setSelectedAccessions(SAMPLE_GENERATION_ID, gidList);
+
+            rs = stmt.executeQuery("SELECT count(*) as genotypeCount from mbdt_selected_genotypes");
+            assert(rs.next());
+
+            assertEquals(genotypeCount, rs.getInt("genotypeCount"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, rs);
+        }
+    }
+
+    @Test
     public void testSetParentDataNonExistingGenerationID() throws Exception {
         try {
             dut.setParentData(Integer.MAX_VALUE, SelectedGenotypeEnum.R, SAMPLE_PARENT_GIDS);
