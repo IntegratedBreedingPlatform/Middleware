@@ -407,6 +407,25 @@ public class TestMBDTDataManager
     }
 
     @Test
+    public void testGetSelectedAccessionNonExistingGenerationID() throws Exception {
+        try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+            insertSampleAccessionData();
+
+            // attempt to retrieve accesions for non existing generation
+            List<SelectedGenotype> accessions = dut.getSelectedAccession(Integer.MAX_VALUE);
+            fail("Unable to recognize non existing generation ID");
+        } catch (MiddlewareQueryException e) {
+
+        } finally {
+            deleteSampleAccessionData();
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+        }
+    }
+
+    @Test
     public void testGetSelectedAccessions() throws Exception {
         try {
             insertSampleProjectData();
@@ -533,6 +552,16 @@ public class TestMBDTDataManager
             deleteSampleGenerationData();
             deleteSampleProjectData();
             closeDatabaseResources(conn, stmt, rs);
+        }
+    }
+
+    @Test
+    public void testSetParentDataNonExistingGenerationID() throws Exception {
+        try {
+            dut.setParentData(Integer.MAX_VALUE, SelectedGenotypeEnum.R, SAMPLE_PARENT_GIDS);
+            fail ("Unable to catch non existing generation ID");
+        } catch (MiddlewareQueryException e) {
+            e.printStackTrace();
         }
     }
 
