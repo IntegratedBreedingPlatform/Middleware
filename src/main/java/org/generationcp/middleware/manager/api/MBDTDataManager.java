@@ -34,8 +34,8 @@ public interface MBDTDataManager {
      *
      * @param projectID The project id the MBDTGeneration object will be associated to during the saving operation
      * @param generation The MBDTGeneration object to be saved into the database
-     * @return
-     * @throws MiddlewareQueryException
+     * @return The saved MBDTGeneration object, with a valid generation ID
+     * @throws MiddlewareQueryException if the provided project ID does not refer to a valid project
      */
     public MBDTGeneration setGeneration(Integer projectID, MBDTGeneration generation) throws MiddlewareQueryException;
 
