@@ -80,6 +80,14 @@ public interface UserDataManager {
     List<Person> getAllPersons() throws MiddlewareQueryException;
     
     /**
+     * Returns all Persons from local sorted by first-middle-last 
+     * followed by all persons from local sorted by first-middle-last
+     *
+     * @return gets all Persons
+     */   
+    List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException;
+
+    /**
      * Returns number of all Persons.
      *
      * @return the number of all Persons

@@ -585,7 +585,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<Person> getAllPersons() throws MiddlewareQueryException {
         return getUserDataManager().getAllPersons();
     }
-    
+
+    public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
+        return getUserDataManager().getAllPersonsOrderedByLocalCentral();
+    }
+
     public int countPlotsWithRecordedVariatesInDataset(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
 //        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
         

@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -171,6 +172,24 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     public List<Person> getAllPersons() throws MiddlewareQueryException {
         return (List<Person>) getAllFromCentralAndLocal(getPersonDao());
     }
+
+    @Override
+    public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
+        List<Person> toReturn = new ArrayList<Person>();
+        PersonDAO dao = getPersonDao();
+        if (setDaoSession(dao, getCurrentSessionForLocal())) {
+            List<Person> localPersons = dao.getAll();
+            Collections.sort(localPersons);
+            toReturn.addAll(localPersons);
+        }
+        if (setDaoSession(dao, getCurrentSessionForCentral())) {
+            List<Person> centralPersons = dao.getAll();
+            Collections.sort(centralPersons);
+            toReturn.addAll(centralPersons);
+        }
+        return toReturn;
+    }
+
 
     public long countAllPersons() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getPersonDao());
