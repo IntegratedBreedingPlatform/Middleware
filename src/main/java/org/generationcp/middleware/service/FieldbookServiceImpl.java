@@ -936,7 +936,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				}
 			}
 		
-			getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
+			if (!deletedExperimentIds.isEmpty()) {
+				getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
+			}
 		}
 	}
 }
