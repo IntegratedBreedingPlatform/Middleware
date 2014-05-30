@@ -51,6 +51,23 @@ public class ExperimentPropertySaver extends Saver {
         getExperimentPropertyDao().saveOrUpdate(experimentProperty);
     }
     
+    public void saveOrUpdateProperty(ExperimentModel experiment, int propertyType, String value) throws MiddlewareQueryException {
+        ExperimentProperty experimentProperty = getExperimentProperty(experiment, propertyType);
+        if (experimentProperty == null) {
+            
+            setWorkingDatabase(Database.LOCAL);
+            experimentProperty = new ExperimentProperty();
+            experimentProperty.setNdExperimentpropId(getExperimentPropertyDao().getNegativeId("ndExperimentpropId"));
+            experimentProperty.setTypeId(propertyType);
+            experimentProperty.setRank(0);
+            experimentProperty.setExperiment(experiment);
+        }
+        
+        setWorkingDatabase(Database.LOCAL);
+        experimentProperty.setValue(value);
+        getExperimentPropertyDao().saveOrUpdate(experimentProperty);
+    }
+    
     private ExperimentProperty getExperimentProperty(ExperimentModel experiment, int typeId) {
         if (experiment != null && experiment.getProperties() != null) {
             for (ExperimentProperty property : experiment.getProperties()) {

@@ -153,6 +153,10 @@ public class Workbook {
 	    return this.studyDetails.isNursery();
 	}
 	
+	public void setMeasurementDatasetVariables(List<MeasurementVariable> measurementDatasetVariables) {
+		this.measurementDatasetVariables = measurementDatasetVariables;
+	}
+	
 	public List<MeasurementVariable> getMeasurementDatasetVariables() {
 		if(measurementDatasetVariables==null) {
 			measurementDatasetVariables = new ArrayList<MeasurementVariable>();

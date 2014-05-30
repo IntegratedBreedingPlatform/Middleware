@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -128,6 +130,14 @@ public class WorkbookBuilder extends Builder {
 		    if (getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP.getId()) {
 		        variable.setPossibleValues(getAllBreedingMethods());
 		    }
+		}
+		
+		//remove OCC from nursery level conditions
+		Iterator<MeasurementVariable> iter = conditions.iterator();
+		while(iter.hasNext()) {
+			if (iter.next().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+				iter.remove();
+			}
 		}
 		
 		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates(), factors, variates, isTrial);
@@ -336,23 +346,22 @@ public class WorkbookBuilder extends Builder {
 	        	if (isTrial && 
 	        			variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
 	        			|| !PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
-	        		
+	        		boolean isEditable = NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true : false;
 	            	MeasurementData measurementData = null;
 	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
-                        		variable.getDisplayValue(), false, 
+                        		variable.getDisplayValue(), isEditable, 
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
                                 id,
                                 getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
 	            	}
 	            	else {
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
-                                variable.getValue(), false, 
+                                variable.getValue(), isEditable, 
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
                                 getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
 	            	}
-                    
 	            	measurementDataList.add(measurementData);
 	            }
 	        }

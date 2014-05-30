@@ -288,39 +288,43 @@ public class WorkbookSaver extends Saver {
 			observations = workbook.getObservations();
 		}
 		Map<String, Integer> locationMap = new HashMap<String, Integer>();
-		for (MeasurementRow row : observations) {
-			TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
-			VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
-			if (geolocation != null && geolocation.size() > 0) {
-				String trialInstanceNumber = getTrialInstanceNumber(geolocation);
-                if (LOG.isDebugEnabled()){
-                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
-                }
-                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
-		            watch.restart("save geolocation");
-		            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery());
-		            locationId = g.getLocationId();
-		            locationIds.add(locationId);
-		            if(g.getVariates()!=null && g.getVariates().size() > 0) {
-		            	VariableList trialVariates = new VariableList();
-		            	trialVariates.addAll(g.getVariates());
-		            	trialVariatesMap.put(locationId,trialVariates);
-		            }
+		if (observations != null) {
+			for (MeasurementRow row : observations) {
+				TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
+				VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
+				if (geolocation != null && geolocation.size() > 0) {
+					String trialInstanceNumber = getTrialInstanceNumber(geolocation);
+	                if (LOG.isDebugEnabled()){
+	                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
+	                }
+	                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
+			            watch.restart("save geolocation");
+			            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery());
+			            locationId = g.getLocationId();
+			            locationIds.add(locationId);
+			            if(g.getVariates()!=null && g.getVariates().size() > 0) {
+			            	VariableList trialVariates = new VariableList();
+			            	trialVariates.addAll(g.getVariates());
+			            	trialVariatesMap.put(locationId,trialVariates);
+			            }
+					}
+					row.setLocationId(locationId);
+					locationMap.put(trialInstanceNumber, locationId);
+		        }
+			}
+			
+			if (hasTrialObservations) {
+				for (MeasurementRow row : workbook.getObservations()) {
+					String trialInstance = getTrialInstanceNumber(row);
+					Integer locId = locationMap.get(trialInstance);
+					row.setLocationId(locId);
 				}
-				row.setLocationId(locationId);
-				locationMap.put(trialInstanceNumber, locationId);
-	        }
+			}
+	        //return studyLocationId
+			return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
 		}
 		
-		if (hasTrialObservations) {
-			for (MeasurementRow row : workbook.getObservations()) {
-				String trialInstance = getTrialInstanceNumber(row);
-				Integer locId = locationMap.get(trialInstance);
-				row.setLocationId(locId);
-			}
-		}
-        //return studyLocationId
-		return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
+		return 0;
 	}
 	
 	private String getTrialInstanceNumber(MeasurementRow row) {
@@ -494,7 +498,7 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 	
-	private void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
+	public void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = getStockModelBuilder().getStockMapForDataset(datasetId);
 
 		//TimerWatch watch = new TimerWatch("fetch stocks", LOG);
@@ -510,14 +514,17 @@ public class WorkbookSaver extends Saver {
 		}
 		if (workbook.getObservations() != null) {
         	    for (MeasurementRow row : workbook.getObservations()) {
-        												
+        	    
         		VariableList stock = getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
         		String stockFactor = getStockFactor(stock);
         		Integer stockId = stockMap.get(stockFactor);
+        		
         		if (stockId == null) {
         		      //rowWatch.restart("--save 1 stock");
         			stockId = getStockSaver().saveStock(stock);
         			stockMap.put(stockFactor, stockId);
+        		} else {
+        			getStockSaver().saveOrUpdateStock(stock, stockId);
         		}
         		row.setStockId(stockId);
         		if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
@@ -754,7 +761,7 @@ public class WorkbookSaver extends Saver {
 		return list;
 	}
 	
-	public void saveWorkbookVariables(Workbook workbook) throws MiddlewareQueryException {
+	public void saveWorkbookVariables(Workbook workbook) throws MiddlewareQueryException {		
 		setWorkingDatabase(Database.LOCAL);
 		getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(), 
 				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
