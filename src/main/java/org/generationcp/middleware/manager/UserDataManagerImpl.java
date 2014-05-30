@@ -184,8 +184,14 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         }
         if (setDaoSession(dao, getCurrentSessionForCentral())) {
             List<Person> centralPersons = dao.getAll();
-            Collections.sort(centralPersons);
-            toReturn.addAll(centralPersons);
+            List<Person> centralPersonsNew = new ArrayList<Person>();
+            for(Person person : centralPersons){
+            	if(person != null && !"".equalsIgnoreCase(person.getDisplayName())){
+            		centralPersonsNew.add(person);
+            	}
+            }
+            Collections.sort(centralPersonsNew);
+            toReturn.addAll(centralPersonsNew);
         }
         return toReturn;
     }
