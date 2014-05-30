@@ -197,6 +197,7 @@ public enum TermId {
     , PLANTS_SELECTED_PROP (2660)
     
     , BREEDING_METHOD_VARIATE (8262)
+    , SEED_SOURCE (8360)
 	;
 	
 	private final int id;

@@ -34,7 +34,7 @@ public class StockSaver extends Saver {
 	public Integer saveStock(VariableList variableList) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
-		StockModel stockModel = createStock(variableList);
+		StockModel stockModel = createStock(variableList, null);
 		if (stockModel != null) {
 			getStockDao().save(stockModel);
 			return stockModel.getStockId();
@@ -43,8 +43,17 @@ public class StockSaver extends Saver {
 		return null;
 	}
 	
-	private StockModel createStock(VariableList variableList) throws MiddlewareQueryException {
-		StockModel stockModel = null;
+	public void saveOrUpdateStock(VariableList variableList, int stockId) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		
+		StockModel stockModel = getStockModelBuilder().get(stockId);
+		createStock(variableList, stockModel);
+		if (stockModel != null) {
+			getStockDao().merge(stockModel);
+		}
+	}
+	
+	private StockModel createStock(VariableList variableList, StockModel stockModel) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
 			int propertyIndex = getStockPropertyDao().getNegativeId("stockPropId");
 			for (Variable variable : variableList.getVariables()) {
@@ -77,8 +86,10 @@ public class StockSaver extends Saver {
 					
 				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
 					stockModel = getStockObject(stockModel);
-					addProperty(stockModel, createProperty(propertyIndex--, variable));
-					
+					StockProperty stockProperty = getStockProperty(stockModel, variable);
+					if (stockProperty == null) {
+						addProperty(stockModel, createProperty(propertyIndex--, variable));
+					}				
 				} else {
 					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: " + variable.getVariableType().getId());
 				}
@@ -86,6 +97,16 @@ public class StockSaver extends Saver {
 		}
 		
 		return stockModel;
+	}
+	
+	private StockProperty getStockProperty(StockModel stockModel, Variable variable) { 
+		for (StockProperty property : stockModel.getProperties()) {
+			if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
+				property.setValue(variable.getValue());
+				return property;
+			}
+		}
+		return null;
 	}
 	
 	private StockModel getStockObject(StockModel stockModel) throws MiddlewareQueryException {

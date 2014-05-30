@@ -340,10 +340,22 @@ public interface FieldbookService {
      */
     List<Person> getAllPersons() throws MiddlewareQueryException;
     
+    
+    /**
+     * Returns all Persons from local sorted by first-middle-last 
+     * followed by all persons from local sorted by first-middle-last
+     *
+     * @return the all persons ordered by local central
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException;
+
+    
     /**
      * Count plots with plants selectedof nursery.
      *
      * @param nurseryId the nursery id
+     * @param variateIds the variate ids
      * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -607,10 +619,10 @@ public interface FieldbookService {
 	
 	/**
 	 * Returns true if all instances in the study has fieldmap.
-	 * 
-	 * @param studyId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param studyId the study id
+	 * @return true, if successful
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException;
 }

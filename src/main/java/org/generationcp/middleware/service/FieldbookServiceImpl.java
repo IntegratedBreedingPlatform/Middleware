@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -220,6 +222,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return workbook;
     }
 
+	@SuppressWarnings("unchecked")
 	@Override
     public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
@@ -229,18 +232,50 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         long startTime = System.currentTimeMillis();
 
         try {
-            trans = session.beginTransaction();
+            trans = session.beginTransaction(); 
             
-            getWorkbookSaver().saveWorkbookVariables(workbook);
             List<Integer> deletedVariateIds = getDeletedVariateIds(workbook.getVariates());
 
             saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
+            List<MeasurementVariable> factors = workbook.getFactors();
             List<MeasurementRow> observations = workbook.getObservations();
             
             int i = 0;
+            getWorkbookSaver().saveWorkbookVariables(workbook);
             
+            final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook); 		
+            Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+            Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+            List<String> trialHeaders = headerMap.get("trialHeaders");
+            VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+            
+            Integer measurementDatasetId = workbook.getMeasurementDatesetId();
+            if (measurementDatasetId == null) {
+            	measurementDatasetId = getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+            }
+    
+            //save factors
+            getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
+            
+            if (factors != null) {
+            	for (MeasurementVariable factor : factors) {
+            		if (NonEditableFactors.find(factor.getTermId()) == null) {
+            			for (MeasurementRow row : observations){
+	                        for (MeasurementData field : row.getDataList()){
+	                            if (factor.getName().equals(field.getLabel())){
+	                            	if (factor.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+	                            		getExperimentPropertySaver().saveOrUpdateProperty(getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
+	                            	} 
+	                            }
+	                        }
+            			}
+            		}
+            	}
+            }
+            
+            //save variates
             if (variates != null){
                 for (MeasurementVariable variate : variates){
                 	if (deletedVariateIds != null && !deletedVariateIds.isEmpty()
@@ -293,7 +328,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 + ((System.currentTimeMillis() - startTime)/60));
         
     }
-	
+		
 	private void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
 		setWorkingDatabase(Database.LOCAL);
 		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
@@ -550,7 +585,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<Person> getAllPersons() throws MiddlewareQueryException {
         return getUserDataManager().getAllPersons();
     }
-    
+
+    public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
+        return getUserDataManager().getAllPersonsOrderedByLocalCentral();
+    }
+
     public int countPlotsWithRecordedVariatesInDataset(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
 //        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
         
@@ -936,7 +975,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				}
 			}
 		
-			getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
+			if (!deletedExperimentIds.isEmpty()) {
+				getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
+			}
 		}
 	}
 }
