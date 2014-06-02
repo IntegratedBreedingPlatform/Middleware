@@ -980,4 +980,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 		}
 	}
+	
+	@Override
+	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
+	throws MiddlewareQueryException {
+		return getWorkbookBuilder().buildTrialObservations(trialDatasetId, factorList, variateList);
+	}
 }

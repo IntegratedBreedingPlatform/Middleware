@@ -629,7 +629,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	private List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
+	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
 	throws MiddlewareQueryException {
 		
 		int totalRows = (int) getStudyDataManager().countExperiments(trialDatasetId);

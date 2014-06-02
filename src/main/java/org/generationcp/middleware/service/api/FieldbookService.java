@@ -23,6 +23,8 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -625,4 +627,15 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Builds the Trial Observations from the trial dataset id.
+	 * @param trialDatasetId
+	 * @param factorList
+	 * @param variateList
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
+			throws MiddlewareQueryException;
 }
