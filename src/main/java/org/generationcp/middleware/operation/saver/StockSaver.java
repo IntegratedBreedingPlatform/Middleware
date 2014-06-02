@@ -99,11 +99,13 @@ public class StockSaver extends Saver {
 		return stockModel;
 	}
 	
-	private StockProperty getStockProperty(StockModel stockModel, Variable variable) { 
-		for (StockProperty property : stockModel.getProperties()) {
-			if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
-				property.setValue(variable.getValue());
-				return property;
+	private StockProperty getStockProperty(StockModel stockModel, Variable variable) {
+		if (stockModel != null && stockModel.getProperties() != null && !stockModel.getProperties().isEmpty()) {
+			for (StockProperty property : stockModel.getProperties()) {
+				if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
+					property.setValue(variable.getValue());
+					return property;
+				}
 			}
 		}
 		return null;
