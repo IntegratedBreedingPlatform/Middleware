@@ -57,42 +57,48 @@ public class TestConformityTestingService {
         input.setParentAGID(1);
         input.setParentBGID(2);
 
-        ConformityGermplasmInput entry = new ConformityGermplasmInput("005_24", 1);
+        ConformityGermplasmInput entry = new ConformityGermplasmInput("005_24", "", 1);
         entry.getMarkerValues().put("SB_01_112", "G");
         entry.getMarkerValues().put("SB_01_161", "G");
         entry.getMarkerValues().put("SB_01_122", "G");
-
+        entry.setsNumber(1);
         input.addEntry(entry);
 
-        entry = new ConformityGermplasmInput("093_09", 2);
+        entry = new ConformityGermplasmInput("093_09", "", 2);
         entry.getMarkerValues().put("SB_01_112", "A");
         entry.getMarkerValues().put("SB_01_161", "A/G");
         entry.getMarkerValues().put("SB_01_122", "A/G");
+        entry.setsNumber(2);
         input.addEntry(entry);
 
-        entry = new ConformityGermplasmInput("C1_001-01", 3);
+        entry = new ConformityGermplasmInput("C1_001-01", "", 3);
         entry.getMarkerValues().put("SB_01_112", "-");
         entry.getMarkerValues().put("SB_01_161", "-");
         entry.getMarkerValues().put("SB_01_122", "G");
+        entry.setsNumber(3);
         input.addEntry(entry);
 
-        entry = new ConformityGermplasmInput("C1_001-02", 4);
+        entry = new ConformityGermplasmInput("C1_001-02", "", 4);
         entry.getMarkerValues().put("SB_01_112", "A/G");
         entry.getMarkerValues().put("SB_01_161", "G");
         entry.getMarkerValues().put("SB_01_122", "A/G");
+        entry.setsNumber(4);
         input.addEntry(entry);
 
-        entry = new ConformityGermplasmInput("C1_001-03", 5);
+        entry = new ConformityGermplasmInput("C1_001-03", "", 5);
         entry.getMarkerValues().put("SB_01_112", "A");
         entry.getMarkerValues().put("SB_01_161", "A");
         entry.getMarkerValues().put("SB_01_122", "G");
+        entry.setsNumber(5);
         input.addEntry(entry);
 
-        entry = new ConformityGermplasmInput("C1_001-04", 6);
+        entry = new ConformityGermplasmInput("C1_001-04", "", 6);
         entry.getMarkerValues().put("SB_01_112", "-");
         entry.getMarkerValues().put("SB_01_161", "G");
         entry.getMarkerValues().put("SB_01_122", "G");
+        entry.setsNumber(6);
         input.addEntry(entry);
+
 
         try {
             Map<Integer, Map<String, String>> output = conformityTestingService.testConformity(input);
