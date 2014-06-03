@@ -283,7 +283,10 @@ public class MeasurementVariable {
 	
 	public String getDataTypeDisplay() {
 	    //datatype ids: 1120, 1125, 1128, 1130
-	    if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() || 
+		if(dataTypeId == null && dataType != null) {
+			return dataType;
+		}
+		else if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() || 
 	            dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()) {
 	        return "C";
 	    } else {
