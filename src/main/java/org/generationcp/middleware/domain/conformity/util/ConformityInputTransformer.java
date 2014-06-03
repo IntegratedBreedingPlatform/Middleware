@@ -66,7 +66,7 @@ public class ConformityInputTransformer {
         String lineNoString = dataMap.get(S_NUMBER_KEY);
         if (lineNoString != null) {
             Integer lineNumber = Integer.parseInt(lineNoString);
-            entry.setsNumber(lineNumber);   `
+            entry.setsNumber(lineNumber);
         }
 
         dataMap.remove(S_NUMBER_KEY);
