@@ -459,6 +459,17 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         boolean hasMeasurementData = fieldbookService.checkIfStudyHasMeasurementData(workbook.getMeasurementDatesetId(), variateIds);
         System.out.println(hasMeasurementData);
     }
+    
+    @Test
+    public void testDeleteObservationsOfStudy() throws MiddlewareQueryException {
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(INDENT);
+        int id = dataImportService.saveDataset(workbook);
+        workbook = fieldbookService.getNurseryDataSet(id);
+        
+        fieldbookService.deleteObservationsOfStudy(workbook.getMeasurementDatesetId());
+        workbook.print(INDENT);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

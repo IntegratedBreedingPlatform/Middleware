@@ -18,4 +18,9 @@ public class ExperimentDestroyer extends Destroyer {
 		requireLocalDatabaseInstance();
 		getExperimentDao().deleteExperimentsByIds(experimentIds);
 	}
+	
+	public void deleteExperimentsByStudy(int datasetId) throws MiddlewareQueryException {
+	    requireLocalDatabaseInstance();
+	    getExperimentDao().deleteExperimentsByStudy(datasetId);
+	} 
 }

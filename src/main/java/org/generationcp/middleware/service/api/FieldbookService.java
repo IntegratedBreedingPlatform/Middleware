@@ -649,4 +649,12 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Delete observations of study.
+	 *
+	 * @param studyId the study id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException;
 }

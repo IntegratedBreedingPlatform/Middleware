@@ -261,7 +261,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
                 .append(")");
             Query query = getSession().createSQLQuery(sql.toString());
         
-            System.out.println(sql.toString());
             return ((BigInteger) query.uniqueResult()).intValue();
                         
         } catch(HibernateException e) {
