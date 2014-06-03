@@ -11,9 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1007,5 +1009,32 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
 	throws MiddlewareQueryException {
 		return getWorkbookBuilder().buildTrialObservations(trialDatasetId, factorList, variateList);
+	}
+	
+	@Override
+	public List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException {
+		List<Integer> ids = new ArrayList<Integer>();
+		int count = Long.valueOf(getGermplasmDataManager().countGermplasmByName(name, Operation.EQUAL)).intValue();
+		List<Germplasm> germplasms = getGermplasmDataManager().getGermplasmByName(name, 0, count, Operation.EQUAL);
+		if (germplasms != null && !germplasms.isEmpty()) {
+			for (Germplasm germplasm : germplasms) {
+				ids.add(germplasm.getGid());
+			}
+		}
+		return ids;
+	}
+	
+	@Override
+	public Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException {
+		Name name = new Name(null, gid, 1, 1, userId, nameValue, 0, 0, 0);
+		return getGermplasmDataManager().addGermplasmName(name);
+	}
+	
+	@Override
+	public Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException {
+		Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
+		Integer date = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, date, name);
+		return getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 }

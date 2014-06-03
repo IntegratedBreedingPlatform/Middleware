@@ -279,10 +279,14 @@ public class WorkbookSaver extends Saver {
 		Set<String> trialInstanceNumbers = new HashSet<String>();
 		Integer locationId = null;
 		List<MeasurementRow> observations = null;
+		Long geolocationId = null;
 		boolean hasTrialObservations = false;
 		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
 			observations = workbook.getTrialObservations();
 			hasTrialObservations = true;
+			if (workbook.isNursery()) {
+				geolocationId = observations.get(0).getLocationId();
+			}
 		}
 		else {
 			observations = workbook.getObservations();
@@ -290,34 +294,44 @@ public class WorkbookSaver extends Saver {
 		Map<String, Integer> locationMap = new HashMap<String, Integer>();
 		if (observations != null) {
 			for (MeasurementRow row : observations) {
-				TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
-				VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
-				if (geolocation != null && geolocation.size() > 0) {
-					String trialInstanceNumber = getTrialInstanceNumber(geolocation);
-	                if (LOG.isDebugEnabled()){
-	                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
-	                }
-	                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
-			            watch.restart("save geolocation");
-			            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery());
-			            locationId = g.getLocationId();
-			            locationIds.add(locationId);
-			            if(g.getVariates()!=null && g.getVariates().size() > 0) {
-			            	VariableList trialVariates = new VariableList();
-			            	trialVariates.addAll(g.getVariates());
-			            	trialVariatesMap.put(locationId,trialVariates);
-			            }
-					}
-					row.setLocationId(locationId);
-					locationMap.put(trialInstanceNumber, locationId);
-		        }
+				if (geolocationId != null && geolocationId != 0) { //if geolocationId already exists, no need to create the geolocation
+					row.setLocationId(geolocationId);
+				}
+				else {
+					TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
+					VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
+					if (geolocation != null && geolocation.size() > 0) {
+						String trialInstanceNumber = getTrialInstanceNumber(geolocation);
+		                if (LOG.isDebugEnabled()){
+		                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
+		                }
+		                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
+				            watch.restart("save geolocation");
+				            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery());
+				            locationId = g.getLocationId();
+				            locationIds.add(locationId);
+				            if(g.getVariates()!=null && g.getVariates().size() > 0) {
+				            	VariableList trialVariates = new VariableList();
+				            	trialVariates.addAll(g.getVariates());
+				            	trialVariatesMap.put(locationId,trialVariates);
+				            }
+						}
+						row.setLocationId(locationId);
+						locationMap.put(trialInstanceNumber, locationId);
+			        }
+				}
 			}
 			
 			if (hasTrialObservations) {
 				for (MeasurementRow row : workbook.getObservations()) {
 					String trialInstance = getTrialInstanceNumber(row);
-					Integer locId = locationMap.get(trialInstance);
-					row.setLocationId(locId);
+					if (trialInstance != null) {
+						Integer locId = locationMap.get(trialInstance);
+						row.setLocationId(locId);
+					}
+					else if (geolocationId != null) {
+						row.setLocationId(geolocationId);
+					}
 				}
 			}
 	        //return studyLocationId

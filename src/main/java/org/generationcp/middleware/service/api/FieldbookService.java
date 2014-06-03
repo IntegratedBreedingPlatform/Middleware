@@ -657,4 +657,33 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException;
+
+	/**
+	 * Get germplasms by name.
+	 * 
+	 * @param name
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException;
+	
+	/**
+	 * Add Germplasm Name.
+	 * 
+	 * @param nameValue
+	 * @param gid
+	 * @param userId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException;
+	
+	/**
+	 * Adds a new Germplasm.
+	 * @param nameValue
+	 * @param userId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException;
 }
