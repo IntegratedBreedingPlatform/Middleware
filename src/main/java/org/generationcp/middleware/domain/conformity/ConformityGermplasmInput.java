@@ -69,4 +69,15 @@ public class ConformityGermplasmInput {
     public void setsNumber(Integer sNumber) {
         this.sNumber = sNumber;
     }
+
+    @Override
+    public String toString() {
+        return "ConformityGermplasmInput{" +
+                "line='" + line + '\'' +
+                ", alias='" + alias + '\'' +
+                ", gid=" + gid +
+                ", sNumber=" + sNumber +
+                ", markerValues=" + markerValues +
+                '}';
+    }
 }
