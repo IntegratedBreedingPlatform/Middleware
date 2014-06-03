@@ -445,6 +445,20 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
     	studyId = -18;
     	System.out.println("RESULT2 = " + fieldbookService.checkIfStudyHasFieldmap(studyId));
     }
+    
+    @Test
+    public void testCheckIfStudyHasMeasurementData() throws MiddlewareQueryException {
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(INDENT);
+        int id = dataImportService.saveDataset(workbook);
+        workbook = fieldbookService.getNurseryDataSet(id);
+        List<Integer> variateIds =  new ArrayList<Integer>();
+        variateIds.add(new Integer(21980));
+        variateIds.add(new Integer(21981));
+        
+        boolean hasMeasurementData = fieldbookService.checkIfStudyHasMeasurementData(workbook.getMeasurementDatesetId(), variateIds);
+        System.out.println(hasMeasurementData);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

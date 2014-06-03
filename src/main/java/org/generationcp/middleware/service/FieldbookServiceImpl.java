@@ -960,6 +960,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return getExperimentBuilder().checkIfStudyHasFieldmap(studyId);
 	}
 	
+	@Override
+	public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+	    return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+	}
+	
 	private void applyDeletedObservations(Workbook workbook) throws MiddlewareQueryException {
 		if (workbook.getOriginalObservations() != null && !workbook.getOriginalObservations().isEmpty()) {
 			List<Integer> experimentIds = new ArrayList<Integer>();

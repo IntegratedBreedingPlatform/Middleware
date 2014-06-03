@@ -41,6 +41,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -1072,6 +1073,33 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         setWorkingDatabase(folderId);
         DmsProject currentFolder = getDmsProjectDao().getById(folderId);
         return currentFolder.getName();
+    }
+    
+    @Override
+    public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+        setWorkingDatabase(datasetId);
+        String factors = buildNonEditableFactorsList();
+        if (getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0) {
+            return true;
+        } else if (getStockDao().countStockObservations(datasetId, factors) > 0){
+            return true;
+        } else if (getExperimentPropertyDao().countExperimentPropObservations(datasetId, factors) > 0) {
+            return true;
+        }
+        return false;
+    }
+    
+    private String buildNonEditableFactorsList() {
+        StringBuilder factors = new StringBuilder();
+        int index = 0;
+        for (NonEditableFactors factor : NonEditableFactors.values()) {
+                if (index > 0) {
+                    factors.append(",");
+                }
+                factors.append(factor.getId());
+                index++;
+        }
+        return factors.toString();
     }
     
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
