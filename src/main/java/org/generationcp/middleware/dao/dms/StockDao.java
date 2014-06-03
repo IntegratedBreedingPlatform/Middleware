@@ -247,4 +247,25 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockModels;
    	}
 
+   	public int countStockObservations(int datasetId, String nonEditableFactors) throws MiddlewareQueryException {
+        try {
+            
+            StringBuilder sql = new StringBuilder()
+                .append("SELECT COUNT(sp.stockprop_id) ")
+                .append("FROM nd_experiment_stock es ")
+                .append("INNER JOIN nd_experiment e ON e.nd_experiment_id = es.nd_experiment_id ")
+                .append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
+                .append("INNER JOIN stockProp sp ON sp.stock_id = es.stock_id ")
+                .append("WHERE ep.project_id = ").append(datasetId)
+                .append(" AND sp.type_id NOT IN (").append(nonEditableFactors)
+                .append(")");
+            Query query = getSession().createSQLQuery(sql.toString());
+        
+            return ((BigInteger) query.uniqueResult()).intValue();
+                        
+        } catch(HibernateException e) {
+            logAndThrowException("Error at countStockObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
+        }
+        return 0;
+    }
 }

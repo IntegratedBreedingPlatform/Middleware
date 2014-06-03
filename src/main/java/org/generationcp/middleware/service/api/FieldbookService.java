@@ -345,7 +345,7 @@ public interface FieldbookService {
     
     /**
      * Returns all Persons from local sorted by first-middle-last 
-     * followed by all persons from local sorted by first-middle-last
+     * followed by all persons from local sorted by first-middle-last.
      *
      * @return the all persons ordered by local central
      * @throws MiddlewareQueryException the middleware query exception
@@ -630,12 +630,31 @@ public interface FieldbookService {
 	
 	/**
 	 * Builds the Trial Observations from the trial dataset id.
-	 * @param trialDatasetId
-	 * @param factorList
-	 * @param variateList
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param trialDatasetId the trial dataset id
+	 * @param factorList the factor list
+	 * @param variateList the variate list
+	 * @return the list
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
 			throws MiddlewareQueryException;
+	
+	/**
+	 * Check if study has measurement data.
+	 *
+	 * @param datasetId the dataset id
+	 * @param variateIds the variate ids
+	 * @return true, if successful
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Delete observations of study.
+	 *
+	 * @param studyId the study id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException;
 }

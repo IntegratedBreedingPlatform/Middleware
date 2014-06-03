@@ -12,6 +12,7 @@ public class ConformityGermplasmInput {
 
     private String name;
     private Integer gid;
+    private Integer lineNumber;
 
     private Map<String, String> markerValues;
 
@@ -48,5 +49,13 @@ public class ConformityGermplasmInput {
 
     public void setMarkerValues(Map<String, String> markerValues) {
         this.markerValues = markerValues;
+    }
+
+    public Integer getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(Integer lineNumber) {
+        this.lineNumber = lineNumber;
     }
 }

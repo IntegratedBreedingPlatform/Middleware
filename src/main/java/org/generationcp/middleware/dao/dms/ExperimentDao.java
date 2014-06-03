@@ -23,6 +23,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -284,4 +285,27 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			logAndThrowException("Error in deleteExperimentsByLocation=" + experimentIds + " in DataSetDao: " + e.getMessage(), e);
 		}
 	}
+	
+	public void deleteExperimentsByStudy(int datasetId) throws MiddlewareQueryException {
+        
+        try {
+            this.flush();
+            
+            // Delete experiments
+            Query statement = getSession().createSQLQuery("DELETE e, ep, es, epheno, pheno, eprop " +
+                       "FROM nd_experiment e " + 
+                       "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id " +
+                       "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id " + 
+                       "LEFT JOIN nd_experiment_phenotype epheno ON e.nd_experiment_id = epheno.nd_experiment_id " +
+                       "LEFT JOIN phenotype pheno ON epheno.phenotype_id = pheno.phenotype_id " +
+                       "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " +
+                       "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
+            statement.executeUpdate();     
+            this.flush();
+            this.clear();
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in deleteExperimentsByStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
+        }
+    }
 }

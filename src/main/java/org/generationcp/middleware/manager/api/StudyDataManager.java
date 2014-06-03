@@ -707,6 +707,7 @@ public interface StudyDataManager{
      * Count plots with plants selectedof dataset.
      *
      * @param dataSetId the data set id
+     * @param variateIds the variate ids
      * @return the int
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -741,4 +742,13 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
+    
+    /**
+     * Check if study has measurement data.
+     *
+     * @param studyId the study id
+     * @return true, if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
 }

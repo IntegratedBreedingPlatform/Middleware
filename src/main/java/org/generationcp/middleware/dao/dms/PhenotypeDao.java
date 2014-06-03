@@ -746,6 +746,35 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	    }
 	    return 0;
 	}
+	
+	public int countVariatesDataOfStudy(Integer projectId, List<Integer> variateIds) throws MiddlewareQueryException {
+        try {
+            
+            if (variateIds != null && !variateIds.isEmpty()) {
+                StringBuilder sql = new StringBuilder();
+
+                sql.append("SELECT COUNT(p.phenotype_id) FROM phenotype p ")
+                .append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+                .append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
+                .append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
+                for (int i = 0; i < variateIds.size(); i++) {
+                    if (i > 0) {
+                        sql.append(",");
+                    }
+                    sql.append(variateIds.get(i));
+                }
+                sql.append(")");
+             Query query = getSession().createSQLQuery(sql.toString());
+        
+                return ((BigInteger) query.uniqueResult()).intValue();
+            }
+        } catch (HibernateException e) {
+                logAndThrowException(
+                        "Error at countVariatesDataOfStudy() query on PhenotypeDao: "
+                                + e.getMessage(), e);
+        }
+        return 0;
+    }
 
 	public List<Phenotype> getByTypeAndValue(int typeId, String value, boolean isEnumeration) throws MiddlewareQueryException {
 		try {

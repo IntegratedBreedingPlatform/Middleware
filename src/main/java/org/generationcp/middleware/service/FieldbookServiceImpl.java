@@ -960,6 +960,28 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return getExperimentBuilder().checkIfStudyHasFieldmap(studyId);
 	}
 	
+	@Override
+	public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+	    return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+	}
+	
+	@Override
+	public void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException {
+	    requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction(); 
+
+    	    getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
+    	    trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, LOG);
+        }
+	}
+	
 	private void applyDeletedObservations(Workbook workbook) throws MiddlewareQueryException {
 		if (workbook.getOriginalObservations() != null && !workbook.getOriginalObservations().isEmpty()) {
 			List<Integer> experimentIds = new ArrayList<Integer>();
