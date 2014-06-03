@@ -1288,7 +1288,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode) throws MiddlewareQueryException {
     	List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
         return (List<GermplasmNameDetails>) super.getAllFromCentralAndLocalByMethod(getNameDao(), "getGermplasmNameDetailsByNames",
-                new Object[] { namesToUse }, new Class[]{List.class});
+                new Object[] { namesToUse, mode }, new Class[]{List.class, GetGermplasmByNameModes.class});
     }
     
     @Override
