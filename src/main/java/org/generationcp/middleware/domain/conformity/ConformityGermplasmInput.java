@@ -10,25 +10,38 @@ import java.util.Map;
  */
 public class ConformityGermplasmInput {
 
-    private String name;
+    private String line;
+    private String alias;
     private Integer gid;
-    private Integer lineNumber;
+    private Integer sNumber;
 
     private Map<String, String> markerValues;
 
     public ConformityGermplasmInput() {
-        this(null, null);
+        this(null, null, null);
     }
 
-    public ConformityGermplasmInput(String name, Integer gid) {
-        this.name = name;
+    public ConformityGermplasmInput(String line, String alias, Integer gid) {
+        this.line = line;
         this.gid = gid;
 
         this.markerValues = new HashMap<String, String>();
     }
 
-    public String getName() {
-        return name;
+    public String getLine() {
+        return line;
+    }
+
+    public void setLine(String line) {
+        this.line = line;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public Integer getGid() {
@@ -39,9 +52,7 @@ public class ConformityGermplasmInput {
         this.gid = gid;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+
 
     public Map<String, String> getMarkerValues() {
         return markerValues;
@@ -51,11 +62,11 @@ public class ConformityGermplasmInput {
         this.markerValues = markerValues;
     }
 
-    public Integer getLineNumber() {
-        return lineNumber;
+    public Integer getsNumber() {
+        return sNumber;
     }
 
-    public void setLineNumber(Integer lineNumber) {
-        this.lineNumber = lineNumber;
+    public void setsNumber(Integer sNumber) {
+        this.sNumber = sNumber;
     }
 }

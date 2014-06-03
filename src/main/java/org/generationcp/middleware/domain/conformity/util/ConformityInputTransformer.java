@@ -4,7 +4,6 @@ import org.generationcp.middleware.domain.conformity.ConformityGermplasmInput;
 import org.generationcp.middleware.domain.conformity.UploadInput;
 import org.generationcp.middleware.exceptions.ConformityException;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public class ConformityInputTransformer {
     public static final String GID_KEY = "GID";
     public static final String ALIAS_KEY = "Alias";
     public static final String LINE_KEY = "Line";
-    public static final String LINE_NUMBER_KEY = "SNo";
+    public static final String S_NUMBER_KEY = "SNo";
 
     public UploadInput transformInput(Map<String, String>[] parentMapArray, Map<String, String>[] populationMapArray) throws ConformityException{
         if (parentMapArray == null || parentMapArray.length != 2) {
@@ -57,19 +56,20 @@ public class ConformityInputTransformer {
             entry.setGid(gid);
         }
 
-        entry.setName(dataMap.get(LINE_KEY));
+        entry.setLine(dataMap.get(LINE_KEY));
         dataMap.remove(LINE_KEY);
 
         // currently, alias is not used
+        entry.setAlias(dataMap.get(ALIAS_KEY));
         dataMap.remove(ALIAS_KEY);
 
-        String lineNoString = dataMap.get(LINE_NUMBER_KEY);
+        String lineNoString = dataMap.get(S_NUMBER_KEY);
         if (lineNoString != null) {
             Integer lineNumber = Integer.parseInt(lineNoString);
-            entry.setLineNumber(lineNumber);
+            entry.setsNumber(lineNumber);
         }
 
-        dataMap.remove(LINE_NUMBER_KEY);
+        dataMap.remove(S_NUMBER_KEY);
 
         Map<String, String> markerValues = new HashMap<String, String>(dataMap);
         entry.setMarkerValues(markerValues);

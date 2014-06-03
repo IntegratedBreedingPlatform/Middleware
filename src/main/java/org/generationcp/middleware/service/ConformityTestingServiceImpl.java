@@ -87,7 +87,7 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
                     }
 
                     if (errorMarkers.size() > 0) {
-                        errorItems.put(conformityGermplasmInput.getLineNumber(), errorMarkers);
+                        errorItems.put(conformityGermplasmInput.getGid(), errorMarkers);
                     }
 
                 }
@@ -130,7 +130,9 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
         if (parentAlleleValues == null || parentAlleleValues.size() == 0) {
             return null;
         } else {
-            ConformityGermplasmInput input = new ConformityGermplasmInput("", gid);
+
+            // TODO retrieve other details from the database aside from just the marker values
+            ConformityGermplasmInput input = new ConformityGermplasmInput("", "", gid);
 
             for (AllelicValueElement parentAlleleValue : parentAlleleValues) {
                 input.getMarkerValues().put(parentAlleleValue.getMarkerName(), parentAlleleValue.getData());
