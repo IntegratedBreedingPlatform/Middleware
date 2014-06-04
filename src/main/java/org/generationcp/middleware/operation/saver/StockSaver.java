@@ -87,9 +87,9 @@ public class StockSaver extends Saver {
 				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
 					stockModel = getStockObject(stockModel);
 					StockProperty stockProperty = getStockProperty(stockModel, variable);
-					if (stockProperty == null) {
+					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {
 						addProperty(stockModel, createProperty(propertyIndex--, variable));
-					}				
+					}			
 				} else {
 					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: " + variable.getVariableType().getId());
 				}
