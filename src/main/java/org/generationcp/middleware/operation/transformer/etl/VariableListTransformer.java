@@ -57,34 +57,27 @@ public class VariableListTransformer extends Transformer {
 		if(mRow == null) {
 			return variableList;
 		}
-		/*
+
 		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
 		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			int nonTrialMDSize = nonTrialMD.size();
 			int variableTypeSize =  variableTypeList.getVariableTypes().size();
 			if (nonTrialMDSize == variableTypeSize) {
-				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
-						variableList.add(new Variable(variableType, nonTrialMD.get(i).getValue()));
+					    for (MeasurementData data : nonTrialMD) {
+					        if (data.getMeasurementVariable().getTermId() == variableType.getStandardVariable().getId()) {
+					            variableList.add(new Variable(variableType, data.getValue()));
+					        }
+					    }						
 					}
-					i++;
 				}
 				
 			} else {//else invalid data
 				throw new MiddlewareQueryException("Variables did not match the Measurements Row.");
 			}
 		}
-		*/
-		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
-		for(Integer index : variableIndexesList) {
-			if (nonTrialMD.get(index).getcValueId() != null) {
-				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getcValueId()));
-			}
-			else {
-				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
-			}
-		}
+
 		return variableList;
 	}
 	
@@ -98,6 +91,7 @@ public class VariableListTransformer extends Transformer {
 		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			int nonTrialMDSize = nonTrialMD.size();
 			int variableTypeSize =  variableTypeList.getVariableTypes().size();
+			
 			if (nonTrialMDSize == variableTypeSize) {
 				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
