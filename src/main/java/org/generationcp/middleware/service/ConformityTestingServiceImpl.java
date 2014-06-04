@@ -110,7 +110,7 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
     }
 
     // represents the preparatory step. here we either compute the possible cross results for parent marker data, or gather marker information on ancestors
-    protected void prepareInput(UploadInput input) throws MiddlewareQueryException {
+    protected void prepareInput(UploadInput input) throws MiddlewareQueryException, ConformityException {
         if (input.isParentInputAvailable()) {
             computeCrosses(input.getParentAInput(), input.getParentBInput());
         } else {
@@ -122,6 +122,10 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
             if (parentA == null && parentB == null) {
                 processParentInformation(input.getParentAGID());
                 processParentInformation(input.getParentBGID());
+
+                if (genotypeInfo.get().size() == 0) {
+                    throw new ConformityException("Parent and ancestor data not found. No basis for conformity checking");
+                }
             } else {
                 computeCrosses(parentA, parentB);
                 input.addEntry(parentA);
@@ -206,8 +210,10 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
     protected void processParentInformation(Integer parentGID) throws MiddlewareQueryException {
         // retrieve parent's pedigree, and store all of its ancestors' values
         GermplasmPedigreeTree pedigreeTree = pedigreeDataManager.generatePedigreeTree(parentGID, 4);
+        if (pedigreeTree != null) {
+            processPedigreeNode(pedigreeTree.getRoot());
+        }
 
-        processPedigreeNode(pedigreeTree.getRoot());
 
     }
 
