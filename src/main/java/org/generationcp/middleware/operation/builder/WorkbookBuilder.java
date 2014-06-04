@@ -235,7 +235,8 @@ public class WorkbookBuilder extends Builder {
                 	StudyType studyType = StudyType.N;
                 	if(!isNursery)
                 		studyType = StudyType.T;
-                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
+                	Database database = id > 0 ? Database.CENTRAL : Database.LOCAL;
+                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(database, studyType, id);
                     for (DatasetReference datasetRef : datasetRefList) {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
                                 datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
@@ -341,39 +342,66 @@ public class WorkbookBuilder extends Builder {
 	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes); //experiment.getVariates();
 	        List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
 	        
-	        for (Variable variable : factors.getVariables()) {
-	        	
-	        	if (isTrial && 
-	        			variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
-	        			|| !PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
-	        		boolean isEditable = NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true : false;
-	            	MeasurementData measurementData = null;
-	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
-                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
-                        		variable.getDisplayValue(), isEditable, 
-                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                                id,
-                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
-	            	}
-	            	else {
-                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
-                                variable.getValue(), isEditable, 
-                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
-	            	}
-	            	measurementDataList.add(measurementData);
-	            }
+	        for (MeasurementVariable factor : factorList) {
+	        	boolean found = false;
+		        for (Variable variable : factors.getVariables()) {
+		        	
+		        	if (factor.getTermId() == variable.getVariableType().getStandardVariable().getId()) {
+		        		found = true;
+		        		
+			        	if (isTrial && 
+			        			variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
+			        			|| !PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
+			        		boolean isEditable = NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true : false;
+			            	MeasurementData measurementData = null;
+			            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+		                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+		                        		variable.getDisplayValue(), isEditable, 
+		                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+		                                id,
+		                                factor);
+			            	}
+			            	else {
+		                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+		                                variable.getValue(), isEditable, 
+		                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+		                                factor);
+			            	}
+			            	measurementDataList.add(measurementData);
+			            	break;
+			            }
+		        	}
+		        }
+		        if (!found) {
+	        		boolean isEditable = NonEditableFactors.find(factor.getTermId()) == null ? true : false;
+		        	MeasurementData measurementData = new MeasurementData(factor.getName(), null, isEditable, 
+		        			getDataType(factor.getDataTypeId()), factor.getTermId(), factor);
+		        	measurementDataList.add(measurementData);
+		        }
 	        }
 	        
-	        for (Variable variable : variates.getVariables()) {
-                    MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
-                            variable.getValue(), true,  
-                            getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                            getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
-                    measurementData.setPhenotypeId(variable.getPhenotypeId());
-                    measurementDataList.add(measurementData);
+	        for (MeasurementVariable variate : variateList) {
+        		boolean found = false;
+	        	
+	        	for (Variable variable : variates.getVariables()) {
+	        		if (variate.getTermId() == variable.getVariableType().getStandardVariable().getId()) {
+	        			found = true;
+	                    MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+	                            variable.getValue(), true,  
+	                            getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
+	                            variate);
+	                    measurementData.setPhenotypeId(variable.getPhenotypeId());
+	                    measurementDataList.add(measurementData);
+	                    break;
+	        		}
                 }
+        		if (!found) {
+        			MeasurementData measurementData = new MeasurementData(variate.getName(), null, true,
+        					getDataType(variate.getDataTypeId()), variate);
+        			measurementDataList.add(measurementData);
+        		}
+	        }
 	        
 	        MeasurementRow measurementRow = new MeasurementRow(measurementDataList);
 	        measurementRow.setExperimentId(experimentId);
