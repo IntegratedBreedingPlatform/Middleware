@@ -24,16 +24,7 @@ import java.util.Properties;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.CrossStudyDataManager;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -344,6 +335,10 @@ public class ManagerFactory implements Serializable {
     
     public OntologyService getOntologyService() throws ConfigException {
         return new OntologyServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public MBDTDataManager getMbdtDataManager() {
+        return new MBDTDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     /**

@@ -154,7 +154,7 @@ public enum TermId {
 	// Stock Type
 	, ENTRY_CODE(8300)
 	, ENTRY_NO (8230)
-	, SOURCE (8378)
+	, SOURCE (8360)
 	, CROSS (8377)
 	, DESIG (8250)
 	, CHECK (8255)
@@ -195,6 +195,9 @@ public enum TermId {
     //Selection Variates Properties
     , BREEDING_METHOD_PROP (2670)
     , PLANTS_SELECTED_PROP (2660)
+    
+    , BREEDING_METHOD_VARIATE (8262)
+    , SEED_SOURCE (8360)
 	;
 	
 	private final int id;

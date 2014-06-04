@@ -14,11 +14,14 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Basic;
 
 /**
  * POJO for gdms_marker_user_info table.
@@ -32,32 +35,51 @@ public class MarkerUserInfo implements Serializable{
     private static final long serialVersionUID = 1L;
     
     @Id
+    @Column(name = "userinfo_id")
+    private Integer userInfoId;
+
     @Column(name = "marker_id")
     private Integer markerId;
 
-    @Column(name = "principal_investigator")
-    @Basic(optional = false)
-    private String principalInvestigator;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "contact_id")
+    private MarkerUserInfoDetails markerUserInfoDetails;
 
-    @Column(name = "contact")
-    private String contact; 
-    
-    @Column(name = "institute")
-    private String institute;
-    
     public MarkerUserInfo() {
-        super();
     }
 
     public MarkerUserInfo(Integer markerId, String principalInvestigator, String contact, String institute) {
-        super();
         this.markerId = markerId;
-        this.principalInvestigator = principalInvestigator;
-        this.contact = contact;
-        this.institute = institute;
+        this.markerUserInfoDetails = new MarkerUserInfoDetails(null, principalInvestigator, contact, institute);
     }
 
-    public Integer getMarkerId() {
+    public MarkerUserInfo(Integer markerId, Integer contactId, String principalInvestigator, String contact, String institute) {
+        this.markerId = markerId;
+        this.markerUserInfoDetails = new MarkerUserInfoDetails(contactId, principalInvestigator, contact, institute);
+    }
+    
+    public MarkerUserInfo(Integer markerId, MarkerUserInfoDetails contact) {
+        this.markerId = markerId;
+        this.markerUserInfoDetails = contact;
+    }
+
+    public Integer getUserInfoId() {
+		return userInfoId;
+	}
+
+	public void setUserInfoId(Integer userInfoId) {
+		this.userInfoId = userInfoId;
+	}
+
+	public MarkerUserInfoDetails getMarkerUserInfoDetails() {
+		return markerUserInfoDetails;
+	}
+
+	public void setMarkerUserInfoDetails(MarkerUserInfoDetails markerUserInfoDetails) {
+		this.markerUserInfoDetails = markerUserInfoDetails;
+	}
+
+	public Integer getMarkerId() {
         return markerId;
     }
     
@@ -66,85 +88,97 @@ public class MarkerUserInfo implements Serializable{
     }
     
     public String getPrincipalInvestigator() {
-        return principalInvestigator;
+    	if (markerUserInfoDetails != null){
+    		return markerUserInfoDetails.getPrincipalInvestigator();
+    	}
+        return null;
     }
     
     public void setPrincipalInvestigator(String principalInvestigator) {
-        this.principalInvestigator = principalInvestigator;
+    	if (markerUserInfoDetails == null){
+    		markerUserInfoDetails = new MarkerUserInfoDetails();
+    	}
+		markerUserInfoDetails.setPrincipalInvestigator(principalInvestigator);
     }
     
-    public String getContact() {
-        return contact;
+    public String getContactValue() {
+    	if (markerUserInfoDetails != null){
+    		return markerUserInfoDetails.getContact();
+    	}
+        return null;
     }
     
-    public void setContact(String contact) {
-        this.contact = contact;
+    public void setContactValue(String contactString) {
+    	if (markerUserInfoDetails == null){
+    		markerUserInfoDetails = new MarkerUserInfoDetails();
+    	}
+		markerUserInfoDetails.setContact(contactString);
     }
 
     public String getInstitute() {
-        return institute;
+    	if (markerUserInfoDetails != null){
+    		return markerUserInfoDetails.getInstitute();
+    	}
+        return null;
     }
     
     public void setInstitute(String institute) {
-        this.institute = institute;
+    	if (markerUserInfoDetails == null){
+    		markerUserInfoDetails = new MarkerUserInfoDetails();
+    	}
+		markerUserInfoDetails.setInstitute(institute);
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((contact == null) ? 0 : contact.hashCode());
-        result = prime * result + ((institute == null) ? 0 : institute.hashCode());
-        result = prime * result + ((markerId == null) ? 0 : markerId.hashCode());
-        result = prime * result + ((principalInvestigator == null) ? 0 : principalInvestigator.hashCode());
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((markerUserInfoDetails == null) ? 0 : markerUserInfoDetails.hashCode());
+		result = prime * result
+				+ ((markerId == null) ? 0 : markerId.hashCode());
+		result = prime * result
+				+ ((userInfoId == null) ? 0 : userInfoId.hashCode());
+		return result;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        MarkerUserInfo other = (MarkerUserInfo) obj;
-        if (contact == null) {
-            if (other.contact != null)
-                return false;
-        } else if (!contact.equals(other.contact))
-            return false;
-        if (institute == null) {
-            if (other.institute != null)
-                return false;
-        } else if (!institute.equals(other.institute))
-            return false;
-        if (markerId == null) {
-            if (other.markerId != null)
-                return false;
-        } else if (!markerId.equals(other.markerId))
-            return false;
-        if (principalInvestigator == null) {
-            if (other.principalInvestigator != null)
-                return false;
-        } else if (!principalInvestigator.equals(other.principalInvestigator))
-            return false;
-        return true;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MarkerUserInfo other = (MarkerUserInfo) obj;
+		if (markerUserInfoDetails == null) {
+			if (other.markerUserInfoDetails != null)
+				return false;
+		} else if (!markerUserInfoDetails.equals(other.markerUserInfoDetails))
+			return false;
+		if (markerId == null) {
+			if (other.markerId != null)
+				return false;
+		} else if (!markerId.equals(other.markerId))
+			return false;
+		if (userInfoId == null) {
+			if (other.userInfoId != null)
+				return false;
+		} else if (!userInfoId.equals(other.userInfoId))
+			return false;
+		return true;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("MarkerUserInfo [markerId=");
-        builder.append(markerId);
-        builder.append(", principalInvestigator=");
-        builder.append(principalInvestigator);
-        builder.append(", contact=");
-        builder.append(contact);
-        builder.append(", institute=");
-        builder.append(institute);
-        builder.append("]");
-        return builder.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MarkerUserInfo [userInfoId=");
+		builder.append(userInfoId);
+		builder.append(", markerId=");
+		builder.append(markerId);
+		builder.append(", contact=");
+		builder.append(markerUserInfoDetails);
+		builder.append("]");
+		return builder.toString();
+	}
     
 }

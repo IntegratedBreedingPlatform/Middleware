@@ -11,9 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,8 +27,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -35,6 +35,7 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -222,6 +224,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return workbook;
     }
 
+	@SuppressWarnings("unchecked")
 	@Override
     public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
@@ -231,48 +234,91 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         long startTime = System.currentTimeMillis();
 
         try {
-            trans = session.beginTransaction();
+            trans = session.beginTransaction(); 
             
+            List<Integer> deletedVariateIds = getDeletedVariateIds(workbook.getVariates());
+
             saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
+            List<MeasurementVariable> factors = workbook.getFactors();
             List<MeasurementRow> observations = workbook.getObservations();
             
             int i = 0;
+            getWorkbookSaver().saveWorkbookVariables(workbook);
             
+            final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook); 		
+            Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+            Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+            List<String> trialHeaders = headerMap.get("trialHeaders");
+            VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+            
+            Integer measurementDatasetId = workbook.getMeasurementDatesetId();
+            if (measurementDatasetId == null) {
+            	measurementDatasetId = getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+            }
+    
+            //save factors
+            getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
+            
+            if (factors != null) {
+            	for (MeasurementVariable factor : factors) {
+            		if (NonEditableFactors.find(factor.getTermId()) == null) {
+            			for (MeasurementRow row : observations){
+	                        for (MeasurementData field : row.getDataList()){
+	                            if (factor.getName().equals(field.getLabel())){
+	                            	if (factor.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+	                            		getExperimentPropertySaver().saveOrUpdateProperty(getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
+	                            	} 
+	                            }
+	                        }
+            			}
+            		}
+            	}
+            }
+            
+            //save variates
             if (variates != null){
                 for (MeasurementVariable variate : variates){
-                    for (MeasurementRow row : observations){
-                        for (MeasurementData field : row.getDataList()){
-                            if (variate.getName().equals(field.getLabel())){
-                            	Phenotype phenotype = null;
-                                if (field.getValue() != null) {
-                                	field.setValue(field.getValue().trim());
-                                }
-                                if (field.getPhenotypeId() != null) {
-	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
-                                }
-                                if (phenotype == null && field.getValue() != null 
-                                        && !"".equals(field.getValue().trim())){
-                                    phenotype = new Phenotype();
-                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
-                                }
-                                if (phenotype != null) {
-	                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
-	                                        , variate.getTermId(), variate.getStoredIn()
-	                                        , field.getValue(), phenotype);
-	
-	                                i++;
-	                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
-	                                    session.flush();
-	                                    session.clear();
+                	if (deletedVariateIds != null && !deletedVariateIds.isEmpty()
+                			&& deletedVariateIds.contains(variate.getTermId())) {
+                		//skip this was already deleted.
+                	}
+                	else {
+	                    for (MeasurementRow row : observations){
+	                        for (MeasurementData field : row.getDataList()){
+	                            if (variate.getName().equals(field.getLabel())){
+	                            	Phenotype phenotype = null;
+	                                if (field.getValue() != null) {
+	                                	field.setValue(field.getValue().trim());
 	                                }
-                                }
-                            }
-                        }
-                    }
+	                                if (field.getPhenotypeId() != null) {
+		                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
+	                                }
+	                                if (phenotype == null && field.getValue() != null 
+	                                        && !"".equals(field.getValue().trim())){
+	                                    phenotype = new Phenotype();
+	                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+	                                }
+	                                if (phenotype != null) {
+		                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
+		                                        , variate.getTermId(), variate.getStoredIn()
+		                                        , field.getValue(), phenotype);
+		
+		                                i++;
+		                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
+		                                    session.flush();
+		                                    session.clear();
+		                                }
+	                                }
+	                            }
+	                        }
+	                    }
+                	}
                 }
             }
+            
+            applyDeletedObservations(workbook);
             
             trans.commit();
         } catch (Exception e) {
@@ -284,7 +330,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 + ((System.currentTimeMillis() - startTime)/60));
         
     }
-	
+		
 	private void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
 		setWorkingDatabase(Database.LOCAL);
 		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
@@ -541,32 +587,37 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<Person> getAllPersons() throws MiddlewareQueryException {
         return getUserDataManager().getAllPersons();
     }
-    
-    public int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException {
-        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
+
+    public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
+        return getUserDataManager().getAllPersonsOrderedByLocalCentral();
+    }
+
+    public int countPlotsWithRecordedVariatesInDataset(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+//        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
         
-        int dataSetId = 0;
+//        int dataSetId = 0;
+//        
+//        //get observation dataset
+//        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
+//        if (datasetRefList != null) {
+//            for (DatasetReference datasetRef : datasetRefList) {
+//                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
+//                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
+//                    dataSetId = datasetRef.getId();
+//                }
+//            }
+//        }
+//        
+//        //if not found in the list using the name, get dataset with Plot Data type
+//        if (dataSetId == 0) {
+//            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
+//            if (dataset != null){
+//                dataSetId = dataset.getId();
+//            }
+//        }
         
-        //get observation dataset
-        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
-        if (datasetRefList != null) {
-            for (DatasetReference datasetRef : datasetRefList) {
-                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
-                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
-                    dataSetId = datasetRef.getId();
-                }
-            }
-        }
-        
-        //if not found in the list using the name, get dataset with Plot Data type
-        if (dataSetId == 0) {
-            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
-            if (dataset != null){
-                dataSetId = dataset.getId();
-            }
-        }
-        
-        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
+//        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId, variateIds);
+        return getStudyDataManager().countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
     }
     
     @Override
@@ -892,5 +943,98 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public String getFolderNameById(Integer folderId) throws MiddlewareQueryException {
 	    return getStudyDataManager().getFolderNameById(folderId);
+	}
+	
+	private List<Integer> getDeletedVariateIds(List<MeasurementVariable> variables) {
+		List<Integer> ids = new ArrayList<Integer>();
+		if (variables != null) {
+			for (MeasurementVariable variable : variables) {
+				if (variable.getOperation() == Operation.DELETE) {
+					ids.add(variable.getTermId());
+				}
+			}
+		}
+		return ids;
+	}
+	
+	@Override
+	public boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException {
+		return getExperimentBuilder().checkIfStudyHasFieldmap(studyId);
+	}
+	
+	@Override
+	public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+	    return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+	}
+	
+	@Override
+	public void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException {
+	    requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction(); 
+
+    	    getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
+    	    trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, LOG);
+        }
+	}
+	
+	private void applyDeletedObservations(Workbook workbook) throws MiddlewareQueryException {
+		if (workbook.getOriginalObservations() != null && !workbook.getOriginalObservations().isEmpty()) {
+			List<Integer> experimentIds = new ArrayList<Integer>();
+			for (MeasurementRow observation : workbook.getObservations()) {
+				if (observation.getExperimentId() < 0) {
+					experimentIds.add(observation.getExperimentId());
+				}
+			}
+			List<Integer> deletedExperimentIds = new ArrayList<Integer>();
+			for (MeasurementRow observation : workbook.getOriginalObservations()) {
+				if (!experimentIds.contains(observation.getExperimentId())) {
+					deletedExperimentIds.add(observation.getExperimentId());
+				}
+			}
+		
+			if (!deletedExperimentIds.isEmpty()) {
+				getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
+			}
+		}
+	}
+	
+	@Override
+	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
+	throws MiddlewareQueryException {
+		return getWorkbookBuilder().buildTrialObservations(trialDatasetId, factorList, variateList);
+	}
+	
+	@Override
+	public List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException {
+		List<Integer> ids = new ArrayList<Integer>();
+		int count = Long.valueOf(getGermplasmDataManager().countGermplasmByName(name, Operation.EQUAL)).intValue();
+		List<Germplasm> germplasms = getGermplasmDataManager().getGermplasmByName(name, 0, count, Operation.EQUAL);
+		if (germplasms != null && !germplasms.isEmpty()) {
+			for (Germplasm germplasm : germplasms) {
+				ids.add(germplasm.getGid());
+			}
+		}
+		return ids;
+	}
+	
+	@Override
+	public Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException {
+		Name name = new Name(null, gid, 1, 1, userId, nameValue, 0, 0, 0);
+		return getGermplasmDataManager().addGermplasmName(name);
+	}
+	
+	@Override
+	public Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException {
+		Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
+		Integer date = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, date, name);
+		return getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 }

@@ -41,6 +41,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -244,6 +245,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
+	public List<Experiment> getExperiments(int dataSetId, int start,
+			int numOfRows, VariableTypeList varTypeList)
+			throws MiddlewareQueryException {
+    	clearSessions();
+		if(varTypeList == null)
+			return getExperiments(dataSetId, start, numOfRows);
+		else{
+			return getExperimentBuilder().build(
+	                dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, varTypeList);
+		}
+	}
+
+	@Override
     public long countExperiments(int dataSetId) throws MiddlewareQueryException {
         return getExperimentBuilder().count(dataSetId);
     }
@@ -283,6 +297,31 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
         }
     }
+    
+    @Override
+	public void addOrUpdateExperiment(int dataSetId,
+			ExperimentType experimentType,
+			List<ExperimentValues> experimentValuesList)
+			throws MiddlewareQueryException {
+    	  requireLocalDatabaseInstance();
+          Session session = getCurrentSessionForLocal();
+          Transaction trans = null;
+
+          try {
+              trans = session.beginTransaction();
+              
+              for (ExperimentValues experimentValues : experimentValuesList){
+            	  getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
+              }
+              
+              trans.commit();
+
+          } catch (Exception e) {
+              rollbackTransaction(trans);
+              throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+          }
+		
+	}
 
     @Override
     public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
@@ -1016,9 +1055,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException {
+    public int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException {
         if (setWorkingDatabase(Database.LOCAL)) {
-            return getPhenotypeDao().countPlantsSelectedOfNursery(dataSetId);
+            return getPhenotypeDao().countRecordedVariatesOfStudy(dataSetId, variateIds);
         }
         return 0;
     }
@@ -1034,6 +1073,33 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         setWorkingDatabase(folderId);
         DmsProject currentFolder = getDmsProjectDao().getById(folderId);
         return currentFolder.getName();
+    }
+    
+    @Override
+    public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+        setWorkingDatabase(datasetId);
+        String factors = buildNonEditableFactorsList();
+        if (getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0) {
+            return true;
+        } else if (getStockDao().countStockObservations(datasetId, factors) > 0){
+            return true;
+        } else if (getExperimentPropertyDao().countExperimentPropObservations(datasetId, factors) > 0) {
+            return true;
+        }
+        return false;
+    }
+    
+    private String buildNonEditableFactorsList() {
+        StringBuilder factors = new StringBuilder();
+        int index = 0;
+        for (NonEditableFactors factor : NonEditableFactors.values()) {
+                if (index > 0) {
+                    factors.append(",");
+                }
+                factors.append(factor.getId());
+                index++;
+        }
+        return factors.toString();
     }
     
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
@@ -1178,4 +1244,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	}
     	return null;
     }
+
+	
 }

@@ -2,6 +2,8 @@ package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.manager.Operation;
+
 public class Constant  implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -16,6 +18,9 @@ public class Constant  implements Serializable {
 	private Integer dataTypeId;
 	private Double minRange;
 	private Double maxRange;
+	private Operation operation;
+	private int id;
+        private int storedIn;
 	
 	public Constant(){
 		super();
@@ -110,5 +115,47 @@ public class Constant  implements Serializable {
 	public void setMaxRange(Double maxRange) {
 		this.maxRange = maxRange;
 	}
+
+    /**
+     * @return the operation
+     */
+    public Operation getOperation() {
+        return operation;
+    }
+
+    /**
+     * @param operation the operation to set
+     */
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the storedIn
+     */
+    public int getStoredIn() {
+        return storedIn;
+    }
+
+    /**
+     * @param storedIn the storedIn to set
+     */
+    public void setStoredIn(int storedIn) {
+        this.storedIn = storedIn;
+    }
 
 }

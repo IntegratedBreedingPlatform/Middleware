@@ -31,7 +31,7 @@ import org.generationcp.middleware.util.Util;
  */
 @Entity
 @Table(name = "persons")
-public class Person implements Serializable{
+public class Person implements  Comparable<Person>, Serializable{
 
     private static final long serialVersionUID = -3159738927364282485L;
 
@@ -332,5 +332,14 @@ public class Person implements Serializable{
 
         return new EqualsBuilder().append(id, otherObj.id).isEquals();
     }
+    
+    @Override
+    public int compareTo(Person o) {
+        if (this.getDisplayName() != null && o != null) {
+            return this.getDisplayName().compareTo(o.getDisplayName());
+        }
+        return 0;
+    }
+
 
 }

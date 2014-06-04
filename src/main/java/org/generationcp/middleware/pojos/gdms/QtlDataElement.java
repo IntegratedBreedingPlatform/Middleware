@@ -29,7 +29,7 @@ public class QtlDataElement {
 	String experiment; 
 	String leftFlankingMarker; 
 	String rightFlankingMarker; 
-	Integer effect; 
+	Float effect; 
 	Float scoreValue; 
 	Float rSquare;
 
@@ -41,7 +41,7 @@ public class QtlDataElement {
 	public QtlDataElement(String qtlName, String linkageGroup, Float position,
 			Float minPosition, Float maxPosition, Integer traitId,
 			String experiment, String leftFlankingMarker,
-			String rightFlankingMarker, Integer effect, Float scoreValue,
+			String rightFlankingMarker, Float effect, Float scoreValue,
 			Float rSquare) {
 		super();
 		this.qtlName = qtlName;
@@ -130,11 +130,11 @@ public class QtlDataElement {
 		this.rightFlankingMarker = rightFlankingMarker;
 	}
 
-	public Integer getEffect() {
+	public Float getEffect() {
 		return effect;
 	}
 
-	public void setEffect(Integer effect) {
+	public void setEffect(Float effect) {
 		this.effect = effect;
 	}
 

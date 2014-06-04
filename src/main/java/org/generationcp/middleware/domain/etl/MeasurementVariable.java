@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementVariable {
@@ -49,10 +50,12 @@ public class MeasurementVariable {
 	
 	private Double maxRange;
 
-    private boolean required;
+        private boolean required;
+        
+        private String treatmentLabel;
     
-    private String treatmentLabel;
-
+        private Operation operation;
+        
 	public MeasurementVariable() {
 	}
 
@@ -280,7 +283,10 @@ public class MeasurementVariable {
 	
 	public String getDataTypeDisplay() {
 	    //datatype ids: 1120, 1125, 1128, 1130
-	    if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() || 
+		if(dataTypeId == null && dataType != null) {
+			return dataType;
+		}
+		else if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() || 
 	            dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()) {
 	        return "C";
 	    } else {
@@ -303,4 +309,18 @@ public class MeasurementVariable {
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
+
+    /**
+     * @return the operation
+     */
+    public Operation getOperation() {
+        return operation;
+    }
+
+    /**
+     * @param operation the operation to set
+     */
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
 }

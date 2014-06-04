@@ -23,6 +23,8 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -340,14 +342,26 @@ public interface FieldbookService {
      */
     List<Person> getAllPersons() throws MiddlewareQueryException;
     
+    
+    /**
+     * Returns all Persons from local sorted by first-middle-last 
+     * followed by all persons from local sorted by first-middle-last.
+     *
+     * @return the all persons ordered by local central
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException;
+
+    
     /**
      * Count plots with plants selectedof nursery.
      *
      * @param nurseryId the nursery id
+     * @param variateIds the variate ids
      * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException;
+    int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds) throws MiddlewareQueryException;
     
     /**
      * Filter standard variables by mode.
@@ -604,4 +618,72 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns true if all instances in the study has fieldmap.
+	 *
+	 * @param studyId the study id
+	 * @return true, if successful
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Builds the Trial Observations from the trial dataset id.
+	 *
+	 * @param trialDatasetId the trial dataset id
+	 * @param factorList the factor list
+	 * @param variateList the variate list
+	 * @return the list
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
+			throws MiddlewareQueryException;
+	
+	/**
+	 * Check if study has measurement data.
+	 *
+	 * @param datasetId the dataset id
+	 * @param variateIds the variate ids
+	 * @return true, if successful
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Delete observations of study.
+	 *
+	 * @param studyId the study id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException;
+
+	/**
+	 * Get germplasms by name.
+	 * 
+	 * @param name
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException;
+	
+	/**
+	 * Add Germplasm Name.
+	 * 
+	 * @param nameValue
+	 * @param gid
+	 * @param userId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException;
+	
+	/**
+	 * Adds a new Germplasm.
+	 * @param nameValue
+	 * @param userId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException;
 }

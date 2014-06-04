@@ -542,7 +542,7 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetGermplasmDetailsByGermplasmNames() throws Exception {
-        List<String> germplasmNames = Arrays.asList("C 65 CU   79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65");
+        List<String> germplasmNames = Arrays.asList("C 65 CU   79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65", " BASMATI   370");
         // SQL TO VERIFY (CENTRAL AND LOCAL): select gid, nid, nval from names where nval in (:germplasmNames);
         
         List<GermplasmNameDetails> results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.NORMAL);
@@ -556,6 +556,11 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
         results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.STANDARDIZED);
         Debug.println(INDENT, "GetGermplasmByNameModes.STANDARDIZED:");
         Debug.printObjects(INDENT, results);
+
+        results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES);
+        Debug.println(INDENT, "GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES:");
+        Debug.printObjects(INDENT, results);
+
     }
 
     @Test

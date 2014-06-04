@@ -43,9 +43,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
-import org.generationcp.middleware.pojos.gdms.Qtl;
-import org.generationcp.middleware.pojos.gdms.QtlDataRow;
-import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.util.Debug;
@@ -104,7 +101,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
                 remarks, dataType, missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
     }
     
-    private List<Object> createMarkerMarkeRecords() {
+    private List<Object> createMarkerRecords() {
 
         Integer markerId = null; // Will be set/overridden by the function
         String markerType = null; // Will be set/overridden by the function
@@ -147,7 +144,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
                 ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
                 amplification);
-        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
+        MarkerAlias markerAlias = new MarkerAlias(null, markerId, alias);
         MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
                 minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
                 fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
@@ -174,9 +171,12 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         // AccMetadataSet Additional Fields
         Integer gId = 1;
         Integer nameId = 1;
+        Integer sampleId = 1;
 
         // MarkerMetadataSet Additional Field
         Integer markerId = 1;
+        Integer markerSampleId = 1;
+        Integer accSampleId = 1;
 
         // AlleleValues Additional Fields
         Integer anId = null; // Will be set/overridden by the function
@@ -213,18 +213,18 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
         Dataset dataset = createDataset();
 
-        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
-        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        AccMetadataSet accMetadataSet = new AccMetadataSet(null, datasetId, gId, nameId, sampleId);
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(null, datasetId, markerId, markerSampleId);
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
         AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue,
                 peakHeight);
-        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
+        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue, markerSampleId, accSampleId);
         DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate,
                 picValue, discordance);
         MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize,
                 populationType, mapDataDescription, scoringScheme, mapId);
-        MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId);
-        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+        MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId, markerSampleId, accSampleId);
+        Marker marker = (Marker) createMarkerRecords().get(0);
 
         records.put(DATASET, dataset);
         records.put(ACC_METADATA_SET, accMetadataSet);
@@ -238,58 +238,6 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         records.put(MARKER, marker);
 
         return records;
-    }
-
-    @Test
-    public void testSetQTL() throws Exception {
-        Integer datasetId = null; // Will be set/overridden by the function
-        Integer userId = 123;
-
-        Integer qtlId = null; // Will be set/overridden by the function
-        Integer mapId = 1;
-        Float minPosition = 0f;
-        Float maxPosition = 8f;
-        Integer traitId = 1001; // "DE";
-        String experiment = "";
-        Integer effect = 0;
-        Float scoreValue = 2.5f;
-        Float rSquare = 10f;
-        String linkageGroup = "LG06";
-        String interactions = "";
-        String leftFlankingMarker = "Ah4-101";
-        String rightFlankingMarker = "GM2536";
-        Float position = 34.71f;
-        Float clen = 0f;
-        String seAdditive = null;
-        String hvParent = null;
-        String hvAllele = null;
-        String lvParent = null;
-        String lvAllele = null;
-
-        String qtlName = "TestQTL";
-
-        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-
-        Dataset dataset = createDataset();
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
-
-        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect,
-                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker, rightFlankingMarker, position,
-                clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);
-
-        Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
-
-        List<QtlDataRow> dataRows = new ArrayList<QtlDataRow>();
-        dataRows.add(new QtlDataRow(qtl, qtlDetails));
-
-        Boolean addStatus = manager.setQTL(dataset, datasetUser, dataRows);
-
-        assertTrue(addStatus);
-
-        Debug.println("testSetQTL() Added: ");
-        Debug.println(INDENT, datasetUser.toString());
-        Debug.println(INDENT, dataset.toString());
-        Debug.printObjects(INDENT, dataRows);
     }
 
     @Test

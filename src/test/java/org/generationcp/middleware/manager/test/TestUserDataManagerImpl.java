@@ -86,6 +86,15 @@ public class TestUserDataManagerImpl extends TestOutputFormatter{
         assertNotNull(persons);
         Debug.printObjects(INDENT, persons);
     }
+    
+    @Test
+    public void testGetAllPersonsOrderedByLocalCentral() throws Exception{
+        List<Person> persons = manager.getAllPersonsOrderedByLocalCentral();
+        assertNotNull(persons);
+        for (Person person : persons){
+            Debug.println(person.getDisplayName());
+        }
+    }    
 
     @Test
     public void testCountAllPersons() throws Exception{

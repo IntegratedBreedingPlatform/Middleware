@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
@@ -114,6 +115,39 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
 
         } catch (HibernateException e) {
             logAndThrowException("Error with getObjectBySubjectIdAndTypeId=" + subjectId + ", " + typeId
+                    + ") query from ProjectRelationship: " + e.getMessage(), e);
+        }
+        return null;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<DmsProject> getSubjectsByObjectIdAndTypeId(Integer objectId, Integer typeId) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("typeId", typeId));
+            criteria.add(Restrictions.eq("objectProject.projectId", objectId));
+            criteria.setProjection(Projections.property("subjectProject"));
+            return criteria.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getObjectBySubjectIdAndTypeId=" + objectId + ", " + typeId
+                    + ") query from ProjectRelationship: " + e.getMessage(), e);
+        }
+        return null;
+    }
+    
+    public ProjectRelationship getParentFolderRelationship(int studyId) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("typeId", TermId.STUDY_HAS_FOLDER.getId()));
+            criteria.add(Restrictions.eq("subjectProject.projectId", studyId));
+            List<ProjectRelationship> list = criteria.list();
+            if (list != null && !list.isEmpty()) {
+            	return list.get(0);
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getParentFolderRelationship(" + studyId 
                     + ") query from ProjectRelationship: " + e.getMessage(), e);
         }
         return null;

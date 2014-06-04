@@ -701,6 +701,38 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return methodId;
     }
 
+
+    @Override
+    public Method editMethod(Method method) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Method recordSaved = null;
+
+        try {
+
+            if (method.getMid() == null || method.getMid() > 0)
+                throw new Exception("method has no Id or is not a local method");
+
+            trans = session.beginTransaction();
+            MethodDAO dao = getMethodDao();
+
+            recordSaved = dao.merge(method);
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
+                    LOG);
+        } finally {
+            session.flush();
+        }
+
+        return recordSaved;
+    }
+
     @Override
     public List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
@@ -1274,7 +1306,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode) throws MiddlewareQueryException {
     	List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
         return (List<GermplasmNameDetails>) super.getAllFromCentralAndLocalByMethod(getNameDao(), "getGermplasmNameDetailsByNames",
-                new Object[] { namesToUse }, new Class[]{List.class});
+                new Object[] { namesToUse, mode }, new Class[]{List.class, GetGermplasmByNameModes.class});
     }
     
     @Override

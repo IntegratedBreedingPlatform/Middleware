@@ -35,6 +35,9 @@ public class MarkerAlias implements Serializable{
     private static final long serialVersionUID = 1L;
     
     @Id
+    @Column(name = "markeralias_id")
+    private Integer markerAliasId;
+    
     @Basic(optional = false)
     @Column(name = "marker_id")
     private Integer markerId;
@@ -46,13 +49,20 @@ public class MarkerAlias implements Serializable{
     public MarkerAlias() {
     }
 
-    public MarkerAlias(Integer markerId,
-                    String alias) {
-        
+    public MarkerAlias(Integer markerAliasId, Integer markerId, String alias) {
+        this.markerAliasId = markerAliasId;
         this.markerId = markerId;
         this.alias = alias;
     }
     
+    public Integer getMarkerAliasId() {
+        return markerAliasId;
+    }
+
+    public void setMarkerAliasId(Integer markerAliasId) {
+        this.markerAliasId = markerAliasId;
+    }
+
     public Integer getMarkerId() {
         return markerId;
     }
@@ -82,18 +92,20 @@ public class MarkerAlias implements Serializable{
         }
 
         MarkerAlias rhs = (MarkerAlias) obj;
-        return new EqualsBuilder().append(markerId, rhs.markerId).isEquals();
+        return new EqualsBuilder().append(markerAliasId, rhs.markerAliasId).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(61, 131).append(markerId).toHashCode();
+        return new HashCodeBuilder(61, 131).append(markerAliasId).toHashCode();
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("MarkerAlias [markerId=");
+        builder.append("MarkerAlias [markerAliasId=");
+        builder.append(markerAliasId);
+        builder.append(", markerId=");
         builder.append(markerId);
         builder.append(", alias=");
         builder.append(alias);

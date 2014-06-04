@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -66,6 +65,8 @@ public class Workbook {
 	private Integer measurementDatesetId;
 	
 	private List<MeasurementRow> trialObservations;
+	
+	private List<MeasurementRow> originalObservations;
 
 	public void reset() {
 		trialHeaders = null;
@@ -150,6 +151,10 @@ public class Workbook {
 	
 	public boolean isNursery() {
 	    return this.studyDetails.isNursery();
+	}
+	
+	public void setMeasurementDatasetVariables(List<MeasurementVariable> measurementDatasetVariables) {
+		this.measurementDatasetVariables = measurementDatasetVariables;
 	}
 	
 	public List<MeasurementVariable> getMeasurementDatasetVariables() {
@@ -745,5 +750,29 @@ public class Workbook {
 		this.exportArrangedObservations = exportArrangedObservations;
 	}
 	
+	public String getStudyName() {
+		if (getStudyConditions() != null) {
+			for (MeasurementVariable condition : getStudyConditions()) {
+				if (condition.getTermId() == TermId.STUDY_NAME.getId()) {
+					return condition.getValue();
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return the originalObservations
+	 */
+	public List<MeasurementRow> getOriginalObservations() {
+		return originalObservations;
+	}
+
+	/**
+	 * @param originalObservations the originalObservations to set
+	 */
+	public void setOriginalObservations(List<MeasurementRow> originalObservations) {
+		this.originalObservations = originalObservations;
+	}
 	
 }

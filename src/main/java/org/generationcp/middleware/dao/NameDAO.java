@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
@@ -169,28 +170,40 @@ public class NameDAO extends GenericDAO<Name, Integer>{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(List<String> germplasmNames) throws MiddlewareQueryException {
+    public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(List<String> germplasmNames
+            , GetGermplasmByNameModes mode) throws MiddlewareQueryException {
         List<GermplasmNameDetails> toReturn = new ArrayList<GermplasmNameDetails>();
 
         try {
+            
             if (germplasmNames != null && !germplasmNames.isEmpty()) {
-	            SQLQuery query = getSession().createSQLQuery(Name.GET_NAME_DETAILS_BY_NAME);
-	            query.setParameterList("germplasmNameList", germplasmNames);
-	            List results = query.list();
-	
-	            for (Object o : results) {
-	                Object[] result = (Object[]) o;
-	                if (result != null) {
-	                    Integer gId = (Integer) result[0];
+                
+                // Default query if mode = NORMAL, STANDARDIZED, SPACES_REMOVED
+                SQLQuery query = getSession().createSQLQuery(Name.GET_NAME_DETAILS_BY_NAME);
+                    
+                if (mode == GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES){
+                    query = getSession().createSQLQuery(
+                            "SELECT gid, nid, REPLACE(nval, ' ', '') " 
+                            + "FROM names " 
+                            + "WHERE nval IN (:germplasmNameList)");
+                }
+
+                query.setParameterList("germplasmNameList", germplasmNames);
+                List results = query.list();
+    
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer gId = (Integer) result[0];
                         Integer nId = (Integer) result[1];
                         String nVal = (String) result[2];
-	                    GermplasmNameDetails element = new GermplasmNameDetails(gId, nId, nVal);
-	                    toReturn.add(element);
-	                }
-	            }
+                        GermplasmNameDetails element = new GermplasmNameDetails(gId, nId, nVal);
+                        toReturn.add(element);
+                    }
+                }
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getGidAndNidByGermplasmNames(germplasmNames=" + germplasmNames
+            logAndThrowException("Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames
                     + ") query from Name " + e.getMessage(), e);
         }
         return toReturn;
