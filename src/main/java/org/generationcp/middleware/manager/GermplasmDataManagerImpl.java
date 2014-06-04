@@ -362,13 +362,20 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException{
-        if (setWorkingDatabase(gid)) {
+        /*if (setWorkingDatabase(gid)) {
             List<Name> names = getNameDao().getByGIDWithFilters(gid, 8, null);
             if (!names.isEmpty()) {
                 return names.get(0).getNval();
             }
         }
-        return null;
+        return null;*/
+        setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("gid",gid);
+		return getNameDao().
+				callStoredProcedureForObject("getPreferredNameByGid",
+						params,String.class);
     }
 
     @Override
