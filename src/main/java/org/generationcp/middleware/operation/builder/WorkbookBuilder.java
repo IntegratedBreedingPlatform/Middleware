@@ -227,9 +227,9 @@ public class WorkbookBuilder extends Builder {
 	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
             Workbook workbook = new Workbook();
             Study study = getStudyBuilder().createStudy(id);
-            int dataSetId = 0;
+            Integer dataSetId = null;
             //get observation dataset
-            if (dataSetId == 0) {
+            if (dataSetId == null) {
                 List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
                 if (datasetRefList != null) {
                 	StudyType studyType = StudyType.N;
@@ -247,18 +247,24 @@ public class WorkbookBuilder extends Builder {
             }
             
             //if dataset is not found, get dataset with Plot Data type
-            if (dataSetId == 0) {
-                dataSetId = getStudyDataManager().findOneDataSetByType(id, DataSetType.PLOT_DATA).getId();
+            if (dataSetId == null || dataSetId == 0) {
+            	DataSet dataset = getStudyDataManager().findOneDataSetByType(id, DataSetType.PLOT_DATA);
+            	if (dataset != null) {
+            		dataSetId = dataset.getId();
+            	}
             }
             
-            VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
+            VariableTypeList variables = null;
+            if (dataSetId != null) {
+            	variables = getDataSetBuilder().getVariableTypes(dataSetId);
+            }
             
             List<MeasurementVariable> factors = buildFactors(variables, !isNursery);
             List<MeasurementVariable> variates = buildVariates(variables);
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
             List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
             List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
-            List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
+            List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
             
             for (ProjectProperty projectProperty : projectProperties) {
                 if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
@@ -739,6 +745,11 @@ public class WorkbookBuilder extends Builder {
 		    }
 		}
 		//if not found in the list using the name, get dataset with Plot Data type
-	    return getStudyDataManager().findOneDataSetByType(studyId, DataSetType.PLOT_DATA).getId();
+		DataSet dataset = getStudyDataManager().findOneDataSetByType(studyId, DataSetType.PLOT_DATA);
+		if (dataset != null) {
+			return dataset.getId();
+		} else {
+			return 0;
+		}
 	}
 }
