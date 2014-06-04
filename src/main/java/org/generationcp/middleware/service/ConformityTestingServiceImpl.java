@@ -68,7 +68,13 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
                             continue;
                         }
 
-                        boolean passed = processedInput.get(entry.getKey()).contains(entry.getValue());
+                        boolean passed = true;
+                        if (entry.getValue().contains(CROSS_SEPARATOR)) {
+                            passed &= processedInput.get(entry.getKey()).contains(normalizeHeterozygousValue(entry.getValue()));
+                        } else {
+                            passed &= processedInput.get(entry.getKey()).contains(entry.getValue());
+                        }
+
                         if (!passed) {
                             errorMarkers.put(entry.getKey(), entry.getValue());
                         }
@@ -304,5 +310,23 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
             characterList.add(value);
         }
 
+    }
+
+    protected String normalizeHeterozygousValue(String heterozygousValue) {
+        assert(heterozygousValue.contains(CROSS_SEPARATOR));
+
+        String[] values = heterozygousValue.split(CROSS_SEPARATOR);
+        Arrays.sort(values);
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0 ; i < values.length; i++) {
+            if (i != 0) {
+                builder.append(CROSS_SEPARATOR);
+            }
+
+            builder.append(values[i]);
+        }
+
+        return builder.toString();
     }
 }
