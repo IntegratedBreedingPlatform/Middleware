@@ -1,6 +1,6 @@
 # PROJECT SPECIFIC IGNORES
-/src/main/resources/*
-/src/test/resources/*
+/src/main/resources/*.properties
+/src/test/resources/*.properties
 
 # Maven
 log/
