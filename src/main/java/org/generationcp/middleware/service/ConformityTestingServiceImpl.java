@@ -119,17 +119,26 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
             ConformityGermplasmInput parentA = retrieveParentInput(input.getParentAGID());
             ConformityGermplasmInput parentB = retrieveParentInput(input.getParentBGID());
 
-            if (parentA == null && parentB == null) {
-                processParentInformation(input.getParentAGID());
-                processParentInformation(input.getParentBGID());
+            if (!(parentA == null || parentB == null)) {
+                computeCrosses(parentA, parentB);
+                input.addEntry(parentA);
+                input.addEntry(parentB);
+            } else {
+                if (parentA == null) {
+                    processParentInformation(input.getParentAGID());
+                } else {
+                    processParentInformation(parentA);
+                }
+
+                if (parentB == null) {
+                    processParentInformation(input.getParentBGID());
+                } else {
+                    processParentInformation(parentB);
+                }
 
                 if (genotypeInfo.get().size() == 0) {
                     throw new ConformityException("Parent and ancestor data not found. No basis for conformity checking");
                 }
-            } else {
-                computeCrosses(parentA, parentB);
-                input.addEntry(parentA);
-                input.addEntry(parentB);
             }
 
         }
@@ -215,6 +224,12 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
         }
 
 
+    }
+
+    protected void processParentInformation(ConformityGermplasmInput parent) {
+        for (Map.Entry<String, String> entry : parent.getMarkerValues().entrySet()) {
+            processGenotypeInfo(entry.getKey(), entry.getValue());
+        }
     }
 
     protected void processPedigreeNode(GermplasmPedigreeTreeNode node) throws MiddlewareQueryException {
@@ -319,13 +334,13 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
     }
 
     protected String normalizeHeterozygousValue(String heterozygousValue) {
-        assert(heterozygousValue.contains(CROSS_SEPARATOR));
+        assert (heterozygousValue.contains(CROSS_SEPARATOR));
 
         String[] values = heterozygousValue.split(CROSS_SEPARATOR);
         Arrays.sort(values);
 
         StringBuilder builder = new StringBuilder();
-        for (int i = 0 ; i < values.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             if (i != 0) {
                 builder.append(CROSS_SEPARATOR);
             }
