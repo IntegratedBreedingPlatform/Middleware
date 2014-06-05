@@ -686,4 +686,12 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException;
+	
+	/**
+	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
+	 * @param name
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Integer getProjectIdByName(String name) throws MiddlewareQueryException;
 }
