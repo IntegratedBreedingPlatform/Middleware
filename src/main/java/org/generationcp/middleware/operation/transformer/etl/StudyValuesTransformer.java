@@ -28,16 +28,19 @@ public class StudyValuesTransformer extends Transformer {
 		VariableList variableListFromStudy = getVariableListTransformer().transformStudyDetails(studyDetails, variableTypeList);
 		variableTypeList.allocateRoom(variableListFromStudy.size());
 		
-		int i = 0;
-		
 		if (variableTypeList != null) {
 			for (VariableType variableType : variableTypeList.getVariableTypes()) {
 				if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.STUDY 
 				        || variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {
-				    
-					variableList.add(new Variable(variableType, measurementVariables.get(i).getValue()));
+				    String value = null;
+				    for (MeasurementVariable var : measurementVariables) {
+				        if (var.getTermId() == variableType.getId()) {
+				            value = var.getValue();
+				            
+				        }
+				    }
+				    variableList.add(new Variable(variableType, value));
 				}
-				i++;
 			}
 		}
 		
