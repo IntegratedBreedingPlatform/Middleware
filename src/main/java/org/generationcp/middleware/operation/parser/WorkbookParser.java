@@ -106,7 +106,6 @@ public class WorkbookParser {
      * @param file
      * @return workbook
      * @throws org.generationcp.middleware.exceptions.WorkbookParserException
-     *
      */
     public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation) throws WorkbookParserException {
 
@@ -443,7 +442,6 @@ public class WorkbookParser {
                 if (col < factors.size()) {
 
 
-
                     if (columnName == null || !factors.get(col).getName().toUpperCase().equals(columnName.toUpperCase())) {
                         // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
@@ -473,7 +471,7 @@ public class WorkbookParser {
                     continue;
                 }
 
-                List<MeasurementData> measurementData = new ArrayList<MeasurementData>();
+                List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 
                 for (int col = 0; col < factors.size() + variates.size(); col++) {
                     // danielv -- commented out because this is no longer relevant. Stock id is computed later on in the process
@@ -486,13 +484,18 @@ public class WorkbookParser {
                     if (variables.get(col).getName().equals("GYLD")) {
                         LOG.debug(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
                     }
-                    measurementData.add(new MeasurementData(variables.get(col).getName(),
+
+                    MeasurementData data = new MeasurementData(variables.get(col).getName(),
                             getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)
-                    ));
+                    );
+
+                    data.setMeasurementVariable(variables.get(col));
+
+                    dataList.add(data);
                 }
 
                 // danielv -- made use of new constructor to make it clear that only the measurement data is needed at this point. The other values are computed later on in the process
-                observations.add(new MeasurementRow(measurementData));
+                observations.add(new MeasurementRow(dataList));
                 /*observations.add(new MeasurementRow(stockId, DEFAULT_GEOLOCATION_ID, measurementData));//note that the locationid will be replaced inside*/
                 currentRow++;
             }
