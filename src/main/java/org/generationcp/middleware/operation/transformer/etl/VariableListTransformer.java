@@ -72,7 +72,8 @@ public class VariableListTransformer extends Transformer {
 					    String value = null;
 					    for (MeasurementData data : nonTrialMD) {
 					        if (data.getMeasurementVariable().getTermId() == variableType.getStandardVariable().getId()) {
-					            value = data.getValue();
+					            value = data.getcValueId() != null ? data.getcValueId() : data.getValue();
+					            break;
 					        }
 					    }		
 					    variableList.add(new Variable(variableType, value));
