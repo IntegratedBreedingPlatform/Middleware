@@ -128,15 +128,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-    	LOG.debug("in getGermplasmListDataByListId("+id+")");
-    	/*return getFromInstanceByIdAndMethod(getGermplasmListDataDAO(), id, "getByListId", 
-    				new Object[] {id, start, numOfRows},
-    				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});*/
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", centralDatabaseName);
 		params.put("listid",id);
-		getGermplasmListDataDAO().callStoredProcedure("getListDataByListId",params);
 		params.put("start",start);
 		params.put("numOfRows",numOfRows);
 		return getGermplasmListDataDAO().
@@ -146,14 +141,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
-    	LOG.debug("in countGermplasmListDataByListId("+id+")");
-    	/*return countFromInstanceByIdAndMethod(getGermplasmListDataDAO(), id, "countByListId", 
-    				new Object[] {id}, new Class[] {Integer.class});*/
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", centralDatabaseName);
 		params.put("id",id);
-		getGermplasmListDataDAO().callStoredProcedure("getListDataByListId",params);
 		return getGermplasmListDataDAO().
 				callStoredProcedureForObject("countGermplasmListDataByListId",
 						params,Long.class);
@@ -169,17 +160,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
-    	
-        /*if (setWorkingDatabase(listId)) {
-            return getGermplasmListDataDAO().getByListIdAndEntryId(listId, entryId);
-        }
-        
-        return null;*/
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", centralDatabaseName);
 		params.put("listId",listId);
-		getGermplasmListDataDAO().callStoredProcedure("getListDataByListId",params);
 		params.put("entryId",entryId);
 		return getGermplasmListDataDAO().
 				callStoredProcedureForObject("getGermplasmListDataByListIdAndEntryId",
@@ -188,17 +172,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
-    	
-        /*if (setWorkingDatabase(listId)) {
-            return getGermplasmListDataDAO().getByListIdAndLrecId(listId, lrecId);
-        }
-        
-        return null;*/
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", centralDatabaseName);
 		params.put("listId",listId);
-		getGermplasmListDataDAO().callStoredProcedure("getListDataByListId",params);
 		params.put("lrecId",lrecId);
 		return getGermplasmListDataDAO().
 				callStoredProcedureForObject("getGermplasmListDataByListIdAndLrecId",
@@ -673,31 +650,5 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     		return getListDataPropertyDAO().getPropertiesForList(listId);
     	}
     	return null;
-	} 
-    
-	/*//may be used in the future
-	 public List<GermplasmListData> getUpdatedGermplasmListDataByListId_1(Integer id) throws MiddlewareQueryException {
-	 
-		List<GermplasmListData> filteredList = new ArrayList<GermplasmListData>();
-		List<GermplasmListData> list = getGermplasmListDataByListId(id,0,Integer.MAX_VALUE);
-		if(list!=null && !list.isEmpty()) {
-			setWorkingDatabase(Database.LOCAL);
-			for (GermplasmListData listData : list) {
-				Map<String,Object> params = new LinkedHashMap<String,Object>();
-    			params.put("central_db_name", centralDatabaseName);
-    			params.put("gid",listData.getGid());
-    			Integer gid = getGermplasmListDataDAO().
-    					callStoredProcedureForObject("getUpdatedGermplasmIDByID",
-    							params,Integer.class);
-    			if(gid!=null) {
-    				listData.setGid(gid);
-    				filteredList.add(listData);
-    			}
-			}
-		}
-		return filteredList;
-    }
-    */
-	
-	
+	}
 }
