@@ -2006,24 +2006,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
          return toreturn;
     }
 
-    /**
-     * Search for germplasms given a search term Q.
-     * @param q - the search term to be used in query
-     * @param o - operation to be used for comparison (equal or like)
-     * @param includeParents boolean flag to denote whether parents will be included in search results
-     * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
-     * @throws MiddlewareQueryException
-     */
-    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents)
+    @Override
+    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData)
             throws MiddlewareQueryException{
         List<Germplasm> resultsFromCentral;
         List<Germplasm> resultsFromLocal;
         List<Germplasm> combinedResults = new ArrayList<Germplasm>();
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o, includeParents, true, getCurrentSessionForLocal());
-            combinedResults.addAll(resultsFromCentral);
-        }
+        if(searchPublicData) {
+	        if (setWorkingDatabase(Database.CENTRAL)) {
+	            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o, includeParents, true, getCurrentSessionForLocal());
+	            combinedResults.addAll(resultsFromCentral);
+	        }
+	    }
         
         if (setWorkingDatabase(Database.LOCAL)) {
             resultsFromLocal = getGermplasmDao().searchForGermplasms(q, o, includeParents, false, null);

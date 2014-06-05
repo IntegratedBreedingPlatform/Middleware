@@ -796,7 +796,7 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
       String q = "dinurado";
       boolean includeParents = true;
             
-      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, includeParents);
+      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, includeParents, true);
       
       Debug.println(INDENT, "searchForGermplasm(" + q + "): ");
       for(Germplasm g : results){
