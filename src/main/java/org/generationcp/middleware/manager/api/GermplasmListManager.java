@@ -529,10 +529,11 @@ public interface GermplasmListManager{
      * Search for germplasm lists given a search term Q
      * @param q string
      * @param o operation
+     * @param searchPublicData flag to indicate whether public (central) data should be searched 
      * @return - List of germplasm lists
      * @throws MiddlewareQueryException
      */
-    List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException;
+    List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException;
     
     
     /**
