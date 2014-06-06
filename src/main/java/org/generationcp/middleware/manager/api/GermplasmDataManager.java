@@ -1248,13 +1248,14 @@ public interface GermplasmDataManager {
      * @param q - the search term to be used in retrieving the germplasm
      * @param o - the operation to be used for the query (equal or like)
      * @param includeParents - boolean flag to denote whether parents will be included in search results
+     * @param searchPublicData flag to indicate whether public (central) data should be searched
      * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
      * Given a List of GIDs, return the list of gids mapped to their corresponding location
      * Map<Integer, String>
      * - map of gids to their corresponding location name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents) throws MiddlewareQueryException;
+    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData) throws MiddlewareQueryException;
 
     /**
      * Please use LocationDataManager.getLocationsByIDs().

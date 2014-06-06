@@ -1037,4 +1037,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, date, name);
 		return getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
+	
+	@Override
+	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		Integer id = getDmsProjectDao().getProjectIdByName(name);
+		if (id == null) {
+			setWorkingDatabase(Database.CENTRAL);
+			id = getDmsProjectDao().getProjectIdByName(name);
+		}
+		return id;
+	}
 }

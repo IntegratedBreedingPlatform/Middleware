@@ -470,6 +470,12 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         fieldbookService.deleteObservationsOfStudy(workbook.getMeasurementDatesetId());
         workbook.print(INDENT);
     }
+    
+    @Test
+    public void testGetProjectIdByName() throws Exception {
+    	String name = "ROOT STUDY";
+    	System.out.println("ID IS " + fieldbookService.getProjectIdByName(name));
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

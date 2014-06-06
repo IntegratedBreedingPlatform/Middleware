@@ -250,6 +250,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
         	params.put("numOfRows",null);
         }
+        params.put("searchPublicData",1);
         
 		return getNameDao().
 				callStoredProcedureForList("searchGermplasmsByName",
@@ -290,6 +291,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
         	params.put("numOfRows",null);
         }
+        params.put("searchPublicData",1);
         
 		return getNameDao().
 				callStoredProcedureForList("searchGermplasmsByName",
@@ -324,6 +326,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
         	params.put("type",null);
         }
+        params.put("searchPublicData",1);
         
         return getNameDao().
 				callStoredProcedureForObject("countGermplasmByName",
@@ -351,6 +354,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else if (operation == Operation.LIKE) {
         	params.put("searchType","LIKE");
         }
+		params.put("searchPublicData",1);
 
         return getNameDao().
 				callStoredProcedureForObject("countGermplasmByName",
@@ -2159,15 +2163,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
          return toreturn;
     }
 
-    /**
-     * Search for germplasms given a search term Q.
-     * @param q - the search term to be used in query
-     * @param o - operation to be used for comparison (equal or like)
-     * @param includeParents boolean flag to denote whether parents will be included in search results
-     * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
-     * @throws MiddlewareQueryException
-     */
-    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents)
+    @Override
+    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData)
             throws MiddlewareQueryException{
     	//revised logic from GermplasmDAO.searchForGermplasms
     	
@@ -2191,6 +2188,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			params.put("central_db_name", centralDatabaseName);
 			params.put("gid",q);
 			params.put("searchType", searchType);
+			params.put("searchPublicData",searchPublicData?1:0);
 			List<Germplasm> germplasmsByGid = getGermplasmListDataDAO().
 					callStoredProcedureForList("searchGermplasmsByID",
 							params,Germplasm.class);
@@ -2213,6 +2211,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		params.put("type", null);
 		params.put("start", null);
 		params.put("numOfRows", null);
+		params.put("searchPublicData",searchPublicData?1:0);
 		List<Germplasm> germplasmsByName = getGermplasmListDataDAO().
 				callStoredProcedureForList("searchGermplasmsByName",
 						params,Germplasm.class);

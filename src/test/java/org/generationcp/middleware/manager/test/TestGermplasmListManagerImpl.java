@@ -532,7 +532,7 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     	//String q = "HB2009DS";
         String q = "dinurado";  
     	
-        List<GermplasmList> results = manager.searchForGermplasmList(q, Operation.EQUAL);
+        List<GermplasmList> results = manager.searchForGermplasmList(q, Operation.EQUAL, true);
         Debug.println(INDENT, "searchForGermplasmList(" + q + ")");
         for(GermplasmList g : results){
           Debug.println(INDENT, g.getId() + " : " + g.getName());

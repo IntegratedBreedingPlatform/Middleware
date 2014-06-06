@@ -35,12 +35,16 @@ public class VariableListTransformer extends Transformer {
 			int nonTrialMDSize = nonTrialMD.size();
 			int variableTypeSize =  variableTypeList.getVariableTypes().size();
 			if (nonTrialMDSize == variableTypeSize) {
-				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
-						variableList.add(new Variable(variableType, nonTrialMD.get(i).getValue()));
+					    String value = null;
+					    for (MeasurementData data : nonTrialMD) {
+					        if (data.getMeasurementVariable().getTermId() == variableType.getStandardVariable().getId()) {
+					            value = data.getValue();
+					        }
+					    }
+					    variableList.add(new Variable(variableType, value));
 					}
-					i++;
 				}
 				
 			} else {//else invalid data
@@ -57,34 +61,30 @@ public class VariableListTransformer extends Transformer {
 		if(mRow == null) {
 			return variableList;
 		}
-		/*
+
 		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
 		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			int nonTrialMDSize = nonTrialMD.size();
 			int variableTypeSize =  variableTypeList.getVariableTypes().size();
 			if (nonTrialMDSize == variableTypeSize) {
-				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
-						variableList.add(new Variable(variableType, nonTrialMD.get(i).getValue()));
+					    String value = null;
+					    for (MeasurementData data : nonTrialMD) {
+					        if (data.getMeasurementVariable().getTermId() == variableType.getStandardVariable().getId()) {
+					            value = data.getcValueId() != null ? data.getcValueId() : data.getValue();
+					            break;
+					        }
+					    }		
+					    variableList.add(new Variable(variableType, value));
 					}
-					i++;
 				}
 				
 			} else {//else invalid data
 				throw new MiddlewareQueryException("Variables did not match the Measurements Row.");
 			}
 		}
-		*/
-		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
-		for(Integer index : variableIndexesList) {
-			if (nonTrialMD.get(index).getcValueId() != null) {
-				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getcValueId()));
-			}
-			else {
-				variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
-			}
-		}
+
 		return variableList;
 	}
 	
@@ -98,6 +98,7 @@ public class VariableListTransformer extends Transformer {
 		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			int nonTrialMDSize = nonTrialMD.size();
 			int variableTypeSize =  variableTypeList.getVariableTypes().size();
+			
 			if (nonTrialMDSize == variableTypeSize) {
 				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
@@ -130,12 +131,17 @@ public class VariableListTransformer extends Transformer {
 				int varTypeSize = varTypes.size();
 				for(int i = 0, l = varTypeSize; i < l; i++ ){
 					VariableType varType = varTypes.get(i);
-					String value = trialMD.get(i).getValue();
 										
 					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT ||
 						varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {//include variate
-						Variable variable = new Variable(varType, value);
-						variableList.add(variable);
+					    String value = null;
+					    for (MeasurementData data : trialMD) {
+					        if (data.getMeasurementVariable().getTermId() == varTypes.get(i).getId()) {
+					            value = data.getValue();
+					        }
+					    }
+					    Variable variable = new Variable(varType, value);
+                        variableList.add(variable);
 					}
 				}
 			}
@@ -187,16 +193,19 @@ public class VariableListTransformer extends Transformer {
 				
 				List<VariableType> varTypes = variableTypeList.getVariableTypes();
 				for(int i = 0, l = mVarList.size(); i < l ; i++ ){
-					VariableType varType = varTypes.get(i);
-					String value = mVarList.get(i).getValue();
-					
-					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT
-					        || varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {
-					    
-						variableList.add(new Variable(varType,value));
-					}
+				    VariableType varTypeFinal = null;
+				    String value = mVarList.get(i).getValue();
+				    for (VariableType varType : varTypes) {
+				        if (mVarList.get(i).getTermId() == varType.getId()) {
+		                    if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT
+		                            || varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {
+		                        varTypeFinal = varType;
+		                        
+		                    }
+				        }
+				    }
+				    variableList.add(new Variable(varTypeFinal,value));
 				}
-				
 			} else {//else invalid data
 				throw new MiddlewareQueryException("Variables did not match the Measurement Variable List.");
 			}

@@ -979,4 +979,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return results;
 	}
+	
+	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT project_id FROM project WHERE name = :name ";
+			Query query = getSession().createSQLQuery(sql).setParameter("name", name);
+			List<Integer> list = query.list();
+			if (list != null && !list.isEmpty()) {
+				return (Integer) list.get(0);
+			}
+		} catch(HibernateException e) {
+			logAndThrowException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
+		}
+		return null;
+	}
 }

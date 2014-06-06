@@ -322,7 +322,7 @@ public class WorkbookSaver extends Saver {
 				}
 			}
 			
-			if (hasTrialObservations) {
+			if (hasTrialObservations && workbook.getObservations() != null) {
 				for (MeasurementRow row : workbook.getObservations()) {
 					String trialInstance = getTrialInstanceNumber(row);
 					if (trialInstance != null) {
@@ -335,7 +335,12 @@ public class WorkbookSaver extends Saver {
 				}
 			}
 	        //return studyLocationId
-			return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
+			if (workbook.getObservations() != null) {
+			    return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
+			} 
+			else {
+			    return Long.valueOf(workbook.getTrialObservations().get(0).getLocationId()).intValue(); 
+			}
 		}
 		
 		return 0;

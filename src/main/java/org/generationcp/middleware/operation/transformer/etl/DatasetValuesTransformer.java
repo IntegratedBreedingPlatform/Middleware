@@ -28,11 +28,14 @@ public class DatasetValuesTransformer extends Transformer {
 		VariableList variables = new VariableList();
 		
 		List<VariableType> varTypes = varTypeList.getVariableTypes();
-		for(int i = 0, l = mvList.size(); i < l ; i++ ){
-			VariableType varType = varTypes.get(i);
-			String value = mvList.get(i).getValue();
-			
-			variables.add(new Variable(varType,value));
+		for (VariableType varType : varTypes) {
+		    String value = null;
+		    for (MeasurementVariable var : mvList) {
+		        if (var.getTermId() == varType.getId()) {
+		            value = var.getValue();
+		        }
+		    }
+		    variables.add(new Variable(varType, value));
 		}
 		
 		dataValues.setVariables(variables);
