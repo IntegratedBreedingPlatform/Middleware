@@ -386,6 +386,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         ret.add(Float.class);
         ret.add(Double.class);
         ret.add(Void.class);
+        ret.add(String.class);
         return ret;
     }
 }
