@@ -1013,15 +1013,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException {
-		List<Integer> ids = new ArrayList<Integer>();
-		int count = Long.valueOf(getGermplasmDataManager().countGermplasmByName(name, Operation.EQUAL)).intValue();
-		List<Germplasm> germplasms = getGermplasmDataManager().getGermplasmByName(name, 0, count, Operation.EQUAL);
-		if (germplasms != null && !germplasms.isEmpty()) {
-			for (Germplasm germplasm : germplasms) {
-				ids.add(germplasm.getGid());
-			}
-		}
-		return ids;
+		setWorkingDatabase(Database.LOCAL);
+		List<Integer> gids = getNameDao().getGidsByName(name);
+		setWorkingDatabase(Database.CENTRAL);
+		gids.addAll(getNameDao().getGidsByName(name));
+		return gids;
 	}
 	
 	@Override
