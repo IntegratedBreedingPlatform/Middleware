@@ -160,7 +160,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     @Override
-    public List<Integer> addLot(List<Lot> lots) throws MiddlewareQueryException {
+    public List<Integer> addLots(List<Lot> lots) throws MiddlewareQueryException {
         return addOrUpdateLot(lots, Operation.ADD);
     }
 
@@ -173,7 +173,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     @Override
-    public List<Integer> updateLot(List<Lot> lots) throws MiddlewareQueryException {
+    public List<Integer> updateLots(List<Lot> lots) throws MiddlewareQueryException {
         return addOrUpdateLot(lots, Operation.UPDATE);
     }
 
@@ -191,13 +191,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
             for (Lot lot : lots) {
                 if (operation == Operation.ADD) {
-                    // Auto-assign negative IDs for new local DB records
-                    Integer negativeId = dao.getNegativeId("id");
-                    lot.setId(negativeId);
-                } else if (operation == Operation.UPDATE) {
-                    // Check if Lot is a local DB record. Throws exception if
-                    // Lot is a central DB record.
-                    dao.validateId(lot);
+                    // Auto-assign IDs for new local DB records
+                    Integer id = dao.getPositiveId("id");
+                    lot.setId(id);
                 }
                 Lot recordSaved = dao.saveOrUpdate(lot);
                 idLotsSaved.add(recordSaved.getId());
@@ -227,52 +223,16 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         return idLotsSaved;
     }
 
-    public List<Integer> addIndividualLots(List<Lot> lots) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-
-        List<Integer> idLotsSaved = new ArrayList<Integer>();
-        // begin save transaction
-        LotDAO dao = getLotDao();
-        dao.flush();
-        dao.clear();
-
-        for (Lot lot : lots) {
-            Session session = getCurrentSessionForLocal();
-            Transaction trans = null;
-            try {
-                trans = session.beginTransaction();
-                // Auto-assign negative IDs for new local DB records
-                Integer negativeId = dao.getNegativeId("id");
-                lot.setId(negativeId);
-                Lot recordSaved = dao.save(lot);
-                trans.commit();
-                if (recordSaved != null && recordSaved.getId() != null) {
-                    lot.setId(negativeId);
-	                idLotsSaved.add(recordSaved.getId());
-                }
-            } catch (Exception e) {
-                rollbackTransaction(trans);
-                dao.flush();
-                dao.clear();
-                lot.setId(null);
-            } finally {
-                session.flush();
-            }
-        }
-            
-        return idLotsSaved;
-    }
-
     @Override
     public Integer addTransaction(org.generationcp.middleware.pojos.Transaction transaction) throws MiddlewareQueryException {
         List<org.generationcp.middleware.pojos.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.Transaction>();
         transactions.add(transaction);
-        List<Integer> ids = addTransaction(transactions);
+        List<Integer> ids = addTransactions(transactions);
         return ids.size() > 0 ? ids.get(0) : null;
     }
 
     @Override
-    public List<Integer> addTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions) throws MiddlewareQueryException {
+    public List<Integer> addTransactions(List<org.generationcp.middleware.pojos.Transaction> transactions) throws MiddlewareQueryException {
         return addOrUpdateTransaction(transactions, Operation.ADD);
     }
 
@@ -285,7 +245,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     @Override
-    public List<Integer> updateTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions)
+    public List<Integer> updateTransactions(List<org.generationcp.middleware.pojos.Transaction> transactions)
             throws MiddlewareQueryException {
         return addOrUpdateTransaction(transactions, Operation.UPDATE);
     }
@@ -305,13 +265,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
             for (org.generationcp.middleware.pojos.Transaction transaction : transactions) {
                 if (operation == Operation.ADD) {
-                    // Auto-assign negative IDs for new local DB records
-                    Integer negativeId = dao.getNegativeId("id");
-                    transaction.setId(negativeId);
-                } else if (operation == Operation.UPDATE) {
-                    // Check if Lot is a local DB record. Throws exception if
-                    // Lot is a central DB record.
-                    dao.validateId(transaction);
+                    // Auto-assign IDs for new local DB records
+                    Integer id = dao.getPositiveId("id");
+                    transaction.setId(id);
                 }
                 org.generationcp.middleware.pojos.Transaction recordSaved = dao.saveOrUpdate(transaction);
                 idTransactionsSaved.add(recordSaved.getId());
@@ -350,6 +306,15 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             return lot.getTransactions();
         }
         return null;
+    }
+
+    @Override
+    public List<org.generationcp.middleware.pojos.Transaction> getAllTransactions(int start, int numOfRows) throws MiddlewareQueryException{
+        List<org.generationcp.middleware.pojos.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.Transaction>();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            transactions = getTransactionDao().getAll(start, numOfRows);
+        }
+        return transactions;
     }
 
     @Override

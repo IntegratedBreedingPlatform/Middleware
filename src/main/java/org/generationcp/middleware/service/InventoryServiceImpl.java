@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
  *  
  */
 public class InventoryServiceImpl extends Service implements InventoryService {
-	
-	private Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
+    
+    private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     public InventoryServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -62,10 +62,10 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		List<Lot> lots = getLotBuilder().buildForSave(gids, locationId, scaleId, comment, userId);
 		List<Integer> lotIdsAdded = new ArrayList<Integer>();
 		try {
-			lotIdsAdded = getInventoryDataManager().addLot(lots);
+			lotIdsAdded = getInventoryDataManager().addLots(lots);
 		} catch(MiddlewareQueryException e) {
 	    	if (e.getCause() != null && e.getCause() instanceof ConstraintViolationException) {
-	        	lotIdsAdded = getInventoryDataManager().addIndividualLots(lots);	
+	        	lotIdsAdded = getInventoryDataManager().addLots(lots); 	
 	    	}
 	    	else {
 	    		logAndThrowException(e.getMessage(), e, LOG);

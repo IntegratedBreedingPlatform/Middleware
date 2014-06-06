@@ -32,22 +32,6 @@ import org.hibernate.criterion.Restrictions;
  */
 public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 
-    public void validateId(Transaction transaction) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-		if (transaction != null) {
-			Integer id = transaction.getId();
-			if (id != null && id.intValue() > 0) {
-				logAndThrowException("Error with validateId(transaction="
-						+ transaction
-						+ "): Cannot update a Central Database record. "
-						+ "Transaction object to update must be a Local Record (ID must be negative)", new Throwable());
-			}
-		} else {
-			logAndThrowException("Error with validateId(transaction="
-					+ transaction + "): transaction is null. ", new Throwable());
-		}
-    }
-
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllReserve(int start, int numOfRows) throws MiddlewareQueryException {
         try {

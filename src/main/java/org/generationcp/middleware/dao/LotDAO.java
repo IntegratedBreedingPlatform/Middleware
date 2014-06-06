@@ -196,19 +196,6 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         return 0L;
     }
 
-    public void validateId(Lot lot) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-    	if (lot != null){
-	        Integer id = lot.getId();
-	        if (id != null && id.intValue() > 0) {
-	            logAndThrowException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
-	                    + "Attribute object to update must be a Local Record (ID must be negative)", new Throwable());
-	        }
-    	}else{
-    	    logAndThrowException("Error with validateId(lot=" + lot + "): lot is null)", new Throwable());
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public List<Lot> getByEntityTypeEntityIdsLocationIdAndScaleId(String type, List<Integer> entityIds, Integer locationId, Integer scaleId)
             throws MiddlewareQueryException {
