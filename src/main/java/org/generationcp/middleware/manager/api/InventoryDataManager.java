@@ -16,8 +16,8 @@ import java.util.Set;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Lot;
-import org.generationcp.middleware.pojos.Transaction;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
@@ -139,7 +139,7 @@ public interface InventoryDataManager{
      * @return The actual transaction balance of all the specified Lot
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException;
+    Double getActualLotBalance(Integer lotId) throws MiddlewareQueryException;
 
     /**
      * Returns the available transaction balance of the Lot with the specified
@@ -151,7 +151,7 @@ public interface InventoryDataManager{
      * @return The available transaction balance of all the specified Lot
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException;
+    Double getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException;
 
     /**
      * Given a valid Lot object, add it as a new record to the database. It is

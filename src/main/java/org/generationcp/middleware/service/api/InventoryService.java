@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.LotsResult;
+import org.generationcp.middleware.pojos.ims.LotsResult;
 
 /**
  * This is the API for inventory management system.
@@ -60,9 +60,13 @@ public interface InventoryService {
 	 * @param locationId
 	 * @param scaleId
 	 * @param comment
+	 * @param userId
+	 * @param amount - The quantity
+	 * @param sourceId - List Id or Study Id (supports List Id for now)
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId) throws MiddlewareQueryException;
+	LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId, 
+			Double amount, Integer sourceId) throws MiddlewareQueryException;
 	
 }

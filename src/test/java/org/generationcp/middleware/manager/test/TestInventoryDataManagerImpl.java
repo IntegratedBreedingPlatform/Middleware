@@ -24,8 +24,9 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.pojos.Lot;
-import org.generationcp.middleware.pojos.Transaction;
+import org.generationcp.middleware.pojos.ims.EntityType;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.Debug;
@@ -49,7 +50,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testGetLotsByEntityType() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         List<Lot> results = manager.getLotsByEntityType(type, 0, 5);
         Assert.assertTrue(results != null);
         Assert.assertTrue(!results.isEmpty());
@@ -59,12 +60,12 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testCountLotsByEntityType() throws Exception {
-        Debug.println(INDENT, "testCountLotsByEntityType(\"GERMPLSM\"): " + manager.countLotsByEntityType("GERMPLSM"));
+        Debug.println(INDENT, "testCountLotsByEntityType(\"GERMPLSM\"): " + manager.countLotsByEntityType(EntityType.GERMPLSM.name()));
     }
 
     @Test
     public void testGetLotsByEntityTypeAndEntityId() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         Integer entityId = Integer.valueOf(50533);
         List<Lot> results = manager.getLotsByEntityTypeAndEntityId(type, entityId, 0, 5);
         Assert.assertTrue(results != null);
@@ -75,7 +76,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testCountLotsByEntityTypeAndEntityId() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         Integer entityId = Integer.valueOf(50533);
         Debug.println(INDENT, "testCountLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId + "): "
                 + manager.countLotsByEntityTypeAndEntityId(type, entityId));
@@ -83,7 +84,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testGetLotsByEntityTypeAndLocationId() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         Integer locationId = Integer.valueOf(9001);
         List<Lot> results = manager.getLotsByEntityTypeAndLocationId(type, locationId, 0, 5);
         Assert.assertTrue(results != null);
@@ -94,7 +95,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testCountLotsByEntityTypeAndLocationId() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         Integer locationId = Integer.valueOf(9000);
         Debug.println(INDENT, "testCountLotsByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId + "): "
                 + manager.countLotsByEntityTypeAndLocationId(type, locationId));
@@ -102,7 +103,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testGetLotsByEntityTypeAndEntityIdAndLocationId() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         Integer entityId = Integer.valueOf(50533);
         Integer locationId = Integer.valueOf(9001);
         List<Lot> results = manager.getLotsByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, 0, 5);
@@ -115,7 +116,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testCountLotsByEntityTypeAndEntityIdAndLocationId() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         Integer entityId = Integer.valueOf(50533);
         Integer locationId = Integer.valueOf(9000);
         Debug.println(INDENT, "testCountLotsByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId + ", locationId="
@@ -124,19 +125,19 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testGetActualLotBalance() throws Exception {
-        Integer lotId = Integer.valueOf(-1);
+        Integer lotId = Integer.valueOf(1);
         Debug.println(INDENT, "testGetActualLotBalance(lotId=" + lotId + "): " + manager.getActualLotBalance(lotId));
     }
 
     @Test
     public void testGetAvailableLotBalance() throws Exception {
-        Integer lotId = Integer.valueOf(-1);
+        Integer lotId = Integer.valueOf(1);
         Debug.println(INDENT, "testGetAvailableLotBalance(lotId=" + lotId + "): " + manager.getAvailableLotBalance(lotId));
     }
 
     @Test
     public void testAddLot() throws Exception {
-        Lot lot = new Lot(null, 1, "GERMPLSM", 50533, 9001, 6088, 0, "sample added lot");
+        Lot lot = new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 6088, 0, 0, "sample added lot");
         manager.addLot(lot);
         assertNotNull(lot.getId());
         Debug.println(INDENT, "Added: " + lot.toString());
@@ -145,8 +146,8 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     @Test
     public void testAddLots() throws Exception {
         List<Lot> lots = new ArrayList<Lot>();
-        lots.add(new Lot(null, 1, "GERMPLSM", 50533, 9001, 1538, 0, "sample added lot 1"));
-        lots.add(new Lot(null, 1, "GERMPLSM", 50533, 9002, 1539, 0, "sample added lot 2"));
+        lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 1538, 0, 0, "sample added lot 1"));
+        lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2"));
         List<Integer> idList = manager.addLots(lots);
 
         assertFalse(idList.isEmpty());
@@ -157,7 +158,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     @Test
     public void testUpdateLot() throws Exception {
         // this test assumes there are existing lot records with entity type = GERMPLSM
-        Lot lot = manager.getLotsByEntityType("GERMPLSM", 0, 1).get(0);
+        Lot lot = manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0);
         
         Debug.println(INDENT, "BEFORE: " + lot.toString());
         
@@ -177,7 +178,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     @Test
     public void testUpdateLots() throws Exception {
         // this test assumes there are at least 2 existing lot records with entity type = GERMPLSM
-        List<Lot> lots = manager.getLotsByEntityType("GERMPLSM", 0, 2);
+        List<Lot> lots = manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 2);
 
         Debug.println(INDENT, "BEFORE: ");
         Debug.printObjects(INDENT * 2, lots);
@@ -203,8 +204,8 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     
     @Test
     public void testAddTransaction() throws Exception {
-        Transaction transaction =  new Transaction(null, 1, manager.getLotsByEntityType("GERMPLSM", 0, 1).get(0)
-                , Integer.valueOf(20140413), 1, 200, "sample added transaction", null, null, null, 100, 1);
+        Transaction transaction =  new Transaction(null, 1, manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0)
+                , Integer.valueOf(20140413), 1, 200d, "sample added transaction", 0, null, null, null, 100d, 1);
         manager.addTransaction(transaction);
         assertNotNull(transaction.getId());
         Debug.println(INDENT, "testAddTransaction() Added: " + transaction);
@@ -214,10 +215,10 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     public void testAddTransactions() throws Exception {
         // this test assumes there are existing lot records with entity type = GERMPLSM
         List<Transaction> transactions = new ArrayList<Transaction>();
-        transactions.add(new Transaction(null, 1, manager.getLotsByEntityType("GERMPLSM", 0, 1).get(0)
-                , Integer.valueOf(20140413), 1, 200, "sample added transaction 1", null, null, null, 100, 1));
-        transactions.add(new Transaction(null, 1, manager.getLotsByEntityType("GERMPLSM", 0, 1).get(0)
-                , Integer.valueOf(20140518), 1, 300, "sample added transaction 2", null, null, null, 150, 1));
+        transactions.add(new Transaction(null, 1, manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0)
+                , Integer.valueOf(20140413), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1));
+        transactions.add(new Transaction(null, 1, manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0)
+                , Integer.valueOf(20140518), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1));
         manager.addTransactions(transactions);
         assertNotNull(transactions.get(0).getId());
         Debug.printObjects(INDENT, transactions);
@@ -403,7 +404,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 
     @Test
     public void testGenerateReportOnLotsByEntityType() throws Exception {
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         Debug.println(INDENT, "Balance Report on Lots by Entity Type: " + type);
         List<LotReportRow> report = manager.generateReportOnLotsByEntityType(type, 0, 10);
         Assert.assertTrue(report != null);
@@ -415,7 +416,7 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     @Test
     public void testGenerateReportOnLotsByEntityTypeAndEntityId() throws Exception {
         Debug.println(INDENT, "Balance Report on Lots by Entity Type and Entity ID:");
-        String type = "GERMPLSM";
+        String type = EntityType.GERMPLSM.name();
         List<Integer> entityIdList = new ArrayList<Integer>();
         entityIdList.add(50533);
         entityIdList.add(537652);

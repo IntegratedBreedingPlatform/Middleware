@@ -9,14 +9,15 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.ims;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Lot;
-import org.generationcp.middleware.pojos.Transaction;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
@@ -161,7 +162,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         return 0;
     }
 
-    public Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
+    public Double getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
         	if (lotId != null){
 	            Lot lot = getById(lotId, false);
@@ -170,15 +171,15 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 	            criteria.add(Restrictions.eq("lot", lot));
 	            // get only committed transactions
 	            criteria.add(Restrictions.eq("status", 1));
-	            return (Long) criteria.uniqueResult();
+	            return (Double) criteria.uniqueResult();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getActualLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(), e);
         }
-        return 0L;
+        return 0d;
     }
 
-    public Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
+    public Double getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
         	if (lotId != null){
 	            Lot lot = getById(lotId, false);
@@ -187,13 +188,13 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 	            criteria.add(Restrictions.eq("lot", lot));
 	            // get all non-cancelled transactions
 	            criteria.add(Restrictions.ne("status", 9));
-	            return (Long) criteria.uniqueResult();
+	            return (Double) criteria.uniqueResult();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getAvailableLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(),
                     e);
         }
-        return 0L;
+        return 0d;
     }
 
     @SuppressWarnings("unchecked")

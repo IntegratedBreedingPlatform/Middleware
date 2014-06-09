@@ -17,8 +17,10 @@ import java.util.List;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.Lot;
-import org.generationcp.middleware.pojos.LotsResult;
+import org.generationcp.middleware.pojos.ims.EntityType;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotsResult;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -58,8 +60,16 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
 
 	@Override
-	public LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId) throws MiddlewareQueryException {
-		List<Lot> lots = getLotBuilder().buildForSave(gids, locationId, scaleId, comment, userId);
+	public LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
+			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
+		
+		requireLocalDatabaseInstance();
+		
+		LotsResult result  = getLotBuilder().getGidsForUpdateAndAdd(gids, locationId, scaleId);
+		List<Integer> newGids = result.getGidsAdded();
+		
+		// Save lots
+		List<Lot> lots = getLotBuilder().build(newGids, locationId, scaleId, comment, userId, amount, sourceId);
 		List<Integer> lotIdsAdded = new ArrayList<Integer>();
 		try {
 			lotIdsAdded = getInventoryDataManager().addLots(lots);
@@ -71,27 +81,18 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 	    		logAndThrowException(e.getMessage(), e, LOG);
 	    	}
 		}
-		
-		List<Integer> gidsAdded = new ArrayList<Integer>();
-		if (lotIdsAdded != null) {
-			for (Lot lot : lots) {
-				if (lot.getId() != null && lotIdsAdded.contains(lot.getId())) {
-					gidsAdded.add(lot.getEntityId());
-				}
-			}
-		}
-		List<Integer> gidsNotAdded = new ArrayList<Integer>();
-		if (gids != null && !gids.isEmpty()) {
-			for (Integer gid : gids) {
-				if (!gidsAdded.contains(gid)) {
-					gidsNotAdded.add(gid);
-				}
-			}
-		}
-		LotsResult result = new LotsResult();
-		result.setGidsSkipped(gidsNotAdded);
-		result.setGidsProcessed(gidsAdded);
 		result.setLotIdsAdded(lotIdsAdded);
+		
+		// Update existing transactions - for existing gid/location/scale combination - add the supplied amount
+		List<Lot> existingLots = getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(EntityType.GERMPLSM.name(), gids, locationId, scaleId);
+
+		List<Transaction> transactionsForUpdate = getTransactionBuilder(). buildForUpdate(existingLots, amount);
+		getInventoryDataManager().updateTransactions(transactionsForUpdate);
+
+		// Add new transactions - for non-existing gid/location/scale combination
+		List<Transaction> transactionsForAdd = getTransactionBuilder(). buildForSave(lots, amount, userId, comment, sourceId);
+		getInventoryDataManager().addTransactions(transactionsForAdd);
+		
 		return result;
 	}
 	
