@@ -63,7 +63,7 @@ public class TransactionBuilder  extends Builder {
 		if (gids != null && !gids.isEmpty()){
 			for (Transaction transaction : existingTransactions){
 				if (gids.contains(transaction.getSourceRecordId())){
-					transaction.setQuantity(formatAmount(transaction.getQuantity() + amount));
+					transaction.setQuantity(formatAmount(amount));
 				}
 			}
 		}
