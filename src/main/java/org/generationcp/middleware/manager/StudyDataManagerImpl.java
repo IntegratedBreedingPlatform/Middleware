@@ -1078,28 +1078,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
         setWorkingDatabase(datasetId);
-        String factors = buildNonEditableFactorsList();
         if (getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0) {
             return true;
-        } else if (getStockDao().countStockObservations(datasetId, factors) > 0){
-            return true;
-        } else if (getExperimentPropertyDao().countExperimentPropObservations(datasetId, factors) > 0) {
-            return true;
-        }
+        } 
         return false;
-    }
-    
-    private String buildNonEditableFactorsList() {
-        StringBuilder factors = new StringBuilder();
-        int index = 0;
-        for (NonEditableFactors factor : NonEditableFactors.values()) {
-                if (index > 0) {
-                    factors.append(",");
-                }
-                factors.append(factor.getId());
-                index++;
-        }
-        return factors.toString();
     }
     
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
