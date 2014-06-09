@@ -254,7 +254,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         	
         	StringBuffer sql = new StringBuffer()
         		.append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-        		.append("tran.sourceid, tran.trnqty, lot.comment ")
+        		.append("tran.sourceid, tran.trnqty, lot.comments ")
         		.append("FROM ims_lot lot ")
         		.append("LEFT JOIN ims_transaction tran ON lot.lotid = tran.lotid ")
         		.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
