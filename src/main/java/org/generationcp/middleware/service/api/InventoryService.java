@@ -54,7 +54,8 @@ public interface InventoryService {
 	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException; 
 
 	/**
-	 * Used for creating Lot record(s).
+	 * Used for creating Lot record(s) in Fieldbook / Seed Storage Magement / Advancing. 
+	 * Updates the lots if the gids are already existing. Otherwise, new lot entries are added.
 	 * 
 	 * @param gids
 	 * @param locationId
@@ -66,7 +67,7 @@ public interface InventoryService {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId, 
+	LotsResult addAdvanceLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId, 
 			Double amount, Integer sourceId) throws MiddlewareQueryException;
 	
 }

@@ -215,4 +215,22 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         }
         return new ArrayList<Lot>();
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Lot> getByEntityTypeAndEntityIds(String type, List<Integer> entityIds) throws MiddlewareQueryException {
+        try {
+        	if (entityIds != null && !entityIds.isEmpty()){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.in("entityId", entityIds));
+	            return criteria.list();
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByEntityTypeAndEntityIds(type=" + type + ", entityIds=" + entityIds
+                    + ") query from Lot: " + e.getMessage(), e);
+        }
+        return new ArrayList<Lot>();
+    }
+
+
 }

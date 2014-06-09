@@ -54,33 +54,16 @@ public class TestInventoryServiceImpl extends TestOutputFormatter {
     		gids.add(i + ((int)(Math.random() * 1000)));
     	}
     	
-    	int locationId = 1; // + ((int)(Math.random() * 100));
+    	int locationId = 1 + ((int)(Math.random() * 1000));
     	int scaleId = 6090;
     	String comment = "No Comment";
     	int userId = 1;
     	double amount = 1.23456;
     	int listId = 1426;
-    	LotsResult result = inventoryService.addLots(gids, locationId, scaleId, comment, userId, amount, listId);
+    	LotsResult result = inventoryService.addAdvanceLots(gids, locationId, scaleId, comment, userId, amount, listId);
     	if (result != null) {
     		Debug.printFormattedObject(INDENT, result);
-//    		if (result.getGidsAdded() != null && !result.getGidsAdded().isEmpty()) {
-//	    		Debug.println("GIDs ADDED = " + result);
-//	    		for (Integer gid : result.getGidsAdded()) {
-//	    			System.out.print(gid + " ");
-//	    		}
-//	    		System.out.println();
-//	    	}
-//	    	else {
-//	    		System.out.println("NO LOT ADDED");
-//	    	}
-//    		
-//			if (result.getGidsUpdated() != null && !result.getGidsUpdated().isEmpty()) {
-//				System.out.println("GIDs SKIPPED ");
-//				for (Integer gid : result.getGidsUpdated()) {
-//					System.out.print(gid + " ");
-//				}
-//				System.out.println();
-//			}
     	}
+    	
     }
 }

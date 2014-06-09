@@ -38,6 +38,12 @@ public class LotBuilder extends Builder {
 		return lots;
 	}
 
+	public List<Lot> buildForUpdate(List<Integer> gids, Integer locationId, Integer scaleId, String comment) throws MiddlewareQueryException {
+		
+		List<Lot> lots = createLotsForUpdate(gids, locationId, scaleId, comment);
+		return lots;
+	}
+
 	public List<Lot> buildForSave(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
 			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
 		
@@ -84,13 +90,30 @@ public class LotBuilder extends Builder {
 		return lots;
 	}
 	
-	public LotsResult getGidsForUpdateAndAdd(List<Integer> gids, Integer locationId, Integer scaleId) 
+	private List<Lot> createLotsForUpdate(List<Integer> gids, Integer locationId, Integer scaleId, String comment) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		List<Lot> existingLots = getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
+
+        if (gids != null && !gids.isEmpty()) {
+        	
+			for (Lot lot : existingLots) {
+				lot.setLocationId(locationId);
+				lot.setScaleId(scaleId);
+				lot.setComments(comment);
+			}
+		}
+		
+		return existingLots;
+	}
+	
+	public LotsResult getGidsForUpdateAndAdd(List<Integer> gids) 
 			throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 
 		List<Integer> newGids = new ArrayList<Integer>();
 		
-		List<Lot> existingLots = getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(EntityType.GERMPLSM.name(), gids, locationId, scaleId);
+		List<Lot> existingLots = getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
+
 		List<Integer> gidsWithExistingCombi = new ArrayList<Integer>();
 		if (existingLots != null && !existingLots.isEmpty()) {
 			for (Lot lot : existingLots) {

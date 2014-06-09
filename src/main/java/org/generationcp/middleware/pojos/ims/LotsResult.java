@@ -20,6 +20,8 @@ public class LotsResult {
 
 	private List<Integer> lotIdsAdded;
 	
+	private List<Integer> lotIdsUpdated;
+	
 	private List<Integer> gidsUpdated;
 	
 	private List<Integer> gidsAdded;
@@ -30,6 +32,14 @@ public class LotsResult {
 
 	public void setLotIdsAdded(List<Integer> lotIdsAdded) {
 		this.lotIdsAdded = lotIdsAdded;
+	}
+
+	public List<Integer> getLotIdsUpdated() {
+		return lotIdsUpdated;
+	}
+
+	public void setLotIdsUpdated(List<Integer> lotIdsUpdated) {
+		this.lotIdsUpdated = lotIdsUpdated;
 	}
 
 	public List<Integer> getGidsUpdated() {
@@ -53,6 +63,8 @@ public class LotsResult {
 		StringBuilder builder = new StringBuilder();
 		builder.append("LotsResult [lotIdsAdded=");
 		builder.append(lotIdsAdded);
+		builder.append(", lotIdsUpdated=");
+		builder.append(lotIdsUpdated);
 		builder.append(", gidsUpdated=");
 		builder.append(gidsUpdated);
 		builder.append(", gidsAdded=");

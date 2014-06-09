@@ -254,7 +254,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         	
         	StringBuffer sql = new StringBuffer()
         		.append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-        		.append("tran.sourceid, tran.trnqty ")
+        		.append("tran.sourceid, tran.trnqty, lot.comment ")
         		.append("FROM ims_lot lot ")
         		.append("LEFT JOIN ims_transaction tran ON lot.lotid = tran.lotid ")
         		.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
@@ -273,15 +273,16 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		        	Integer scaleId = (Integer) row[4];
 		        	Integer sourceId = (Integer) row[5];
 		        	Double amount = (Double) row[6];
+		        	String comment = (String) row[7];
 		        	
 					inventoryDetails.add(new InventoryDetails(gid, null, lotId, locationId, null, 
-													userId, amount, sourceId, null, scaleId, null));
+													userId, amount, sourceId, null, scaleId, null, comment));
 	        	}
 	        }
 	        
 			for (Integer gid: gids){
 				if (!isGidInInventoryList(inventoryDetails, gid)){
-					inventoryDetails.add(new InventoryDetails(gid, null, null, null, null, null, null, null, null, null, null));
+					inventoryDetails.add(new InventoryDetails(gid, null, null, null, null, null, null, null, null, null, null, null));
 				}
 			}
 

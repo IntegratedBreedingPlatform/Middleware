@@ -17,7 +17,6 @@ import java.util.List;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotsResult;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -60,13 +59,14 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
 
 	@Override
-	public LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
+	public LotsResult addAdvanceLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
 			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
 		
 		requireLocalDatabaseInstance();
 		
-		LotsResult result  = getLotBuilder().getGidsForUpdateAndAdd(gids, locationId, scaleId);
+		LotsResult result  = getLotBuilder().getGidsForUpdateAndAdd(gids);
 		List<Integer> newGids = result.getGidsAdded();
+		List<Integer> existingGids = result.getGidsUpdated();
 		
 		// Save lots
 		List<Lot> lots = getLotBuilder().build(newGids, locationId, scaleId, comment, userId, amount, sourceId);
@@ -83,9 +83,23 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		}
 		result.setLotIdsAdded(lotIdsAdded);
 		
-		// Update existing transactions - for existing gid/location/scale combination - add the supplied amount
-		List<Lot> existingLots = getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(EntityType.GERMPLSM.name(), gids, locationId, scaleId);
+		// Update existing lots
+		List<Lot> existingLots = getLotBuilder().buildForUpdate(existingGids, locationId, scaleId, comment);
+		List<Integer> lotIdsUpdated = new ArrayList<Integer>();
+		try {
+			lotIdsUpdated = getInventoryDataManager().updateLots(existingLots);
+		} catch(MiddlewareQueryException e) {
+	    	if (e.getCause() != null && e.getCause() instanceof ConstraintViolationException) {
+	    		lotIdsUpdated = getInventoryDataManager().updateLots(lots); 	
+	    	}
+	    	else {
+	    		logAndThrowException(e.getMessage(), e, LOG);
+	    	}
+		}
+		result.setLotIdsUpdated(lotIdsUpdated);
+		
 
+		// Update existing transactions - for existing gids
 		List<Transaction> transactionsForUpdate = getTransactionBuilder(). buildForUpdate(existingLots, amount);
 		getInventoryDataManager().updateTransactions(transactionsForUpdate);
 
