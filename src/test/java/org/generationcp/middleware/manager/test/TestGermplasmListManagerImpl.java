@@ -18,6 +18,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataColumn;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
+import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
@@ -568,6 +569,19 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     public void testGetAdditionalColumnsForList() throws MiddlewareQueryException{
     	GermplasmListNewColumnsInfo listInfo = manager.getAdditionalColumnsForList(-14);
     	listInfo.print(0);
+    }
+    
+    @Test
+    public void testGetListDataWithInventory() throws MiddlewareQueryException{
+    	//TODO transform into a real test with assertions, test data etc
+		int listid = 18234; // wheat list
+		List<GermplasmListData> listEntries = manager.getGermplasmListDataWithInventoryByListId(listid, 0, Integer.MAX_VALUE);
+		for (GermplasmListData entry : listEntries){
+			ListDataInventory inventory = entry.getInventoryInfo();
+			if (inventory != null){
+				System.out.println(inventory);
+			}
+		}
     }
     
     

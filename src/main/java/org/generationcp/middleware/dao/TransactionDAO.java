@@ -11,8 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -306,6 +309,34 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         }    	
 
     	return inventoryDetails;
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(List<Integer> listEntryIds) throws MiddlewareQueryException{
+    	Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
+
+    	try {
+    		String sql = "SELECT recordid, count(lotid) " +
+    		"FROM ims_transaction " +
+    		"WHERE trnstat = 0 AND trnqty <= 0 AND recordid IN (:entryIds) " +
+    		"GROUP BY recordid " +
+    		"ORDER BY recordid ";
+    		Query query = getSession().createSQLQuery(sql)
+    		.setParameterList("entryIds", listEntryIds);
+    		List<Object[]> result = query.list();
+    		for (Object[] row : result) {
+    			Integer entryId = (Integer) row[0];
+    			BigInteger count = (BigInteger) row[1];
+    			
+    			lotCounts.put(entryId, count);
+    		}
+    		
+		} catch (Exception e) {
+			logAndThrowException("Error at countLotsWithReservationForListEntries=" + listEntryIds + " at TransactionDAO: " + e.getMessage(), e);
+		}
+			
+		return lotCounts;
     }
     
     private boolean isGidInInventoryList(List<InventoryDetails> inventoryDetails, Integer gid){

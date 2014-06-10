@@ -126,6 +126,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     				new Object[] {id, start, numOfRows},
     				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
     }
+    
+    @Override
+    public List<GermplasmListData> getGermplasmListDataWithInventoryByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
+    	return getListInventoryBuilder().retrieveInventoryForList(id, start, numOfRows);
+    }
+    
 
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
