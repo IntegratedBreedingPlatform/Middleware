@@ -63,6 +63,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -878,9 +879,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             //modify the folder name
             String name = project.getName() + "#" + Math.random();
             project.setName(name);
-            //delete the project_relationship
-            getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
             dmsProjectDao.saveOrUpdate(project);
+            getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
