@@ -39,11 +39,12 @@
         <mapping class="org.generationcp.middleware.pojos.UserDefinedField"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
-        <mapping class="org.generationcp.middleware.pojos.Lot"/>
-        <mapping class="org.generationcp.middleware.pojos.Transaction"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/>
         <mapping class="org.generationcp.middleware.pojos.Installation"/>
         <mapping class="org.generationcp.middleware.pojos.ListDataProperty"/>
+        
+        <mapping class="org.generationcp.middleware.pojos.ims.Lot"/>
+        <mapping class="org.generationcp.middleware.pojos.ims.Transaction"/>
 
         <mapping class="org.generationcp.middleware.pojos.gdms.AccMetadataSet"/>
         <mapping class="org.generationcp.middleware.pojos.gdms.AlleleValues"/>

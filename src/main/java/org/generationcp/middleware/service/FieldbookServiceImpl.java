@@ -1044,4 +1044,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		return id;
 	}
+	
+	@Override
+	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method, PhenotypicType role) 
+	throws MiddlewareQueryException {
+		MeasurementVariable variable = null;
+		StandardVariable standardVariable = null;
+		Integer id = getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
+		if (id != null) {
+			standardVariable = getStandardVariableBuilder().create(id);
+			return getMeasurementVariableTransformer().transform(standardVariable, false);
+		}
+		return variable;
+	}
 }

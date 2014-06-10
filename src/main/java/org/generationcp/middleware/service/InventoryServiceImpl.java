@@ -17,8 +17,9 @@ import java.util.List;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.Lot;
-import org.generationcp.middleware.pojos.LotsResult;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotsResult;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -29,8 +30,8 @@ import org.slf4j.LoggerFactory;
  *  
  */
 public class InventoryServiceImpl extends Service implements InventoryService {
-	
-	private Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
+    
+    private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     public InventoryServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -58,40 +59,54 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
 
 	@Override
-	public LotsResult addLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId) throws MiddlewareQueryException {
-		List<Lot> lots = getLotBuilder().buildForSave(gids, locationId, scaleId, comment, userId);
+	public LotsResult addAdvanceLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
+			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
+		
+		requireLocalDatabaseInstance();
+		
+		LotsResult result  = getLotBuilder().getGidsForUpdateAndAdd(gids);
+		List<Integer> newGids = result.getGidsAdded();
+		List<Integer> existingGids = result.getGidsUpdated();
+		
+		// Save lots
+		List<Lot> lots = getLotBuilder().build(newGids, locationId, scaleId, comment, userId, amount, sourceId);
 		List<Integer> lotIdsAdded = new ArrayList<Integer>();
 		try {
-			lotIdsAdded = getInventoryDataManager().addLot(lots);
+			lotIdsAdded = getInventoryDataManager().addLots(lots);
 		} catch(MiddlewareQueryException e) {
 	    	if (e.getCause() != null && e.getCause() instanceof ConstraintViolationException) {
-	        	lotIdsAdded = getInventoryDataManager().addIndividualLots(lots);	
+	        	lotIdsAdded = getInventoryDataManager().addLots(lots); 	
 	    	}
 	    	else {
 	    		logAndThrowException(e.getMessage(), e, LOG);
 	    	}
 		}
-		
-		List<Integer> gidsAdded = new ArrayList<Integer>();
-		if (lotIdsAdded != null) {
-			for (Lot lot : lots) {
-				if (lot.getId() != null && lotIdsAdded.contains(lot.getId())) {
-					gidsAdded.add(lot.getEntityId());
-				}
-			}
-		}
-		List<Integer> gidsNotAdded = new ArrayList<Integer>();
-		if (gids != null && !gids.isEmpty()) {
-			for (Integer gid : gids) {
-				if (!gidsAdded.contains(gid)) {
-					gidsNotAdded.add(gid);
-				}
-			}
-		}
-		LotsResult result = new LotsResult();
-		result.setGidsSkipped(gidsNotAdded);
-		result.setGidsProcessed(gidsAdded);
 		result.setLotIdsAdded(lotIdsAdded);
+		
+		// Update existing lots
+		List<Lot> existingLots = getLotBuilder().buildForUpdate(existingGids, locationId, scaleId, comment);
+		List<Integer> lotIdsUpdated = new ArrayList<Integer>();
+		try {
+			lotIdsUpdated = getInventoryDataManager().updateLots(existingLots);
+		} catch(MiddlewareQueryException e) {
+	    	if (e.getCause() != null && e.getCause() instanceof ConstraintViolationException) {
+	    		lotIdsUpdated = getInventoryDataManager().updateLots(lots); 	
+	    	}
+	    	else {
+	    		logAndThrowException(e.getMessage(), e, LOG);
+	    	}
+		}
+		result.setLotIdsUpdated(lotIdsUpdated);
+		
+
+		// Update existing transactions - for existing gids
+		List<Transaction> transactionsForUpdate = getTransactionBuilder(). buildForUpdate(existingLots, amount, comment);
+		getInventoryDataManager().updateTransactions(transactionsForUpdate);
+
+		// Add new transactions - for non-existing gid/location/scale combination
+		List<Transaction> transactionsForAdd = getTransactionBuilder(). buildForSave(lots, amount, userId, comment, sourceId);
+		getInventoryDataManager().addTransactions(transactionsForAdd);
+		
 		return result;
 	}
 	

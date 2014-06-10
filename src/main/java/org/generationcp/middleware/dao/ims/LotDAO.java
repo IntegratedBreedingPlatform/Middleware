@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.ims;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,9 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Lot;
-import org.generationcp.middleware.pojos.Transaction;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -165,7 +166,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         return 0;
     }
 
-    public Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
+    public Double getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
         	if (lotId != null){
 	            Lot lot = getById(lotId, false);
@@ -174,15 +175,15 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 	            criteria.add(Restrictions.eq("lot", lot));
 	            // get only committed transactions
 	            criteria.add(Restrictions.eq("status", 1));
-	            return (Long) criteria.uniqueResult();
+	            return (Double) criteria.uniqueResult();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getActualLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(), e);
         }
-        return 0L;
+        return 0d;
     }
 
-    public Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
+    public Double getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
         	if (lotId != null){
 	            Lot lot = getById(lotId, false);
@@ -191,26 +192,13 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 	            criteria.add(Restrictions.eq("lot", lot));
 	            // get all non-cancelled transactions
 	            criteria.add(Restrictions.ne("status", 9));
-	            return (Long) criteria.uniqueResult();
+	            return (Double) criteria.uniqueResult();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getAvailableLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(),
                     e);
         }
-        return 0L;
-    }
-
-    public void validateId(Lot lot) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-    	if (lot != null){
-	        Integer id = lot.getId();
-	        if (id != null && id.intValue() > 0) {
-	            logAndThrowException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
-	                    + "Attribute object to update must be a Local Record (ID must be negative)", new Throwable());
-	        }
-    	}else{
-    	    logAndThrowException("Error with validateId(lot=" + lot + "): lot is null)", new Throwable());
-        }
+        return 0d;
     }
 
     @SuppressWarnings("unchecked")
@@ -263,4 +251,22 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 			
 		return lotCounts;
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Lot> getByEntityTypeAndEntityIds(String type, List<Integer> entityIds) throws MiddlewareQueryException {
+        try {
+        	if (entityIds != null && !entityIds.isEmpty()){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.in("entityId", entityIds));
+	            return criteria.list();
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByEntityTypeAndEntityIds(type=" + type + ", entityIds=" + entityIds
+                    + ") query from Lot: " + e.getMessage(), e);
+        }
+        return new ArrayList<Lot>();
+    }
+
+
 }

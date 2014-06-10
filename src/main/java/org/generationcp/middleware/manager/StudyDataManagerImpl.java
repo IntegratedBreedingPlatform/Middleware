@@ -63,6 +63,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -878,9 +879,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             //modify the folder name
             String name = project.getName() + "#" + Math.random();
             project.setName(name);
-            //delete the project_relationship
-            getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
             dmsProjectDao.saveOrUpdate(project);
+            getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -1078,28 +1078,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
         setWorkingDatabase(datasetId);
-        String factors = buildNonEditableFactorsList();
         if (getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0) {
             return true;
-        } else if (getStockDao().countStockObservations(datasetId, factors) > 0){
-            return true;
-        } else if (getExperimentPropertyDao().countExperimentPropObservations(datasetId, factors) > 0) {
-            return true;
-        }
+        } 
         return false;
-    }
-    
-    private String buildNonEditableFactorsList() {
-        StringBuilder factors = new StringBuilder();
-        int index = 0;
-        for (NonEditableFactors factor : NonEditableFactors.values()) {
-                if (index > 0) {
-                    factors.append(",");
-                }
-                factors.append(factor.getId());
-                index++;
-        }
-        return factors.toString();
     }
     
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
