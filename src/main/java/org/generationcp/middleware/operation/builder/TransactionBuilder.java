@@ -47,7 +47,7 @@ public class TransactionBuilder  extends Builder {
 		return transactions;
 	}
 	
-	public List<Transaction> buildForUpdate(List<Lot> lots, Double amount) throws MiddlewareQueryException {
+	public List<Transaction> buildForUpdate(List<Lot> lots, Double amount, String comment) throws MiddlewareQueryException {
 		
 		requireLocalDatabaseInstance();
 		
@@ -64,6 +64,7 @@ public class TransactionBuilder  extends Builder {
 			for (Transaction transaction : existingTransactions){
 				if (gids.contains(transaction.getSourceRecordId())){
 					transaction.setQuantity(formatAmount(amount));
+					transaction.setComments(comment);
 				}
 			}
 		}

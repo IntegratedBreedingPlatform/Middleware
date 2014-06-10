@@ -100,7 +100,7 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		
 
 		// Update existing transactions - for existing gids
-		List<Transaction> transactionsForUpdate = getTransactionBuilder(). buildForUpdate(existingLots, amount);
+		List<Transaction> transactionsForUpdate = getTransactionBuilder(). buildForUpdate(existingLots, amount, comment);
 		getInventoryDataManager().updateTransactions(transactionsForUpdate);
 
 		// Add new transactions - for non-existing gid/location/scale combination
