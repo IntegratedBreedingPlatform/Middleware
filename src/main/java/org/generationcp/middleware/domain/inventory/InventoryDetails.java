@@ -62,6 +62,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The scale name. */
 	String scaleName;
 	
+	
 	String comment;
 	
 	String parentage; // listdata.grpname
@@ -94,7 +95,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public InventoryDetails(Integer gid, String germplasmName, Integer lotId,
 			Integer locationId, String locationName, Integer userId,
 			Double amount, Integer sourceId, String sourceName,
-			Integer scaleId, String scaleName) {
+			Integer scaleId, String scaleName, String comment) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.lotId = lotId;
@@ -106,6 +107,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.sourceName = sourceName;
 		this.scaleId = scaleId;
 		this.scaleName = scaleName;
+		this.comment = comment;
 	}
 
 	/**

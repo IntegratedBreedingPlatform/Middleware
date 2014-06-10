@@ -1,4 +1,4 @@
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.pojos.ims;
 
 public enum LotStatus {
 

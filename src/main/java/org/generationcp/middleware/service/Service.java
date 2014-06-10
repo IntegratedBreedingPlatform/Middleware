@@ -32,6 +32,7 @@ import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
@@ -129,6 +130,10 @@ public abstract class Service extends DatabaseBroker {
     
     protected final ExperimentDestroyer getExperimentDestroyer() {
     	return new ExperimentDestroyer(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final TransactionBuilder getTransactionBuilder() {
+    	return new TransactionBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
 }
