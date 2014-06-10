@@ -40,6 +40,7 @@ import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 
@@ -136,4 +137,8 @@ public abstract class Service extends DatabaseBroker {
     	return new TransactionBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
+	    return new MeasurementVariableTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
 }

@@ -100,4 +100,30 @@ public class MeasurementVariableTransformer extends Transformer {
 		
 		return list;
 	}
+
+	public MeasurementVariable transform(StandardVariable stdVariable, boolean isFactor) {
+		MeasurementVariable measurementVariable = null;
+		
+	    if (stdVariable != null) {
+            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+            
+            measurementVariable = new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), 
+                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+                    stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), "", 
+                    label);
+            measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+            measurementVariable.setFactor(isFactor);
+            measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+            measurementVariable.setPossibleValues(transformPossibleValues(stdVariable.getEnumerations()));
+            if (stdVariable.getConstraints() != null) {
+            	measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
+            	measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
+            }
+//            if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+//            	measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
+//            }
+	    }
+	    
+	    return measurementVariable;
+	}
 }

@@ -694,4 +694,16 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	Integer getProjectIdByName(String name) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the stanadard variale given the PSMR combination
+	 * @param property
+	 * @param scale
+	 * @param method
+	 * @param role
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method, PhenotypicType role) 
+			throws MiddlewareQueryException;
 }
