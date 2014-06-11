@@ -1209,12 +1209,12 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
     		
     	List<Object[]> value = manager.getPhenotypeIdsByLocationAndPlotNo(-26, -14, 101, cvTermIds);
     	
-    	for (Object[] val :value){
-    		System.out.println(val.toString());
-    	}
-    	
+    	assertNotNull(value);
     	
     	Debug.println(INDENT, "getPhenotypeIdsByLocationAndPlotNo Test");
+    	for (Object[] val :value){
+    		Debug.println(val.toString());
+    	}
     	
     	
     }
@@ -1235,6 +1235,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
     	outliers.add(phenotypeOutlier);
     	
     	manager.saveOrUpdatePhenotypeOutliers(outliers);
+    	
     	Debug.println(INDENT, "testSavePhenotypeOutlier Test");
     	
     	
