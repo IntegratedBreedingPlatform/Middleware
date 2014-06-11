@@ -1057,4 +1057,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		return variable;
 	}
+	
+	@Override
+	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+		return getDataSetBuilder().buildCompleteDataset(datasetId, false);
+	}
 }

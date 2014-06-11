@@ -706,4 +706,13 @@ public interface FieldbookService {
 	 */
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method, PhenotypicType role) 
 			throws MiddlewareQueryException;
+	
+	/**
+	 * Return the measurement rows of a given dataset.
+	 * @param datasetId
+	 * @param isTrial
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException;
 }
