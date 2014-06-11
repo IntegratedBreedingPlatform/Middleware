@@ -40,6 +40,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -574,6 +575,12 @@ public class DatabaseBroker {
     	PhenotypeDao phenotypeDao = new PhenotypeDao();
     	phenotypeDao.setSession(getActiveSession());
     	return phenotypeDao;
+    }
+    
+    protected final PhenotypeOutlierDao getPhenotypeOutlierDao() {
+    	PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
+    	phenotypeOutlierDao.setSession(getActiveSession());
+    	return phenotypeOutlierDao;
     }
 
     protected final ExperimentPhenotypeDao getExperimentPhenotypeDao() {
