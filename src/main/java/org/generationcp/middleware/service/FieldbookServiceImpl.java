@@ -318,8 +318,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 }
             }
             
-            applyDeletedObservations(workbook);
-            
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -982,27 +980,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, LOG);
         }
-	}
-	
-	private void applyDeletedObservations(Workbook workbook) throws MiddlewareQueryException {
-		if (workbook.getOriginalObservations() != null && !workbook.getOriginalObservations().isEmpty()) {
-			List<Integer> experimentIds = new ArrayList<Integer>();
-			for (MeasurementRow observation : workbook.getObservations()) {
-				if (observation.getExperimentId() < 0) {
-					experimentIds.add(observation.getExperimentId());
-				}
-			}
-			List<Integer> deletedExperimentIds = new ArrayList<Integer>();
-			for (MeasurementRow observation : workbook.getOriginalObservations()) {
-				if (!experimentIds.contains(observation.getExperimentId())) {
-					deletedExperimentIds.add(observation.getExperimentId());
-				}
-			}
-		
-			if (!deletedExperimentIds.isEmpty()) {
-				getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
-			}
-		}
 	}
 	
 	@Override
