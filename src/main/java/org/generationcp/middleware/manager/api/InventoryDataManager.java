@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
+import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
@@ -562,5 +564,48 @@ public interface InventoryDataManager{
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException; 
+	
+	/**
+	 * Returns lot rows and aggregate inventory data for given list entry
+     * 
+	 * @param listId
+	 * @param recordId
+	 * @param gid
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ListEntryLotDetails> getLotDetailsForListEntry(Integer listId, Integer recordId, Integer gid) throws MiddlewareQueryException;
+	
+	 
+    /**
+     * Returns the germplasm entries of given list id with lot rows and aggregate
+     * inventory data per entry
+     * 
+     * @param listId - id of list
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * 
+     * @return List of GermplasmListData POJOs
+     */
+	List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
+	
+	 
+    /**
+     * Returns the germplasm entries of given list id with lot counts  
+     * such as # of lots with available balance and # of lots with reserved seed per entry
+     * 
+     * @param listId - id of list
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * 
+     * @return List of GermplasmListData POJOs
+     */
+    List<GermplasmListData> getLotCountsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
 
 }

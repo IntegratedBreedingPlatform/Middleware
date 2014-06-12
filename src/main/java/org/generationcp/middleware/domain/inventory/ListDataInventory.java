@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * POJO for storing aggregate inventory data for specific
@@ -23,8 +24,11 @@ public class ListDataInventory implements Serializable {
 	
 	//number of lots with reserved amount for given list entry
 	private Integer reservedLotCount;
-
 	
+	//list of lots for germplasm
+	private List<ListEntryLotDetails> lotRows;
+
+
 	public ListDataInventory(Integer listDataId) {
 		super();
 		this.listDataId = listDataId;
@@ -66,6 +70,14 @@ public class ListDataInventory implements Serializable {
 
 	public void setReservedLotCount(Integer reservedLotCount) {
 		this.reservedLotCount = reservedLotCount;
+	}
+
+	public List<ListEntryLotDetails> getLotRows() {
+		return lotRows;
+	}
+
+	public void setLotRows(List<ListEntryLotDetails> lotRows) {
+		this.lotRows = lotRows;
 	}
 
 	@Override
@@ -129,6 +141,15 @@ public class ListDataInventory implements Serializable {
 		builder.append(actualInventoryLotCount);
 		builder.append(", reservedLotCount=");
 		builder.append(reservedLotCount);
+		if (lotRows != null){
+			builder.append(", lotCount = ");
+			builder.append(lotRows.size());
+			builder.append(", lots={");
+			for (ListEntryLotDetails lot : lotRows){
+				builder.append(lot);
+			}
+			builder.append("}");
+		}
 		builder.append("]");
 		return builder.toString();
 	}

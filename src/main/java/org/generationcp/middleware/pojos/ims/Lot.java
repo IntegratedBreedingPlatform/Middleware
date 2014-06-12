@@ -21,10 +21,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.inventory.LotAggregateData;
 
 /**
  * POJO for ims_lot table.
@@ -83,6 +85,9 @@ public class Lot implements Serializable{
 
     @OneToMany(mappedBy = "lot")
     private Set<Transaction> transactions = new HashSet<Transaction>();
+    
+    @Transient
+    private LotAggregateData aggregateData;
 
     public Lot() {
 
@@ -202,7 +207,15 @@ public class Lot implements Serializable{
         this.transactions = transactions;
     }
 
-    @Override
+    public LotAggregateData getAggregateData() {
+		return aggregateData;
+	}
+
+	public void setAggregateData(LotAggregateData aggregateData) {
+		this.aggregateData = aggregateData;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Lot [id=");

@@ -18,12 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
+import org.generationcp.middleware.domain.inventory.ListDataInventory;
+import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -32,6 +34,7 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -486,6 +489,35 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     	Integer listId = 1426;
     	List<InventoryDetails> result = manager.getInventoryDetailsByGermplasmList(listId);
     	Debug.printObjects(INDENT, result);
+    }
+    
+    @Test
+    public void testGetLotCountsForGermplasmList() throws MiddlewareQueryException{
+    	int listid = -543041; // wheat list
+		List<GermplasmListData> listEntries = manager.getLotCountsForList(listid, 0, Integer.MAX_VALUE);
+		for (GermplasmListData entry : listEntries){
+			ListDataInventory inventory = entry.getInventoryInfo();
+			if (inventory != null){
+				System.out.println(inventory);
+			}
+		}
+    }
+    
+    @Test
+    public void testGetLotsForGermplasmListEntry() throws MiddlewareQueryException{
+    	List<ListEntryLotDetails> lots = manager.getLotDetailsForListEntry(-543041, -507029, -88175);
+    	for (ListEntryLotDetails lot : lots){
+    		Debug.print(lot);
+    	}
+    }
+    
+    @Test
+    public void testGetLotsForGermplasmList() throws MiddlewareQueryException{
+    	List<GermplasmListData> listEntries = manager.getLotDetailsForList(-543041, 0, 500);
+    	for (GermplasmListData entry : listEntries){
+    		Debug.print("Id=" + entry.getId() + ", GID = " + entry.getGid());
+    		Debug.print(3, entry.getInventoryInfo());
+    	}
     }
     
     @AfterClass

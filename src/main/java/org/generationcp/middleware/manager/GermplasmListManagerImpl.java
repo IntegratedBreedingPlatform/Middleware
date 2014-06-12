@@ -127,10 +127,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
     }
     
-    @Override
-    public List<GermplasmListData> getGermplasmListDataWithInventoryByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-    	return getListInventoryBuilder().retrieveInventoryForList(id, start, numOfRows);
-    }
     
 
     @Override
@@ -631,6 +627,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     		return getListDataPropertyDAO().getPropertiesForList(listId);
     	}
     	return null;
-	} 
+	}
     
 }
