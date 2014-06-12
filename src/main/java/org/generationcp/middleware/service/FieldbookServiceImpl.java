@@ -318,8 +318,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 }
             }
             
-            applyDeletedObservations(workbook);
-            
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -984,27 +982,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
 	}
 	
-	private void applyDeletedObservations(Workbook workbook) throws MiddlewareQueryException {
-		if (workbook.getOriginalObservations() != null && !workbook.getOriginalObservations().isEmpty()) {
-			List<Integer> experimentIds = new ArrayList<Integer>();
-			for (MeasurementRow observation : workbook.getObservations()) {
-				if (observation.getExperimentId() < 0) {
-					experimentIds.add(observation.getExperimentId());
-				}
-			}
-			List<Integer> deletedExperimentIds = new ArrayList<Integer>();
-			for (MeasurementRow observation : workbook.getOriginalObservations()) {
-				if (!experimentIds.contains(observation.getExperimentId())) {
-					deletedExperimentIds.add(observation.getExperimentId());
-				}
-			}
-		
-			if (!deletedExperimentIds.isEmpty()) {
-				getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
-			}
-		}
-	}
-	
 	@Override
 	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
 	throws MiddlewareQueryException {
@@ -1056,5 +1033,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			return getMeasurementVariableTransformer().transform(standardVariable, false);
 		}
 		return variable;
+	}
+	
+	@Override
+	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+		return getDataSetBuilder().buildCompleteDataset(datasetId, false);
 	}
 }

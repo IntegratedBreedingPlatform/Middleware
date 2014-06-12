@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -141,4 +142,8 @@ public abstract class Service extends DatabaseBroker {
 	    return new MeasurementVariableTransformer(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
+    protected final DataSetBuilder getDataSetBuilder() {
+    	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }
