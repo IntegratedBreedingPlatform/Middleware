@@ -150,10 +150,10 @@ public class DataSetBuilder extends Builder {
 		if (variables != null) {
 			for (VariableType variable : variables.getVariableTypes()) {
 				boolean partOfHiddenDatasetColumns = HIDDEN_DATASET_COLUMNS.contains(variable.getId());
-				boolean isOccAndNursery = variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isNursery;
+				boolean isOccAndNurseryAndMeasurementDataset = variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isNursery && isMeasurementDataset;
 				boolean isMeasurementDatasetAndIsTrialFactors = isMeasurementDataset 
 						&& PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStandardVariable().getStoredIn().getId());
-				if (!partOfHiddenDatasetColumns && !isOccAndNursery && !isMeasurementDatasetAndIsTrialFactors) {
+				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors) {
 					newVariables.add(variable);
 				}
 			}
