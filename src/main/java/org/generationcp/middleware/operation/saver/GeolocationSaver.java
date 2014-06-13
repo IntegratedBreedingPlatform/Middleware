@@ -199,4 +199,32 @@ public class GeolocationSaver extends Saver {
 			geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 		}	
 	}
+	
+	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, 
+			VariableList variableList, MeasurementRow row, boolean isNursery) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		Geolocation geolocation = null;
+		
+		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+			String trialInstanceNumber = null;
+			for (Variable variable : variableList.getVariables()) {
+				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
+				String value = variable.getValue();				
+				if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+					trialInstanceNumber = value;
+					break;
+				}
+			}
+			if(isNursery && trialInstanceNumber==null) {
+				trialInstanceNumber = "1";
+			}
+			//check if existing
+			Integer locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+			geolocation = createOrUpdate(variableList, row, locationId);
+			geolocation.setDescription(trialInstanceNumber);
+			getGeolocationDao().saveOrUpdate(geolocation);
+			return geolocation;
+		}
+		return null;
+	}
 }

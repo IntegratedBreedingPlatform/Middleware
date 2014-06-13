@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -34,6 +35,8 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.workbench.DatasetType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.TimerWatch;
@@ -571,10 +574,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
         }
 
-        if (!isPlotExists(ontology, workbook.getFactors())) {
-            initializeIfNull(errors, Constants.MISSING_PLOT);
-            // DMV : TODO change implem so that backend is agnostic to UI when determining messages
-            errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
+        if(workbook.getImportType()==null || workbook.getImportType().intValue()==DataSetType.PLOT_DATA.getId()) {
+	        if (!isPlotExists(ontology, workbook.getFactors())) {
+	            initializeIfNull(errors, Constants.MISSING_PLOT);
+	            // DMV : TODO change implem so that backend is agnostic to UI when determining messages
+	            errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
+	        }
         }
 
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
@@ -705,17 +710,43 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             if (observationCount < maxNumOfIterations) {
                 maxNumOfIterations = observationCount;
             }
+            List<String> duplicateTrialInstances = new ArrayList<String>();
+            boolean isMeansDataImport = 
+            		workbook.getImportType()!=null && 
+            		workbook.getImportType().intValue()==DataSetType.MEANS_DATA.getId();
             for (int i = 0; i < maxNumOfIterations; i++) {
                 MeasurementRow row = workbook.getObservations().get(i);
                 trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
                 if (locationIds.add(trialInstanceNumber)) {
                     Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
                     if (locationId != null) {//same location and study
-                        initializeIfNull(errors, Constants.GLOBAL);
-                        errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", trialInstanceNumber));
+                    	duplicateTrialInstances.add(trialInstanceNumber);
                     }
                 }
             }
+            boolean hasDuplicateTrialInstances = false;
+            if(!duplicateTrialInstances.isEmpty() && workbook.getStudyId()!=null) {
+            	//check import type first
+            	List<Integer> variateIds = new ArrayList<Integer>();
+        		//check at least one variate
+        		variateIds.add(workbook.getVariates().get(0).getTermId());
+        		int numberOfVariatesData = 
+        				getPhenotypeDao().countVariatesDataOfStudy(
+        						isMeansDataImport?
+        								workbook.getMeansDatasetId():
+        								workbook.getMeasurementDatesetId(), 
+        						variateIds);
+        		if(numberOfVariatesData>0) {
+        			hasDuplicateTrialInstances = true;
+        		}          	
+            }
+            if(hasDuplicateTrialInstances) {
+            	for (String trialInstanceNo : duplicateTrialInstances) {
+            		initializeIfNull(errors, Constants.GLOBAL);
+                    errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", trialInstanceNo));
+				}
+            }
+            	
         }
     }
 
