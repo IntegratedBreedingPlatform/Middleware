@@ -654,68 +654,78 @@ public interface FieldbookService {
 	/**
 	 * Delete observations of study.
 	 *
-	 * @param studyId the study id
+	 * @param datasetId the dataset id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException;
 
 	/**
 	 * Get germplasms by name.
-	 * 
-	 * @param name
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param name the name
+	 * @return the germplasm ids by name
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException;
 	
 	/**
 	 * Add Germplasm Name.
-	 * 
-	 * @param nameValue
-	 * @param gid
-	 * @param userId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param nameValue the name value
+	 * @param gid the gid
+	 * @param userId the user id
+	 * @return the integer
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException;
 	
 	/**
 	 * Adds a new Germplasm.
-	 * @param nameValue
-	 * @param userId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param nameValue the name value
+	 * @param userId the user id
+	 * @return the integer
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException;
 	
 	/**
 	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
-	 * @param name
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param name the name
+	 * @return the project id by name
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer getProjectIdByName(String name) throws MiddlewareQueryException;
 	
 	/**
-	 * Returns the stanadard variale given the PSMR combination
-	 * @param property
-	 * @param scale
-	 * @param method
-	 * @param role
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Returns the stanadard variale given the PSMR combination.
+	 *
+	 * @param property the property
+	 * @param scale the scale
+	 * @param method the method
+	 * @param role the role
+	 * @return the measurement variable by property scale method and role
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method, PhenotypicType role) 
 			throws MiddlewareQueryException;
 	
 	/**
 	 * Return the measurement rows of a given dataset.
-	 * @param datasetId
-	 * @param isTrial
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param datasetId the dataset id
+	 * @param isTrial the is trial
+	 * @return the complete dataset
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException;
 	
-	 List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
+	/**
+	 * Gets the germplasm name types.
+	 *
+	 * @return the germplasm name types
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
 }
