@@ -1018,6 +1018,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
+	public Integer addGermplasm(Germplasm germplasm, Name name) throws MiddlewareQueryException {
+        return getGermplasmDataManager().addGermplasm(germplasm, name);
+	}
+	
+	@Override
 	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		Integer id = getDmsProjectDao().getProjectIdByName(name);

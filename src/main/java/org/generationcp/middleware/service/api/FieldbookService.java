@@ -699,6 +699,16 @@ public interface FieldbookService {
 	Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException;
 	
 	/**
+	 * Adds the germplasm.
+	 *
+	 * @param germplasm the germplasm
+	 * @param name the name
+	 * @return the integer
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Integer addGermplasm(Germplasm germplasm, Name name) throws MiddlewareQueryException;
+	
+	/**
 	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
 	 *
 	 * @param name the name
