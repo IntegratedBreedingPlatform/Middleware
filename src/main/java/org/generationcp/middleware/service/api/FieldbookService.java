@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.UserDefinedField;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -715,4 +716,6 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException;
+	
+	 List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
 }

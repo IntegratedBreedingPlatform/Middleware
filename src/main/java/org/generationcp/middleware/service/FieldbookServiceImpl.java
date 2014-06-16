@@ -66,6 +66,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -1038,5 +1039,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
 		return getDataSetBuilder().buildCompleteDataset(datasetId, false);
+	}
+	
+	@Override
+	public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
+	    return getGermplasmListManager().getGermplasmNameTypes();
 	}
 }
