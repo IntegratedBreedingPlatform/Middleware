@@ -85,6 +85,16 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
+	
+	/**
+	 * Adds a StandardVariable to the database.
+	 * Must provide the property, method, scale, dataType, and storedIn info.
+	 * Otherwise, it will throw an exception.
+	 *
+	 * @param stdVariable the std variable
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException;
 
 	
 	/**
@@ -560,4 +570,6 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
+
+	
 }
