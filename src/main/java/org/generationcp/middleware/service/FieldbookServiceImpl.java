@@ -962,8 +962,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
-	    return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+    public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+        return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+	}
+	
+    @Override
+	public int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+	    return getStudyDataManager().countVariatesWithData(datasetId, variateIds);
 	}
 	
 	@Override

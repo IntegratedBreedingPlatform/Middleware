@@ -41,7 +41,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -63,7 +62,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -1082,6 +1080,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return true;
         } 
         return false;
+    }
+    
+    @Override
+    public int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+    	int variatesWithDataCount = 0;
+    	if (variateIds != null && !variateIds.isEmpty()) {
+	        setWorkingDatabase(datasetId);
+	        Map<Integer, Integer> map = getPhenotypeDao().countVariatesDataOfStudy(datasetId);
+	        for (Integer variateId : variateIds) {
+	        	Integer count = map.get(variateId);
+	        	if (count != null && count > 0) {
+	        		variatesWithDataCount++;
+	        	}
+	        }
+    	}
+    	return variatesWithDataCount;
     }
     
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {

@@ -254,6 +254,8 @@ public class WorkbookBuilder extends Builder {
             	}
             }
             
+            workbook.setMeasurementDatesetId(dataSetId);
+            
             VariableTypeList variables = null;
             if (dataSetId != null) {
             	variables = getDataSetBuilder().getVariableTypes(dataSetId);

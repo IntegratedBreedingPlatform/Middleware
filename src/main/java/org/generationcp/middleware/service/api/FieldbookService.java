@@ -652,6 +652,15 @@ public interface FieldbookService {
 	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
 	
 	/**
+	 * Count the number of variates with data
+	 * @param datasetId
+	 * @param variateIds
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	
+	/**
 	 * Delete observations of study.
 	 *
 	 * @param datasetId the dataset id

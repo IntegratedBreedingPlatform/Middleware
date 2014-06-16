@@ -776,6 +776,35 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
         return 0;
     }
 
+	public Map<Integer, Integer> countVariatesDataOfStudy(Integer projectId) throws MiddlewareQueryException {
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+        try {
+            
+            StringBuilder sql = new StringBuilder();
+
+            sql.append("SELECT COUNT(p.phenotype_id), p.observable_id FROM phenotype p ")
+            .append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+            .append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
+            .append("WHERE e.project_id = ").append(projectId)
+            .append(" AND (p.value <> '' OR p.cvalue_id > 0) ")
+            .append(" GROUP BY p.observable_id ");
+            Query query = getSession().createSQLQuery(sql.toString());
+    
+            List<Object[]> result = query.list();
+            if (result != null) {
+            	for(Object[] row : result) {
+            		map.put((Integer) row[1], ((BigInteger) row[0]).intValue());
+            	}
+            }
+
+        } catch (HibernateException e) {
+                logAndThrowException(
+                        "Error at countVariatesDataOfStudy() query on PhenotypeDao: "
+                                + e.getMessage(), e);
+        }
+        return map;
+    }
+
 	public List<Phenotype> getByTypeAndValue(int typeId, String value, boolean isEnumeration) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
