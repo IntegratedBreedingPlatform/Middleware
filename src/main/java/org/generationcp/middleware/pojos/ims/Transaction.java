@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.pojos.ims;
 
 import java.io.Serializable;
 
@@ -60,7 +60,7 @@ public class Transaction implements Serializable{
 
     @Basic(optional = false)
     @Column(name = "trndate")
-    private Integer date;
+    private Integer transactionDate;
 
     @Basic(optional = false)
     @Column(name = "trnstat")
@@ -68,10 +68,15 @@ public class Transaction implements Serializable{
 
     @Basic(optional = false)
     @Column(name = "trnqty")
-    private Integer quantity;
+    private Double quantity;
 
     @Column(name = "comments")
     private String comments;
+
+    @Basic(optional = false)
+    @Column(name = "cmtdata")
+    private Integer commitmentDate;
+
 
     @Column(name = "sourcetype")
     private String sourceType;
@@ -83,7 +88,7 @@ public class Transaction implements Serializable{
     private Integer sourceRecordId;
 
     @Column(name = "prevamount")
-    private Integer previousAmount;
+    private Double previousAmount;
 
     @Column(name = "personid")
     private Integer personId;
@@ -96,16 +101,18 @@ public class Transaction implements Serializable{
         this.id = id;
     }
 
-    public Transaction(Integer id, Integer userId, Lot lot, Integer date, Integer status, Integer quantity, String comments,
-            String sourceType, Integer sourceId, Integer sourceRecordId, Integer previousAmount, Integer personId) {
+    public Transaction(Integer id, Integer userId, Lot lot, Integer transactionDate, Integer status, 
+    		Double quantity, String comments, Integer commitmentDate, String sourceType, Integer sourceId, 
+    		Integer sourceRecordId, Double previousAmount, Integer personId) {
         super();
         this.id = id;
         this.userId = userId;
         this.lot = lot;
-        this.date = date;
+        this.transactionDate = transactionDate;
         this.status = status;
         this.quantity = quantity;
         this.comments = comments;
+        this.commitmentDate = commitmentDate;
         this.sourceType = sourceType;
         this.sourceId = sourceId;
         this.sourceRecordId = sourceRecordId;
@@ -137,12 +144,12 @@ public class Transaction implements Serializable{
         this.lot = lot;
     }
 
-    public Integer getDate() {
-        return date;
+    public Integer getTransactionDate() {
+        return transactionDate;
     }
 
-    public void setDate(Integer date) {
-        this.date = date;
+    public void setTransactionDate(Integer transactionDate) {
+        this.transactionDate = transactionDate;
     }
 
     public Integer getStatus() {
@@ -153,11 +160,11 @@ public class Transaction implements Serializable{
         this.status = status;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 
@@ -167,6 +174,14 @@ public class Transaction implements Serializable{
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public Integer getCommitmentDate() {
+        return commitmentDate;
+    }
+
+    public void setCommitmentDate(Integer commitmentDate) {
+        this.commitmentDate = commitmentDate;
     }
 
     public String getSourceType() {
@@ -193,11 +208,11 @@ public class Transaction implements Serializable{
         this.sourceRecordId = sourceRecordId;
     }
 
-    public Integer getPreviousAmount() {
+    public Double getPreviousAmount() {
         return previousAmount;
     }
 
-    public void setPreviousAmount(Integer previousAmount) {
+    public void setPreviousAmount(Double previousAmount) {
         this.previousAmount = previousAmount;
     }
 
@@ -216,14 +231,16 @@ public class Transaction implements Serializable{
         builder.append(id);
         builder.append(", userId=");
         builder.append(userId);
-        builder.append(", date=");
-        builder.append(date);
+        builder.append(", transactionDate=");
+        builder.append(transactionDate);
         builder.append(", status=");
         builder.append(status);
         builder.append(", quantity=");
         builder.append(quantity);
         builder.append(", comments=");
         builder.append(comments);
+        builder.append(", commitmentDate=");
+        builder.append(commitmentDate);
         builder.append(", sourceType=");
         builder.append(sourceType);
         builder.append(", sourceId=");

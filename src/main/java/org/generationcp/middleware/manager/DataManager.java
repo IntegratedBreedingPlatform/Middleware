@@ -21,6 +21,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.FolderBuilder;
+import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -1183,5 +1184,9 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final GeolocationPropertySaver getGeolocationPropertySaver() {
     	return new GeolocationPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ListInventoryBuilder getListInventoryBuilder() {
+    	return new ListInventoryBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

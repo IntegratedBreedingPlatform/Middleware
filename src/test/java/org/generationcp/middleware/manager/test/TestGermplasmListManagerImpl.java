@@ -576,7 +576,6 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     	listInfo.print(0);
     }
     
-    
     @AfterClass
     public static void tearDown() throws Exception {
     	removeTestData();

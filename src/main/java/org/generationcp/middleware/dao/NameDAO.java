@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
@@ -279,7 +280,19 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         return toReturn;
     }
     
-    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getGidsByName(String name) throws MiddlewareQueryException {
+    	List<Integer> gids = new ArrayList<Integer>();
+    	try {
+    		String sql = "SELECT gid FROM names where nval = :name";
+    		Query query = getSession().createSQLQuery(sql).setParameter("name", name);
+    		return query.list();
+    		
+    	} catch (Exception e) {
+            logAndThrowException("Error with NameDAO.getGidsByName(" + name + ") " + e.getMessage(), e);
+    	}
+    	return gids;
+    }
     
     
 }

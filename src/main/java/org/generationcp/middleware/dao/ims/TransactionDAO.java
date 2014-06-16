@@ -9,15 +9,19 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.ims;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.LotStatus;
-import org.generationcp.middleware.pojos.Transaction;
+import org.generationcp.middleware.pojos.ims.LotStatus;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -32,28 +36,12 @@ import org.hibernate.criterion.Restrictions;
  */
 public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 
-    public void validateId(Transaction transaction) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-		if (transaction != null) {
-			Integer id = transaction.getId();
-			if (id != null && id.intValue() > 0) {
-				logAndThrowException("Error with validateId(transaction="
-						+ transaction
-						+ "): Cannot update a Central Database record. "
-						+ "Transaction object to update must be a Local Record (ID must be negative)", new Throwable());
-			}
-		} else {
-			logAndThrowException("Error with validateId(transaction="
-					+ transaction + "): transaction is null. ", new Throwable());
-		}
-    }
-
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllReserve(int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Transaction.class);
             criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+            criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -68,7 +56,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             Criteria criteria = getSession().createCriteria(Transaction.class);
             criteria.setProjection(Projections.rowCount());
             criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+            criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllReserve() query from Transaction: " + e.getMessage(), e);
@@ -81,7 +69,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Transaction.class);
             criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
+            criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -96,7 +84,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             Criteria criteria = getSession().createCriteria(Transaction.class);
             criteria.setProjection(Projections.rowCount());
             criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
+            criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllDeposit() query from Transaction: " + e.getMessage(), e);
@@ -110,7 +98,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         	if (personId != null){
 	            Criteria criteria = getSession().createCriteria(Transaction.class);
 	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-	            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
 	            criteria.add(Restrictions.eq("personId", personId));
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
@@ -129,7 +117,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 	            Criteria criteria = getSession().createCriteria(Transaction.class);
 	            criteria.setProjection(Projections.rowCount());
 	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-	            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
 	            criteria.add(Restrictions.eq("personId", personId));
 	            return ((Long) criteria.uniqueResult()).longValue(); 
         	}
@@ -146,7 +134,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         	if (personId != null){
 	            Criteria criteria = getSession().createCriteria(Transaction.class);
 	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-	            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
 	            criteria.add(Restrictions.eq("personId", personId));
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
@@ -165,7 +153,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 	            Criteria criteria = getSession().createCriteria(Transaction.class);
 	            criteria.setProjection(Projections.rowCount());
 	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-	            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.gt("quantity", Double.valueOf(0)));
 	            criteria.add(Restrictions.eq("personId", personId));
 	            return ((Long) criteria.uniqueResult()).longValue(); 
         	}
@@ -206,7 +194,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public List<Transaction> getAllWithdrawals(int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Transaction.class);
-            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+            criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -220,7 +208,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Transaction.class);
             criteria.setProjection(Projections.rowCount());
-            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+            criteria.add(Restrictions.lt("quantity", Double.valueOf(0)));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllWithdrawals() query from Transaction: " + e.getMessage(), e);
@@ -242,7 +230,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     }
 
     @SuppressWarnings("unchecked")
-    public List<Transaction> getLotWithMinimumAmount(long minAmount, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<Transaction> getLotWithMinimumAmount(double minAmount, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Query query = getSession().getNamedQuery(Transaction.GET_LOT_WITH_MINIMUM_AMOUNT);
             query.setFirstResult(start);
@@ -269,7 +257,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         	
         	StringBuffer sql = new StringBuffer()
         		.append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-        		.append("tran.sourceid, tran.trnqty ")
+        		.append("tran.sourceid, tran.trnqty, lot.comments ")
         		.append("FROM ims_lot lot ")
         		.append("LEFT JOIN ims_transaction tran ON lot.lotid = tran.lotid ")
         		.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
@@ -288,15 +276,16 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		        	Integer scaleId = (Integer) row[4];
 		        	Integer sourceId = (Integer) row[5];
 		        	Double amount = (Double) row[6];
+		        	String comment = (String) row[7];
 		        	
 					inventoryDetails.add(new InventoryDetails(gid, null, lotId, locationId, null, 
-													userId, amount, sourceId, null, scaleId, null));
+													userId, amount, sourceId, null, scaleId, null, comment));
 	        	}
 	        }
 	        
 			for (Integer gid: gids){
 				if (!isGidInInventoryList(inventoryDetails, gid)){
-					inventoryDetails.add(new InventoryDetails(gid, null, null, null, null, null, null, null, null, null, null));
+					inventoryDetails.add(new InventoryDetails(gid, null, null, null, null, null, null, null, null, null, null, null));
 				}
 			}
 
@@ -308,6 +297,34 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     	return inventoryDetails;
     }
     
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, BigInteger> countLotsWithReservationForListEntries(List<Integer> listEntryIds) throws MiddlewareQueryException{
+    	Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
+
+    	try {
+    		String sql = "SELECT recordid, count(lotid) " +
+    		"FROM ims_transaction " +
+    		"WHERE trnstat = 0 AND trnqty <= 0 AND recordid IN (:entryIds) " +
+    		"GROUP BY recordid " +
+    		"ORDER BY recordid ";
+    		Query query = getSession().createSQLQuery(sql)
+    		.setParameterList("entryIds", listEntryIds);
+    		List<Object[]> result = query.list();
+    		for (Object[] row : result) {
+    			Integer entryId = (Integer) row[0];
+    			BigInteger count = (BigInteger) row[1];
+    			
+    			lotCounts.put(entryId, count);
+    		}
+    		
+		} catch (Exception e) {
+			logAndThrowException("Error at countLotsWithReservationForListEntries=" + listEntryIds + " at TransactionDAO: " + e.getMessage(), e);
+		}
+			
+		return lotCounts;
+    }
+    
     private boolean isGidInInventoryList(List<InventoryDetails> inventoryDetails, Integer gid){
     	for (InventoryDetails detail: inventoryDetails){
     		if (detail.getGid().equals(gid)){
@@ -315,6 +332,45 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     		}
     	}
     	return false;
+    }
+    
+    
+//    @SuppressWarnings("unchecked")
+//    public List<Transaction> getByGids(List<Integer> gids) throws MiddlewareQueryException {
+//    	List<Transaction> transactions = new ArrayList<Transaction>();
+//    	
+//    	if (gids == null || gids.isEmpty()){
+//    		return transactions;
+//    	}
+//    	
+//        try {
+//                Criteria criteria = getSession().createCriteria(Transaction.class);
+//                criteria.add(Restrictions.in("sourceRecordId", gids));
+//                return criteria.list();
+//        } catch (HibernateException e) {
+//            logAndThrowException("Error with getByGids() query from Transaction: " + e.getMessage(), e);
+//        }
+//
+//    	return transactions;
+//    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Transaction> getByLotIds(List<Integer> lotIds) throws MiddlewareQueryException {
+    	List<Transaction> transactions = new ArrayList<Transaction>();
+    	
+    	if (lotIds == null || lotIds.isEmpty()){
+    		return transactions;
+    	}
+    	
+        try {
+                Criteria criteria = getSession().createCriteria(Transaction.class);
+                criteria.add(Restrictions.in("lot.id", lotIds));
+                return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByLotIds() query from Transaction: " + e.getMessage(), e);
+        }
+
+    	return transactions;
     }
     
 

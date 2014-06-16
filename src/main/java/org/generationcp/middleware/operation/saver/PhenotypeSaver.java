@@ -191,6 +191,9 @@ public class PhenotypeSaver extends Saver{
             if (value != null && !value.equals("")) {
                 phenotype.setcValue(Double.valueOf(value).intValue());
             }
+            else {
+            	phenotype.setcValue(null);
+            }
         }
         phenotype.setObservableId(variableId);
         phenotype.setUniqueName(phenotype.getPhenotypeId().toString());

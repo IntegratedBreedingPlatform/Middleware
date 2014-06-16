@@ -190,7 +190,20 @@ public class MeasurementData {
 			}
 		}
 		else {
-			return this.value;
+			if(this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null && this.getMeasurementVariable().getDataTypeDisplay().equalsIgnoreCase("N")){
+				if(this.value != null && !this.value.equalsIgnoreCase("")) {
+					int intVal = Double.valueOf(this.value).intValue();
+					double doubleVal = Double.valueOf(this.value);
+					if(intVal == doubleVal){
+						this.value = Integer.toString(intVal);
+						return this.value;
+					} else {
+						return this.value;
+					}
+				}
+			} else {
+				return this.value;
+			}
 		}
 		return "";
 	}

@@ -66,6 +66,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -317,8 +318,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 	}
                 }
             }
-            
-            applyDeletedObservations(workbook);
             
             trans.commit();
         } catch (Exception e) {
@@ -963,8 +962,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
-	    return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+    public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+        return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+	}
+	
+    @Override
+	public int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+	    return getStudyDataManager().countVariatesWithData(datasetId, variateIds);
 	}
 	
 	@Override
@@ -984,27 +988,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
 	}
 	
-	private void applyDeletedObservations(Workbook workbook) throws MiddlewareQueryException {
-		if (workbook.getOriginalObservations() != null && !workbook.getOriginalObservations().isEmpty()) {
-			List<Integer> experimentIds = new ArrayList<Integer>();
-			for (MeasurementRow observation : workbook.getObservations()) {
-				if (observation.getExperimentId() < 0) {
-					experimentIds.add(observation.getExperimentId());
-				}
-			}
-			List<Integer> deletedExperimentIds = new ArrayList<Integer>();
-			for (MeasurementRow observation : workbook.getOriginalObservations()) {
-				if (!experimentIds.contains(observation.getExperimentId())) {
-					deletedExperimentIds.add(observation.getExperimentId());
-				}
-			}
-		
-			if (!deletedExperimentIds.isEmpty()) {
-				getExperimentDestroyer().deleteExperimentsByIds(deletedExperimentIds);
-			}
-		}
-	}
-	
 	@Override
 	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList, List<MeasurementVariable> variateList)
 	throws MiddlewareQueryException {
@@ -1013,15 +996,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException {
-		List<Integer> ids = new ArrayList<Integer>();
-		int count = Long.valueOf(getGermplasmDataManager().countGermplasmByName(name, Operation.EQUAL)).intValue();
-		List<Germplasm> germplasms = getGermplasmDataManager().getGermplasmByName(name, 0, count, Operation.EQUAL);
-		if (germplasms != null && !germplasms.isEmpty()) {
-			for (Germplasm germplasm : germplasms) {
-				ids.add(germplasm.getGid());
-			}
-		}
-		return ids;
+		setWorkingDatabase(Database.LOCAL);
+		List<Integer> gids = getNameDao().getGidsByName(name);
+		setWorkingDatabase(Database.CENTRAL);
+		gids.addAll(getNameDao().getGidsByName(name));
+		return gids;
 	}
 	
 	@Override
@@ -1039,6 +1018,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
+	public Integer addGermplasm(Germplasm germplasm, Name name) throws MiddlewareQueryException {
+        return getGermplasmDataManager().addGermplasm(germplasm, name);
+	}
+	
+	@Override
 	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		Integer id = getDmsProjectDao().getProjectIdByName(name);
@@ -1047,5 +1031,28 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			id = getDmsProjectDao().getProjectIdByName(name);
 		}
 		return id;
+	}
+	
+	@Override
+	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method, PhenotypicType role) 
+	throws MiddlewareQueryException {
+		MeasurementVariable variable = null;
+		StandardVariable standardVariable = null;
+		Integer id = getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
+		if (id != null) {
+			standardVariable = getStandardVariableBuilder().create(id);
+			return getMeasurementVariableTransformer().transform(standardVariable, false);
+		}
+		return variable;
+	}
+	
+	@Override
+	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+		return getDataSetBuilder().buildCompleteDataset(datasetId, false);
+	}
+	
+	@Override
+	public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
+	    return getGermplasmListManager().getGermplasmNameTypes();
 	}
 }

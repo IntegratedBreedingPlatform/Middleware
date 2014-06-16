@@ -9,16 +9,23 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.ims;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Lot;
-import org.generationcp.middleware.pojos.Transaction;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -28,7 +35,21 @@ import org.hibernate.criterion.Restrictions;
  */
 public class LotDAO extends GenericDAO<Lot, Integer>{
 
-    @SuppressWarnings("unchecked")
+    private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1 " +
+	    					"FROM " +
+	    					"   (SELECT i.lotid, i.eid, scaleid, i.comments, " +
+	    					"       SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, " +
+	    					"       SUM(trnqty) AS available_balance " +
+	    					"      FROM ims_lot i " +
+	    					"      LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
+	    					"     WHERE i.status = 0 and i.eid  IN (:gids) " +
+	    					"     GROUP BY i.lotid" +
+	    					"   ) lot " +
+	    					" LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " +
+	    					"  AND trnstat = 0 and trnqty < 0 " +
+	    					"  AND sourceid = :listId and sourcetype = 'LIST' ";
+
+	@SuppressWarnings("unchecked")
     public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Lot.class);
@@ -161,7 +182,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         return 0;
     }
 
-    public Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
+    public Double getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
         	if (lotId != null){
 	            Lot lot = getById(lotId, false);
@@ -170,15 +191,15 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 	            criteria.add(Restrictions.eq("lot", lot));
 	            // get only committed transactions
 	            criteria.add(Restrictions.eq("status", 1));
-	            return (Long) criteria.uniqueResult();
+	            return (Double) criteria.uniqueResult();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getActualLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(), e);
         }
-        return 0L;
+        return 0d;
     }
 
-    public Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
+    public Double getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
         	if (lotId != null){
 	            Lot lot = getById(lotId, false);
@@ -187,26 +208,13 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 	            criteria.add(Restrictions.eq("lot", lot));
 	            // get all non-cancelled transactions
 	            criteria.add(Restrictions.ne("status", 9));
-	            return (Long) criteria.uniqueResult();
+	            return (Double) criteria.uniqueResult();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getAvailableLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(),
                     e);
         }
-        return 0L;
-    }
-
-    public void validateId(Lot lot) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-    	if (lot != null){
-	        Integer id = lot.getId();
-	        if (id != null && id.intValue() > 0) {
-	            logAndThrowException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
-	                    + "Attribute object to update must be a Local Record (ID must be negative)", new Throwable());
-	        }
-    	}else{
-    	    logAndThrowException("Error with validateId(lot=" + lot + "): lot is null)", new Throwable());
-        }
+        return 0d;
     }
 
     @SuppressWarnings("unchecked")
@@ -227,4 +235,150 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         }
         return new ArrayList<Lot>();
     }
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, BigInteger> countLotsWithAvailableBalance(List<Integer> gids) throws MiddlewareQueryException{
+    	Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
+
+    	try {
+    		String sql = "SELECT entity_id, count(lotid) FROM ( " +
+    						"SELECT i.lotid, i.eid AS entity_id, " +
+    						"   SUM(trnqty) AS avail_bal " +
+    						"  FROM ims_lot i " +
+    						"  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
+    						" WHERE i.status = 0 and i.eid  in (:gids) " +
+    						" GROUP BY i.lotid ) inv " +
+    					"WHERE avail_bal > 0 " +
+    					"GROUP BY entity_id;";
+    		
+    		Query query = getSession().createSQLQuery(sql)
+    		.setParameterList("gids", gids);
+    		List<Object[]> result = query.list();
+    		for (Object[] row : result) {
+    			Integer gid = (Integer) row[0];
+    			BigInteger count = (BigInteger) row[1];
+    			
+    			lotCounts.put(gid, count);
+    		}
+    		
+		} catch (Exception e) {
+			logAndThrowException("Error at countLotsWithAvailableBalance=" + gids + " at LotDAO: " + e.getMessage(), e);
+		}
+			
+		return lotCounts;
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    public List<Lot> getByEntityTypeAndEntityIds(String type, List<Integer> entityIds) throws MiddlewareQueryException {
+        try {
+        	if (entityIds != null && !entityIds.isEmpty()){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.in("entityId", entityIds));
+	            return criteria.list();
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByEntityTypeAndEntityIds(type=" + type + ", entityIds=" + entityIds
+                    + ") query from Lot: " + e.getMessage(), e);
+        }
+        return new ArrayList<Lot>();
+    }
+    
+    
+	public List<Lot> getLotAggregateDataForListEntry(Integer listId, Integer gid) throws MiddlewareQueryException{
+    	List<Lot> lots = new ArrayList<Lot>();
+    	
+    	try {
+    		String sql = GET_LOTS_FOR_LIST_ENTRIES + "ORDER by lot.lotid ";
+    		
+    		Query query = getSession().createSQLQuery(sql);
+    		query.setParameterList("gids", Collections.singletonList(gid));
+    		query.setParameter("listId", listId);
+    		
+    		createLotRows(lots, query);
+    		
+		} catch (Exception e) {
+			logAndThrowException("Error at getLotAggregateDataForListEntry for list ID = " + listId + 
+					" and GID = " + gid + " at LotDAO: " + e.getMessage(), e);
+		}
+		
+    	return lots;
+    }
+    
+	
+	public List<Lot> getLotAggregateDataForList(Integer listId, List<Integer> gids) throws MiddlewareQueryException{
+    	List<Lot> lots = new ArrayList<Lot>();
+    	
+    	try {
+    		String sql = GET_LOTS_FOR_LIST_ENTRIES + "ORDER by lot.eid ";
+    		
+    		Query query = getSession().createSQLQuery(sql);
+    		query.setParameterList("gids", gids);
+    		query.setParameter("listId", listId);
+    		
+    		createLotRows(lots, query);
+    		
+		} catch (Exception e) {
+			logAndThrowException("Error at getLotAggregateDataForListEntry for list ID = " + listId + 
+					" and GIDs = " + gids + " at LotDAO: " + e.getMessage(), e);
+		}
+		
+    	return lots;
+    }
+
+	@SuppressWarnings("unchecked")
+	private void createLotRows(List<Lot> lots, Query query) {
+		List<Object[]> result = query.list();
+		
+		Map<Integer, Double> reservationMap = null;
+		Lot lot = null;
+		
+		for (Object[] row : result) {
+			Integer lotId = (Integer) row[0];
+			if (lot == null || !lot.getId().equals(lotId)) {
+				if (lot != null && reservationMap != null){
+					lot.getAggregateData().setReservationMap(reservationMap);
+				}
+				Integer entityId = (Integer) row[1];
+				Integer scaleId = (Integer) row[2];
+				String comments = (String) row[3];
+				Double actualBalance = (Double) row[4];
+				Double availableBalance = (Double) row[5];
+
+				lot = new Lot(lotId);
+				lot.setEntityId(entityId);
+				lot.setScaleId(scaleId);
+				lot.setComments(comments);
+
+				LotAggregateData aggregateData = new LotAggregateData(lotId);
+				aggregateData.setActualBalance(actualBalance);
+				aggregateData.setAvailableBalance(availableBalance);
+				
+				reservationMap = new HashMap<Integer, Double>();
+				aggregateData.setReservationMap(reservationMap);
+				lot.setAggregateData(aggregateData);
+				
+				lots.add(lot);
+			}
+			
+			Integer recordId = (Integer) row[6];
+			Double qty = (Double) row[7];
+			if (recordId != null && qty != null){ // compute total reserved for entry
+				Double prevValue = reservationMap.get(recordId);
+				Double prevTotal = prevValue == null ? 0d : prevValue;
+				reservationMap.put(recordId, prevTotal + qty);
+			}
+			
+		}
+		
+		//set last lot's reservation map
+		if (lot != null && reservationMap != null){
+			lot.getAggregateData().setReservationMap(reservationMap);
+		}
+	}
+    
+    
+
+
 }

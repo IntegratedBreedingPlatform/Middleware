@@ -14,17 +14,11 @@ package org.generationcp.middleware.utils.test;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * The Class Debug. Used to print debug information. 
  */
 public class Debug {
     
-    
-    private static final Logger LOG = LoggerFactory.getLogger(Debug.class);
-
     private static StringBuffer printIndent(int indent){
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < indent; i++) {
@@ -42,11 +36,11 @@ public class Debug {
     public static void println(int indent, String s) {
         StringBuffer sb = printIndent(indent);
         sb.append(s);
-        if (LOG.isDebugEnabled()){
-            LOG.debug(sb.toString());
-        } else {
-            System.out.println(sb.toString());
-        }
+        System.out.println(sb.toString());
+    }
+
+    public static void println(String s) {
+        System.out.println(s);
     }
 
     /**
@@ -68,11 +62,7 @@ public class Debug {
     public static void print(int indent, String s) {
         StringBuffer sb = printIndent(indent);
         sb.append(s);
-        if (LOG.isDebugEnabled()){
-            LOG.debug(sb.toString());
-        } else {
-            System.out.print(sb.toString());
-        }
+        System.out.print(sb.toString());
     }
     
     /**
@@ -103,17 +93,9 @@ public class Debug {
             try {
                 println(indent + 3, field.getName() + " = "  + field.get(obj));
             } catch (IllegalArgumentException e) {
-                if (LOG.isDebugEnabled()){
-                    LOG.error(e.getMessage(), e);
-                } else {
-                    e.printStackTrace();
-                }
+                e.printStackTrace();
             } catch (IllegalAccessException e) {
-                if (LOG.isDebugEnabled()){
-                    LOG.error(e.getMessage(), e);
-                } else {
-                    e.printStackTrace();
-                }
+                e.printStackTrace();
             }
         }        
     }

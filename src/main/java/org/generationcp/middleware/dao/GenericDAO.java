@@ -228,6 +228,27 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
     
+    public Integer getPositiveId(String idName) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(getPersistentClass());
+            crit.setProjection(Projections.max(idName));
+            Integer maxId = (Integer) crit.uniqueResult();
+            if (maxId != null) {
+                if (maxId.intValue() <= 0) {
+                    maxId = Integer.valueOf(1);
+                } else {
+                    maxId = Integer.valueOf(maxId.intValue() + 1);
+                }
+            } else {
+                maxId = Integer.valueOf(1);
+            }
+
+            return maxId;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getPositiveId(idName=" + idName + "): " + e.getMessage(), e);
+        }
+    }
+    
     public static Integer getLastId(Session session, Database instance, String tableName, String idName) throws MiddlewareQueryException {
     	try {
     		String selectCol = (instance == Database.LOCAL ? "MIN" : "MAX") + "(" + idName + ")";

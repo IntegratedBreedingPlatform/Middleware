@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
+o * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
@@ -161,7 +161,7 @@ public interface GermplasmListManager{
      * @return List of GermplasmListData POJOs
      */
     List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException;
-
+    
     /**
      * Returns the number of germplasm list entries that belong to the list
      * identified by the given id.

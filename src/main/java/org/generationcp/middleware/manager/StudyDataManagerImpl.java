@@ -41,7 +41,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -878,9 +877,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             //modify the folder name
             String name = project.getName() + "#" + Math.random();
             project.setName(name);
-            //delete the project_relationship
-            getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
             dmsProjectDao.saveOrUpdate(project);
+            getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -1078,28 +1076,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
         setWorkingDatabase(datasetId);
-        String factors = buildNonEditableFactorsList();
         if (getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0) {
             return true;
-        } else if (getStockDao().countStockObservations(datasetId, factors) > 0){
-            return true;
-        } else if (getExperimentPropertyDao().countExperimentPropObservations(datasetId, factors) > 0) {
-            return true;
-        }
+        } 
         return false;
     }
     
-    private String buildNonEditableFactorsList() {
-        StringBuilder factors = new StringBuilder();
-        int index = 0;
-        for (NonEditableFactors factor : NonEditableFactors.values()) {
-                if (index > 0) {
-                    factors.append(",");
-                }
-                factors.append(factor.getId());
-                index++;
-        }
-        return factors.toString();
+    @Override
+    public int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+    	int variatesWithDataCount = 0;
+    	if (variateIds != null && !variateIds.isEmpty()) {
+	        setWorkingDatabase(datasetId);
+	        Map<Integer, Integer> map = getPhenotypeDao().countVariatesDataOfStudy(datasetId);
+	        for (Integer variateId : variateIds) {
+	        	Integer count = map.get(variateId);
+	        	if (count != null && count > 0) {
+	        		variatesWithDataCount++;
+	        	}
+	        }
+    	}
+    	return variatesWithDataCount;
     }
     
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {

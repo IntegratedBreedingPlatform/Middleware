@@ -476,6 +476,12 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
     	String name = "ROOT STUDY";
     	System.out.println("ID IS " + fieldbookService.getProjectIdByName(name));
     }
+    
+    @Test
+    public void testGetGidsByName() throws Exception {
+    	String name = "CG7";
+    	System.out.println("GIDS = " + fieldbookService.getGermplasmIdsByName(name));
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

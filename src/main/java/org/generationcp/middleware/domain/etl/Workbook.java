@@ -63,11 +63,14 @@ public class Workbook {
 	private Integer studyId;
 	private Integer trialDatasetId;
 	private Integer measurementDatesetId;
+	private Integer meansDatasetId;
 	
 	private List<MeasurementRow> trialObservations;
 	
 	private List<MeasurementRow> originalObservations;
 
+	private Integer importType;
+	
 	public void reset() {
 		trialHeaders = null;
 		trialVariables = null;
@@ -604,10 +607,11 @@ public class Workbook {
 		this.variableMap = variableMap;
 	}
 
-    public void populateStudyAndDatasetIds(int studyId, int trialDatasetId, int measurementDatasetId) {
+    public void populateStudyAndDatasetIds(int studyId, int trialDatasetId, int measurementDatasetId, int meansDatasetId) {
     	this.studyId = studyId;
     	this.trialDatasetId = trialDatasetId;
     	this.measurementDatesetId = measurementDatasetId;
+    	this.meansDatasetId = meansDatasetId;
     }
 
 	public Integer getStudyId() {
@@ -774,5 +778,24 @@ public class Workbook {
 	public void setOriginalObservations(List<MeasurementRow> originalObservations) {
 		this.originalObservations = originalObservations;
 	}
+
+	public Integer getImportType() {
+		return importType;
+	}
+
+	public void setImportType(Integer importType) {
+		this.importType = importType;
+	}
+
+	public Integer getMeansDatasetId() {
+		return meansDatasetId;
+	}
+
+	public void setMeansDatasetId(Integer meansDatasetId) {
+		this.meansDatasetId = meansDatasetId;
+	}
+	
+	
+	
 	
 }

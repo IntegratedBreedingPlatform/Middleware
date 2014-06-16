@@ -104,4 +104,9 @@ public abstract class Builder extends DatabaseBroker {
     protected final OntologyDataManager getOntologyDataManager() {
         return new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
+
+    protected final WorkbookBuilder getWorkbookBuilder() {
+    	return new WorkbookBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }

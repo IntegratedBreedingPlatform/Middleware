@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.pojos.ims;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -19,14 +19,14 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.inventory.LotAggregateData;
 
 /**
  * POJO for ims_lot table.
@@ -77,15 +77,17 @@ public class Lot implements Serializable{
     @Column(name = "status")
     private Integer status;
 
-    @ManyToOne(targetEntity = Lot.class)
-    @JoinColumn(name = "sourceid", nullable = true)
-    private Lot source;
+    @Column(name = "sourceid")
+    private Integer sourceId;
 
     @Column(name = "comments")
     private String comments;
 
     @OneToMany(mappedBy = "lot")
     private Set<Transaction> transactions = new HashSet<Transaction>();
+    
+    @Transient
+    private LotAggregateData aggregateData;
 
     public Lot() {
 
@@ -97,7 +99,7 @@ public class Lot implements Serializable{
     }
 
     public Lot(Integer id, Integer userId, String entityType, Integer entityId, Integer locationId, 
-    		Integer scaleId, Integer status, String comments) {
+    		Integer scaleId, Integer status, Integer sourceId, String comments) {
         super();
         this.id = id;
         this.userId = userId;
@@ -106,7 +108,23 @@ public class Lot implements Serializable{
         this.locationId = locationId;
         this.scaleId = scaleId;
         this.status = status;
+        this.sourceId = sourceId;
         this.comments = comments;
+    }
+    
+    public Lot(Integer id, Integer userId, String entityType, Integer entityId, Integer locationId, 
+    		Integer scaleId, Integer status, Integer sourceId, String comments, Set<Transaction> transactions) {
+        super();
+        this.id = id;
+        this.userId = userId;
+        this.entityType = entityType;
+        this.entityId = entityId;
+        this.locationId = locationId;
+        this.scaleId = scaleId;
+        this.status = status;
+        this.sourceId = sourceId;
+        this.comments = comments;
+        this.transactions = transactions;        
     }
 
     public Integer getId() {
@@ -165,12 +183,12 @@ public class Lot implements Serializable{
         this.status = status;
     }
 
-    public Lot getSource() {
-        return source;
+    public Integer getSource() {
+        return sourceId;
     }
 
-    public void setSource(Lot source) {
-        this.source = source;
+    public void setSource(Integer sourceId) {
+        this.sourceId = sourceId;
     }
 
     public String getComments() {
@@ -189,7 +207,15 @@ public class Lot implements Serializable{
         this.transactions = transactions;
     }
 
-    @Override
+    public LotAggregateData getAggregateData() {
+		return aggregateData;
+	}
+
+	public void setAggregateData(LotAggregateData aggregateData) {
+		this.aggregateData = aggregateData;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Lot [id=");
@@ -206,8 +232,8 @@ public class Lot implements Serializable{
 		builder.append(scaleId);
 		builder.append(", status=");
 		builder.append(status);
-		builder.append(", source.id=");
-		builder.append(source != null ? source.getId() : null);
+		builder.append(", sourceId=");
+		builder.append(sourceId);
 		builder.append(", comments=");
 		builder.append(comments);
 		builder.append(", transactions=");
