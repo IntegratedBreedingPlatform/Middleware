@@ -37,7 +37,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 
     private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1 " +
 	    					"FROM " +
-	    					"   (SELECT i.lotid, i.eid, scaleid, i.comments, " +
+	    					"   (SELECT i.lotid, i.eid, i.locid, scaleid, i.comments, " +
 	    					"       SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, " +
 	    					"       SUM(trnqty) AS available_balance " +
 	    					"      FROM ims_lot i " +
@@ -341,13 +341,15 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 					lot.getAggregateData().setReservationMap(reservationMap);
 				}
 				Integer entityId = (Integer) row[1];
-				Integer scaleId = (Integer) row[2];
-				String comments = (String) row[3];
-				Double actualBalance = (Double) row[4];
-				Double availableBalance = (Double) row[5];
+				Integer locationId = (Integer) row[2];
+				Integer scaleId = (Integer) row[3];
+				String comments = (String) row[4];
+				Double actualBalance = (Double) row[5];
+				Double availableBalance = (Double) row[6];
 
 				lot = new Lot(lotId);
 				lot.setEntityId(entityId);
+				lot.setLocationId(locationId);
 				lot.setScaleId(scaleId);
 				lot.setComments(comments);
 
@@ -362,8 +364,8 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 				lots.add(lot);
 			}
 			
-			Integer recordId = (Integer) row[6];
-			Double qty = (Double) row[7];
+			Integer recordId = (Integer) row[7];
+			Double qty = (Double) row[8];
 			if (recordId != null && qty != null){ // compute total reserved for entry
 				Double prevValue = reservationMap.get(recordId);
 				Double prevTotal = prevValue == null ? 0d : prevValue;

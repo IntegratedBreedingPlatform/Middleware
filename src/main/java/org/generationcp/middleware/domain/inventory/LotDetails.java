@@ -116,8 +116,12 @@ public class LotDetails implements Serializable{
         builder.append(availableLotBalance);
         builder.append(", reservedTotal=");
         builder.append(reservedTotal);
+        builder.append(", locationId=");
+        builder.append(locId);
         builder.append(", locationOfLot=");
         builder.append(locationOfLot);
+        builder.append(", scaleId=");
+        builder.append(scaleId);
         builder.append(", scaleOfLot=");
         builder.append(scaleOfLot);
         builder.append(", commentOfLot=");

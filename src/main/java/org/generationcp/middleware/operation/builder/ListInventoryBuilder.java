@@ -2,17 +2,22 @@ package org.generationcp.middleware.operation.builder;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
+import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.domain.inventory.util.LotTransformer;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 
 public class ListInventoryBuilder extends Builder {
@@ -92,9 +97,9 @@ public class ListInventoryBuilder extends Builder {
 			List<Lot> lots = getLotDao().getLotAggregateDataForList(listId, gids);
 			
 			// add to each list entry related lot information
-			LotTransformer.extractLotRowsForList(listEntries, lots);
+			List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
+			setLocationsAndScales(lotRows);
 			
-			//TODO perform one-off retrieve for scales and locations - NOT per lot
 		}
     	
 		return listEntries;
@@ -107,7 +112,7 @@ public class ListInventoryBuilder extends Builder {
 		if (setWorkingDatabase(Database.LOCAL)){
 			List<Lot> lots = getLotDao().getLotAggregateDataForListEntry(listId, gid);
 			lotRows = LotTransformer.extractLotDetailsForListEntry(lots, recordId);
-			//TODO perform one-off retrieve for scales and locations - NOT per lot
+			setLocationsAndScales(lotRows);
 			
 		}
 		return lotRows;
@@ -148,6 +153,130 @@ public class ListInventoryBuilder extends Builder {
 				}
 			}
 		}
+	}
+	
+	/*
+	 * Perform one-retrieval for central/local scales and central/local locations
+	 * for list of lots
+	 */
+	private void setLocationsAndScales(List<? extends LotDetails> lots) throws MiddlewareQueryException{
+		
+		List<Integer> negativeLocationIds = new ArrayList<Integer>();
+		List<Integer> positiveLocationIds = new ArrayList<Integer>();
+		List<Integer> negativeScaleIds = new ArrayList<Integer>();
+		List<Integer> positiveScaleIds = new ArrayList<Integer>();
+		Map<Integer, List<LotDetails>> scaleLotMap = new HashMap<Integer, List<LotDetails>>();
+		Map<Integer, List<LotDetails>> locationLotMap = new HashMap<Integer, List<LotDetails>>();
+		
+		createScaleAndLocationMaps(lots, negativeLocationIds,	positiveLocationIds, negativeScaleIds, positiveScaleIds,
+				scaleLotMap, locationLotMap);
+		
+		System.out.println(negativeLocationIds);
+		List<Location> allLocations = new ArrayList<Location>();
+		List<Term> allScales = new ArrayList<Term>();
+		queryLocationsAndScalesFromDatabase(negativeLocationIds, positiveLocationIds, negativeScaleIds, positiveScaleIds, 
+				allLocations, allScales);
+		
+		for (Location location : allLocations){
+			List<LotDetails> lotList = locationLotMap.get(location.getLocid());
+			for (LotDetails lot : lotList){
+				lot.setLocationOfLot(location);
+			}
+		}
+		
+		for (Term scale : allScales){
+			List<LotDetails> lotList = scaleLotMap.get(scale.getId());
+			for (LotDetails lot : lotList){
+				lot.setScaleOfLot(scale);
+			}
+		}
+	}
+
+	// create maps of scale/location IDs to lots for easier setting of Terms and Locations
+	private void createScaleAndLocationMaps(List<? extends LotDetails> lots,
+			List<Integer> negativeLocationIds,
+			List<Integer> positiveLocationIds, List<Integer> negativeScaleIds,
+			List<Integer> positiveScaleIds,
+			Map<Integer, List<LotDetails>> scaleLotMap,
+			Map<Integer, List<LotDetails>> locationLotMap) {
+		
+		for (LotDetails lot : lots){
+			Integer locationId = lot.getLocId();
+			List<LotDetails> lotList = locationLotMap.get(locationId);
+			if (lotList != null){
+				lotList.add(lot);
+			} else {
+				List<LotDetails> listLot = new ArrayList<LotDetails>();
+				listLot.add(lot);
+				locationLotMap.put(locationId, listLot); 
+			}
+			if (locationId < 0){
+				negativeLocationIds.add(locationId);
+			} else {
+				positiveLocationIds.add(locationId);
+			}
+			
+			Integer scaleId = lot.getScaleId();
+			if (scaleLotMap.get(scaleId) != null){
+				scaleLotMap.get(scaleId).add(lot);
+			} else {
+				List<LotDetails> listLot = new ArrayList<LotDetails>();
+				listLot.add(lot);
+				scaleLotMap.put(scaleId, listLot); 
+			}
+			if (scaleId < 0){
+				negativeScaleIds.add(scaleId);
+			} else {
+				positiveScaleIds.add(scaleId);
+			}
+		}
+		
+	}
+
+	private void queryLocationsAndScalesFromDatabase(
+			List<Integer> negativeLocationIds,
+			List<Integer> positiveLocationIds, List<Integer> negativeScaleIds,
+			List<Integer> positiveScaleIds, List<Location> allLocations,
+			List<Term> allScales) throws MiddlewareQueryException {
+		
+		List<Location> localLocations = new ArrayList<Location>();
+		List<Location> centralLocations = new ArrayList<Location>();
+		List<Term> localScales = new ArrayList<Term>();
+		List<Term> centralScales = new ArrayList<Term>();
+		
+		if (!negativeLocationIds.isEmpty() || !negativeScaleIds.isEmpty()){
+			setWorkingDatabase(Database.LOCAL);
+			
+			if (!negativeLocationIds.isEmpty()){
+				localLocations = getLocationDao().getByIds(negativeLocationIds);
+			}
+			
+			if (!negativeScaleIds.isEmpty()){
+				List<CVTerm> cvTerms = getCvTermDao().getByIds(negativeScaleIds);
+				for (CVTerm cvTerm : cvTerms){
+					localScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
+				}
+			}
+		}
+		
+		if (!positiveLocationIds.isEmpty() || !positiveScaleIds.isEmpty()){
+			setWorkingDatabase(Database.CENTRAL);
+			
+			if (!positiveLocationIds.isEmpty()){
+				centralLocations = getLocationDao().getByIds(positiveLocationIds);
+			}
+			
+			if (!positiveScaleIds.isEmpty()){
+				List<CVTerm> cvTerms = getCvTermDao().getByIds(positiveScaleIds);
+				for (CVTerm cvTerm : cvTerms){
+					centralScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
+				}
+			}
+		}
+		allLocations.addAll(localLocations);
+		allLocations.addAll(centralLocations);
+		allScales.addAll(localScales);
+		allScales.addAll(centralScales);
 	}
 
 }
