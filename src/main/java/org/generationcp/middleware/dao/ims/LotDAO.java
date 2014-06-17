@@ -252,7 +252,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     						"   SUM(trnqty) AS avail_bal " +
     						"  FROM ims_lot i " +
     						"  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
-    						" WHERE i.status = 0 and i.eid  in (:gids) " +
+    						" WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " +
     						" GROUP BY i.lotid ) inv " +
     					"WHERE avail_bal > 0 " +
     					"GROUP BY entity_id;";

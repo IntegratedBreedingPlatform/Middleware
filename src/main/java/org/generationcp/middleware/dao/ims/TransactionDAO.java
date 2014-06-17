@@ -303,9 +303,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     	Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
 
     	try {
-    		String sql = "SELECT recordid, count(lotid) " +
-    		"FROM ims_transaction " +
+    		String sql = "SELECT recordid, count(t.lotid) " +
+    		"FROM ims_transaction t " +
+    		"INNER JOIN ims_lot l ON l.lotid = t.lotid " +
     		"WHERE trnstat = 0 AND trnqty <= 0 AND recordid IN (:entryIds) " +
+    		"  AND l.status = 0 AND l.etype = 'GERMPLSM' " +
     		"GROUP BY recordid " +
     		"ORDER BY recordid ";
     		Query query = getSession().createSQLQuery(sql)
