@@ -21,6 +21,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
+import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -525,6 +526,15 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     	int gid = -644052;
 		Integer count = manager.countLotsWithAvailableBalanceForGermplasm(gid);
     	Debug.print("GID=" + gid + ", lotCount=" + count);
+    }
+    
+    @Test
+    public void testGetLotsForGermplasm() throws MiddlewareQueryException{
+    	int gid = -644052;
+		List<LotDetails> lots = manager.getLotDetailsForGermplasm(gid);
+		for (LotDetails lot : lots){
+			System.out.println(lot);
+		}
     }
     
     @AfterClass

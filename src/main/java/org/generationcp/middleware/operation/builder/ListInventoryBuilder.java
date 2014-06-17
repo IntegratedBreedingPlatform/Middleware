@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -78,6 +77,17 @@ public class ListInventoryBuilder extends Builder {
 		}
 		
 		return lotCount; 
+	}
+
+	public List<LotDetails> retrieveInventoryLotsForGermplasm(Integer gid) throws MiddlewareQueryException{
+		List<LotDetails> lotDetails = null;
+		if (setWorkingDatabase(Database.LOCAL)){
+			List<Lot> lots = getLotDao().getLotAggregateDataForGermplasm(gid);
+			lotDetails = LotTransformer.extraLotDetails(lots);
+			setLocationsAndScales(lotDetails);
+		}
+		
+		return lotDetails;
 	}
 	
 	
@@ -186,7 +196,6 @@ public class ListInventoryBuilder extends Builder {
 		createScaleAndLocationMaps(lots, negativeLocationIds,	positiveLocationIds, negativeScaleIds, positiveScaleIds,
 				scaleLotMap, locationLotMap);
 		
-		System.out.println(negativeLocationIds);
 		List<Location> allLocations = new ArrayList<Location>();
 		List<Term> allScales = new ArrayList<Term>();
 		queryLocationsAndScalesFromDatabase(negativeLocationIds, positiveLocationIds, negativeScaleIds, positiveScaleIds, 

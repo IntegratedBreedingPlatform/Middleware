@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
+import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -600,6 +601,15 @@ public interface InventoryDataManager{
 	 * @throws MiddlewareQueryException
 	 */
 	Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException;
+	
+	/**
+	 * Return list of lots with aggregate inventory information for given germplasm 
+	 * 
+	 * @param gid
+	 * @return
+	 * @throws MiddlewareQueryException.List<GermplasmListData>
+	 */
+	List<LotDetails> getLotDetailsForGermplasm(Integer gid) throws MiddlewareQueryException;
 	
     /**
      * Returns the germplasm entries of given list id with lot counts  

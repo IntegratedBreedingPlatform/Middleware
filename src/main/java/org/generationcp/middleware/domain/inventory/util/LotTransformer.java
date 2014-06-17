@@ -8,6 +8,7 @@ import java.util.Map;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
+import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 
@@ -101,6 +102,40 @@ public class LotTransformer {
 			}
 			
 		}
+		return returnLotRows;
+	}
+	
+	/**
+	 * Transform Lot objects to LotDetails objects
+	 * 
+	 * @param lots
+	 * @return
+	 */
+	public static List<LotDetails> extraLotDetails(List<Lot> lots){
+		List<LotDetails> returnLotRows = null;
+		
+		if (lots != null){
+			returnLotRows = new ArrayList<LotDetails>();
+
+			for (Lot lot : lots){
+				LotDetails lotDetails = new LotDetails();
+				lotDetails.setLotId(lot.getId());
+				lotDetails.setLocId(lot.getLocationId());
+				lotDetails.setScaleId(lot.getScaleId());
+				lotDetails.setEntityIdOfLot(lot.getEntityId());
+				lotDetails.setCommentOfLot(lot.getComments());
+				
+				LotAggregateData aggregateData = lot.getAggregateData();
+				if (aggregateData != null){
+					lotDetails.setActualLotBalance(aggregateData.getActualBalance());
+					lotDetails.setAvailableLotBalance(aggregateData.getAvailableBalance());
+					lotDetails.setReservedTotal(aggregateData.getReservedTotal());
+				}
+				
+				returnLotRows.add(lotDetails);
+			}
+		}
+		
 		return returnLotRows;
 	}
 
