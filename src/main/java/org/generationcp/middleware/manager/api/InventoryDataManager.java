@@ -592,7 +592,15 @@ public interface InventoryDataManager{
      */
 	List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
 	
-	 
+	/**
+	 *  Gets number of lots with available balance for germplasm
+	 *  
+	 * @param gid
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException;
+	
     /**
      * Returns the germplasm entries of given list id with lot counts  
      * such as # of lots with available balance and # of lots with reserved seed per entry

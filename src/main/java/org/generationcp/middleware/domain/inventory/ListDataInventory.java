@@ -1,7 +1,5 @@
 package org.generationcp.middleware.domain.inventory;
 
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * POJO for storing aggregate inventory data for specific
@@ -10,34 +8,15 @@ import java.util.List;
  * @author Darla Ani
  *
  */
-public class ListDataInventory implements Serializable {
+public class ListDataInventory extends GermplasmInventory  {
 	
 	private static final long serialVersionUID = -8594381810347667269L;
 
 	private Integer listDataId;
-	
-	//gid needs to be redundant for easier access to imslot info
-	private Integer gid;
-	
-	//number of lots with actual inventory available for given germplasm
-	private Integer actualInventoryLotCount;
-	
-	//number of lots with reserved amount for given list entry
-	private Integer reservedLotCount;
-	
-	//list of lots for germplasm
-	private List<ListEntryLotDetails> lotRows;
 
-
-	public ListDataInventory(Integer listDataId) {
-		super();
-		this.listDataId = listDataId;
-	}
-	
 	public ListDataInventory(Integer listDataId, Integer gid) {
-		super();
+		super(gid);
 		this.listDataId = listDataId;
-		this.gid = gid;
 	}
 
 	public Integer getListDataId() {
@@ -48,104 +27,22 @@ public class ListDataInventory implements Serializable {
 		this.listDataId = listDataId;
 	}
 
-	public Integer getGid() {
-		return gid;
-	}
-
-	public void setGid(Integer gid) {
-		this.gid = gid;
-	}
-
-	public Integer getActualInventoryLotCount() {
-		return actualInventoryLotCount;
-	}
-
-	public void setActualInventoryLotCount(Integer actualInventoryLotCount) {
-		this.actualInventoryLotCount = actualInventoryLotCount;
-	}
-
-	public Integer getReservedLotCount() {
-		return reservedLotCount;
-	}
-
-	public void setReservedLotCount(Integer reservedLotCount) {
-		this.reservedLotCount = reservedLotCount;
-	}
-
-	public List<ListEntryLotDetails> getLotRows() {
-		return lotRows;
-	}
-
-	public void setLotRows(List<ListEntryLotDetails> lotRows) {
-		this.lotRows = lotRows;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime
-				* result
-				+ ((actualInventoryLotCount == null) ? 0
-						: actualInventoryLotCount.hashCode());
-		result = prime * result + ((gid == null) ? 0 : gid.hashCode());
-		result = prime * result
-				+ ((listDataId == null) ? 0 : listDataId.hashCode());
-		result = prime
-				* result
-				+ ((reservedLotCount == null) ? 0 : reservedLotCount.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ListDataInventory other = (ListDataInventory) obj;
-		if (actualInventoryLotCount == null) {
-			if (other.actualInventoryLotCount != null)
-				return false;
-		} else if (!actualInventoryLotCount
-				.equals(other.actualInventoryLotCount))
-			return false;
-		if (gid == null) {
-			if (other.gid != null)
-				return false;
-		} else if (!gid.equals(other.gid))
-			return false;
-		if (listDataId == null) {
-			if (other.listDataId != null)
-				return false;
-		} else if (!listDataId.equals(other.listDataId))
-			return false;
-		if (reservedLotCount == null) {
-			if (other.reservedLotCount != null)
-				return false;
-		} else if (!reservedLotCount.equals(other.reservedLotCount))
-			return false;
-		return true;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ListDataInventory [listDataId=");
 		builder.append(listDataId);
 		builder.append(", gid=");
-		builder.append(gid);
+		builder.append(getGid());
 		builder.append(", actualInventoryLotCount=");
-		builder.append(actualInventoryLotCount);
+		builder.append(getActualInventoryLotCount());
 		builder.append(", reservedLotCount=");
-		builder.append(reservedLotCount);
-		if (lotRows != null){
+		builder.append(getReservedLotCount());
+		if (getLotRows() != null){
 			builder.append(", lotCount = ");
-			builder.append(lotRows.size());
+			builder.append(getLotRows().size());
 			builder.append(", lots={");
-			for (ListEntryLotDetails lot : lotRows){
+			for (LotDetails lot : getLotRows()) {
 				builder.append(lot);
 			}
 			builder.append("}");

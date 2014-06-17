@@ -520,6 +520,13 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     	}
     }
     
+    @Test
+    public void testGetLotCountsForGermplasm() throws MiddlewareQueryException{
+    	int gid = -644052;
+		Integer count = manager.countLotsWithAvailableBalanceForGermplasm(gid);
+    	Debug.print("GID=" + gid + ", lotCount=" + count);
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

@@ -943,4 +943,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
     	return getListInventoryBuilder().retrieveLotCountsForListEntries(id, start, numOfRows);
     }
+
+	@Override
+	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid)
+			throws MiddlewareQueryException {
+		return getListInventoryBuilder().countLotsWithAvailableBalanceForGermplasm(gid);
+	}
+
 }

@@ -2,10 +2,12 @@ package org.generationcp.middleware.operation.builder;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -64,6 +66,20 @@ public class ListInventoryBuilder extends Builder {
     	
 		return listEntries;
 	}
+	
+	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException{
+		Integer lotCount = null;
+		if (setWorkingDatabase(Database.LOCAL)){
+			Map<Integer, BigInteger> lotCounts = getLotDao().countLotsWithAvailableBalance(Collections.singletonList(gid));
+			BigInteger lotCountBigInt = lotCounts.get(gid);
+			if (lotCounts != null && lotCountBigInt != null){
+				lotCount = lotCountBigInt.intValue();
+			}
+		}
+		
+		return lotCount; 
+	}
+	
 	
 	/**
 	 * Return list of GermplasmListData objects for given list with
@@ -125,7 +141,6 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	private void retrieveAvailableBalLotCounts(List<GermplasmListData> listEntries, List<Integer> gids) throws MiddlewareQueryException{
 		Map<Integer, BigInteger> lotCounts = getLotDao().countLotsWithAvailableBalance(gids);
-		Debug.print(0, gids);
 		for (GermplasmListData entry : listEntries){
 			ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null ){

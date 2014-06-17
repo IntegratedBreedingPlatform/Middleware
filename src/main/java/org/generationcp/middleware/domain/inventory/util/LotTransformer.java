@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.report.LotReportRow;
 
 public class LotTransformer {
 	
