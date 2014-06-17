@@ -66,6 +66,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -961,8 +962,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
-	    return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+    public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+        return getStudyDataManager().checkIfStudyHasMeasurementData(datasetId, variateIds);
+	}
+	
+    @Override
+	public int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
+	    return getStudyDataManager().countVariatesWithData(datasetId, variateIds);
 	}
 	
 	@Override
@@ -1012,6 +1018,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
+	public Integer addGermplasm(Germplasm germplasm, Name name) throws MiddlewareQueryException {
+        return getGermplasmDataManager().addGermplasm(germplasm, name);
+	}
+	
+	@Override
 	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		Integer id = getDmsProjectDao().getProjectIdByName(name);
@@ -1038,5 +1049,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
 		return getDataSetBuilder().buildCompleteDataset(datasetId, false);
+	}
+	
+	@Override
+	public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
+	    return getGermplasmListManager().getGermplasmNameTypes();
 	}
 }

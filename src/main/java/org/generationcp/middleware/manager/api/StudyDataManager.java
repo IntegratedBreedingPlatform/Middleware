@@ -751,4 +751,13 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+    
+    /**
+     * Count the number of variates with recorded data.
+     * @param datasetId
+     * @param variateIds
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
 }
