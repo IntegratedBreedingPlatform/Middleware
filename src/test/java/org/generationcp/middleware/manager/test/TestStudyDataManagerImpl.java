@@ -1226,10 +1226,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
     	List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
     	PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
     	//phenotypeOutlier.setPhenotypeOutlierId(-1);
-    	phenotypeOutlier.setObservableId(1);
     	phenotypeOutlier.setPhenotypeId(1);
-    	phenotypeOutlier.setPlotNo(1);
-    	phenotypeOutlier.setProjectId(1);
     	phenotypeOutlier.setValue("hello");
     	
     	outliers.add(phenotypeOutlier);

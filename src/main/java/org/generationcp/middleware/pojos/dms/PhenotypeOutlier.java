@@ -41,19 +41,6 @@ public class PhenotypeOutlier implements Serializable {
     @Column(name="phenotype_id")
 	private Integer phenotypeId;
     
-	// References cvterm
-	@Basic(optional = false)
-    @Column(name="observable_id")
-	private Integer observableId;
-    
-	@Basic(optional = false)
-    @Column(name="plot_no")
-	private Integer plotNo;
-    
-    @Basic(optional = false)
-    @Column(name="project_id")
-	private Integer projectId;
-
 	@Column(name = "value")
 	private String value;
 	
@@ -71,9 +58,6 @@ public class PhenotypeOutlier implements Serializable {
 			String value) {
 		this.setPhenotypeOutlierId(phenotypeOutlierId);
 		this.setPhenotypeId(phenotypeId);
-		this.setObservableId(observableId);
-		this.setPlotNo(plotNo);
-		this.setProjectId(projectId);
 		this.setValue(value);
 	}
 	
@@ -93,9 +77,6 @@ public class PhenotypeOutlier implements Serializable {
 		int result = 1;
 		result = prime * result + ((phenotypeOutlierId == null) ? 0 : phenotypeOutlierId.hashCode());
 		result = prime * result + ((phenotypeId == null) ? 0 : phenotypeId.hashCode());
-		result = prime * result + ((observableId == null) ? 0 : observableId.hashCode());
-		result = prime * result + ((plotNo == null) ? 0 : plotNo.hashCode());
-		result = prime * result + ((projectId == null) ? 0 : projectId.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -121,25 +102,7 @@ public class PhenotypeOutlier implements Serializable {
 				return false;
 		} else if (!phenotypeId.equals(other.phenotypeId))
 			return false;
-		
-		if (observableId == null) {
-			if (other.observableId != null)
-				return false;
-		} else if (!observableId.equals(other.observableId))
-			return false;
-		
-		
-		if (plotNo == null) {
-			if (other.plotNo != null)
-				return false;
-		} else if (!plotNo.equals(other.plotNo))
-			return false;
-		
-		if (projectId == null) {
-			if (other.projectId != null)
-				return false;
-		} else if (!projectId.equals(other.projectId))
-			return false;
+	
 		
 		if (value == null) {
 			if (other.value != null)
@@ -158,12 +121,6 @@ public class PhenotypeOutlier implements Serializable {
 		builder.append(getPhenotypeOutlierId());
 		builder.append(", phenotypeId=");
 		builder.append(getPhenotypeId());
-		builder.append(", observableId=");
-		builder.append(getObservableId());
-		builder.append(", plotNo=");
-		builder.append(getPlotNo());
-		builder.append(", projectId=");
-		builder.append(getProjectId());
 		builder.append(", value=");
 		builder.append(getValue());
 		builder.append("]");
@@ -178,36 +135,6 @@ public class PhenotypeOutlier implements Serializable {
 
 	public void setPhenotypeId(Integer phenotypeId) {
 		this.phenotypeId = phenotypeId;
-	}
-
-
-	public Integer getObservableId() {
-		return observableId;
-	}
-
-
-	public void setObservableId(Integer observableId) {
-		this.observableId = observableId;
-	}
-
-
-	public Integer getPlotNo() {
-		return plotNo;
-	}
-
-
-	public void setPlotNo(Integer plotNo) {
-		this.plotNo = plotNo;
-	}
-
-
-	public Integer getProjectId() {
-		return projectId;
-	}
-
-
-	public void setProjectId(Integer projectId) {
-		this.projectId = projectId;
 	}
 
 
