@@ -33,6 +33,31 @@ public class MBDTGenerationDAO extends GenericDAO<MBDTGeneration, Integer> {
         return generation;
     }
 
+    public MBDTGeneration getByNameAndProjectID(String name, Integer projectID) throws MiddlewareQueryException {
+
+        try {
+            MBDTGeneration generation = null;
+
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria
+                    .add(Restrictions.eq("generationName", name))
+                    .add(Restrictions.eq("project.projectID", projectID));
+
+            Object obj = criteria.uniqueResult();
+
+            if (obj == null) {
+                return null;
+            } else {
+                generation = (MBDTGeneration) obj;
+            }
+
+            return generation;
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getByNameAndProjectID query on MBDTGenerationDAO: " + e.getMessage(), e);
+            return null;
+        }
+    }
+
     public List<MBDTGeneration> getByProjectID(Integer projectID) throws MiddlewareQueryException {
         Criteria crit = getSession().createCriteria(getPersistentClass());
 

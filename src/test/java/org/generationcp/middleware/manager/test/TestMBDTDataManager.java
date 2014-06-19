@@ -219,6 +219,74 @@ public class TestMBDTDataManager
     }
 
     @Test
+    public void testGetAllProjects() throws Exception {
+        // set up dummy data in database
+        Connection conn = null;
+        Statement stmt = null;
+
+        try {
+            insertSampleProjectData();
+
+            List<MBDTProjectData> dataList = dut.getAllProjects();
+
+            assertNotNull(dataList);
+
+            assertTrue(dataList.size() == 1);
+
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        } finally {
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, null);
+        }
+    }
+
+    @Test
+    public void testGetProjectByNamePositive() throws Exception {
+        // set up dummy data in database
+        Connection conn = null;
+        Statement stmt = null;
+
+        try {
+            insertSampleProjectData();
+
+            Integer projectID = dut.getProjectIDByProjectName(SAMPLE_PROJECT_NAME);
+
+            assertNotNull(projectID);
+
+            assertEquals(SAMPLE_PROJECT_ID, projectID);
+
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        } finally {
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, null);
+        }
+    }
+
+    @Test
+    public void testGetProjectByNameNegative() throws Exception {
+        // set up dummy data in database
+        Connection conn = null;
+        Statement stmt = null;
+
+        try {
+            insertSampleProjectData();
+
+            Integer projectID = dut.getProjectIDByProjectName("non existent project name");
+
+            assertNull(projectID);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        } finally {
+            deleteSampleProjectData();
+            closeDatabaseResources(conn, stmt, null);
+        }
+    }
+
+    @Test
     public void testAddGeneration() throws Exception {
 
         // check the database for correct retrieval
@@ -284,6 +352,41 @@ public class TestMBDTDataManager
         }
     }
 
+    @Test
+    public void testGetGenerationByNameAndProjectIDPositive() throws Exception {
+        try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+            Integer generationID = dut.getGenerationIDByGenerationName(SAMPLE_GENERATION_NAME, SAMPLE_PROJECT_ID);
+
+            assertNotNull(generationID);
+            assertTrue(SAMPLE_GENERATION_ID == generationID);
+        } catch (MiddlewareQueryException e) {
+            fail(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+        }
+    }
+
+    @Test
+    public void testGetGenerationByNameAndProjectIDNegative() throws Exception {
+        try {
+            insertSampleProjectData();
+            insertSampleGenerationData();
+            Integer generationID = dut.getGenerationIDByGenerationName("non existent generation name", SAMPLE_PROJECT_ID);
+
+            assertNull(generationID);
+        } catch (MiddlewareQueryException e) {
+            fail(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            deleteSampleGenerationData();
+            deleteSampleProjectData();
+        }
+    }
+
 
     // added a test case for retrieving multiple generations
     @Test
@@ -292,7 +395,7 @@ public class TestMBDTDataManager
             insertSampleProjectData();
             insertSampleGenerationData();
 
-            List<MBDTGeneration> generations = dut.getGenerations(SAMPLE_PROJECT_ID);
+            List<MBDTGeneration> generations = dut.getAllGenerations(SAMPLE_PROJECT_ID);
 
             assertNotNull(generations);
             assertTrue(generations.size() == 1);
@@ -580,13 +683,13 @@ public class TestMBDTDataManager
             stmt = conn.createStatement();
             rs = stmt.executeQuery("SELECT count(*) as genotypeCount from mbdt_selected_genotypes");
 
-            assert(rs.next());
+            assert (rs.next());
             int genotypeCount = rs.getInt("genotypeCount");
 
             dut.setSelectedAccessions(SAMPLE_GENERATION_ID, gidList);
 
             rs = stmt.executeQuery("SELECT count(*) as genotypeCount from mbdt_selected_genotypes");
-            assert(rs.next());
+            assert (rs.next());
 
             assertEquals(genotypeCount, rs.getInt("genotypeCount"));
 
