@@ -1055,4 +1055,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
 	    return getGermplasmListManager().getGermplasmNameTypes();
 	}
+	
+	@Override
+	public Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException {
+		Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+		
+		setWorkingDatabase(Database.CENTRAL);
+		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		setWorkingDatabase(Database.LOCAL);
+		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		
+		return map;
+	}
 }

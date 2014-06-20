@@ -747,4 +747,12 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
+	
+	/**
+	 * Returns a map of Gid, and list of Names
+	 * @param gids
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException;
 }
