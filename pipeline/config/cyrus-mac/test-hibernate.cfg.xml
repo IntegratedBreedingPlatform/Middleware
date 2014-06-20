@@ -103,6 +103,7 @@
   <mapping class="org.generationcp.middleware.pojos.dms.StockModel"/>
   <mapping class="org.generationcp.middleware.pojos.dms.StockProperty"/>
   <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.PhenotypeOutlier"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentPhenotype"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProject"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>

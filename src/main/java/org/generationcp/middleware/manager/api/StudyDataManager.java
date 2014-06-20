@@ -752,7 +752,7 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
-<<<<<<< HEAD
+
     
     /**
      * Count the number of variates with recorded data.
@@ -762,7 +762,7 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
-=======
+
 
     /**
      * Check if study has measurement data.
@@ -798,5 +798,5 @@ public interface StudyDataManager{
      */
 	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers)
 			throws MiddlewareQueryException;
->>>>>>> remotes/origin/GCP-8783_Outlier_Changes
+
 }
