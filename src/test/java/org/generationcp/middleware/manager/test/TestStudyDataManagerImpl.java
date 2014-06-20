@@ -62,6 +62,7 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
@@ -1192,6 +1193,49 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
         List<FolderReference> tree = manager.getFolderTree();
         Debug.println(INDENT, "GetFolderTree Test");
         printFolderTree(tree, 1);
+    }
+    
+    @Test
+    public void testGetPhenotypeIdsByLocationAndPlotNo() throws Exception{
+    	
+    	
+    	List<Integer> cvTermIds = new ArrayList<Integer>();
+    	
+    	DataSet dataSet = manager.getDataSet(-26);
+    	
+		for (VariableType vType: dataSet.getVariableTypes().getVariates().getVariableTypes()){
+			cvTermIds.add(vType.getStandardVariable().getId());
+		}
+    		
+    	List<Object[]> value = manager.getPhenotypeIdsByLocationAndPlotNo(-26, -14, 101, cvTermIds);
+    	
+    	assertNotNull(value);
+    	
+    	Debug.println(INDENT, "getPhenotypeIdsByLocationAndPlotNo Test");
+    	for (Object[] val :value){
+    		Debug.println(val.toString());
+    	}
+    	
+    	
+    }
+    
+    
+    @Test
+    public void testSaveOrUpdatePhenotypeOutliers() throws Exception{
+    	
+    	List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
+    	PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
+    	//phenotypeOutlier.setPhenotypeOutlierId(-1);
+    	phenotypeOutlier.setPhenotypeId(1);
+    	phenotypeOutlier.setValue("hello");
+    	
+    	outliers.add(phenotypeOutlier);
+    	
+    	manager.saveOrUpdatePhenotypeOutliers(outliers);
+    	
+    	Debug.println(INDENT, "testSavePhenotypeOutlier Test");
+    	
+    	
     }
     
     private void printFolderTree(List<FolderReference> tree, int tab) {

@@ -123,6 +123,30 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
         }
     }
+    
+    @Override
+    public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        trans = session.beginTransaction();
+
+        try {
+
+        	 for (StandardVariable stdVariable : stdVariableList){
+		                getStandardVariableSaver().save(stdVariable);
+        	 }
+            
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
+        }
+        
+        
+    }
 
     @Deprecated
     @Override
