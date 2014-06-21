@@ -747,4 +747,6 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
+	
+	int countGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
 }

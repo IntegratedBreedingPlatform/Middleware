@@ -1055,4 +1055,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
 	    return getGermplasmListManager().getGermplasmNameTypes();
 	}
+
+	@Override
+	public int countGermplasmListDataByListId(Integer listId)
+			throws MiddlewareQueryException {
+		return (int)getGermplasmListManager().countGermplasmListDataByListId(listId);
+	}
+	
 }
