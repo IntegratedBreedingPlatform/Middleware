@@ -308,10 +308,10 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 			List<Name> list = (List<Name>)  criteria.list();
 			if (list != null) {
 				for (Name name : list) {
-					List<Name> names = map.get(name.getNid());
+					List<Name> names = map.get(name.getGermplasmId());
 					if (names == null) {
 						names = new ArrayList<Name>();
-						map.put(name.getNid(), names);
+						map.put(name.getGermplasmId(), names);
 					}
 					names.add(name);
 				}
