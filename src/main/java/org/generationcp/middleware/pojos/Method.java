@@ -45,7 +45,8 @@ public class Method implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    private static final List<Integer> BULKED_CLASSES = Arrays.asList(30, 31, 61, 62, 326);
+    private static final List<Integer> BULKED_CLASSES = Arrays.asList(1490, 1530, 1540, 1550);
+    private static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(1510);
 
     public static final String GET_ALL = "getAllMethods";
 
@@ -421,6 +422,11 @@ public class Method implements Serializable{
 	@Transient
 	public boolean isBulked() {
 		return geneq != null && BULKED_CLASSES.contains(geneq);
+	}
+	
+	@Transient
+	public boolean isNonBulked() {
+		return geneq != null && NON_BULKED_CLASSES.contains(geneq);
 	}
 
 }
