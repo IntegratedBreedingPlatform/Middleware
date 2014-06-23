@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -160,5 +161,14 @@ public class TermBuilder extends Builder {
 			
 		}
 		return term;
+	}
+	
+	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+		List<Scale> list = new ArrayList<Scale>();
+		setWorkingDatabase(Database.CENTRAL);
+		list.addAll(getCvTermDao().getAllInventoryScales());
+		setWorkingDatabase(Database.LOCAL);
+		list.addAll(getCvTermDao().getAllInventoryScales());
+		return list;
 	}
 }

@@ -377,4 +377,8 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException {
     	return getStandardVariableBuilder().findAllByProperty(propertyId);
     }
+    
+    public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+    	return getTermBuilder().getAllInventoryScales();
+    }
 }

@@ -33,6 +33,7 @@ import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
@@ -144,6 +145,10 @@ public abstract class Service extends DatabaseBroker {
 	
     protected final DataSetBuilder getDataSetBuilder() {
     	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final TermBuilder getTermBuilder() {
+    	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
 }

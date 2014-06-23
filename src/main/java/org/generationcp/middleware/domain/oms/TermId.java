@@ -198,6 +198,8 @@ public enum TermId {
     
     , BREEDING_METHOD_VARIATE (8262)
     , SEED_SOURCE (8360)
+    
+    , INVENTORY_AMOUNT_PROPERTY (2620)
 	;
 	
 	private final int id;

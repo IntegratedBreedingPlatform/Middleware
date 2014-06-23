@@ -630,6 +630,17 @@ public class TestOntologyServiceImpl extends TestOutputFormatter {
         return stdVariable;
     }
     
+    @Test
+    public void testGetAllInventoryScales() throws Exception {
+    	List<Scale> scales = ontologyService.getAllInventoryScales();
+    	if (scales != null) {
+    		System.out.println("INVENTORY SCALES = ");
+    		for (Scale scale : scales) {
+    			System.out.println(scale);
+    		}
+    	}
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         if (serviceFactory != null) {

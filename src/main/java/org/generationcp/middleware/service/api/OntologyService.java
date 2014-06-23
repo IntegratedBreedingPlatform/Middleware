@@ -602,4 +602,11 @@ public interface OntologyService{
      * @throws MiddlewareQueryException
      */
     List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException;
+    
+    /**
+     * Return all invenotry scales.
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Scale> getAllInventoryScales() throws MiddlewareQueryException;
 }
