@@ -674,6 +674,14 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
         assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
     }
+
+    @Test
+    public void testGetAllMethodsNotGenerative() throws Exception {
+        List<Method> results = manager.getAllMethodsNotGenerative();
+        assertNotNull(results);
+        assertTrue(!results.isEmpty());
+        Debug.printObjects(INDENT, results);
+    }
     
     @Test
     public void testCountGermplasmByPrefName() throws Exception {

@@ -705,7 +705,9 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getAllMethods() throws MiddlewareQueryException;
-    
+
+    List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException;
+
     /**
      * Returns count of all the method records.
      *

@@ -188,6 +188,19 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         }
         return new ArrayList<Method>();
     }
+
+    public List<Method> getAllMethodsNotGenerative()  throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.ne("mtype","GEN"));
+            criteria.addOrder(Order.asc("mname"));
+
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAllMethodsNotGenerative() query from Method: " + e.getMessage(), e);
+        }
+        return new ArrayList<Method>();
+    }
     
     
     
