@@ -686,7 +686,7 @@ public interface FieldbookService {
 	 * @return the integer
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException;
+	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId,int locationId, Integer date) throws MiddlewareQueryException;
 	
 	/**
 	 * Adds a new Germplasm.

@@ -1007,8 +1007,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException {
-		Name name = new Name(null, gid, 1, 1, userId, nameValue, 0, 0, 0);
+	public Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId,int locationId, Integer date) throws MiddlewareQueryException {
+		Name name = new Name(null, gid, nameTypeId, 0, userId, nameValue, locationId, date, 0);
 		return getGermplasmDataManager().addGermplasmName(name);
 	}
 	
