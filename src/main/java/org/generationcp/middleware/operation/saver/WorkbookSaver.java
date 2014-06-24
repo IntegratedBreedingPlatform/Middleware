@@ -469,7 +469,7 @@ public class WorkbookSaver extends Saver {
 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
 			DatasetValues trialValues = getDatasetValuesTransformer().transform(trialName, trialName, 
-					DataSetType.PLOT_DATA, trialMV, trialVariables);
+					DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 			
 			if (workbook.isNursery() && (trialMV == null || trialMV.size() == 0 || getMainFactor(trialMV) == null)) {
 				trialVariables.add(createOccVariableType(trialVariables.size()+1));
