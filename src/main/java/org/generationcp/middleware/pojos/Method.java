@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.generationcp.middleware.domain.oms.TermId;
+
 /**
  * POJO for methods table.
  * 
@@ -45,8 +47,14 @@ public class Method implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    private static final List<Integer> BULKED_CLASSES = Arrays.asList(1490, 1530, 1540, 1550);
-    private static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(1510);
+    private static final List<Integer> BULKED_CLASSES = Arrays.asList(
+    		TermId.BULKING_BREEDING_METHOD_CLASS.getId() 
+    		, TermId.SEED_INCREASE_METHOD_CLASS.getId() 
+    		, TermId.SEED_ACQUISITION_METHOD_CLASS.getId()
+    		, TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
+    
+    private static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(
+    		TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
 
     public static final String GET_ALL = "getAllMethods";
 
@@ -420,13 +428,16 @@ public class Method implements Serializable{
 	}
 	
 	@Transient
-	public boolean isBulked() {
-		return geneq != null && BULKED_CLASSES.contains(geneq);
+	public Boolean isBulkingMethod() {
+		if (geneq != null) {
+			if (BULKED_CLASSES.contains(geneq)) {
+				return true;
+			}
+			else if (NON_BULKED_CLASSES.contains(geneq)) {
+				return false;
+			}
+		}
+		return null;
 	}
 	
-	@Transient
-	public boolean isNonBulked() {
-		return geneq != null && NON_BULKED_CLASSES.contains(geneq);
-	}
-
 }
