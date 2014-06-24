@@ -407,11 +407,11 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String generateTrialDatasetName(String studyName, StudyType studyType) {
-		return "TRIAL_" + studyName;
+		return studyName + "-ENVIRONMENT";
 	}
 	
 	private String generateMeasurementEffectDatasetName(String studyName) {
-		return "MEASUREMENT EFEC_" + studyName;
+		return studyName + "-PLOTDATA";
 	}
 	
 	private String generateMeansDatasetName(String studyName) {
@@ -469,7 +469,7 @@ public class WorkbookSaver extends Saver {
 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
 			DatasetValues trialValues = getDatasetValuesTransformer().transform(trialName, trialName, 
-					DataSetType.PLOT_DATA, trialMV, trialVariables);
+					DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 			
 			if (workbook.isNursery() && (trialMV == null || trialMV.size() == 0 || getMainFactor(trialMV) == null)) {
 				trialVariables.add(createOccVariableType(trialVariables.size()+1));
