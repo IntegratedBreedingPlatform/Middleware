@@ -365,10 +365,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	        for(int i = 0 ; i < methodIds.size() ; i++){
 	            Integer methodId = methodIds.get(i);
 	            Method method = getGermplasmDataManager().getMethodByID(methodId);
-
                 // filter out generative method types
-                if (!method.getMtype().equals("GEN"))
-                    methodList.add(method);
+	            if (method!= null) {
+    	            if (method.getMtype() == null || !method.getMtype().equals("GEN")) {
+                            methodList.add(method);
+    	            } 
+	            }
 	        }
 	        
 	        Collections.sort(methodList, new Comparator<Method>(){
