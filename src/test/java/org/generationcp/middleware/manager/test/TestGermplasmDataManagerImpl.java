@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -854,6 +855,24 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
+    }
+    
+    @Test
+    public void testUpdateGermplasm() throws Exception {
+    	//use wheat local database
+    	Integer gid = -35457;
+    	List<Germplasm> gList = new ArrayList<Germplasm>();
+    	Germplasm oldG = manager.getGermplasmByGID(gid);
+    	oldG.setGrplce(gid);
+		gList.add(oldG);
+        manager.updateGermplasm(gList);
+        Germplasm newG = manager.getGermplasmByGID(gid);
+        assertNull(newG);
+        //revert changes to Germplasm
+        oldG.setGrplce(0);
+		gList.add(oldG);
+        manager.updateGermplasm(gList);
+        Debug.println(INDENT, "testUpdateGermplasm(" + gid + ")");
     }
     
 }

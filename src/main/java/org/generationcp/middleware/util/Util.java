@@ -22,8 +22,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +37,7 @@ import java.util.List;
  */
 public class Util{
 
+	public static final String DATE_AS_NUMBER_FORMAT = "yyyyMMdd";
     /**
      * Get the boolean value of <code>value</code>.
      * 
@@ -146,5 +149,14 @@ public class Util{
         }
 
         return Arrays.asList(objects);
+    }
+    
+    public static Integer getCurrentDate(){
+        Calendar now = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_AS_NUMBER_FORMAT);
+        String dateNowStr = formatter.format(now.getTime());
+        Integer dateNowInt = Integer.valueOf(dateNowStr);
+        return dateNowInt;
+
     }
 }

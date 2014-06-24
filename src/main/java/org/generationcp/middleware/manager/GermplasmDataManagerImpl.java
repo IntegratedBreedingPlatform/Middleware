@@ -1228,7 +1228,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Integer> updateGermplasm(List<Germplasm> germplasms) throws MiddlewareQueryException {
-        return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
+    	if(germplasms!=null) {
+    		List<Integer> gids = new ArrayList<Integer>(); 
+    		for (Germplasm germplasm : germplasms) {
+    			if(germplasm.getGid().equals(germplasm.getGrplce())) {//deleted
+    				gids.add(germplasm.getGid());
+    			}
+			}
+    		if(gids!=null && !gids.isEmpty()) {
+    			setWorkingDatabase(Database.LOCAL);
+    			getTransactionDao().cancelUnconfirmedTransactionsForGermplasms(gids);
+    		}
+    	}
+    	return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
     }
 
     @Override

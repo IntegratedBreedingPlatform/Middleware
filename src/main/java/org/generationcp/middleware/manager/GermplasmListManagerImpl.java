@@ -479,9 +479,15 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         try {
             // begin delete transaction
             trans = session.beginTransaction();
-
+            
+            List<Integer> listEntryIds = new ArrayList<Integer>();            
             for (GermplasmListData germplasmListData : germplasmListDatas) {
-                getGermplasmListDataDAO().makeTransient(germplasmListData);
+            	listEntryIds.add(germplasmListData.getId());
+            }
+            getTransactionDao().cancelUnconfirmedTransactionsForListEntries(listEntryIds);
+            
+            for (GermplasmListData germplasmListData : germplasmListDatas) {
+            	getGermplasmListDataDAO().makeTransient(germplasmListData);
                 germplasmListDataDeleted++;
             }
             // end transaction, commit to database
