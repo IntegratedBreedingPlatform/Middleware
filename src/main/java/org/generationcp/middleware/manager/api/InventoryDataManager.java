@@ -625,5 +625,17 @@ public interface InventoryDataManager{
      * @return List of GermplasmListData POJOs
      */
     List<GermplasmListData> getLotCountsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Return the germplasm entries of given entry IDs of specific list
+     * with lot counts such as # of lots with available balance and # of lots with reserved seed per entry
+     * 
+     * @param listId
+     * @param entryIds
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException;
 
 }
