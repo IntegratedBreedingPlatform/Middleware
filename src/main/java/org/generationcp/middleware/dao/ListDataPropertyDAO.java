@@ -60,7 +60,7 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 		" FROM listdataprops p " +
 		" INNER JOIN listdata d ON d.lrecid = p.listdata_id " +
 		" WHERE d.listid = :listId " + 
-		" ORDER BY p.listdataprop_id DESC ";
+		" ORDER BY p.column_name,p.listdataprop_id DESC";
 
 		GermplasmListNewColumnsInfo listInfo = new GermplasmListNewColumnsInfo(listId);
 		try {
