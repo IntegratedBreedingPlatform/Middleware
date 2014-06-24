@@ -755,4 +755,12 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException;
+
+	/**
+	 * Return all methods.
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<Method> getAllMethods() throws MiddlewareQueryException;
+
 }

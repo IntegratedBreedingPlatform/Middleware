@@ -423,7 +423,7 @@ public class WorkbookBuilder extends Builder {
 	
 	private List<ValueReference> getAllBreedingMethods() throws MiddlewareQueryException{
             List<ValueReference> list = new ArrayList<ValueReference>();
-            List<Method> methodList = getGermplasmDataManager().getAllMethods();
+            List<Method> methodList = getGermplasmDataManager().getAllMethodsNotGenerative();
             
             Collections.sort(methodList, new Comparator<Method>(){
 

@@ -599,6 +599,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    public List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException {
+        return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethodsNotGenerative", new Object[] {}, new Class[] {});
+    }
+
+    @Override
     public long countAllMethods() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getMethodDao());
     }

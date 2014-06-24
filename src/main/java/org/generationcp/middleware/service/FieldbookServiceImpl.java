@@ -341,7 +341,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {
-		List<Method> methodList = getGermplasmDataManager().getAllMethods();
+		List<Method> methodList = getGermplasmDataManager().getAllMethodsNotGenerative();
 		Collections.sort(methodList, new Comparator<Method>(){
 
 			@Override
@@ -365,7 +365,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	        for(int i = 0 ; i < methodIds.size() ; i++){
 	            Integer methodId = methodIds.get(i);
 	            Method method = getGermplasmDataManager().getMethodByID(methodId);
-	            methodList.add(method);
+
+	            // filter out generative method types and no valid geneq ids
+	            if (!method.getMtype().equals("GEN") && method.isBulkingMethod() != null) {
+	            	methodList.add(method);
+	            }
 	        }
 	        
 	        Collections.sort(methodList, new Comparator<Method>(){
@@ -1067,4 +1071,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		
 		return map;
 	}
+
+	@Override
+	public List<Method> getAllMethods() throws MiddlewareQueryException {
+		List<Method> methodList = getGermplasmDataManager().getAllMethods();
+		Collections.sort(methodList, new Comparator<Method>(){
+
+			@Override
+			public int compare(Method o1, Method o2) {
+				 String methodName1 = o1.getMname().toUpperCase();
+			      String methodName2 = o2.getMname().toUpperCase();
+		 
+			      //ascending order
+			      return methodName1.compareTo(methodName2);
+			}
+			
+		});
+		return methodList;
+	}
+
 }

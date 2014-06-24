@@ -47,13 +47,13 @@ public class Method implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    private static final List<Integer> BULKED_CLASSES = Arrays.asList(
+    public static final List<Integer> BULKED_CLASSES = Arrays.asList(
     		TermId.BULKING_BREEDING_METHOD_CLASS.getId() 
     		, TermId.SEED_INCREASE_METHOD_CLASS.getId() 
     		, TermId.SEED_ACQUISITION_METHOD_CLASS.getId()
     		, TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
     
-    private static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(
+    public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(
     		TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
 
     public static final String GET_ALL = "getAllMethods";
