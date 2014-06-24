@@ -407,11 +407,11 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String generateTrialDatasetName(String studyName, StudyType studyType) {
-		return "TRIAL_" + studyName;
+		return studyName + "-ENVIRONMENT";
 	}
 	
 	private String generateMeasurementEffectDatasetName(String studyName) {
-		return "MEASUREMENT EFEC_" + studyName;
+		return studyName + "-PLOTDATA";
 	}
 	
 	private String generateMeansDatasetName(String studyName) {
