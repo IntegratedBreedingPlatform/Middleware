@@ -39,7 +39,7 @@ public class ListInventoryBuilder extends Builder {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public List<GermplasmListData> retrieveLotCountsForListEntries(Integer listId, Integer start, Integer numOfRows) throws MiddlewareQueryException{
+	public List<GermplasmListData> retrieveLotCountsForList(Integer listId, Integer start, Integer numOfRows) throws MiddlewareQueryException{
 		List<GermplasmListData> listEntries = null;
 		
 		if (setWorkingDatabase(listId)){
@@ -53,17 +53,41 @@ public class ListInventoryBuilder extends Builder {
 				entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			}
 
-			// retrieve inventory information from local db
-			setWorkingDatabase(Database.LOCAL);
-			
-			// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
-			// where listdata.gid may not be the final germplasm displayed
-			retrieveAvailableBalLotCounts(listEntries, gids);
-			
-			retrieveReservedLotCounts(listEntries, listEntryIds);
+			retrieveLotCounts(listEntryIds, listEntries, gids);
 		}
     	
 		return listEntries;
+	}
+	
+	
+	public List<GermplasmListData> retrieveLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException{
+		List<GermplasmListData> listEntries = null;
+		if (setWorkingDatabase(listId)){
+			listEntries = getGermplasmListDataDAO().getByIds(entryIds);
+			List<Integer> gids = new ArrayList<Integer>();
+			for (GermplasmListData entry : listEntries){
+				gids.add(entry.getGid());
+				entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
+			}
+
+			retrieveLotCounts(entryIds, listEntries, gids);
+		}
+		
+		return listEntries;
+
+	}
+
+	private void retrieveLotCounts(List<Integer> entryIds,
+			List<GermplasmListData> listEntries, List<Integer> gids)
+			throws MiddlewareQueryException {
+		// retrieve inventory information from local db
+		setWorkingDatabase(Database.LOCAL);
+		
+		// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
+		// where listdata.gid may not be the final germplasm displayed
+		retrieveAvailableBalLotCounts(listEntries, gids);
+		
+		retrieveReservedLotCounts(listEntries, entryIds);
 	}
 	
 	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException{

@@ -504,6 +504,23 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 		}
     }
     
+    
+    @Test
+    public void testGetLotCountsForGermplasmListEntries() throws MiddlewareQueryException{
+    	int listid = -543041; // wheat list
+    	List<Integer> entryIds = new ArrayList<Integer>();
+    	entryIds.add(-507029);
+    	entryIds.add(-507028);
+    	entryIds.add(-507027);
+		List<GermplasmListData> listEntries = manager.getLotCountsForListEntries(listid, entryIds);
+		for (GermplasmListData entry : listEntries){
+			ListDataInventory inventory = entry.getInventoryInfo();
+			if (inventory != null){
+				System.out.println(inventory);
+			}
+		}
+    }
+    
     @Test
     public void testGetLotsForGermplasmListEntry() throws MiddlewareQueryException{
     	List<ListEntryLotDetails> lots = manager.getLotDetailsForListEntry(-543041, -507029, -88175);

@@ -942,7 +942,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	
     @Override
     public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-    	return getListInventoryBuilder().retrieveLotCountsForListEntries(id, start, numOfRows);
+    	return getListInventoryBuilder().retrieveLotCountsForList(id, start, numOfRows);
     }
 
 	@Override
@@ -955,6 +955,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<LotDetails> getLotDetailsForGermplasm(Integer gid)
 			throws MiddlewareQueryException {
 		return getListInventoryBuilder().retrieveInventoryLotsForGermplasm(gid);
+	}
+
+	@Override
+	public List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException {
+		return getListInventoryBuilder().retrieveLotCountsForListEntries(listId, entryIds);
 	}
 
 }
