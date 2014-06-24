@@ -23,7 +23,6 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
@@ -1291,7 +1290,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     	List<Scale> list = new ArrayList<Scale>();
     	try {
     		StringBuffer sql = new StringBuffer()
-    							.append("SELECT pr.subject_id AS id, m.name AS methodname, s.name AS scalename ")
+    							.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname ")
     							.append(" FROM cvterm_relationship pr ")
     							.append(" INNER JOIN cvterm_relationship mr ON mr.subject_id = pr.subject_id ")
     							.append("    AND mr.type_id = ").append(TermId.HAS_METHOD.getId())
@@ -1305,13 +1304,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     		
     		SQLQuery query = getSession().createSQLQuery(sql.toString())
     							.addScalar("id")
-    							.addScalar("methodname")
     							.addScalar("scalename")
+    							.addScalar("methodname")
     							;
     		List<Object[]> result = query.list();
     		if (result != null && !result.isEmpty()) {
     			for (Object[] row : result) {
-    				String displayName = row[1] + "-" + row[2];
+    				String displayName = row[1] + " - " + row[2];
     				list.add(new Scale(new Term((Integer) row[0], displayName, displayName)));
     			}
     		}
