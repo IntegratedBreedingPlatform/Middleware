@@ -211,7 +211,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllBreedingMethods() throws MiddlewareQueryException {
-        List<Method> methods = fieldbookService.getAllBreedingMethods();
+        List<Method> methods = fieldbookService.getAllBreedingMethods(false);
         assertFalse(methods.isEmpty());
         Debug.printObjects(INDENT, methods);
     }

@@ -204,7 +204,7 @@ public interface FieldbookService {
      * @return All breeding methods
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Method> getAllBreedingMethods() throws MiddlewareQueryException;
+    List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException;
 
     /**
      * Gets the favorite breeding methods.
@@ -213,7 +213,7 @@ public interface FieldbookService {
      * @return the favorite breeding methods
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)  throws MiddlewareQueryException;
+    List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative)  throws MiddlewareQueryException;
         
     /**
      * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database. 

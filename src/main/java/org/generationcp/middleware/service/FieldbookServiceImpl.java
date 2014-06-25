@@ -340,8 +340,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {
-		List<Method> methodList = getGermplasmDataManager().getAllMethodsNotGenerative();
+	public List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException {
+		List<Method> methodList = filterOutGenerative ? getGermplasmDataManager().getAllMethodsNotGenerative() : getGermplasmDataManager().getAllMethods();
 		Collections.sort(methodList, new Comparator<Method>(){
 
 			@Override
@@ -358,7 +358,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)
+	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative)
 			throws MiddlewareQueryException {
 		 List<Method> methodList = new ArrayList<Method>();
 	        
@@ -366,11 +366,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	            Integer methodId = methodIds.get(i);
 	            Method method = getGermplasmDataManager().getMethodByID(methodId);
                 // filter out generative method types
+	            
 	            if (method!= null) {
-    	            if (method.getMtype() == null || !method.getMtype().equals("GEN")) {
-                            methodList.add(method);
-    	            } 
+	            	if(filterOutGenerative){
+	    	            if (method.getMtype() == null || !method.getMtype().equals("GEN")) {
+	                            methodList.add(method);
+	    	            } 
+	            	}else{
+	            		methodList.add(method);
+	            	}
 	            }
+	            
 	        }
 	        
 	        Collections.sort(methodList, new Comparator<Method>(){
