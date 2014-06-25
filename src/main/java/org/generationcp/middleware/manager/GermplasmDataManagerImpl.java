@@ -28,6 +28,8 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -2110,6 +2112,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		setWorkingDatabase(Database.LOCAL);
 			 return getGermplasmDao().getNegativeId("gid");
 			
+	}
+
+	@Override
+	public List<Term> getMethodClasses() throws MiddlewareQueryException {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(TermId.BULKING_BREEDING_METHOD_CLASS.getId());
+		ids.add(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
+		ids.add(TermId.SEED_INCREASE_METHOD_CLASS.getId());
+		ids.add(TermId.SEED_ACQUISITION_METHOD_CLASS.getId());
+		ids.add(TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
+		
+		return getTermBuilder().getTermsByIds(ids);
+		
 	}    
     
 }

@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -850,6 +851,12 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
         Map<Integer, String> results = manager.getAttributeValuesByTypeAndGIDList(attributeType, gids);
         Debug.println(INDENT, "getAttributeValuesByTypeAndGIDList(" + attributeType + ", " + gids + "): ");
         Debug.println(INDENT, results.toString());
+    }
+    
+    @Test
+    public void getMethodClasses() throws MiddlewareQueryException{
+    	List<Term> terms = manager.getMethodClasses();
+    	System.out.println(terms);
     }
   
     @AfterClass

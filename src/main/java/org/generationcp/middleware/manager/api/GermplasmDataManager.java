@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -820,6 +821,15 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countMethodsByGroup(String group) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets list of cvterm records which are possible values of method classes
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Term> getMethodClasses() throws MiddlewareQueryException;
 
     /**
      * Returns the udfld record identified by the given id.
