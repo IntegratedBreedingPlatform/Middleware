@@ -741,10 +741,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         		}          	
             }
             if(hasDuplicateTrialInstances) {
+            	initializeIfNull(errors, Constants.GLOBAL);
+            	StringBuilder trialInstanceNumbers = new StringBuilder();
             	for (String trialInstanceNo : duplicateTrialInstances) {
-            		initializeIfNull(errors, Constants.GLOBAL);
-                    errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", trialInstanceNo));
+            		trialInstanceNumbers.append(trialInstanceNo);
+            		trialInstanceNumbers.append(",");                    
 				}
+            	errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", 
+            			trialInstanceNumbers.toString().substring(0, trialInstanceNumbers.toString().length()-1)));
             }
             	
         }

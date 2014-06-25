@@ -415,7 +415,7 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String generateMeansDatasetName(String studyName) {
-		return "RESULTS_TRAIT_MEANS_" + studyName;
+		return studyName + "-MEANS";
 	}
 	
 	private ExperimentValues createTrialExperimentValues(Integer locationId, VariableList variates) {
