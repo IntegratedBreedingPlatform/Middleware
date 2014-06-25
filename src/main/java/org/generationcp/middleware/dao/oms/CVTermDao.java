@@ -1311,6 +1311,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     		if (result != null && !result.isEmpty()) {
     			for (Object[] row : result) {
     				String displayName = row[1] + " - " + row[2];
+
+                    // TODO : consider adding a separate field 'displayName' to Term or Scale, to avoid de-sync of POJO values and that of DB.
+                    // With this implementation, the name and description in the DB is ignored in favor of the display name format provided in the specs
     				list.add(new Scale(new Term((Integer) row[0], displayName, displayName)));
     			}
     		}
