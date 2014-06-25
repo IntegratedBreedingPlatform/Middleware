@@ -1,7 +1,9 @@
 package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.manager.Operation;
 
 public class Factor  implements Serializable {
@@ -18,7 +20,11 @@ public class Factor  implements Serializable {
 	private String treatmentLabel;
 	private Operation operation;
 	private int id;
-        private int storedIn;
+    private int storedIn;
+    private Integer dataTypeId;
+    private List<ValueReference> possibleValues;
+    private Double minRange;
+    private Double maxRange;
 	
 	public Factor(){
 		super();
@@ -135,6 +141,38 @@ public class Factor  implements Serializable {
      */
     public void setStoredIn(int storedIn) {
         this.storedIn = storedIn;
+    }
+
+    public Integer getDataTypeId() {
+        return dataTypeId;
+    }
+
+    public void setDataTypeId(Integer dataTypeId) {
+        this.dataTypeId = dataTypeId;
+    }
+
+    public List<ValueReference> getPossibleValues() {
+        return possibleValues;
+    }
+
+    public void setPossibleValues(List<ValueReference> possibleValues) {
+        this.possibleValues = possibleValues;
+    }
+
+    public Double getMinRange() {
+        return minRange;
+    }
+
+    public void setMinRange(Double minRange) {
+        this.minRange = minRange;
+    }
+
+    public Double getMaxRange() {
+        return maxRange;
+    }
+
+    public void setMaxRange(Double maxRange) {
+        this.maxRange = maxRange;
     }
 
  }
