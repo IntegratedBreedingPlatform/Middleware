@@ -1,6 +1,6 @@
 package org.generationcp.middleware.domain.inventory;
 
-public class ListEntryLotDetails extends LotDetails {
+public class ListEntryLotDetails extends LotDetails implements Cloneable {
 private static final long serialVersionUID = -4418453030620877249L;
 	
 	private Integer id;
@@ -44,7 +44,9 @@ private static final long serialVersionUID = -4418453030620877249L;
 	@Override
 	public String toString() {
 		 StringBuilder builder = new StringBuilder();
-	        builder.append("ListEntryLotReportRow [lotId=");
+	        builder.append("ListEntryLotReportRow [id=");
+	        builder.append(getId());
+	        builder.append(", lotId=");
 	        builder.append(getLotId());
 	        builder.append(", entityIdOfLot=");
 	        builder.append(getEntityIdOfLot());
@@ -71,4 +73,13 @@ private static final long serialVersionUID = -4418453030620877249L;
 	        builder.append("]");
 	        return builder.toString();
 	}
+
+	public ListEntryLotDetails makeClone(){
+        try{
+            return (ListEntryLotDetails) super.clone();
+        }catch( CloneNotSupportedException e ){
+            return null;
+        }
+    } 
+	
 }
