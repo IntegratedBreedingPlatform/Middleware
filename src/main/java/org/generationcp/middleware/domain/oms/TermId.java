@@ -55,6 +55,7 @@ public enum TermId {
 	/*, STUDY_IP(8120)*/
 	, CREATION_DATE(8048)
 	, STUDY_STATUS(8006)
+	, STUDY_UPDATE(8009)
 	
 	// Dataset Fields
 	, DATASET_NAME(8150)
