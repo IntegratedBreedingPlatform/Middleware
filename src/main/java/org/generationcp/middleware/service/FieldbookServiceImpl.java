@@ -1068,9 +1068,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException {
+		Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+		
+		setWorkingDatabase(Database.CENTRAL);
+		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		setWorkingDatabase(Database.LOCAL);
+		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		
+		return map;
+	}
+
+	@Override
 	public int countGermplasmListDataByListId(Integer listId)
 			throws MiddlewareQueryException {
 		return (int)getGermplasmListManager().countGermplasmListDataByListId(listId);
 	}
-	
 }

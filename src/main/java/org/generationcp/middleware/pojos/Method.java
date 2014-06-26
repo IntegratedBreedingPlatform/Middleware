@@ -12,6 +12,8 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -27,6 +29,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.generationcp.middleware.domain.oms.TermId;
+
 /**
  * POJO for methods table.
  * 
@@ -37,11 +41,20 @@ import javax.xml.bind.annotation.XmlType;
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "method")
-@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid" })
+@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator", "prefix", "count", "suffix" })
 @XmlAccessorType(XmlAccessType.NONE)
 public class Method implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    public static final List<Integer> BULKED_CLASSES = Arrays.asList(
+    		TermId.BULKING_BREEDING_METHOD_CLASS.getId() 
+    		, TermId.SEED_INCREASE_METHOD_CLASS.getId() 
+    		, TermId.SEED_ACQUISITION_METHOD_CLASS.getId()
+    		, TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
+    
+    public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(
+    		TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
 
     public static final String GET_ALL = "getAllMethods";
 
@@ -111,6 +124,27 @@ public class Method implements Serializable{
     @Basic(optional = false)
     @Column(name = "mdate")
     private Integer mdate;
+    
+    @Basic(optional = true)
+    @Column(name = "snametype")
+    private Integer snametype;
+    
+    @Basic(optional = true)
+    @Column(name = "separator")
+    private String separator;
+    
+    @Basic(optional = true)
+    @Column(name = "prefix")
+    private String prefix;
+    
+    @Basic(optional = true)
+    @Column(name = "count")
+    private String count;
+    
+    @Basic(optional = true)
+    @Column(name = "suffix")
+    private String suffix;
+    
     
     @Transient
     private Boolean isnew = false;
@@ -323,4 +357,87 @@ public class Method implements Serializable{
 		this.isnew = isnew;
 	}
 
+	/**
+	 * @return the snametype
+	 */
+	public Integer getSnametype() {
+		return snametype;
+	}
+
+	/**
+	 * @param snametype the snametype to set
+	 */
+	public void setSnametype(Integer snametype) {
+		this.snametype = snametype;
+	}
+
+	/**
+	 * @return the separator
+	 */
+	public String getSeparator() {
+		return separator;
+	}
+
+	/**
+	 * @param separator the separator to set
+	 */
+	public void setSeparator(String separator) {
+		this.separator = separator;
+	}
+
+	/**
+	 * @return the prefix
+	 */
+	public String getPrefix() {
+		return prefix;
+	}
+
+	/**
+	 * @param prefix the prefix to set
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
+	/**
+	 * @return the count
+	 */
+	public String getCount() {
+		return count;
+	}
+
+	/**
+	 * @param count the count to set
+	 */
+	public void setCount(String count) {
+		this.count = count;
+	}
+
+	/**
+	 * @return the suffix
+	 */
+	public String getSuffix() {
+		return suffix;
+	}
+
+	/**
+	 * @param suffix the suffix to set
+	 */
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
+	
+	@Transient
+	public Boolean isBulkingMethod() {
+		if (geneq != null) {
+			if (BULKED_CLASSES.contains(geneq)) {
+				return true;
+			}
+			else if (NON_BULKED_CLASSES.contains(geneq)) {
+				return false;
+			}
+		}
+		return null;
+	}
+	
 }

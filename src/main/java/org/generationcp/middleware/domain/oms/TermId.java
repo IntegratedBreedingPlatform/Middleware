@@ -55,8 +55,7 @@ public enum TermId {
 	/*, STUDY_IP(8120)*/
 	, CREATION_DATE(8048)
 	, STUDY_STATUS(8006)
-	, STUDY_UPDATE(8009)
-
+	
 	// Dataset Fields
 	, DATASET_NAME(8150)
 	, DATASET_TITLE(8155)
@@ -88,6 +87,7 @@ public enum TermId {
 	, SEASON_VAR(8371) 
 	, SEASON_WET(10300)
 	, SEASON_DRY(10290)
+	, SEASON_VAR_TEXT(8370)
 	
 	, GID(8240)
 	
