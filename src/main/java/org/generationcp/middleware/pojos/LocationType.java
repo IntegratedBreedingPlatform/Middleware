@@ -22,6 +22,7 @@ public enum LocationType {
     , BREED("BREED")
     , BLOCK("BLOCK")
     , FIELD("FIELD")
+    , SSTORE("SSTORE")
     ;
 	private String code;
 	

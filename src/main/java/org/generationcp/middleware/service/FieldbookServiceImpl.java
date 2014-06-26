@@ -140,6 +140,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	return newLocation;
     }
 
+
+    @Override 
+    public List<Location> getAllBreedingLocations()throws MiddlewareQueryException{
+        return getLocationDataManager().getAllBreedingLocations();
+    }
+    
+    @Override 
+    public List<Location> getAllSeedLocations()throws MiddlewareQueryException{
+        Integer seedLType = getLocationDataManager().getUserDefinedFieldIdOfCode(
+                UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
+        return getLocationDataManager().getLocationsByType(seedLType);
+    }
+    
     @Override
     public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
             throws MiddlewareQueryException {

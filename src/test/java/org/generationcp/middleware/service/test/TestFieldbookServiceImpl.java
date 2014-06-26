@@ -128,13 +128,22 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllLocations() throws MiddlewareQueryException {
-    	List<Location> locations = fieldbookService.getAllLocations();
-    	for (Location loc : locations){
-    		Debug.println(INDENT, loc.toString());
-    	}
-    	Debug.println(INDENT, "#RECORDS: " + locations.size());
+        List<Location> locations = fieldbookService.getAllLocations();
+        Debug.printObjects(locations);
     }
-    
+
+    @Test
+    public void testGetAllBreedingLocations() throws MiddlewareQueryException {
+        List<Location> locations = fieldbookService.getAllBreedingLocations();
+        Debug.printObjects(locations);
+    }
+
+    @Test
+    public void testGetAllSeedLocations() throws MiddlewareQueryException {
+        List<Location> locations = fieldbookService.getAllSeedLocations();
+        Debug.printObjects(locations);
+    }
+
     @Test
     public void testGetNurseryDataSet() throws MiddlewareQueryException {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
