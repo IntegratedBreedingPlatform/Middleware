@@ -484,7 +484,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             for (GermplasmListData germplasmListData : germplasmListDatas) {
             	listEntryIds.add(germplasmListData.getId());
             }
-            getTransactionDao().cancelUnconfirmedTransactionsForListEntries(listEntryIds);
+            
+            if (!listEntryIds.isEmpty()){
+            	getTransactionDao().cancelUnconfirmedTransactionsForListEntries(listEntryIds);
+            }
             
             for (GermplasmListData germplasmListData : germplasmListDatas) {
             	getGermplasmListDataDAO().makeTransient(germplasmListData);
