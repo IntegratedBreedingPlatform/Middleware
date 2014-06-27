@@ -34,44 +34,10 @@
             <properties>
                 <envConfig>ci</envConfig>
             </properties>
-
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
-
-        <!--<profile>
-            <id>withDependency</id>
-            <activation>
-                <property>
-                    <name>withDependencies</name>
-                </property>
-            </activation>
-
-            <build>
-                <plugins>
-                    &lt;!&ndash; jar-with-dependencies is built for external middleware teams
-                                		such as the one at ICRISAT India where Maven is not used. &ndash;&gt;
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>jar-with-dependencies</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>-->
     </profiles>
 
     <dependencies>
