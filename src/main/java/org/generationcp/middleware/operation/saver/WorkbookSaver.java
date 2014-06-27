@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
@@ -461,12 +462,21 @@ public class WorkbookSaver extends Saver {
 		
 		TimerWatch watch = new TimerWatch("find trial dataset", LOG);
 		String trialName = workbook.getStudyDetails().getTrialDatasetName();
+		Integer trialDatasetId = null;
  		if(trialName == null || trialName.equals("") ){
- 			trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
+ 		    List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
+ 	        if (datasetRefList != null) {
+ 	            for (DatasetReference datasetRef : datasetRefList) {
+ 	              if (datasetRef.getName().equals("TRIAL_" + workbook.getStudyDetails().getStudyName())) {
+ 	                 trialDatasetId = datasetRef.getId();
+ 	              }
+ 	            }
+ 	        } else {
+ 		       trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
+ 		       trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
+ 	        }
  		}
-		Integer trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
-		
-		if (trialDatasetId == null) {
+ 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
 			DatasetValues trialValues = getDatasetValuesTransformer().transform(trialName, trialName, 
 					DataSetType.SUMMARY_DATA, trialMV, trialVariables);
@@ -502,11 +512,23 @@ public class WorkbookSaver extends Saver {
 
 		TimerWatch watch = new TimerWatch("find measurement effect dataset", LOG);
         String datasetName = workbook.getStudyDetails().getMeasurementDatasetName();
-        if(datasetName == null || datasetName.equals("")){
-        	datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
-        }
-		Integer datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
+        Integer datasetId = null;
 		
+		if(datasetName == null || datasetName.equals("") ){
+		    List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
+            if (datasetRefList != null) {
+                for (DatasetReference datasetRef : datasetRefList) {
+                  if (datasetRef.getName().equals("MEASUREMENT EFEC_" + workbook.getStudyDetails().getStudyName()) || 
+                        datasetRef.getName().equals("MEASUREMENT EFECT_" + workbook.getStudyDetails().getStudyName())) {
+                      datasetId = datasetRef.getId();
+                  }
+                }
+            } else {
+                datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
+                datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
+            }
+        }
+
 		if (datasetId == null) {
 	        watch.restart("transform measurement effect dataset");
 			DatasetValues datasetValues = getDatasetValuesTransformer().transform(datasetName, datasetName,

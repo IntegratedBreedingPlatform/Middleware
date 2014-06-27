@@ -12,6 +12,8 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
@@ -132,5 +134,8 @@ public abstract class Saver extends DatabaseBroker{
     protected final GeolocationPropertySaver getGeolocationPropertySaver() {
     	return new GeolocationPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
-    
+ 
+    protected final StudyDataManager getStudyDataManager() {
+        return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }
