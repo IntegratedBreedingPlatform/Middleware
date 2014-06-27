@@ -374,7 +374,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative)
 			throws MiddlewareQueryException {
 		 List<Method> methodList = new ArrayList<Method>();
-	        
+		 	List<Integer> validMethodClasses = new ArrayList<Integer>();
+	     	validMethodClasses.addAll(Method.BULKED_CLASSES);
+	     	validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
 	        for(int i = 0 ; i < methodIds.size() ; i++){
 	            Integer methodId = methodIds.get(i);
 	            Method method = getGermplasmDataManager().getMethodByID(methodId);
@@ -383,7 +385,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	            if (method!= null) {
 	            	if(filterOutGenerative){
 	    	            if (method.getMtype() == null || !method.getMtype().equals("GEN")) {
+	    	            	 if(method.getGeneq() != null && validMethodClasses.contains(method.getGeneq())){
 	                            methodList.add(method);
+	    	            	 }
 	    	            } 
 	            	}else{
 	            		methodList.add(method);
