@@ -130,19 +130,19 @@ public class Method implements Serializable{
     private Integer snametype;
     
     @Basic(optional = true)
-    @Column(name = "separator")
+    @Column(name = "[separator]")
     private String separator;
     
     @Basic(optional = true)
-    @Column(name = "prefix")
+    @Column(name = "[prefix]")
     private String prefix;
     
     @Basic(optional = true)
-    @Column(name = "count")
+    @Column(name = "[count]")
     private String count;
     
     @Basic(optional = true)
-    @Column(name = "suffix")
+    @Column(name = "[suffix]")
     private String suffix;
     
     
