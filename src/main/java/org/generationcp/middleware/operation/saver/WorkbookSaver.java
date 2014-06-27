@@ -471,6 +471,10 @@ public class WorkbookSaver extends Saver {
  	                 trialDatasetId = datasetRef.getId();
  	              }
  	            }
+ 	            if (trialDatasetId == null) {
+     	           trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
+                   trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
+ 	            }
  	        } else {
  		       trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
  		       trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
@@ -522,6 +526,10 @@ public class WorkbookSaver extends Saver {
                         datasetRef.getName().equals("MEASUREMENT EFECT_" + workbook.getStudyDetails().getStudyName())) {
                       datasetId = datasetRef.getId();
                   }
+                }
+                if (datasetId == null) {
+                    datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
+                    datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
                 }
             } else {
                 datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
