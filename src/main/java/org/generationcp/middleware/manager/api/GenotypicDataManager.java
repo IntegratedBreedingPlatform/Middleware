@@ -731,7 +731,7 @@ public interface GenotypicDataManager{
      * based on the given list of dataset ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AccMetadataSet> getAccMetadatasetByDatasetIds(List<Integer> datasetIds, 
+    List<AccMetadataSet> getAccMetadatasetsByDatasetIds(List<Integer> datasetIds, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -745,7 +745,7 @@ public interface GenotypicDataManager{
      * @return List of name ids from acc_metadataset based on the given list of dataset ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AccMetadataSet> getAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, 
+    List<AccMetadataSet> getAccMetadatasetsByDatasetIds(List<Integer> datasetIds, List<Integer> gids, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
     /**

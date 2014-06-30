@@ -504,12 +504,12 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
-    public void testGetAccMetadatasetByDatasetIds() throws Exception {
+    public void testGetAccMetadatasetsByDatasetIds() throws Exception {
         List<Integer> datasetIds = Arrays.asList(-1, -2, -3, 1, 2, 3);
         List<Integer> gids = Arrays.asList(-2);
 
-        List<AccMetadataSet> nids = manager.getAccMetadatasetByDatasetIds(datasetIds, 0, 10);
-        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetByDatasetIds(datasetIds, gids, 0, 10);
+        List<AccMetadataSet> nids = manager.getAccMetadatasetsByDatasetIds(datasetIds, 0, 10);
+        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetsByDatasetIds(datasetIds, gids, 0, 10);
 
         Debug.println("testGgetAccMetadatasetByDatasetIds: " + nids);
         Debug.println("testGetgetAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
