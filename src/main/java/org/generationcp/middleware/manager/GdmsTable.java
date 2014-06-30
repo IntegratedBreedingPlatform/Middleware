@@ -9,6 +9,11 @@ public enum GdmsTable {
 	, GDMS_DART_VALUES("gdms_dart_values", "ad_id")
 	, GDMS_MAPPING_POP_VAUES("gdms_mapping_pop_values", "mp_id")
 	, GDMS_MTA("gdms_mta", "mta_id")
+	, GDMS_MARKERS_ONMAP("gdms_markers_onmap", "markeronmap_id")
+	, GDMS_MAP("gdms_map", "map_id")
+	, GDMS_QTL("gdms_qtl", "qtl_id")
+	
+	
 	;
 
 	private final String tableName;
