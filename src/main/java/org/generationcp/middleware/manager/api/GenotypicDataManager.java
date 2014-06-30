@@ -2184,11 +2184,11 @@ public interface GenotypicDataManager{
      * Adds MTA, Dataset, and DatasetUsers records to the database.
      *
      * @param dataset the dataset
-     * @param mta the mta
+     * @param mtaList the mtas to add
      * @param users the users
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void addMTA(Dataset dataset, Mta mta, DatasetUsers users) throws MiddlewareQueryException;
+    void addMTAs(Dataset dataset, List<Mta> mtaList, DatasetUsers users) throws MiddlewareQueryException;
 
     //GCP-8565
     /**

@@ -36,6 +36,7 @@ import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MtaDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -74,6 +75,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfoDetails;
 import org.generationcp.middleware.pojos.gdms.Mta;
+import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
@@ -2666,7 +2668,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public void addMTA(Dataset dataset, Mta mta, DatasetUsers users) throws MiddlewareQueryException {
+    public void addMTAs(Dataset dataset, List<Mta> mtaList, DatasetUsers users) throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
 
@@ -2681,9 +2683,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             users.setDatasetId(dataset.getDatasetId());
             getDatasetUsersDao().save(users);
 
-            mta.setMtaId(getMtaDao().getNegativeId("mtaId"));
-            mta.setDatasetId(dataset.getDatasetId());
-            getMtaDao().save(mta);
+            int rowsSaved = 0;
+            MtaDAO mtaDao = getMtaDao();
+            int id = getMtaDao().getNegativeId("mtaId");
+            for (Mta mta : mtaList){
+            	mta.setMtaId(id);
+            	mta.setDatasetId(dataset.getDatasetId());
+            	mtaDao.save(mta);
+            	id--;
+            	
+	            if (rowsSaved++ % (JDBC_BATCH_SIZE) == 0){
+	            	mtaDao.flush();
+	            	mtaDao.clear();
+	            }
+            }
 
             trans.commit();
         } catch (Exception e) {
@@ -2717,7 +2730,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	
     }
 
-
+    public void addMtaMetadata(MtaMetadata mtaMetadata) throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        //TODO
+        
+    }
     // --------------------------------- COMMON SAVER METHODS ------------------------------------------//
 
     // Saves a dataset of the given datasetType and dataType

@@ -2167,11 +2167,15 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     public void testAddMTA() throws Exception {
         Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
                 "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
-        Mta mta = new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA",
-        			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod",
-        			8.8f, 9.9f, "dominance", "evidence", "reference", "notes");
+        List<Mta> mtaList = new ArrayList<Mta>();
+        mtaList.add( new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA",
+    			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod",
+    			8.8f, 9.9f, "dominance", "evidence", "reference", "notes"));
+        mtaList.add( new Mta(null, 2, null, 2, 3.1f, 2, 2.1f, 3.2f, 4.3f, "gene", "chromosome", "alleleA",
+    			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 5.4f, 6.5f, 7.6f, 8.7f, "correctionMethod",
+    			9.8f, 10.9f, "dominance", "evidence", "reference", "notes"));
         DatasetUsers users = new DatasetUsers(null, 1);
-        manager.addMTA(dataset, mta, users);
+        manager.addMTAs(dataset, mtaList, users);
         Debug.println("done with testAddMTA");
     }
     
