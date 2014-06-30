@@ -77,8 +77,6 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 	public void testGetCvTermById() throws Exception {
 		Term term = manager.getTermById(6040);
 		assertNotNull(term);
-//		assertTrue(term.getId() == CV_TERM_ID);
-//		assertTrue(term.getName().equals(CV_TERM_NAME));
 		Debug.println(INDENT, "testGetCvTermById(): " + term);
 	}
 	
@@ -87,6 +85,17 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 		StandardVariable stdVar = manager.getStandardVariable(STD_VARIABLE_ID);
 		assertNotNull(stdVar);		
 		Debug.println(INDENT, "testGetStandardVariable(): " + stdVar);
+	}
+	
+	@Test
+	public void getStandVariableList() throws MiddlewareQueryException {
+		List<Integer> ids = Arrays.asList(new Integer[] {1,2,3,4,5});
+		List<StandardVariable> standardVariables = manager.getStandardVariables(ids);
+		assertNotNull(standardVariables);
+		assertTrue(standardVariables.size() > 0);
+		for (StandardVariable standardVariable : standardVariables) {
+			assertTrue(ids.contains(standardVariable.getId()));
+		}
 	}
 	
 	@Test

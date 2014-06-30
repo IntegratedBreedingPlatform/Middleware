@@ -55,6 +55,13 @@ public interface OntologyDataManager {
      */
 	StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
 	
+	/**
+	 * Retrieves a list of Standard Variables from a list of Ids.
+	 * @param ids - list of ids
+	 * @return list of StandardVariable instances
+	 */
+	List<StandardVariable> getStandardVariables(List<Integer> ids) throws MiddlewareQueryException;
+	
 	 /**
  	 * Retrieves a the standardVariableId given the property, scale and method Ids.
  	 *

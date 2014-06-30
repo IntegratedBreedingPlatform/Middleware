@@ -49,6 +49,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
         return getOntologyDataManager().getStandardVariable(stdVariableId);
     }
+    
+	@Override
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		return getOntologyDataManager().getStandardVariables(standardVariableIds);
+	}
 
     @Override
     public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId)

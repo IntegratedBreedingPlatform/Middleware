@@ -50,6 +50,15 @@ public interface OntologyService{
      */
     StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException;
 
+    /**
+     * Gets the standard variables given a list of ids
+     *
+     * @param stdVariableIds the list of standard variable ids
+     * @return the list of standard variables
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException;
+
     
     /**
      * Gets the standard variable given the property, method and scale.

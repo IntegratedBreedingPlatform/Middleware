@@ -73,6 +73,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
         return getStandardVariableBuilder().create(stdVariableId);
     }
+    
+	@Override
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		return getStandardVariableBuilder().create(standardVariableIds);
+	}
 
     @Override
     public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
@@ -1087,6 +1092,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
     	return getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
     }
+
+
 }
 
 

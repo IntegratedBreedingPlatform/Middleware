@@ -66,7 +66,8 @@ public class StandardVariableBuilder extends Builder {
 		}
 		return standardVariable;
 	}
-
+	
+	// FIXME : this is a select in a loop - (Create(id) is a DB select)
 	public List<StandardVariable> create(List<Integer> standardVariableIds) throws MiddlewareQueryException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 		if(standardVariableIds != null && !standardVariableIds.isEmpty()) {
