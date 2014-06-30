@@ -63,6 +63,7 @@ import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MtaDAO;
+import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.dao.gdms.TrackDataDAO;
@@ -149,6 +150,7 @@ public class DatabaseBroker {
     private QtlDAO qtlDao;
     private QtlDetailsDAO qtlDetailsDao;
     private MtaDAO mtaDao;
+    private MtaMetadataDAO mtaMetadataDao;
     private TrackDataDAO trackDataDao;
     private TrackMarkerDAO trackMarkerDao;
 
@@ -777,6 +779,14 @@ public class DatabaseBroker {
         }
         mtaDao.setSession(getActiveSession());
         return mtaDao;
+    }
+
+    protected final MtaMetadataDAO getMtaMetadataDao() {
+        if (mtaMetadataDao == null) {
+            mtaMetadataDao = new MtaMetadataDAO();
+        }
+        mtaMetadataDao.setSession(getActiveSession());
+        return mtaMetadataDao;
     }
 
     protected final TrackDataDAO getTrackDataDao() {

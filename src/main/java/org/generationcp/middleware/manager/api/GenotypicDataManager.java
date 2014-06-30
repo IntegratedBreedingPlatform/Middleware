@@ -51,6 +51,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.Mta;
+import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
@@ -2181,14 +2182,26 @@ public interface GenotypicDataManager{
     long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException;
     
     /**
-     * Adds MTA, Dataset, and DatasetUsers records to the database.
+     * Adds the mta.
      *
      * @param dataset the dataset
-     * @param mtaList the mtas to add
+     * @param mta the mta
+     * @param mtaMetadata the mta metadata
      * @param users the users
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void addMTAs(Dataset dataset, List<Mta> mtaList, DatasetUsers users) throws MiddlewareQueryException;
+    void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException;
+
+	/**
+     * Adds MTA, MTA Metadata, Dataset, and DatasetUsers records to the database. Mta and MtaMetadata have 1:1 correspondence, hence the same size.
+     *
+     * @param dataset the dataset
+     * @param mtaList the mtas to add
+     * @param mtaMetadataList the mtaMetadataList to add
+     * @param users the users
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void addMTAs(Dataset dataset, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList, DatasetUsers users) throws MiddlewareQueryException;
 
     //GCP-8565
     /**
@@ -2199,7 +2212,17 @@ public interface GenotypicDataManager{
      */
     void deleteMTA(List<Integer> datasetIds) throws MiddlewareQueryException;
     
-    // GCP-7873
+
+    /**
+     * Adds  MtaMetadata.
+     *
+     * @param mtaMetadata the mtaMetadata to add
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void addMtaMetadata(MtaMetadata mtaMetadata) throws MiddlewareQueryException;
+
+    	
+	// GCP-7873
     /**
      * Gets the all snp markers.
      *

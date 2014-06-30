@@ -56,6 +56,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.Mta;
+import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
@@ -2164,7 +2165,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
-    public void testAddMTA() throws Exception {
+    public void testAddMTAs() throws Exception {
         Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
                 "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
         List<Mta> mtaList = new ArrayList<Mta>();
@@ -2174,26 +2175,42 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         mtaList.add( new Mta(null, 2, null, 2, 3.1f, 2, 2.1f, 3.2f, 4.3f, "gene", "chromosome", "alleleA",
     			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 5.4f, 6.5f, 7.6f, 8.7f, "correctionMethod",
     			9.8f, 10.9f, "dominance", "evidence", "reference", "notes"));
+        
+        
+        List<MtaMetadata> mtaMetadataList = new ArrayList<MtaMetadata>();
+        mtaMetadataList.add(new MtaMetadata(null, "project1", "population", 100, "Thousand"));
+        mtaMetadataList.add(new MtaMetadata(null, "project2", "population", 1, "Million"));
+        
         DatasetUsers users = new DatasetUsers(null, 1);
-        manager.addMTAs(dataset, mtaList, users);
-        Debug.println("done with testAddMTA");
+        manager.addMTAs(dataset, mtaList, mtaMetadataList, users);
+        Debug.println("done with testAddMTAs");
     }
     
     @Test
     public void testDeleteMTA() throws Exception {
     	List<Mta> mtas = manager.getAllMTAs();
     	
-    	if (mtas != null && !mtas.isEmpty()){
-    		
+    	if (mtas != null && !mtas.isEmpty()){    		
     		List<Integer> datasetIds = new ArrayList<Integer>();
     		datasetIds.add(mtas.get(0).getDatasetId());
     		manager.deleteMTA(datasetIds);
-    		Debug.println(INDENT, "datasetId deleted = " + datasetIds);
-    		
+    		Debug.println(INDENT, "datasetId deleted = " + datasetIds);    		
     	}
-    	
-    	
     }
+    
+    @Test
+    public void testAddMtaMetadata() throws Exception {
+    	List<Mta> mtas = manager.getAllMTAs();
+    	
+    	if (mtas != null && !mtas.isEmpty()){
+    		Mta mta = mtas.get(0);
+    		MtaMetadata mtaMetadata = new MtaMetadata(mta.getMtaId(), "project", "population", 100, "Thousand");
+    		manager.addMtaMetadata(mtaMetadata);
+    		Debug.println(INDENT, "MtaMetadataset added: " + mtaMetadata);
+    	}
+
+    }
+
     
     @Test
     public void testGetDartMarkerDetails() throws Exception {

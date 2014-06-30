@@ -37,6 +37,7 @@ import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.MtaDAO;
+import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -2668,7 +2669,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public void addMTAs(Dataset dataset, List<Mta> mtaList, DatasetUsers users) throws MiddlewareQueryException {
+    public void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
 
@@ -2683,20 +2684,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             users.setDatasetId(dataset.getDatasetId());
             getDatasetUsersDao().save(users);
 
-            int rowsSaved = 0;
             MtaDAO mtaDao = getMtaDao();
-            int id = getMtaDao().getNegativeId("mtaId");
-            for (Mta mta : mtaList){
-            	mta.setMtaId(id);
-            	mta.setDatasetId(dataset.getDatasetId());
-            	mtaDao.save(mta);
-            	id--;
-            	
-	            if (rowsSaved++ % (JDBC_BATCH_SIZE) == 0){
-	            	mtaDao.flush();
-	            	mtaDao.clear();
-	            }
-            }
+            int id = mtaDao.getNegativeId("mtaId");
+        	mta.setMtaId(id);
+        	mta.setDatasetId(dataset.getDatasetId());
+        	mtaDao.save(mta);
+        	
+        	MtaMetadataDAO mtaMetadataDao = getMtaMetadataDao();
+            mtaMetadata.setMtaId(id);
+            mtaMetadataDao.save(mtaMetadata);
 
             trans.commit();
         } catch (Exception e) {
@@ -2704,6 +2700,60 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             logAndThrowException("Error in GenotypicDataManager.addMTA: " + e.getMessage(), e);
         }
     }
+    
+    @Override
+    public void addMTAs(Dataset dataset, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList, DatasetUsers users) throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+        
+        if (mtaList.size() != mtaMetadataList.size()){
+        	logAndThrowException("Error in GenotypicDataManager.addMTAs: mtaList and mtaMetadataList must have the same size");
+        }
+
+        try {
+            trans = session.beginTransaction();
+
+            dataset.setDatasetId(getDatasetDao().getNegativeId("datasetId"));
+            dataset.setDatasetType(TYPE_MTA);
+            dataset.setUploadTemplateDate(new Date());
+            getDatasetDao().save(dataset);
+
+            users.setDatasetId(dataset.getDatasetId());
+            getDatasetUsersDao().save(users);
+
+            MtaDAO mtaDao = getMtaDao();
+            MtaMetadataDAO mtaMetadataDao = getMtaMetadataDao();
+
+            int rowsSaved = 0;
+            int id = mtaDao.getNegativeId("mtaId");
+
+            for (int i = 0; i < mtaList.size(); i++){
+            	Mta mta = mtaList.get(i);
+            	mta.setMtaId(id);
+            	mta.setDatasetId(dataset.getDatasetId());
+            	mtaDao.save(mta);
+            	
+            	MtaMetadata mtaMetadata = mtaMetadataList.get(i);
+            	mtaMetadata.setMtaId(id);
+            	mtaMetadataDao.save(mtaMetadata);
+
+            	id--;
+            	
+	            if (rowsSaved++ % (JDBC_BATCH_SIZE) == 0){
+	            	mtaDao.flush();
+	            	mtaDao.clear();
+	            	mtaMetadataDao.flush();
+	            	mtaMetadataDao.clear();
+	            }
+            }
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error in GenotypicDataManager.addMTAs: " + e.getMessage(), e);
+        }
+    }
+
     
     @Override
     public void deleteMTA(List<Integer> datasetIds) throws MiddlewareQueryException {
@@ -2730,11 +2780,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	
     }
 
+    @Override
     public void addMtaMetadata(MtaMetadata mtaMetadata) throws MiddlewareQueryException {
+    	
+    	if (mtaMetadata == null){
+    		logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata must not be null.");
+    	}
+    	if (mtaMetadata.getMtaId() == null){
+    		logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata.mtaId must not be null.");
+    	}
+    	
         Session session = requireLocalDatabaseInstance();
-        //TODO
-        
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            // No need to generate id. The id (mta_id) is a foreign key
+            MtaMetadataDAO mtaMetadataDao = getMtaMetadataDao();
+        	mtaMetadataDao.save(mtaMetadata);
+
+        	trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: " + e.getMessage(), e);
+        }
     }
+
     // --------------------------------- COMMON SAVER METHODS ------------------------------------------//
 
     // Saves a dataset of the given datasetType and dataType
