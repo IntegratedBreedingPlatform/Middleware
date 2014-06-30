@@ -731,7 +731,7 @@ public interface GenotypicDataManager{
      * based on the given list of dataset ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, 
+    List<AccMetadataSet> getAccMetadatasetByDatasetIds(List<Integer> datasetIds, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -745,7 +745,7 @@ public interface GenotypicDataManager{
      * @return List of name ids from acc_metadataset based on the given list of dataset ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, 
+    List<AccMetadataSet> getAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -1913,7 +1913,7 @@ public interface GenotypicDataManager{
      * @return Count of NIDs
      * @throws MiddlewareQueryException the middleware query exception
      */
-    long countNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds) 
+    long countAccMetadatasetByDatasetIds(List<Integer> datasetIds) 
             throws MiddlewareQueryException;
     
     /**

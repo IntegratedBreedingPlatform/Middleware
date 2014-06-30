@@ -712,15 +712,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, int start, int numOfRows)
+    public List<AccMetadataSet> getAccMetadatasetByDatasetIds(List<Integer> datasetIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return getNidsFromAccMetadatasetByDatasetIds(datasetIds, null, start, numOfRows);
+        return getAccMetadatasetByDatasetIds(datasetIds, null, start, numOfRows);
     }
 
     @Override
-    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
+    public List<AccMetadataSet> getAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return (List<Integer>) super.getAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "getNIDsByDatasetIds",
+        return (List<AccMetadataSet>) super.getAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "getByDatasetIdsAndNotInGids",
                 new Object[]{datasetIds, gids, start, numOfRows}, new Class[]{List.class, List.class, Integer.TYPE, Integer.TYPE});
     }
 
@@ -2357,7 +2357,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public long countNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+    public long countAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countNidsByDatasetIds",
                 new Object[]{datasetIds}, new Class[]{List.class});
     }

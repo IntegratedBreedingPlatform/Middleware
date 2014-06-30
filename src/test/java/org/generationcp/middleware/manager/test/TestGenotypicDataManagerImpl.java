@@ -504,15 +504,15 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
-    public void testGetNidsFromAccMetadatasetByDatasetIds() throws Exception {
+    public void testGetAccMetadatasetByDatasetIds() throws Exception {
         List<Integer> datasetIds = Arrays.asList(-1, -2, -3, 1, 2, 3);
         List<Integer> gids = Arrays.asList(-2);
 
-        List<Integer> nids = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, 0, 10);
-        List<Integer> nidsWithGidFilter = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, gids, 0, 10);
+        List<AccMetadataSet> nids = manager.getAccMetadatasetByDatasetIds(datasetIds, 0, 10);
+        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetByDatasetIds(datasetIds, gids, 0, 10);
 
-        Debug.println("testGetNidsFromAccMetadatasetByDatasetIds RESULTS: " + nids);
-        Debug.println("testGetNidsFromAccMetadatasetByDatasetIds with gid filter RESULTS: " + nidsWithGidFilter);
+        Debug.println("testGgetAccMetadatasetByDatasetIds: " + nids);
+        Debug.println("testGetgetAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
     }
 
     @Test
@@ -1867,7 +1867,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testCountNidsFromAccMetadatasetByDatasetIds() throws Exception {
         List<Integer> datasetIds = Arrays.asList(2, 3, 4);
-        long count = manager.countNidsFromAccMetadatasetByDatasetIds(datasetIds);
+        long count = manager.countAccMetadatasetByDatasetIds(datasetIds);
         Debug.println("testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
     }
 
