@@ -181,6 +181,8 @@ public class ListInventoryBuilder extends Builder {
 				BigInteger count = lotCounts.get(entry.getGid());
 				if (count != null){
 					inventory.setActualInventoryLotCount(count.intValue());
+				}else{
+					inventory.setActualInventoryLotCount(null);
 				}
 			}
 		}

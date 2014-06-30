@@ -247,14 +247,14 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     	Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
 
     	try {
-    		String sql = "SELECT entity_id, count(lotid) FROM ( " +
+    		String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( " +
     						"SELECT i.lotid, i.eid AS entity_id, " +
     						"   SUM(trnqty) AS avail_bal " +
     						"  FROM ims_lot i " +
     						"  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
     						" WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " +
     						" GROUP BY i.lotid ) inv " +
-    					"WHERE avail_bal > 0 " +
+    					"WHERE avail_bal > -1 " +
     					"GROUP BY entity_id;";
     		
     		Query query = getSession().createSQLQuery(sql)
