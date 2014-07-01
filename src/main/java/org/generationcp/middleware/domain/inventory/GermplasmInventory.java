@@ -22,6 +22,9 @@ public class GermplasmInventory implements Serializable {
 	//number of lots with reserved amount for given germplasm
 	private Integer reservedLotCount;
 	
+	//number of lots for given germplasm
+	private Integer lotCount;
+	
 	//list of lots for germplasm
 	private List<? extends LotDetails> lotRows;
 	
@@ -61,6 +64,7 @@ public class GermplasmInventory implements Serializable {
 
 	public void setLotRows(List<? extends LotDetails> lotRows) {
 		this.lotRows = lotRows;
+		lotCount = lotRows.size();
 	}
 
 	@Override
@@ -81,9 +85,20 @@ public class GermplasmInventory implements Serializable {
 				builder.append(lot);
 			}
 			builder.append("}");
+		}else{
+			builder.append(", lotCount = ");
+			builder.append(lotCount);
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public Integer getLotCount() {
+		return lotCount;
+	}
+
+	public void setLotCount(Integer lotCount) {
+		this.lotCount = lotCount;
 	}
 
 }

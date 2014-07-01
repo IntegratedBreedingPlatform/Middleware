@@ -174,15 +174,17 @@ public class ListInventoryBuilder extends Builder {
 	 * Retrieve the number of lots with available balance per germplasm
 	 */
 	private void retrieveAvailableBalLotCounts(List<GermplasmListData> listEntries, List<Integer> gids) throws MiddlewareQueryException{
-		Map<Integer, BigInteger> lotCounts = getLotDao().countLotsWithAvailableBalance(gids);
+		Map<Integer, BigInteger[]> lotCounts = getLotDao().getLotsWithAvailableBalanceCountAndTotalLotsCount(gids);
 		for (GermplasmListData entry : listEntries){
 			ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null ){
-				BigInteger count = lotCounts.get(entry.getGid());
+				BigInteger[] count = lotCounts.get(entry.getGid());
 				if (count != null){
-					inventory.setActualInventoryLotCount(count.intValue());
+					inventory.setActualInventoryLotCount(count[0].intValue());
+					inventory.setLotCount(count[1].intValue());
 				}else{
-					inventory.setActualInventoryLotCount(null);
+					inventory.setActualInventoryLotCount(0);
+					inventory.setLotCount(0);
 				}
 			}
 		}
@@ -205,6 +207,7 @@ public class ListInventoryBuilder extends Builder {
 			}
 		}
 	}
+	
 	
 	/*
 	 * Perform one-retrieval for central/local scales and central/local locations
