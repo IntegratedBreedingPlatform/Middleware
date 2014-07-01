@@ -85,7 +85,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     "ORDER BY gav.gid DESC";
 
     public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
-            "SELECT an_id, dataset_id, marker_id, gid, CONCAT(allele_bin_value, ''), peak_height " +
+            "SELECT an_id, dataset_id, marker_id, gid, CONCAT(allele_bin_value, ''), peak_height, " +
+            			"gav.marker_sample_id, gav.acc_sample_id " +
                     "FROM gdms_allele_values gav " +
                     "WHERE  gav.marker_id IN (:markerIdList) " +
                     "ORDER BY gav.gid DESC";
@@ -130,7 +131,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
     public static final String GET_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
             "SELECT gdms_allele_values.dataset_id, gdms_allele_values.gid, gdms_allele_values.marker_id  "
                     + ", CONCAT(gdms_marker.marker_name, ''), CONCAT(gdms_allele_values.allele_bin_value, '') "
-                    + ", gdms_allele_values.peak_height "
+                    + ", gdms_allele_values.peak_height, gdms_allele_values.marker_sample_id, gdms_allele_values.acc_sample_id "
                     + "FROM gdms_allele_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_allele_values.marker_id "
                     + "WHERE gdms_allele_values.gid IN (:gids) "
                     + "ORDER BY gid, marker_name ";
@@ -237,7 +238,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     Integer gId = (Integer) result[3];
                     String alleleBinValue = (String) result[4];
                     Integer peakHeight = (Integer) result[5];
-                    AllelicValueElement value = new AllelicValueElement(anId, datasetId, gId, markerId, alleleBinValue, peakHeight);
+                    Integer markerSampleId = (Integer) result[6];
+                    Integer accSampleId = (Integer) result[7];
+                    AllelicValueElement value = new AllelicValueElement(anId, datasetId, gId, markerId, alleleBinValue, 
+                    		peakHeight, markerSampleId, accSampleId);
                     returnVal.add(value);
                 }
             }
@@ -456,8 +460,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                         String markerName = (String) result[3];
                         String alleleBinValue = (String) result[4];
                         Integer peakHeight = (Integer) result[5];
+                        Integer markerSampleId = (Integer) result[6];
+                        Integer accSampleId = (Integer) result[7];
                         AllelicValueElement allelicValueElement =
-                                new AllelicValueElement(datasetId, gid, markerId, markerName, alleleBinValue, peakHeight);
+                                new AllelicValueElement(datasetId, gid, markerId, markerName, alleleBinValue, peakHeight, markerSampleId, accSampleId);
                         values.add(allelicValueElement);
                     }
                 }

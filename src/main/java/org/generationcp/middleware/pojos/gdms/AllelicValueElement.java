@@ -39,6 +39,12 @@ public class AllelicValueElement implements Serializable{
     private String alleleBinValue;
     
     private Integer peakHeight;
+    
+	private Integer markerSampleId;
+
+    private Integer accSampleId;
+
+    
 
     /**
      * Instantiates a AllelicValueElement object with datasetId, gid, markerName and data(char_value for table char_values, 
@@ -50,14 +56,19 @@ public class AllelicValueElement implements Serializable{
      * @param markerName
      * @param data
      * @param peakHeight
+     * @param markerSampleId
+     * @param accSampleIld
      */
-    public AllelicValueElement(Integer datasetId, Integer gid, Integer markerId, String markerName, String data, Integer peakHeight) {
+    public AllelicValueElement(Integer datasetId, Integer gid, Integer markerId, String markerName, String data, Integer peakHeight
+    		, Integer markerSampleId, Integer accSampleId) {
         this.datasetId = datasetId;
         this.gid = gid;
         this.data = data;
         this.markerId = markerId;
         this.markerName = markerName;
         this.peakHeight = peakHeight;
+        this.markerSampleId = markerSampleId;
+        this.accSampleId = accSampleId;
     }
 
     /**
@@ -70,14 +81,19 @@ public class AllelicValueElement implements Serializable{
      * @param markerId
      * @param alleleBinValue
      * @param peakHeight
+     * @param markerSampleId
+     * @param accSampleIld
      */
-    public AllelicValueElement(Integer id, Integer datasetId, Integer gid, Integer markerId, String alleleBinValue, Integer peakHeight) {
+    public AllelicValueElement(Integer id, Integer datasetId, Integer gid, Integer markerId, String alleleBinValue, Integer peakHeight,
+    		Integer markerSampleId, Integer accSampleId) {
     	this.setId(id);
         this.datasetId = datasetId;
         this.gid = gid;
         this.alleleBinValue = alleleBinValue;
         this.markerId = markerId;
         this.peakHeight = peakHeight;
+        this.markerSampleId = markerSampleId;
+        this.accSampleId = accSampleId;
     }
 
     /**
@@ -196,34 +212,30 @@ public class AllelicValueElement implements Serializable{
 		this.peakHeight = peakHeight;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("AllelicValueElement [id=");
-		builder.append(id);
-		builder.append(", gid=");
-		builder.append(gid);
-		builder.append(", data=");
-		builder.append(data);
-		builder.append(", markerId=");
-		builder.append(markerId);
-		builder.append(", markerName=");
-		builder.append(markerName);
-		builder.append(", datasetId=");
-		builder.append(datasetId);
-		builder.append(", alleleBinValue=");
-		builder.append(alleleBinValue);
-		builder.append(", peakHeight=");
-		builder.append(peakHeight);
-		builder.append("]");
-		return builder.toString();
+    public Integer getMarkerSampleId() {
+		return markerSampleId;
 	}
-    
 
-    @Override
+	public void setMarkerSampleId(Integer markerSampleId) {
+		this.markerSampleId = markerSampleId;
+	}
+
+	public Integer getAccSampleId() {
+		return accSampleId;
+	}
+
+	public void setAccSampleId(Integer accSampleId) {
+		this.accSampleId = accSampleId;
+	}
+
+
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((accSampleId == null) ? 0 : accSampleId.hashCode());
 		result = prime * result
 				+ ((alleleBinValue == null) ? 0 : alleleBinValue.hashCode());
 		result = prime * result + ((data == null) ? 0 : data.hashCode());
@@ -235,6 +247,8 @@ public class AllelicValueElement implements Serializable{
 				+ ((markerId == null) ? 0 : markerId.hashCode());
 		result = prime * result
 				+ ((markerName == null) ? 0 : markerName.hashCode());
+		result = prime * result
+				+ ((markerSampleId == null) ? 0 : markerSampleId.hashCode());
 		result = prime * result
 				+ ((peakHeight == null) ? 0 : peakHeight.hashCode());
 		return result;
@@ -249,6 +263,11 @@ public class AllelicValueElement implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		AllelicValueElement other = (AllelicValueElement) obj;
+		if (accSampleId == null) {
+			if (other.accSampleId != null)
+				return false;
+		} else if (!accSampleId.equals(other.accSampleId))
+			return false;
 		if (alleleBinValue == null) {
 			if (other.alleleBinValue != null)
 				return false;
@@ -284,6 +303,11 @@ public class AllelicValueElement implements Serializable{
 				return false;
 		} else if (!markerName.equals(other.markerName))
 			return false;
+		if (markerSampleId == null) {
+			if (other.markerSampleId != null)
+				return false;
+		} else if (!markerSampleId.equals(other.markerSampleId))
+			return false;
 		if (peakHeight == null) {
 			if (other.peakHeight != null)
 				return false;
@@ -291,6 +315,36 @@ public class AllelicValueElement implements Serializable{
 			return false;
 		return true;
 	}
+
+
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("AllelicValueElement [id=");
+		builder.append(id);
+		builder.append(", gid=");
+		builder.append(gid);
+		builder.append(", data=");
+		builder.append(data);
+		builder.append(", markerId=");
+		builder.append(markerId);
+		builder.append(", markerName=");
+		builder.append(markerName);
+		builder.append(", datasetId=");
+		builder.append(datasetId);
+		builder.append(", alleleBinValue=");
+		builder.append(alleleBinValue);
+		builder.append(", peakHeight=");
+		builder.append(peakHeight);
+		builder.append(", markerSampleId=");
+		builder.append(markerSampleId);
+		builder.append(", accSampleId=");
+		builder.append(accSampleId);
+		builder.append("]");
+		return builder.toString();
+	}
+
 
 
 	public static Comparator<AllelicValueElement> AllelicValueElementComparator
