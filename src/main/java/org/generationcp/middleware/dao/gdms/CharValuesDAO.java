@@ -121,7 +121,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         "WHERE gid IN (:gids)";
 	
     public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
-    		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') "
+    		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, ''), marker_sample_id, acc_sample_id "
     		+ "FROM gdms_char_values cv " 
     		+ "WHERE  cv.marker_id IN (:markerIdList) " 
     		+ "ORDER BY cv.gid DESC ";
@@ -327,7 +327,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 	                    Integer markerId = (Integer) result[2];
 	                    Integer gId = (Integer) result[3];
 	                    String data = (String) result[4];
-	                    AllelicValueElement value = new AllelicValueElement(acId, datasetId, gId, markerId, data);
+	                    Integer markerSampleId = (Integer) result[5];
+	                    Integer accSampleId = (Integer) result[6];
+	                    AllelicValueElement value = new AllelicValueElement(acId, datasetId, gId, markerId
+	                    		, data, markerSampleId, accSampleId);
 	                    returnVal.add(value);
 	                }
 	            }
@@ -357,7 +360,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
         
         String sql = new StringBuffer()
-                .append("SELECT dataset_id, gid, marker_id, CONCAT(char_value,'') ")
+                .append("SELECT dataset_id, gid, marker_id, CONCAT(char_value,''), marker_sample_id, acc_sample_id ")
                 .append("FROM gdms_char_values ")
                 .append("   WHERE (marker_id, char_value) IN (" + placeholders + ") ")
                 .toString();
@@ -380,8 +383,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
                     Integer gid = (Integer) result[1];
                     Integer markerId = (Integer) result[2];
                     String charValue = (String) result[3];
+                    Integer markerSampleId = (Integer) result[4];
+                    Integer accSampleId = (Integer) result[5];
                     AllelicValueElement allelicValueElement =
-                            new AllelicValueElement(null, datasetId, gid, markerId, charValue);
+                            new AllelicValueElement(null, datasetId, gid, markerId, charValue, markerSampleId, accSampleId);
                     values.add(allelicValueElement);
                 }
             }

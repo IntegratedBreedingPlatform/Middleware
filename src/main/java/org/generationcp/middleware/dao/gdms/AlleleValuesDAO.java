@@ -319,7 +319,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
         
         String sql = new StringBuffer()
-            .append("SELECT dataset_id, gid, marker_id, CONCAT(allele_bin_value,'') ")
+            .append("SELECT dataset_id, gid, marker_id, CONCAT(allele_bin_value,''), marker_sample_id, acc_sample_id ")
             .append("FROM gdms_allele_values ")
             .append("WHERE (marker_id, allele_bin_value) IN (" + placeholders + ") ")
             .toString();
@@ -342,8 +342,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     Integer gid = (Integer) result[1];
                     Integer markerId = (Integer) result[2];
                     String alleleBinValue = (String) result[3];
+                    Integer markerSampleId = (Integer) result[4];
+                    Integer accSampleId = (Integer) result[5];
                     AllelicValueElement allelicValueElement =
-                            new AllelicValueElement(null, datasetId, gid, markerId, alleleBinValue);
+                            new AllelicValueElement(null, datasetId, gid, markerId, alleleBinValue, markerSampleId, accSampleId);
                     values.add(allelicValueElement);
                 }
             }
