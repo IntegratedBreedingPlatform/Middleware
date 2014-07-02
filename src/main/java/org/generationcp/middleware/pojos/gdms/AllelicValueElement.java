@@ -130,12 +130,15 @@ public class AllelicValueElement implements Serializable{
         this.peakHeight = peakHeight;
     }
     
-    public AllelicValueElement(Integer gid, String data, Integer markerId, String markerName, Integer peakHeight) {
+    public AllelicValueElement(Integer gid, String data, Integer markerId, String markerName, Integer peakHeight,
+            Integer markerSampleId, Integer accSampleId) {
         this.gid = gid;
         this.data = data;
         this.markerId = markerId;
         this.markerName = markerName;
         this.peakHeight = peakHeight;
+        this.markerSampleId = markerSampleId;
+        this.accSampleId = accSampleId;
     }
     
     public AllelicValueElement(Integer id, Integer datasetId, Integer gid, Integer markerId, String data,

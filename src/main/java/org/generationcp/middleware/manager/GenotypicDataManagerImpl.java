@@ -387,7 +387,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
 
-    	// Get from local and central (with marker names available in local
+    	// Get from local and central (with marker names available in local)
     	List<MarkerNameElement> dataValues = (List<MarkerNameElement>) super.getAllFromCentralAndLocalByMethod(getMarkerDao(), 
         		"getMarkerNamesByGIds", new Object[]{gIds}, new Class[]{List.class});
         

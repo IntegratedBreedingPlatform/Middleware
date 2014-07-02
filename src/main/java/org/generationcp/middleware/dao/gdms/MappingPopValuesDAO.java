@@ -70,7 +70,9 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
                 "gmpv.gid, " +
                 "gmpv.marker_id, " +
                 "CONCAT(gmpv.map_char_value, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
+                "CAST(NULL AS UNSIGNED INTEGER), " +  //peak height
+                "gmpv.marker_sample_id, " +
+                "gmpv.acc_sample_id " +
             "FROM gdms_mapping_pop_values gmpv " +
             "WHERE gmpv.gid IN (:gidList) " +
                 "AND gmpv.marker_id IN (:markerIdList) " +

@@ -558,7 +558,10 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
                 Integer markerId = (Integer) result[1];
                 String data = (String) result[2];
                 Integer peakHeight = (Integer) result[3];
-                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, markerId, null, peakHeight);
+                Integer markerSampleId = (Integer) result[4];
+                Integer accSampleId = (Integer) result[5];                        
+                AllelicValueElement allelicValueElement = new AllelicValueElement(
+                        gid, data, markerId, null, peakHeight, markerSampleId, accSampleId);
                 values.add(allelicValueElement);
             }
         }
@@ -640,14 +643,14 @@ public class MarkerDAO extends GenericDAO<Marker, Integer> {
             allelicValues.addAll(getAllelicValueElementsFromList(results));
 
             //retrieve allelic values from char_values
-            query = getSession().createSQLQuery(CharValuesDAO.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
+            query = getSession().createSQLQuery(CharValuesDAO.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS); 
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             results = query.list();
             allelicValues.addAll(getAllelicValueElementsFromList(results));
 
             //retrieve allelic values from mapping_pop_values
-            query = getSession().createSQLQuery(MappingPopValuesDAO.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS);
+            query = getSession().createSQLQuery(MappingPopValuesDAO.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_IDS); 
             query.setParameterList("gidList", gids);
             query.setParameterList("markerIdList", markerIds);
             results = query.list();

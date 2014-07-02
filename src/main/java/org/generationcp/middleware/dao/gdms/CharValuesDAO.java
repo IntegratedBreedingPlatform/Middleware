@@ -71,8 +71,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             "SELECT DISTINCT " +
                     "gcv.gid, " +
                     "gcv.marker_id, " +
-                "CONCAT(gcv.char_value, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
+                    "CONCAT(gcv.char_value, ''), " +
+                    "CAST(NULL AS UNSIGNED INTEGER), " + //peak height
+                    "gcv.marker_sample_id, " +
+                    "gcv.acc_sample_id " +
             "FROM gdms_char_values gcv " +
             "WHERE gcv.gid IN (:gidList) " +
                 "AND gcv.marker_id IN (:markerIdList) " +

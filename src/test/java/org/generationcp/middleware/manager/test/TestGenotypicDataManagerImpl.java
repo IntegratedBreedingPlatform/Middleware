@@ -300,9 +300,6 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 //        List<String> markerNames = Arrays.asList("CaM0038", "CaM0463", "CaM0539", "CaM0639",
 //        		"CaM0658", "1_0001", "1_0007","1_0013", "1_0025", "1_0031");
 //        List<Integer> gids = Arrays.asList(-5276, -5287, -5484, -5485, -6786, -6785, -3785, -3786);
-        
-        
-        
         List<String> markerNames = Arrays.asList("Xtxp25");
         List<Integer> gids = Arrays.asList(10, 28);
         
@@ -321,6 +318,13 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
         Debug.println("testGetAllelicValuesByGidsAndMarkerNamesForGDMS(" + gids + ", " + markerNames + ") RESULTS: ");
         Debug.printFormattedObjects(INDENT, allelicValues);
+    }
+    
+    @Test
+    public void testGetAllelicValuesByGid() throws Exception {
+        Integer gid = 7;
+        List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGid(gid);
+        Debug.printObjects(allelicValues);
     }
 
     @Test

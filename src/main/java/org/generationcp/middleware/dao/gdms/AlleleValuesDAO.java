@@ -78,7 +78,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     "gav.gid, " +
                     "gav.marker_id, " +
                     "CONCAT(gav.allele_bin_value, ''), " +
-                    "gav.peak_height " +
+                    "gav.peak_height, " +
+                    "gav.marker_sample_id, " +
+                    "gav.acc_sample_id " +
                     "FROM gdms_allele_values gav " +
                     "WHERE  gav.gid IN (:gidList) " +
                     "AND gav.marker_id IN (:markerIdList) " +
