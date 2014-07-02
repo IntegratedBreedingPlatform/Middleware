@@ -411,5 +411,19 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		}
     }
 
-    
+    public void cancelUnconfirmedTransactionsForLists(List<Integer> listIds) throws MiddlewareQueryException{
+    	try {
+    		String sql = "UPDATE ims_transaction " +
+    		"SET trnstat = 9, " +
+    		"trndate = :currentDate " +
+    		"WHERE trnstat = 0 AND sourceId in (:listIds) " +
+    		"AND sourceType = 'LIST'";
+    		Query query = getSession().createSQLQuery(sql)
+    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameterList("listIds", listIds);
+    		query.executeUpdate();
+		} catch (Exception e) {
+			logAndThrowException("Error at cancelUnconfirmedTransactionsForLists=" + listIds + " at TransactionDAO: " + e.getMessage(), e);
+		}
+    }
 }
