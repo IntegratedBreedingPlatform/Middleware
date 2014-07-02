@@ -207,6 +207,8 @@ public class ListInventoryBuilder extends Builder {
 				BigInteger count = reservedLotCounts.get(entry.getId());
 				if (count != null){
 					inventory.setReservedLotCount(count.intValue());
+				}else{
+					inventory.setReservedLotCount(0);
 				}
 			}
 		}
