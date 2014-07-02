@@ -53,7 +53,9 @@ public class ListInventoryBuilder extends Builder {
 				entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			}
 
-			retrieveLotCounts(listEntryIds, listEntries, gids);
+			if (listEntries != null && !listEntries.isEmpty()){
+				retrieveLotCounts(listEntryIds, listEntries, gids);
+			}
 		}
     	
 		return listEntries;
@@ -139,16 +141,18 @@ public class ListInventoryBuilder extends Builder {
 				entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			}
 
-			// retrieve inventory information from local db
-			setWorkingDatabase(Database.LOCAL);
-			
-			// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
-			// where listdata.gid may not be the final germplasm displayed
-			List<Lot> lots = getLotDao().getLotAggregateDataForList(listId, gids);
-			
-			// add to each list entry related lot information
-			List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
-			setLocationsAndScales(lotRows);
+			if (listEntries != null && !listEntries.isEmpty()){
+				// retrieve inventory information from local db
+				setWorkingDatabase(Database.LOCAL);
+				
+				// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
+				// where listdata.gid may not be the final germplasm displayed
+				List<Lot> lots = getLotDao().getLotAggregateDataForList(listId, gids);
+				
+				// add to each list entry related lot information
+				List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
+				setLocationsAndScales(lotRows);
+			}
 			
 		}
     	
