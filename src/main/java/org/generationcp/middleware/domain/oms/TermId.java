@@ -89,6 +89,7 @@ public enum TermId {
 	, SEASON_WET(10300)
 	, SEASON_DRY(10290)
 	, SEASON_VAR_TEXT(8370)
+	, SEASON_MONTH (8369)
 	
 	, GID(8240)
 	
