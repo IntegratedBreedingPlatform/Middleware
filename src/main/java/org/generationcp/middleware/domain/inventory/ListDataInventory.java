@@ -32,21 +32,8 @@ public class ListDataInventory extends GermplasmInventory  {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ListDataInventory [listDataId=");
 		builder.append(listDataId);
-		builder.append(", gid=");
-		builder.append(getGid());
-		builder.append(", actualInventoryLotCount=");
-		builder.append(getActualInventoryLotCount());
-		builder.append(", reservedLotCount=");
-		builder.append(getReservedLotCount());
-		if (getLotRows() != null){
-			builder.append(", lotCount = ");
-			builder.append(getLotRows().size());
-			builder.append(", lots={");
-			for (LotDetails lot : getLotRows()) {
-				builder.append(lot);
-			}
-			builder.append("}");
-		}
+		builder.append(", ");
+		builder.append(getFieldsToString());
 		builder.append("]");
 		return builder.toString();
 	}

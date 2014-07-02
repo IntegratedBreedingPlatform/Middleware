@@ -71,6 +71,13 @@ public class GermplasmInventory implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("GermplasmInventory [");
+		builder.append(getFieldsToString());
+		builder.append("]");
+		return builder.toString();
+	}
+
+	protected String getFieldsToString() {
+		StringBuilder builder = new StringBuilder();
 		builder.append("gid=");
 		builder.append(gid);
 		builder.append(", actualInventoryLotCount=");
@@ -89,7 +96,6 @@ public class GermplasmInventory implements Serializable {
 			builder.append(", lotCount = ");
 			builder.append(lotCount);
 		}
-		builder.append("]");
 		return builder.toString();
 	}
 
