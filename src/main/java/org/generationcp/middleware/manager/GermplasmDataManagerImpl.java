@@ -2126,5 +2126,36 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return getTermBuilder().getTermsByIds(ids);
 		
 	}    
+	
+	@Override
+	public Method getMethodByCode(String code) throws MiddlewareQueryException {
+	    Method method = new Method();
+	    if (setWorkingDatabase(Database.CENTRAL)) {
+	        method = getMethodDao().getByCode(code);
+	    }
+	    if (method == null || method.getMid() == null) {
+	        setWorkingDatabase(Database.LOCAL);
+	        method = getMethodDao().getByCode(code);
+	    }
+	    return method;
+	}
+	
+	@Override
+	public Method getMethodByName(String name) throws MiddlewareQueryException {
+	    List<Method> methods = new ArrayList<Method>();
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            methods = getMethodDao().getByName(name);
+        }
+        if (methods == null || methods.size() == 0) {
+            setWorkingDatabase(Database.LOCAL);
+            methods = getMethodDao().getByName(name);
+        }
+        if (methods != null && methods.size() > 0) {
+            Method method = methods.get(0); 
+            return method;
+        } else {
+            return new Method();
+        }
+	}
     
 }

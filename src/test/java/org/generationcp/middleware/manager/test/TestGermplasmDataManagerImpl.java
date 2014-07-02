@@ -882,4 +882,21 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
         Debug.println(INDENT, "testUpdateGermplasm(" + gid + ")");
     }
     
+    @Test
+    public void testGetMethodByName() throws Exception {
+        String name = "breeders seed";
+        Method method = manager.getMethodByName(name);
+        assertNotNull(method);
+        Debug.println(INDENT, "testGetMethodByName("+name+"): ");
+        Debug.println(INDENT, method);
+    }
+    
+    @Test
+    public void testGetMethodByCode() throws Exception {
+        String code = "VBS";
+        Method method = manager.getMethodByCode(code);
+        assertNotNull(method);
+        Debug.println(INDENT, "testGetMethodByCode("+code+"): ");
+        Debug.println(INDENT, method);
+    }
 }

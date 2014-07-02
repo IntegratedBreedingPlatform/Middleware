@@ -441,7 +441,7 @@ public class WorkbookBuilder extends Builder {
             if (methodList != null && !methodList.isEmpty()) {
                 for (Method method : methodList) {
                     if (method != null) {
-                        list.add(new ValueReference(method.getMid(), method.getMname(), method.getMname()));
+                        list.add(new ValueReference(method.getMid(), method.getMname() + " - " + method.getMcode(), method.getMname() + " - " + method.getMcode()));
                     }
                 }
             }

@@ -43,6 +43,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -771,10 +772,11 @@ public interface FieldbookService {
 	List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
 	
 	/**
-	 * Returns a map of Gid, and list of Names
-	 * @param gids
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Returns a map of Gid, and list of Names.
+	 *
+	 * @param gids the gids
+	 * @return the names by gids
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException;
 
@@ -786,4 +788,31 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	int countGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the method by code.
+	 *
+	 * @param code the code
+	 * @return the method by code
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Method getMethodByCode(String code) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the method by id.
+	 *
+	 * @param id the id
+	 * @return the method by id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Method getMethodById(int id) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the method by name.
+	 *
+	 * @param name the name
+	 * @return the method by name
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Method getMethodByName(String name) throws MiddlewareQueryException;
 }

@@ -1101,4 +1101,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			throws MiddlewareQueryException {
 		return (int)getGermplasmListManager().countGermplasmListDataByListId(listId);
 	}
+	
+	@Override
+	public Method getMethodById(int id) throws MiddlewareQueryException {
+	    return getGermplasmDataManager().getMethodByID(id);
+	}
+	
+	@Override
+	public Method getMethodByCode(String code) throws MiddlewareQueryException {
+	    return getGermplasmDataManager().getMethodByCode(code);
+	}
+	
+	@Override
+	public Method getMethodByName(String name) throws MiddlewareQueryException {
+	   return getGermplasmDataManager().getMethodByName(name); 
+	}
 }
