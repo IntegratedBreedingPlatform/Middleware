@@ -17,6 +17,7 @@ import java.util.List;
 /**
  * The Class Debug. Used to print debug information. 
  */
+
 public class Debug {
     
     private static StringBuffer printIndent(int indent){
@@ -53,6 +54,10 @@ public class Debug {
         println(indent, obj.toString());
     }
 
+    public static void print(Object obj) {
+        print(0, obj);
+    }
+    
     /**
      * Prints the String s with the given indent.
      *
@@ -77,7 +82,7 @@ public class Debug {
 
     
     /**
-     * Prints the formatted object. The class name, and each field is on one line.
+     * Prints the formatted object - one line for each field.
      *
      * @param indent the indent
      * @param obj the object to print
@@ -99,6 +104,10 @@ public class Debug {
             }
         }        
     }
+    
+    public static void printFormattedObject(Object obj){
+        printFormattedObject(0, obj);
+    }
 
     /**
      * Prints multiple formatted objects. 
@@ -115,6 +124,10 @@ public class Debug {
         println(indent, "#RECORDS: " + (objects != null ? objects.size() : 0));
     }
 
+    public static void printFormattedObjects(List<?> objects){
+        printFormattedObjects(0, objects);
+    }
+
     /**
      * Prints the obj.toString().
      *
@@ -125,6 +138,9 @@ public class Debug {
         println(indent, obj.toString());
     }
 
+    public static void printObject(Object obj) {
+        printObject(0, obj);
+    }
     /**
      * Prints the obj.toString() of the objects passed.
      *
@@ -139,5 +155,10 @@ public class Debug {
         }
         println(indent, "#RECORDS: " + (objects != null ? objects.size() : 0));
     }
+    
+    public static void printObjects(List<?> objects){
+        printObjects(0, objects);
+    }
+
     
 }
