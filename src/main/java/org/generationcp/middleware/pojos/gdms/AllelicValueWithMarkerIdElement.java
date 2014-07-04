@@ -39,15 +39,19 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
     
     private Integer accSampleId;
 
-    public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId) {
-        this(gid, data, markerId, null);
+    public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId
+            , Integer markerSampleId, Integer accSampleId) {
+        this(gid, data, markerId, null, markerSampleId, accSampleId);
     }
 
-    public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId, Integer peakHeight) {
+    public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId, Integer peakHeight
+            , Integer markerSampleId, Integer accSampleId) {
         this.gid = gid;
         this.data = data;
         this.markerId = markerId;
         this.peakHeight = peakHeight;
+        this.markerSampleId = markerSampleId;
+        this.accSampleId = accSampleId;
     }
 
     public Integer getGid() {

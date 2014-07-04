@@ -106,6 +106,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID =
             "SELECT gid, marker_id, CONCAT(allele_bin_value, ''), peak_height " +
+                    "  , marker_sample_id, acc_sample_id " +
                     "FROM gdms_allele_values " +
                     "WHERE dataset_id = :datasetId " +
                     "ORDER BY gid ASC, marker_id ASC";
@@ -207,8 +208,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                         Integer markerId = (Integer) result[1];
                         String data = (String) result[2];
                         Integer peakHeight = (Integer) result[3];
+                        Integer markerSampleId = (Integer) result[4];
+                        Integer accSampleId = (Integer) result[5];
                         AllelicValueWithMarkerIdElement allelicValueElement =
-                                new AllelicValueWithMarkerIdElement(gid, data, markerId, peakHeight);
+                                new AllelicValueWithMarkerIdElement(gid, data, markerId, peakHeight, markerSampleId, accSampleId);
                         toReturn.add(allelicValueElement);
                     }
                 }

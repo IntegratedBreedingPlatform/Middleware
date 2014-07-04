@@ -92,6 +92,7 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
             "SELECT gid, marker_id, CONCAT(map_char_value, '') " +
+            "           , marker_sample_id, acc_sample_id " +
             "FROM gdms_mapping_pop_values " +
             "WHERE dataset_id = :datasetId " +
             "ORDER BY gid ASC, marker_id ASC";
@@ -150,7 +151,10 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
 	                    Integer gid = (Integer) result[0];
 	                    Integer markerId = (Integer) result[1];
 	                    String data = (String) result[2];
-	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(gid, data, markerId);
+                        Integer markerSampleId = (Integer) result[3];
+                        Integer accSampleId = (Integer) result[4];
+	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(
+	                            gid, data, markerId, markerSampleId, accSampleId);
 	                    toReturn.add(allelicValueElement);
 	                }
 	            }

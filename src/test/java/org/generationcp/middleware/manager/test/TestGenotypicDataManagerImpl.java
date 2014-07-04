@@ -325,7 +325,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {
-        Integer datasetId = Integer.valueOf(2);
+        Integer datasetId = Integer.valueOf(6);
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
         List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(
                 datasetId, 0, (int) count);
