@@ -714,14 +714,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AccMetadataSet> getAccMetadatasetsByDatasetIds(List<Integer> datasetIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return getAccMetadatasetsByDatasetIds(datasetIds, null, start, numOfRows);
+        return getAccMetadatasetsByDatasetIdsAndNotGids(datasetIds, null, start, numOfRows);
     }
 
     @Override
-    public List<AccMetadataSet> getAccMetadatasetsByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
+    public List<AccMetadataSet> getAccMetadatasetsByDatasetIdsAndNotGids(
+            List<Integer> datasetIds, List<Integer> notGids, int start, int numOfRows)
             throws MiddlewareQueryException {
         return (List<AccMetadataSet>) super.getAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "getByDatasetIdsAndNotInGids",
-                new Object[]{datasetIds, gids, start, numOfRows}, new Class[]{List.class, List.class, Integer.TYPE, Integer.TYPE});
+                new Object[]{datasetIds, notGids, start, numOfRows}, new Class[]{List.class, List.class, Integer.TYPE, Integer.TYPE});
     }
 
 

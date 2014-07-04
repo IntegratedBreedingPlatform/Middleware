@@ -738,14 +738,14 @@ public interface GenotypicDataManager{
      * Gets the nids from acc metadataset by dataset ids filtered by gids.
      *
      * @param datasetIds - the dataset ids to match
-     * @param gids - the gids to match
+     * @param notGids - the gids to exclude
      * @param start - the starting index of the sublist of results to be returned
      * @param numOfRows - the number of rows to be included in the sublist of results
      * to be returned
      * @return List of name ids from acc_metadataset based on the given list of dataset ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AccMetadataSet> getAccMetadatasetsByDatasetIds(List<Integer> datasetIds, List<Integer> gids, 
+    List<AccMetadataSet> getAccMetadatasetsByDatasetIdsAndNotGids(List<Integer> datasetIds, List<Integer> notGids, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
     /**

@@ -509,7 +509,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         List<Integer> gids = Arrays.asList(-2);
 
         List<AccMetadataSet> nids = manager.getAccMetadatasetsByDatasetIds(datasetIds, 0, 10);
-        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetsByDatasetIds(datasetIds, gids, 0, 10);
+        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetsByDatasetIdsAndNotGids(datasetIds, gids, 0, 10);
 
         Debug.println("testGgetAccMetadatasetByDatasetIds: " + nids);
         Debug.println("testGetgetAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
