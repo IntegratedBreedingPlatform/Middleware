@@ -1116,4 +1116,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Method getMethodByName(String name) throws MiddlewareQueryException {
 	   return getGermplasmDataManager().getMethodByName(name); 
 	}
+	
+	@Override
+	public void deleteStudy(int studyId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction(); 
+
+            getStudyDestroyer().deleteStudy(studyId);
+		
+            trans.commit();
+         } catch (Exception e) {
+             rollbackTransaction(trans);
+             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
+         }
+	}
 }

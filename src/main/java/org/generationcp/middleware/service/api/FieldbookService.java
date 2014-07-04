@@ -815,4 +815,9 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Method getMethodByName(String name) throws MiddlewareQueryException;
+
+	/*
+	 * Deletes a study (logical delete).
+	 */
+	void deleteStudy(int studyId) throws MiddlewareQueryException;
 }
