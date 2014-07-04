@@ -146,6 +146,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
     public static final String GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
             "SELECT gdms_char_values.dataset_id, gdms_char_values.gid, gdms_char_values.marker_id "
                     + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_char_values.char_value,'') "
+                    + ", gdms_char_values.marker_sample_id, gdms_char_values.acc_sample_id "
                     + "FROM gdms_char_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_char_values.marker_id "
                     + "WHERE gdms_char_values.gid IN (:gids) "
                     + "ORDER BY gid, marker_name ";
@@ -158,6 +159,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
     public static final String GET_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =
             "SELECT gdms_mapping_pop_values.dataset_id, gdms_mapping_pop_values.gid, gdms_mapping_pop_values.marker_id "
                     + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_mapping_pop_values.map_char_value,'') "
+                    + ", gdms_mapping_pop_values.marker_sample_id, gdms_mapping_pop_values.acc_sample_id "
                     + "FROM gdms_mapping_pop_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id "
                     + "WHERE gdms_mapping_pop_values.gid IN (:gids) "
                     + "ORDER BY gid, marker_name ";
@@ -516,13 +518,17 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                         Integer markerId = (Integer) result[2];
                         String markerName = (String) result[3];
                         String charValue = (String) result[4];
-                        AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, markerId, markerName, charValue);
+                        Integer markerSampleId = (Integer) result[5];
+                        Integer accSampleId = (Integer) result[6];
+                        AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, 
+                                markerId, markerName, charValue, markerSampleId, accSampleId);
                         values.add(allelicValueElement);
                     }
                 }
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" 
+                        + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
         return values;
     }
@@ -538,13 +544,14 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                 }
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" 
+                    + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
         return 0;
     }
 
     public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids,
-                                                                                          int start, int numOfRows) throws MiddlewareQueryException {
+                                      int start, int numOfRows) throws MiddlewareQueryException {
         try {
             if (gids != null && !gids.isEmpty()) {
                 SQLQuery query = getSession().createSQLQuery(GET_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS);
@@ -563,8 +570,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                         Integer markerId = (Integer) result[2];
                         String markerName = (String) result[3];
                         String data = (String) result[4];
-                        AllelicValueElement allelicValueElement =
-                                new AllelicValueElement(datasetId, gid, markerId, markerName, data);
+                        Integer markerSampleId = (Integer) result[5];
+                        Integer accSampleId = (Integer) result[6];
+                        AllelicValueElement allelicValueElement = new AllelicValueElement(
+                                datasetId, gid, markerId, markerName, data, markerSampleId, accSampleId);
                         values.add(allelicValueElement);
                     }
                 }
@@ -572,7 +581,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                 return values;
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" 
+                    + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
         return new ArrayList<AllelicValueElement>();
     }

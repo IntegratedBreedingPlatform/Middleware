@@ -901,9 +901,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     private List<AllelicValueElement> getForPolyMorphicMarkersRetrieval(String getMethodName,
-                                                                        List<Integer> gids, int start, int numOfRows) 
-                                                                        		throws MiddlewareQueryException {
-        List<AllelicValueElement> allelicValueElements = (List<AllelicValueElement>) super.getAllFromCentralAndLocalByMethod(
+                                List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
+        List<AllelicValueElement> allelicValueElements = 
+                (List<AllelicValueElement>) super.getAllFromCentralAndLocalByMethod(
                 getAlleleValuesDao(), getMethodName, new Object[]{gids, start, numOfRows}, 
                 new Class[]{List.class, Integer.TYPE, Integer.TYPE});
 
