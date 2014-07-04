@@ -660,8 +660,8 @@ public class WorkbookSaver extends Saver {
 	
 	private VariableType createOccVariableType(int rank) throws MiddlewareQueryException {
 		VariableInfo info = new VariableInfo();
-		info.setLocalName("OCC");
-		info.setLocalDescription("OCC");
+		info.setLocalName("TRIAL_INSTANCE");
+		info.setLocalDescription("TRIAL_INSTANCE");
 		info.setStdVariableId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		info.setRank(rank);
 		return getVariableTypeBuilder().create(info);
