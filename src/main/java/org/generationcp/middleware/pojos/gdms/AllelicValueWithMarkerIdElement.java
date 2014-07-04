@@ -13,9 +13,6 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 /**
  * Placeholder POJO for Allelic Value that stores the marker id
  * Used by GenotypicDataManager.getAllelicValuesFromCharValuesByDatasetId().
@@ -37,6 +34,10 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
     private Integer markerId;
     
     private Integer peakHeight;
+    
+    private Integer markerSampleId;
+    
+    private Integer accSampleId;
 
     public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId) {
         this(gid, data, markerId, null);
@@ -84,7 +85,79 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
 	public void setPeakHeight(Integer peakHeight) {
 		this.peakHeight = peakHeight;
 	}
-	@Override
+	
+    public Integer getMarkerSampleId() {
+        return markerSampleId;
+    }
+    
+    public void setMarkerSampleId(Integer markerSampleId) {
+        this.markerSampleId = markerSampleId;
+    }
+
+    public Integer getAccSampleId() {
+        return accSampleId;
+    }
+    
+    public void setAccSampleId(Integer accSampleId) {
+        this.accSampleId = accSampleId;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((accSampleId == null) ? 0 : accSampleId.hashCode());
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        result = prime * result + ((gid == null) ? 0 : gid.hashCode());
+        result = prime * result + ((markerId == null) ? 0 : markerId.hashCode());
+        result = prime * result + ((markerSampleId == null) ? 0 : markerSampleId.hashCode());
+        result = prime * result + ((peakHeight == null) ? 0 : peakHeight.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        AllelicValueWithMarkerIdElement other = (AllelicValueWithMarkerIdElement) obj;
+        if (accSampleId == null) {
+            if (other.accSampleId != null)
+                return false;
+        } else if (!accSampleId.equals(other.accSampleId))
+            return false;
+        if (data == null) {
+            if (other.data != null)
+                return false;
+        } else if (!data.equals(other.data))
+            return false;
+        if (gid == null) {
+            if (other.gid != null)
+                return false;
+        } else if (!gid.equals(other.gid))
+            return false;
+        if (markerId == null) {
+            if (other.markerId != null)
+                return false;
+        } else if (!markerId.equals(other.markerId))
+            return false;
+        if (markerSampleId == null) {
+            if (other.markerSampleId != null)
+                return false;
+        } else if (!markerSampleId.equals(other.markerSampleId))
+            return false;
+        if (peakHeight == null) {
+            if (other.peakHeight != null)
+                return false;
+        } else if (!peakHeight.equals(other.peakHeight))
+            return false;
+        return true;
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("AllelicValueWithMarkerIdElement [gid=");
@@ -95,34 +168,13 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
         builder.append(markerId);
         builder.append(", peakHeight=");
         builder.append(peakHeight);
+        builder.append(", markerSampleId=");
+        builder.append(markerSampleId);
+        builder.append(", accSampleId=");
+        builder.append(accSampleId);
         builder.append("]");
         return builder.toString();
     }
 
-	@Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof AllelicValueWithMarkerIdElement)) {
-            return false;
-        }
 
-        AllelicValueWithMarkerIdElement rhs = (AllelicValueWithMarkerIdElement) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(gid, rhs.gid)
-                .append(data, rhs.data)
-                .append(markerId, rhs.markerId)
-                .append(peakHeight, rhs.peakHeight)
-                .isEquals();
-    }
-    
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 97).append(gid)
-                .append(data)
-                .append(markerId).toHashCode();
-    }
 }
