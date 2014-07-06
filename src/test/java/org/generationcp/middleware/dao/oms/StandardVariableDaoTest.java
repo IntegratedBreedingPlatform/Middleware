@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -55,18 +57,38 @@ public class StandardVariableDaoTest {
 	}
 	
 	@Test
-	public void testgetStandardVariable1() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummaryFromView() throws MiddlewareQueryException {
+		
 		StandardVariableDao dao = new StandardVariableDao(factory.getSessionProviderForCentral().getSession());
-		StandardVariableSummary variable = dao.getStandardVariableSummary(VARIABLE_ID);	
-		Assert.assertNotNull(variable);
-		System.out.println(variable);
+		
+		//Load summary from the view
+		StandardVariableSummary summary = dao.getStandardVariableSummary(VARIABLE_ID);	
+		Assert.assertNotNull(summary);
+
+		//Load details using existing method
+		StandardVariable details = manager.getStandardVariable(VARIABLE_ID);
+		Assert.assertNotNull(details);
+		
+		//Make sure that the summary data loaded from view matches with details data loaded using the usual method.
+		Assert.assertEquals(summary.getId(), new Integer(details.getId()));
+		Assert.assertEquals(summary.getName(), details.getName());
+		Assert.assertEquals(summary.getDescription(), details.getDescription());
+		
+		assertTermsEquals(summary.getProperty(), details.getProperty());
+		assertTermsEquals(summary.getMethod(), details.getMethod());
+		assertTermsEquals(summary.getScale(), details.getScale());
+		assertTermsEquals(summary.getIsA(), details.getIsA());
+		assertTermsEquals(summary.getDataType(), details.getDataType());
+		assertTermsEquals(summary.getStoredIn(), details.getStoredIn());
+		
+		Assert.assertEquals(summary.getPhenotypicType(), details.getPhenotypicType());
+							
 	}
 	
-	@Test
-	public void testGetStandardVariable2() throws MiddlewareQueryException {
-		StandardVariable variable = manager.getStandardVariable(VARIABLE_ID);
-		Assert.assertNotNull(variable);
-		System.out.println(variable);							
+	private void assertTermsEquals(TermSummary termSummary, Term termDetails) {
+		Assert.assertEquals(termSummary.getId(), new Integer(termDetails.getId()));
+		Assert.assertEquals(termSummary.getName(), termDetails.getName());
+		Assert.assertEquals(termSummary.getDefinition(), termDetails.getDefinition());
 	}
 	
 	@AfterClass
@@ -75,6 +97,5 @@ public class StandardVariableDaoTest {
 			factory.close();
 		}
 	}
-	
 
 }
