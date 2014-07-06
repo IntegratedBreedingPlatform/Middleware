@@ -3,6 +3,8 @@ package org.generationcp.middleware.dao.oms;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
@@ -25,7 +27,7 @@ import org.junit.rules.TestName;
 
 public class StandardVariableDaoTest {
 	
-	private static final int VARIABLE_ID = 18020;
+	private static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
 	
 	private static ManagerFactory factory;
 	private static OntologyDataManager manager;
@@ -57,35 +59,47 @@ public class StandardVariableDaoTest {
 	}
 	
 	@Test
-	public void testGetStandardVariableSummaryFromView() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummary() throws MiddlewareQueryException {
 		
 		StandardVariableDao dao = new StandardVariableDao(factory.getSessionProviderForCentral().getSession());
 		
 		//Load summary from the view
-		StandardVariableSummary summary = dao.getStandardVariableSummary(VARIABLE_ID);	
+		StandardVariableSummary summary = dao.getStandardVariableSummary(PLANT_HEIGHT_ID);	
 		Assert.assertNotNull(summary);
 
 		//Load details using existing method
-		StandardVariable details = manager.getStandardVariable(VARIABLE_ID);
+		StandardVariable details = manager.getStandardVariable(PLANT_HEIGHT_ID);
 		Assert.assertNotNull(details);
 		
 		//Make sure that the summary data loaded from view matches with details data loaded using the usual method.
+		assertVariableDataMatches(summary, details);	
+	}
+	
+	
+	@Test
+	public void testGetStarndardVariableSummaries() throws MiddlewareQueryException {
+		
+		StandardVariableDao dao = new StandardVariableDao(factory.getSessionProviderForCentral().getSession());		
+		List<StandardVariableSummary> starndardVariableSummaries = dao.getStarndardVariableSummaries(Arrays.asList(GRAIN_YIELD_ID, PLANT_HEIGHT_ID));		
+		Assert.assertEquals(2, starndardVariableSummaries.size());
+	}
+	
+	private void assertVariableDataMatches(StandardVariableSummary summary, StandardVariable details) {
 		Assert.assertEquals(summary.getId(), new Integer(details.getId()));
 		Assert.assertEquals(summary.getName(), details.getName());
 		Assert.assertEquals(summary.getDescription(), details.getDescription());
 		
-		assertTermsEquals(summary.getProperty(), details.getProperty());
-		assertTermsEquals(summary.getMethod(), details.getMethod());
-		assertTermsEquals(summary.getScale(), details.getScale());
-		assertTermsEquals(summary.getIsA(), details.getIsA());
-		assertTermsEquals(summary.getDataType(), details.getDataType());
-		assertTermsEquals(summary.getStoredIn(), details.getStoredIn());
+		assertTermDataMatches(summary.getProperty(), details.getProperty());
+		assertTermDataMatches(summary.getMethod(), details.getMethod());
+		assertTermDataMatches(summary.getScale(), details.getScale());
+		assertTermDataMatches(summary.getIsA(), details.getIsA());
+		assertTermDataMatches(summary.getDataType(), details.getDataType());
+		assertTermDataMatches(summary.getStoredIn(), details.getStoredIn());
 		
 		Assert.assertEquals(summary.getPhenotypicType(), details.getPhenotypicType());
-							
 	}
 	
-	private void assertTermsEquals(TermSummary termSummary, Term termDetails) {
+	private void assertTermDataMatches(TermSummary termSummary, Term termDetails) {
 		Assert.assertEquals(termSummary.getId(), new Integer(termDetails.getId()));
 		Assert.assertEquals(termSummary.getName(), termDetails.getName());
 		Assert.assertEquals(termSummary.getDefinition(), termDetails.getDefinition());
