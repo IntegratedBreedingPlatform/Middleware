@@ -302,7 +302,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	                    for (MeasurementRow row : observations){
 	                        for (MeasurementData field : row.getDataList()){
 	                            if (variate.getName().equals(field.getLabel())){
-	                            	Phenotype phenotype = null;
+	                            	Phenotype phenotype = getPhenotypeDao().getPhenotypeByProjectExperimentAndType(measurementDatasetId, row.getExperimentId(), variate.getTermId());
 	                                if (field.getValue() != null) {
 	                                	field.setValue(field.getValue().trim());
 	                                }
