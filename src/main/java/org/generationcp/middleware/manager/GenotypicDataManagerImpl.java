@@ -73,6 +73,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfoDetails;
 import org.generationcp.middleware.pojos.gdms.Mta;
@@ -2652,15 +2653,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public List<Integer> getMarkerFromAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.getAllFromCentralAndLocalByMethod(getAlleleValuesDao(), "getMarkerIdsByGids",
+    public List<MarkerSampleId> getMarkerFromAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
+        return super.getAllFromCentralAndLocalByMethod(getAlleleValuesDao(), "getMarkerSampleIdsByGids",
                 new Object[]{gIds}, new Class[]{List.class});
+        //TODO
     }
 
     @Override
-    public List<Integer> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.getAllFromCentralAndLocalByMethod(getMappingPopValuesDao(), "getMarkerIdsByGids",
+    public List<MarkerSampleId> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException {
+        return super.getAllFromCentralAndLocalByMethod(getMappingPopValuesDao(), "getMarkerSampleIdsByGids",
                 new Object[]{gIds}, new Class[]{List.class});
+        //TODO
     }
 
     @Override

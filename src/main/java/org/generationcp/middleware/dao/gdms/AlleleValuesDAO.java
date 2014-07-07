@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -170,8 +171,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
                     + "FROM gdms_mapping_pop_values LEFT JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id "
                     + "WHERE gdms_mapping_pop_values.gid IN (:gids) ";
 
-    public static final String GET_MARKER_IDS_BY_GIDS =
-            "SELECT DISTINCT marker_id " +
+    public static final String GET_MARKER_SAMPLE_IDS_BY_GIDS =
+            "SELECT DISTINCT marker_id, marker_sample_id " +
                     "FROM gdms_allele_values " +
                     "WHERE gid IN (:gids)";
 
@@ -621,20 +622,28 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Integer> getMarkerIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
-
+    public List<MarkerSampleId> getMarkerSampleIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+    	List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
         try {
             if (gIds != null && gIds.size() > 0) {
-                SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_GIDS);
+                SQLQuery query = getSession().createSQLQuery(GET_MARKER_SAMPLE_IDS_BY_GIDS);
                 query.setParameterList("gids", gIds);
 
-                return query.list();
+				List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer markerId = (Integer) result[0];
+                    	Integer markerSampleId = (Integer) result[1];
+                        MarkerSampleId dataElement = new MarkerSampleId(markerId, markerSampleId);
+                        toReturn.add(dataElement);
+                    }
+                }
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from AlleleValuesDAO: " + e.getMessage(), e);
+            logAndThrowException("Error with getMarkerSampleIdsByGids(gIds=" + gIds + ") query from AlleleValuesDAO: " + e.getMessage(), e);
         }
-        return new ArrayList<Integer>();
+        return toReturn;
     }
 
     public long countByGids(List<Integer> gIds) throws MiddlewareQueryException {

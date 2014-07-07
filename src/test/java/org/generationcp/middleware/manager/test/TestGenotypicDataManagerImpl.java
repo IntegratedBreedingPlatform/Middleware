@@ -54,6 +54,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.MtaMetadata;
@@ -2138,15 +2139,15 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetMarkerFromAlleleValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2213, 2214);
-        List<Integer> result = manager.getMarkerFromAlleleValuesByGids(gIds);
-        Debug.println("testGetMarkerFromAlleleValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromAlleleValuesByGids(gIds);
+        Debug.printObjects(result);
     }
 
     @Test
     public void testGetMarkerFromMappingPopValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(1434, 1435);
-        List<Integer> result = manager.getMarkerFromMappingPopByGids(gIds);
-        Debug.println("testGetMarkerFromMappingPopValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromMappingPopByGids(gIds);
+        Debug.printObjects(result);
     }
 
     @Test
