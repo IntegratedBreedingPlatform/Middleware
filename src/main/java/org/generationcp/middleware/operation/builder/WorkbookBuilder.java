@@ -227,7 +227,7 @@ public class WorkbookBuilder extends Builder {
 	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
             Workbook workbook = new Workbook();
             Study study = getStudyBuilder().createStudy(id);
-            Integer dataSetId = null;
+            Integer dataSetId = null, trialDatasetId = null;
             //get observation dataset
             if (dataSetId == null) {
                 List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
@@ -243,6 +243,9 @@ public class WorkbookBuilder extends Builder {
                                 datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
                             dataSetId = datasetRef.getId();
                         }
+                        else if (datasetRef.getName().equals("TRIAL_" + studyDetails.getStudyName())) {
+                        	trialDatasetId = datasetRef.getId();
+                        }
                     }
                 }
             }
@@ -255,7 +258,15 @@ public class WorkbookBuilder extends Builder {
             	}
             }
             
+            if (trialDatasetId == null || trialDatasetId == 0) {
+            	DataSet dataset = getStudyDataManager().findOneDataSetByType(id, DataSetType.SUMMARY_DATA);
+            	if (dataset != null) {
+            		trialDatasetId = dataset.getId();
+            	}
+            }
+            
             workbook.setMeasurementDatesetId(dataSetId);
+            workbook.setTrialDatasetId(trialDatasetId);
             
             VariableTypeList variables = null;
             if (dataSetId != null) {
@@ -286,8 +297,11 @@ public class WorkbookBuilder extends Builder {
                         String value = null;
                         if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
                         	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        	if (value == null) {
+                        		value = "";
+                        	}
                         }
-                        else if (isNursery) { //set trial env for nursery studies
+                        else /*if (isNursery)*/ { //set trial env for nursery studies
                         	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
