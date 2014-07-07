@@ -2166,6 +2166,53 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
+    public void testAddMta() throws Exception {
+        Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
+                "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
+        Mta mta = new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA",
+    			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod",
+    			8.8f, 9.9f, "dominance", "evidence", "reference", "notes");
+        MtaMetadata mtaMetadata = new MtaMetadata(null, "project1", "population", 100, "Thousand");
+        DatasetUsers users = new DatasetUsers(null, 1);
+        manager.addMTA(dataset, mta, mtaMetadata, users);
+        
+        // non-null id means the records were inserted.
+        assertTrue(mta.getMtaId() != null && mtaMetadata.getMtaId() != null); 
+        
+        Debug.println("MTA added: ");
+        Debug.printObject(INDENT, mta);
+        Debug.printObject(INDENT, mtaMetadata);
+    }
+    
+    @Test
+    public void testAddMtaGCP9174() throws Exception {
+    	int nextDatasetId = (int) (manager.getLastId(Database.LOCAL, GdmsTable.GDMS_DATASET) - 1);
+        Dataset dataset = new Dataset(nextDatasetId, "sample","testing", "MTA", "Groundnut", "Groundnut", null, "", 
+        		"int", null, "Tassel", "LOD", "ICRISAT",  "TrusharShah", null, null);
+        
+        int nextMtaId = (int) (manager.getLastId(Database.LOCAL, GdmsTable.GDMS_MTA) - 1);
+
+        Mta mta = new Mta(nextMtaId, 964, nextDatasetId, 5, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T", 
+        		"absent", "present", 0.0f, 0.0f, 0.0f, 0.0f, "Bonferroni", 0.0f, 
+        		0.0f, "co-dominant", "association", "Ellis et al (2002) TAG 105:1038-1042", "");
+
+        MtaMetadata mtaMetadata = new MtaMetadata(nextMtaId, "project1", "population", 100, "Thousand");
+        
+        DatasetUsers users = new DatasetUsers(nextDatasetId, 1);
+        
+        manager.addMTA(dataset, mta, mtaMetadata, users);
+        
+        // non-null id means the records were inserted.
+        assertTrue(mta.getMtaId() != null && mtaMetadata.getMtaId() != null); 
+        
+        Debug.println("MTA added: ");
+        Debug.printObject(INDENT, dataset);
+        Debug.printObject(INDENT, mta);
+        Debug.printObject(INDENT, mtaMetadata);
+    }
+
+    
+    @Test
     public void testAddMTAs() throws Exception {
         Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
                 "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
@@ -2176,15 +2223,19 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         mtaList.add( new Mta(null, 2, null, 2, 3.1f, 2, 2.1f, 3.2f, 4.3f, "gene", "chromosome", "alleleA",
     			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 5.4f, 6.5f, 7.6f, 8.7f, "correctionMethod",
     			9.8f, 10.9f, "dominance", "evidence", "reference", "notes"));
-        
-        
+       
         List<MtaMetadata> mtaMetadataList = new ArrayList<MtaMetadata>();
         mtaMetadataList.add(new MtaMetadata(null, "project1", "population", 100, "Thousand"));
         mtaMetadataList.add(new MtaMetadata(null, "project2", "population", 1, "Million"));
         
         DatasetUsers users = new DatasetUsers(null, 1);
         manager.addMTAs(dataset, mtaList, mtaMetadataList, users);
-        Debug.println("done with testAddMTAs");
+        
+        // Non-null id means the record was inserted.
+        assertTrue(mtaList.get(0).getMtaId() != null && mtaMetadataList.get(0).getMtaId() != null); 
+        
+        Debug.println("MTAs added: ");
+        Debug.printObjects(INDENT, mtaList);
     }
     
     @Test

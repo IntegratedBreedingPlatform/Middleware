@@ -2674,11 +2674,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
+        
+        if (dataset == null){
+        	logAndThrowException("Dataset passed must not be null");
+        } 
 
         try {
             trans = session.beginTransaction();
 
-            dataset.setDatasetId(getDatasetDao().getNegativeId("datasetId"));
+            if (dataset.getDatasetId() == null){
+            	dataset.setDatasetId(getDatasetDao().getNegativeId("datasetId"));
+            } 
             dataset.setDatasetType(TYPE_MTA);
             dataset.setUploadTemplateDate(new Date());
             getDatasetDao().save(dataset);
