@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
@@ -76,6 +78,42 @@ public class StandardVariableBuilder extends Builder {
 			}
 		}
 		return standardVariables;
+	}
+	
+	/**
+	 * Loads a list of {@link StandardVariableSummary}'s for the given set of standard variable ids from standard_variable_summary database view.
+	 * 
+	 * @see StandardVariableDao#getStarndardVariableSummaries(List)
+	 */
+	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+
+		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
+		if(standardVariableIds != null && !standardVariableIds.isEmpty()) {
+			List<Integer> positiveIds = new ArrayList<Integer>();
+			for(Integer id : standardVariableIds) {
+				if(id > 0) {
+					positiveIds.add(id);
+				}
+			}
+			if(!positiveIds.isEmpty()) {
+				if(setWorkingDatabase(Database.CENTRAL)) {		
+					result.addAll(getStandardVariableDao().getStarndardVariableSummaries(positiveIds));
+				}
+			}
+			
+			List<Integer> negativeIds = new ArrayList<Integer>();
+			for(Integer id : standardVariableIds) {
+				if(id < 0) {
+					negativeIds.add(id);
+				}
+			}	
+			if(!negativeIds.isEmpty()) {
+				if(setWorkingDatabase(Database.LOCAL)) {		
+					result.addAll(getStandardVariableDao().getStarndardVariableSummaries(negativeIds));
+				}
+			}
+		}
+		return result;
 	}
 
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {

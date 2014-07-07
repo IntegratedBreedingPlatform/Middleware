@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
@@ -77,6 +78,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
 		return getStandardVariableBuilder().create(standardVariableIds);
+	}
+	
+	@Override
+	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		return getStandardVariableBuilder().getStandardVariableSummaries(standardVariableIds);
 	}
 
     @Override

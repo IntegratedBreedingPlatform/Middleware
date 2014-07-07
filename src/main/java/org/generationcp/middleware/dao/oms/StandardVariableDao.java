@@ -42,11 +42,14 @@ public class StandardVariableDao {
 			Object[] queryResult = (Object[]) query.uniqueResult();			
 			variable = mapResults(queryResult);
 		} catch(HibernateException he) {
-			throw new MiddlewareQueryException("Hibernate error in getting standard variable summary from standard_variable_summary view by id : " + standardVariableId, he);
+			throw new MiddlewareQueryException(
+					String.format(
+							"Hibernate error in getting standard variable summary from standard_variable_summary view by id: %s. Cause: %s",
+							standardVariableId, he.getCause().getMessage()));
 		}
 		
 		long elapsedTime = System.nanoTime() - startTime;
-		LOG.debug(String.format("getStandardVariableSummary(%d) from standard_variable_summary took %f ms.", standardVariableId, ((double) elapsedTime/1000000L )));
+		LOG.debug(String.format("Time taken: %f ms.", ((double) elapsedTime/1000000L )));
 		return variable;
 	}
 	
@@ -61,8 +64,7 @@ public class StandardVariableDao {
 		long startTime = System.nanoTime();
 		assert this.session != null : "Hibernate session is required.";
 		
-		List<StandardVariableSummary> variableSummaries = new ArrayList<StandardVariableSummary>();
-		
+		List<StandardVariableSummary> variableSummaries = new ArrayList<StandardVariableSummary>();		
 		if(standardVariableIds != null && !standardVariableIds.isEmpty()) {	
 			try {
 				SQLQuery query = this.session.createSQLQuery("SELECT * FROM standard_variable_summary where id in (:ids)");
@@ -76,13 +78,16 @@ public class StandardVariableDao {
 					}
 				}
 			} catch(HibernateException he) {
-				throw new MiddlewareQueryException("Hibernate error in getting standard variable summaries from standard_variable_summary view by ids: " + standardVariableIds, he);
+				throw new MiddlewareQueryException(
+						String.format(
+								"Hibernate error in getting standard variable summaries from standard_variable_summary view. Cause: %s",
+								he.getCause().getMessage()));
 			}
 		}
 		
 		long elapsedTime = System.nanoTime() - startTime;
-		LOG.debug(String.format("getStarndardVariableSummaries(%s) from standard_variable_summary view took %f ms.", standardVariableIds, ((double) elapsedTime/1000000L )));
-		
+		LOG.debug(String.format("Time taken: %f ms.", ((double) elapsedTime/1000000L )));
+		LOG.debug(String.format("Number of IDs supplied: %d. Number of standard variable summaries found: %d.", standardVariableIds.size(), variableSummaries.size()));
 		return variableSummaries;
 	}
 
