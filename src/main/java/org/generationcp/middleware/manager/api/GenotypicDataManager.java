@@ -2366,7 +2366,27 @@ public interface GenotypicDataManager{
      */
     List<DartValues> getDartMarkerDetails(List<Integer> markerIds) throws MiddlewareQueryException;
 
-
+    
+    /**
+     * Gets the marker metadataset by dataset id.
+     *
+     * @param datasetId the dataset id
+     * @return the marker metadataset by dataset id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    MarkerMetadataSet getMarkerMetadatasetByDatasetId(Integer datasetId) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the char values by marker ids.
+     *
+     * @param markerIds the marker ids
+     * @return the char values by marker ids
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
+    
+    
 }
 
 

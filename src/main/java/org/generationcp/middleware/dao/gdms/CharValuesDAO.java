@@ -22,9 +22,11 @@ import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link CharValues}.
@@ -416,4 +418,24 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         
         return values;
 	}
+    
+    
+	@SuppressWarnings("unchecked")
+	public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+		List<CharValues> toReturn = new ArrayList<CharValues>();
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.in("markerId", markerIds));
+			toReturn = criteria.list();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error in getCharValuesByMarkerIds=" + markerIds.toString() + " query on CharValuesDAO: " + e.getMessage(), e);
+		}
+		
+		return toReturn;
+	}
+
+    
+    
+    
 }

@@ -2219,7 +2219,23 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         List<DartValues> result = manager.getDartMarkerDetails(markerIds);
         Debug.printObjects(0, result);
     }
+
     
+    @Test
+    public void testGetMarkerMetadatasetByDatasetId() throws Exception {
+    	Integer datasetId = 1;
+        MarkerMetadataSet result = manager.getMarkerMetadatasetByDatasetId(datasetId);
+        Debug.printObject(0, result);
+    }
+
+    
+    @Test
+    public void testGetCharValuesByMarkerIds() throws Exception {
+    	List<Integer> markerIds = Arrays.asList(-1, -2);
+        List<CharValues> result = manager.getCharValuesByMarkerIds(markerIds);
+        Debug.printObjects(0, result);
+    }
+
 
     @Test
     public void testUpdateMarkerInfoExisting() throws Exception {

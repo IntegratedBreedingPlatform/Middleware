@@ -3805,5 +3805,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	return super.getAllFromCentralAndLocalByMethod(getDartValuesDao(), "getDartValuesByMarkerIds"
     			, new Object[]{markerIds}, new Class[]{List.class});
     }
+    
+    @Override
+    public MarkerMetadataSet getMarkerMetadatasetByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+    	return null;
+    	//TODO GCP-9319 
+    }
+
+    @Override
+    public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
+    	return super.getAllFromCentralAndLocalByMethod(getCharValuesDao(), "getCharValuesByMarkerIds"
+    			, new Object[]{markerIds}, new Class[]{List.class});
+    }
+
 
 }
