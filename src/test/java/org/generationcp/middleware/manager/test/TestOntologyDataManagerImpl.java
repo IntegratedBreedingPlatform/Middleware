@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
@@ -96,6 +97,18 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 		for (StandardVariable standardVariable : standardVariables) {
 			assertTrue(ids.contains(standardVariable.getId()));
 		}
+	}
+	
+	@Test
+	public void testGetStandardVariableSummaries() throws MiddlewareQueryException {
+		final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;		
+		List<Integer> idList = Arrays.asList(PLANT_HEIGHT_ID, GRAIN_YIELD_ID);
+		List<StandardVariableSummary> summaries = manager.getStandardVariableSummaries(idList);
+		assertNotNull(summaries);
+		assertEquals(idList.size(), summaries.size());
+		for(StandardVariableSummary summary : summaries) {
+			assertTrue(idList.contains(summary.getId()));
+		}		
 	}
 	
 	@Test

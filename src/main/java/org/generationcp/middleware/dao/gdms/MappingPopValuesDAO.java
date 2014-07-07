@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -92,6 +93,7 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
             "SELECT gid, marker_id, CONCAT(map_char_value, '') " +
+            "           , marker_sample_id, acc_sample_id " +
             "FROM gdms_mapping_pop_values " +
             "WHERE dataset_id = :datasetId " +
             "ORDER BY gid ASC, marker_id ASC";
@@ -116,8 +118,8 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
     "FROM gdms_mapping_pop_values " +
     "WHERE gid in (:gIdList)";
     
-    public static final String GET_MARKER_IDS_BY_GIDS = 
-        "SELECT DISTINCT marker_id " +
+    public static final String GET_MARKER_SAMPLE_IDS_BY_GIDS = 
+        "SELECT DISTINCT marker_id, marker_sample_id " +
         "FROM gdms_mapping_pop_values " +
         "WHERE gid IN (:gids)";
     
@@ -150,7 +152,10 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
 	                    Integer gid = (Integer) result[0];
 	                    Integer markerId = (Integer) result[1];
 	                    String data = (String) result[2];
-	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(gid, data, markerId);
+                        Integer markerSampleId = (Integer) result[3];
+                        Integer accSampleId = (Integer) result[4];
+	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(
+	                            gid, data, markerId, markerSampleId, accSampleId);
 	                    toReturn.add(allelicValueElement);
 	                }
 	            }
@@ -268,20 +273,29 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
         }
     }
     
-    @SuppressWarnings("unchecked")
-    public List<Integer> getMarkerIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
-
+    @SuppressWarnings("rawtypes")
+    public List<MarkerSampleId> getMarkerSampleIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+    	List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
         try {
             if (gIds != null && gIds.size() > 0) {
-                SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_GIDS);
+                SQLQuery query = getSession().createSQLQuery(GET_MARKER_SAMPLE_IDS_BY_GIDS);
                 query.setParameterList("gids", gIds);
                 
-                return query.list();
+				List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer markerId = (Integer) result[0];
+                    	Integer markerSampleId = (Integer) result[1];
+                        MarkerSampleId dataElement = new MarkerSampleId(markerId, markerSampleId);
+                        toReturn.add(dataElement);
+                    }
+                }
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from MappingPopValuesDAO: " + e.getMessage(), e);
+            logAndThrowException("Error with getMarkerSampleIdsByGids(gIds=" + gIds + ") query from MappingPopValuesDAO: " + e.getMessage(), e);
         }
-        return new ArrayList<Integer>();
+        return toReturn;
     }
     
 

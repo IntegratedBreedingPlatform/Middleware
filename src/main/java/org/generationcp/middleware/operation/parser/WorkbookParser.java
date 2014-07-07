@@ -49,7 +49,9 @@ public class WorkbookParser {
     public static final int END_DATE_ROW_INDEX = 5;
     public static final int STUDY_TYPE_ROW_INDEX = 6;
 
+    public static final int STUDY_DETAILS_LABEL_COLUMN_INDEX = 0;
     public static final int STUDY_DETAILS_VALUE_COLUMN_INDEX = 1;
+    public static final String PMKEY_LABEL = "PMKEY";
 
     private int currentRow;
     private List<Message> errorMessages;
@@ -197,12 +199,17 @@ public class WorkbookParser {
         String study = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_NAME_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String title = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TITLE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String pmKey = getCellStringValue(wb, DESCRIPTION_SHEET, PMKEY_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String objective = getCellStringValue(wb, DESCRIPTION_SHEET, OBJECTIVE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String startDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String endDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String pmKeyLabel = getCellStringValue(wb, DESCRIPTION_SHEET, PMKEY_ROW_INDEX, STUDY_DETAILS_LABEL_COLUMN_INDEX);
+        int rowAdjustMent = 0;
+        if(pmKeyLabel!=null && !pmKeyLabel.trim().equals(PMKEY_LABEL)) {
+        	rowAdjustMent++;
+        }
+        String objective = getCellStringValue(wb, DESCRIPTION_SHEET, OBJECTIVE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String startDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String endDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
 
         //determine study type
-        String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
 
 

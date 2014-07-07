@@ -38,6 +38,7 @@ import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
+import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
@@ -151,4 +152,8 @@ public abstract class Service extends DatabaseBroker {
     	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final StudyDestroyer getStudyDestroyer() {
+    	return new StudyDestroyer(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
 }

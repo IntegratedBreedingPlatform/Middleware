@@ -49,6 +49,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.MtaMetadata;
@@ -738,14 +739,14 @@ public interface GenotypicDataManager{
      * Gets the nids from acc metadataset by dataset ids filtered by gids.
      *
      * @param datasetIds - the dataset ids to match
-     * @param gids - the gids to match
+     * @param notGids - the gids to exclude
      * @param start - the starting index of the sublist of results to be returned
      * @param numOfRows - the number of rows to be included in the sublist of results
      * to be returned
      * @return List of name ids from acc_metadataset based on the given list of dataset ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<AccMetadataSet> getAccMetadatasetsByDatasetIds(List<Integer> datasetIds, List<Integer> gids, 
+    List<AccMetadataSet> getAccMetadatasetsByDatasetIdsAndNotGids(List<Integer> datasetIds, List<Integer> notGids, 
             int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -2143,31 +2144,31 @@ public interface GenotypicDataManager{
     void deleteMaps(Integer mapId) throws MiddlewareQueryException;
     
     /**
-     * Retrieve the list of Marker IDs from CharValues matching list of GIDs.
+     * Retrieve the list of Marker Id and MarkerSampleId combinations from CharValues matching list of GIDs.
      *
      * @param gIds the g ids
      * @return the marker from char values by gids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getMarkerFromCharValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    List<MarkerSampleId> getMarkerFromCharValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
     
     /**
-     * Retrieve the list of Marker IDs from AlleleValues matching list of GIDs.
+     * Retrieve the list of Marker ID and MarkerSampleId combinations from AlleleValues matching list of GIDs.
      *
      * @param gIds the g ids
      * @return the marker from allele values by gids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getMarkerFromAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    List<MarkerSampleId> getMarkerFromAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
     
     /**
-     * Retrieve the list of Marker IDs from MappingPop matching list of GIDs.
+     * Retrieve the list of Marker ID and MarkerSampleId combinations from MappingPop matching list of GIDs.
      *
      * @param gIds the g ids
      * @return the marker from mapping pop by gids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    List<MarkerSampleId> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException;
 
     /**
      * Retrieves the last ID of a given GDMS table.

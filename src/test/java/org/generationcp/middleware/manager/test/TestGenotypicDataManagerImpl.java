@@ -54,6 +54,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.MtaMetadata;
@@ -325,7 +326,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {
-        Integer datasetId = Integer.valueOf(2);
+        Integer datasetId = Integer.valueOf(6);
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
         List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(
                 datasetId, 0, (int) count);
@@ -509,7 +510,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         List<Integer> gids = Arrays.asList(-2);
 
         List<AccMetadataSet> nids = manager.getAccMetadatasetsByDatasetIds(datasetIds, 0, 10);
-        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetsByDatasetIds(datasetIds, gids, 0, 10);
+        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetsByDatasetIdsAndNotGids(datasetIds, gids, 0, 10);
 
         Debug.println("testGgetAccMetadatasetByDatasetIds: " + nids);
         Debug.println("testGetgetAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
@@ -2131,22 +2132,22 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetMarkerFromCharValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2012, 2014, 2016, 310544);
-        List<Integer> result = manager.getMarkerFromCharValuesByGids(gIds);
-        Debug.println("testGetMarkerFromCharValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromCharValuesByGids(gIds);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test
     public void testGetMarkerFromAlleleValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2213, 2214);
-        List<Integer> result = manager.getMarkerFromAlleleValuesByGids(gIds);
-        Debug.println("testGetMarkerFromAlleleValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromAlleleValuesByGids(gIds);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test
     public void testGetMarkerFromMappingPopValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(1434, 1435);
-        List<Integer> result = manager.getMarkerFromMappingPopByGids(gIds);
-        Debug.println("testGetMarkerFromMappingPopValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromMappingPopByGids(gIds);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test

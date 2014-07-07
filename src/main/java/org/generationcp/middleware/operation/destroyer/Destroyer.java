@@ -15,6 +15,7 @@ package org.generationcp.middleware.operation.destroyer;
 
 import org.generationcp.middleware.dao.dms.DataSetDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 /**
@@ -34,4 +35,9 @@ public abstract class Destroyer extends DatabaseBroker {
 		dataSetDao.setSession(getActiveSession());
 	    return dataSetDao;
 	}
+
+    protected final ProjectPropertySaver getProjectPropertySaver() {
+    	return new ProjectPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
 }

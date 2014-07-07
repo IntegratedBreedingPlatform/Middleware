@@ -105,14 +105,19 @@ public class AllelicValueElement implements Serializable{
      * @param markerId
      * @param markerName
      * @param data
+     * @param markerSampleId
+     * @param accSampleIld
      */
-    public AllelicValueElement(Integer datasetId, Integer gid, Integer markerId, String markerName, String data) {
+    public AllelicValueElement(Integer datasetId, Integer gid, Integer markerId, String markerName, String data
+            , Integer markerSampleId, Integer accSampleId) {
         this.datasetId = datasetId;
         this.gid = gid;
         this.data = data;
         this.markerId = markerId;
         this.markerName = markerName;
         this.peakHeight = null;
+        this.markerSampleId = markerSampleId;
+        this.accSampleId = accSampleId;
     }
 
     /**
