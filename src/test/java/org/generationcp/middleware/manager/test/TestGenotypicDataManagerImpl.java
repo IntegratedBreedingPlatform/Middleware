@@ -2132,22 +2132,22 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetMarkerFromCharValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2012, 2014, 2016, 310544);
-        List<Integer> result = manager.getMarkerFromCharValuesByGids(gIds);
-        Debug.println("testGetMarkerFromCharValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromCharValuesByGids(gIds);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test
     public void testGetMarkerFromAlleleValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2213, 2214);
         List<MarkerSampleId> result = manager.getMarkerFromAlleleValuesByGids(gIds);
-        Debug.printObjects(result);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test
     public void testGetMarkerFromMappingPopValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(1434, 1435);
         List<MarkerSampleId> result = manager.getMarkerFromMappingPopByGids(gIds);
-        Debug.printObjects(result);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test

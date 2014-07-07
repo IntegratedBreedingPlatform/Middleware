@@ -2144,13 +2144,13 @@ public interface GenotypicDataManager{
     void deleteMaps(Integer mapId) throws MiddlewareQueryException;
     
     /**
-     * Retrieve the list of Marker IDs from CharValues matching list of GIDs.
+     * Retrieve the list of Marker Id and MarkerSampleId combinations from CharValues matching list of GIDs.
      *
      * @param gIds the g ids
      * @return the marker from char values by gids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getMarkerFromCharValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    List<MarkerSampleId> getMarkerFromCharValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
     
     /**
      * Retrieve the list of Marker ID and MarkerSampleId combinations from AlleleValues matching list of GIDs.
