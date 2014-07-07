@@ -281,10 +281,12 @@ public class WorkbookBuilder extends Builder {
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
             
             for (ProjectProperty projectProperty : projectProperties) {
+            	boolean isConstant = false;
                 if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
                     StandardVariable stdVariable = getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
                     if (isNursery && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
-                    		|| !isNursery && stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
+                    		|| !isNursery && (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+                    				|| PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId()))) {
                     	
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
                         
@@ -300,6 +302,11 @@ public class WorkbookBuilder extends Builder {
                         	if (value == null) {
                         		value = "";
                         	}
+                        }
+                        else if (PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
+                        	//constants, no need to retrieve the value
+                        	isConstant = true;
+                        	value = "";
                         }
                         else /*if (isNursery)*/ { //set trial env for nursery studies
                         	setWorkingDatabase(id);
@@ -341,7 +348,12 @@ public class WorkbookBuilder extends Builder {
 	                        measurementVariable.setFactor(true);
 	                        measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 	                        
-	                        conditions.add(measurementVariable);
+	                        if (isConstant) {
+	                        	constants.add(measurementVariable);
+	                        }
+	                        else {
+	                        	conditions.add(measurementVariable);
+	                        }
                         }
                     }
                 }
