@@ -237,6 +237,7 @@ public class WorkbookBuilder extends Builder {
                 		studyType = StudyType.T;
                 	Database database = id > 0 ? Database.CENTRAL : Database.LOCAL;
                     StudyDetails studyDetails = getStudyDataManager().getStudyDetails(database, studyType, id);
+                    workbook.setStudyDetails(studyDetails);
                     for (DatasetReference datasetRef : datasetRefList) {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
                                 datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
