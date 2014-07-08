@@ -1530,13 +1530,15 @@ public interface GenotypicDataManager{
      * @param datasetUser - (DatasetUser)
      * @param markers - List of Markers to add
      * @param markerMetadataSets - List of MarkerMetadataSets to add
-     * @param rows the rows
+     * @param accMetadataSets - List of AccMetadataSets to add
+     * @param dartValueList  - List of DartValues to add
+     * @param alleleValueList - List of AlleleValues to add
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
      */
     Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
-            List<MarkerMetadataSet> markerMetadataSets, List<DartDataRow> rows) 
-            throws MiddlewareQueryException;
+            List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, 
+            List<DartValues> dartValueList, List<AlleleValues> alleleValueList) throws MiddlewareQueryException;
    
     
     /**
