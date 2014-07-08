@@ -505,10 +505,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         try {
 
-            String sql = "select DISTINCT pp.value " +
+        	String sql = "select pp.value " +
                     "from projectprop pp " +
                     "inner join projectprop pp2 on pp.rank = pp2.rank and pp.project_id = pp2.project_id " +
-                    "where pp.project_id = :projectId and pp2.value = :standardVariableId LIMIT 0,1";
+                    "where pp.project_id = :projectId and pp2.value = :standardVariableId " + 
+                    "and pp.type_id not in (pp2.value, "+ TermId.STANDARD_VARIABLE.getId() + "," + TermId.VARIABLE_DESCRIPTION.getId() + ")";
 
 
             Query query = session.createSQLQuery(sql);
