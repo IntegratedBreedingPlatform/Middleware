@@ -323,39 +323,48 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         }
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
 
-        List<SSRDataRow> dataRows = new ArrayList<SSRDataRow>();
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
         
         int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
-        	mappingRecords = createMappingRecords();
-        	Marker marker = (Marker) mappingRecords.get(MARKER);
+
+            mappingRecords = createMappingRecords();
+        	
+            Marker marker = (Marker) mappingRecords.get(MARKER);
         	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_SSR.getValue());
             marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
+            
             AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
             accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
             MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
             markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
+            
             AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
             alleleValues.setMarkerId(marker.getMarkerId());
             alleleValues.setGid(accMetadataSet.getGermplasmId());
-            dataRows.add(new SSRDataRow(accMetadataSet, alleleValues));
+            alleleValueList.add(alleleValues);
+            
             id--;
         }
 
-        Boolean addStatus = manager.setSSR(dataset, datasetUser, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setSSR(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, alleleValueList);
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetSSR() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, alleleValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
         
         /* TO VERIFY RESULTS IN DB:

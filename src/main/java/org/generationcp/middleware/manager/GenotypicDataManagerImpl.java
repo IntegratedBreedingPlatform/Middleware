@@ -1640,7 +1640,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
-            List<MarkerMetadataSet> markerMetadataSets, List<SSRDataRow> rows) throws MiddlewareQueryException {
+                List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, 
+                List<AlleleValues> alleleValueList) throws MiddlewareQueryException{
 
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1654,24 +1655,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     dataset, datasetUser, markers, markerMetadataSets);
 
             // Save data rows
-            if (rows != null && rows.size() > 0) {
-                
-                List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
-                List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
-
-                for (SSRDataRow row : rows) {
-                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-                    accMetadataSet.setDatasetId(datasetId);
-                    accMetadataSets.add(accMetadataSet);
-
-                    AlleleValues alleleValue = row.getAlleleValues();
-                    alleleValue.setDatasetId(datasetId);
-                    alleleValues.add(alleleValue);
-                }
-                
-                saveAccMetadataSets(accMetadataSets);
-                saveAlleleValues(alleleValues);
+            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+                accMetadataSet.setDatasetId(datasetId);
             }
+
+            for (AlleleValues alleleValue  : alleleValueList) {
+                alleleValue.setDatasetId(datasetId);
+            }
+
+            saveAccMetadataSets(accMetadataSets);
+            saveAlleleValues(alleleValueList);
+
             trans.commit();
             return true;
         } catch (Exception e) {

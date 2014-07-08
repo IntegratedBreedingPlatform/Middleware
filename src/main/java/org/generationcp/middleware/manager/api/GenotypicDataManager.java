@@ -1568,13 +1568,15 @@ public interface GenotypicDataManager{
      * @param datasetUser - (DatasetUser)
      * @param markers - List of Markers to add
      * @param markerMetadataSets - List of MarkerMetadataSets to add
+     * @param accMetadataSets - List of AccMetadataSets to add
+     * @param alleleValueList - List of AlleleValues to add
      * @param rows the rows
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException the middleware query exception
      */
     Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
-            List<MarkerMetadataSet> markerMetadataSets, 
-            List<SSRDataRow> rows) throws MiddlewareQueryException;
+            List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, 
+            List<AlleleValues> alleleValueList) throws MiddlewareQueryException;
 
     /**
      * Update SSR Records.
