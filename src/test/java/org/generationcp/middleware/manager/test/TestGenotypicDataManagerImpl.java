@@ -2213,7 +2213,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     
     @Test
-    public void testAddMTAs() throws Exception {
+    public void testSetMTA() throws Exception {
         Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
                 "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
         List<Mta> mtaList = new ArrayList<Mta>();
@@ -2229,13 +2229,14 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         mtaMetadataList.add(new MtaMetadata(null, "project2", "population", 1, "Million"));
         
         DatasetUsers users = new DatasetUsers(null, 1);
-        manager.addMTAs(dataset, mtaList, mtaMetadataList, users);
+        manager.setMTA(dataset, users, mtaList, mtaMetadataList);
         
         // Non-null id means the record was inserted.
         assertTrue(mtaList.get(0).getMtaId() != null && mtaMetadataList.get(0).getMtaId() != null); 
         
         Debug.println("MTAs added: ");
         Debug.printObjects(INDENT, mtaList);
+        Debug.printObjects(INDENT, mtaMetadataList);
     }
     
     @Test

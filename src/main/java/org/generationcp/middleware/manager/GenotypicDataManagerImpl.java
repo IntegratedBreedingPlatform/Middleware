@@ -2676,7 +2676,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public void addMTAs(Dataset dataset, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList, DatasetUsers users) throws MiddlewareQueryException {
+    public void setMTA(Dataset dataset, DatasetUsers users, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList) 
+            throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
         

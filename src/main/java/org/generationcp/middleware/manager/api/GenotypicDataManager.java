@@ -2209,7 +2209,10 @@ public interface GenotypicDataManager{
     void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException;
 
 	/**
-     * Adds MTA, MTA Metadata, Dataset, and DatasetUsers records to the database. Mta and MtaMetadata have 1:1 correspondence, hence the same size.
+     * 
+     * Uploads MTA data to the database.
+     * Adds MTA, MTA Metadata, Dataset, and DatasetUsers records to the database. 
+     * Mta and MtaMetadata have 1:1 correspondence, hence the same size.
      *
      * @param dataset the dataset
      * @param mtaList the mtas to add
@@ -2217,7 +2220,7 @@ public interface GenotypicDataManager{
      * @param users the users
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void addMTAs(Dataset dataset, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList, DatasetUsers users) throws MiddlewareQueryException;
+    void setMTA(Dataset dataset, DatasetUsers users, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList) throws MiddlewareQueryException;
 
     //GCP-8565
     /**
