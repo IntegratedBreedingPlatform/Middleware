@@ -1765,9 +1765,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
     }
 
-	public Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
-            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<MappingAllelicSNPRow> rows)
-            throws MiddlewareQueryException {
+    @Override
+    public Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
+	            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+	            List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList, 
+	            List<CharValues> charValueList) throws MiddlewareQueryException{
         
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1778,30 +1780,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             Integer datasetId = saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
             // Save data rows
-            if (rows != null && rows.size() > 0) {
-
-                List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
-                List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
-                List<CharValues> charValues = new ArrayList<CharValues>();
-
-                for (MappingAllelicSNPRow row : rows) {
-                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-                    accMetadataSet.setDatasetId(datasetId);
-                    accMetadataSets.add(accMetadataSet);
-
-                    MappingPopValues mappingPopValue = row.getMappingPopValues();
-                    mappingPopValue.setDatasetId(datasetId);
-                    mappingPopValues.add(mappingPopValue);
-
-                    CharValues charValue = row.getCharValues();
-                    charValue.setDatasetId(datasetId);
-                    charValues.add(charValue);
-                }
-
-                saveAccMetadataSets(accMetadataSets);
-                saveMappingPopValues(mappingPopValues);
-                saveCharValues(charValues);
+            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+                accMetadataSet.setDatasetId(datasetId);
             }
+
+            for (MappingPopValues mappingPopValue: mappingPopValueList) {
+                mappingPopValue.setDatasetId(datasetId);
+            }
+
+            for (CharValues charValue: charValueList) {
+                    charValue.setDatasetId(datasetId);
+            }
+
+            saveAccMetadataSets(accMetadataSets);
+            saveMappingPopValues(mappingPopValueList);
+            saveCharValues(charValueList);
+            
             trans.commit();
             return true;
         } catch (Exception e) {

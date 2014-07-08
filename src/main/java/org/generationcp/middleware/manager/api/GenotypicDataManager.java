@@ -1677,14 +1677,18 @@ public interface GenotypicDataManager{
      * @param mappingPop - Mapping Population
      * @param markers - List of Markers to add
      * @param markerMetadataSets - List of MarkerMetadataSets to add
+     * @param accMetadataSets - List of AccMetadataSets to add
+     * @param mappingPopValueList - List of MappingPopValues to add
+     * @param charValueList - List of CharValues to add
      * @param rows the rows
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException the middleware query exception
      */
     Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
-            List<MappingAllelicSNPRow> rows) throws MiddlewareQueryException;
-
+            List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList, 
+            List<CharValues> charValueList) throws MiddlewareQueryException;
+    
     /**
      * Update Mapping Allelic SNP Record.
      * For new values to be added, set the id to null.
