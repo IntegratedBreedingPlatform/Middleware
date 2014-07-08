@@ -1679,8 +1679,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     
     @Override
     public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, 
-                    List<MarkerMetadataSet> markerMetadataSets, List<SNPDataRow> rows) 
-                    throws MiddlewareQueryException {
+            List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, 
+            List<CharValues> charValueList) throws MiddlewareQueryException{
+
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
 
@@ -1693,24 +1694,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     dataset, datasetUser, markers, markerMetadataSets);
 
             // Save data rows
-            if (rows != null && rows.size() > 0) {
-                
-                List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
-                List<CharValues> charValues = new ArrayList<CharValues>();
-
-                for (SNPDataRow row : rows) {
-                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-                    accMetadataSet.setDatasetId(datasetId);
-                    accMetadataSets.add(accMetadataSet);
-
-                    CharValues charValue = row.getCharValues();
-                    charValue.setDatasetId(datasetId);
-                    charValues.add(charValue);
-                }
-                
-                saveAccMetadataSets(accMetadataSets);
-                saveCharValues(charValues);
+            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+                accMetadataSet.setDatasetId(datasetId);
             }
+            for (CharValues charValue : charValueList) {
+                charValue.setDatasetId(datasetId);
+            }
+                
+            saveAccMetadataSets(accMetadataSets);
+            saveCharValues(charValueList);
+            
             trans.commit();
             return true;
         } catch (Exception e) {

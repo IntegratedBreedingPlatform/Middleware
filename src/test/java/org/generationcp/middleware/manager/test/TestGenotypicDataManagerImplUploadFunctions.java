@@ -391,37 +391,46 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
-        List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<CharValues> charValueList = new ArrayList<CharValues>();
 
         int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
-        	mappingRecords = createMappingRecords();
+        	
+            mappingRecords = createMappingRecords();
+        	
         	Marker marker = (Marker) mappingRecords.get(MARKER);
         	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
             marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
+            
             AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
             accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
             MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
             markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
+
             CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
             charValues.setMarkerId(marker.getMarkerId());
             charValues.setGid(accMetadataSet.getGermplasmId());
-            dataRows.add(new SNPDataRow(accMetadataSet, charValues));
+            charValueList.add(charValues);
+
             id--;
         }
         
-        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, charValueList);
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetSNP() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, charValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
         /* TO VERIFY RESULTS IN DB:
 			select * from gdms_dataset where dataset_id = <datasetId>;
