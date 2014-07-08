@@ -2653,20 +2653,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             } 
             dataset.setDatasetType(TYPE_MTA);
             dataset.setUploadTemplateDate(new Date());
-            getDatasetDao().save(dataset);
+            if (dataset.getDatasetId() < 0){
+                getDatasetDao().merge(dataset);
+            }
 
             users.setDatasetId(dataset.getDatasetId());
-            getDatasetUsersDao().save(users);
+            getDatasetUsersDao().merge(users);
 
             MtaDAO mtaDao = getMtaDao();
             int id = mtaDao.getNegativeId("mtaId");
         	mta.setMtaId(id);
         	mta.setDatasetId(dataset.getDatasetId());
-        	mtaDao.save(mta);
+        	mtaDao.merge(mta);
         	
         	MtaMetadataDAO mtaMetadataDao = getMtaMetadataDao();
             mtaMetadata.setMtaId(id);
-            mtaMetadataDao.save(mtaMetadata);
+            mtaMetadataDao.merge(mtaMetadata);
 
             trans.commit();
         } catch (Exception e) {
@@ -2698,10 +2700,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             } 
             dataset.setDatasetType(TYPE_MTA);
             dataset.setUploadTemplateDate(new Date());
-            getDatasetDao().save(dataset);
+            if (dataset.getDatasetId() < 0){
+                getDatasetDao().merge(dataset);
+            }
 
             users.setDatasetId(dataset.getDatasetId());
-            getDatasetUsersDao().save(users);
+            getDatasetUsersDao().merge(users);
 
             MtaDAO mtaDao = getMtaDao();
             MtaMetadataDAO mtaMetadataDao = getMtaMetadataDao();
@@ -2713,15 +2717,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             	Mta mta = mtaList.get(i);
             	mta.setMtaId(id);
             	mta.setDatasetId(dataset.getDatasetId());
-            	mtaDao.save(mta);
+            	mtaDao.merge(mta);
             	
             	MtaMetadata mtaMetadata = mtaMetadataList.get(i);
             	mtaMetadata.setMtaId(id);
-            	mtaMetadataDao.save(mtaMetadata);
+            	mtaMetadataDao.merge(mtaMetadata);
 
             	id--;
             	
-	            if (rowsSaved++ % (JDBC_BATCH_SIZE) == 0){
+            	rowsSaved++;
+	            if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
 	            	mtaDao.flush();
 	            	mtaDao.clear();
 	            	mtaMetadataDao.flush();
