@@ -1,5 +1,8 @@
 package org.generationcp.middleware.operation.destroyer;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -26,6 +29,9 @@ public class StudyDestroyer extends Destroyer {
 		
 		requireLocalDatabaseInstance();
 		DmsProject study = getDmsProjectDao().getById(studyId);
+		
+		renameStudyAndDatasets(study);
+
 		if (study.getProperties() != null && !study.getProperties().isEmpty()) {
 			int maxRank = 0;
 			boolean found = false;
@@ -56,6 +62,20 @@ public class StudyDestroyer extends Destroyer {
 				
 				getProjectPropertySaver().saveProjectProperties(study, typeList);
 				getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
+			}
+		}
+	}
+	
+	private void renameStudyAndDatasets(DmsProject study) throws MiddlewareQueryException {
+		String uuid = UUID.randomUUID().toString();
+		study.setName(study.getName() + "#" + uuid);
+		getDmsProjectDao().save(study);
+		
+		List<DmsProject> datasets = getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
+		if (datasets != null) {
+			for (DmsProject dataset : datasets) {
+				dataset.setName(dataset.getName() + "#" + uuid);
+				getDmsProjectDao().save(dataset);
 			}
 		}
 	}
