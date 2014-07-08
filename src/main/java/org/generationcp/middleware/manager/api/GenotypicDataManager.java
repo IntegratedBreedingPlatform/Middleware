@@ -2392,7 +2392,7 @@ public interface GenotypicDataManager{
      * @return the marker metadataset by dataset id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    MarkerMetadataSet getMarkerMetadatasetByDatasetId(Integer datasetId) throws MiddlewareQueryException;
+    List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(Integer datasetId) throws MiddlewareQueryException;
     
     
     /**

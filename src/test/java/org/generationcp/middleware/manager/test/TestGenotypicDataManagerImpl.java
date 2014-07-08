@@ -2261,31 +2261,28 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     		manager.addMtaMetadata(mtaMetadata);
     		Debug.println(INDENT, "MtaMetadataset added: " + mtaMetadata);
     	}
-
     }
-
     
     @Test
     public void testGetDartMarkerDetails() throws Exception {
     	List<Integer> markerIds = Arrays.asList(-1, -2);
         List<DartValues> result = manager.getDartMarkerDetails(markerIds);
-        Debug.printObjects(0, result);
+        Debug.printObjects(INDENT, result);
     }
-
     
     @Test
     public void testGetMarkerMetadatasetByDatasetId() throws Exception {
-    	Integer datasetId = 1;
-        MarkerMetadataSet result = manager.getMarkerMetadatasetByDatasetId(datasetId);
-        Debug.printObject(0, result);
+    	Integer datasetId = 2;
+        List<MarkerMetadataSet> result = manager.getMarkerMetadataSetByDatasetId(datasetId);
+        assertTrue(result != null && !result.isEmpty());
+        Debug.printObjects(INDENT, result);
     }
-
     
     @Test
     public void testGetCharValuesByMarkerIds() throws Exception {
     	List<Integer> markerIds = Arrays.asList(-1, -2);
         List<CharValues> result = manager.getCharValuesByMarkerIds(markerIds);
-        Debug.printObjects(0, result);
+        Debug.printObjects(INDENT, result);
     }
 
 

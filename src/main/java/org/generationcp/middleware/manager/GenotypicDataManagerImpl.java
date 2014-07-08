@@ -3780,9 +3780,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public MarkerMetadataSet getMarkerMetadatasetByDatasetId(Integer datasetId) throws MiddlewareQueryException{
-    	return null;
-    	//TODO GCP-9319 
+    public List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+        return super.getAllFromCentralAndLocalByMethod(getMarkerMetadataSetDao(), "getMarkerMetadataSetByDatasetId"
+                , new Object[]{datasetId}, new Class[]{Integer.class});
     }
 
     @Override
