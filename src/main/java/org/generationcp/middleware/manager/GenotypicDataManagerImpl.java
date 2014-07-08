@@ -1810,9 +1810,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
+//    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,            
+//    List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+//            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException {
+    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
-            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException {
+            List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList, 
+            List<AlleleValues> alleleValueList, List<DartValues> dartValueList) 
+                    throws MiddlewareQueryException{    
+        
 
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1823,36 +1829,27 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             Integer datasetId = saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
             // Save data rows
-            if (rows != null && rows.size() > 0) {
-
-                List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
-                List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
-                List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
-                List<DartValues> dartValues = new ArrayList<DartValues>();
-
-                for (MappingAllelicSSRDArTRow row : rows) {
-                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-                    accMetadataSet.setDatasetId(datasetId);
-                    accMetadataSets.add(accMetadataSet);
-
-                    MappingPopValues mappingPopValue = row.getMappingPopValues();
-                    mappingPopValue.setDatasetId(datasetId);
-                    mappingPopValues.add(mappingPopValue);
-
-                    AlleleValues alleleValue = row.getAlleleValues();
-                    alleleValue.setDatasetId(datasetId);
-                    alleleValues.add(alleleValue);
-                    
-                    DartValues dartValue = row.getDartValues();
-                    dartValue.setDatasetId(datasetId);
-                    dartValues.add(dartValue);
-                }
-
-                saveAccMetadataSets(accMetadataSets);
-                saveMappingPopValues(mappingPopValues);
-                saveAlleleValues(alleleValues);
-                saveDartValues(dartValues);
+            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+                accMetadataSet.setDatasetId(datasetId);
             }
+
+            for (MappingPopValues mappingPopValue : mappingPopValueList) {
+                mappingPopValue.setDatasetId(datasetId);
+            }
+
+            for (AlleleValues alleleValue : alleleValueList) {
+                alleleValue.setDatasetId(datasetId);
+            }
+                
+            for (DartValues dartValue : dartValueList) {
+                dartValue.setDatasetId(datasetId);
+            }
+
+            saveAccMetadataSets(accMetadataSets);
+            saveMappingPopValues(mappingPopValueList);
+            saveAlleleValues(alleleValueList);
+            saveDartValues(dartValueList);
+
             trans.commit();
             return true;
         } catch (Exception e) {
