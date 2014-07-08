@@ -1640,12 +1640,14 @@ public interface GenotypicDataManager{
      * @param mappingPop - Mapping Population
      * @param markers - List of Markers to add
      * @param markerMetadataSets - List of MarkerMetadataSets to add
-     * @param rows the rows
+     * @param accMetadataSets - List of AccMetadataSets to add
+     * @param mappingPopValueList - List of MappingPopValues to add
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException the middleware query exception
      */
     Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
-            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<MappingABHRow> rows) 
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+            List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList)
             throws MiddlewareQueryException;
 
     /**

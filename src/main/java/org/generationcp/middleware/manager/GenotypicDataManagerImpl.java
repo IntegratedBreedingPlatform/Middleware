@@ -1717,8 +1717,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
-            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, List<MappingABHRow> rows)
-            throws MiddlewareQueryException {
+            List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
+            List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList)
+                    throws MiddlewareQueryException {
 
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1729,29 +1730,23 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             Integer datasetId = saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
             // Save data rows
-            if (rows != null && rows.size() > 0) {
-                
-                List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
-                List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
-
-                for (MappingABHRow row : rows) {
-                    AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-                    accMetadataSet.setDatasetId(datasetId);
-                    accMetadataSets.add(accMetadataSet);
-
-                    MappingPopValues mappingPopValue = row.getMappingPopValues();
-                    mappingPopValue.setDatasetId(datasetId);
-                    mappingPopValues.add(mappingPopValue);
-                }
-                
-                saveAccMetadataSets(accMetadataSets);
-                saveMappingPopValues(mappingPopValues);
+            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+                accMetadataSet.setDatasetId(datasetId);
             }
+
+            for (MappingPopValues mappingPopValue : mappingPopValueList) {
+                mappingPopValue.setDatasetId(datasetId);
+            }
+            
+            saveAccMetadataSets(accMetadataSets);
+            saveMappingPopValues(mappingPopValueList);
+
             trans.commit();
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while setting MappingABH: setMappingABH(): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered while setting MappingABH: setMappingABH(): " 
+                    + e.getMessage(), e, LOG);
             return false;
         } finally {
             session.flush();

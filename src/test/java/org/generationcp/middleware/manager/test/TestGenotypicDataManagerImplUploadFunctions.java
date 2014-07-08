@@ -471,39 +471,49 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         dataset.setDataType(dataType);
         dataset.setGenus(genus);
 
-        List<MappingABHRow> dataRows = new ArrayList<MappingABHRow>();
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
         
         int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
-        	mappingRecords = createMappingRecords();
-        	Marker marker = (Marker) mappingRecords.get(MARKER);
+
+            mappingRecords = createMappingRecords();
+        	
+            Marker marker = (Marker) mappingRecords.get(MARKER);
         	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_MAPPING.getValue());
             marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
+            
             AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
             accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
             MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
             markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
+            
             MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
             mappingPopValues.setMarkerId(marker.getMarkerId());
             mappingPopValues.setGid(accMetadataSet.getGermplasmId());
-            dataRows.add(new MappingABHRow(accMetadataSet, mappingPopValues));
+            mappingPopValueList.add(mappingPopValues);
+
             id--;
         }
         
-        Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, markers, 
+                markerMetadataSets, accMetadataSets, mappingPopValueList);
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetMappingABH() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, mappingPop);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, mappingPopValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
         
         /* TO VERIFY RESULTS IN DB:
