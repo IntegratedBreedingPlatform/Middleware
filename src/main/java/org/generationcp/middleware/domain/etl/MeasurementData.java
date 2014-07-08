@@ -191,7 +191,7 @@ public class MeasurementData {
 		}
 		else {
 			if(this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null && this.getMeasurementVariable().getDataTypeDisplay().equalsIgnoreCase("N")){
-				if(this.value != null && !this.value.equalsIgnoreCase("")) {
+				if(this.value != null && !this.value.equalsIgnoreCase("") && !this.value.equalsIgnoreCase("null")) {
 					int intVal = Double.valueOf(this.value).intValue();
 					double doubleVal = Double.valueOf(this.value);
 					if(intVal == doubleVal){
