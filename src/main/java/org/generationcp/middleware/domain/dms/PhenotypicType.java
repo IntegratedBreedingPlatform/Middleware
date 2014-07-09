@@ -34,7 +34,7 @@ public enum PhenotypicType {
             TermId.LONGITUDE_STORAGE.getId(),
             TermId.DATUM_STORAGE.getId(),
             TermId.ALTITUDE_STORAGE.getId()),
-          Arrays.asList("TRIAL","OCC","TRIAL_NO", "TRIALNO", "SITE", "SITE_NO", "SITENO"),
+          Arrays.asList("TRIAL", "TRIAL_INSTANCE", "OCC", "TRIAL_NO", "TRIALNO", "SITE", "SITE_NO", "SITENO"),
           "TRIAL ENVIRONMENT"), 
     GERMPLASM(Arrays.asList(
             TermId.GERMPLASM_ENTRY_STORAGE.getId(),

@@ -33,10 +33,12 @@ import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
+import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
@@ -146,4 +148,12 @@ public abstract class Service extends DatabaseBroker {
     	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final TermBuilder getTermBuilder() {
+    	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final StudyDestroyer getStudyDestroyer() {
+    	return new StudyDestroyer(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
 }

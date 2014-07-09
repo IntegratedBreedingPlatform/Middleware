@@ -21,6 +21,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
+import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -31,7 +32,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -503,6 +504,23 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
 		}
     }
     
+    
+    @Test
+    public void testGetLotCountsForGermplasmListEntries() throws MiddlewareQueryException{
+    	int listid = -543041; // wheat list
+    	List<Integer> entryIds = new ArrayList<Integer>();
+    	entryIds.add(-507029);
+    	entryIds.add(-507028);
+    	entryIds.add(-507027);
+		List<GermplasmListData> listEntries = manager.getLotCountsForListEntries(listid, entryIds);
+		for (GermplasmListData entry : listEntries){
+			ListDataInventory inventory = entry.getInventoryInfo();
+			if (inventory != null){
+				System.out.println(inventory);
+			}
+		}
+    }
+    
     @Test
     public void testGetLotsForGermplasmListEntry() throws MiddlewareQueryException{
     	List<ListEntryLotDetails> lots = manager.getLotDetailsForListEntry(-543041, -507029, -88175);
@@ -518,6 +536,22 @@ public class TestInventoryDataManagerImpl extends TestOutputFormatter {
     		Debug.print("Id=" + entry.getId() + ", GID = " + entry.getGid());
     		Debug.print(3, entry.getInventoryInfo());
     	}
+    }
+    
+    @Test
+    public void testGetLotCountsForGermplasm() throws MiddlewareQueryException{
+    	int gid = -644052;
+		Integer count = manager.countLotsWithAvailableBalanceForGermplasm(gid);
+    	Debug.print("GID=" + gid + ", lotCount=" + count);
+    }
+    
+    @Test
+    public void testGetLotsForGermplasm() throws MiddlewareQueryException{
+    	int gid = -644052;
+		List<LotDetails> lots = manager.getLotDetailsForGermplasm(gid);
+		for (LotDetails lot : lots){
+			System.out.println(lot);
+		}
     }
     
     @AfterClass

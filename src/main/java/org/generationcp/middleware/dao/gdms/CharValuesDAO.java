@@ -20,10 +20,13 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link CharValues}.
@@ -71,8 +74,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             "SELECT DISTINCT " +
                     "gcv.gid, " +
                     "gcv.marker_id, " +
-                "CONCAT(gcv.char_value, ''), " +
-                "CAST(NULL AS UNSIGNED INTEGER) " + //peak height
+                    "CONCAT(gcv.char_value, ''), " +
+                    "CAST(NULL AS UNSIGNED INTEGER), " + //peak height
+                    "gcv.marker_sample_id, " +
+                    "gcv.acc_sample_id " +
             "FROM gdms_char_values gcv " +
             "WHERE gcv.gid IN (:gidList) " +
                 "AND gcv.marker_id IN (:markerIdList) " +
@@ -91,6 +96,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
             "SELECT gid, marker_id,  CONCAT(char_value, '') " +
+            "           , marker_sample_id, acc_sample_id " +
             "FROM gdms_char_values " +
             "WHERE dataset_id = :datasetId " +
             "ORDER BY gid ASC, marker_id ASC";
@@ -115,13 +121,13 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             "FROM gdms_char_values " +
             "WHERE gid in (:gids)";
     
-    public static final String GET_MARKER_IDS_BY_GIDS = 
-        "SELECT DISTINCT marker_id " +
+    public static final String GET_MARKER_SAMPLE_IDS_BY_GIDS = 
+        "SELECT DISTINCT marker_id, marker_sample_id " +
         "FROM gdms_char_values " +
         "WHERE gid IN (:gids)";
 	
     public static final String GET_ALLELIC_VALUES_BY_MARKER_IDS =
-    		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, '') "
+    		"SELECT ac_id, dataset_id, marker_id, gid, CONCAT(char_value, ''), marker_sample_id, acc_sample_id "
     		+ "FROM gdms_char_values cv " 
     		+ "WHERE  cv.marker_id IN (:markerIdList) " 
     		+ "ORDER BY cv.gid DESC ";
@@ -154,7 +160,11 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 	                    Integer gid = (Integer) result[0];
 	                    Integer markerId = (Integer) result[1];
 	                    String data = (String) result[2];
-	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(gid, data, markerId);
+                        Integer markerSampleId = (Integer) result[3];
+                        Integer accSampleId = (Integer) result[4];
+	                            
+	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(
+	                            gid, data, markerId, markerSampleId, accSampleId);
 	                    toReturn.add(allelicValueElement);
 	                }
 	            }
@@ -254,20 +264,30 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         }
     }
     
-    @SuppressWarnings("unchecked")
-    public List<Integer> getMarkerIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+    @SuppressWarnings("rawtypes")
+    public List<MarkerSampleId> getMarkerSampleIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+    	List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
 
         try {
             if (gIds != null && gIds.size() > 0) {
-                SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_GIDS);
+                SQLQuery query = getSession().createSQLQuery(GET_MARKER_SAMPLE_IDS_BY_GIDS);
                 query.setParameterList("gids", gIds);
                 
-                return query.list();
+				List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                    	Integer markerId = (Integer) result[0];
+                    	Integer markerSampleId = (Integer) result[1];
+                        MarkerSampleId dataElement = new MarkerSampleId(markerId, markerSampleId);
+                        toReturn.add(dataElement);
+                    }
+                }
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from CharValues: " + e.getMessage(), e);
         }
-        return new ArrayList<Integer>();
+        return toReturn;
     }
 
 
@@ -327,7 +347,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 	                    Integer markerId = (Integer) result[2];
 	                    Integer gId = (Integer) result[3];
 	                    String data = (String) result[4];
-	                    AllelicValueElement value = new AllelicValueElement(acId, datasetId, gId, markerId, data);
+	                    Integer markerSampleId = (Integer) result[5];
+	                    Integer accSampleId = (Integer) result[6];
+	                    AllelicValueElement value = new AllelicValueElement(acId, datasetId, gId, markerId
+	                    		, data, markerSampleId, accSampleId);
 	                    returnVal.add(value);
 	                }
 	            }
@@ -357,7 +380,7 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         String placeholders = StringUtil.joinIgnoreNull(",", placeholderList);
         
         String sql = new StringBuffer()
-                .append("SELECT dataset_id, gid, marker_id, CONCAT(char_value,'') ")
+                .append("SELECT dataset_id, gid, marker_id, CONCAT(char_value,''), marker_sample_id, acc_sample_id ")
                 .append("FROM gdms_char_values ")
                 .append("   WHERE (marker_id, char_value) IN (" + placeholders + ") ")
                 .toString();
@@ -380,8 +403,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
                     Integer gid = (Integer) result[1];
                     Integer markerId = (Integer) result[2];
                     String charValue = (String) result[3];
+                    Integer markerSampleId = (Integer) result[4];
+                    Integer accSampleId = (Integer) result[5];
                     AllelicValueElement allelicValueElement =
-                            new AllelicValueElement(null, datasetId, gid, markerId, charValue);
+                            new AllelicValueElement(null, datasetId, gid, markerId, charValue, markerSampleId, accSampleId);
                     values.add(allelicValueElement);
                 }
             }
@@ -393,4 +418,24 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         
         return values;
 	}
+    
+    
+	@SuppressWarnings("unchecked")
+	public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+		List<CharValues> toReturn = new ArrayList<CharValues>();
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.in("markerId", markerIds));
+			toReturn = criteria.list();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error in getCharValuesByMarkerIds=" + markerIds.toString() + " query on CharValuesDAO: " + e.getMessage(), e);
+		}
+		
+		return toReturn;
+	}
+
+    
+    
+    
 }

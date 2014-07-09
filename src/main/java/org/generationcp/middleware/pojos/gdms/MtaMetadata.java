@@ -58,6 +58,46 @@ public class MtaMetadata implements Serializable{
 		this.populationUnits = populationUnits;
 	}
 
+	public Integer getMtaId() {
+		return mtaId;
+	}
+
+	public void setMtaId(Integer mtaId) {
+		this.mtaId = mtaId;
+	}
+
+	public String getProject() {
+		return project;
+	}
+
+	public void setProject(String project) {
+		this.project = project;
+	}
+
+	public String getPopulation() {
+		return population;
+	}
+
+	public void setPopulation(String population) {
+		this.population = population;
+	}
+
+	public Integer getPopulationSize() {
+		return populationSize;
+	}
+
+	public void setPopulationSize(Integer populationSize) {
+		this.populationSize = populationSize;
+	}
+
+	public String getPopulationUnits() {
+		return populationUnits;
+	}
+
+	public void setPopulationUnits(String populationUnits) {
+		this.populationUnits = populationUnits;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

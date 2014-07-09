@@ -34,44 +34,10 @@
             <properties>
                 <envConfig>ci</envConfig>
             </properties>
-
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
-
-        <!--<profile>
-            <id>withDependency</id>
-            <activation>
-                <property>
-                    <name>withDependencies</name>
-                </property>
-            </activation>
-
-            <build>
-                <plugins>
-                    &lt;!&ndash; jar-with-dependencies is built for external middleware teams
-                                		such as the one at ICRISAT India where Maven is not used. &ndash;&gt;
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>jar-with-dependencies</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>-->
     </profiles>
 
     <dependencies>
@@ -111,21 +77,6 @@
             <version>3.12.1.GA</version>
         </dependency>
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.12</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.6</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
@@ -136,24 +87,37 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+       
+        <!-- Logging dependencies -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.6.4</version>
-            <type>pom</type>
-            <scope>compile</scope>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.6</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.7</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>1.0.7</version>
-            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.6.4</version>
+        </dependency>        
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.12</version>
         </dependency>
 
         <!-- Servlet API Dependency -->
@@ -274,97 +238,7 @@
                     </sourcepath>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <version>2.1.5</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
-                    </execution>
-                </executions>
 
-                <configuration>
-
-                    <prefix>${project.artifactId}.git</prefix>
-
-
-                    <dateFormat>MM.dd.yyyy '@' HH:mm:ss</dateFormat>
-
-                    <!-- true is default here, it prints some more information during the build -->
-                    <verbose>false</verbose>
-
-                    <!--
-                        If you'd like to tell the plugin where your .git directory is,
-                        use this setting, otherwise we'll perform a search trying to
-                        figure out the right directory. It's better to add it explicite IMHO.
-                    -->
-                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-
-                    <!-- ALTERNATE SETUP - GENERATE FILE -->
-                    <!--
-                        If you want to keep git information, even in your WAR file etc,
-                        use this mode, which will generate a properties file (with filled out values)
-                        which you can then normally read using new Properties().load(/**/)
-                    -->
-
-                    <!--
-                        this is true by default; You may want to set this to false, if the plugin should run inside a
-                        <packaging>pom</packaging> project. Most projects won't need to override this property.
-
-                        For an use-case for this kind of behaviour see: https://github.com/ktoso/maven-git-commit-id-plugin/issues/21
-                    -->
-                    <skipPoms>true</skipPoms>
-
-                    <!-- this is false by default, forces the plugin to generate the git.properties file -->
-                    <generateGitPropertiesFile>false</generateGitPropertiesFile>
-
-                    <!-- The path for the to be generated properties file, it's relative to ${project.basedir} -->
-                    <generateGitPropertiesFilename>src/main/resources/git-${project.artifactId}.properties
-                    </generateGitPropertiesFilename>
-
-                    <!-- true by default, controls whether the plugin will fail when no .git directory is found, when set to false the plugin will just skip execution -->
-                    <!-- @since 2.0.4 -->
-                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
-
-                    <!-- @since 2.1.0 -->
-                    <!--
-                        read up about git-describe on the in man, or it's homepage - it's a really powerful versioning helper
-                        and the recommended way to use git-commit-id-plugin. The configuration bellow is optional,
-                        by default describe will run "just like git-describe on the command line", even though it's a JGit reimplementation.
-                    -->
-                    <gitDescribe>
-
-                        <!-- don't generate the describe property -->
-                        <skip>false</skip>
-
-                        <!--
-                            if no tag was found "near" this commit, just print the commit's id instead,
-                            helpful when you always expect this field to be not-empty
-                        -->
-                        <always>false</always>
-                        <!--
-                             how many chars should be displayed as the commit object id?
-                             7 is git's default,
-                             0 has a special meaning (see end of this README.md),
-                             and 40 is the maximum value here
-                        -->
-                        <abbrev>7</abbrev>
-
-                        <!-- when the build is triggered while the repo is in "dirty state", append this suffix -->
-                        <dirty>-dirty</dirty>
-
-                        <!--
-                             always print using the "tag-commits_from_tag-g_commit_id-maybe_dirty" format, even if "on" a tag.
-                             The distance will always be 0 if you're "on" the tag.
-                        -->
-                        <forceLongFormat>false</forceLongFormat>
-                    </gitDescribe>
-                </configuration>
-
-            </plugin>
         </plugins>
     </build>
 </project>

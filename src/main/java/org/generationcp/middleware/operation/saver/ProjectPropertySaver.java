@@ -163,7 +163,7 @@ public class ProjectPropertySaver extends Saver {
 					updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
 				}
 				else if (variable.getOperation() == Operation.DELETE) {
-					deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId());
+					deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId(), geolocation);
 				}
 			}
 		}
@@ -320,15 +320,20 @@ public class ProjectPropertySaver extends Saver {
 	}
 	
 	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
-			int storedInId, int termId) throws MiddlewareQueryException {
+			int storedInId, int termId, Geolocation geolocation) throws MiddlewareQueryException {
 		
+		setWorkingDatabase(Database.LOCAL);
 		deleteVariable(project, termId);
-		if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(storedInId)) {
 			deleteVariable(trialDataset, termId);
 			deleteVariable(measurementDataset, termId);
-			//remove geolocation prop value
-			setWorkingDatabase(Database.LOCAL);
-			getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
+			if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+				getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
+			}
+			else {
+				getGeolocationSaver().setGeolocation(geolocation, termId, storedInId, null);
+				getGeolocationDao().saveOrUpdate(geolocation);
+			}
 		}
 		else if (storedInId == TermId.OBSERVATION_VARIATE.getId()
 				|| storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
@@ -341,6 +346,7 @@ public class ProjectPropertySaver extends Saver {
 		}
 	}
 	private void deleteVariable(DmsProject project, int termId) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
 		int rank = getRank(project, termId);
 		if (project.getProperties() != null && !project.getProperties().isEmpty()) {
 			for (Iterator<ProjectProperty> iterator = project.getProperties().iterator(); iterator.hasNext();) {
@@ -354,6 +360,7 @@ public class ProjectPropertySaver extends Saver {
 	}
 	
 	public void saveFactors(DmsProject measurementDataset, List<MeasurementVariable> variables) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
 		if (variables != null && !variables.isEmpty()) {
 			for (MeasurementVariable variable : variables) {
 				if (variable.getOperation() == Operation.ADD) {

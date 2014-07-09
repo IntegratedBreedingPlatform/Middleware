@@ -117,7 +117,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
   				.append("   INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
   				.append("   INNER JOIN project_relationship pr ON pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
   				.append("     AND (pr.object_project_id = ep.project_id OR pr.subject_project_id = ep.project_id) ")
-  				.append("   WHERE pr.object_project_id = ").append(studyId).append(") ");
+  				.append("   WHERE pr.object_project_id = ").append(studyId).append(") ")
+  				.append("   AND type_id = ").append(termId);
   			
   			SQLQuery query = getSession().createSQLQuery(sql.toString());
   			query.executeUpdate();

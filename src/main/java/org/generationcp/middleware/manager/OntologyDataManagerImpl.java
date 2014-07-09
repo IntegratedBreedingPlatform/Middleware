@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
@@ -73,6 +74,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
         return getStandardVariableBuilder().create(stdVariableId);
     }
+    
+	@Override
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		return getStandardVariableBuilder().create(standardVariableIds);
+	}
+	
+	@Override
+	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		return getStandardVariableBuilder().getStandardVariableSummaries(standardVariableIds);
+	}
 
     @Override
     public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
@@ -122,6 +133,30 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
         }
+    }
+    
+    @Override
+    public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        trans = session.beginTransaction();
+
+        try {
+
+        	 for (StandardVariable stdVariable : stdVariableList){
+		                getStandardVariableSaver().save(stdVariable);
+        	 }
+            
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
+        }
+        
+        
     }
 
     @Deprecated
@@ -1063,6 +1098,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
     	return getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
     }
+
+
 }
 
 

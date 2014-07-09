@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -30,6 +31,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving Germplasm information.
  * 
@@ -705,7 +707,15 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getAllMethods() throws MiddlewareQueryException;
-    
+
+    /**
+     * Gets the all methods not generative.
+     *
+     * @return the all methods not generative
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException;
+
     /**
      * Returns count of all the method records.
      *
@@ -818,6 +828,15 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countMethodsByGroup(String group) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets list of cvterm records which are possible values of method classes.
+     *
+     * @return the method classes
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Term> getMethodClasses() throws MiddlewareQueryException;
 
     /**
      * Returns the udfld record identified by the given id.
@@ -1112,6 +1131,7 @@ public interface GermplasmDataManager {
      * Gets the germplasm Id and name Id from the names table with the given germplasm names.
      *
      * @param germplasmNames the germplasm names
+     * @param mode the mode
      * @return List of GidNidElement based on the specified list of germplasm names
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -1312,6 +1332,25 @@ public interface GermplasmDataManager {
      * Gets the next negative id.
      *
      * @return the next negative id
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Integer getNextNegativeId() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the method by code.
+     *
+     * @param code the code
+     * @return the method by code
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Method getMethodByCode(String code) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the method by name.
+     *
+     * @param code the code
+     * @return the method by name
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Method getMethodByName(String name) throws MiddlewareQueryException;
 }

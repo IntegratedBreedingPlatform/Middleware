@@ -12,7 +12,6 @@ public class LotDetails implements Serializable{
 	// ims_lot fields
     private Integer lotId;
     private Integer entityIdOfLot;
-    private Double reservedTotal;
     private Integer scaleId;
     private Integer locId;
     private String commentOfLot;
@@ -21,6 +20,7 @@ public class LotDetails implements Serializable{
     private Double actualLotBalance; 
     private Double availableLotBalance;
     private Location locationOfLot;
+    private Double reservedTotal;
     private Term scaleOfLot;
 
 	public Integer getLotId() {
@@ -116,8 +116,12 @@ public class LotDetails implements Serializable{
         builder.append(availableLotBalance);
         builder.append(", reservedTotal=");
         builder.append(reservedTotal);
+        builder.append(", locationId=");
+        builder.append(locId);
         builder.append(", locationOfLot=");
         builder.append(locationOfLot);
+        builder.append(", scaleId=");
+        builder.append(scaleId);
         builder.append(", scaleOfLot=");
         builder.append(scaleOfLot);
         builder.append(", commentOfLot=");

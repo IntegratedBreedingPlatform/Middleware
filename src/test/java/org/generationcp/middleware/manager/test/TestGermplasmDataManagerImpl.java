@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -35,7 +37,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -674,6 +676,14 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
         assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
     }
+
+    @Test
+    public void testGetAllMethodsNotGenerative() throws Exception {
+        List<Method> results = manager.getAllMethodsNotGenerative();
+        assertNotNull(results);
+        assertTrue(!results.isEmpty());
+        Debug.printObjects(INDENT, results);
+    }
     
     @Test
     public void testCountGermplasmByPrefName() throws Exception {
@@ -842,10 +852,51 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
         Debug.println(INDENT, "getAttributeValuesByTypeAndGIDList(" + attributeType + ", " + gids + "): ");
         Debug.println(INDENT, results.toString());
     }
+    
+    @Test
+    public void getMethodClasses() throws MiddlewareQueryException{
+    	List<Term> terms = manager.getMethodClasses();
+    	System.out.println(terms);
+    }
   
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
     }
     
+    @Test
+    public void testUpdateGermplasm() throws Exception {
+    	//use wheat local database
+    	Integer gid = -35457;
+    	List<Germplasm> gList = new ArrayList<Germplasm>();
+    	Germplasm oldG = manager.getGermplasmByGID(gid);
+    	oldG.setGrplce(gid);
+		gList.add(oldG);
+        manager.updateGermplasm(gList);
+        Germplasm newG = manager.getGermplasmByGID(gid);
+        assertNull(newG);
+        //revert changes to Germplasm
+        oldG.setGrplce(0);
+		gList.add(oldG);
+        manager.updateGermplasm(gList);
+        Debug.println(INDENT, "testUpdateGermplasm(" + gid + ")");
+    }
+    
+    @Test
+    public void testGetMethodByName() throws Exception {
+        String name = "breeders seed";
+        Method method = manager.getMethodByName(name);
+        assertNotNull(method);
+        Debug.println(INDENT, "testGetMethodByName("+name+"): ");
+        Debug.println(INDENT, method);
+    }
+    
+    @Test
+    public void testGetMethodByCode() throws Exception {
+        String code = "VBS";
+        Method method = manager.getMethodByCode(code);
+        assertNotNull(method);
+        Debug.println(INDENT, "testGetMethodByCode("+code+"): ");
+        Debug.println(INDENT, method);
+    }
 }

@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -1283,5 +1284,43 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 		
 		return list;
+    }
+    
+    public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+    	List<Scale> list = new ArrayList<Scale>();
+    	try {
+    		StringBuffer sql = new StringBuffer()
+    							.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname ")
+    							.append(" FROM cvterm_relationship pr ")
+    							.append(" INNER JOIN cvterm_relationship mr ON mr.subject_id = pr.subject_id ")
+    							.append("    AND mr.type_id = ").append(TermId.HAS_METHOD.getId())
+    							.append(" INNER JOIN cvterm m ON m.cvterm_id = mr.object_id ")
+    							.append(" INNER JOIN cvterm_relationship sr ON sr.subject_id = pr.subject_id ")
+    							.append("    AND sr.type_id = ").append(TermId.HAS_SCALE.getId())
+    							.append(" INNER JOIN cvterm s ON s.cvterm_id = sr.object_id ")
+    							.append(" WHERE pr.type_id = ").append(TermId.HAS_PROPERTY.getId())
+    							.append("    AND pr.object_id = ").append(TermId.INVENTORY_AMOUNT_PROPERTY.getId())
+    							;
+    		
+    		SQLQuery query = getSession().createSQLQuery(sql.toString())
+    							.addScalar("id")
+    							.addScalar("scalename")
+    							.addScalar("methodname")
+    							;
+    		List<Object[]> result = query.list();
+    		if (result != null && !result.isEmpty()) {
+    			for (Object[] row : result) {
+    				String displayName = row[1] + " - " + row[2];
+
+                    // TODO : consider adding a separate field 'displayName' to Term or Scale, to avoid de-sync of POJO values and that of DB.
+                    // With this implementation, the name and description in the DB is ignored in favor of the display name format provided in the specs
+    				list.add(new Scale(new Term((Integer) row[0], displayName, displayName)));
+    			}
+    		}
+    		
+    	} catch(HibernateException e) {
+			logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
+    	}
+    	return list;
     }
 }

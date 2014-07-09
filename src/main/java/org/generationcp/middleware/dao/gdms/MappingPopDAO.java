@@ -47,6 +47,8 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
                 ", gdms_mapping_pop_values.gid " +
                 ", gdms_mapping_pop_values.marker_id " +
                 ", CONCAT(gdms_marker.marker_type, '')" +
+                ", gdms_mapping_pop_values.marker_sample_id " +
+                ", gdms_mapping_pop_values.acc_sample_id " +
             " FROM gdms_mapping_pop_values " +
                 "JOIN gdms_mapping_pop ON gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id " +
                 "LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
@@ -116,8 +118,11 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
                     Integer gid = (Integer) result[4];
                     Integer markerId = (Integer) result[5];
                     String markerType = (String) result[6];
+                    Integer markerSampleId = (Integer) result[7];
+                    Integer accSampleId = (Integer) result[8];
                     MappingValueElement mappingValueElement = new MappingValueElement(
-                            datasetId, mappingPopType, parentAGid, parentBGid, gid, markerId, markerType);
+				                            datasetId, mappingPopType, parentAGid, parentBGid, gid, 
+				                            markerId, markerType, markerSampleId, accSampleId);
                     mappingValues.add(mappingValueElement);
                 }
             }

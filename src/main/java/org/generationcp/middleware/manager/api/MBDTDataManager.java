@@ -32,6 +32,21 @@ public interface MBDTDataManager {
 
     /**
      *
+     * @return a list of MBDTProjectData objects representing all of the project data available in the database
+     * @throws MiddlewareQueryException
+     */
+    public List<MBDTProjectData> getAllProjects() throws MiddlewareQueryException;
+
+    /**
+     *
+     * @param projectName The name of the project to be searched for in the database
+     * @return An integer representing the project id of the project with the given name. Returns null if a project with the given name cannot be found
+     * @throws MiddlewareQueryException
+     */
+    public Integer getProjectIDByProjectName(String projectName) throws MiddlewareQueryException;
+
+    /**
+     *
      * @param projectID The project id the MBDTGeneration object will be associated to during the saving operation
      * @param generation The MBDTGeneration object to be saved into the database
      * @return The saved MBDTGeneration object, with a valid generation ID
@@ -53,7 +68,17 @@ public interface MBDTDataManager {
      * @return a list of MBDTGeneration objects representing the generation entries with the given project_id as its parent
      * @throws MiddlewareQueryException
      */
-    public List<MBDTGeneration> getGenerations(Integer projectID) throws MiddlewareQueryException;
+    public List<MBDTGeneration> getAllGenerations(Integer projectID) throws MiddlewareQueryException;
+
+    /**
+     *
+     * @param name The name of the generation to be retrieved
+     * @param projectID The ID of the project this generation is associated with
+     * @return The integer representing the ID of the generation of the given name within the specified project
+     * @throws MiddlewareQueryException
+     */
+
+    public Integer getGenerationIDByGenerationName(String name, Integer projectID) throws MiddlewareQueryException;
 
     /**
      *

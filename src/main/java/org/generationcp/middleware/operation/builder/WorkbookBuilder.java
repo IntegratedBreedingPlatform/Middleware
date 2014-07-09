@@ -227,7 +227,7 @@ public class WorkbookBuilder extends Builder {
 	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
             Workbook workbook = new Workbook();
             Study study = getStudyBuilder().createStudy(id);
-            Integer dataSetId = null;
+            Integer dataSetId = null, trialDatasetId = null;
             //get observation dataset
             if (dataSetId == null) {
                 List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
@@ -237,10 +237,14 @@ public class WorkbookBuilder extends Builder {
                 		studyType = StudyType.T;
                 	Database database = id > 0 ? Database.CENTRAL : Database.LOCAL;
                     StudyDetails studyDetails = getStudyDataManager().getStudyDetails(database, studyType, id);
+                    workbook.setStudyDetails(studyDetails);
                     for (DatasetReference datasetRef : datasetRefList) {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
                                 datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
                             dataSetId = datasetRef.getId();
+                        }
+                        else if (datasetRef.getName().equals("TRIAL_" + studyDetails.getStudyName())) {
+                        	trialDatasetId = datasetRef.getId();
                         }
                     }
                 }
@@ -254,7 +258,15 @@ public class WorkbookBuilder extends Builder {
             	}
             }
             
+            if (trialDatasetId == null || trialDatasetId == 0) {
+            	DataSet dataset = getStudyDataManager().findOneDataSetByType(id, DataSetType.SUMMARY_DATA);
+            	if (dataset != null) {
+            		trialDatasetId = dataset.getId();
+            	}
+            }
+            
             workbook.setMeasurementDatesetId(dataSetId);
+            workbook.setTrialDatasetId(trialDatasetId);
             
             VariableTypeList variables = null;
             if (dataSetId != null) {
@@ -269,10 +281,12 @@ public class WorkbookBuilder extends Builder {
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
             
             for (ProjectProperty projectProperty : projectProperties) {
+            	boolean isConstant = false;
                 if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
                     StandardVariable stdVariable = getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
                     if (isNursery && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
-                    		|| !isNursery && stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
+                    		|| !isNursery && (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+                    				|| PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId()))) {
                     	
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
                         
@@ -285,8 +299,16 @@ public class WorkbookBuilder extends Builder {
                         String value = null;
                         if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
                         	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        	if (value == null) {
+                        		value = "";
+                        	}
                         }
-                        else if (isNursery) { //set trial env for nursery studies
+                        else if (PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
+                        	//constants, no need to retrieve the value
+                        	isConstant = true;
+                        	value = "";
+                        }
+                        else /*if (isNursery)*/ { //set trial env for nursery studies
                         	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
@@ -326,7 +348,12 @@ public class WorkbookBuilder extends Builder {
 	                        measurementVariable.setFactor(true);
 	                        measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 	                        
-	                        conditions.add(measurementVariable);
+	                        if (isConstant) {
+	                        	constants.add(measurementVariable);
+	                        }
+	                        else {
+	                        	conditions.add(measurementVariable);
+	                        }
                         }
                     }
                 }
@@ -423,7 +450,7 @@ public class WorkbookBuilder extends Builder {
 	
 	private List<ValueReference> getAllBreedingMethods() throws MiddlewareQueryException{
             List<ValueReference> list = new ArrayList<ValueReference>();
-            List<Method> methodList = getGermplasmDataManager().getAllMethods();
+            List<Method> methodList = getGermplasmDataManager().getAllMethodsNotGenerative();
             
             Collections.sort(methodList, new Comparator<Method>(){
 
@@ -441,7 +468,7 @@ public class WorkbookBuilder extends Builder {
             if (methodList != null && !methodList.isEmpty()) {
                 for (Method method : methodList) {
                     if (method != null) {
-                        list.add(new ValueReference(method.getMid(), method.getMname(), method.getMname()));
+                        list.add(new ValueReference(method.getMid(), method.getMname() + " - " + method.getMcode(), method.getMname() + " - " + method.getMcode()));
                     }
                 }
             }

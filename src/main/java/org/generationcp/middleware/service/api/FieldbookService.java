@@ -93,7 +93,43 @@ public interface FieldbookService {
      */
     List<Location> getAllLocations()throws MiddlewareQueryException;
     
+    /**
+     * Gets the all breeding locations.
+     *
+     * @return the all breeding locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
 
+    /**
+     * Gets the all seed locations.
+     *
+     * @return the all seed locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getAllSeedLocations() throws MiddlewareQueryException;
+
+
+    /**
+     * Gets the all breeding methods.
+     *
+     * @param filterOutGenerative the filter out generative
+     * @return All breeding methods
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException;
+
+    /**
+     * Gets the favorite breeding methods.
+     *
+     * @param methodIds the method ids
+     * @param filterOutGenerative the filter out generative
+     * @return the favorite breeding methods
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative)  throws MiddlewareQueryException;
+        
+    
     /**
      * Save or update Field Map Properties like row, column, block, total rows, total columns, planting order.
      *
@@ -198,23 +234,6 @@ public interface FieldbookService {
      */
     void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
 
-    /**
-     * Gets the all breeding methods.
-     *
-     * @return All breeding methods
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Method> getAllBreedingMethods() throws MiddlewareQueryException;
-
-    /**
-     * Gets the favorite breeding methods.
-     *
-     * @param methodIds the method ids
-     * @return the favorite breeding methods
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)  throws MiddlewareQueryException;
-        
     /**
      * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database. 
      * ListData items are always added to the database, before saving the germplasm list.
@@ -412,7 +431,7 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Location> getAllBlockLocations(int fieldId) throws MiddlewareQueryException;
-    
+       
     /**
      * Gets the block information.
      *
@@ -652,11 +671,12 @@ public interface FieldbookService {
 	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
 	
 	/**
-	 * Count the number of variates with data
-	 * @param datasetId
-	 * @param variateIds
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Count the number of variates with data.
+	 *
+	 * @param datasetId the dataset id
+	 * @param variateIds the variate ids
+	 * @return the int
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
 	
@@ -683,10 +703,13 @@ public interface FieldbookService {
 	 * @param nameValue the name value
 	 * @param gid the gid
 	 * @param userId the user id
+	 * @param nameTypeId the name type id
+	 * @param locationId the location id
+	 * @param date the date
 	 * @return the integer
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException;
+	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId,int locationId, Integer date) throws MiddlewareQueryException;
 	
 	/**
 	 * Adds a new Germplasm.
@@ -747,4 +770,54 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
+	
+	/**
+	 * Returns a map of Gid, and list of Names.
+	 *
+	 * @param gids the gids
+	 * @return the names by gids
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException;
+
+    /**
+	 * Count germplasm list data by list id.
+	 *
+	 * @param listId the list id
+	 * @return the int
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	int countGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the method by code.
+	 *
+	 * @param code the code
+	 * @return the method by code
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Method getMethodByCode(String code) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the method by id.
+	 *
+	 * @param id the id
+	 * @return the method by id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Method getMethodById(int id) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the method by name.
+	 *
+	 * @param name the name
+	 * @return the method by name
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Method getMethodByName(String name) throws MiddlewareQueryException;
+
+	/*
+	 * Deletes a study (logical delete).
+	 */
+	void deleteStudy(int studyId) throws MiddlewareQueryException;
 }

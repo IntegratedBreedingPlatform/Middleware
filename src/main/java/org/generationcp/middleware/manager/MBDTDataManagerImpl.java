@@ -42,8 +42,14 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         projectDAO = prepareProjectDAO();
 
 
-        // TODO ask if its required to check for duplicate project name
+
         if (projectData.getProjectID() == null || projectData.getProjectID() == 0) {
+            MBDTProjectData existingData = projectDAO.getByName(projectData.getProjectName());
+
+            if (existingData != null) {
+                throw new MiddlewareQueryException("A project with the given name already exists");
+            }
+
             projectData.setProjectID(projectDAO.getNegativeId());
         }
 
@@ -68,6 +74,30 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
+    public List<MBDTProjectData> getAllProjects() throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        projectDAO = prepareProjectDAO();
+
+        return projectDAO.getAll();
+    }
+
+    @Override
+    public Integer getProjectIDByProjectName(String projectName) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        projectDAO = prepareProjectDAO();
+
+        MBDTProjectData projectData = projectDAO.getByName(projectName);
+
+        if (projectData == null) {
+            return null;
+        } else {
+            return projectData.getProjectID();
+        }
+    }
+
+    @Override
     public MBDTGeneration setGeneration(Integer projectID, MBDTGeneration generation) throws MiddlewareQueryException {
 
         requireLocalDatabaseInstance();
@@ -83,6 +113,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         prepareGenerationDAO();
 
         if (generation.getGenerationID() == null) {
+
+            MBDTGeneration existing = generationDAO.getByNameAndProjectID(generation.getGenerationName(), projectID);
+
+            if (existing != null) {
+                throw new MiddlewareQueryException("A generation with the given name within the project already exists");
+            }
+
             Integer newId = generationDAO.getNegativeId("generationID");
             generation.setGenerationID(newId);
         }
@@ -107,7 +144,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     }
 
     @Override
-    public List<MBDTGeneration> getGenerations(Integer projectID) throws MiddlewareQueryException {
+    public List<MBDTGeneration> getAllGenerations(Integer projectID) throws MiddlewareQueryException {
         if (projectID < 0) {
             requireLocalDatabaseInstance();
         } else {
@@ -116,6 +153,21 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
         prepareGenerationDAO();
         return generationDAO.getByProjectID(projectID);
+    }
+
+    @Override
+    public Integer getGenerationIDByGenerationName(String name, Integer projectID) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        prepareGenerationDAO();
+
+        MBDTGeneration generation = generationDAO.getByNameAndProjectID(name, projectID);
+
+        if (generation == null) {
+            return null;
+        } else {
+            return generation.getGenerationID();
+        }
     }
 
     @Override

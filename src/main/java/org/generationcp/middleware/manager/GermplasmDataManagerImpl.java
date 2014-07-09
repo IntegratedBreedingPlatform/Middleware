@@ -31,6 +31,8 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -756,6 +758,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    public List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException {
+        return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethodsNotGenerative", new Object[] {}, new Class[] {});
+    }
+
+    @Override
     public long countAllMethods() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getMethodDao());
     }
@@ -1380,7 +1387,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Integer> updateGermplasm(List<Germplasm> germplasms) throws MiddlewareQueryException {
-        return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
+    	if(germplasms!=null) {
+    		List<Integer> gids = new ArrayList<Integer>(); 
+    		for (Germplasm germplasm : germplasms) {
+    			if(germplasm.getGid().equals(germplasm.getGrplce())) {//deleted
+    				gids.add(germplasm.getGid());
+    			}
+			}
+    		if(gids!=null && !gids.isEmpty()) {
+    			setWorkingDatabase(Database.LOCAL);
+    			getTransactionDao().cancelUnconfirmedTransactionsForGermplasms(gids);
+    		}
+    	}
+    	return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
     }
 
     @Override
@@ -2305,6 +2324,50 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		setWorkingDatabase(Database.LOCAL);
 			 return getGermplasmDao().getNegativeId("gid");
 			
+	}
+
+	@Override
+	public List<Term> getMethodClasses() throws MiddlewareQueryException {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(TermId.BULKING_BREEDING_METHOD_CLASS.getId());
+		ids.add(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
+		ids.add(TermId.SEED_INCREASE_METHOD_CLASS.getId());
+		ids.add(TermId.SEED_ACQUISITION_METHOD_CLASS.getId());
+		ids.add(TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
+		
+		return getTermBuilder().getTermsByIds(ids);
+		
 	}    
+	
+	@Override
+	public Method getMethodByCode(String code) throws MiddlewareQueryException {
+	    Method method = new Method();
+	    if (setWorkingDatabase(Database.CENTRAL)) {
+	        method = getMethodDao().getByCode(code);
+	    }
+	    if (method == null || method.getMid() == null) {
+	        setWorkingDatabase(Database.LOCAL);
+	        method = getMethodDao().getByCode(code);
+	    }
+	    return method;
+	}
+	
+	@Override
+	public Method getMethodByName(String name) throws MiddlewareQueryException {
+	    List<Method> methods = new ArrayList<Method>();
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            methods = getMethodDao().getByName(name);
+        }
+        if (methods == null || methods.size() == 0) {
+            setWorkingDatabase(Database.LOCAL);
+            methods = getMethodDao().getByName(name);
+        }
+        if (methods != null && methods.size() > 0) {
+            Method method = methods.get(0); 
+            return method;
+        } else {
+            return new Method();
+        }
+	}
     
 }

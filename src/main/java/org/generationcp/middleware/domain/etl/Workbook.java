@@ -659,8 +659,13 @@ public class Workbook {
 	
 	public int getTotalNumberOfInstances() {
 		if (this.totalNumberOfInstances == null) {
-			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
-			this.totalNumberOfInstances = map.size();
+			if (this.trialObservations != null && !this.trialObservations.isEmpty()) {
+				this.totalNumberOfInstances = this.trialObservations.size();
+			}
+			else {
+				Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+				this.totalNumberOfInstances = map.size();
+			}
 		}
 		return this.totalNumberOfInstances;
 	}

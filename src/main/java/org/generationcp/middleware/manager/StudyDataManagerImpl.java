@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -62,11 +63,14 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -255,7 +259,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	                dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, varTypeList);
 		}
 	}
-
+    
 	@Override
     public long countExperiments(int dataSetId) throws MiddlewareQueryException {
         return getExperimentBuilder().count(dataSetId);
@@ -501,10 +505,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         try {
 
-            String sql = "select DISTINCT pp.value " +
+        	String sql = "select pp.value " +
                     "from projectprop pp " +
-                    "inner join projectprop pp2 on pp.rank = pp2.rank and pp.type_id = 1041 " +
-                    "where pp.project_id = :projectId and pp2.value = :standardVariableId LIMIT 0,1";
+                    "inner join projectprop pp2 on pp.rank = pp2.rank and pp.project_id = pp2.project_id " +
+                    "where pp.project_id = :projectId and pp2.value = :standardVariableId " + 
+                    "and pp.type_id not in (pp2.value, "+ TermId.STANDARD_VARIABLE.getId() + "," + TermId.VARIABLE_DESCRIPTION.getId() + ")";
 
 
             Query query = session.createSQLQuery(sql);
@@ -1240,6 +1245,69 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	}
     	return null;
     }
+    
+   @Override 
+   public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, List<Integer> plotNos, List<Integer> cvTermIds) throws MiddlewareQueryException{
+	   setWorkingDatabase(projectId);
+	   return getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNos, cvTermIds);
+	  
+   }
+   
+   @Override 
+   public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, Integer plotNo, List<Integer> cvTermIds) throws MiddlewareQueryException{
+	   setWorkingDatabase(projectId);
+	   return getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNo, cvTermIds);
+	  
+   }
+   
+   @Override
+   public void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers)
+			throws MiddlewareQueryException {
+	   
+   	  	 requireLocalDatabaseInstance();
+         Session session = getCurrentSessionForLocal();
+         Transaction trans = null;
+         PhenotypeOutlierDao phenotypeOutlierDao = getPhenotypeOutlierDao();
+         int i = 0;
+         
+         try {
+             trans = session.beginTransaction();
+             
+             for (PhenotypeOutlier phenotypeOutlier : phenotyleOutliers){
+            	 
+            	 i++;
+            	 
+            	 PhenotypeOutlier existingPhenotypeOutlier = phenotypeOutlierDao.getPhenotypeOutlierByPhenotypeId(phenotypeOutlier.getPhenotypeId());
+            	
+            	 if (existingPhenotypeOutlier != null){
+            		 existingPhenotypeOutlier.setValue(phenotypeOutlier.getValue());
+            		 phenotypeOutlierDao.saveOrUpdate(existingPhenotypeOutlier);
+            	 }else{
+            		 phenotypeOutlier.setPhenotypeOutlierId(phenotypeOutlierDao.getNegativeId("phenotypeOutlierId"));
+            		 phenotypeOutlierDao.saveOrUpdate(phenotypeOutlier);
+            	 }
+            	 
+            	 if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ // batch save
+            		 phenotypeOutlierDao.flush();
+            		 phenotypeOutlierDao.clear();
+                 }
+            	 
+            
+             }
+             
+             phenotypeOutlierDao.flush();
+             phenotypeOutlierDao.clear();
+             
+             trans.commit();
+
+         } catch (Exception e) {
+             rollbackTransaction(trans);
+             throw new MiddlewareQueryException("error in savePhenotypeOutlier " + e.getMessage(), e);
+         }
+		
+	}
+
+
 
 	
 }

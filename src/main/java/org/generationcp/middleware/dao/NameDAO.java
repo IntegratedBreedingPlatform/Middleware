@@ -294,5 +294,34 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     	return gids;
     }
     
+    public Map<Integer, List<Name>> getNamesByGidsInMap(List<Integer> gids) throws MiddlewareQueryException {
+    	Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+    	
+    	if (gids == null || gids.isEmpty()){
+    		return map;
+    	}
+    	
+        try{
+            Criteria criteria = getSession().createCriteria(Name.class);
+			criteria.add(Restrictions.in("germplasmId", gids));
+
+			List<Name> list = (List<Name>)  criteria.list();
+			if (list != null) {
+				for (Name name : list) {
+					List<Name> names = map.get(name.getGermplasmId());
+					if (names == null) {
+						names = new ArrayList<Name>();
+						map.put(name.getGermplasmId(), names);
+					}
+					names.add(name);
+				}
+			}
+			
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage(), e);
+        }
+        
+        return map;
+    }
     
 }

@@ -40,6 +40,7 @@ import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -751,6 +752,7 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+
     
     /**
      * Count the number of variates with recorded data.
@@ -760,4 +762,41 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+
+
+    /**
+     * Check if study has measurement data.
+     *
+     * @param projectId the project id
+     * @param locationId the location id
+     * @param plotNos list of plotNos
+     * @param cvTermIds list of std var Ids
+     * @return list of plotNo, stdVarId and phenoTypeId
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, List<Integer> plotNos, List<Integer> cvTermIds) throws MiddlewareQueryException;
+    
+    /**
+     * Check if study has measurement data.
+     *
+     * @param projectId the project id
+     * @param locationId the location id
+     * @param plotNos list of plotNos
+     * @param cvTermIds list of std var Ids
+     * @return list of plotNo, stdVarId and phenoTypeId
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, Integer plotNo, List<Integer> cvTermIds) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Save the Phenotype Outlier data
+     *
+     * @param phenotyleOutliers list of PhenotypeOutliers
+     * @return none
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers)
+			throws MiddlewareQueryException;
+
 }

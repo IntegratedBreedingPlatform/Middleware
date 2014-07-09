@@ -48,7 +48,7 @@ public class AccMetadataSet implements Serializable{
     private Integer nameId;
     
     @Column(name = "acc_sample_id")
-    private Integer sampleId;
+    private Integer accSampleId;
 
     public AccMetadataSet() {
     }
@@ -60,7 +60,7 @@ public class AccMetadataSet implements Serializable{
 		this.datasetId = datasetId;
 		this.germplasmId = germplasmId;
 		this.nameId = nameId;
-		this.sampleId = sampleId;
+		this.accSampleId = sampleId;
 	}
 
 	public Integer getAccMetadataSetId() {
@@ -95,12 +95,12 @@ public class AccMetadataSet implements Serializable{
 		this.nameId = nameId;
 	}
 
-	public Integer getSampleId() {
-		return sampleId;
+	public Integer getAccSampleId() {
+		return accSampleId;
 	}
 
-	public void setSampleId(Integer sampleId) {
-		this.sampleId = sampleId;
+	public void setAccSampleId(Integer accSampleId) {
+		this.accSampleId = accSampleId;
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class AccMetadataSet implements Serializable{
 				+ ((germplasmId == null) ? 0 : germplasmId.hashCode());
 		result = prime * result + ((nameId == null) ? 0 : nameId.hashCode());
 		result = prime * result
-				+ ((sampleId == null) ? 0 : sampleId.hashCode());
+				+ ((accSampleId == null) ? 0 : accSampleId.hashCode());
 		return result;
 	}
 
@@ -149,10 +149,10 @@ public class AccMetadataSet implements Serializable{
 				return false;
 		} else if (!nameId.equals(other.nameId))
 			return false;
-		if (sampleId == null) {
-			if (other.sampleId != null)
+		if (accSampleId == null) {
+			if (other.accSampleId != null)
 				return false;
-		} else if (!sampleId.equals(other.sampleId))
+		} else if (!accSampleId.equals(other.accSampleId))
 			return false;
 		return true;
 	}
@@ -169,7 +169,7 @@ public class AccMetadataSet implements Serializable{
 		builder.append(", nameId=");
 		builder.append(nameId);
 		builder.append(", sampleId=");
-		builder.append(sampleId);
+		builder.append(accSampleId);
 		builder.append("]");
 		return builder.toString();
 	}

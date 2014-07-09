@@ -140,6 +140,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	return newLocation;
     }
 
+
+    @Override 
+    public List<Location> getAllBreedingLocations()throws MiddlewareQueryException{
+        return getLocationDataManager().getAllBreedingLocations();
+    }
+    
+    @Override 
+    public List<Location> getAllSeedLocations()throws MiddlewareQueryException{
+        Integer seedLType = getLocationDataManager().getUserDefinedFieldIdOfCode(
+                UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
+        return getLocationDataManager().getLocationsByType(seedLType);
+    }
+    
     @Override
     public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
             throws MiddlewareQueryException {
@@ -289,7 +302,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	                    for (MeasurementRow row : observations){
 	                        for (MeasurementData field : row.getDataList()){
 	                            if (variate.getName().equals(field.getLabel())){
-	                            	Phenotype phenotype = null;
+	                            	Phenotype phenotype = getPhenotypeDao().getPhenotypeByProjectExperimentAndType(measurementDatasetId, row.getExperimentId(), variate.getTermId());
 	                                if (field.getValue() != null) {
 	                                	field.setValue(field.getValue().trim());
 	                                }
@@ -340,8 +353,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {
-		List<Method> methodList = getGermplasmDataManager().getAllMethods();
+	public List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException {
+		List<Method> methodList = filterOutGenerative ? getGermplasmDataManager().getAllMethodsNotGenerative() : getGermplasmDataManager().getAllMethods();
 		Collections.sort(methodList, new Comparator<Method>(){
 
 			@Override
@@ -358,14 +371,29 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)
+	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative)
 			throws MiddlewareQueryException {
 		 List<Method> methodList = new ArrayList<Method>();
-	        
+		 	List<Integer> validMethodClasses = new ArrayList<Integer>();
+	     	validMethodClasses.addAll(Method.BULKED_CLASSES);
+	     	validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
 	        for(int i = 0 ; i < methodIds.size() ; i++){
 	            Integer methodId = methodIds.get(i);
 	            Method method = getGermplasmDataManager().getMethodByID(methodId);
-	            methodList.add(method);
+                // filter out generative method types
+	            
+	            if (method!= null) {
+	            	if(filterOutGenerative){
+	    	            if (method.getMtype() == null || !method.getMtype().equals("GEN")) {
+	    	            	 if(method.getGeneq() != null && validMethodClasses.contains(method.getGeneq())){
+	                            methodList.add(method);
+	    	            	 }
+	    	            } 
+	            	}else{
+	            		methodList.add(method);
+	            	}
+	            }
+	            
 	        }
 	        
 	        Collections.sort(methodList, new Comparator<Method>(){
@@ -1004,8 +1032,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public Integer addGermplasmName(String nameValue, int gid, int userId) throws MiddlewareQueryException {
-		Name name = new Name(null, gid, 1, 1, userId, nameValue, 0, 0, 0);
+	public Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId,int locationId, Integer date) throws MiddlewareQueryException {
+		Name name = new Name(null, gid, nameTypeId, 0, userId, nameValue, locationId, date, 0);
 		return getGermplasmDataManager().addGermplasmName(name);
 	}
 	
@@ -1054,5 +1082,56 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
 	    return getGermplasmListManager().getGermplasmNameTypes();
+	}
+
+	@Override
+	public Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException {
+		Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+		
+		setWorkingDatabase(Database.CENTRAL);
+		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		setWorkingDatabase(Database.LOCAL);
+		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		
+		return map;
+	}
+
+	@Override
+	public int countGermplasmListDataByListId(Integer listId)
+			throws MiddlewareQueryException {
+		return (int)getGermplasmListManager().countGermplasmListDataByListId(listId);
+	}
+	
+	@Override
+	public Method getMethodById(int id) throws MiddlewareQueryException {
+	    return getGermplasmDataManager().getMethodByID(id);
+	}
+	
+	@Override
+	public Method getMethodByCode(String code) throws MiddlewareQueryException {
+	    return getGermplasmDataManager().getMethodByCode(code);
+	}
+	
+	@Override
+	public Method getMethodByName(String name) throws MiddlewareQueryException {
+	   return getGermplasmDataManager().getMethodByName(name); 
+	}
+	
+	@Override
+	public void deleteStudy(int studyId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction(); 
+
+            getStudyDestroyer().deleteStudy(studyId);
+		
+            trans.commit();
+         } catch (Exception e) {
+             rollbackTransaction(trans);
+             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
+         }
 	}
 }

@@ -54,8 +54,10 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.Mta;
+import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
@@ -64,7 +66,7 @@ import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -296,17 +298,10 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllelicValuesByGidsAndMarkerNames() throws Exception {
-//        List<String> markerNames = Arrays.asList("CaM0038", "CaM0463", "CaM0539", "CaM0639",
-//        		"CaM0658", "1_0001", "1_0007","1_0013", "1_0025", "1_0031");
-//        List<Integer> gids = Arrays.asList(-5276, -5287, -5484, -5485, -6786, -6785, -3785, -3786);
-        
-        
-        
-        List<String> markerNames = Arrays.asList("Xtxp25");
-        List<Integer> gids = Arrays.asList(10, 28);
-        
+        List<String> markerNames = Arrays.asList("RN18H05");
+        List<Integer> gids = Arrays.asList(7, 1035);
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
-        Debug.println("testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
+        Debug.printObjects(allelicValues);
     }
 
     @Test
@@ -321,10 +316,17 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
         Debug.println("testGetAllelicValuesByGidsAndMarkerNamesForGDMS(" + gids + ", " + markerNames + ") RESULTS: ");
         Debug.printFormattedObjects(INDENT, allelicValues);
     }
+    
+    @Test
+    public void testGetAllelicValuesByGid() throws Exception {
+        Integer gid = 7;
+        List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGid(gid);
+        Debug.printObjects(allelicValues);
+    }
 
     @Test
     public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {
-        Integer datasetId = Integer.valueOf(2);
+        Integer datasetId = Integer.valueOf(6);
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
         List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(
                 datasetId, 0, (int) count);
@@ -503,15 +505,15 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
-    public void testGetNidsFromAccMetadatasetByDatasetIds() throws Exception {
+    public void testGetAccMetadatasetsByDatasetIds() throws Exception {
         List<Integer> datasetIds = Arrays.asList(-1, -2, -3, 1, 2, 3);
         List<Integer> gids = Arrays.asList(-2);
 
-        List<Integer> nids = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, 0, 10);
-        List<Integer> nidsWithGidFilter = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, gids, 0, 10);
+        List<AccMetadataSet> nids = manager.getAccMetadatasetsByDatasetIds(datasetIds, 0, 10);
+        List<AccMetadataSet> nidsWithGidFilter = manager.getAccMetadatasetsByDatasetIdsAndNotGids(datasetIds, gids, 0, 10);
 
-        Debug.println("testGetNidsFromAccMetadatasetByDatasetIds RESULTS: " + nids);
-        Debug.println("testGetNidsFromAccMetadatasetByDatasetIds with gid filter RESULTS: " + nidsWithGidFilter);
+        Debug.println("testGgetAccMetadatasetByDatasetIds: " + nids);
+        Debug.println("testGetgetAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
     }
 
     @Test
@@ -1866,7 +1868,7 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testCountNidsFromAccMetadatasetByDatasetIds() throws Exception {
         List<Integer> datasetIds = Arrays.asList(2, 3, 4);
-        long count = manager.countNidsFromAccMetadatasetByDatasetIds(datasetIds);
+        long count = manager.countAccMetadatasetByDatasetIds(datasetIds);
         Debug.println("testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
     }
 
@@ -2130,22 +2132,22 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetMarkerFromCharValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2012, 2014, 2016, 310544);
-        List<Integer> result = manager.getMarkerFromCharValuesByGids(gIds);
-        Debug.println("testGetMarkerFromCharValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromCharValuesByGids(gIds);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test
     public void testGetMarkerFromAlleleValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(2213, 2214);
-        List<Integer> result = manager.getMarkerFromAlleleValuesByGids(gIds);
-        Debug.println("testGetMarkerFromAlleleValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromAlleleValuesByGids(gIds);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test
     public void testGetMarkerFromMappingPopValuesByGids() throws Exception {
         List<Integer> gIds = Arrays.asList(1434, 1435);
-        List<Integer> result = manager.getMarkerFromMappingPopByGids(gIds);
-        Debug.println("testGetMarkerFromMappingPopValuesByGids(): " + result.size() + "\n\t" + result);
+        List<MarkerSampleId> result = manager.getMarkerFromMappingPopByGids(gIds);
+        Debug.printObjects(INDENT, result);
     }
 
     @Test
@@ -2164,40 +2166,125 @@ public class TestGenotypicDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
-    public void testAddMTA() throws Exception {
+    public void testAddMta() throws Exception {
         Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
                 "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
         Mta mta = new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA",
-        			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod",
-        			8.8f, 9.9f, "dominance", "evidence", "reference", "notes");
+    			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod",
+    			8.8f, 9.9f, "dominance", "evidence", "reference", "notes");
+        MtaMetadata mtaMetadata = new MtaMetadata(null, "project1", "population", 100, "Thousand");
         DatasetUsers users = new DatasetUsers(null, 1);
-        manager.addMTA(dataset, mta, users);
-        Debug.println("done with testAddMTA");
+        manager.addMTA(dataset, mta, mtaMetadata, users);
+        
+        // non-null id means the records were inserted.
+        assertTrue(mta.getMtaId() != null && mtaMetadata.getMtaId() != null); 
+        
+        Debug.println("MTA added: ");
+        Debug.printObject(INDENT, mta);
+        Debug.printObject(INDENT, mtaMetadata);
+    }
+    
+    @Test
+    public void testAddMtaGCP9174() throws Exception {
+    	int nextDatasetId = (int) (manager.getLastId(Database.LOCAL, GdmsTable.GDMS_DATASET) - 1);
+        Dataset dataset = new Dataset(nextDatasetId, "sample","testing", "MTA", "Groundnut", "Groundnut", null, "", 
+        		"int", null, "Tassel", "LOD", "ICRISAT",  "TrusharShah", null, null);
+        
+        int nextMtaId = (int) (manager.getLastId(Database.LOCAL, GdmsTable.GDMS_MTA) - 1);
+
+        Mta mta = new Mta(nextMtaId, 964, nextDatasetId, 5, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T", 
+        		"absent", "present", 0.0f, 0.0f, 0.0f, 0.0f, "Bonferroni", 0.0f, 
+        		0.0f, "co-dominant", "association", "Ellis et al (2002) TAG 105:1038-1042", "");
+
+        MtaMetadata mtaMetadata = new MtaMetadata(nextMtaId, "project1", "population", 100, "Thousand");
+        
+        DatasetUsers users = new DatasetUsers(nextDatasetId, 1);
+        
+        manager.addMTA(dataset, mta, mtaMetadata, users);
+        
+        // non-null id means the records were inserted.
+        assertTrue(mta.getMtaId() != null && mtaMetadata.getMtaId() != null); 
+        
+        Debug.println("MTA added: ");
+        Debug.printObject(INDENT, dataset);
+        Debug.printObject(INDENT, mta);
+        Debug.printObject(INDENT, mtaMetadata);
+    }
+
+    
+    @Test
+    public void testSetMTA() throws Exception {
+        Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
+                "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
+        List<Mta> mtaList = new ArrayList<Mta>();
+        mtaList.add( new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA",
+    			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod",
+    			8.8f, 9.9f, "dominance", "evidence", "reference", "notes"));
+        mtaList.add( new Mta(null, 2, null, 2, 3.1f, 2, 2.1f, 3.2f, 4.3f, "gene", "chromosome", "alleleA",
+    			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 5.4f, 6.5f, 7.6f, 8.7f, "correctionMethod",
+    			9.8f, 10.9f, "dominance", "evidence", "reference", "notes"));
+       
+        List<MtaMetadata> mtaMetadataList = new ArrayList<MtaMetadata>();
+        mtaMetadataList.add(new MtaMetadata(null, "project1", "population", 100, "Thousand"));
+        mtaMetadataList.add(new MtaMetadata(null, "project2", "population", 1, "Million"));
+        
+        DatasetUsers users = new DatasetUsers(null, 1);
+        manager.setMTA(dataset, users, mtaList, mtaMetadataList);
+        
+        // Non-null id means the record was inserted.
+        assertTrue(mtaList.get(0).getMtaId() != null && mtaMetadataList.get(0).getMtaId() != null); 
+        
+        Debug.println("MTAs added: ");
+        Debug.printObjects(INDENT, mtaList);
+        Debug.printObjects(INDENT, mtaMetadataList);
     }
     
     @Test
     public void testDeleteMTA() throws Exception {
     	List<Mta> mtas = manager.getAllMTAs();
     	
-    	if (mtas != null && !mtas.isEmpty()){
-    		
+    	if (mtas != null && !mtas.isEmpty()){    		
     		List<Integer> datasetIds = new ArrayList<Integer>();
     		datasetIds.add(mtas.get(0).getDatasetId());
     		manager.deleteMTA(datasetIds);
-    		Debug.println(INDENT, "datasetId deleted = " + datasetIds);
-    		
+    		Debug.println(INDENT, "datasetId deleted = " + datasetIds);    		
     	}
+    }
+    
+    @Test
+    public void testAddMtaMetadata() throws Exception {
+    	List<Mta> mtas = manager.getAllMTAs();
     	
-    	
+    	if (mtas != null && !mtas.isEmpty()){
+    		Mta mta = mtas.get(0);
+    		MtaMetadata mtaMetadata = new MtaMetadata(mta.getMtaId(), "project", "population", 100, "Thousand");
+    		manager.addMtaMetadata(mtaMetadata);
+    		Debug.println(INDENT, "MtaMetadataset added: " + mtaMetadata);
+    	}
     }
     
     @Test
     public void testGetDartMarkerDetails() throws Exception {
     	List<Integer> markerIds = Arrays.asList(-1, -2);
         List<DartValues> result = manager.getDartMarkerDetails(markerIds);
-        Debug.printObjects(0, result);
+        Debug.printObjects(INDENT, result);
     }
     
+    @Test
+    public void testGetMarkerMetadatasetByDatasetId() throws Exception {
+    	Integer datasetId = 2;
+        List<MarkerMetadataSet> result = manager.getMarkerMetadataSetByDatasetId(datasetId);
+        assertTrue(result != null && !result.isEmpty());
+        Debug.printObjects(INDENT, result);
+    }
+    
+    @Test
+    public void testGetCharValuesByMarkerIds() throws Exception {
+    	List<Integer> markerIds = Arrays.asList(-1, -2);
+        List<CharValues> result = manager.getCharValuesByMarkerIds(markerIds);
+        Debug.printObjects(INDENT, result);
+    }
+
 
     @Test
     public void testUpdateMarkerInfoExisting() throws Exception {

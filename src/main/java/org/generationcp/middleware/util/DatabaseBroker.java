@@ -38,6 +38,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -62,6 +63,7 @@ import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MtaDAO;
+import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.dao.gdms.TrackDataDAO;
@@ -158,6 +160,7 @@ public class DatabaseBroker {
     private QtlDAO qtlDao;
     private QtlDetailsDAO qtlDetailsDao;
     private MtaDAO mtaDao;
+    private MtaMetadataDAO mtaMetadataDao;
     private TrackDataDAO trackDataDao;
     private TrackMarkerDAO trackMarkerDao;
 
@@ -595,6 +598,12 @@ public class DatabaseBroker {
     	phenotypeDao.setSession(getActiveSession());
     	return phenotypeDao;
     }
+    
+    protected final PhenotypeOutlierDao getPhenotypeOutlierDao() {
+    	PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
+    	phenotypeOutlierDao.setSession(getActiveSession());
+    	return phenotypeOutlierDao;
+    }
 
     protected final ExperimentPhenotypeDao getExperimentPhenotypeDao() {
     	ExperimentPhenotypeDao experimentPhenotypeDao = new ExperimentPhenotypeDao();
@@ -790,6 +799,14 @@ public class DatabaseBroker {
         }
         mtaDao.setSession(getActiveSession());
         return mtaDao;
+    }
+
+    protected final MtaMetadataDAO getMtaMetadataDao() {
+        if (mtaMetadataDao == null) {
+            mtaMetadataDao = new MtaMetadataDAO();
+        }
+        mtaMetadataDao.setSession(getActiveSession());
+        return mtaMetadataDao;
     }
 
     protected final TrackDataDAO getTrackDataDao() {

@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
+import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -941,6 +942,24 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	
     @Override
     public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-    	return getListInventoryBuilder().retrieveLotCountsForListEntries(id, start, numOfRows);
+    	return getListInventoryBuilder().retrieveLotCountsForList(id, start, numOfRows);
     }
+
+	@Override
+	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid)
+			throws MiddlewareQueryException {
+		return getListInventoryBuilder().countLotsWithAvailableBalanceForGermplasm(gid);
+	}
+
+	@Override
+	public List<LotDetails> getLotDetailsForGermplasm(Integer gid)
+			throws MiddlewareQueryException {
+		return getListInventoryBuilder().retrieveInventoryLotsForGermplasm(gid);
+	}
+
+	@Override
+	public List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException {
+		return getListInventoryBuilder().retrieveLotCountsForListEntries(listId, entryIds);
+	}
+
 }

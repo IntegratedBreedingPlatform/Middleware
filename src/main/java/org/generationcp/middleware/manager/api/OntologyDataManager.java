@@ -19,6 +19,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
@@ -55,6 +56,22 @@ public interface OntologyDataManager {
      */
 	StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
 	
+	/**
+	 * Retrieves a list of Standard Variables from a list of Ids.
+	 * @param ids - list of ids
+	 * @return list of StandardVariable instances
+	 */
+	List<StandardVariable> getStandardVariables(List<Integer> ids) throws MiddlewareQueryException;
+	
+    /**
+     * Gets standard variable summaries for given a list of ids
+     *
+     * @param stdVariableIds the list of standard variable ids
+     * @return the list of standard variable summaries
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException;
+    
 	 /**
  	 * Retrieves a the standardVariableId given the property, scale and method Ids.
  	 *
@@ -85,6 +102,16 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
+	
+	/**
+	 * Adds a StandardVariable to the database.
+	 * Must provide the property, method, scale, dataType, and storedIn info.
+	 * Otherwise, it will throw an exception.
+	 *
+	 * @param stdVariable the std variable
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException;
 
 	
 	/**
@@ -560,4 +587,6 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
+
+	
 }

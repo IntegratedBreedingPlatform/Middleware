@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
@@ -41,7 +42,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -77,8 +78,6 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 	public void testGetCvTermById() throws Exception {
 		Term term = manager.getTermById(6040);
 		assertNotNull(term);
-//		assertTrue(term.getId() == CV_TERM_ID);
-//		assertTrue(term.getName().equals(CV_TERM_NAME));
 		Debug.println(INDENT, "testGetCvTermById(): " + term);
 	}
 	
@@ -87,6 +86,29 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 		StandardVariable stdVar = manager.getStandardVariable(STD_VARIABLE_ID);
 		assertNotNull(stdVar);		
 		Debug.println(INDENT, "testGetStandardVariable(): " + stdVar);
+	}
+	
+	@Test
+	public void getStandVariableList() throws MiddlewareQueryException {
+		List<Integer> ids = Arrays.asList(new Integer[] {1,2,3,4,5});
+		List<StandardVariable> standardVariables = manager.getStandardVariables(ids);
+		assertNotNull(standardVariables);
+		assertTrue(standardVariables.size() > 0);
+		for (StandardVariable standardVariable : standardVariables) {
+			assertTrue(ids.contains(standardVariable.getId()));
+		}
+	}
+	
+	@Test
+	public void testGetStandardVariableSummaries() throws MiddlewareQueryException {
+		final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;		
+		List<Integer> idList = Arrays.asList(PLANT_HEIGHT_ID, GRAIN_YIELD_ID);
+		List<StandardVariableSummary> summaries = manager.getStandardVariableSummaries(idList);
+		assertNotNull(summaries);
+		assertEquals(idList.size(), summaries.size());
+		for(StandardVariableSummary summary : summaries) {
+			assertTrue(idList.contains(summary.getId()));
+		}		
 	}
 	
 	@Test

@@ -18,8 +18,10 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link MarkerMetadataSet}.
@@ -240,7 +242,23 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 	        } catch (HibernateException e) {
 	            logAndThrowException("Error with isExisting(markerMetadataSet=" + markerMetadataSet + ") query from MarkerMetadataSet " + e.getMessage(), e);
 	        }
-			return false;	}
+			return false;	
+	}
 
+    @SuppressWarnings("unchecked")
+    public List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("datasetId", datasetId));
+            return criteria.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error in getMarkerMetadataSetByDatasetId=" + datasetId
+                    + " query on MarkerMetadataSetDao: " + e.getMessage(), e);
+        }
+
+        return new ArrayList<MarkerMetadataSet>();
+
+    }
 
 }

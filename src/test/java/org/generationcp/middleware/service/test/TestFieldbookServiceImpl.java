@@ -43,7 +43,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
@@ -128,13 +128,22 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllLocations() throws MiddlewareQueryException {
-    	List<Location> locations = fieldbookService.getAllLocations();
-    	for (Location loc : locations){
-    		Debug.println(INDENT, loc.toString());
-    	}
-    	Debug.println(INDENT, "#RECORDS: " + locations.size());
+        List<Location> locations = fieldbookService.getAllLocations();
+        Debug.printObjects(locations);
     }
-    
+
+    @Test
+    public void testGetAllBreedingLocations() throws MiddlewareQueryException {
+        List<Location> locations = fieldbookService.getAllBreedingLocations();
+        Debug.printObjects(locations);
+    }
+
+    @Test
+    public void testGetAllSeedLocations() throws MiddlewareQueryException {
+        List<Location> locations = fieldbookService.getAllSeedLocations();
+        Debug.printObjects(locations);
+    }
+
     @Test
     public void testGetNurseryDataSet() throws MiddlewareQueryException {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
@@ -211,7 +220,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllBreedingMethods() throws MiddlewareQueryException {
-        List<Method> methods = fieldbookService.getAllBreedingMethods();
+        List<Method> methods = fieldbookService.getAllBreedingMethods(false);
         assertFalse(methods.isEmpty());
         Debug.printObjects(INDENT, methods);
     }

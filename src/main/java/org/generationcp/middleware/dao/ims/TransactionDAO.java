@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -303,9 +304,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     	Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
 
     	try {
-    		String sql = "SELECT recordid, count(lotid) " +
-    		"FROM ims_transaction " +
+    		String sql = "SELECT recordid, count(DISTINCT t.lotid) " +
+    		"FROM ims_transaction t " +
+    		"INNER JOIN ims_lot l ON l.lotid = t.lotid " +
     		"WHERE trnstat = 0 AND trnqty <= 0 AND recordid IN (:entryIds) " +
+    		"  AND l.status = 0 AND l.etype = 'GERMPLSM' " +
     		"GROUP BY recordid " +
     		"ORDER BY recordid ";
     		Query query = getSession().createSQLQuery(sql)
@@ -373,6 +376,54 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     	return transactions;
     }
     
-
     
+    public void cancelUnconfirmedTransactionsForListEntries(List<Integer> listEntryIds) throws MiddlewareQueryException{
+    	try {
+    		String sql = "UPDATE ims_transaction " +
+    		"SET trnstat = 9, " +
+    		"trndate = :currentDate " +
+    		"WHERE trnstat = 0 AND recordid IN (:entryIds) " +
+    		"AND sourceType = 'LIST'";
+    		Query query = getSession().createSQLQuery(sql)
+    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameterList("entryIds", listEntryIds);
+    		query.executeUpdate();
+		} catch (Exception e) {
+			logAndThrowException("Error at cancelReservationForListEntries=" + listEntryIds + " at TransactionDAO: " + e.getMessage(), e);
+		}
+    }
+    
+    public void cancelUnconfirmedTransactionsForGermplasms(List<Integer> gids) throws MiddlewareQueryException{
+    	try {
+    		String sql = "UPDATE ims_transaction " +
+    		"SET trnstat = 9, " +
+    		"trndate = :currentDate " +
+    		"WHERE trnstat = 0 AND sourceType = 'LIST' "+
+    		"AND lotid in ( select lotid from ims_lot " +
+    		"WHERE status = 0 AND etype = 'GERMPLSM' " +
+    		"AND eid = (:gids))";
+    		Query query = getSession().createSQLQuery(sql)
+    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameterList("gids", gids);
+    		query.executeUpdate();
+		} catch (Exception e) {
+			logAndThrowException("Error at cancelUnconfirmedTransactionsForGermplasms=" + gids + " at TransactionDAO: " + e.getMessage(), e);
+		}
+    }
+
+    public void cancelUnconfirmedTransactionsForLists(List<Integer> listIds) throws MiddlewareQueryException{
+    	try {
+    		String sql = "UPDATE ims_transaction " +
+    		"SET trnstat = 9, " +
+    		"trndate = :currentDate " +
+    		"WHERE trnstat = 0 AND sourceId in (:listIds) " +
+    		"AND sourceType = 'LIST'";
+    		Query query = getSession().createSQLQuery(sql)
+    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameterList("listIds", listIds);
+    		query.executeUpdate();
+		} catch (Exception e) {
+			logAndThrowException("Error at cancelUnconfirmedTransactionsForLists=" + listIds + " at TransactionDAO: " + e.getMessage(), e);
+		}
+    }
 }

@@ -39,14 +39,6 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
             "FROM gdms_acc_metadataset " +
             "WHERE gid IN (:gIdList)";
     
-    public static final String GET_NIDS_BY_DATASET_IDS = 
-            "SELECT DISTINCT(nid) " +
-            "FROM gdms_acc_metadataset " +
-            "WHERE dataset_id IN (:datasetId) ";
-    
-    public static final String GET_NIDS_BY_DATASET_IDS_FILTER_BY_GIDS = 
-            "AND gid NOT IN (:gids)";
-
     public static final String GET_ACC_METADATASETS_BY_GIDS = 
             "SELECT gid, nid, dataset_id " +
             "FROM gdms_acc_metadataset " +
@@ -113,31 +105,25 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
     }
 
     @SuppressWarnings("unchecked")
-    public List<Integer> getNIDsByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
+    public List<AccMetadataSet> getByDatasetIdsAndNotInGids(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<Integer> nids = new ArrayList<Integer>();
+        List<AccMetadataSet> returnValues = new ArrayList<AccMetadataSet>();
         try { 
         	if (datasetIds != null && !datasetIds.isEmpty()){
-            SQLQuery query;
+        		Criteria criteria = getSession().createCriteria(getPersistentClass());
+        		criteria.add(Restrictions.in("datasetId", datasetIds));
+        		
+        		if (gids != null && !gids.isEmpty()){
+        			criteria.add(Restrictions.not(Restrictions.in("germplasmId", gids)));        			
+        		}
 
-            if (gids == null || gids.isEmpty()) {
-                query = getSession().createSQLQuery(GET_NIDS_BY_DATASET_IDS);
-            } else {
-                query = getSession().createSQLQuery(
-                        GET_NIDS_BY_DATASET_IDS + GET_NIDS_BY_DATASET_IDS_FILTER_BY_GIDS);
-                query.setParameterList("gids", gids);
-            }
-
-            query.setParameterList("datasetId", datasetIds);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            nids = query.list();
+    			returnValues = criteria.list();
         	}
         } catch (HibernateException e) {
-            logAndThrowException("Error with getNIDsByDatasetIds(datasetIds=" + datasetIds + ", gids=" + gids + ") query from AccMetadataSet: "
+            logAndThrowException("Error with getByDatasetIdsAndNotInGids(datasetIds=" + datasetIds + ", gids=" + gids + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
-        return nids;
+        return returnValues;
     }
     
     @SuppressWarnings("unchecked")

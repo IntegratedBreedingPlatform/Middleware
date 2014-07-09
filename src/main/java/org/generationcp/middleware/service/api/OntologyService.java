@@ -18,6 +18,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
@@ -49,6 +50,25 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      */
     StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException;
+
+    /**
+     * Gets the standard variables given a list of ids
+     *
+     * @param stdVariableIds the list of standard variable ids
+     * @return the list of standard variables
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets standard variable summaries for given a list of ids
+     *
+     * @param stdVariableIds the list of standard variable ids
+     * @return the list of standard variable summaries
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException;
 
     
     /**
@@ -602,4 +622,11 @@ public interface OntologyService{
      * @throws MiddlewareQueryException
      */
     List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException;
+    
+    /**
+     * Return all invenotry scales.
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Scale> getAllInventoryScales() throws MiddlewareQueryException;
 }

@@ -329,7 +329,15 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             // begin delete transaction
             trans = session.beginTransaction();
 
-            List<GermplasmListData> listDataList;
+            List<Integer> listIds = new ArrayList<Integer>();            
+	        for (GermplasmList germplasmList : germplasmLists) {
+	        	listIds.add(germplasmList.getId());
+            }
+            
+            if(!listIds.isEmpty()) {
+            	getTransactionDao().cancelUnconfirmedTransactionsForLists(listIds);
+            }
+            
             for (GermplasmList germplasmList : germplasmLists) {
             	           	
             	//delete GermplasmList
@@ -403,7 +411,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
             GermplasmListDataDAO dao = new GermplasmListDataDAO();
             dao.setSession(session);
-
+            
+            List<Integer> deletedListEntryIds = new ArrayList<Integer>();
+            
             for (GermplasmListData germplasmListData : germplasmListDatas) {
                 if (operation == Operation.ADD) {
                     // Auto-assign negative IDs for new local DB records
@@ -422,6 +432,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                 	getGermplasmListDataDAO().flush();
                 	getGermplasmListDataDAO().clear();
                 }
+                if(germplasmListData.getStatus()!=null && germplasmListData.getStatus().intValue() == 9) {
+                	deletedListEntryIds.add(germplasmListData.getId());
+                }
+            }
+            
+            if(!deletedListEntryIds.isEmpty()) {
+            	getTransactionDao().cancelUnconfirmedTransactionsForListEntries(deletedListEntryIds);
             }
             // end transaction, commit to database
             trans.commit();
@@ -452,6 +469,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             trans = session.beginTransaction();
 
             germplasmListDataDeleted = getGermplasmListDataDAO().deleteByListId(listId);
+            getTransactionDao().cancelUnconfirmedTransactionsForLists(Arrays.asList(new Integer[]{listId}));
+            
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
@@ -498,9 +517,18 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         try {
             // begin delete transaction
             trans = session.beginTransaction();
-
+            
+            List<Integer> listEntryIds = new ArrayList<Integer>();            
             for (GermplasmListData germplasmListData : germplasmListDatas) {
-                getGermplasmListDataDAO().makeTransient(germplasmListData);
+            	listEntryIds.add(germplasmListData.getId());
+            }
+            
+            if (!listEntryIds.isEmpty()){
+            	getTransactionDao().cancelUnconfirmedTransactionsForListEntries(listEntryIds);
+            }
+            
+            for (GermplasmListData germplasmListData : germplasmListDatas) {
+            	getGermplasmListDataDAO().makeTransient(germplasmListData);
                 germplasmListDataDeleted++;
             }
             // end transaction, commit to database

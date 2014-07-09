@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
@@ -188,7 +189,25 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         }
         return new ArrayList<Method>();
     }
-    
+
+    @SuppressWarnings("unchecked")
+	public List<Method> getAllMethodsNotGenerative()  throws MiddlewareQueryException {
+        try {
+        	List<Integer> validMethodClasses = new ArrayList<Integer>();
+        	validMethodClasses.addAll(Method.BULKED_CLASSES);
+        	validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
+        	
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.ne("mtype","GEN"));
+            criteria.add(Restrictions.in("geneq", validMethodClasses));
+            criteria.addOrder(Order.asc("mname"));
+
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAllMethodsNotGenerative() query from Method: " + e.getMessage(), e);
+        }
+        return new ArrayList<Method>();
+    }
     
     
     public long countByGroup(String group) throws MiddlewareQueryException {
@@ -201,5 +220,55 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             logAndThrowException("Error with countMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
         }
         return 0;
-    }    
+    }   
+    
+    public Method getByCode(String code) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.eq("mcode", code));
+            return (Method) criteria.uniqueResult();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMethodByCode(code=" + code + ") query from Method: " + e.getMessage(), e);
+        }
+        return new Method();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Method> getByName(String name) throws MiddlewareQueryException {
+        List<Method> methods = new ArrayList<Method>();
+        try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate ")
+                    .append("FROM methods m WHERE m.mname = :mname");
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("mname", name);
+
+            List<Object[]> list = query.list();
+            
+            for (Object[] row : list){
+                Integer mid = (Integer) row[0];
+                String mtype = (String) row[1];
+                String mgrp = (String) row[2];
+                String mcode = (String) row[3];
+                String mname = (String) row[4];
+                String mdesc = (String) row[5];
+                Integer mref = (Integer) row[6];
+                Integer mprgn = (Integer) row[7];
+                Integer mfprg = (Integer) row[8];
+                Integer mattr = (Integer) row[9];
+                Integer geneq = (Integer) row[10];
+                Integer muid = (Integer) row[11];
+                Integer lmid = (Integer) row[12];
+                Integer mdate = (Integer) row[13];
+                
+                Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate);
+                methods.add(method);
+            }
+            
+            return methods;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByName(name=" + name + ") query from Method: " + e.getMessage(), e);
+        }
+        return new ArrayList<Method>();
+    }
 }

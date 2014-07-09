@@ -83,7 +83,7 @@ public abstract class SessionFactoryUtil {
             }
         }
 
-        LOG.info("Opening SessionFactory for local database...");
+        LOG.info("Opening SessionFactory for: " + connectionUrl);
         return cfg.buildSessionFactory();
     }
 }

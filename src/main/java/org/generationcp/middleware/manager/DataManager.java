@@ -986,6 +986,11 @@ public abstract class DataManager extends DatabaseBroker{
         }
     }
 
+    protected void logAndThrowException(String message) throws MiddlewareQueryException {
+        LOG.error(message);
+        throw new MiddlewareQueryException(message);
+    }
+
 
     /**
      * Logs an error based on the given message using the given Logger parameter.

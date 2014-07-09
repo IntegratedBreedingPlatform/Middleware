@@ -15,15 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermProperty;
 
 public class TermBuilder extends Builder {
 
@@ -40,7 +39,7 @@ public class TermBuilder extends Builder {
 		return term;
 	}
 	
-	public Term mapCVTermToTerm(CVTerm cVTerm) throws MiddlewareQueryException {
+	public static Term mapCVTermToTerm(CVTerm cVTerm) throws MiddlewareQueryException {
 		Term term = null;
 		
 		if (cVTerm != null){
@@ -162,5 +161,14 @@ public class TermBuilder extends Builder {
 			
 		}
 		return term;
+	}
+	
+	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+		List<Scale> list = new ArrayList<Scale>();
+		setWorkingDatabase(Database.CENTRAL);
+		list.addAll(getCvTermDao().getAllInventoryScales());
+		setWorkingDatabase(Database.LOCAL);
+		list.addAll(getCvTermDao().getAllInventoryScales());
+		return list;
 	}
 }
