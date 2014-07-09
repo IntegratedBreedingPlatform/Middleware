@@ -234,7 +234,10 @@
                     <docencoding>UTF-8</docencoding>
                     <docfilessubdirs>true</docfilessubdirs>
                     <sourcepath>
-                        ${basedir}/src/main/java/org/generationcp/middleware/service/api;${basedir}/src/main/java/org/generationcp/middleware/manager/api;${basedir}/src/main/java/org/generationcp/middleware/domain;
+                        ${basedir}/src/main/java/org/generationcp/middleware/service/api;
+                        ${basedir}/src/main/java/org/generationcp/middleware/manager/api;
+                        ${basedir}/src/main/java/org/generationcp/middleware/domain;
+                        ${basedir}/src/main/java/org/generationcp/middleware/pojos;
                     </sourcepath>
                 </configuration>
             </plugin>
