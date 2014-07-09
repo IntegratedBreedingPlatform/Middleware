@@ -1,4 +1,5 @@
 /*******************************************************************************
+
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
@@ -64,13 +65,21 @@ public interface OntologyDataManager {
 	List<StandardVariable> getStandardVariables(List<Integer> ids) throws MiddlewareQueryException;
 	
     /**
-     * Gets standard variable summaries for given a list of ids
+     * Gets standard variable summaries for given a list of ids. Returns an empty list if no matches are found.
      *
      * @param stdVariableIds the list of standard variable ids
      * @return the list of standard variable summaries
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException;
+    
+    /**
+     * Gets summary for a standard variable identified by given id. Returns {@code null} if no match is found.
+     * @param standardVariableId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException;
     
 	 /**
  	 * Retrieves a the standardVariableId given the property, scale and method Ids.

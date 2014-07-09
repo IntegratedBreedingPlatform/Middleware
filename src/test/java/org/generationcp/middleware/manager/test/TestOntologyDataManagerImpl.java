@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
@@ -36,6 +37,7 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -46,6 +48,7 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -62,6 +65,8 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
     private static final Integer CV_TERM_ID = 1010;
     private static final String CV_TERM_NAME = "Study Information";
     private static final Integer STD_VARIABLE_ID = 8350; // 8310; 
+    
+    private static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
 	
 	private static ManagerFactory factory;
 	private static OntologyDataManager manager;
@@ -100,15 +105,87 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 	}
 	
 	@Test
-	public void testGetStandardVariableSummaries() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummariesCentral() throws MiddlewareQueryException {
 		final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;		
 		List<Integer> idList = Arrays.asList(PLANT_HEIGHT_ID, GRAIN_YIELD_ID);
+		
 		List<StandardVariableSummary> summaries = manager.getStandardVariableSummaries(idList);
+		
 		assertNotNull(summaries);
 		assertEquals(idList.size(), summaries.size());
 		for(StandardVariableSummary summary : summaries) {
 			assertTrue(idList.contains(summary.getId()));
 		}		
+	}
+	
+	@Test
+	public void testGetStandardVariableSummaryCentral() throws MiddlewareQueryException {		
+		//Load summary from the view based method
+		StandardVariableSummary summary = manager.getStandardVariableSummary(PLANT_HEIGHT_ID);	
+		Assert.assertNotNull(summary);
+
+		//Load details using the ususal method
+		StandardVariable details = manager.getStandardVariable(PLANT_HEIGHT_ID);
+		Assert.assertNotNull(details);
+		
+		//Make sure that the summary data loaded from view based method matches with detailed data loaded using the usual method.
+		assertVariableDataMatches(details, summary);	
+	}
+	
+	@Test
+	public void testGetStandardVariableSummaryLocal() throws MiddlewareQueryException {			
+		//First create a local Standardvariable
+		StandardVariable myOwnPlantHeight = new StandardVariable();
+		myOwnPlantHeight.setName("MyOwnPlantHeight " + new Random().nextInt(1000));
+		myOwnPlantHeight.setDescription(myOwnPlantHeight.getName() + " - Description.");
+		myOwnPlantHeight.setProperty(new Term(15020, "Plant height", "Plant height"));
+		myOwnPlantHeight.setMethod(new Term(16010, "Soil to tip at maturity", "Soil to tip at maturity"));
+		
+		Term myOwnScale = new Term();
+		myOwnScale.setName("MyOwnScale " + new Random().nextInt(1000));
+		myOwnScale.setDefinition(myOwnScale.getName() + " - Description.");
+		myOwnPlantHeight.setScale(myOwnScale);
+		
+		myOwnPlantHeight.setIsA(new Term(1340, "Agronomic", "Agronomic"));
+		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
+		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
+		
+		manager.addStandardVariable(myOwnPlantHeight);
+		
+		//Load details using existing method
+		StandardVariable details = manager.getStandardVariable(myOwnPlantHeight.getId());
+		Assert.assertNotNull(details);
+		
+		//Load summary from the view based method
+		StandardVariableSummary summary = manager.getStandardVariableSummary(myOwnPlantHeight.getId());	
+		Assert.assertNotNull(summary);
+		
+		//Make sure that the summary data loaded from view matches with details data loaded using the usual method.
+		assertVariableDataMatches(details, summary);
+
+		//Test done. Cleanup the test data created.
+		manager.deleteStandardVariable(myOwnPlantHeight.getId());
+	}
+	
+	private void assertVariableDataMatches(StandardVariable details, StandardVariableSummary summary) {
+		Assert.assertEquals(new Integer(details.getId()), summary.getId());
+		Assert.assertEquals(details.getName(), details.getName());
+		Assert.assertEquals(details.getDescription(), details.getDescription());
+		
+		assertTermDataMatches(details.getProperty(), summary.getProperty());
+		assertTermDataMatches(details.getMethod(), summary.getMethod());
+		assertTermDataMatches(details.getScale(), summary.getScale());
+		assertTermDataMatches(details.getIsA(), summary.getIsA());
+		assertTermDataMatches(details.getDataType(), summary.getDataType());
+		assertTermDataMatches(details.getStoredIn(), summary.getStoredIn());
+		
+		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
+	}
+	
+	private void assertTermDataMatches(Term termDetails, TermSummary termSummary) {
+		Assert.assertEquals(new Integer(termDetails.getId()), termSummary.getId());
+		Assert.assertEquals(termDetails.getName(), termSummary.getName());
+		Assert.assertEquals(termDetails.getDefinition(), termSummary.getDefinition());
 	}
 	
 	@Test
