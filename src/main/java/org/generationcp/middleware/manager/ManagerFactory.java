@@ -309,7 +309,7 @@ public class ManagerFactory implements Serializable {
         if (sessionProviderForLocal == null) {
             throw new ConfigException("The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");
         } else {
-            return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+            return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
         }
     }
     
