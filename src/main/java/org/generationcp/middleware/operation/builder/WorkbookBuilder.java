@@ -285,7 +285,7 @@ public class WorkbookBuilder extends Builder {
                 if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
                     StandardVariable stdVariable = getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
                     if (isNursery && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
-                    		|| !isNursery && (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+                    		|| !isNursery && (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
                     				|| PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId()))) {
                     	
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
