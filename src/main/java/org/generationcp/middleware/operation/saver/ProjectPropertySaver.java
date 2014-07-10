@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.hibernate.Session;
 
 public class ProjectPropertySaver extends Saver {
 
@@ -323,10 +324,13 @@ public class ProjectPropertySaver extends Saver {
 			int storedInId, int termId, Geolocation geolocation) throws MiddlewareQueryException {
 		
 		setWorkingDatabase(Database.LOCAL);
+		Session session = getCurrentSessionForLocal();
 		deleteVariable(project, termId);
 		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(storedInId)) {
 			deleteVariable(trialDataset, termId);
 			deleteVariable(measurementDataset, termId);
+			session.flush();
+            session.clear();
 			if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
 			}
