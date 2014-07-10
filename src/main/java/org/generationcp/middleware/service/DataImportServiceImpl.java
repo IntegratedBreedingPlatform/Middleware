@@ -325,7 +325,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             	key = measurementVariable.getProperty().toLowerCase() + "-" + 
             		  measurementVariable.getScale().toLowerCase() + "-" + 
             		  measurementVariable.getMethod().toLowerCase() + "-" + 
-            		  type==null?measurementVariable.getLabel().toLowerCase():type.getGroup();
+            		  (type==null?measurementVariable.getLabel().toLowerCase():type.getGroup());
             }
             List<MeasurementVariable> vars = stdVarMap.get(key);
             if(vars==null) {
