@@ -40,7 +40,7 @@ public class StudyDestroyer extends Destroyer {
 			for (ProjectProperty property : study.getProperties()) {
 				if (property.getTypeId().equals(TermId.STUDY_STATUS.getId())) {
 					found = true;
-					if (property.getValue() != null && !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
+					if (property.getValue() == null || !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
 						property.setValue(String.valueOf(TermId.DELETED_STUDY.getId()));
 						getProjectPropertyDao().saveOrUpdate(property);
 					}
