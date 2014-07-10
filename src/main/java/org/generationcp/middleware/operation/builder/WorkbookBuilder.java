@@ -132,11 +132,13 @@ public class WorkbookBuilder extends Builder {
 		    }
 		}
 		
-		//remove OCC from nursery level conditions
-		Iterator<MeasurementVariable> iter = conditions.iterator();
-		while(iter.hasNext()) {
-			if (iter.next().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-				iter.remove();
+		if(!isTrial){
+			//remove OCC from nursery level conditions for nursery cause its duplicating becuase its being added in conditions and factors
+			Iterator<MeasurementVariable> iter = conditions.iterator();
+			while(iter.hasNext()) {
+				if (iter.next().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					iter.remove();
+				}
 			}
 		}
 		
