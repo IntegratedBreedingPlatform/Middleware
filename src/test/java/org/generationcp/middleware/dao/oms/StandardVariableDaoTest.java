@@ -78,8 +78,8 @@ public class StandardVariableDaoTest {
 	
 	private void assertVariableDataMatches(StandardVariable details, StandardVariableSummary summary) {
 		Assert.assertEquals(new Integer(details.getId()), summary.getId());
-		Assert.assertEquals(details.getName(), details.getName());
-		Assert.assertEquals(details.getDescription(), details.getDescription());
+		Assert.assertEquals(details.getName(), summary.getName());
+		Assert.assertEquals(details.getDescription(), summary.getDescription());
 		
 		assertTermDataMatches(details.getProperty(), summary.getProperty());
 		assertTermDataMatches(details.getMethod(), summary.getMethod());
@@ -128,8 +128,8 @@ public class StandardVariableDaoTest {
 		
 		//Make sure that the summary data loaded from view matches with details data loaded using the usual method.
 		Assert.assertEquals(new Integer(details.getId()), summary.getId());
-		Assert.assertEquals(details.getName(), details.getName());
-		Assert.assertEquals(details.getDescription(), details.getDescription());
+		Assert.assertEquals(details.getName(), summary.getName());
+		Assert.assertEquals(details.getDescription(), summary.getDescription());
 
 		// For local standard variables we only assert the IDs of main components of the ontology star because
 		// some ID references in the LOCAL 'standard_variable_summary' view data may be to central DB which view does not hard link to.

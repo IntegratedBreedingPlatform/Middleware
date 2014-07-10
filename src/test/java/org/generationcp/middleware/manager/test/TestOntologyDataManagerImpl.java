@@ -169,8 +169,8 @@ public class TestOntologyDataManagerImpl extends TestOutputFormatter {
 	
 	private void assertVariableDataMatches(StandardVariable details, StandardVariableSummary summary) {
 		Assert.assertEquals(new Integer(details.getId()), summary.getId());
-		Assert.assertEquals(details.getName(), details.getName());
-		Assert.assertEquals(details.getDescription(), details.getDescription());
+		Assert.assertEquals(details.getName(), summary.getName());
+		Assert.assertEquals(details.getDescription(), summary.getDescription());
 		
 		assertTermDataMatches(details.getProperty(), summary.getProperty());
 		assertTermDataMatches(details.getMethod(), summary.getMethod());
