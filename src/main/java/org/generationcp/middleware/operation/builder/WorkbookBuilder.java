@@ -101,15 +101,14 @@ public class WorkbookBuilder extends Builder {
 		//watch.stop();
 		
 		//watch = new TimerWatch("Workbook create 2");
-		VariableList conditionVariables = null, constantVariables = null;
+		VariableList conditionVariables = null, constantVariables = null, trialConstantVariables = null;
 		if (isTrial) {
 			conditionVariables = new VariableList();
 			conditionVariables.addAll(study.getConditions());
 			conditionVariables.addAll(getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId));
 			
-			constantVariables = new VariableList();
-			constantVariables.addAll(study.getConstants());
-			constantVariables.addAll(getTrialConstants(workbook.getTrialDatasetId()));
+			constantVariables = study.getConstants();
+			trialConstantVariables = getTrialConstants(workbook.getTrialDatasetId());
 			
 			variables = removeTrialDatasetVariables(variables, conditionVariables, constantVariables);
 		}
@@ -118,9 +117,10 @@ public class WorkbookBuilder extends Builder {
 			conditionVariables = study.getConditions();
 			constantVariables = study.getConstants();
 		}
-		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true);
+		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true, true);
 		List<MeasurementVariable> factors = buildFactors(variables, isTrial);		
-		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false);
+		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false, true);
+		constants.addAll(buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
 		
 		//watch.stop();
@@ -501,8 +501,8 @@ public class WorkbookBuilder extends Builder {
          return label;   
         }
 	
-	private List<MeasurementVariable> buildStudyMeasurementVariables(VariableList variableList, boolean isFactor) {
-		return getMeasurementVariableTransformer().transform(variableList, isFactor);
+	private List<MeasurementVariable> buildStudyMeasurementVariables(VariableList variableList, boolean isFactor, boolean isStudy) {
+		return getMeasurementVariableTransformer().transform(variableList, isFactor, isStudy);
 	}
 	
 	private List<MeasurementVariable> buildFactors(List<Experiment> experiments, boolean isTrial) {
