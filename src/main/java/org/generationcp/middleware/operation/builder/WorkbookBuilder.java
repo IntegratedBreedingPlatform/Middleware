@@ -149,8 +149,7 @@ public class WorkbookBuilder extends Builder {
 		for (ProjectProperty projectProperty : projectProperties) {
 	                if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 	                    StandardVariable stdVariable = getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
-	                    if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
-	                    		|| isTrial && stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()) {
+	                    if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
 	                    	
 	                        String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
 	                        
