@@ -277,8 +277,8 @@ public class WorkbookBuilder extends Builder {
             
             List<MeasurementVariable> factors = buildFactors(variables, !isNursery);
             List<MeasurementVariable> variates = buildVariates(variables);
-            List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
-            List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
+            List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true, true);
+            List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false, true);
             List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
             
