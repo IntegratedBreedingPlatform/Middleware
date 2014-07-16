@@ -47,6 +47,7 @@ public class Workbook {
 	private List<MeasurementVariable> studyVariables;
 	private List<MeasurementVariable> nonTrialFactors;
 	private List<MeasurementVariable> trialFactors;
+	private List<MeasurementVariable> germplasmFactors;
 	private List<MeasurementVariable> studyConditions;
 	private List<MeasurementVariable> studyConstants;
 	private List<MeasurementVariable> trialConditions;
@@ -78,6 +79,7 @@ public class Workbook {
 		studyVariables = null;
 		nonTrialFactors = null;
 		trialFactors = null;
+		germplasmFactors = null;
 		studyConditions = null;
 		studyConstants = null;
 		trialConditions = null;
@@ -237,6 +239,13 @@ public class Workbook {
 		}
 		return trialFactors;
 	}
+	
+	public List<MeasurementVariable> getGermplasmFactors() {
+		if(germplasmFactors==null || germplasmFactors.isEmpty()) {
+			germplasmFactors = getGermplasmVariables(factors);
+		}
+		return germplasmFactors;
+	}
 
 	private List<MeasurementVariable> getConditionsAndConstants(boolean isStudy) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
@@ -308,6 +317,18 @@ public class Workbook {
 		if (variables != null && variables.size() > 0) {
 			for (MeasurementVariable variable : variables) {
 				if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
+					list.add(variable);
+				}
+			}
+		}
+		return list;
+	}
+	
+	private List<MeasurementVariable> getGermplasmVariables(List<MeasurementVariable> variables) {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (variables != null && variables.size() > 0) {
+			for (MeasurementVariable variable : variables) {
+				if (PhenotypicType.GERMPLASM.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
 				}
 			}
