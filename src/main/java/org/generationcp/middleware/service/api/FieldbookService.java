@@ -487,7 +487,7 @@ public interface FieldbookService {
      * @return all treatment levels
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException;
+    List<StandardVariableReference> getAllTreatmentLevels(List<Integer> hiddenFields) throws MiddlewareQueryException;
     
     /**
      * Fetch all the possible pairs of the treatment level variable.
@@ -497,7 +497,7 @@ public interface FieldbookService {
      * @return list of all possible treatment pairs
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException;
+    List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException;
 
     /**
      * Returns the study type.

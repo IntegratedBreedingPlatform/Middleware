@@ -1183,7 +1183,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return sb.toString();
     }
     
-    public List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException {
+    public List<StandardVariableReference> getAllTreatmentFactors() throws MiddlewareQueryException {
     	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
     	
 		try {
@@ -1193,9 +1193,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append(" INNER JOIN cvterm_relationship stinrel ON stinrel.subject_id = c.cvterm_id ")
 				.append("   AND stinrel.type_id = ").append(TermId.STORED_IN.getId())
 				.append("   AND stinrel.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
-				.append(" INNER JOIN cvterm_relationship dtyprel ON dtyprel.subject_id = c.cvterm_id ")
-				.append("   AND dtyprel.type_id = ").append(TermId.HAS_TYPE.getId())
-				.append("   AND dtyprel.object_id = ").append(TermId.NUMERIC_VARIABLE.getId())
 			;
 			    
 			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
@@ -1206,13 +1203,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	        }
 		        
 		} catch(HibernateException e) {
-			logAndThrowException("Error in getAllTreatmentLevels in CVTermDao: " + e.getMessage(), e);
+			logAndThrowException("Error in getAllTreatmentFactors in CVTermDao: " + e.getMessage(), e);
 		}
 		
 		return list;
     }
     
-    public boolean hasPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
+    public boolean hasPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException {
     	List<StandardVariable> list = new ArrayList<StandardVariable>();
     	
 		try {
@@ -1228,10 +1225,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("   AND mr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvterm_relationship stin ON stin.type_id = ").append(TermId.STORED_IN.getId())
 				.append("   AND stin.subject_id = c.cvterm_id AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
-				.append(" WHERE c.cvterm_id <> ").append(cvTermId);
+				.append(" INNER JOIN cvterm_relationship dtyperel ON dtyperel.type_id = ").append(TermId.HAS_TYPE.getId())
+				.append("   AND dtyperel.subject_id = c.cvterm_id AND dtyperel.object_id = ").append(TermId.NUMERIC_VARIABLE.getId())
+				.append(" WHERE c.cvterm_id <> ").append(cvTermId)
+				.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 			;
 			
 			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+			query.setParameterList("hiddenFields", hiddenFields);
 			long count = ((BigInteger) query.uniqueResult()).longValue();
 			return count > 0;
 			
@@ -1241,7 +1242,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return false;
     }
     
-    public List<StandardVariable> getAllPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
+    public List<StandardVariable> getAllPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException {
     	List<StandardVariable> list = new ArrayList<StandardVariable>();
     	
 		try {
@@ -1256,7 +1257,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append("   AND mr.subject_id = c.cvterm_id ")
 				.append(" INNER JOIN cvterm_relationship stin ON stin.type_id = ").append(TermId.STORED_IN.getId())
 				.append("   AND stin.subject_id = c.cvterm_id AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
-				.append(" WHERE c.cvterm_id <> ").append(cvTermId);
+				.append(" WHERE c.cvterm_id <> ").append(cvTermId)
+				.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 			;
 			    
 			SQLQuery query = getSession().createSQLQuery(sqlString.toString())
@@ -1266,6 +1268,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					.addScalar("propertyId")
 					.addScalar("scaleId")
 					.addScalar("methodId");
+			
+			query.setParameterList("hiddenFields", hiddenFields);
 					             
 	        List<Object[]> results = (List<Object[]>) query.list();
 	        for (Object[] row : results) {

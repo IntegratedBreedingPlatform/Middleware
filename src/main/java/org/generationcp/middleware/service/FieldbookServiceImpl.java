@@ -803,12 +803,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException {
+	public List<StandardVariableReference> getAllTreatmentLevels(List<Integer> hiddenFields) throws MiddlewareQueryException {
 		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
 		setWorkingDatabase(Database.CENTRAL);
-		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		list.addAll(getCvTermDao().getAllTreatmentFactors());
 		setWorkingDatabase(Database.LOCAL);
-		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		list.addAll(getCvTermDao().getAllTreatmentFactors());
 		
 		for (Iterator<StandardVariableReference> iter = list.iterator(); iter.hasNext(); ) {
 			boolean hasPairInCentral = false, hasPairInLocal = false;
@@ -819,10 +819,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			if (relationship != null) {
 				int propertyId = relationship.getObjectId();
 				setWorkingDatabase(Database.CENTRAL);
-				hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId);
+				hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId, hiddenFields);
 				if (!hasPairInCentral) {
 					setWorkingDatabase(Database.LOCAL);
-					hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId);
+					hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId, hiddenFields);
 				}
 			}
 			
@@ -836,13 +836,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
+	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException {
 		List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
 		
 		setWorkingDatabase(Database.CENTRAL);
-		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 		setWorkingDatabase(Database.LOCAL);
-		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 		
 		List<Integer> termIds = new ArrayList<Integer>();
 		Map<Integer, CVTerm> termMap = new HashMap<Integer, CVTerm>();
