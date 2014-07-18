@@ -240,7 +240,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-    public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
+    public void saveMeasurementRows(Workbook workbook, boolean isDeleteTrialDataset) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -248,11 +248,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         long startTime = System.currentTimeMillis();
 
         try {
-            trans = session.beginTransaction(); 
+            trans = session.beginTransaction();
+            
+            if (isDeleteTrialDataset) {
+                deleteObservationsOfStudy(workbook.getTrialDatasetId());
+            }
             
             List<Integer> deletedVariateIds = getDeletedVariateIds(workbook.getVariates());
-
-            saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
             List<MeasurementVariable> factors = workbook.getFactors();
@@ -260,6 +262,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             int i = 0;
             getWorkbookSaver().saveWorkbookVariables(workbook);
+            
+            saveTrialObservations(workbook);
             
             final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook); 		
             Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
