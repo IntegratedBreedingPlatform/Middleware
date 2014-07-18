@@ -56,6 +56,17 @@ public class GeolocationSaver extends Saver {
 			else {
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
+			if (geolocation.getVariates() != null) {
+			    for (Variable var : geolocation.getVariates().getVariables()) {
+			        if (var.getPhenotypeId() == null) {
+			            getPhenotypeSaver().save(row.getExperimentId(), var);
+			        } else {
+			            getPhenotypeSaver().saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(),
+			                    var.getVariableType().getStandardVariable().getStoredIn().getId(), var.getValue(), 
+			                    getPhenotypeDao().getById(var.getPhenotypeId()));
+			        }
+			    }
+			}
 			return geolocation;
 		}
 		return null;
