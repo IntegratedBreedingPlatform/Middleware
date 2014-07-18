@@ -201,7 +201,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 //        	}
 //        }
         
-        fieldbookService.saveMeasurementRows(workbook, false);
+        fieldbookService.saveMeasurementRows(workbook);
         Workbook workbook2 = fieldbookService.getNurseryDataSet(id);
         workbook2.print(INDENT);
         assertFalse(workbook.equals(workbook2));

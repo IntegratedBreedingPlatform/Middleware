@@ -232,7 +232,7 @@ public interface FieldbookService {
      * @param workbook that contains the measurement rows to save
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void saveMeasurementRows(Workbook workbook, boolean isDeleteTrialDataset) throws MiddlewareQueryException;
+    void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
 
     /**
      * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database. 

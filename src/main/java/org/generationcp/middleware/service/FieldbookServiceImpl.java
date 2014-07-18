@@ -240,7 +240,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-    public void saveMeasurementRows(Workbook workbook, boolean isDeleteTrialDataset) throws MiddlewareQueryException {
+    public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -249,10 +249,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
         try {
             trans = session.beginTransaction();
-            
-            if (isDeleteTrialDataset) {
-                deleteObservationsOfStudy(workbook.getTrialDatasetId());
-            }
             
             List<Integer> deletedVariateIds = getDeletedVariateIds(workbook.getVariates());
             
