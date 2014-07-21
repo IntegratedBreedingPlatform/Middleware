@@ -13,6 +13,7 @@ package org.generationcp.middleware.service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,6 +36,7 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -47,7 +49,6 @@ import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -67,6 +68,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -259,13 +261,61 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             int i = 0;
             getWorkbookSaver().saveWorkbookVariables(workbook);
             
-            saveTrialObservations(workbook);
+            final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook);
             
-            final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook); 		
+            // unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
             Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+            Map<String, List<MeasurementVariable>> measurementVariableMap = (Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
             Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+            
+            // unpack maps
+            // Strings
             List<String> trialHeaders = headerMap.get("trialHeaders");
+            
+            //VariableTypeLists
             VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+            VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
+            VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
+            
+            // Lists of measurementVariables
+            List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
+            
+            //get the trial dataset id
+            Integer trialDatasetId = workbook.getTrialDatasetId();
+            if (trialDatasetId == null) {
+                trialDatasetId = getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+            }
+            
+            List<Integer> locationIds = new ArrayList<Integer>();
+            Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
+            int studyLocationId = 0;
+            int totalRows = (int) getStudyDataManager().countExperiments(trialDatasetId);             
+            
+            //if number of trial instances was not changed, no need to set location ids 
+            if (totalRows != workbook.getTrialObservations().size() && totalRows > 0) {
+                getWorkbookSaver().resetTrialObservations(workbook.getTrialObservations());                
+                
+                if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { //also a multi-location
+                    studyLocationId = getWorkbookSaver().createLocationsAndSetToObservations(locationIds,  workbook,  trialVariables, trialHeaders, trialVariatesMap, true);
+                } else {
+                    studyLocationId = getWorkbookSaver().createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, true);
+                }
+                
+                session.flush();
+                session.clear();
+                
+                //get the geolocation id of the study
+                ExperimentModel studyExperiment = getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
+                studyExperiment.setGeoLocation(getGeolocationDao().getById(studyLocationId));
+                getExperimentDao().saveOrUpdate(studyExperiment);
+                
+                //delete trial observations then reset trial observations
+                getExperimentDestroyer().deleteTrialExperimentsOfStudy(trialDatasetId);
+            }
+            
+            //save trial observations
+            getWorkbookSaver().saveOrUpdateTrialObservations(workbook.getTrialDatasetId(), workbook, trialVariableTypeList, locationIds, 
+                    trialVariatesMap, studyLocationId, totalRows);
             
             Integer measurementDatasetId = workbook.getMeasurementDatesetId();
             if (measurementDatasetId == null) {
@@ -342,15 +392,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 + ((System.currentTimeMillis() - startTime)/60));
         
     }
-		
-	private void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
-		setWorkingDatabase(Database.LOCAL);
-		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
-			for (MeasurementRow trialObservation : workbook.getTrialObservations()) {
-				getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery());
-			}
-		}
-	}
 
 	@Override
 	public List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException {

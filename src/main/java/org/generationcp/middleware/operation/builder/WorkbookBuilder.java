@@ -782,6 +782,24 @@ public class WorkbookBuilder extends Builder {
 			return 0;
 		}
 	}
+	
+	public int getTrialDataSetId(int studyId, String studyName) throws MiddlewareQueryException {
+        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
+        if (datasetRefList != null) {
+            for (DatasetReference datasetRef : datasetRefList) {
+                if (datasetRef.getName().equals("TRIAL_" + studyName)) {
+                    return datasetRef.getId();
+                }
+            }
+        }
+        //if not found in the list using the name, get dataset with Summary Data type
+        DataSet dataset = getStudyDataManager().findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
+        if (dataset != null) {
+            return dataset.getId();
+        } else {
+            return 0;
+        }
+    }
 
 	public List<MeasurementRow> buildDatasetObservations(List<Experiment> experiments, VariableTypeList variateTypes,
 			List<MeasurementVariable> factorList, List<MeasurementVariable> variateList) {
