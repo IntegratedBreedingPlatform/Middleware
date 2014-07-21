@@ -193,7 +193,7 @@ public class WorkbookSaver extends Saver {
             totalRows = (int) getStudyDataManager().countExperiments(trialDatasetId);
         }
         
-        if (totalRows != workbook.getTrialObservations().size() && totalRows > 0 && trialDatasetId != null) {
+        if (workbook.getTrialObservations() != null && totalRows != workbook.getTrialObservations().size() && totalRows > 0 && trialDatasetId != null) {
             isDeleteTrialObservations = true;
             resetTrialObservations(workbook.getTrialObservations());
         }
@@ -269,7 +269,7 @@ public class WorkbookSaver extends Saver {
 	public void saveOrUpdateTrialObservations(int trialDatasetId, Workbook workbook, VariableTypeList trialVariableTypeList, 
 	        List<Integer> locationIds, Map<Integer,VariableList> trialVariatesMap, int studyLocationId, int totalRows) 
 	                throws MiddlewareQueryException, MiddlewareException {           
-        if (totalRows == workbook.getTrialObservations().size() && totalRows > 0) {
+        if (workbook.getTrialObservations() != null && totalRows == workbook.getTrialObservations().size() && totalRows > 0) {
             saveTrialObservations(workbook);
         } else {            
             if(trialVariableTypeList!=null || workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {//multi-location
