@@ -278,6 +278,7 @@ public class WorkbookBuilder extends Builder {
             List<MeasurementVariable> variates = buildVariates(variables);
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true, true);
             List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false, true);
+            variates = removeConstantsFromVariates(variates, constants);
             List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
             
@@ -589,6 +590,23 @@ public class WorkbookBuilder extends Builder {
             return variates;
         }
 
+	private List<MeasurementVariable> removeConstantsFromVariates(List<MeasurementVariable> variates, List<MeasurementVariable> constants) {
+		List<MeasurementVariable> newVariates = new ArrayList<MeasurementVariable>();
+		if (variates != null && constants != null && !variates.isEmpty() && !constants.isEmpty()) {
+			for (MeasurementVariable variate : variates) {
+				boolean found = false;
+				for (MeasurementVariable constant : constants) {
+					if (variate.getTermId() == constant.getTermId()) {
+						found = true;
+					}
+				}
+				if (!found) {
+					newVariates.add(variate);
+				}
+			}
+		}
+		return newVariates;
+	}
 	private List<MeasurementVariable> buildVariates(VariableTypeList variables) {
 		return buildVariates(variables, null);
 	}
