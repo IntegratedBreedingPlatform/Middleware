@@ -179,7 +179,7 @@ public class Workbook {
 		if (!isNursery()) {
             MeasurementVariable trialFactor = null;
             if (getTrialFactors() != null) {
-            	for (MeasurementVariable var : getTrialFactors()) {
+            	for (MeasurementVariable var : getTrialConditions()) {
             		if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
             			trialFactor = var;
             			break;

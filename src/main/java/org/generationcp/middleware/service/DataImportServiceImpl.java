@@ -64,12 +64,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
      */
     @Override
     public int saveDataset(Workbook workbook) throws MiddlewareQueryException {
-        return saveDataset(workbook, false);
+        return saveDataset(workbook, false, false);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int saveDataset(Workbook workbook, boolean retainValues) throws MiddlewareQueryException {
+    public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -114,7 +114,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
             trans2 = session.beginTransaction();
 
-            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues);
+            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations);
 
             trans2.commit();
 

@@ -264,7 +264,7 @@ public class TestDataImportServiceImpl extends TestOutputFormatter {
     	int trialNo = 1;
     	Workbook workbook = TestWorkbookUtil.getTestWorkbookForWizard(studyName,trialNo);
         workbook.print(INDENT);
-        dataImportService.saveDataset(workbook,true);
+        dataImportService.saveDataset(workbook,true,false);
         Map<String,List<Message>> errors = dataImportService.validateProjectData(workbook);
         assertNotNull(errors);
         if(errors!=null) {

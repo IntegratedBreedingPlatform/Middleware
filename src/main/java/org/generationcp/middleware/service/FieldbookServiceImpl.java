@@ -265,7 +265,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             // unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
             Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
-            Map<String, List<MeasurementVariable>> measurementVariableMap = (Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
             Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
             
             // unpack maps
@@ -274,48 +273,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             //VariableTypeLists
             VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
-            VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
-            VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
-            
-            // Lists of measurementVariables
-            List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
             
             //get the trial dataset id
             Integer trialDatasetId = workbook.getTrialDatasetId();
             if (trialDatasetId == null) {
                 trialDatasetId = getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
-            }
-            
-            List<Integer> locationIds = new ArrayList<Integer>();
-            Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
-            int studyLocationId = 0;
-            int totalRows = (int) getStudyDataManager().countExperiments(trialDatasetId);             
-            
-            //if number of trial instances was not changed, no need to set location ids 
-            if (totalRows != workbook.getTrialObservations().size() && totalRows > 0) {
-                getWorkbookSaver().resetTrialObservations(workbook.getTrialObservations());                
-                
-                if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { //also a multi-location
-                    studyLocationId = getWorkbookSaver().createLocationsAndSetToObservations(locationIds,  workbook,  trialVariables, trialHeaders, trialVariatesMap, true);
-                } else {
-                    studyLocationId = getWorkbookSaver().createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, true);
-                }
-                
-                session.flush();
-                session.clear();
-                
-                //get the geolocation id of the study
-                ExperimentModel studyExperiment = getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
-                studyExperiment.setGeoLocation(getGeolocationDao().getById(studyLocationId));
-                getExperimentDao().saveOrUpdate(studyExperiment);
-                
-                //delete trial observations then reset trial observations
-                getExperimentDestroyer().deleteTrialExperimentsOfStudy(trialDatasetId);
-            }
+            }             
             
             //save trial observations
-            getWorkbookSaver().saveOrUpdateTrialObservations(workbook.getTrialDatasetId(), workbook, trialVariableTypeList, locationIds, 
-                    trialVariatesMap, studyLocationId, totalRows);
+            getWorkbookSaver().saveTrialObservations(workbook);
             
             Integer measurementDatasetId = workbook.getMeasurementDatesetId();
             if (measurementDatasetId == null) {
