@@ -129,7 +129,13 @@ public class DataSetBuilder extends Builder {
 		DataSet dataset = build(datasetId);
 		List<Integer> siblingVariables = getVariablesOfSiblingDatasets(datasetId);
 		boolean isMeasurementDataset = isMeasurementDataset(dataset);
-		VariableTypeList variables = filterVariables(dataset.getVariableTypes(), siblingVariables);
+		VariableTypeList variables = null;
+		if (isMeasurementDataset) {
+			variables = filterVariables(dataset.getVariableTypes(), siblingVariables);
+		}
+		else {
+			variables = dataset.getVariableTypes();
+		}
 		variables = filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
 		long expCount = getStudyDataManager().countExperiments(datasetId);
 		List<Experiment> experiments = getStudyDataManager().getExperiments(datasetId, 0, (int)expCount, variables);
@@ -182,7 +188,7 @@ public class DataSetBuilder extends Builder {
 		VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
 			for (VariableType variable : variables.getVariableTypes()) {
-				if (!filters.contains(variable.getId())) {
+				if (!filters.contains(variable.getId()) && variable.getId() != TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					newList.add(variable);
 				}
 			}

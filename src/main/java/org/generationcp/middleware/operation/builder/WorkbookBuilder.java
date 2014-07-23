@@ -592,12 +592,14 @@ public class WorkbookBuilder extends Builder {
 
 	private List<MeasurementVariable> removeConstantsFromVariates(List<MeasurementVariable> variates, List<MeasurementVariable> constants) {
 		List<MeasurementVariable> newVariates = new ArrayList<MeasurementVariable>();
-		if (variates != null && constants != null && !variates.isEmpty() && !constants.isEmpty()) {
+		if (variates != null && !variates.isEmpty()) {
 			for (MeasurementVariable variate : variates) {
 				boolean found = false;
-				for (MeasurementVariable constant : constants) {
-					if (variate.getTermId() == constant.getTermId()) {
-						found = true;
+				if (constants != null && !constants.isEmpty()) {
+					for (MeasurementVariable constant : constants) {
+						if (variate.getTermId() == constant.getTermId()) {
+							found = true;
+						}
 					}
 				}
 				if (!found) {
