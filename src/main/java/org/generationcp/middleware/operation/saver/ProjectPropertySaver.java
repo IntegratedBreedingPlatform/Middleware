@@ -203,12 +203,17 @@ public class ProjectPropertySaver extends Saver {
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
 			if (isConstant) {
-				insertVariable(project, variable, rank);
-				//Variable var = new Variable(createVariableType(variable, rank), variable.getValue());
-				//setWorkingDatabase(Database.LOCAL);
-				//int experimentId = getExperimentProjectDao().getExperimentIdByProjectId(project.getProjectId());
-				//getPhenotypeSaver().save(experimentId, var);
-				getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { //a trial constant
+					int datasetRank = getNextRank(trialDataset);
+					int measurementRank = getNextRank(measurementDataset);
+					insertVariable(trialDataset, variable, datasetRank);
+					insertVariable(measurementDataset, variable, measurementRank);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
+				else { // a study constant
+					insertVariable(project, variable, rank);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
 			}
 			else {
 				int measurementRank = getNextRank(measurementDataset);
@@ -264,8 +269,15 @@ public class ProjectPropertySaver extends Saver {
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
 			if (isConstant) {
-				updateVariable(project, variable);
-				getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { //a trial constant
+					updateVariable(trialDataset, variable);
+					updateVariable(measurementDataset, variable);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
+				else { //a study constant
+					updateVariable(project, variable);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
 			}
 			else {
 				updateVariable(measurementDataset, variable);
@@ -342,6 +354,7 @@ public class ProjectPropertySaver extends Saver {
 		else if (storedInId == TermId.OBSERVATION_VARIATE.getId()
 				|| storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
 			deleteVariable(project, termId); //for constants
+			deleteVariable(trialDataset, termId); //for constants
 			deleteVariable(measurementDataset, termId); //for variates
 			//remove phoenotype value
 			List<Integer> ids = Arrays.asList(project.getProjectId(), trialDataset.getProjectId(), measurementDataset.getProjectId());
