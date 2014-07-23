@@ -742,10 +742,15 @@ public class WorkbookBuilder extends Builder {
 	            	dataList.add(measurementData);
 				}
 		        for (Variable variable : experiment.getVariates().getVariables()) {
-                    MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
+					MeasurementData measurementData = null;
+					Integer id = null;
+	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+	            		id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+	            	}
+                    measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                             variable.getValue(), true,  
                             getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                            variable.getVariableType().getStandardVariable().getDataType().getId(),
+                            id,
                             getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
                     measurementData.setPhenotypeId(variable.getPhenotypeId());
 	            	dataList.add(measurementData);
