@@ -148,7 +148,8 @@ public class StandardVariableBuilder extends Builder {
 			return;
 		}
 		
-		List<Integer> cvTermsToLoad = new ArrayList<Integer>();		
+		// Collect IDs of all cental database references (+ve IDs) in ontology star components of the local standard variables.
+		Set<Integer> cvTermsToLoad = new HashSet<Integer>();		
 		for(StandardVariableSummary summary : summaries) {
 			if(summary.getProperty() != null && summary.getProperty().getId() > 0) {
 				cvTermsToLoad.add(summary.getProperty().getId());
@@ -172,7 +173,7 @@ public class StandardVariableBuilder extends Builder {
 		
 		setWorkingDatabase(Database.CENTRAL);
 		
-		List<CVTerm> cvTerms = getCvTermDao().getByIds(cvTermsToLoad);
+		List<CVTerm> cvTerms = getCvTermDao().getByIds(new ArrayList<Integer>(cvTermsToLoad));
 		Map<Integer, CVTerm> cvTermMap = new HashMap<Integer, CVTerm>();
 		for(CVTerm term : cvTerms) {
 			cvTermMap.put(term.getCvTermId(), term);
@@ -181,23 +182,33 @@ public class StandardVariableBuilder extends Builder {
 		for(StandardVariableSummary summary : summaries) {
 			if(summary.getProperty() != null && summary.getProperty().getId() > 0) {
 				CVTerm prop = cvTermMap.get(summary.getProperty().getId());
-				summary.setProperty(new TermSummary(prop.getCvTermId(), prop.getName(), prop.getDefinition()));
+				if(prop != null) {
+					summary.setProperty(new TermSummary(prop.getCvTermId(), prop.getName(), prop.getDefinition()));
+				}
 			}
 			if(summary.getMethod() != null && summary.getMethod().getId() > 0) {
 				CVTerm method = cvTermMap.get(summary.getMethod().getId());
-				summary.setMethod(new TermSummary(method.getCvTermId(), method.getName(), method.getDefinition()));
+				if(method != null) {
+					summary.setMethod(new TermSummary(method.getCvTermId(), method.getName(), method.getDefinition()));
+				}
 			}
 			if(summary.getScale() != null && summary.getScale().getId() > 0) {
 				CVTerm scale = cvTermMap.get(summary.getScale().getId());
-				summary.setScale(new TermSummary(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
+				if(scale != null) {
+					summary.setScale(new TermSummary(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
+				}
 			}
 			if(summary.getDataType() != null && summary.getDataType().getId() > 0) {
 				CVTerm dataType = cvTermMap.get(summary.getDataType().getId());
-				summary.setDataType(new TermSummary(dataType.getCvTermId(), dataType.getName(), dataType.getDefinition()));
+				if(dataType != null) {
+					summary.setDataType(new TermSummary(dataType.getCvTermId(), dataType.getName(), dataType.getDefinition()));
+				}
 			}
 			if(summary.getStoredIn() != null && summary.getStoredIn().getId() > 0) {
 				CVTerm storedIn = cvTermMap.get(summary.getStoredIn().getId());
-				summary.setStoredIn(new TermSummary(storedIn.getCvTermId(), storedIn.getName(), storedIn.getDefinition()));
+				if(storedIn != null) {  
+					summary.setStoredIn(new TermSummary(storedIn.getCvTermId(), storedIn.getName(), storedIn.getDefinition()));
+				}
 			}
 			
 			//Special hackery for the isA (class) part of the relationship!
@@ -207,7 +218,9 @@ public class StandardVariableBuilder extends Builder {
 		        setWorkingDatabase(summary.getProperty().getId());
 				List<CVTermRelationship> propertyCvTermRelationships = getCvTermRelationshipDao().getBySubject(summary.getProperty().getId());
 				Term isAOfProperty = createTerm(propertyCvTermRelationships, TermId.IS_A);
-				summary.setIsA(new TermSummary(isAOfProperty.getId(), isAOfProperty.getName(), isAOfProperty.getDefinition()));
+				if(isAOfProperty != null) {
+					summary.setIsA(new TermSummary(isAOfProperty.getId(), isAOfProperty.getName(), isAOfProperty.getDefinition()));
+				}
 		    }
 		}
 		
