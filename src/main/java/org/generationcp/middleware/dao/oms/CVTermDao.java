@@ -1187,6 +1187,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
     	
 		try {
+			
+			// TODO : further optimize to remove the need for union of operation
 			StringBuffer sqlString = new StringBuffer()
 				.append("SELECT c.cvterm_id, c.name, c.definition ")
 				.append(" FROM cvterm c ")
