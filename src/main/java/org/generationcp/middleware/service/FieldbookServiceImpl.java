@@ -817,27 +817,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		setWorkingDatabase(Database.LOCAL);
 		list.addAll(getCvTermDao().getAllTreatmentFactors());
 		
-		for (Iterator<StandardVariableReference> iter = list.iterator(); iter.hasNext(); ) {
-			boolean hasPairInCentral = false, hasPairInLocal = false;
-			StandardVariableReference ref =  iter.next();
-			setWorkingDatabase(ref.getId());
-			CVTermRelationship relationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(ref.getId(), TermId.HAS_PROPERTY.getId());
-			
-			if (relationship != null) {
-				int propertyId = relationship.getObjectId();
-				setWorkingDatabase(Database.CENTRAL);
-				hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId, hiddenFields);
-				if (!hasPairInCentral) {
-					setWorkingDatabase(Database.LOCAL);
-					hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId, hiddenFields);
-				}
-			}
-			
-			if (!hasPairInCentral && !hasPairInLocal) {
-				iter.remove();
-			}
-		}
-		
 		Collections.sort(list);
 		return list;
 	}

@@ -1193,6 +1193,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append(" INNER JOIN cvterm_relationship stinrel ON stinrel.subject_id = c.cvterm_id ")
 				.append("   AND stinrel.type_id = ").append(TermId.STORED_IN.getId())
 				.append("   AND stinrel.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
+				.append(" INNER JOIN cvterm_relationship dtyperel ON dtyperel.subject_id = c.cvterm_id ")
+				.append("   AND dtyperel.type_id = ").append(TermId.HAS_TYPE.getId())
+				.append("   AND dtyperel.object_id = ").append(TermId.NUMERIC_VARIABLE.getId())
 			;
 			    
 			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
