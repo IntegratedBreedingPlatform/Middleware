@@ -279,6 +279,7 @@ public class WorkbookBuilder extends Builder {
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true, true);
             List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false, true);
             List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
+            setTreatmentFactorValues(treatmentFactors, dataSetId);
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
             
             for (ProjectProperty projectProperty : projectProperties) {
@@ -921,5 +922,17 @@ public class WorkbookBuilder extends Builder {
 	    
 	    return observations;
 	}
-	
+
+	private void setTreatmentFactorValues(List<TreatmentVariable> treatmentVariables, int measurementDatasetId) 
+			throws MiddlewareQueryException {
+		
+		setWorkingDatabase(measurementDatasetId);
+		for (TreatmentVariable treatmentVariable : treatmentVariables) {
+			List<String> values = getExperimentPropertyDao().getTreatmentFactorValues(
+					treatmentVariable.getLevelVariable().getTermId(), 
+					treatmentVariable.getValueVariable().getTermId(), 
+					measurementDatasetId);
+			treatmentVariable.setValues(values);
+		}
+	}
 }
