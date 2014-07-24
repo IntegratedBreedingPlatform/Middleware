@@ -26,6 +26,8 @@ import org.generationcp.middleware.util.Debug;
 public class StandardVariableReference extends Reference implements Serializable, Comparable<StandardVariableReference>{
 	
 	private static final long serialVersionUID = 1L;
+	
+	private boolean hasPair;
 
 	public StandardVariableReference(Integer id, String name) {
 		super.setId(id);
@@ -39,7 +41,21 @@ public class StandardVariableReference extends Reference implements Serializable
 	}
 
 
-    @Override
+    /**
+	 * @return the hasPair
+	 */
+	public boolean isHasPair() {
+		return hasPair;
+	}
+
+	/**
+	 * @param hasPair the hasPair to set
+	 */
+	public void setHasPair(boolean hasPair) {
+		this.hasPair = hasPair;
+	}
+
+	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("StandardVariableReference [id=");
@@ -48,6 +64,8 @@ public class StandardVariableReference extends Reference implements Serializable
         builder.append(getName());
         builder.append(", description=");
         builder.append(getDescription());
+        builder.append(", hasPair=");
+        builder.append(isHasPair());
         builder.append("]");
         return builder.toString();
     }
@@ -57,6 +75,7 @@ public class StandardVariableReference extends Reference implements Serializable
         Debug.println(indent + 3, "Id: " + getId());
         Debug.println(indent + 3, "Name: " + getName());
         Debug.println(indent + 3, "Description: " + getDescription());
+        Debug.println(indent + 3, "Has Pair: " + isHasPair());
     }
 	
     /* (non-Javadoc)

@@ -813,9 +813,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<StandardVariableReference> getAllTreatmentLevels(List<Integer> hiddenFields) throws MiddlewareQueryException {
 		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
 		setWorkingDatabase(Database.CENTRAL);
-		list.addAll(getCvTermDao().getAllTreatmentFactors());
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, true));
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, false));
 		setWorkingDatabase(Database.LOCAL);
-		list.addAll(getCvTermDao().getAllTreatmentFactors());
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, true));
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, false));
 		
 		Collections.sort(list);
 		return list;

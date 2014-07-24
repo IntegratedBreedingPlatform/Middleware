@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -490,6 +492,17 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
     public void testGetGidsByName() throws Exception {
     	String name = "CG7";
     	System.out.println("GIDS = " + fieldbookService.getGermplasmIdsByName(name));
+    }
+    
+    @Test
+    public void testGetAllTreatmentFactors() throws Exception {
+    	List<Integer> hiddenFields = Arrays.asList(8200,8380,8210,8220,8400,8410,8581,8582);
+    	List<StandardVariableReference> variables = fieldbookService.getAllTreatmentLevels(hiddenFields);
+    	if (variables != null) {
+    		for (StandardVariableReference variable : variables) {
+    			System.out.println(variable);
+    		}
+    	}
     }
 
     @AfterClass

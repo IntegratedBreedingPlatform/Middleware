@@ -1183,7 +1183,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return sb.toString();
     }
     
-    public List<StandardVariableReference> getAllTreatmentFactors() throws MiddlewareQueryException {
+    public List<StandardVariableReference> getAllTreatmentFactors(List<Integer> hiddenFields, boolean showOnlyPaired) throws MiddlewareQueryException {
     	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
     	
 		try {
@@ -1196,13 +1196,28 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append(" INNER JOIN cvterm_relationship dtyperel ON dtyperel.subject_id = c.cvterm_id ")
 				.append("   AND dtyperel.type_id = ").append(TermId.HAS_TYPE.getId())
 				.append("   AND dtyperel.object_id = ").append(TermId.NUMERIC_VARIABLE.getId())
+				.append(" INNER JOIN cvterm_relationship proprel ON proprel.subject_id = c.cvterm_id ")
+				.append("   AND proprel.type_id = ").append(TermId.HAS_PROPERTY.getId())
+				.append(" WHERE c.cvterm_id NOT IN (:hiddenFields) AND ")
 			;
+			if (!showOnlyPaired) {
+				sqlString.append(" NOT " );
+			}
+			sqlString.append(" EXISTS (SELECT 1 FROM cvterm_relationship pairrel ")
+				.append(" WHERE pairrel.object_id = proprel.object_id ")
+				.append(" AND pairrel.type_id = ").append(TermId.HAS_PROPERTY.getId())
+				.append(" AND pairrel.subject_id <> c.cvterm_id ")
+				.append(" AND pairrel.subject_id NOT IN (:hiddenFields)) ")
+				;
 			    
 			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
-					             
+			query.setParameterList("hiddenFields", hiddenFields);
+			
 	        List<Object[]> results = (List<Object[]>) query.list();
 	        for (Object[] row : results) {
-	            list.add(new StandardVariableReference((Integer) row[0], (String) row[1], (String) row[2]));
+	        	StandardVariableReference svar = new StandardVariableReference((Integer) row[0], (String) row[1], (String) row[2]);
+	        	svar.setHasPair(showOnlyPaired);
+	            list.add(svar);
 	        }
 		        
 		} catch(HibernateException e) {
