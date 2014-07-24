@@ -92,6 +92,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         try {
 
             trans = session.beginTransaction();
+            
+            boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
+            if (isUpdate) {
+                getWorkbookSaver().saveWorkbookVariables(workbook);
+                getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+            }
 
             variableMap = getWorkbookSaver().saveVariables(workbook);
 

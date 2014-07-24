@@ -13,7 +13,6 @@ package org.generationcp.middleware.service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -36,7 +35,6 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -68,10 +66,8 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -260,6 +256,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             int i = 0;
             getWorkbookSaver().saveWorkbookVariables(workbook);
+            getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
             
             final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook);
             

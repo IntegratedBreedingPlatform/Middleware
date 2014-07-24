@@ -15,15 +15,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
@@ -45,6 +44,7 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -169,19 +169,14 @@ public class WorkbookSaver extends Saver {
 //			}
 //			else LOG.info("Role for : " + ev.getStandardVariable().getName() + " : " + ev.getStandardVariable().getStoredIn().getId());
 //		}
-//		if(error) return -1;
-		
-		boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
-		
-		if (isUpdate) {
-            saveWorkbookVariables(workbook);
-        }
+//		if(error) return -1;				
 		
         //GCP-6091 start
         int studyLocationId;
         List<Integer> locationIds = new ArrayList<Integer>();
         Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
         
+        //get the trial and measurement dataset id to use in deletion of experiments 
         Integer trialDatasetId = workbook.getTrialDatasetId();
         Integer datasetId = workbook.getMeasurementDatesetId();
         int totalRows = 0;
@@ -196,7 +191,7 @@ public class WorkbookSaver extends Saver {
         if (trialDatasetId != null) {
             totalRows = (int) getStudyDataManager().countExperiments(trialDatasetId);
         }
-         
+        
         if (((workbook.getTrialObservations() != null && totalRows != workbook.getTrialObservations().size() 
                 && totalRows > 0) || isDeleteObservations) && trialDatasetId != null) {
             isDeleteTrialObservations = true;
@@ -216,12 +211,12 @@ public class WorkbookSaver extends Saver {
         } else {
         	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations);
         }
-		//GCP-6091 end
-        
+
+        //GCP-6091 end
         if (isDeleteTrialObservations) {
             session.flush();
             session.clear();
-            
+            requireLocalDatabaseInstance();
             ExperimentModel studyExperiment = getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
             studyExperiment.setGeoLocation(getGeolocationDao().getById(studyLocationId));
             getExperimentDao().saveOrUpdate(studyExperiment);
@@ -231,7 +226,7 @@ public class WorkbookSaver extends Saver {
         }
 		
 		int studyId = 0;
-		if (!isUpdate) {
+		if (!(workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null)) {
 			studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
 		}
 		else {
@@ -264,6 +259,55 @@ public class WorkbookSaver extends Saver {
    		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
    		
    		return studyId;
+	}
+	
+	public void removeDeletedVariablesAndObservations(Workbook workbook) {
+	    deleteDeletedVariablesInObservations(workbook.getFactors(), workbook.getVariates(), workbook.getObservations());
+	    deleteDeletedVariables(workbook.getConditions());
+	    deleteDeletedVariables(workbook.getFactors());
+	    deleteDeletedVariables(workbook.getVariates());
+	    deleteDeletedVariables(workbook.getConstants());
+	}
+	
+	private void deleteDeletedVariablesInObservations(List<MeasurementVariable> factors, List<MeasurementVariable> variates, List<MeasurementRow> observations) {
+	    //create a map of deleted variables
+	    HashMap<Integer, MeasurementVariable> deletedVariables = new HashMap<Integer, MeasurementVariable>();
+	    if (factors != null) {
+    	    for (MeasurementVariable var : factors) {
+    	        if (var.getOperation().equals(Operation.DELETE)) {
+    	            deletedVariables.put(Integer.valueOf(var.getTermId()), var);
+    	        }
+    	    }
+	    }
+	    if (variates != null) {
+            for (MeasurementVariable var : variates) {
+                if (var.getOperation().equals(Operation.DELETE)) {
+                    deletedVariables.put(Integer.valueOf(var.getTermId()), var);
+                }
+            }
+        }
+	    
+	    if (observations != null) {
+    	    for (MeasurementRow row : observations) {
+    	        Iterator<MeasurementData> data = row.getDataList().iterator();
+    	        while (data.hasNext()) {
+    	            if (deletedVariables.get(Integer.valueOf(data.next().getMeasurementVariable().getTermId())) != null) {
+    	                data.remove();
+    	            }
+    	        }
+    	    }
+	    }
+	}
+	
+	private void deleteDeletedVariables(List<MeasurementVariable> variableList) {
+	    if (variableList != null) {
+    	    Iterator<MeasurementVariable> variable = variableList.iterator();
+            while (variable.hasNext()) {
+                if (variable.next().getOperation().equals(Operation.DELETE)) {
+                    variable.remove();
+                }
+            }
+	    }
 	}
 	
 	public void resetTrialObservations(List<MeasurementRow> trialObservations) {
