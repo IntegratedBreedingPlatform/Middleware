@@ -116,6 +116,9 @@ public class ProjectPropertySaver extends Saver {
 		saveProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank());
 		saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank());
 		saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(variableType.getStandardVariable().getId()), variableType.getRank());
+		if (variableType.getTreatmentLabel() != null && !variableType.getTreatmentLabel().isEmpty()) {
+			saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType.getRank());
+		}
 	}
 	
 	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
@@ -246,6 +249,9 @@ public class ProjectPropertySaver extends Saver {
 		varType.setLocalDescription(variable.getDescription());
 		varType.setRank(rank);
 		
+		if (variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
+			varType.setTreatmentLabel(variable.getTreatmentLabel());
+		}
 		return varType;
 	}
 	
