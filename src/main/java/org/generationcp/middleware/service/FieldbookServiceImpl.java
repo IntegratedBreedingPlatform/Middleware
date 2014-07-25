@@ -1076,7 +1076,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		setWorkingDatabase(Database.CENTRAL);
 		map.putAll(getNameDao().getNamesByGidsInMap(gids));
 		setWorkingDatabase(Database.LOCAL);
-		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		Map<Integer, List<Name>> locals = getNameDao().getNamesByGidsInMap(gids);
+		if (locals != null && !locals.isEmpty()) {
+			for (Integer key : locals.keySet()) {
+				List<Name> names = locals.get(key);
+				if (map.containsKey(key)) {
+					map.get(key).addAll(names);
+				}
+				else {
+					map.put(key, names);
+				}
+			}
+		}
 		
 		return map;
 	}
