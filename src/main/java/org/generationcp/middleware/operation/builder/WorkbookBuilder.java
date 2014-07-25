@@ -923,7 +923,7 @@ public class WorkbookBuilder extends Builder {
 	    return observations;
 	}
 
-	private void setTreatmentFactorValues(List<TreatmentVariable> treatmentVariables, int measurementDatasetId) 
+	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentVariables, int measurementDatasetId)
 			throws MiddlewareQueryException {
 		
 		setWorkingDatabase(measurementDatasetId);

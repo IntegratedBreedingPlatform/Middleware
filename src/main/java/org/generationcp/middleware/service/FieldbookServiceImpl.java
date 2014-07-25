@@ -36,11 +36,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
@@ -1058,8 +1054,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		return variable;
 	}
-	
-	@Override
+
+    @Override
+    public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID) throws MiddlewareQueryException {
+        getWorkbookBuilder().setTreatmentFactorValues(treatmentFactors, measurementDatasetID);
+    }
+
+    @Override
 	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
 		return getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
 	}
