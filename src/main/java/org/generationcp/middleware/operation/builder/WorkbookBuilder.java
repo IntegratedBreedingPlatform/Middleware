@@ -590,7 +590,7 @@ public class WorkbookBuilder extends Builder {
                             (PhenotypicType.TRIAL_DESIGN.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
                             || PhenotypicType.GERMPLASM.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
                             || PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))))
-                    		&& (variable.getTreatmentLabel() == null || variable.getTreatmentLabel().isEmpty())) {
+                    		) {
                     	
                         factorList.add(variable);
                     }
