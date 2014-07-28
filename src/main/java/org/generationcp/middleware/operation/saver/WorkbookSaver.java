@@ -303,7 +303,8 @@ public class WorkbookSaver extends Saver {
 	    if (variableList != null) {
     	    Iterator<MeasurementVariable> variable = variableList.iterator();
             while (variable.hasNext()) {
-                if (variable.next().getOperation() != null && variable.next().getOperation().equals(Operation.DELETE)) {
+            	MeasurementVariable var = variable.next();
+                if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
                     variable.remove();
                 }
             }
