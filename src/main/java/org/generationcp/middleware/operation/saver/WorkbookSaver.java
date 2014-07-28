@@ -274,14 +274,14 @@ public class WorkbookSaver extends Saver {
 	    HashMap<Integer, MeasurementVariable> deletedVariables = new HashMap<Integer, MeasurementVariable>();
 	    if (factors != null) {
     	    for (MeasurementVariable var : factors) {
-    	        if (var.getOperation().equals(Operation.DELETE)) {
+    	        if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
     	            deletedVariables.put(Integer.valueOf(var.getTermId()), var);
     	        }
     	    }
 	    }
 	    if (variates != null) {
             for (MeasurementVariable var : variates) {
-                if (var.getOperation().equals(Operation.DELETE)) {
+                if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
                     deletedVariables.put(Integer.valueOf(var.getTermId()), var);
                 }
             }
@@ -303,7 +303,7 @@ public class WorkbookSaver extends Saver {
 	    if (variableList != null) {
     	    Iterator<MeasurementVariable> variable = variableList.iterator();
             while (variable.hasNext()) {
-                if (variable.next().getOperation().equals(Operation.DELETE)) {
+                if (variable.next().getOperation() != null && variable.next().getOperation().equals(Operation.DELETE)) {
                     variable.remove();
                 }
             }
