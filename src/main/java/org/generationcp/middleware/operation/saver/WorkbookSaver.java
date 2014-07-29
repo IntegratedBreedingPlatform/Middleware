@@ -293,7 +293,9 @@ public class WorkbookSaver extends Saver {
                             varIndex++;
                         }
                     }
-                    row.getDataList().remove(varIndex);
+                    if (varIndex < row.getDataList().size()) {
+                        row.getDataList().remove(varIndex);
+                    }
                     index++;
                 }
             }
