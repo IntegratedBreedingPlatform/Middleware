@@ -162,7 +162,6 @@
                             <tasks>
                                 <copy todir="src/main/resources" overwrite="true">
                                     <fileset dir="pipeline/config/${envConfig}" id="fromDir">
-                                        <include name="IBPDatasource.properties"/>
                                         <include name="workbench.properties"/>
                                     </fileset>
                                 </copy>
