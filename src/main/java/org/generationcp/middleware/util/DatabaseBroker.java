@@ -39,6 +39,7 @@ import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -164,6 +165,7 @@ public class DatabaseBroker {
     private MethodDAO methodDao;
     private ProgenitorDAO progenitorDao;
     private UserDefinedFieldDAO userDefinedFieldDao;
+    private ProgramFavoriteDAO programFavoriteDao;
 
     // GermplasmListDataManager DAOs
     private GermplasmListDAO germplasmListDao;
@@ -890,6 +892,14 @@ public class DatabaseBroker {
         locdesDao.setSession(getActiveSession());
         return locdesDao;
     }
+    
+    public ProgramFavoriteDAO getProgramFavoriteDao() {
+		 if (programFavoriteDao == null) {
+			 	programFavoriteDao = new ProgramFavoriteDAO();
+	        }
+		 programFavoriteDao.setSession(getActiveSession());
+	        return programFavoriteDao;
+	}
 
     //================================ GermplasmListDataManager DAO Methods =============================
     
@@ -981,4 +991,6 @@ public class DatabaseBroker {
     protected final TermPropertyBuilder getTermPropertyBuilder() {
         return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+	
+	
 }

@@ -27,6 +27,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -45,6 +46,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.pojos.germplasm.BackcrossElement;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCross;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
@@ -2157,5 +2160,147 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return new Method();
         }
 	}
+
+	@Override
+	public List<ProgramFavorite> getProgramFavorites(FavoriteType type)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		return this.getProgramFavoriteDao().getProgramFavorites(type);
+	}
+
+	@Override
+	public int countProgramFavorites(FavoriteType type)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		return this.getProgramFavoriteDao().countProgramFavorites(type);
+	}
+	
+	@Override
+	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		return this.getProgramFavoriteDao().getProgramFavorites(type, max);
+	}
+
+	@Override
+	public void saveProgramFavorites(List<ProgramFavorite> list)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		int favoriteSaved = 0;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+
+			for (ProgramFavorite favorite : list) {
+
+				Integer negativeId = dao.getNegativeId("id");
+				favorite.setProgramFavoriteId(negativeId);
+				dao.save(favorite);
+				favoriteSaved++;
+
+				if (favoriteSaved % JDBC_BATCH_SIZE == 0) {
+					// flush a batch of inserts and release memory
+					dao.flush();
+					dao.clear();
+				}
+			}
+			// end transaction, commit to database
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list="
+					+ list + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+
+	}
+
+	@Override
+	public void saveProgramFavorite(ProgramFavorite favorite)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+			Integer negativeId = dao.getNegativeId("id");
+			favorite.setProgramFavoriteId(negativeId);
+			dao.save(favorite);
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite="
+					+ favorite + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+		
+	}
+
+	@Override
+	public void deleteProgramFavorites(List<ProgramFavorite> list)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		int favoriteDeleted = 0;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+
+			for (ProgramFavorite favorite : list) {
+
+				dao.makeTransient(favorite);
+
+				if (favoriteDeleted % JDBC_BATCH_SIZE == 0) {
+					// flush a batch of inserts and release memory
+					dao.flush();
+					dao.clear();
+				}
+			}
+			// end transaction, commit to database
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list="
+					+ list + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+		
+	}
+
+	@Override
+	public void deleteProgramFavorite(ProgramFavorite favorite)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+			dao.makeTransient(favorite);
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite="
+					+ favorite + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+		
+	}
+
+	
     
 }

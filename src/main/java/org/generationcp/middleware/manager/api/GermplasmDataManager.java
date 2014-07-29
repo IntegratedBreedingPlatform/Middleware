@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -1353,4 +1354,71 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Method getMethodByName(String name) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the list of favorite methods/locations
+     *
+     * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
+     * @return list of ProgramFavorite
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the list of favorite methods/locations
+     *
+     * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
+     * @param max - maximum number of records to return
+     * @return list of ProgramFavorite
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max) throws MiddlewareQueryException;
+    
+    /**
+     * count favorite methods/locations
+     *
+     * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
+     * @return count of ProgramFavorite list
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    int countProgramFavorites(ProgramFavorite.FavoriteType type) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Saves the list of favorite methods/locations
+     *
+     * @param list of ProgramFavorite
+     * @return none
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void saveProgramFavorites(List<ProgramFavorite> list) throws MiddlewareQueryException;
+    
+    /**
+     * Saves a favorite method/location
+     *
+     * @param ProgramFavorite to be saved
+     * @return none
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void saveProgramFavorite(ProgramFavorite favorite) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Deletes a list of favorite methods/locations
+     *
+     * @param list of ProgramFavorite
+     * @return none
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteProgramFavorites(List<ProgramFavorite> list) throws MiddlewareQueryException;
+    
+    /**
+     * Deletes a favorite method/location
+     *
+     * @param code the code
+     * @return none
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteProgramFavorite(ProgramFavorite favorite) throws MiddlewareQueryException;
 }

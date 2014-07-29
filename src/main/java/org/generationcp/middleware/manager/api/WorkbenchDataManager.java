@@ -453,6 +453,7 @@ public interface WorkbenchDataManager {
      * @return the list of {@link Location} ids
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
@@ -462,6 +463,7 @@ public interface WorkbenchDataManager {
      * @return the number of {@link Location} ids
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     long countLocationIdsByProjectId(Long projectId) throws MiddlewareQueryException;
 
     /**
@@ -473,6 +475,7 @@ public interface WorkbenchDataManager {
      * @return the list of method ids
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -482,6 +485,7 @@ public interface WorkbenchDataManager {
      * @return the number of method ids
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     long countMethodIdsByProjectId(Long projectId) throws MiddlewareQueryException;
     
     
@@ -522,6 +526,7 @@ public interface WorkbenchDataManager {
      * in the database.
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Integer addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
     
     /**
@@ -531,6 +536,7 @@ public interface WorkbenchDataManager {
      * @return Returns the ids of the {@code ProjectLocationMap} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Integer> addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws MiddlewareQueryException;
     
     
@@ -543,6 +549,7 @@ public interface WorkbenchDataManager {
      * @return the project location map by project id
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
+    @Deprecated
     List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
     
 
@@ -552,6 +559,7 @@ public interface WorkbenchDataManager {
      * @param projectLocationMap the project location map
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
 
     /**
@@ -561,6 +569,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code ProjectMethod} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Integer addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
     
     /**
@@ -570,6 +579,7 @@ public interface WorkbenchDataManager {
      * @return Returns the ids of the {@code ProjectUserRole} records added
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Integer> addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException;
 
     
@@ -582,6 +592,7 @@ public interface WorkbenchDataManager {
      * @return the list of ProjectMethod records retrieved
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException;
     
 
@@ -591,6 +602,7 @@ public interface WorkbenchDataManager {
      * @param projectMethod - the project method
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     void deleteProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
     
     /**
@@ -985,6 +997,7 @@ public interface WorkbenchDataManager {
      * @return List of breeding method IDs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException;
 
     /**
@@ -996,6 +1009,7 @@ public interface WorkbenchDataManager {
      * @return the favorite project location ids
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Long> getFavoriteProjectLocationIds(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -1007,6 +1021,7 @@ public interface WorkbenchDataManager {
      * @return the favorite project methods
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Integer> getFavoriteProjectMethods(Project project, int start, int numOfRows) throws  MiddlewareQueryException;
 
     /**
