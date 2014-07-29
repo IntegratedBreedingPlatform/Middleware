@@ -167,7 +167,6 @@
                                 </copy>
                                 <copy todir="src/test/resources" overwrite="true">
                                     <fileset dir="pipeline/config/${envConfig}" id="fromDir">
-                                        <include name="test-hibernate.cfg.xml"/>
                                         <include name="testDatabaseConfig.properties"/>
                                     </fileset>
                                 </copy>
