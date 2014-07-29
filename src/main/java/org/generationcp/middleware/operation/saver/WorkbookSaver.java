@@ -262,40 +262,41 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	public void removeDeletedVariablesAndObservations(Workbook workbook) {
-	    deleteDeletedVariablesInObservations(workbook.getFactors(), workbook.getVariates(), workbook.getObservations());
+	    deleteDeletedVariablesInObservations(workbook.getFactors(), workbook.getObservations());
+	    deleteDeletedVariablesInObservations(workbook.getVariates(), workbook.getObservations());
 	    deleteDeletedVariables(workbook.getConditions());
 	    deleteDeletedVariables(workbook.getFactors());
 	    deleteDeletedVariables(workbook.getVariates());
 	    deleteDeletedVariables(workbook.getConstants());
 	}
 	
-	private void deleteDeletedVariablesInObservations(List<MeasurementVariable> factors, List<MeasurementVariable> variates, List<MeasurementRow> observations) {
-	    //create a map of deleted variables
-	    HashMap<Integer, MeasurementVariable> deletedVariables = new HashMap<Integer, MeasurementVariable>();
-	    if (factors != null) {
-    	    for (MeasurementVariable var : factors) {
-    	        if (var.getOperation().equals(Operation.DELETE)) {
-    	            deletedVariables.put(Integer.valueOf(var.getTermId()), var);
-    	        }
-    	    }
-	    }
-	    if (variates != null) {
-            for (MeasurementVariable var : variates) {
+	private void deleteDeletedVariablesInObservations(List<MeasurementVariable> variableList, List<MeasurementRow> observations) {
+	    List<Integer> deletedList = new ArrayList<Integer>();
+	    if (variableList != null) {
+    	    for (MeasurementVariable var : variableList) {
                 if (var.getOperation().equals(Operation.DELETE)) {
-                    deletedVariables.put(Integer.valueOf(var.getTermId()), var);
+                    deletedList.add(Integer.valueOf(var.getTermId()));
                 }
             }
-        }
-	    
-	    if (observations != null) {
-    	    for (MeasurementRow row : observations) {
-    	        Iterator<MeasurementData> data = row.getDataList().iterator();
-    	        while (data.hasNext()) {
-    	            if (deletedVariables.get(Integer.valueOf(data.next().getMeasurementVariable().getTermId())) != null) {
-    	                data.remove();
-    	            }
-    	        }
-    	    }
+	    }
+	    if (deletedList != null) {
+            for (Integer termId : deletedList) {
+                //remove from measurement rows
+                int index = 0;
+                int varIndex = 0;
+                for (MeasurementRow row : observations) {
+                    if (index == 0) {
+                        for (MeasurementData var : row.getDataList()) {
+                            if (var.getMeasurementVariable().getTermId() == termId.intValue()) {
+                                break;
+                            }
+                            varIndex++;
+                        }
+                    }
+                    row.getDataList().remove(varIndex);
+                    index++;
+                }
+            }
 	    }
 	}
 	
