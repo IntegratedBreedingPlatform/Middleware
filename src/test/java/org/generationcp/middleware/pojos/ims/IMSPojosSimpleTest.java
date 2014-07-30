@@ -13,33 +13,27 @@ package org.generationcp.middleware.pojos.ims;
 
 import java.util.List;
 
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SuppressWarnings("rawtypes")
-public class IMSPojosSimpleTest extends TestOutputFormatter{
+public class IMSPojosSimpleTest extends DataManagerIntegrationTest {
 
-    private static HibernateUtil hibernateUtil;
+	private static Session session;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "local"));
+    	session = managerFactory.getSessionProviderForLocal().getSession();
     }
 
     @Test
     public void testLot() throws Exception {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Lot");
         query.setMaxResults(5);
         List results = query.list();
@@ -54,7 +48,6 @@ public class IMSPojosSimpleTest extends TestOutputFormatter{
 
 	@Test
     public void testTransaction() throws Exception {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Transaction");
         query.setMaxResults(5);
         List results = query.list();
@@ -69,7 +62,6 @@ public class IMSPojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testPerson() throws Exception {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Person");
         query.setMaxResults(5);
         List results = query.list();
@@ -81,10 +73,4 @@ public class IMSPojosSimpleTest extends TestOutputFormatter{
             Debug.println(INDENT, holder);
         }
     }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        hibernateUtil.shutdown();
-    }
-
 }

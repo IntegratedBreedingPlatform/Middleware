@@ -11,44 +11,41 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.generationcp.middleware.domain.etl.WorkbookTest2;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
+import org.generationcp.middleware.ServiceIntegraionTest;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.WorkbookTest;
+import org.generationcp.middleware.domain.etl.WorkbookTest2;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
-import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.util.Message;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
+import org.generationcp.middleware.utils.test.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.junit.Assert.*;
-
 @RunWith(JUnit4.class)
-public class DataImportServiceImplTest extends TestOutputFormatter {
+public class DataImportServiceImplTest extends ServiceIntegraionTest {
 
-    private static ServiceFactory serviceFactory;
     private static DataImportService dataImportService;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "central");
-        serviceFactory = new ServiceFactory(local, central);
         dataImportService = serviceFactory.getDataImportService();
     }
 
@@ -282,11 +279,4 @@ public class DataImportServiceImplTest extends TestOutputFormatter {
         }
     }
 
-    @AfterClass
-    public static void tearDown() throws Exception {
-        if (serviceFactory != null) {
-            serviceFactory.close();
-        }
-    }
-    
 }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.generationcp.middleware.ServiceIntegraionTest;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
@@ -35,19 +36,15 @@ import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class OntologyServiceImplTest extends TestOutputFormatter {
+public class OntologyServiceImplTest extends ServiceIntegraionTest {
     
     private static final String NUMBER_OF_RECORDS = " #RECORDS: ";
     private static final int AGRONOMIC_TRAIT_CLASS = 1340;
@@ -65,16 +62,7 @@ public class OntologyServiceImplTest extends TestOutputFormatter {
 
     @BeforeClass
     public static void setUp() throws Exception {
-
-        local = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "local");
-        central = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "central");
-
-        serviceFactory = new ServiceFactory(local, central);
-
         ontologyService = serviceFactory.getOntologyService();
-        
     }
 
     @Test
@@ -636,12 +624,5 @@ public class OntologyServiceImplTest extends TestOutputFormatter {
     			System.out.println(scale);
     		}
     	}
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-        if (serviceFactory != null) {
-            serviceFactory.close();
-        }
     }
 }

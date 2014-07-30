@@ -14,9 +14,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
@@ -24,16 +22,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class GermplasmDAOTest{
+public class GermplasmDAOTest extends MiddlewareIntegrationTest {
 
-    private static HibernateUtil hibernateUtil;
     private static GermplasmDAO dao;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
         dao = new GermplasmDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(centralSessionUtil.getCurrentSession());
     }
 
     /**
@@ -63,7 +59,6 @@ public class GermplasmDAOTest{
      *       Debug.println(0, g); Debug.println(0, g.getPreferredName()); }
      *       }
      **/
-
     @Test
     public void testGetDerivativeChildren() throws Exception {
         Integer gid = Integer.valueOf(1);
@@ -91,7 +86,6 @@ public class GermplasmDAOTest{
     public static void tearDown() throws Exception {
         dao.setSession(null);
         dao = null;
-        hibernateUtil.shutdown();
     }
 
 }

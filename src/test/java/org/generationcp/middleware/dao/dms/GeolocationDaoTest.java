@@ -17,25 +17,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class GeolocationDaoTest{
+public class GeolocationDaoTest extends MiddlewareIntegrationTest {
 
-    private static HibernateUtil hibernateUtil;
     private static GeolocationDao dao;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
         dao = new GeolocationDao();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(centralSessionUtil.getCurrentSession());
     }
 
 
@@ -54,7 +50,6 @@ public class GeolocationDaoTest{
     public static void tearDown() throws Exception {
         dao.setSession(null);
         dao = null;
-        hibernateUtil.shutdown();
     }
 
 }

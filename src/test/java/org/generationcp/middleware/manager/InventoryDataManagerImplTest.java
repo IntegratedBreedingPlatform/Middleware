@@ -18,13 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.EntityType;
@@ -33,23 +32,17 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class InventoryDataManagerImplTest extends TestOutputFormatter {
+public class InventoryDataManagerImplTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static InventoryDataManager manager;
     
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getInventoryDataManager();
+        manager = managerFactory.getInventoryDataManager();
     }
 
     @Test
@@ -552,10 +545,5 @@ public class InventoryDataManagerImplTest extends TestOutputFormatter {
 		for (LotDetails lot : lots){
 			System.out.println(lot);
 		}
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
     }
 }

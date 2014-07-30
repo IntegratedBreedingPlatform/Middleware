@@ -13,45 +13,26 @@ package org.generationcp.middleware.pojos;
 
 import java.util.List;
 
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.Georef;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.Installation;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SuppressWarnings("rawtypes")
-public class PojosSimpleTest extends TestOutputFormatter{
+public class PojosSimpleTest extends DataManagerIntegrationTest {
 
-    private static HibernateUtil hibernateUtil;
+    private static Session session;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
+    	session = managerFactory.getSessionProviderForCentral().getSession();
     }
 
     @Test
     public void testAtributs() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Attribute");
         query.setMaxResults(5);
         List results = query.list();
@@ -66,7 +47,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testBibrefs() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Bibref");
         query.setMaxResults(5);
         List results = query.list();
@@ -81,7 +61,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testCntry() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Country");
         query.setMaxResults(5);
         List results = query.list();
@@ -96,7 +75,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testGeoref() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Georef");
         query.setMaxResults(5);
         List results = query.list();
@@ -111,7 +89,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testGermplsm() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Germplasm");
         query.setMaxResults(5);
         List results = query.list();
@@ -126,7 +103,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testLocation() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Location");
         query.setMaxResults(5);
         List results = query.list();
@@ -141,7 +117,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testLocdes() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Locdes");
         query.setMaxResults(5);
         List results = query.list();
@@ -156,7 +131,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testMethods() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Method");
         query.setMaxResults(5);
         List results = query.list();
@@ -171,7 +145,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testNames() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Name");
         query.setMaxResults(5);
         List results = query.list();
@@ -186,7 +159,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testProgntrs() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Progenitor");
         query.setMaxResults(5);
         List results = query.list();
@@ -201,7 +173,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testUdflds() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM UserDefinedField");
         query.setMaxResults(5);
         List results = query.list();
@@ -216,7 +187,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testUser() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM User");
         query.setMaxResults(5);
         List results = query.list();
@@ -232,14 +202,12 @@ public class PojosSimpleTest extends TestOutputFormatter{
     @Test
     public void testGettingGermplasmDetails() {
         Integer gid = Integer.valueOf(50533);
-        Session session = hibernateUtil.getCurrentSession();
         Germplasm g = (Germplasm) session.load(Germplasm.class, gid);
         Debug.println(INDENT, g);
     }
 
     @Test
     public void testGermplasmList() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM GermplasmList");
         query.setMaxResults(5);
         List results = query.list();
@@ -254,7 +222,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testGermplasmListData() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM GermplasmListData");
         query.setMaxResults(5);
         List results = query.list();
@@ -269,7 +236,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testInstallation() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Installation");
         query.setMaxResults(5);
         List results = query.list();
@@ -284,7 +250,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
     
     @Test
     public void testListDataProperty() {
-        Session session = hibernateUtil.getCurrentSession();
         
         // UNCOMMENT TO TEST: (IMPORTANT -- RUN IN RICE DB ONLY)
         Query query = session.createQuery("FROM GermplasmListData where id IN (32334, 32335, 32336)");
@@ -297,10 +262,4 @@ public class PojosSimpleTest extends TestOutputFormatter{
         	data.print(INDENT);
         }
     }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        hibernateUtil.shutdown();
-    }
-
 }

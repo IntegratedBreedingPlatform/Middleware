@@ -15,24 +15,18 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataColumn;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DataManager;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -47,19 +41,15 @@ import org.junit.runners.MethodSorters;
 // Test using RICE database
 */
 @FixMethodOrder(MethodSorters.JVM)
-public class GermplasmListManagerImplTest extends TestOutputFormatter{
+public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static GermplasmListManager manager;
     private static List<Integer> testDataIds;
     private static final Integer STATUS_DELETED = 9;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getGermplasmListManager();
+        manager = managerFactory.getGermplasmListManager();
         testDataIds = new ArrayList<Integer>();
     }
 
@@ -573,12 +563,6 @@ public class GermplasmListManagerImplTest extends TestOutputFormatter{
     public void testGetAdditionalColumnsForList() throws MiddlewareQueryException{
     	GermplasmListNewColumnsInfo listInfo = manager.getAdditionalColumnsForList(-14);
     	listInfo.print(0);
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-    	removeTestData();
-        factory.close();
     }
     
     private static String getTestDataIds() {

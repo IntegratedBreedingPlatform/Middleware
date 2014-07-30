@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
@@ -26,28 +27,18 @@ import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class CrossStudyDataManagerImplTest extends TestOutputFormatter{
+public class CrossStudyDataManagerImplTest extends DataManagerIntegrationTest {
 
-	private static ManagerFactory factory;
 	private static CrossStudyDataManager manager;
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-		DatabaseConnectionParameters local = new DatabaseConnectionParameters(
-				"testDatabaseConfig.properties", "local");
-		DatabaseConnectionParameters central = new DatabaseConnectionParameters(
-				"testDatabaseConfig.properties", "central");
-		factory = new ManagerFactory(local, central);
-		manager = factory.getCrossStudyDataManager();
+		manager = managerFactory.getCrossStudyDataManager();
 	}
 
 	@Test
@@ -240,13 +231,5 @@ public class CrossStudyDataManagerImplTest extends TestOutputFormatter{
     	TrialEnvironments environments = manager.getEnvironmentsForTraits(traitIds);
         environments.print(INDENT);
 		Debug.println(INDENT, "#RECORDS: " + environments.size());
-	}
-  
-	@AfterClass
-	public static void tearDown() throws Exception {
-		if (factory != null) {
-			factory.close();
-		}
-	}
-	
+	}	
 }

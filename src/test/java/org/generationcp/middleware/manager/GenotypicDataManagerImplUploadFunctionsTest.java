@@ -15,12 +15,16 @@ package org.generationcp.middleware.manager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GdmsType;
@@ -48,6 +52,7 @@ import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -71,13 +76,25 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-                "localgroundnut");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-                "centralgroundnut");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getGenotypicDataManager();
-    }
+        DatabaseConnectionParameters local, central;
+		try {
+			local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
+			        "localgroundnut");
+			central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
+	                "centralgroundnut");
+	        factory = new ManagerFactory(local, central);
+	        manager = factory.getGenotypicDataManager();
+	        
+		} catch (FileNotFoundException e) {
+			Assert.fail(e.getMessage());
+		} catch (ConfigException e) {
+			Assert.fail(e.getMessage());
+		} catch (URISyntaxException e) {
+			Assert.fail(e.getMessage());
+		} catch (IOException e) {
+			Assert.fail(e.getMessage());
+		}    
+	}
 
     private Dataset createDataset() throws Exception {
         Integer datasetId = null; // Crop tested: Groundnut
@@ -1183,7 +1200,9 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
 
     @AfterClass
     public static void tearDown() throws Exception {
-        factory.close();
+    	if(factory != null) {
+    		factory.close();
+    	}
     }
 
 }

@@ -12,27 +12,21 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.utils.test.Debug;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class GermplasmAddUpdateFunctionsTest{
+public class GermplasmAddUpdateFunctionsTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static GermplasmDataManager manager;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getGermplasmDataManager();
+        manager = managerFactory.getGermplasmDataManager();
     }
 
     /**
@@ -163,7 +157,6 @@ public class GermplasmAddUpdateFunctionsTest{
      *       int updated = manager.updateGermplasm(germplasms);
      *       Assert.assertTrue(updated == 2); }
      **/
-
     @Test
     public void testAddGermplasm() throws Exception {
         Germplasm g = new Germplasm();
@@ -192,10 +185,4 @@ public class GermplasmAddUpdateFunctionsTest{
         Debug.println(0, "Germplasm added: " + added); 
        
     }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
-    }
-
 }

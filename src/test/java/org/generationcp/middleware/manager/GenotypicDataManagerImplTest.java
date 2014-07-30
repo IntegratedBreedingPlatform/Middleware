@@ -15,19 +15,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.GdmsTable;
-import org.generationcp.middleware.manager.GdmsType;
-import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
@@ -69,6 +67,7 @@ import org.generationcp.middleware.pojos.gdms.TrackMarker;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -79,13 +78,25 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
     private static GenotypicDataManager manager;
 
     @BeforeClass
-    public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-                "localgroundnut");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-                "centralgroundnut");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getGenotypicDataManager();
+    public static void setUp() {
+        DatabaseConnectionParameters local, central;
+		try {
+			local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
+			        "localgroundnut");
+			central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
+	                "centralgroundnut");
+	        factory = new ManagerFactory(local, central);
+	        manager = factory.getGenotypicDataManager();
+	        
+		} catch (FileNotFoundException e) {
+			Assert.fail(e.getMessage());
+		} catch (ConfigException e) {
+			Assert.fail(e.getMessage());
+		} catch (URISyntaxException e) {
+			Assert.fail(e.getMessage());
+		} catch (IOException e) {
+			Assert.fail(e.getMessage());
+		}
     }
 
     @Test
@@ -2411,7 +2422,9 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
     
     @AfterClass
     public static void tearDown() throws Exception {
-        factory.close();
+        if(factory != null) {
+        	factory.close();
+        }
     }
 
 }

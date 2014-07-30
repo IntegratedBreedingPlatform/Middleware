@@ -15,20 +15,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
-import org.junit.Assert;
-
-import org.generationcp.middleware.dao.ToolConfigurationDAO;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -36,43 +35,37 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
+import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.TemplateSetting;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
+import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
+import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
+import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
+public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     private static WorkbenchDataManager manager;
-    private static HibernateUtil hibernateUtil;
 
     @BeforeClass
     public static void setUp() throws Exception {
-
-        DatabaseConnectionParameters workbenchDb = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
-        hibernateUtil = new HibernateUtil(workbenchDb.getHost(), workbenchDb.getPort(), workbenchDb.getDbName(),
-                                workbenchDb.getUsername(), workbenchDb.getPassword());
-        HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
+        HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(workbenchSessionUtil.getSessionFactory());
         manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
   
@@ -412,7 +405,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
             manager.updateToolConfiguration(toolConfig);
 
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
-            dao.setSession(hibernateUtil.getCurrentSession());
+            dao.setSession(workbenchSessionUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
             Debug.println(INDENT, "testUpdateToolConfiguration(toolId=" + toolId + "): ");
@@ -431,7 +424,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
         if (toolConfig != null){
             manager.deleteToolConfiguration(toolConfig);
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
-            dao.setSession(hibernateUtil.getCurrentSession());
+            dao.setSession(workbenchSessionUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
             Debug.println(INDENT, "testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
@@ -1328,10 +1321,4 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
         return new TemplateSetting(templateSettingId, projectId, name, tool, configuration, isDefault);
     }
 
-    
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        hibernateUtil.shutdown();
-    }
 }
