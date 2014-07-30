@@ -1206,6 +1206,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				sqlString.append(" NOT " );
 			}
 			sqlString.append(" EXISTS (SELECT 1 FROM cvterm_relationship pairrel ")
+				.append(" INNER JOIN cvterm_relationship stin ON stin.subject_id = pairrel.subject_id ")
+				.append(" AND stin.type_id = ").append(TermId.STORED_IN.getId())
+				.append(" AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
 				.append(" WHERE pairrel.object_id = proprel.object_id ")
 				.append(" AND pairrel.type_id = ").append(TermId.HAS_PROPERTY.getId())
 				.append(" AND pairrel.subject_id <> c.cvterm_id ")
