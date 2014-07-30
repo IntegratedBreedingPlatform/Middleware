@@ -411,7 +411,7 @@ public class Germplasm implements Serializable{
     @XmlElement(name = "secondParent")
     private Integer gpid2;
 
-    /**
+    /*
      * @ManyToOne(targetEntity = User.class)
      * @JoinColumn(name = "germuid", nullable = false)
      * @NotFound(action = NotFoundAction.IGNORE) private User user;
@@ -425,7 +425,7 @@ public class Germplasm implements Serializable{
     @Column(name = "lgid")
     private Integer lgid;
 
-    /**
+    /*
      * @ManyToOne(targetEntity = Location.class)
      * @JoinColumn(name = "glocn", nullable = true)
      * @NotFound(action = NotFoundAction.IGNORE) private Location location;
@@ -440,7 +440,7 @@ public class Germplasm implements Serializable{
     @XmlElement(name = "creationDate")
     private Integer gdate;
 
-    /**
+    /*
      * @ManyToOne(targetEntity = Bibref.class)
      * @JoinColumn(name = "gref", nullable = true)
      * @NotFound(action = NotFoundAction.IGNORE) private Bibref reference;
@@ -637,14 +637,14 @@ public class Germplasm implements Serializable{
     // this.gchange = gchange;
     // }
 
-    /**
+    /*
      * public Set<Attribute> getAttributes() { return attributes; }
      * 
      * public void setAttributes(Set<Attribute> attributes) { this.attributes =
      * attributes; }
      **/
 
-    /**
+    /*
      * public Method getMethod() { return method; }
      * 
      * @XmlElement(name = "creationMethod") public String getMethodMname() {
@@ -662,7 +662,7 @@ public class Germplasm implements Serializable{
         this.methodId = methodId;
     }
 
-    /**
+    /*
      * public User getUser() { return user; }
      * 
      * public void setUser(User user) { this.user = user; }
@@ -676,7 +676,7 @@ public class Germplasm implements Serializable{
         this.userId = userId;
     }
 
-    /**
+    /*
      * public Location getLocation() { return location; }
      * 
      * @XmlElement(name = "location") public String getLocationLname() { return
@@ -694,7 +694,7 @@ public class Germplasm implements Serializable{
         this.locationId = locationId;
     }
 
-    /**
+    /*
      * public Bibref getReference() { return reference; }
      * 
      * public void setReference(Bibref reference) { this.reference = reference;
@@ -709,7 +709,7 @@ public class Germplasm implements Serializable{
         this.referenceId = referenceId;
     }
 
-    /**
+    /*
      * public Set<Name> getNames() { return names; }
      * 
      * public void setNames(Set<Name> names) { this.names = names; }
@@ -739,7 +739,7 @@ public class Germplasm implements Serializable{
     	return method;
     }
 
-    /**
+    /*
      * public Set<Progenitor> getProgenitor() { return progntr; }
      * 
      * public void setProgenitor(Set<Progenitor> progntr) { this.progntr =

@@ -18,11 +18,13 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClass;
@@ -48,6 +50,25 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      */
     StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException;
+
+    /**
+     * Gets the standard variables given a list of ids
+     *
+     * @param stdVariableIds the list of standard variable ids
+     * @return the list of standard variables
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets standard variable summaries for given a list of ids
+     *
+     * @param stdVariableIds the list of standard variable ids
+     * @return the list of standard variable summaries
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException;
 
     
     /**
@@ -84,7 +105,7 @@ public interface OntologyService{
     /**
      * Gets the all standard variables.
      *
-     * @return the all standard variables
+     * @return the standard variables
      * @throws MiddlewareQueryException the middleware query exception
      */
     // Review: why do we need such a method? Can load a large portion of the DB.
@@ -130,7 +151,7 @@ public interface OntologyService{
      * Gets the all terms by cv id.
      *
      * @param cvId the cv id
-     * @return the all terms by cv id
+     * @return the terms by cv id
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
@@ -168,7 +189,6 @@ public interface OntologyService{
      *
      * @param standardVariableId the standard variable id
      * @param constraints the constraints
-     * @return the variable constraints with the id set
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
@@ -519,7 +539,7 @@ public interface OntologyService{
      * Count the number of projects the variable was used.
      *
      * @param variableId the variable id
-     * @return the long
+     * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
@@ -529,7 +549,7 @@ public interface OntologyService{
      *
      * @param variableId the variable id
      * @param storedInId the stored in id
-     * @return the long
+     * @return the count
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
@@ -579,7 +599,7 @@ public interface OntologyService{
     /**
      * Returns all Properties with its trait class.
      *
-     * @return the all properties with trait class
+     * @return the properties with trait class
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
@@ -590,9 +610,23 @@ public interface OntologyService{
      * 
      * @param standardVariableId
      * @param enumerationId
-     * @return
+     * @return true if valid
      * @throws MiddlewareQueryException
      */
     boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
+ 
+    /**
+     * find all variables given the property
+     * @param propertyId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException;
     
+    /**
+     * Return all invenotry scales.
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Scale> getAllInventoryScales() throws MiddlewareQueryException;
 }

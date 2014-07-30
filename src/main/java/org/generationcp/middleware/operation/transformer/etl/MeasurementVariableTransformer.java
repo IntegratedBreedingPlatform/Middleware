@@ -42,6 +42,9 @@ public class MeasurementVariableTransformer extends Transformer {
 	            	measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
 	            	measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
 	            }
+	            if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+	            	measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
+	            }
 	            measurementVariables.add(measurementVariable);
 	        }
 	    }
@@ -49,7 +52,7 @@ public class MeasurementVariableTransformer extends Transformer {
 	    return measurementVariables;
 	}
 	
-	public List<MeasurementVariable> transform(VariableList variableList, boolean isFactor) {
+	public List<MeasurementVariable> transform(VariableList variableList, boolean isFactor, boolean isStudy) {
 		
 	    List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 	    
@@ -58,6 +61,9 @@ public class MeasurementVariableTransformer extends Transformer {
 	        	VariableType variableType = variable.getVariableType();
 	            StandardVariable stdVariable = variableType.getStandardVariable();
 	            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+	            if (!isFactor && !isStudy) {  //for trial constants
+	            	label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
+	            }
 	            
 	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), 
 	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
@@ -71,6 +77,9 @@ public class MeasurementVariableTransformer extends Transformer {
 	            if (stdVariable.getConstraints() != null) {
 	            	measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
 	            	measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
+	            }
+	            if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+	            	measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
 	            }
 	            measurementVariables.add(measurementVariable);
 	        }
@@ -93,5 +102,31 @@ public class MeasurementVariableTransformer extends Transformer {
 		}
 		
 		return list;
+	}
+
+	public MeasurementVariable transform(StandardVariable stdVariable, boolean isFactor) {
+		MeasurementVariable measurementVariable = null;
+		
+	    if (stdVariable != null) {
+            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+            
+            measurementVariable = new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), 
+                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+                    stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), "", 
+                    label);
+            measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+            measurementVariable.setFactor(isFactor);
+            measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+            measurementVariable.setPossibleValues(transformPossibleValues(stdVariable.getEnumerations()));
+            if (stdVariable.getConstraints() != null) {
+            	measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
+            	measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
+            }
+//            if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
+//            	measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
+//            }
+	    }
+	    
+	    return measurementVariable;
 	}
 }

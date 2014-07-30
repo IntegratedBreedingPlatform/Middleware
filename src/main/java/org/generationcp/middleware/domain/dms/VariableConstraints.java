@@ -29,6 +29,8 @@ public class VariableConstraints implements Serializable{
     private Integer maxValueId; // the cvtermprop id of max constraint - to identify if from local or central
     
 	private Double maxValue;
+	
+	public VariableConstraints() { }
 
     public VariableConstraints(Double minValue, Double maxValue) {
         this.minValue = minValue;

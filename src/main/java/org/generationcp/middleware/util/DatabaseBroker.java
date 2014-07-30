@@ -22,12 +22,10 @@ import org.generationcp.middleware.dao.InstallationDAO;
 import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
-import org.generationcp.middleware.dao.LotDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.TransactionDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -40,6 +38,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
 import org.generationcp.middleware.dao.dms.LocationSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -62,9 +61,15 @@ import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MtaDAO;
+import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.dao.gdms.TrackDataDAO;
+import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
+import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
@@ -141,9 +146,14 @@ public class DatabaseBroker {
     private MarkerMetadataSetDAO markerMetadataSetDao;
     private MarkerOnMapDAO markerOnMapDao;
     private MarkerUserInfoDAO markerUserInfoDao;
+    private MarkerUserInfoDetailsDAO markerUserInfoDetailsDao;
     private QtlDAO qtlDao;
     private QtlDetailsDAO qtlDetailsDao;
     private MtaDAO mtaDao;
+    private MtaMetadataDAO mtaMetadataDao;
+    private TrackDataDAO trackDataDao;
+    private TrackMarkerDAO trackMarkerDao;
+
     
     // GermplasmDataManager DAOs
     private AttributeDAO attributeDao;
@@ -233,7 +243,7 @@ public class DatabaseBroker {
      * Utility method that returns the appropriate {@link Session} based on the given database instance.
      * 
      * @param instance
-     * @return
+     * @return The session based on the given database instance
      * @throws MiddlewareQueryException
      *             if a {@link Session} for the specified database instance is not available
      */
@@ -324,7 +334,7 @@ public class DatabaseBroker {
     /** 
      * Retrieves the current active session - either local or central database connection.
      * 
-     * @return
+     * @return The current active session
      */
     protected Session getActiveSession() {
         return activeSession;
@@ -568,6 +578,12 @@ public class DatabaseBroker {
     	phenotypeDao.setSession(getActiveSession());
     	return phenotypeDao;
     }
+    
+    protected final PhenotypeOutlierDao getPhenotypeOutlierDao() {
+    	PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
+    	phenotypeOutlierDao.setSession(getActiveSession());
+    	return phenotypeOutlierDao;
+    }
 
     protected final ExperimentPhenotypeDao getExperimentPhenotypeDao() {
     	ExperimentPhenotypeDao experimentPhenotypeDao = new ExperimentPhenotypeDao();
@@ -732,6 +748,14 @@ public class DatabaseBroker {
         markerUserInfoDao.setSession(getActiveSession());
         return markerUserInfoDao;
     }
+    
+    protected final MarkerUserInfoDetailsDAO getMarkerUserInfoDetailsDao() {
+        if (markerUserInfoDetailsDao == null) {
+        	markerUserInfoDetailsDao = new MarkerUserInfoDetailsDAO();
+        }
+        markerUserInfoDetailsDao.setSession(getActiveSession());
+        return markerUserInfoDetailsDao;
+    }
 
     protected final QtlDAO getQtlDao() {
         if (qtlDao == null) {
@@ -756,6 +780,31 @@ public class DatabaseBroker {
         mtaDao.setSession(getActiveSession());
         return mtaDao;
     }
+
+    protected final MtaMetadataDAO getMtaMetadataDao() {
+        if (mtaMetadataDao == null) {
+            mtaMetadataDao = new MtaMetadataDAO();
+        }
+        mtaMetadataDao.setSession(getActiveSession());
+        return mtaMetadataDao;
+    }
+
+    protected final TrackDataDAO getTrackDataDao() {
+        if (trackDataDao == null) {
+        	trackDataDao = new TrackDataDAO();
+        }
+        trackDataDao.setSession(getActiveSession());
+        return trackDataDao;
+    }
+
+    protected final TrackMarkerDAO getTrackMarkerDao() {
+        if (trackMarkerDao == null) {
+        	trackMarkerDao = new TrackMarkerDAO();
+        }
+        trackMarkerDao.setSession(getActiveSession());
+        return trackMarkerDao;
+    }
+
 
 
 

@@ -16,22 +16,34 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
+import org.generationcp.middleware.manager.InventoryDataManagerImpl;
 import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.ExperimentBuilder;
+import org.generationcp.middleware.operation.builder.LotBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.TermBuilder;
+import org.generationcp.middleware.operation.builder.TransactionBuilder;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
+import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
+import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
+import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 
@@ -59,6 +71,10 @@ public abstract class Service extends DatabaseBroker {
     protected final WorkbookSaver getWorkbookSaver() {
         return new WorkbookSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final ExperimentPropertySaver getExperimentPropertySaver() {
+        return new ExperimentPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
 
     protected final StudyDataManager getStudyDataManager() {
         return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
@@ -74,6 +90,10 @@ public abstract class Service extends DatabaseBroker {
     
     protected final GermplasmListManager getGermplasmListManager() {
         return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final InventoryDataManager getInventoryDataManager() {
+        return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final LocationDataManager getLocationDataManager() {
@@ -95,9 +115,45 @@ public abstract class Service extends DatabaseBroker {
     protected final GeolocationSaver getGeolocationSaver() {
         return new GeolocationSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
-    
+        
     protected final StandardVariableBuilder getStandardVariableBuilder() {
     	return new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final LotBuilder getLotBuilder() {
+    	return new LotBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final ExperimentBuilder getExperimentBuilder() {
+    	return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final StockBuilder getStockBuilder() {
+    	return new StockBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ExperimentDestroyer getExperimentDestroyer() {
+    	return new ExperimentDestroyer(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final TransactionBuilder getTransactionBuilder() {
+    	return new TransactionBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
+	    return new MeasurementVariableTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+    protected final DataSetBuilder getDataSetBuilder() {
+    	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final TermBuilder getTermBuilder() {
+    	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final StudyDestroyer getStudyDestroyer() {
+    	return new StudyDestroyer(sessionProviderForLocal, sessionProviderForCentral);
     }
 
 }

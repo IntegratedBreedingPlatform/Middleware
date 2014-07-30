@@ -33,9 +33,42 @@ import org.hibernate.criterion.Restrictions;
  */
 public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
 
+    public static final String GET_PARENTS_BY_DATASET_ID =
+            "SELECT parent_a_nid, parent_b_nid, mapping_type " +
+            "FROM gdms_mapping_pop " +
+            "WHERE dataset_id = :datasetId";
+
+    public static final String GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS =
+            "SELECT DISTINCT" +
+                " gdms_mapping_pop_values.dataset_id" +
+                ", gdms_mapping_pop.mapping_type" +
+                ", gdms_mapping_pop.parent_a_nid" +
+                ", gdms_mapping_pop.parent_b_nid" +
+                ", gdms_mapping_pop_values.gid " +
+                ", gdms_mapping_pop_values.marker_id " +
+                ", CONCAT(gdms_marker.marker_type, '')" +
+                ", gdms_mapping_pop_values.marker_sample_id " +
+                ", gdms_mapping_pop_values.acc_sample_id " +
+            " FROM gdms_mapping_pop_values " +
+                "JOIN gdms_mapping_pop ON gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id " +
+                "LEFT JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
+            " WHERE gdms_mapping_pop_values.marker_id IN (:markerIdList)" +
+                " AND gdms_mapping_pop_values.gid IN (:gidList)" +
+            " ORDER BY" +
+                " gdms_mapping_pop_values.gid DESC" +
+                ", gdms_marker.marker_name";
+
+    public static final String GET_ALL_PARENTS_FROM_MAPPING_POPULATION = 
+            "SELECT parent_a_nid, parent_b_nid " +
+            "FROM gdms_mapping_pop";
+        
+    public static final String COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION = 
+            "SELECT count(parent_a_nid) " +
+            "FROM gdms_mapping_pop";
+
     @SuppressWarnings("rawtypes")
     public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        SQLQuery query = getSession().createSQLQuery(MappingPop.GET_PARENTS_BY_DATASET_ID);
+        SQLQuery query = getSession().createSQLQuery(GET_PARENTS_BY_DATASET_ID);
         query.setParameter("datasetId", datasetId);
 
         List<ParentElement> dataValues = new ArrayList<ParentElement>();
@@ -68,7 +101,7 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             return mappingValues;
         }
 
-        SQLQuery query = getSession().createSQLQuery(MappingPop.GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS);
+        SQLQuery query = getSession().createSQLQuery(GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS);
         query.setParameterList("markerIdList", markerIds);
         query.setParameterList("gidList", gids);
 
@@ -85,8 +118,11 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
                     Integer gid = (Integer) result[4];
                     Integer markerId = (Integer) result[5];
                     String markerType = (String) result[6];
+                    Integer markerSampleId = (Integer) result[7];
+                    Integer accSampleId = (Integer) result[8];
                     MappingValueElement mappingValueElement = new MappingValueElement(
-                            datasetId, mappingPopType, parentAGid, parentBGid, gid, markerId, markerType);
+				                            datasetId, mappingPopType, parentAGid, parentBGid, gid, 
+				                            markerId, markerType, markerSampleId, accSampleId);
                     mappingValues.add(mappingValueElement);
                 }
             }
@@ -102,7 +138,7 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
     public List<ParentElement> getAllParentsFromMappingPopulation(int start, int numOfRows)
             throws MiddlewareQueryException {
 
-        SQLQuery query = getSession().createSQLQuery(MappingPop.GET_ALL_PARENTS_FROM_MAPPING_POPULATION);
+        SQLQuery query = getSession().createSQLQuery(GET_ALL_PARENTS_FROM_MAPPING_POPULATION);
         query.setFirstResult(start);
         query.setMaxResults(numOfRows);
         
@@ -131,7 +167,7 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
     public Long countAllParentsFromMappingPopulation()
             throws MiddlewareQueryException {
 
-        SQLQuery query = getSession().createSQLQuery(MappingPop.COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION);
+        SQLQuery query = getSession().createSQLQuery(COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION);
 
         try {
             BigInteger result = (BigInteger) query.uniqueResult();

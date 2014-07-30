@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -23,13 +24,14 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GidNidElement;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving Germplasm information.
  * 
@@ -705,7 +707,15 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getAllMethods() throws MiddlewareQueryException;
-    
+
+    /**
+     * Gets the all methods not generative.
+     *
+     * @return the all methods not generative
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException;
+
     /**
      * Returns count of all the method records.
      *
@@ -818,6 +828,15 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countMethodsByGroup(String group) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets list of cvterm records which are possible values of method classes.
+     *
+     * @return the method classes
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Term> getMethodClasses() throws MiddlewareQueryException;
 
     /**
      * Returns the udfld record identified by the given id.
@@ -903,15 +922,28 @@ public interface GermplasmDataManager {
     @Deprecated
     void deleteLocation(Location location) throws MiddlewareQueryException;
 
+
     /**
-     * Inserts a single {@code Method} object into the database.
+     * Updates the {@code Method} object into the database.
      *
      * @param method - The {@code Method} object to be persisted to the database.
      * Must be a valid {@code Method} object.
-     * @return Returns the id of the {@code Method} record inserted in the
-     * database.
+     * @return Returns the updated {@code Method} record
+     *
      * @throws MiddlewareQueryException the middleware query exception
      */
+    Method editMethod(Method method) throws MiddlewareQueryException;
+
+
+        /**
+         * Inserts a single {@code Method} object into the database.
+         *
+         * @param method - The {@code Method} object to be persisted to the database.
+         * Must be a valid {@code Method} object.
+         * @return Returns the id of the {@code Method} record inserted in the
+         * database.
+         * @throws MiddlewareQueryException the middleware query exception
+         */
     Integer addMethod(Method method) throws MiddlewareQueryException;
     
     /**
@@ -1099,10 +1131,11 @@ public interface GermplasmDataManager {
      * Gets the germplasm Id and name Id from the names table with the given germplasm names.
      *
      * @param germplasmNames the germplasm names
+     * @param mode the mode
      * @return List of GidNidElement based on the specified list of germplasm names
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException;
+    List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode) throws MiddlewareQueryException;
 
     /**
      * Gets the cross expansion.
@@ -1235,13 +1268,14 @@ public interface GermplasmDataManager {
      * @param q - the search term to be used in retrieving the germplasm
      * @param o - the operation to be used for the query (equal or like)
      * @param includeParents - boolean flag to denote whether parents will be included in search results
+     * @param searchPublicData flag to indicate whether public (central) data should be searched
      * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
      * Given a List of GIDs, return the list of gids mapped to their corresponding location
      * Map<Integer, String>
      * - map of gids to their corresponding location name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents) throws MiddlewareQueryException;
+    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData) throws MiddlewareQueryException;
 
     /**
      * Please use LocationDataManager.getLocationsByIDs().
@@ -1298,6 +1332,25 @@ public interface GermplasmDataManager {
      * Gets the next negative id.
      *
      * @return the next negative id
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Integer getNextNegativeId() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the method by code.
+     *
+     * @param code the code
+     * @return the method by code
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Method getMethodByCode(String code) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the method by name.
+     *
+     * @param code the code
+     * @return the method by name
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Method getMethodByName(String name) throws MiddlewareQueryException;
 }

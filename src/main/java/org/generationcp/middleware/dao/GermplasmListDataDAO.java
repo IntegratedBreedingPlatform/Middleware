@@ -12,13 +12,17 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -64,6 +68,21 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
             logAndThrowException("Error with countByListId(id=" + id + ") query from GermplasmListData " + e.getMessage(), e);
         }
         return 0;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<GermplasmListData> getByIds(List<Integer> entryIds) throws MiddlewareQueryException {
+        try {
+        	if (entryIds != null && !entryIds.isEmpty()){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.add(Restrictions.in("id", entryIds));
+	            criteria.addOrder(Order.asc("entryId"));
+	            return criteria.list();
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByIds(ids=" + entryIds + ") query from GermplasmListData " + e.getMessage(), e);
+        }
+        return new ArrayList<GermplasmListData>();
     }
 
     @SuppressWarnings("unchecked")
@@ -184,4 +203,45 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
                     + "): GermplasmListData is null", new Throwable());
     	}
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getGidsByListId(Integer listId) throws MiddlewareQueryException {
+    	List<Integer> gids = new ArrayList<Integer>();
+    	
+        try {
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery("SELECT gid FROM listdata WHERE listid = :listId "); 
+        	query.setParameter("listId", listId);
+            return query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidsByListId() query from GermplasmList: " + e.getMessage(), e);
+        }    	
+    	return gids;    	
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+	public Map<Integer, String> getGidAndDesigByListId(Integer listId) throws MiddlewareQueryException {
+    	Map<Integer, String> toReturn = new HashMap<Integer, String>();
+    	
+        try {
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery("SELECT DISTINCT gid, desig FROM listdata WHERE listid = :listId "); 
+        	query.setParameter("listId", listId);
+        	
+	        List<Object[]> results = query.list();
+	    	
+	        for (Object[] row : results){
+	        	Integer gid = (Integer) row[0];
+	        	String desig = (String) row[1];
+	        	toReturn.put(gid, desig);
+	        }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGidAndDesigByListId() query from GermplasmList: " + e.getMessage(), e);
+        }    	
+    	return toReturn;    	
+    }
+
+
 }

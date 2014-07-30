@@ -12,13 +12,16 @@
 package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
@@ -41,8 +44,10 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.TimerWatch;
 import org.hibernate.Session;
@@ -136,8 +141,8 @@ public class WorkbookSaver extends Saver {
      * @throws Exception
      */
 	@SuppressWarnings("unchecked")
-	public int saveDataset(Workbook workbook, Map<String, ?> variableMap, boolean retainValues) throws Exception {
-		
+	public int saveDataset(Workbook workbook, Map<String, ?> variableMap, boolean retainValues, boolean isDeleteObservations) throws Exception {
+	    Session session = getCurrentSessionForLocal(); 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -159,39 +164,80 @@ public class WorkbookSaver extends Saver {
 //		boolean error = false;
 //		for (VariableType ev : effectVariables.getVariableTypes()) {
 //			if(ev.getStandardVariable().getStoredIn() == null) {
-//		c○		LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
+//				LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
 //				error = true;
 //			}
 //			else LOG.info("Role for : " + ev.getStandardVariable().getName() + " : " + ev.getStandardVariable().getStoredIn().getId());
 //		}
-//		if(error) return -1;
-		
+//		if(error) return -1;				
 		
         //GCP-6091 start
         int studyLocationId;
         List<Integer> locationIds = new ArrayList<Integer>();
         Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
-        if(trialVariableTypeList!=null) {//multi-location
-   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap);
-        } else if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { //also a multi-location
-        	studyLocationId = createLocationsAndSetToObservations(locationIds,  workbook,  trialVariables, trialHeaders, trialVariatesMap);
-        } else {
-        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap);
+        
+        //get the trial and measurement dataset id to use in deletion of experiments 
+        Integer trialDatasetId = workbook.getTrialDatasetId();
+        Integer datasetId = workbook.getMeasurementDatesetId();
+        int totalRows = 0;
+        boolean isDeleteTrialObservations = false;
+        if (trialDatasetId == null && workbook.getStudyDetails().getId() != null) {
+            trialDatasetId = getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
         }
-		//GCP-6091 end
+        if (datasetId == null && workbook.getStudyDetails().getId() != null) {
+            datasetId = getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+        }
+        
+        if (trialDatasetId != null) {
+            totalRows = (int) getStudyDataManager().countExperiments(trialDatasetId);
+        }
+        
+        if (((workbook.getTrialObservations() != null && totalRows != workbook.getTrialObservations().size() 
+                && totalRows > 0) || isDeleteObservations) && trialDatasetId != null) {
+            isDeleteTrialObservations = true;
+            //delete measurement data
+            getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
+            session.flush();
+            session.clear();
+            
+            //reset trial observation details such as experimentid, stockid and geolocationid
+            resetTrialObservations(workbook.getTrialObservations());
+        }
+        
+        if(trialVariableTypeList!=null && !isDeleteObservations) {//multi-location for data loader
+   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap, false);
+        } else if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { //also a multi-location
+        	studyLocationId = createLocationsAndSetToObservations(locationIds,  workbook,  trialVariables, trialHeaders, trialVariatesMap, isDeleteTrialObservations);
+        } else {
+        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations);
+        }
+
+        //GCP-6091 end
+        if (isDeleteTrialObservations) {
+            session.flush();
+            session.clear();
+            requireLocalDatabaseInstance();
+            ExperimentModel studyExperiment = getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
+            studyExperiment.setGeoLocation(getGeolocationDao().getById(studyLocationId));
+            getExperimentDao().saveOrUpdate(studyExperiment);
+            
+            //delete trial observations
+            getExperimentDestroyer().deleteTrialExperimentsOfStudy(trialDatasetId);
+        }
 		
-		int studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
-   		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
+		int studyId = 0;
+		if (!(workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null)) {
+			studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
+		}
+		else {
+			studyId = workbook.getStudyDetails().getId();
+		}
+   		trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
    		
-   		if(trialVariableTypeList!=null || workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {//multi-location
-   			for(Integer locationId : locationIds) {
-   				createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
-   			}
-   		} else {
-   			createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
-   		}
+   		saveOrUpdateTrialObservations(trialDatasetId, workbook, trialVariableTypeList, locationIds, 
+   		        trialVariatesMap, studyLocationId, totalRows, isDeleteObservations);
    		
-   		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
+   		datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
    		createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
    		
    		if (!retainValues){
@@ -211,12 +257,98 @@ public class WorkbookSaver extends Saver {
    		}
    		
    		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
-        
+   		
    		return studyId;
 	}
 	
-	private int createLocationAndSetToObservations(Workbook workbook, List<MeasurementVariable> trialMV, 
-			VariableTypeList trialVariables, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
+	public void removeDeletedVariablesAndObservations(Workbook workbook) {
+	    deleteDeletedVariablesInObservations(workbook.getFactors(), workbook.getVariates(), workbook.getObservations());
+	    deleteDeletedVariables(workbook.getConditions());
+	    deleteDeletedVariables(workbook.getFactors());
+	    deleteDeletedVariables(workbook.getVariates());
+	    deleteDeletedVariables(workbook.getConstants());
+	}
+	
+	private void deleteDeletedVariablesInObservations(List<MeasurementVariable> factors, List<MeasurementVariable> variates, List<MeasurementRow> observations) {
+	    //create a map of deleted variables
+	    HashMap<Integer, MeasurementVariable> deletedVariables = new HashMap<Integer, MeasurementVariable>();
+	    if (factors != null) {
+    	    for (MeasurementVariable var : factors) {
+    	        if (var.getOperation().equals(Operation.DELETE)) {
+    	            deletedVariables.put(Integer.valueOf(var.getTermId()), var);
+    	        }
+    	    }
+	    }
+	    if (variates != null) {
+            for (MeasurementVariable var : variates) {
+                if (var.getOperation().equals(Operation.DELETE)) {
+                    deletedVariables.put(Integer.valueOf(var.getTermId()), var);
+                }
+            }
+        }
+	    
+	    if (observations != null) {
+    	    for (MeasurementRow row : observations) {
+    	        Iterator<MeasurementData> data = row.getDataList().iterator();
+    	        while (data.hasNext()) {
+    	            if (deletedVariables.get(Integer.valueOf(data.next().getMeasurementVariable().getTermId())) != null) {
+    	                data.remove();
+    	            }
+    	        }
+    	    }
+	    }
+	}
+	
+	private void deleteDeletedVariables(List<MeasurementVariable> variableList) {
+	    if (variableList != null) {
+    	    Iterator<MeasurementVariable> variable = variableList.iterator();
+            while (variable.hasNext()) {
+                if (variable.next().getOperation().equals(Operation.DELETE)) {
+                    variable.remove();
+                }
+            }
+	    }
+	}
+	
+	public void resetTrialObservations(List<MeasurementRow> trialObservations) {
+        for (MeasurementRow row : trialObservations) {
+            row.setExperimentId(0);
+            row.setLocationId(0);
+            row.setStockId(0);
+            for (MeasurementData data: row.getDataList()) {
+                data.setPhenotypeId(null);
+            }
+        }
+    }
+	
+	public void saveOrUpdateTrialObservations(int trialDatasetId, Workbook workbook, VariableTypeList trialVariableTypeList, 
+	        List<Integer> locationIds, Map<Integer,VariableList> trialVariatesMap, int studyLocationId, int totalRows, boolean isDeleteObservations) 
+	                throws MiddlewareQueryException, MiddlewareException {           
+        if (workbook.getTrialObservations() != null && totalRows == workbook.getTrialObservations().size() && totalRows > 0 
+                && !isDeleteObservations) {
+            saveTrialObservations(workbook);
+        } else {            
+            if(trialVariableTypeList!=null || workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {//multi-location
+                for(Integer locationId : locationIds) {
+                    createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
+                }
+            } else {
+                createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
+            }
+        }
+	}
+	
+	public void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
+        setWorkingDatabase(Database.LOCAL);
+        if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+            for (MeasurementRow trialObservation : workbook.getTrialObservations()) {
+                getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery());
+            }
+        }
+    }
+	
+	public int createLocationAndSetToObservations(Workbook workbook, List<MeasurementVariable> trialMV, 
+			VariableTypeList trialVariables, Map<Integer,VariableList> trialVariatesMap, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("transform trial environment", LOG);
 		if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() == 1) {
@@ -239,7 +371,8 @@ public class WorkbookSaver extends Saver {
         }
 
         watch.restart("save geolocation");
-        Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, null, workbook.isNursery());
+        Geolocation g = getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
+        		workbook.getStudyDetails().getStudyName(),geolocation, null, workbook.isNursery(), isDeleteTrialObservations);
         studyLocationId = g.getLocationId();
         if(g.getVariates()!=null && g.getVariates().size() > 0) {
         	VariableList trialVariates = new VariableList();
@@ -253,63 +386,87 @@ public class WorkbookSaver extends Saver {
 				row.setLocationId(studyLocationId);
 			}
 		}
-    	for(MeasurementRow row : workbook.getObservations()) {
-    	    if (studyLocationId != null){
-    	        row.setLocationId(studyLocationId);
-    	    }
-        }
+	if (workbook.getObservations() != null) {
+            for(MeasurementRow row : workbook.getObservations()) {
+       		row.setLocationId(studyLocationId);
+            }
+	}
     	watch.stop();
     	
     	return studyLocationId;
 	}
 	
-	private int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors, List<String> trialHeaders, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
+	public int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors, List<String> trialHeaders, Map<Integer,VariableList> trialVariatesMap, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
 		
 		Set<String> trialInstanceNumbers = new HashSet<String>();
 		Integer locationId = null;
 		List<MeasurementRow> observations = null;
+		Long geolocationId = null;
 		boolean hasTrialObservations = false;
 		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
 			observations = workbook.getTrialObservations();
 			hasTrialObservations = true;
+			if (workbook.isNursery()) {
+				geolocationId = observations.get(0).getLocationId();
+			}
 		}
 		else {
 			observations = workbook.getObservations();
 		}
 		Map<String, Integer> locationMap = new HashMap<String, Integer>();
-		for (MeasurementRow row : observations) {
-			TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
-			VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
-			if (geolocation != null && geolocation.size() > 0) {
-				String trialInstanceNumber = getTrialInstanceNumber(geolocation);
-                if (LOG.isDebugEnabled()){
-                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
-                }
-                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
-		            watch.restart("save geolocation");
-		            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery());
-		            locationId = g.getLocationId();
-		            locationIds.add(locationId);
-		            if(g.getVariates()!=null && g.getVariates().size() > 0) {
-		            	VariableList trialVariates = new VariableList();
-		            	trialVariates.addAll(g.getVariates());
-		            	trialVariatesMap.put(locationId,trialVariates);
-		            }
+		if (observations != null) {
+			for (MeasurementRow row : observations) {
+				if (geolocationId != null && geolocationId != 0) { //if geolocationId already exists, no need to create the geolocation
+					row.setLocationId(geolocationId);
 				}
-				row.setLocationId(locationId);
-				locationMap.put(trialInstanceNumber, locationId);
-	        }
-		}
-		
-		if (hasTrialObservations) {
-			for (MeasurementRow row : workbook.getObservations()) {
-				String trialInstance = getTrialInstanceNumber(row);
-				Integer locId = locationMap.get(trialInstance);
-				row.setLocationId(locId);
+				else {
+					TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
+					VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
+					if (geolocation != null && geolocation.size() > 0) {
+						String trialInstanceNumber = getTrialInstanceNumber(geolocation);
+		                if (LOG.isDebugEnabled()){
+		                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
+		                }
+		                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
+				            watch.restart("save geolocation");
+				            Geolocation g = getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
+				            		workbook.getStudyDetails().getStudyName(), geolocation, row, workbook.isNursery(), isDeleteTrialObservations);
+				            locationId = g.getLocationId();
+				            locationIds.add(locationId);
+				            if(g.getVariates()!=null && g.getVariates().size() > 0) {
+				            	VariableList trialVariates = new VariableList();
+				            	trialVariates.addAll(g.getVariates());
+				            	trialVariatesMap.put(locationId,trialVariates);
+				            }
+						}
+						row.setLocationId(locationId);
+						locationMap.put(trialInstanceNumber, locationId);
+			        }
+				}
+			}
+			
+			if (hasTrialObservations && workbook.getObservations() != null) {
+				for (MeasurementRow row : workbook.getObservations()) {
+					String trialInstance = getTrialInstanceNumber(row);
+					if (trialInstance != null) {
+						Integer locId = locationMap.get(trialInstance);
+						row.setLocationId(locId);
+					}
+					else if (geolocationId != null) {
+						row.setLocationId(geolocationId);
+					}
+				}
+			}
+	        //return studyLocationId
+			if (workbook.getObservations() != null && workbook.getObservations().size() > 0) {
+			    return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
+			} 
+			else {
+			    return Long.valueOf(workbook.getTrialObservations().get(0).getLocationId()).intValue(); 
 			}
 		}
-        //return studyLocationId
-		return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
+		
+		return 0;
 	}
 	
 	private String getTrialInstanceNumber(MeasurementRow row) {
@@ -370,11 +527,15 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String generateTrialDatasetName(String studyName, StudyType studyType) {
-		return "TRIAL_" + studyName;
+		return studyName + "-ENVIRONMENT";
 	}
 	
 	private String generateMeasurementEffectDatasetName(String studyName) {
-		return "MEASUREMENT EFEC_" + studyName;
+		return studyName + "-PLOTDATA";
+	}
+	
+	private String generateMeansDatasetName(String studyName) {
+		return studyName + "-MEANS";
 	}
 	
 	private ExperimentValues createTrialExperimentValues(Integer locationId, VariableList variates) {
@@ -420,15 +581,28 @@ public class WorkbookSaver extends Saver {
 		
 		TimerWatch watch = new TimerWatch("find trial dataset", LOG);
 		String trialName = workbook.getStudyDetails().getTrialDatasetName();
+		Integer trialDatasetId = null;
  		if(trialName == null || trialName.equals("") ){
- 			trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
+ 		    List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
+ 	        if (datasetRefList != null) {
+ 	            for (DatasetReference datasetRef : datasetRefList) {
+ 	              if (datasetRef.getName().equals("TRIAL_" + workbook.getStudyDetails().getStudyName())) {
+ 	                 trialDatasetId = datasetRef.getId();
+ 	              }
+ 	            }
+ 	            if (trialDatasetId == null) {
+     	           trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
+                   trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
+ 	            }
+ 	        } else {
+ 		       trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
+ 		       trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
+ 	        }
  		}
-		Integer trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
-		
-		if (trialDatasetId == null) {
+ 		if (trialDatasetId == null) {
 			watch.restart("transform trial dataset values");
 			DatasetValues trialValues = getDatasetValuesTransformer().transform(trialName, trialName, 
-					DataSetType.PLOT_DATA, trialMV, trialVariables);
+					DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 			
 			if (workbook.isNursery() && (trialMV == null || trialMV.size() == 0 || getMainFactor(trialMV) == null)) {
 				trialVariables.add(createOccVariableType(trialVariables.size()+1));
@@ -455,16 +629,33 @@ public class WorkbookSaver extends Saver {
 		watch.stop();
 	}
 	
+	
 	private int createMeasurementEffectDatasetIfNecessary(Workbook workbook, int studyId, 
 	List<MeasurementVariable> effectMV, VariableTypeList effectVariables, VariableTypeList trialVariables) throws MiddlewareQueryException, MiddlewareException {
 
 		TimerWatch watch = new TimerWatch("find measurement effect dataset", LOG);
         String datasetName = workbook.getStudyDetails().getMeasurementDatasetName();
-        if(datasetName == null || datasetName.equals("")){
-        	datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
-        }
-		Integer datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
+        Integer datasetId = null;
 		
+		if(datasetName == null || datasetName.equals("") ){
+		    List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
+            if (datasetRefList != null) {
+                for (DatasetReference datasetRef : datasetRefList) {
+                  if (datasetRef.getName().equals("MEASUREMENT EFEC_" + workbook.getStudyDetails().getStudyName()) || 
+                        datasetRef.getName().equals("MEASUREMENT EFECT_" + workbook.getStudyDetails().getStudyName())) {
+                      datasetId = datasetRef.getId();
+                  }
+                }
+                if (datasetId == null) {
+                    datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
+                    datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
+                }
+            } else {
+                datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
+                datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
+            }
+        }
+
 		if (datasetId == null) {
 	        watch.restart("transform measurement effect dataset");
 			DatasetValues datasetValues = getDatasetValuesTransformer().transform(datasetName, datasetName,
@@ -483,7 +674,7 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 	
-	private void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
+	public void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = getStockModelBuilder().getStockMapForDataset(datasetId);
 
 		//TimerWatch watch = new TimerWatch("fetch stocks", LOG);
@@ -497,22 +688,27 @@ public class WorkbookSaver extends Saver {
 			MeasurementRow row = workbook.getObservations().get(0);
 			variableIndexesList  = getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
 		}
-		for (MeasurementRow row : workbook.getObservations()) {
-												
-			VariableList stock = getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
-			String stockFactor = getStockFactor(stock);
-			Integer stockId = stockMap.get(stockFactor);
-			if (stockId == null) {
-				//rowWatch.restart("--save 1 stock");
-				stockId = getStockSaver().saveStock(stock);
-				stockMap.put(stockFactor, stockId);
-			}
-			row.setStockId(stockId);
-			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
-				session.flush();
-				session.clear();
-			}
-			i++;
+		if (workbook.getObservations() != null) {
+        	    for (MeasurementRow row : workbook.getObservations()) {
+        	    
+        		VariableList stock = getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
+        		String stockFactor = getStockFactor(stock);
+        		Integer stockId = stockMap.get(stockFactor);
+        		
+        		if (stockId == null) {
+        		      //rowWatch.restart("--save 1 stock");
+        			stockId = getStockSaver().saveStock(stock);
+        			stockMap.put(stockFactor, stockId);
+        		} else {
+        			getStockSaver().saveOrUpdateStock(stock, stockId);
+        		}
+        		row.setStockId(stockId);
+        		if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        		      session.flush();
+        		      session.clear();
+        		}
+        		i++;
+        	    }
 		}
 		
 		//rowWatch.stop();
@@ -530,35 +726,37 @@ public class WorkbookSaver extends Saver {
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
 		Map<Integer,PhenotypeExceptionDto> exceptions = null;
-		for(MeasurementRow row : observations) {
-			rowWatch.restart("saving row "+(i++));
-			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-			VariableList trialVariates = trialVariatesMap.get((int)row.getLocationId());
-			if(trialVariates!=null) {
-				experimentValues.getVariableList().addAll(trialVariates);
-			}
-			try {
-				experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
-			} catch(PhenotypeException e) {
-				if(exceptions==null) {
-					exceptions = e.getExceptions();
-				} else {
-					for (Integer standardVariableId : e.getExceptions().keySet()) {
-						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-						if(exceptions.get(standardVariableId)==null) {
-							exceptions.put(standardVariableId, exception);//add exception
-						} else {//add invalid values to the existing map of exceptions for each phenotype
-							for(String invalidValue : exception.getInvalidValues()) {
-								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
-							}
-						}
-					}
-				}
-			}
-			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
-				session.flush();
-				session.clear();
-			}
+		if (observations != null) {
+        		for(MeasurementRow row : observations) {
+        			rowWatch.restart("saving row "+(i++));
+        			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
+        			VariableList trialVariates = trialVariatesMap.get((int)row.getLocationId());
+        			if(trialVariates!=null) {
+        				experimentValues.getVariableList().addAll(trialVariates);
+        			}
+        			try {
+        				experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+        			} catch(PhenotypeException e) {
+        				if(exceptions==null) {
+        					exceptions = e.getExceptions();
+        				} else {
+        					for (Integer standardVariableId : e.getExceptions().keySet()) {
+        						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+        						if(exceptions.get(standardVariableId)==null) {
+        							exceptions.put(standardVariableId, exception);//add exception
+        						} else {//add invalid values to the existing map of exceptions for each phenotype
+        							for(String invalidValue : exception.getInvalidValues()) {
+        								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+        							}
+        						}
+        					}
+        				}
+        			}
+        			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        				session.flush();
+        				session.clear();
+        			}
+        		}
 		}
 		rowWatch.stop();
 		watch.stop();
@@ -581,8 +779,8 @@ public class WorkbookSaver extends Saver {
 	
 	private VariableType createOccVariableType(int rank) throws MiddlewareQueryException {
 		VariableInfo info = new VariableInfo();
-		info.setLocalName("OCC");
-		info.setLocalDescription("OCC");
+		info.setLocalName("TRIAL_INSTANCE");
+		info.setLocalDescription("TRIAL_INSTANCE");
 		info.setStdVariableId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		info.setRank(rank);
 		return getVariableTypeBuilder().create(info);
@@ -624,10 +822,24 @@ public class WorkbookSaver extends Saver {
 		return id;
 	}
 	
+	
+	private Integer getMeansDataset(Integer studyId) throws MiddlewareQueryException {
+		Integer id = null;
+		setWorkingDatabase(Database.LOCAL);
+		List<DmsProject> datasets = getDmsProjectDao().getDataSetsByStudyAndProjectProperty(
+                studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.MEANS_DATA.getId()));
+		if(datasets!=null && !datasets.isEmpty()) {
+			id = datasets.get(0).getProjectId();
+		}
+		return id;
+	}
+	
+	
+	
 	/**
      * Saves project ontology creating entries in the following tables:
      * project, projectprop and project_relationship
-     * @param Workbook
+     * @param workbook
      * @return study id
      * @throws Exception
      */
@@ -651,14 +863,21 @@ public class WorkbookSaver extends Saver {
 		
 		int studyId = createStudyIfNecessary(workbook, 0, false);//locationId and experiment are not yet needed here
 		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
-		int measurementDatasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
+		int measurementDatasetId = 0;
+		int meansDatasetId = 0;
+		if(workbook.getImportType()!=null && workbook.getImportType().intValue()==DataSetType.MEANS_DATA.getId()) {
+			meansDatasetId = createMeansDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
+		} else {
+			measurementDatasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
+		}
 		
-		workbook.populateStudyAndDatasetIds(studyId, trialDatasetId, measurementDatasetId);
+		workbook.populateStudyAndDatasetIds(studyId, trialDatasetId, measurementDatasetId, meansDatasetId);
 		
 		if (LOG.isDebugEnabled()){
 			LOG.debug("studyId = "+studyId);
             LOG.debug("trialDatasetId = "+trialDatasetId);
             LOG.debug("measurementDatasetId = "+measurementDatasetId);
+            LOG.debug("meansDatasetId = "+meansDatasetId);
         }
 		
 		return studyId;
@@ -668,8 +887,7 @@ public class WorkbookSaver extends Saver {
      * Saves experiments creating entries in the following tables:
      * nd_geolocation, nd_geolocationprop, nd_experiment, nd_experiment_project, nd_experimentprop
      * nd_experiment_stock, stock, stockprop, nd_experiment_phenotype and phenotype
-     * @param Workbook
-     * @return 
+     * @param workbook
      * @throws Exception
      */
 	@SuppressWarnings("unchecked")
@@ -677,7 +895,9 @@ public class WorkbookSaver extends Saver {
 		
 		int studyId = workbook.getStudyId();
 		int trialDatasetId = workbook.getTrialDatasetId();
-		int measurementDatasetId = workbook.getMeasurementDatesetId();
+		int measurementDatasetId = workbook.getMeasurementDatesetId()!=null?workbook.getMeasurementDatesetId():0;
+		int meansDatasetId = workbook.getMeansDatasetId()!=null?workbook.getMeansDatasetId():0;
+		boolean isMeansDataImport = workbook.getImportType()!=null && workbook.getImportType().intValue()==DataSetType.MEANS_DATA.getId();
 		
 		Map<String, ?> variableMap = workbook.getVariableMap();
 		if(variableMap==null || variableMap.isEmpty()) {
@@ -702,31 +922,65 @@ public class WorkbookSaver extends Saver {
         List<Integer> locationIds = new ArrayList<Integer>();
         Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
         if(trialVariableTypeList!=null) {//multi-location
-   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap);
+   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap, false);
         } else {
-        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap);
+        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, false);
         }
 		
         //create stock and stockprops and associate to observations
-        createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
+        int datasetId = measurementDatasetId;
+        if(isMeansDataImport) {
+        	datasetId = meansDatasetId;
+        }
+        createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
         
-		//create experiments
-        //1. study experiment
-        StudyValues values = new StudyValues();
-        values.setLocationId(studyLocationId);
-        getStudySaver().saveStudyExperiment(studyId, values);
-        //2. trial experiments
-        if(trialVariableTypeList!=null) {//multi-location
-   			for(Integer locationId : locationIds) {
-   				createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
-   			}
-   		} else {
-   			createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
-   		}
-        //3. measurement experiments
-        createMeasurementEffectExperiments(measurementDatasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
+        //create trial experiments if not yet existing
+        boolean hasExistingStudyExperiment = checkIfHasExistingStudyExperiment(studyId);
+        boolean hasExistingTrialExperiments = checkIfHasExistingExperiments(locationIds);
+        if(!hasExistingStudyExperiment) {
+			//1. study experiment
+	        StudyValues values = new StudyValues();
+	        values.setLocationId(studyLocationId);
+	        getStudySaver().saveStudyExperiment(studyId, values);
+        }
+        //create trial experiments if not yet existing        
+        if(!hasExistingTrialExperiments) {
+	        //2. trial experiments
+	        if(trialVariableTypeList!=null) {//multi-location
+	   			for(Integer locationId : locationIds) {
+	   				createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
+	   			}
+	   		} else {
+	   			createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
+	   		}
+        }
+        if(isMeansDataImport) {
+        	//3. means experiments
+        	createMeansExperiments(meansDatasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
+        } else {
+        	//3. measurement experiments
+        	createMeasurementEffectExperiments(measurementDatasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
+        }
 	}
 	
+	private boolean checkIfHasExistingStudyExperiment(int studyId) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+        Integer experimentId = getExperimentProjectDao().getExperimentIdByProjectId(studyId);
+        if(experimentId!=null) {
+        	return true;
+        }
+        return false;
+	}
+
+	private boolean checkIfHasExistingExperiments(List<Integer> locationIds) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+        List<Integer> experimentIds = getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
+        if(experimentIds!=null && !experimentIds.isEmpty()) {
+        	return true;
+        }
+        return false;
+	}
+
 	private VariableList createDefaultGeolocationVariableList() throws MiddlewareQueryException {
 		VariableList list = new VariableList();
 		
@@ -738,5 +992,121 @@ public class WorkbookSaver extends Saver {
 		list.add(variable);
 		
 		return list;
+	}
+	
+	public void saveWorkbookVariables(Workbook workbook) throws MiddlewareQueryException {		
+		setWorkingDatabase(Database.LOCAL);
+		getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(), 
+				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
+		setWorkingDatabase(Database.LOCAL);
+		DmsProject study = getDmsProjectDao().getById(workbook.getStudyDetails().getId());
+		Integer trialDatasetId = workbook.getTrialDatasetId(), measurementDatasetId = workbook.getMeasurementDatesetId();
+		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {
+			measurementDatasetId = getWorkbookBuilder().getMeasurementDataSetId(study.getProjectId(), workbook.getStudyName());
+			List<DmsProject> datasets = getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
+			if (datasets != null) {
+				for (DmsProject dataset : datasets) {
+					if (!dataset.getProjectId().equals(measurementDatasetId)) {
+						trialDatasetId = dataset.getProjectId();
+						break;
+					}
+				}
+			}
+		}
+		DmsProject trialDataset = getDmsProjectDao().getById(trialDatasetId);
+		DmsProject measurementDataset = getDmsProjectDao().getById(measurementDatasetId);
+		
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConditions(), false);
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getConstants(), true);
+		getProjectPropertySaver().saveProjectProperties(study, trialDataset, measurementDataset, workbook.getVariates(), false);
+		getProjectPropertySaver().saveFactors(measurementDataset, workbook.getFactors());
+	}
+	
+	private int createMeansDatasetIfNecessary(Workbook workbook, int studyId, 
+			List<MeasurementVariable> effectMV, VariableTypeList effectVariables, VariableTypeList trialVariables) throws MiddlewareQueryException, MiddlewareException {
+
+		TimerWatch watch = new TimerWatch("find means dataset", LOG);
+        Integer datasetId = getMeansDataset(studyId);
+		
+		if (datasetId == null) {
+	        watch.restart("transform means dataset");
+	        String datasetName = generateMeansDatasetName(workbook.getStudyDetails().getStudyName());
+	        DatasetValues datasetValues = getDatasetValuesTransformer().transform(datasetName, datasetName,
+											DataSetType.MEANS_DATA, effectMV, effectVariables);
+
+			watch.restart("save means dataset");
+			VariableTypeList datasetVariables = getMeansData(effectVariables, trialVariables);
+			DmsProject dataset = getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues);
+			datasetId = dataset.getProjectId();
+		}
+		
+		watch.stop();
+		return datasetId;
+	}
+	
+	private VariableTypeList getMeansData(VariableTypeList effectVariables, VariableTypeList trialVariables) throws MiddlewareQueryException, MiddlewareException {
+		
+		VariableTypeList newList = new VariableTypeList();
+		int rank = 1;
+		for (VariableType var : trialVariables.getVariableTypes()) {
+			var.setRank(rank++);
+			newList.add(var);
+		}
+		for (VariableType var : effectVariables.getVariableTypes()) {
+			var.setRank(rank++);
+			newList.add(var);
+		}
+		return newList;
+	}
+	
+	private void createMeansExperiments(int datasetId, VariableTypeList effectVariables, 
+			List<MeasurementRow> observations, List<String> trialHeaders, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
+		
+		TimerWatch watch = new TimerWatch("saving means data (total)", LOG);
+		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
+		
+		int i = 2;//observation values start at row 2
+		Session session = getCurrentSessionForLocal();
+		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
+		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
+		Map<Integer,PhenotypeExceptionDto> exceptions = null;
+		if (observations != null) {
+        		for(MeasurementRow row : observations) {
+        			rowWatch.restart("saving row "+(i++));
+        			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
+        			VariableList trialVariates = trialVariatesMap.get((int)row.getLocationId());
+        			if(trialVariates!=null) {
+        				experimentValues.getVariableList().addAll(trialVariates);
+        			}
+        			try {
+        				experimentModelSaver.addExperiment(datasetId, ExperimentType.AVERAGE, experimentValues);
+        			} catch(PhenotypeException e) {
+        				if(exceptions==null) {
+        					exceptions = e.getExceptions();
+        				} else {
+        					for (Integer standardVariableId : e.getExceptions().keySet()) {
+        						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+        						if(exceptions.get(standardVariableId)==null) {
+        							exceptions.put(standardVariableId, exception);//add exception
+        						} else {//add invalid values to the existing map of exceptions for each phenotype
+        							for(String invalidValue : exception.getInvalidValues()) {
+        								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+        							}
+        						}
+        					}
+        				}
+        			}
+        			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        				session.flush();
+        				session.clear();
+        			}
+        		}
+		}
+		rowWatch.stop();
+		watch.stop();
+		
+		if(exceptions!=null) {
+			throw new PhenotypeException(exceptions);
+		}
 	}
 }

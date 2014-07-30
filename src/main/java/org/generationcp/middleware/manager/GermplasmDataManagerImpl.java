@@ -28,6 +28,8 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -35,7 +37,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GidNidElement;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
@@ -599,6 +601,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    public List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException {
+        return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethodsNotGenerative", new Object[] {}, new Class[] {});
+    }
+
+    @Override
     public long countAllMethods() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getMethodDao());
     }
@@ -681,6 +688,38 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             session.flush();
         }
         return methodId;
+    }
+
+
+    @Override
+    public Method editMethod(Method method) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Method recordSaved = null;
+
+        try {
+
+            if (method.getMid() == null || method.getMid() > 0)
+                throw new Exception("method has no Id or is not a local method");
+
+            trans = session.beginTransaction();
+            MethodDAO dao = getMethodDao();
+
+            recordSaved = dao.merge(method);
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
+                    LOG);
+        } finally {
+            session.flush();
+        }
+
+        return recordSaved;
     }
 
     @Override
@@ -1191,7 +1230,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Integer> updateGermplasm(List<Germplasm> germplasms) throws MiddlewareQueryException {
-        return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
+    	if(germplasms!=null) {
+    		List<Integer> gids = new ArrayList<Integer>(); 
+    		for (Germplasm germplasm : germplasms) {
+    			if(germplasm.getGid().equals(germplasm.getGrplce())) {//deleted
+    				gids.add(germplasm.getGid());
+    			}
+			}
+    		if(gids!=null && !gids.isEmpty()) {
+    			setWorkingDatabase(Database.LOCAL);
+    			getTransactionDao().cancelUnconfirmedTransactionsForGermplasms(gids);
+    		}
+    	}
+    	return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
     }
 
     @Override
@@ -1253,11 +1304,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
-    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException {
-        return (List<GidNidElement>) super.getAllFromCentralAndLocalByMethod(getNameDao(), "getGidAndNidByGermplasmNames",
-                new Object[] { germplasmNames }, new Class[]{List.class});
+    public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode) throws MiddlewareQueryException {
+    	List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
+        return (List<GermplasmNameDetails>) super.getAllFromCentralAndLocalByMethod(getNameDao(), "getGermplasmNameDetailsByNames",
+                new Object[] { namesToUse, mode }, new Class[]{List.class, GetGermplasmByNameModes.class});
     }
-
+    
     @Override
     @Deprecated
     public List<Country> getAllCountry() throws MiddlewareQueryException {
@@ -1973,24 +2025,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
          return toreturn;
     }
 
-    /**
-     * Search for germplasms given a search term Q.
-     * @param q - the search term to be used in query
-     * @param o - operation to be used for comparison (equal or like)
-     * @param includeParents boolean flag to denote whether parents will be included in search results
-     * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
-     * @throws MiddlewareQueryException
-     */
-    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents)
+    @Override
+    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData)
             throws MiddlewareQueryException{
         List<Germplasm> resultsFromCentral;
         List<Germplasm> resultsFromLocal;
         List<Germplasm> combinedResults = new ArrayList<Germplasm>();
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o, includeParents, true, getCurrentSessionForLocal());
-            combinedResults.addAll(resultsFromCentral);
-        }
+        if(searchPublicData) {
+	        if (setWorkingDatabase(Database.CENTRAL)) {
+	            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o, includeParents, true, getCurrentSessionForLocal());
+	            combinedResults.addAll(resultsFromCentral);
+	        }
+	    }
         
         if (setWorkingDatabase(Database.LOCAL)) {
             resultsFromLocal = getGermplasmDao().searchForGermplasms(q, o, includeParents, false, null);
@@ -2065,6 +2112,50 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		setWorkingDatabase(Database.LOCAL);
 			 return getGermplasmDao().getNegativeId("gid");
 			
+	}
+
+	@Override
+	public List<Term> getMethodClasses() throws MiddlewareQueryException {
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(TermId.BULKING_BREEDING_METHOD_CLASS.getId());
+		ids.add(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
+		ids.add(TermId.SEED_INCREASE_METHOD_CLASS.getId());
+		ids.add(TermId.SEED_ACQUISITION_METHOD_CLASS.getId());
+		ids.add(TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
+		
+		return getTermBuilder().getTermsByIds(ids);
+		
 	}    
+	
+	@Override
+	public Method getMethodByCode(String code) throws MiddlewareQueryException {
+	    Method method = new Method();
+	    if (setWorkingDatabase(Database.CENTRAL)) {
+	        method = getMethodDao().getByCode(code);
+	    }
+	    if (method == null || method.getMid() == null) {
+	        setWorkingDatabase(Database.LOCAL);
+	        method = getMethodDao().getByCode(code);
+	    }
+	    return method;
+	}
+	
+	@Override
+	public Method getMethodByName(String name) throws MiddlewareQueryException {
+	    List<Method> methods = new ArrayList<Method>();
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            methods = getMethodDao().getByName(name);
+        }
+        if (methods == null || methods.size() == 0) {
+            setWorkingDatabase(Database.LOCAL);
+            methods = getMethodDao().getByName(name);
+        }
+        if (methods != null && methods.size() > 0) {
+            Method method = methods.get(0); 
+            return method;
+        } else {
+            return new Method();
+        }
+	}
     
 }

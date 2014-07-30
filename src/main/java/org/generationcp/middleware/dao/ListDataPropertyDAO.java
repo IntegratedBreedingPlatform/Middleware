@@ -1,8 +1,9 @@
 package org.generationcp.middleware.dao;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataColumnValues;
@@ -58,8 +59,8 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 		String sql = " SELECT DISTINCT column_name,  listdata_id, value" +
 		" FROM listdataprops p " +
 		" INNER JOIN listdata d ON d.lrecid = p.listdata_id " +
-		" WHERE d.listid = :listId " +
-		" ORDER BY column_name, listdata_id ";
+		" WHERE d.listid = :listId " + 
+		" ORDER BY p.column_name,p.listdataprop_id DESC";
 
 		GermplasmListNewColumnsInfo listInfo = new GermplasmListNewColumnsInfo(listId);
 		try {
@@ -68,7 +69,7 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 			query.setParameter("listId", listId);
 			List<Object[]> recordList =  query.list();
 
-			Map<String, List<ListDataColumnValues>> columnValuesMap = new HashMap<String, List<ListDataColumnValues>>();
+			Map<String, List<ListDataColumnValues>> columnValuesMap = new LinkedHashMap<String, List<ListDataColumnValues>>();
 			List<ListDataColumnValues> columnValues = new ArrayList<ListDataColumnValues>();
 			String lastColumn = null;
 			

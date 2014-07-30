@@ -57,6 +57,7 @@ import org.generationcp.middleware.util.PropertyReader;
     /*, STUDY_IP("8120")*/
     , CREATION_DATE
     , STUDY_STATUS
+	, STUDY_UPDATE
     
     // Dataset Fields
     , DATASET_NAME
@@ -118,10 +119,14 @@ import org.generationcp.middleware.util.PropertyReader;
     // Stock Plot / Fieldmap 
     , PLOT_NO
     , PLOT_NNO
+    , PLOT_CODE
     , REP_NO
     , BLOCK_NO
-    , COLUMN_NO //(8400) //(32769)
-    , RANGE_NO //(8410) //(32770)
+    , COLUMN_NO
+    , RANGE_NO
+    , ROW
+    , COL
+
     , BLOCK_NAME
     , COLUMNS_IN_BLOCK
     , RANGES_IN_BLOCK
@@ -130,7 +135,7 @@ import org.generationcp.middleware.util.PropertyReader;
     , FIELD_NAME
     , FIELDMAP_UUID
     , MACHINE_ROW_CAPACITY
-    , BLOCK_ID //(8583)// (77783)
+    , BLOCK_ID
     
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE
@@ -149,35 +154,36 @@ import org.generationcp.middleware.util.PropertyReader;
     , MAX_VALUE
     , CROP_ONTOLOGY_ID
 
-    // Stock Type
-    , ENTRY_CODE
-    , ENTRY_NO
-    , SOURCE
-    , CROSS
-    , DESIG
-    , CHECK
-    
-    // Location 
+	// Stock Type
+	, ENTRY_CODE
+	, ENTRY_NO
+	, SOURCE
+	, CROSS
+	, DESIG
+	, CHECK
+	
+	//Location 
     , TRIAL_LOCATION
     , LOCATION_ID
     , SITE_NAME
-    
-    // Study Type
-    , NURSERY
-    , TRIAL
-    
-    // Main Factor ("Variable")
-    , TRIAL_INSTANCE_FACTOR
+	
+	//Study Type
+	, NURSERY
+	, TRIAL
+	
+	//Main Factor (Variable)
+	, TRIAL_INSTANCE_FACTOR
+	
+	, DELETED_STUDY
+	
+	//Planting Order
+	, ROW_COLUMN
+	, SERPENTINE
+	
+	, BREEDING_METHOD_ID
+	, BREEDING_METHOD
+	, BREEDING_METHOD_CODE
 
-    , DELETED_STUDY
-    
-    // Planting Order
-    , ROW_COLUMN
-    , SERPENTINE
-    
-    ,BREEDING_METHOD_ID
-    ,BREEDING_METHOD
-    
     // Breeding Methods
     , SINGLE_PLANT_SELECTION_SF
     , SELECTED_BULK_SF
@@ -194,13 +200,41 @@ import org.generationcp.middleware.util.PropertyReader;
     , NUMBER_OF_REPLICATES
     , BLOCK_SIZE
     , BLOCKS_PER_REPLICATE
-    ;
 
+    //Selection Variates Properties
+    , BREEDING_METHOD_PROP
+    , PLANTS_SELECTED_PROP
+    
+    , BREEDING_METHOD_VARIATE
+    , BREEDING_METHOD_VARIATE_CODE
+    , SEED_SOURCE
+    , BREEDING_METHOD_VARIATE_TEXT
+    
+    , INVENTORY_AMOUNT_PROPERTY
+
+    //Method Classes
+    , BULKING_BREEDING_METHOD_CLASS
+    , NON_BULKING_BREEDING_METHOD_CLASS
+    , SEED_INCREASE_METHOD_CLASS
+    , SEED_ACQUISITION_METHOD_CLASS
+    , CULTIVAR_FORMATION_METHOD_CLASS
+
+	;
+	
     private static final String PROPERTY_FILE = "constants/termId.properties";
     private static final PropertyReader propertyReader = new PropertyReader(PROPERTY_FILE);
     
     public int getId(){
         return propertyReader.getIntegerValue(this.toString().trim());
     }
+    
+    public static TermId getById(int id) {
+        for (TermId term : values()) {
+            if (term.getId() == id) {
+                return term;
+            }
+        }
+        return null;
+    }
+
 }
-	

@@ -13,8 +13,10 @@ package org.generationcp.middleware.dao.dms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -225,5 +227,45 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
    	    
    	    return stocks;
    	}
+   	
+   	@SuppressWarnings("unchecked")
+	public Map<Integer, StockModel> getStocksByIds(List<Integer> ids) throws MiddlewareQueryException{
+   		Map<Integer, StockModel> stockModels = new HashMap<Integer, StockModel>();
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.in("stockId", ids));
+			List<StockModel> stocks = criteria.list();
+			
+			for (StockModel stock : stocks){
+				stockModels.put(stock.getStockId(), stock);
+			}
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getStocksByIds=" + ids + " in StockDao: " + e.getMessage(), e);
+		}
+		
+		return stockModels;
+   	}
 
+   	public int countStockObservations(int datasetId, String nonEditableFactors) throws MiddlewareQueryException {
+        try {
+            
+            StringBuilder sql = new StringBuilder()
+                .append("SELECT COUNT(sp.stockprop_id) ")
+                .append("FROM nd_experiment_stock es ")
+                .append("INNER JOIN nd_experiment e ON e.nd_experiment_id = es.nd_experiment_id ")
+                .append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
+                .append("INNER JOIN stockProp sp ON sp.stock_id = es.stock_id ")
+                .append("WHERE ep.project_id = ").append(datasetId)
+                .append(" AND sp.type_id NOT IN (").append(nonEditableFactors)
+                .append(")");
+            Query query = getSession().createSQLQuery(sql.toString());
+        
+            return ((BigInteger) query.uniqueResult()).intValue();
+                        
+        } catch(HibernateException e) {
+            logAndThrowException("Error at countStockObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
+        }
+        return 0;
+    }
 }

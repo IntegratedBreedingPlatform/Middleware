@@ -135,8 +135,7 @@ public class HibernateUtil implements Serializable{
      * 
      * 
      * 
-     * @param propertyFilename
-     * @param key 
+     * @param connectionParams
      * @throws ConfigException
      * @throws HibernateException
      * @throws IOException 
@@ -165,7 +164,7 @@ public class HibernateUtil implements Serializable{
     /**
      * Returns the SessionFactory object.
      * 
-     * @return
+     * @return the SessionFactory
      */
     public SessionFactory getSessionFactory() {
         return this.sessionFactory;
@@ -182,7 +181,7 @@ public class HibernateUtil implements Serializable{
     /**
      * Returns the Session for the thread which made the call to this method.
      * 
-     * @return
+     * @return the Session
      */
     public Session getCurrentSession() {
         Session session = threadSession.get();

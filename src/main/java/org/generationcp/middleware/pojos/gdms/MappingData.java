@@ -31,12 +31,6 @@ public class MappingData implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    public static final String GET_MAP_INFO_BY_MAP_NAME = 
-            "SELECT marker_id, marker_name, map_name, linkage_group, start_position " +
-            "FROM gdms_mapping_data " +
-            "WHERE map_name = :mapName " +
-            "ORDER BY linkage_group, start_position, marker_name";
-            
     @Id
     @Column(name = "marker_id")
     private Integer markerId;

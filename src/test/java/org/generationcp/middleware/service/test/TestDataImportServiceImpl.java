@@ -23,7 +23,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
@@ -264,7 +264,7 @@ public class TestDataImportServiceImpl extends TestOutputFormatter {
     	int trialNo = 1;
     	Workbook workbook = TestWorkbookUtil.getTestWorkbookForWizard(studyName,trialNo);
         workbook.print(INDENT);
-        dataImportService.saveDataset(workbook,true);
+        dataImportService.saveDataset(workbook,true,false);
         Map<String,List<Message>> errors = dataImportService.validateProjectData(workbook);
         assertNotNull(errors);
         if(errors!=null) {

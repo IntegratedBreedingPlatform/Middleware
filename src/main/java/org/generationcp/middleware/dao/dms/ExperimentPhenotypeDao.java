@@ -18,6 +18,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -42,5 +43,5 @@ public class ExperimentPhenotypeDao extends GenericDAO<ExperimentPhenotype, Inte
         }
         return null;
     }
-	
+
 }

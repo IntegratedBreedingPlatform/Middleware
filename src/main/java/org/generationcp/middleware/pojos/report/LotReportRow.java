@@ -25,7 +25,7 @@ public class LotReportRow implements Serializable{
 
     private Integer lotId;
     private Integer entityIdOfLot;
-    private Long actualLotBalance;
+    private Double actualLotBalance;
     private Location locationOfLot;
     private Term scaleOfLot;
     private String commentOfLot;
@@ -46,11 +46,11 @@ public class LotReportRow implements Serializable{
         this.entityIdOfLot = entityIdOfLot;
     }
 
-    public Long getActualLotBalance() {
+    public Double getActualLotBalance() {
         return actualLotBalance;
     }
 
-    public void setActualLotBalance(Long actualLotBalance) {
+    public void setActualLotBalance(Double actualLotBalance) {
         this.actualLotBalance = actualLotBalance;
     }
 

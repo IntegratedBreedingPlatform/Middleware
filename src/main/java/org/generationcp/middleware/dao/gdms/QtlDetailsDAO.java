@@ -36,10 +36,116 @@ import org.hibernate.criterion.Restrictions;
 @SuppressWarnings("unchecked")
 public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 
-    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max
+    public static final String GET_MARKER_IDS_BY_QTL = 
+            "SELECT marker_id "
+            + "FROM gdms_markers_onmap, gdms_qtl_details, gdms_qtl "
+            + "WHERE gdms_markers_onmap.map_id = gdms_qtl_details.map_id " 
+            + "        AND gdms_qtl_details.qtl_id = gdms_qtl.qtl_id "
+            + "        AND gdms_qtl.qtl_name = :qtlName "
+            + "        AND gdms_markers_onmap.linkage_group = :chromosome " 
+            + "        AND gdms_markers_onmap.start_position between :min AND :max "
+            ;
+
+    
+    public static final String COUNT_MARKER_IDS_BY_QTL = 
+            "SELECT COUNT(marker_id)  "
+            + "FROM gdms_markers_onmap, gdms_qtl_details, gdms_qtl "
+            + "WHERE gdms_markers_onmap.map_id = gdms_qtl_details.map_id " 
+            + "        AND gdms_qtl_details.qtl_id = gdms_qtl.qtl_id "
+            + "        AND gdms_qtl.qtl_name = :qtlName "
+            + "        AND gdms_markers_onmap.linkage_group = :chromosome " 
+            + "        AND gdms_markers_onmap.start_position between :min AND :max "
+            ;
+
+    public static final String GET_MAP_IDS_BY_QTL = 
+            "SELECT DISTINCT map_id " 
+            + "FROM gdms_qtl_details "
+            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
+
+    public static final String COUNT_MAP_IDS_BY_QTL = 
+            "SELECT COUNT(DISTINCT map_id) " 
+            + "FROM gdms_qtl_details "
+            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
+
+    public static final String GET_MARKER_IDS_BY_QTL_AND_MAP_ID = 
+          "SELECT DISTINCT gm.marker_id " 
+          + "FROM gdms_marker gm "
+          + "    INNER JOIN gdms_markers_onmap gmo ON gm.marker_id = gmo.marker_id " 
+          + "    INNER JOIN gdms_qtl_details gqd ON gqd.map_id = gmo.map_id " 
+          + "    INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id " 
+          + "    WHERE gmo.linkage_group = :chromosome "
+          + "         AND gmo.start_position BETWEEN :min AND :max " 
+          + "         AND gmo.map_id = :mapId "
+          + "         AND gq.qtl_name like :qtlName "
+          ;
+
+    public static final String COUNT_MARKER_IDS_BY_QTL_AND_MAP_ID = 
+            "SELECT COUNT(DISTINCT gm.marker_id) " 
+            + "FROM gdms_marker gm "
+            + "    INNER JOIN gdms_markers_onmap gmo ON gm.marker_id = gmo.marker_id " 
+            + "    INNER JOIN gdms_qtl_details gqd ON gqd.map_id = gmo.map_id " 
+            + "    INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id " 
+            + "    WHERE gmo.linkage_group = :chromosome "
+            + "         AND gmo.start_position BETWEEN :min AND :max " 
+            + "         AND gmo.map_id = :mapId "
+            + "         AND gq.qtl_name like :qtlName "
+            ;
+
+    public static final String GET_MAP_ID_BY_QTL =
+            "SELECT DISTINCT map_id " 
+            + "FROM gdms_qtl_details "
+            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
+    		;
+    		
+    public static final String GET_QTL_TRAITS_BY_DATASET_ID = 
+    		"SELECT DISTINCT gqd.tid " 
+    		+ "FROM gdms_qtl gq  "
+    		+ "INNER JOIN gdms_qtl_details gqd  " 
+    		+ "ON gq.qtl_id = gqd.qtl_id  "
+    		+ "WHERE gq.dataset_id = :datasetId  "
+    		;
+
+    public static final String COUNT_QTL_TRAITS_BY_DATASET_ID = 
+    		"SELECT COUNT(DISTINCT gqd.tid) " 
+    		+ "FROM gdms_qtl gq  "
+    		+ "INNER JOIN gdms_qtl_details gqd  " 
+    		+ "ON gq.qtl_id = gqd.qtl_id  "
+    		+ "WHERE gq.dataset_id = :datasetId  "
+    		;
+    
+    public static final String GET_QTL_DATA_BY_QTL_TRAITS =
+    		"SELECT CONCAT(gq.qtl_name,'') " 
+			+ "		, gqd.linkage_group " 
+    		+ "		, gqd.position " 
+    		+ "		, gqd.min_position " 
+    		+ "		, gqd.max_position " 
+    		+ "		, gqd.tid " 
+    		+ "		, CONCAT(gqd.experiment,'') " 
+    		+ "		, gqd.left_flanking_marker " 
+    		+ "		, gqd.right_flanking_marker " 
+    		+ "		, gqd.effect " 
+    		+ "		, gqd.score_value "
+    		+ "		, gqd.r_square "
+    		+ "FROM gdms_qtl_details gqd " 
+    		+ "INNER JOIN gdms_qtl gq "
+    		+ "ON gqd.qtl_id = gq.qtl_id " 
+    		+ "AND gqd.tid "
+    		+ "IN (:qtlTraits) " 
+    		;
+
+    public static final String COUNT_QTL_DATA_BY_QTL_TRAITS =
+    		"SELECT COUNT(*) "
+    		+ "FROM gdms_qtl_details gqd " 
+    		+ "INNER JOIN gdms_qtl gq "
+    		+ "ON gqd.qtl_id = gq.qtl_id " 
+    		+ "AND gqd.tid "
+    		+ "IN (:qtlTraits) " 
+    		;
+    
+    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, float min, float max
             , int start, int numOfRows) throws MiddlewareQueryException{
         try {
-            SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_MARKER_IDS_BY_QTL);
+            SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_QTL);
             query.setParameter("qtlName", qtlName);
             query.setParameter("chromosome", chromosome);
             query.setParameter("min", min);
@@ -54,9 +160,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         return new ArrayList<Integer>();
     }
     
-    public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException{
+    public long countMarkerIdsByQtl(String qtlName, String chromosome, float min, float max) throws MiddlewareQueryException{
         try {
-            SQLQuery query = getSession().createSQLQuery(QtlDetails.COUNT_MARKER_IDS_BY_QTL);
+            SQLQuery query = getSession().createSQLQuery(COUNT_MARKER_IDS_BY_QTL);
             query.setParameter("qtlName", qtlName);
             query.setParameter("chromosome", chromosome);
             query.setParameter("min", min);
@@ -77,7 +183,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 			throws MiddlewareQueryException {
 		try {
 			SQLQuery query = getSession().createSQLQuery(
-					QtlDetails.GET_MAP_ID_BY_QTL);
+					GET_MAP_ID_BY_QTL);
 			query.setParameter("qtlName", qtlName);
 			return (Integer) query.uniqueResult();
 
@@ -92,7 +198,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 
     public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException{
         try {
-            SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_MAP_IDS_BY_QTL);
+            SQLQuery query = getSession().createSQLQuery(GET_MAP_IDS_BY_QTL);
             query.setParameter("qtlName", qtlName);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -106,7 +212,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 
     public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException{
         try {
-            SQLQuery query = getSession().createSQLQuery(QtlDetails.COUNT_MAP_IDS_BY_QTL);
+            SQLQuery query = getSession().createSQLQuery(COUNT_MAP_IDS_BY_QTL);
             query.setParameter("qtlName", qtlName);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
@@ -121,7 +227,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     public List<Integer> getMarkerIdsByQtl(Integer mapId, String qtlName, String chromosome, int min,
             int max, int start, int numOfRows) throws MiddlewareQueryException{
         try {
-            SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_MARKER_IDS_BY_QTL_AND_MAP_ID);
+            SQLQuery query = getSession().createSQLQuery(GET_MARKER_IDS_BY_QTL_AND_MAP_ID);
             query.setParameter("qtlName", qtlName);
             query.setParameter("chromosome", chromosome);
             query.setParameter("min", min);
@@ -137,7 +243,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     public long countMarkerIdsByQtl(Integer mapId, String qtlName, String chromosome, int min, int max)  
     		throws MiddlewareQueryException{
         try {
-            SQLQuery query = getSession().createSQLQuery(QtlDetails.COUNT_MARKER_IDS_BY_QTL_AND_MAP_ID);
+            SQLQuery query = getSession().createSQLQuery(COUNT_MARKER_IDS_BY_QTL_AND_MAP_ID);
             query.setParameter("qtlName", qtlName);
             query.setParameter("chromosome", chromosome);
             query.setParameter("min", min);
@@ -158,7 +264,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     public List<Integer> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
         try {
         	if (datasetId != null){
-        		SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_QTL_TRAITS_BY_DATASET_ID);
+        		SQLQuery query = getSession().createSQLQuery(GET_QTL_TRAITS_BY_DATASET_ID);
 	            query.setParameter("datasetId", datasetId);
 	            query.setFirstResult(start);
 	            query.setMaxResults(numOfRows);
@@ -173,7 +279,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     public long countQtlTraitsByDatasetId(Integer datasetId)  throws MiddlewareQueryException{
         try {
         	if (datasetId != null){
-	            SQLQuery query = getSession().createSQLQuery(QtlDetails.COUNT_QTL_TRAITS_BY_DATASET_ID);
+	            SQLQuery query = getSession().createSQLQuery(COUNT_QTL_TRAITS_BY_DATASET_ID);
 	            query.setParameter("datasetId", datasetId);
 	            BigInteger result = (BigInteger) query.uniqueResult();
 	            if (result != null) {
@@ -191,7 +297,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 
         try {
         	if (qtlTraits != null && !qtlTraits.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_QTL_DATA_BY_QTL_TRAITS);
+	            SQLQuery query = getSession().createSQLQuery(GET_QTL_DATA_BY_QTL_TRAITS);
 	            query.setParameterList("qtlTraits", qtlTraits);
 	            query.setFirstResult(start);
 	            query.setMaxResults(numOfRows);
@@ -212,7 +318,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 	                	String experiment = (String) result[6]; 
 	                	String leftFlankingMarker = (String) result[7]; 
 	                	String rightFlankingMarker = (String) result[8]; 
-	                	Integer effect = (Integer) result[9]; 
+	                	Float effect = (Float) result[9]; 
 	                	Float scoreValue = (Float) result[10]; 
 	                	Float rSquare = (Float) result[11];
 	
@@ -233,7 +339,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     public long countQtlDataByQtlTraits(List<String> qtlTraits)  throws MiddlewareQueryException{
         try {
         	if (qtlTraits != null && !qtlTraits.isEmpty()){        	
-	            SQLQuery query = getSession().createSQLQuery(QtlDetails.COUNT_QTL_DATA_BY_QTL_TRAITS);
+	            SQLQuery query = getSession().createSQLQuery(COUNT_QTL_DATA_BY_QTL_TRAITS);
 	            query.setParameterList("qtlTraits", qtlTraits);
 	            BigInteger result = (BigInteger) query.uniqueResult();
 	            if (result != null) {
@@ -264,7 +370,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("id.mapId", mapId));
+            criteria.add(Restrictions.eq("mapId", mapId));
             
             return criteria.list();
 
@@ -277,7 +383,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     public List<QtlDetails> getQtlDetailsByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.in("id.qtlId", qtlIds));
+            criteria.add(Restrictions.in("qtlId", qtlIds));
             
             return criteria.list();
 
@@ -290,7 +396,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 	public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.eq("id.mapId", mapId));
+			criteria.add(Restrictions.eq("mapId", mapId));
 			criteria.setProjection(Projections.rowCount());
 			
 			return (Long) criteria.uniqueResult();

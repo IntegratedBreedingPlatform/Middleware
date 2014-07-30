@@ -24,21 +24,14 @@ import java.util.Properties;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.CrossStudyDataManager;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
@@ -324,12 +317,20 @@ public class ManagerFactory implements Serializable {
         return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    public InventoryService getInventoryMiddlewareService() throws ConfigException {
+        return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
     public DataImportService getDataImportService() throws ConfigException {
         return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     public OntologyService getOntologyService() throws ConfigException {
         return new OntologyServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public MBDTDataManager getMbdtDataManager() {
+        return new MBDTDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     /**

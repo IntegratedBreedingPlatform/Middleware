@@ -44,7 +44,7 @@ public interface DataImportService {
      * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
      * @return id of created trial or nursery
      */
-    int saveDataset(Workbook workbook, boolean retainValues) throws MiddlewareQueryException;
+    int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException;
 
 	/**
 	 * Given a file, parse the file to create a workbook object
@@ -57,7 +57,7 @@ public interface DataImportService {
 	/**
 	 * 
 	 * @param file
-	 * @return
+	 * @return the workbook
 	 * @throws WorkbookParserException
 	 * @throws MiddlewareQueryException
 	 */
@@ -66,7 +66,7 @@ public interface DataImportService {
     /**
      * 
      * @param workbook
-     * @return
+     * @return the workbook
      * @throws WorkbookParserException
      * @throws MiddlewareQueryException
      */

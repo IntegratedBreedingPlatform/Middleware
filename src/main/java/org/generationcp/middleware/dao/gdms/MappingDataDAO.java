@@ -31,6 +31,13 @@ import org.hibernate.criterion.Restrictions;
  */
 public class MappingDataDAO extends GenericDAO<MappingData, Integer>{
 
+    public static final String GET_MAP_INFO_BY_MAP_NAME = 
+            "SELECT marker_id, marker_name, map_name, linkage_group, start_position " +
+            "FROM gdms_mapping_data " +
+            "WHERE map_name = :mapName " +
+            "ORDER BY linkage_group, start_position, marker_name";
+            
+
     /**
      * Gets the map info by map name.
      *

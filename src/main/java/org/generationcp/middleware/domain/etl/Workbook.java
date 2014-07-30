@@ -38,6 +38,7 @@ public class Workbook {
 	private List<MeasurementVariable> variates; 
 	
 	private List<MeasurementRow> observations; 
+	private List<MeasurementRow> exportArrangedObservations; //for exporting only
 	
 	//derived variables used to improve performance
 	private List<String> trialHeaders;
@@ -46,6 +47,7 @@ public class Workbook {
 	private List<MeasurementVariable> studyVariables;
 	private List<MeasurementVariable> nonTrialFactors;
 	private List<MeasurementVariable> trialFactors;
+	private List<MeasurementVariable> germplasmFactors;
 	private List<MeasurementVariable> studyConditions;
 	private List<MeasurementVariable> studyConstants;
 	private List<MeasurementVariable> trialConditions;
@@ -62,9 +64,14 @@ public class Workbook {
 	private Integer studyId;
 	private Integer trialDatasetId;
 	private Integer measurementDatesetId;
+	private Integer meansDatasetId;
 	
 	private List<MeasurementRow> trialObservations;
+	
+	private List<MeasurementRow> originalObservations;
 
+	private Integer importType;
+	
 	public void reset() {
 		trialHeaders = null;
 		trialVariables = null;
@@ -72,6 +79,7 @@ public class Workbook {
 		studyVariables = null;
 		nonTrialFactors = null;
 		trialFactors = null;
+		germplasmFactors = null;
 		studyConditions = null;
 		studyConstants = null;
 		trialConditions = null;
@@ -150,6 +158,10 @@ public class Workbook {
 	    return this.studyDetails.isNursery();
 	}
 	
+	public void setMeasurementDatasetVariables(List<MeasurementVariable> measurementDatasetVariables) {
+		this.measurementDatasetVariables = measurementDatasetVariables;
+	}
+	
 	public List<MeasurementVariable> getMeasurementDatasetVariables() {
 		if(measurementDatasetVariables==null) {
 			measurementDatasetVariables = new ArrayList<MeasurementVariable>();
@@ -167,7 +179,7 @@ public class Workbook {
 		if (!isNursery()) {
             MeasurementVariable trialFactor = null;
             if (getTrialFactors() != null) {
-            	for (MeasurementVariable var : getTrialFactors()) {
+            	for (MeasurementVariable var : getTrialConditions()) {
             		if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
             			trialFactor = var;
             			break;
@@ -226,6 +238,13 @@ public class Workbook {
 			trialFactors = getTrialVariables(factors);
 		}
 		return trialFactors;
+	}
+	
+	public List<MeasurementVariable> getGermplasmFactors() {
+		if(germplasmFactors==null || germplasmFactors.isEmpty()) {
+			germplasmFactors = getGermplasmVariables(factors);
+		}
+		return germplasmFactors;
 	}
 
 	private List<MeasurementVariable> getConditionsAndConstants(boolean isStudy) {
@@ -298,6 +317,18 @@ public class Workbook {
 		if (variables != null && variables.size() > 0) {
 			for (MeasurementVariable variable : variables) {
 				if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
+					list.add(variable);
+				}
+			}
+		}
+		return list;
+	}
+	
+	private List<MeasurementVariable> getGermplasmVariables(List<MeasurementVariable> variables) {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (variables != null && variables.size() > 0) {
+			for (MeasurementVariable variable : variables) {
+				if (PhenotypicType.GERMPLASM.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
 				}
 			}
@@ -597,10 +628,11 @@ public class Workbook {
 		this.variableMap = variableMap;
 	}
 
-    public void populateStudyAndDatasetIds(int studyId, int trialDatasetId, int measurementDatasetId) {
+    public void populateStudyAndDatasetIds(int studyId, int trialDatasetId, int measurementDatasetId, int meansDatasetId) {
     	this.studyId = studyId;
     	this.trialDatasetId = trialDatasetId;
     	this.measurementDatesetId = measurementDatasetId;
+    	this.meansDatasetId = meansDatasetId;
     }
 
 	public Integer getStudyId() {
@@ -648,8 +680,13 @@ public class Workbook {
 	
 	public int getTotalNumberOfInstances() {
 		if (this.totalNumberOfInstances == null) {
-			Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
-			this.totalNumberOfInstances = map.size();
+			if (this.trialObservations != null && !this.trialObservations.isEmpty()) {
+				this.totalNumberOfInstances = this.trialObservations.size();
+			}
+			else {
+				Map<Long, List<MeasurementRow>> map = segregateByTrialInstances();
+				this.totalNumberOfInstances = map.size();
+			}
 		}
 		return this.totalNumberOfInstances;
 	}
@@ -733,4 +770,58 @@ public class Workbook {
 	public void setTreatmentFactors(List<TreatmentVariable> treatmentFactors) {
 		this.treatmentFactors = treatmentFactors;
 	}
+	
+	public List<MeasurementRow> getExportArrangedObservations() {
+		return exportArrangedObservations;
+	}
+
+	public void setExportArrangedObservations(
+			List<MeasurementRow> exportArrangedObservations) {
+		this.exportArrangedObservations = exportArrangedObservations;
+	}
+	
+	public String getStudyName() {
+		if (getStudyConditions() != null) {
+			for (MeasurementVariable condition : getStudyConditions()) {
+				if (condition.getTermId() == TermId.STUDY_NAME.getId()) {
+					return condition.getValue();
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @return the originalObservations
+	 */
+	public List<MeasurementRow> getOriginalObservations() {
+		return originalObservations;
+	}
+
+	/**
+	 * @param originalObservations the originalObservations to set
+	 */
+	public void setOriginalObservations(List<MeasurementRow> originalObservations) {
+		this.originalObservations = originalObservations;
+	}
+
+	public Integer getImportType() {
+		return importType;
+	}
+
+	public void setImportType(Integer importType) {
+		this.importType = importType;
+	}
+
+	public Integer getMeansDatasetId() {
+		return meansDatasetId;
+	}
+
+	public void setMeansDatasetId(Integer meansDatasetId) {
+		this.meansDatasetId = meansDatasetId;
+	}
+	
+	
+	
+	
 }

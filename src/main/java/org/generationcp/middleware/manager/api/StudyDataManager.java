@@ -40,7 +40,9 @@ import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets
  * from the CHADO schema.
@@ -129,7 +131,18 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareQueryException;
-
+    
+    /**
+     * Gets the experiments.
+     *
+     * @param dataSetId the data set id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @param varTypeList the var type list
+     * @return the experiments
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList) throws MiddlewareQueryException;
     /**
      * Get the number of experiments in a dataset. Retrieves from central if the
      * given ID is positive, otherwise retrieves from local.
@@ -243,6 +256,19 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
+            throws MiddlewareQueryException;
+    
+    /**
+     * Adds or updates experiment rows to the dataset.
+     *
+     * @param dataSetId The ID of the dataset to add the experiment into
+     * @param experimentType The type of Experiment - could be ExperimentType.PLOT,
+     * ExperimentType.SAMPLE, ExperimentType.AVERAGE,
+     * ExperimentType.SUMMARY
+     * @param experimentValues The values to set
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues)
             throws MiddlewareQueryException;
 
     /**
@@ -459,6 +485,8 @@ public interface StudyDataManager{
      * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
      *
      * @param info the info
+     * @param userId the user id
+     * @param isNew the is new
      * @throws MiddlewareQueryException the middleware query exception
      */
     void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) throws MiddlewareQueryException;
@@ -521,7 +549,6 @@ public interface StudyDataManager{
      * Logically delete a folder by updating the folder's name and deleting its project relationships.
      *
      * @param id the id
-     * @return ID of the folder created
      * @throws MiddlewareQueryException the middleware query exception
      */
 	void deleteEmptyFolder(int id) throws MiddlewareQueryException;
@@ -681,10 +708,11 @@ public interface StudyDataManager{
      * Count plots with plants selectedof dataset.
      *
      * @param dataSetId the data set id
+     * @param variateIds the variate ids
      * @return the int
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException;
+    int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException;
     
     /**
      * Gets the geolocation prop value.
@@ -698,11 +726,77 @@ public interface StudyDataManager{
     String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException;
     
     /**
-     * 
-     * @param blockId
-     * @return
-     * @throws MiddlewareQueryException
+     * Gets the all field maps in block by block id.
+     *
+     * @param blockId the block id
+     * @return List of all field maps in the block
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId)
             throws MiddlewareQueryException;
+    
+    /**
+     * Gets the folder name by id.
+     *
+     * @param folderId the folder id
+     * @return the folder name by id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
+    
+    /**
+     * Check if study has measurement data.
+     *
+     * @param studyId the study id
+     * @return true, if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+
+    
+    /**
+     * Count the number of variates with recorded data.
+     * @param datasetId
+     * @param variateIds
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+
+
+    /**
+     * Check if study has measurement data.
+     *
+     * @param projectId the project id
+     * @param locationId the location id
+     * @param plotNos list of plotNos
+     * @param cvTermIds list of std var Ids
+     * @return list of plotNo, stdVarId and phenoTypeId
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, List<Integer> plotNos, List<Integer> cvTermIds) throws MiddlewareQueryException;
+    
+    /**
+     * Check if study has measurement data.
+     *
+     * @param projectId the project id
+     * @param locationId the location id
+     * @param plotNos list of plotNos
+     * @param cvTermIds list of std var Ids
+     * @return list of plotNo, stdVarId and phenoTypeId
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, Integer plotNo, List<Integer> cvTermIds) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Save the Phenotype Outlier data
+     *
+     * @param phenotyleOutliers list of PhenotypeOutliers
+     * @return none
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers)
+			throws MiddlewareQueryException;
+
 }

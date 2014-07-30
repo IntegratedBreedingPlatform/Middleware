@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,8 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -42,7 +45,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
@@ -127,13 +130,22 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllLocations() throws MiddlewareQueryException {
-    	List<Location> locations = fieldbookService.getAllLocations();
-    	for (Location loc : locations){
-    		Debug.println(INDENT, loc.toString());
-    	}
-    	Debug.println(INDENT, "#RECORDS: " + locations.size());
+        List<Location> locations = fieldbookService.getAllLocations();
+        Debug.printObjects(locations);
     }
-    
+
+    @Test
+    public void testGetAllBreedingLocations() throws MiddlewareQueryException {
+        List<Location> locations = fieldbookService.getAllBreedingLocations();
+        Debug.printObjects(locations);
+    }
+
+    @Test
+    public void testGetAllSeedLocations() throws MiddlewareQueryException {
+        List<Location> locations = fieldbookService.getAllSeedLocations();
+        Debug.printObjects(locations);
+    }
+
     @Test
     public void testGetNurseryDataSet() throws MiddlewareQueryException {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
@@ -148,6 +160,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
         // Assumption: there is at least 1 local nursery stored in the database
         int id = fieldbookService.getAllLocalNurseryDetails().get(0).getId();
+//    	int id = -167;
         Workbook workbook = fieldbookService.getNurseryDataSet(id);
         workbook.print(INDENT);
         
@@ -168,6 +181,28 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
             }
         }
         
+//        MeasurementVariable bhtrait = new MeasurementVariable(22448, "BH-LOCAL", "BH-LOCAL DESC", null, null, null, null, null, null);
+//        bhtrait.setOperation(Operation.ADD);
+//        bhtrait.setStoredIn(TermId.OBSERVATION_VARIATE.getId());
+//        workbook.getVariates().add(bhtrait);
+//        for (MeasurementVariable var : workbook.getVariates()) {
+//        	if (var.getTermId() == 8390) { //NOTES trait
+//        		var.setName("LOCAL " + var.getName());
+//        		var.setDescription("LOCAL " + var.getDescription());
+//        		var.setOperation(Operation.UPDATE);
+//        	}
+//        }
+//        for (MeasurementVariable var : workbook.getConditions()) {
+//        	if (var.getTermId() == -160) {
+//        		var.setOperation(Operation.DELETE);
+//        	}
+//        	else if (var.getTermId() == 8100) {
+//        		var.setOperation(Operation.UPDATE);
+//        		var.setName("INVESTIGATOR_NAME");
+//        		var.setDescription("INVESTIGATOR_DESCRIPTION");
+//        	}
+//        }
+        
         fieldbookService.saveMeasurementRows(workbook);
         Workbook workbook2 = fieldbookService.getNurseryDataSet(id);
         workbook2.print(INDENT);
@@ -187,7 +222,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
 
     @Test
     public void testGetAllBreedingMethods() throws MiddlewareQueryException {
-        List<Method> methods = fieldbookService.getAllBreedingMethods();
+        List<Method> methods = fieldbookService.getAllBreedingMethods(false);
         assertFalse(methods.isEmpty());
         Debug.printObjects(INDENT, methods);
     }
@@ -358,7 +393,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
     public void testGetAllPersons() throws MiddlewareQueryException {
             List<Person> persons = fieldbookService.getAllPersons();
             Debug.printObjects(INDENT, persons);
-            Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(-146));
+            //Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(-146));
     }
     
     @Test
@@ -366,7 +401,7 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
         workbook.print(INDENT);
         int id = dataImportService.saveDataset(workbook);
-        Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
+        //Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
     }
     
     @Test
@@ -376,6 +411,13 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         int id = dataImportService.saveDataset(workbook);
         workbook = fieldbookService.getStudyVariableSettings(id, true);
         workbook.print(INDENT);
+    }
+    
+    @Test
+    public void testGetBlockId() throws MiddlewareQueryException {
+    	int datasetId = -167;
+    	String trialInstance = "1";
+    	System.out.println(fieldbookService.getBlockId(datasetId, trialInstance));
     }
 
     @Test
@@ -392,6 +434,75 @@ public class TestFieldbookServiceImpl extends TestOutputFormatter{
         Integer parentFieldId = -11;
         int result = fieldbookService.addBlockLocation(blockName, parentFieldId, -1);
         Debug.println(INDENT, "Added: Location with id = " + result);
+    }
+    
+    @Test
+    public void testGetStudyType() throws MiddlewareQueryException  {
+    	int studyId = -74;
+    	TermId studyType = fieldbookService.getStudyType(studyId);
+    	System.out.println("STUDY TYPE IS " + studyType.name());
+    }
+    
+    @Test
+    public void testGetFolderNameById() throws MiddlewareQueryException  {
+        String folderName = fieldbookService.getFolderNameById(1);
+        System.out.println("Folder Name is: " + folderName);
+    }
+    
+    @Test
+    public void testCheckIfStudyHasFieldmap()	throws MiddlewareQueryException {
+    	int studyId = -12;
+    	System.out.println("RESULT1 = " + fieldbookService.checkIfStudyHasFieldmap(studyId));
+    	studyId = -18;
+    	System.out.println("RESULT2 = " + fieldbookService.checkIfStudyHasFieldmap(studyId));
+    }
+    
+    @Test
+    public void testCheckIfStudyHasMeasurementData() throws MiddlewareQueryException {
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(INDENT);
+        int id = dataImportService.saveDataset(workbook);
+        workbook = fieldbookService.getNurseryDataSet(id);
+        List<Integer> variateIds =  new ArrayList<Integer>();
+        variateIds.add(new Integer(21980));
+        variateIds.add(new Integer(21981));
+        
+        boolean hasMeasurementData = fieldbookService.checkIfStudyHasMeasurementData(workbook.getMeasurementDatesetId(), variateIds);
+        System.out.println(hasMeasurementData);
+    }
+    
+    @Test
+    public void testDeleteObservationsOfStudy() throws MiddlewareQueryException {
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(INDENT);
+        int id = dataImportService.saveDataset(workbook);
+        workbook = fieldbookService.getNurseryDataSet(id);
+        
+        fieldbookService.deleteObservationsOfStudy(workbook.getMeasurementDatesetId());
+        workbook.print(INDENT);
+    }
+    
+    @Test
+    public void testGetProjectIdByName() throws Exception {
+    	String name = "ROOT STUDY";
+    	System.out.println("ID IS " + fieldbookService.getProjectIdByName(name));
+    }
+    
+    @Test
+    public void testGetGidsByName() throws Exception {
+    	String name = "CG7";
+    	System.out.println("GIDS = " + fieldbookService.getGermplasmIdsByName(name));
+    }
+    
+    @Test
+    public void testGetAllTreatmentFactors() throws Exception {
+    	List<Integer> hiddenFields = Arrays.asList(8200,8380,8210,8220,8400,8410,8581,8582);
+    	List<StandardVariableReference> variables = fieldbookService.getAllTreatmentLevels(hiddenFields);
+    	if (variables != null) {
+    		for (StandardVariableReference variable : variables) {
+    			System.out.println(variable);
+    		}
+    	}
     }
 
     @AfterClass

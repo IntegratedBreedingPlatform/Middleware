@@ -468,6 +468,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             for (IbdbUserMap ibdbUserMap : ibdbUserMaps) {
             	deleteIbdbProjectBackup(ibdbUserMap);
             } 
+            
+            //remove template settings per project
+            TemplateSetting setting = new TemplateSetting();
+            setting.setProjectId(projectId.intValue());
+            
+            List<TemplateSetting> templateSettings = getTemplateSettings(setting);
+            for(TemplateSetting templateSetting: templateSettings){
+            	deleteTemplateSetting(templateSetting);
+            }
+            
             //deleteProject(project);
     	}catch (Exception e) {
               

@@ -24,7 +24,7 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.MockDataUtil;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;

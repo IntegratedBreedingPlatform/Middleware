@@ -276,7 +276,6 @@ public interface WorkbenchDataManager {
      *
      * @param project - the project to use
      * @param newRoles - the new roles to add
-     * @return void
      * @throws MiddlewareQueryException the middleware query exception
      */
     void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException;
@@ -1084,7 +1083,7 @@ public interface WorkbenchDataManager {
     /**
      * Delete template setting with the given id.
      *
-     * @param templateSetting the template setting
+     * @param id the template setting id to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteTemplateSetting(Integer id) throws MiddlewareQueryException;

@@ -11,6 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.util.List;
+
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementData {
@@ -173,4 +177,41 @@ public class MeasurementData {
 		this.cValueId = cValueId;
 	}
 	
+	public String getDisplayValue() {
+		if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getPossibleValues() != null
+				&& !this.getMeasurementVariable().getPossibleValues().isEmpty() 
+				&& NumberUtils.isNumber(this.value)) {
+			
+			List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
+			for (ValueReference possibleValue : possibleValues) {
+				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
+					return possibleValue.getDescription();
+				}
+			}
+		}
+		else {
+			if(this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null && this.getMeasurementVariable().getDataTypeDisplay().equalsIgnoreCase("N")){
+				if(this.value != null && !this.value.equalsIgnoreCase("") && !this.value.equalsIgnoreCase("null")) {
+					int intVal = Double.valueOf(this.value).intValue();
+					double doubleVal = Double.valueOf(this.value);
+					if(intVal == doubleVal){
+						this.value = Integer.toString(intVal);
+						return this.value;
+					} else {
+						return this.value;
+					}
+				}
+			} else {
+				return this.value;
+			}
+		}
+		return "";
+	}
+	
+	public MeasurementData copy() {
+		MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
+		data.setPhenotypeId(this.phenotypeId);
+		data.setcValueId(this.cValueId);
+		return data;
+	}
 }

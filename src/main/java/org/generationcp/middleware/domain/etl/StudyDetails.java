@@ -1,4 +1,5 @@
 /*******************************************************************************
+
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
@@ -56,6 +57,8 @@ public class StudyDetails implements Serializable{
     
     //row count in both trial dataset and measurement dataset
     private Integer rowCount;
+    
+    private String label;//used to display "Add to New Study"
 
 	public StudyDetails(){
 		
@@ -74,6 +77,7 @@ public class StudyDetails implements Serializable{
         this.parentFolderId = parentFolderId;
         this.trialDatasetName = trialDatasetName;
         this.measurementDatasetName = measurementDatasetName;
+        this.label = studyName;
     }
 
     // Used by getStudyDetails
@@ -286,7 +290,15 @@ public class StudyDetails implements Serializable{
         this.rowCount = rowCount;
     }
     
-    public boolean hasRows() {
+    public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public boolean hasRows() {
         return rowCount != null && rowCount > 0;
     }
 

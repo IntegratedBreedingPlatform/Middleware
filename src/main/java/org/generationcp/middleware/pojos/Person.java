@@ -31,7 +31,7 @@ import org.generationcp.middleware.util.Util;
  */
 @Entity
 @Table(name = "persons")
-public class Person implements Serializable{
+public class Person implements  Comparable<Person>, Serializable{
 
     private static final long serialVersionUID = -3159738927364282485L;
 
@@ -100,11 +100,17 @@ public class Person implements Serializable{
         this.notes = notes;
     }
     
+    public Person(String firstName, String middleName, String lastName){
+    	this.firstName = firstName;
+    	this.middleName = middleName;
+    	this.lastName = lastName;
+    }
+    
     /**
      * Create a copy of this Person object.
      * Note that this method does not copy the {@link Person#id} field.
      * 
-     * @return
+     * @return the copy of this Person object.
      */
     public Person copy() {
         Person person = new Person();
@@ -326,5 +332,14 @@ public class Person implements Serializable{
 
         return new EqualsBuilder().append(id, otherObj.id).isEquals();
     }
+    
+    @Override
+    public int compareTo(Person o) {
+        if (this.getDisplayName() != null && o != null) {
+            return this.getDisplayName().compareTo(o.getDisplayName());
+        }
+        return 0;
+    }
+
 
 }

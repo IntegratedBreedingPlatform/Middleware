@@ -21,9 +21,31 @@ central.dbname = dbname
 central.username = user
 central.password = password
 
-Set the correct values for your set-up of the databases.
+workbench.host = localhost
+workbench.port = 3306
+workbench.dbname = workbench
+workbench.username = root
+workbench.password = password
 
+localgroundnut.host = localhost
+localgroundnut.port = 3306
+localgroundnut.dbname = groundnut_local
+localgroundnut.username = root
+localgroundnut.password = password
+
+centralgroundnut.host = localhost
+centralgroundnut.port = 3306
+centralgroundnut.dbname = groundnut_central
+centralgroundnut.username = root
+centralgroundnut.password = password
+
+
+Set the correct values for your set-up of the databases.
 
 3. Navigate to the root directory of the project and run the command: mvn clean test.  You can also
 limit the test class to run by using the option "-Dtest=TestClassName", for example:
 mvn clean test -Dtest=TestGermplasmDataManagerImpl
+
+
+4. If you are using a configuration folder (e.g. dev), put the testDatabaseConfig.properties to 
+pipeline/config/dev folder, then run mvn clean test -DenvConfig=dev

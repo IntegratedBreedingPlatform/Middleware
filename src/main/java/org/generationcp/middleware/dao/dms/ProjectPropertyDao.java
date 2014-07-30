@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -156,5 +158,51 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
                     "Error in getByTypeAndValue("    + typeId + ", " + value + ") in ProjectPropertyDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<ProjectProperty>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String getValueByProjectIdAndTypeId(int projectId, int typeId) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT value FROM projectprop WHERE project_id = " + projectId + " AND type_id = " + typeId;
+			Query query = getSession().createSQLQuery(sql);
+			List<String> results = query.list();
+			if (results != null && !results.isEmpty()) {
+				return results.get(0);
+			}
+			
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getByProjectIdAndTypeId("    + projectId + ", " + typeId + ") in ProjectPropertyDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
+		List<Integer> ids = new ArrayList<Integer>();
+		try {
+			String sql = "SELECT dprop.value " 
+					+ " FROM project_relationship mpr "
+					+ " INNER JOIN project_relationship pr ON pr.object_project_id = mpr.object_project_id "
+					+ "   AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() + " AND pr.subject_project_id <> " + datasetId
+					+ " INNER JOIN projectprop dprop ON dprop.project_id = pr.subject_project_id "
+					+ " AND dprop.type_id = " + TermId.STANDARD_VARIABLE.getId()
+					+ " WHERE mpr.subject_project_id = " + datasetId + " AND mpr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
+					;
+			Query query = getSession().createSQLQuery(sql);
+			List<String> results = query.list();
+			if (results != null && !results.isEmpty()) {
+				for (String result : results) {
+					if (NumberUtils.isNumber(result)) {
+						ids.add(Integer.valueOf(result));
+					}
+				}
+			}
+			
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getVariablesOfSiblingDatasets("    + datasetId + ") in ProjectPropertyDao: " + e.getMessage(), e);
+		}
+		return ids;
 	}
 }

@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public enum PhenotypicType {
             TermId.LONGITUDE_STORAGE.getId(),
             TermId.DATUM_STORAGE.getId(),
             TermId.ALTITUDE_STORAGE.getId()),
-          Arrays.asList("TRIAL","OCC","TRIAL_NO", "TRIALNO", "SITE", "SITE_NO", "SITENO"),
+          Arrays.asList("TRIAL", "TRIAL_INSTANCE", "OCC", "TRIAL_NO", "TRIALNO", "SITE", "SITE_NO", "SITENO"),
           "TRIAL ENVIRONMENT"), 
     GERMPLASM(Arrays.asList(
             TermId.GERMPLASM_ENTRY_STORAGE.getId(),
@@ -111,5 +112,11 @@ public enum PhenotypicType {
         return null;
     }
     
-    
+    public static List<Integer> getAllTypeStorages() {
+    	List<Integer> storages = new ArrayList<Integer>();
+    	for (PhenotypicType type : values()) {
+    		storages.addAll(type.getTypeStorages());
+    	}
+    	return storages;
+    }
 }

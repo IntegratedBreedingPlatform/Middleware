@@ -61,7 +61,7 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 	}
 
 	/**
-	 * @param code the code to set
+	 * @param key the key to set
 	 */
 	public void setKey(String key) {
 		this.key = key;

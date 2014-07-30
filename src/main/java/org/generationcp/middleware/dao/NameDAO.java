@@ -18,10 +18,12 @@ import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.pojos.GidNidElement;
+import org.generationcp.middleware.manager.GetGermplasmByNameModes;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
@@ -169,28 +171,40 @@ public class NameDAO extends GenericDAO<Name, Integer>{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException {
-        List<GidNidElement> toReturn = new ArrayList<GidNidElement>();
+    public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(List<String> germplasmNames
+            , GetGermplasmByNameModes mode) throws MiddlewareQueryException {
+        List<GermplasmNameDetails> toReturn = new ArrayList<GermplasmNameDetails>();
 
         try {
+            
             if (germplasmNames != null && !germplasmNames.isEmpty()) {
-	            SQLQuery query = getSession().createSQLQuery(Name.GET_GID_AND_NID_BY_GERMPLASM_NAME);
-	            query.setParameterList("germplasmNameList", germplasmNames);
-	            List results = query.list();
-	
-	            for (Object o : results) {
-	                Object[] result = (Object[]) o;
-	                if (result != null) {
-	                    Integer gId = (Integer) result[0];
+                
+                // Default query if mode = NORMAL, STANDARDIZED, SPACES_REMOVED
+                SQLQuery query = getSession().createSQLQuery(Name.GET_NAME_DETAILS_BY_NAME);
+                    
+                if (mode == GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES){
+                    query = getSession().createSQLQuery(
+                            "SELECT gid, nid, REPLACE(nval, ' ', '') " 
+                            + "FROM names " 
+                            + "WHERE nval IN (:germplasmNameList)");
+                }
+
+                query.setParameterList("germplasmNameList", germplasmNames);
+                List results = query.list();
+    
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer gId = (Integer) result[0];
                         Integer nId = (Integer) result[1];
                         String nVal = (String) result[2];
-	                    GidNidElement element = new GidNidElement(gId, nId, nVal);
-	                    toReturn.add(element);
-	                }
-	            }
+                        GermplasmNameDetails element = new GermplasmNameDetails(gId, nId, nVal);
+                        toReturn.add(element);
+                    }
+                }
             }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getGidAndNidByGermplasmNames(germplasmNames=" + germplasmNames
+            logAndThrowException("Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames
                     + ") query from Name " + e.getMessage(), e);
         }
         return toReturn;
@@ -245,4 +259,69 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         
         return toreturn;
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<Name> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException {
+    	List<Name> toReturn = new ArrayList<Name>();
+    	
+    	if (gids == null || gids.isEmpty()){
+    		return toReturn;
+    	}
+    	
+        try{
+            Criteria criteria = getSession().createCriteria(Name.class);
+			criteria.add(Restrictions.in("germplasmId", gids));
+
+			toReturn = (List<Name>)  criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getNamesByGids(gids=" + gids + ") query from Name " + e.getMessage(), e);
+        }
+        
+        return toReturn;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getGidsByName(String name) throws MiddlewareQueryException {
+    	List<Integer> gids = new ArrayList<Integer>();
+    	try {
+    		String sql = "SELECT gid FROM names where nval = :name";
+    		Query query = getSession().createSQLQuery(sql).setParameter("name", name);
+    		return query.list();
+    		
+    	} catch (Exception e) {
+            logAndThrowException("Error with NameDAO.getGidsByName(" + name + ") " + e.getMessage(), e);
+    	}
+    	return gids;
+    }
+    
+    public Map<Integer, List<Name>> getNamesByGidsInMap(List<Integer> gids) throws MiddlewareQueryException {
+    	Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+    	
+    	if (gids == null || gids.isEmpty()){
+    		return map;
+    	}
+    	
+        try{
+            Criteria criteria = getSession().createCriteria(Name.class);
+			criteria.add(Restrictions.in("germplasmId", gids));
+
+			List<Name> list = (List<Name>)  criteria.list();
+			if (list != null) {
+				for (Name name : list) {
+					List<Name> names = map.get(name.getGermplasmId());
+					if (names == null) {
+						names = new ArrayList<Name>();
+						map.put(name.getGermplasmId(), names);
+					}
+					names.add(name);
+				}
+			}
+			
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage(), e);
+        }
+        
+        return map;
+    }
+    
 }

@@ -11,12 +11,19 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
@@ -26,6 +33,9 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 
 public class DataSetBuilder extends Builder {
+	
+	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(),
+			TermId.DATASET_TYPE.getId());
 
 	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                 HibernateSessionProvider sessionProviderForCentral) {
@@ -113,5 +123,76 @@ public class DataSetBuilder extends Builder {
 	        }
 	    }
 	    return trialDataset;
+	}
+	
+	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+		DataSet dataset = build(datasetId);
+		List<Integer> siblingVariables = getVariablesOfSiblingDatasets(datasetId);
+		boolean isMeasurementDataset = isMeasurementDataset(dataset);
+		VariableTypeList variables = null;
+		if (isMeasurementDataset) {
+			variables = filterVariables(dataset.getVariableTypes(), siblingVariables);
+		}
+		else {
+			variables = dataset.getVariableTypes();
+		}
+		variables = filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
+		long expCount = getStudyDataManager().countExperiments(datasetId);
+		List<Experiment> experiments = getStudyDataManager().getExperiments(datasetId, 0, (int)expCount, variables);
+		List<MeasurementVariable> factorList = getMeasurementVariableTransformer().transform(variables.getFactors(), true);
+		List<MeasurementVariable> variateList = getMeasurementVariableTransformer().transform(variables.getVariates(), false);
+		Workbook workbook = new Workbook();
+		workbook.setObservations(getWorkbookBuilder().buildDatasetObservations(experiments, variables, factorList, variateList));
+		workbook.setFactors(factorList);
+		workbook.setVariates(variateList);
+		List<MeasurementVariable> measurementDatasetVariables = new ArrayList<MeasurementVariable>();
+		measurementDatasetVariables.addAll(factorList);
+		measurementDatasetVariables.addAll(variateList);
+		workbook.setMeasurementDatasetVariables(measurementDatasetVariables);
+		
+		return workbook;
+	}
+	
+	private VariableTypeList filterDatasetVariables(VariableTypeList variables, boolean isNursery, boolean isMeasurementDataset) {
+		VariableTypeList newVariables = new VariableTypeList();
+		if (variables != null) {
+			for (VariableType variable : variables.getVariableTypes()) {
+				boolean partOfHiddenDatasetColumns = HIDDEN_DATASET_COLUMNS.contains(variable.getId());
+				boolean isOccAndNurseryAndMeasurementDataset = variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isNursery && isMeasurementDataset;
+				boolean isMeasurementDatasetAndIsTrialFactors = isMeasurementDataset 
+						&& PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStandardVariable().getStoredIn().getId());
+				boolean isTrialAndOcc = !isNursery && variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId();
+				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors || isTrialAndOcc) {
+					newVariables.add(variable);
+				}
+			}
+		}
+		return newVariables;
+	}
+	
+	private boolean isMeasurementDataset(DataSet dataset) {
+		String datasetName = dataset.getName();
+		DataSetType datasetType = dataset.getDataSetType();
+
+		return datasetName.toUpperCase().startsWith("MEASUREMENT EFEC_") 
+				|| datasetName.toUpperCase().startsWith("MEASUREMENT EFECT_")
+				|| !datasetName.toUpperCase().startsWith("TRIAL_") && datasetType == DataSetType.PLOT_DATA;
+	}
+	
+	private List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
+		setWorkingDatabase(datasetId);
+		return getProjectPropertyDao().getVariablesOfSiblingDatasets(datasetId);
+	}
+	
+	private VariableTypeList filterVariables(VariableTypeList variables, List<Integer> filters) {
+		VariableTypeList newList = new VariableTypeList();
+		if (variables != null && !variables.getVariableTypes().isEmpty()) {
+			for (VariableType variable : variables.getVariableTypes()) {
+				if (!filters.contains(variable.getId()) || variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					newList.add(variable);
+				}
+			}
+		}
+		return newList;
 	}
 }

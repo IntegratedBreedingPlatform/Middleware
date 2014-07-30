@@ -44,10 +44,14 @@ public class VariableTypeListTransformer extends Transformer {
     					isVariate ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()),
     					measurementVariable.getDataType());
     			}
+
+                measurementVariable.setTermId(standardVariable.getId());
+
     			VariableType variableType = new VariableType(
     						measurementVariable.getName(), 
     						measurementVariable.getDescription(), 
     						standardVariable, rank++);
+    			variableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
     			
     			variableTypeList.add(variableType);
 				

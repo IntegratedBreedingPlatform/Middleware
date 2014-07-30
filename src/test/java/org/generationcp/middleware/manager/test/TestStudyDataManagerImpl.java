@@ -62,7 +62,8 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -246,7 +247,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
     public void testGetRootFolders() throws Exception {
         List<FolderReference> rootFolders = manager.getRootFolders(Database.CENTRAL);
         assertNotNull(rootFolders);
-        assert (rootFolders.size() > 0);
+        assertTrue(rootFolders.size() > 0);
         Debug.println(INDENT, "testGetRootFolders(): " + rootFolders.size());
         for (FolderReference node : rootFolders) {
             Debug.println(INDENT, "   " + node);
@@ -259,7 +260,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
         for (Integer folderId : folderIds) {
             List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
             assertNotNull(childrenNodes);
-            assert (childrenNodes.size() > 0);
+            assertTrue(childrenNodes.size() > 0);
             Debug.println(INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
             for (Reference node : childrenNodes) {
                 Debug.println(INDENT, "   " + node);
@@ -272,7 +273,7 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
         Integer studyId = 10010;
         List<DatasetReference> datasetReferences = manager.getDatasetReferences(studyId);
         assertNotNull(datasetReferences);
-        assert (datasetReferences.size() > 0);
+        assertTrue(datasetReferences.size() > 0);
         Debug.println(INDENT, "Dataset Nodes By Study Id Count: " + datasetReferences.size());
         for (DatasetReference node : datasetReferences) {
             Debug.println(INDENT, "   " + node);
@@ -1192,6 +1193,55 @@ public class TestStudyDataManagerImpl extends TestOutputFormatter{
         List<FolderReference> tree = manager.getFolderTree();
         Debug.println(INDENT, "GetFolderTree Test");
         printFolderTree(tree, 1);
+    }
+    
+    @Test
+    public void testGetPhenotypeIdsByLocationAndPlotNo() throws Exception{
+    	
+    	
+    	List<Integer> cvTermIds = new ArrayList<Integer>();
+    	
+    	DataSet dataSet = manager.getDataSet(-9999);
+    	
+    	if (dataSet==null) return;
+    	
+		for (VariableType vType: dataSet.getVariableTypes().getVariates().getVariableTypes()){
+			cvTermIds.add(vType.getStandardVariable().getId());
+		}
+    		
+    	List<Object[]> value = manager.getPhenotypeIdsByLocationAndPlotNo(-26, -14, 101, cvTermIds);
+    	
+    	assertNotNull(value);
+    	
+    	Debug.println(INDENT, "getPhenotypeIdsByLocationAndPlotNo Test");
+    	for (Object[] val :value){
+    		Debug.println(val.toString());
+    	}
+    	
+    	
+    }
+    
+    
+    @Test
+    public void testSaveOrUpdatePhenotypeOutliers() throws Exception{
+    	
+    	List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
+    	PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
+    	//phenotypeOutlier.setPhenotypeOutlierId(-1);
+    	phenotypeOutlier.setPhenotypeId(1);
+    	phenotypeOutlier.setValue("hello");
+    	
+    	outliers.add(phenotypeOutlier);
+    	
+    	try{
+    		manager.saveOrUpdatePhenotypeOutliers(outliers);
+    	}catch(Exception e){
+    	
+    	}
+    	
+    	Debug.println(INDENT, "testSavePhenotypeOutlier Test");
+    	
+    	
     }
     
     private void printFolderTree(List<FolderReference> tree, int tab) {

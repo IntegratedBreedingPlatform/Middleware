@@ -4,16 +4,19 @@
 <h4>Adding Middleware as a dependency of your project</h4>
 
 <p>
-It is recommended to use Apache Maven.  Add the following to your list of dependencies:</br>
+It is recommended to use Apache Maven.  <br/>
+<br/>
+For the released version, add the following to your list of dependencies in your POM file:</br>
 </br>
 <code>
-groupId: org.generationcp</br>
-artifactId: middleware</br>
-version: 2.1.0</br>
+&lt;dependency&gt;</br>
+    &lt;groupId&gt;org.generationcp&lt;/groupId&gt;</br>
+    &lt;artifactId&gt;middleware&lt;/artifactId&gt;</br>
+    &lt;version&gt;2.1.0-RELEASE&lt;/version&gt;</br>
+&lt;/dependency&gt;</br>
 </code>
 </br>
-Take note of the version.  Use of the latest version is recommended.</br>
-The latest version as of October 28, 2013: 2.1.0
+Take note of the version.  Use of the latest version is recommended. The latest version as of April 28, 2014: 2.1.0
 </p>
 <p>
 The Middleware is deployed at the Maven Repository hosted on gcp.efficio.us.com. To use the repository, add the following to your POM file:</br>
@@ -22,15 +25,35 @@ The Middleware is deployed at the Maven Repository hosted on gcp.efficio.us.com.
 &lt;repositories&gt;</br>
 	&lt;repository&gt;</br>
 		&lt;id&gt;gcp-efficio-repo&lt;/id&gt;</br>
-		&lt;url&gt;http://gcp.efficio.us.com:8081/nexus/content/repositories/thirdparty/&lt;/url&gt;</br>
+		&lt;url&gt;http://gcp.leafnode.io:8081/nexus/content/repositories/releases/&lt;/url&gt;</br>
 	&lt;/repository&gt;</br>
 &lt;/repositories&gt;</br>
 </code>
 </p>
 <p>
-If you do not want to use Maven, you can get a jar of the Middleware project by sending a request to Kevin
-Manansala (kevin@efficio.us.com).
+For the development version, add the following to your POM:</br>
+</br>
+<code>
+&lt;dependency&gt;</br>
+    &lt;groupId&gt;org.generationcp&lt;/groupId&gt;</br>
+    &lt;artifactId&gt;middleware&lt;/artifactId&gt;</br>
+    &lt;version&gt;2.1.0-SNAPSHOT&lt;/version&gt;</br>
+&lt;/dependency&gt;</br>
+</code>
+</br>
+<p>
+<code>
+&lt;repositories&gt;</br>
+	&lt;repository&gt;</br>
+		&lt;id&gt;gcp-efficio-repo&lt;/id&gt;</br>
+		&lt;url&gt;http://gcp.leafnode.io:8081/nexus/content/repositories/snapshots/&lt;/url&gt;</br>
+	&lt;/repository&gt;</br>
+&lt;/repositories&gt;</br>
+</code>
 </p>
+
+If you prefer to download the jar file instead, you may get it from http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/org/generationcp/middleware/2.1.0-SNAPSHOT/
+
 
 <h4>Checking out the Middleware Project</h4>
 <p>
@@ -133,6 +156,20 @@ workbench.dbname = workbench</br>
 workbench.username = user</br>
 workbench.password = password</br>
 </br>
+localgroundnut.host = localhost</br>
+localgroundnut.port = 3306</br>
+localgroundnut.dbname = groundnut_local</br>
+localgroundnut.username = root</br>
+localgroundnut.password = password</br>
+</br>
+centralgroundnut.host = localhost</br>
+centralgroundnut.port = 3306</br>
+centralgroundnut.dbname = groundnut_central</br>
+centralgroundnut.username = root</br>
+centralgroundnut.password = password</br>
+</br>
+
+
 Set the correct values for your set-up of the databases.</br>
 </br>
 3. Navigate to the root directory of the project and run the command: mvn clean test.  You can also
@@ -140,9 +177,11 @@ limit the test class to run by using the option "-Dtest=TestClassName", for exam
 mvn clean test -Dtest=TestGermplasmDataManagerImpl</br>
 </br>
 </p>
+4. If you are using a configuration folder (e.g. dev), put the testDatabaseConfig.properties to 
+pipeline/config/dev folder, then run mvn clean test -DenvConfig=dev<br/>
 
 <h4>Technical Support</h4>
 <p>
-For any concerns about the IBP Middleware please email Kevin Manansala (kevin@efficio.us.com).
+For any concerns about the IBP Middleware please email support@efficio.us.com.
 </p>
 </body>

@@ -37,7 +37,7 @@ public class Progenitor implements Serializable{
     @Column(name = "pid")
     private Integer pid;
 
-    /**
+    /*
      * @ManyToOne(targetEntity = Germplasm.class)
      * @JoinColumn(name = "gid", nullable = false, insertable=false,
      *                  updatable=false) private Germplasm germplasm;

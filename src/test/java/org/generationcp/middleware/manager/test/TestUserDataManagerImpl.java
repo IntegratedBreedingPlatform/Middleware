@@ -22,7 +22,7 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -86,6 +86,15 @@ public class TestUserDataManagerImpl extends TestOutputFormatter{
         assertNotNull(persons);
         Debug.printObjects(INDENT, persons);
     }
+    
+    @Test
+    public void testGetAllPersonsOrderedByLocalCentral() throws Exception{
+        List<Person> persons = manager.getAllPersonsOrderedByLocalCentral();
+        assertNotNull(persons);
+        for (Person person : persons){
+            Debug.println(person.getDisplayName());
+        }
+    }    
 
     @Test
     public void testCountAllPersons() throws Exception{

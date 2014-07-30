@@ -80,6 +80,14 @@ public interface UserDataManager {
     List<Person> getAllPersons() throws MiddlewareQueryException;
     
     /**
+     * Returns all Persons from local sorted by first-middle-last 
+     * followed by all persons from local sorted by first-middle-last
+     *
+     * @return gets all Persons
+     */   
+    List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException;
+
+    /**
      * Returns number of all Persons.
      *
      * @return the number of all Persons
@@ -145,7 +153,7 @@ public interface UserDataManager {
      * Get the User with the specified username.
      * 
      * @param userName
-     * @return
+     * @return the user with the given user name
      * @throws MiddlewareQueryException
      */
     User getUserByUserName(String userName) throws MiddlewareQueryException;

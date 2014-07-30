@@ -510,7 +510,7 @@ public class PoiUtil {
      * @param rowIndex
      * @param start
      * @param end
-     * @return
+     * @return true if the row is empty
      */
     public static Boolean rowIsEmpty(Sheet sheet, int rowIndex, int start, int end) {
 
@@ -551,7 +551,7 @@ public class PoiUtil {
      * @param rowIndex
      * @param start
      * @param end
-     * @return
+     * @return true if the row has empty values
      */
     public static Boolean rowHasEmpty(Sheet sheet, int rowIndex, int start, int end) {
         Row row = sheet.getRow(rowIndex);
@@ -587,7 +587,7 @@ public class PoiUtil {
      *
      * @param sheet
      * @param rowIndex
-     * @return
+     * @return The String array representation of the row
      */
 
     public static String[] rowAsStringArray(Sheet sheet, int rowIndex) {
@@ -606,7 +606,7 @@ public class PoiUtil {
      * @param rowIndex
      * @param start
      * @param end
-     * @return
+     * @return  The String array representation of the row
      */
     public static String[] rowAsStringArray(Sheet sheet, int rowIndex, int start, int end) {
         return rowAsStringArray(sheet, rowIndex, start, end, Integer.MAX_VALUE);
@@ -621,7 +621,7 @@ public class PoiUtil {
      * @param start
      * @param end
      * @param max
-     * @return
+     * @return The String array representation of the row
      */
     public static String[] rowAsStringArray(Sheet sheet, int rowIndex, int start, int end, int max) {
         Row row = sheet.getRow(rowIndex);
@@ -656,7 +656,7 @@ public class PoiUtil {
      * @param rowIndex
      * @param start
      * @param end
-     * @return
+     * @return The delimited-String representation of the row
      */
     public static String rowAsString(Sheet sheet, int rowIndex, int start, int end, String delimiter) {
 
@@ -672,7 +672,7 @@ public class PoiUtil {
      * @param start
      * @param end
      * @param max
-     * @return
+     * @return The delimited-String representation of the row
      */
     public static String rowAsString(Sheet sheet, int rowIndex, int start, int end, String delimiter, int max) {
 

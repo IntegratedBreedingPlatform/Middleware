@@ -52,7 +52,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

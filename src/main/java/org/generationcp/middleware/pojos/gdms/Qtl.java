@@ -32,122 +32,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_qtl")
 public class Qtl implements Serializable{
    
-    public static final String GET_MAP_IDS_BY_QTL_NAME = 
-            "SELECT map_id "
-            + "FROM gdms_qtl gq "
-            + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
-            + "WHERE gq.qtl_name=:qtl_name " 
-            + "ORDER BY gq.qtl_id";
-        
-    public static final String COUNT_MAP_IDS_BY_QTL_NAME = 
-            "SELECT COUNT(map_id) "
-            + "FROM gdms_qtl gq "
-            + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
-            + "WHERE gq.qtl_name=:qtl_name";
-    
-    private static final String GET_QTL_DETAILS_SELECT = 
-        "SELECT gq.qtl_id " 
-                + ",CONCAT(gq.qtl_name,'') " 
-                + ",gm.map_id " 
-                + ",CONCAT(gm.map_name,'') "
-                + ",gqd.linkage_group "  // chromosome
-                + ",gqd.min_position "
-                + ",gqd.max_position "
-                + ",gqd.tid " 
-                + ",CONCAT(gqd.experiment,'') " 
-                + ",gqd.left_flanking_marker "
-                + ",gqd.right_flanking_marker "
-                + ",gqd.effect "
-                + ",gqd.score_value " 
-                + ",gqd.r_square "
-                + ",gqd.interactions " 
-                + ",gqd.position " 
-                + ",gqd.clen " 
-                + ",gqd.se_additive " 
-                + ",gqd.hv_parent " 
-                + ",gqd.hv_allele " 
-                + ",gqd. lv_parent " 
-                + ",gqd.lv_allele  " 
-                + ",cvt.name " // trname
-                + ",cvtprop.value " // ontology
-                ;
-
-    private static final String GET_QTL_DETAILS_FROM_CENTRAL =               
-            "FROM gdms_qtl_details gqd "
-                + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
-                + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
-                + "INNER JOIN cvterm cvt ON gqd.tid = cvt.cvterm_id "
-                + "LEFT JOIN cvtermprop cvtprop ON cvt.cvterm_id = cvtprop.cvterm_id "
-        ;
-    
-    public static final String GET_QTL_AND_QTL_DETAILS_BY_QTL_IDS = 
-            GET_QTL_DETAILS_SELECT 
-            + GET_QTL_DETAILS_FROM_CENTRAL
-            + "WHERE gq.qtl_id in(:qtl_id_list) "
-            + "ORDER BY gq.qtl_id";
-
-    public static final String COUNT_QTL_AND_QTL_DETAILS_BY_QTL_IDS = 
-            "SELECT COUNT(*) " 
-            + "FROM gdms_qtl_details gqd "
-            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
-            + "WHERE gq.qtl_id in(:qtl_id_list)"; 
-
-    public static final String GET_QTL_AND_QTL_DETAILS_BY_NAME = 
-            GET_QTL_DETAILS_SELECT 
-            + GET_QTL_DETAILS_FROM_CENTRAL
-            + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "
-            + "ORDER BY gq.qtl_id "
-            ;
-
-    public static final String COUNT_QTL_AND_QTL_DETAILS_BY_NAME = 
-            "SELECT  COUNT(*) " 
-            + "FROM gdms_qtl_details gqd "
-            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
-            + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "
-            ;
-    
-    public static final String GET_QTL_DETAILS_BY_TRAITS = 
-            GET_QTL_DETAILS_SELECT 
-            + GET_QTL_DETAILS_FROM_CENTRAL
-            + "WHERE   gqd.tid IN (:qtlTraitIds) "
-            + "ORDER BY gq.qtl_id "
-            ;
-
-    public static final String COUNT_QTL_DETAILS_BY_TRAITS = 
-            "SELECT  COUNT(*) " 
-            + "FROM gdms_qtl_details gqd "
-            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
-            + "WHERE   gqd.tid IN (:qtlTraitIds) "
-            ;
-
-    public static final String GET_QTL_ID_BY_NAME = 
-            GET_QTL_DETAILS_SELECT 
-            + GET_QTL_DETAILS_FROM_CENTRAL
-            + "WHERE qtl_name LIKE LOWER(:qtlName) "
-            + "ORDER BY qtl_id";
-    
-    public static final String COUNT_QTL_ID_BY_NAME = 
-            "SELECT COUNT(*) "
-            + "FROM gdms_qtl "
-            + "WHERE qtl_name LIKE LOWER(:qtlName) ";
-    		
-    public static final String GET_QTL_BY_TRAIT = 
-            "SELECT qtl_id " 
-            + "FROM gdms_qtl_details " 
-            + "WHERE tid = :qtlTrait " 
-            + "ORDER BY qtl_id "
-            ;
-        
-    public static final String COUNT_QTL_BY_TRAIT = 
-            "SELECT COUNT(qtl_id) " 
-            + "FROM gdms_qtl_details " 
-            + "WHERE tid = :qtlTrait " 
-            ;
-    
-    public static final String GET_QTL_IDS_BY_DATASET_IDS =
-            "SELECT qtl_id "
-            + "FROM gdms_qtl "
-            + "WHERE dataset_id in (:datasetIds) ";
     
     private static final long serialVersionUID = 1L;
 
@@ -174,7 +58,6 @@ public class Qtl implements Serializable{
         this.qtlName = qtlName;
         this.datasetId = datasetId;
     }
-
 
     public Integer getQtlId() {
         return qtlId;

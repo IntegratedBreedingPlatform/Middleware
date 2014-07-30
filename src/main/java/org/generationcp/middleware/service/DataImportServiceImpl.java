@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -62,12 +64,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
      */
     @Override
     public int saveDataset(Workbook workbook) throws MiddlewareQueryException {
-        return saveDataset(workbook, false);
+        return saveDataset(workbook, false, false);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int saveDataset(Workbook workbook, boolean retainValues) throws MiddlewareQueryException {
+    public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -90,6 +92,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         try {
 
             trans = session.beginTransaction();
+            
+            boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
+            if (isUpdate) {
+                getWorkbookSaver().saveWorkbookVariables(workbook);
+                getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+            }
 
             variableMap = getWorkbookSaver().saveVariables(workbook);
 
@@ -112,7 +120,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
             trans2 = session.beginTransaction();
 
-            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues);
+            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations);
 
             trans2.commit();
 
@@ -292,49 +300,83 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 
     private void checkForDuplicatePSMCombo(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        List<MeasurementVariable> workbookVariables = workbook.getNonVariateVariables();
-
-        Map<String, String> psmMap = new HashMap<String, String>();
-
-        for (MeasurementVariable measurementVariable : workbookVariables) {
-            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
-            if (!psmMap.containsKey(temp)) {
-                psmMap.put(temp, measurementVariable.getName());
-            } else {
-                messages.add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
-            }
-        }
-
-        workbookVariables = workbook.getVariateVariables();
-        psmMap = new HashMap<String, String>();
-
-        for (MeasurementVariable measurementVariable : workbookVariables) {
-            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
-            if (!psmMap.containsKey(temp)) {
-                psmMap.put(temp, measurementVariable.getName());
-            } else {
-                messages.add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
-            }
-        }
-
+    	Map<String, List<MeasurementVariable>> stdVarMap = checkForDuplicates(workbook.getNonVariateVariables(),false);
+    	addErrorForDuplicates(messages,stdVarMap);
+    	stdVarMap = checkForDuplicates(workbook.getVariateVariables(),true);
+    	addErrorForDuplicates(messages,stdVarMap);
         if (messages.size() > 0) {
             throw new WorkbookParserException(messages);
         }
     }
 
-    private void checkForDuplicatePSMCombo(Workbook workbook, Map<String, List<Message>> errors) {
-        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
-        Map<String, String> psmMap = new HashMap<String, String>();
-
+    private void checkForDuplicatePSMCombo(Workbook workbook, Map<String, List<Message>> errors) throws MiddlewareQueryException {
+    	Map<String, List<MeasurementVariable>> stdVarMap = checkForDuplicates(workbook.getNonVariateVariables(),false);
+    	addErrorForDuplicates(errors,stdVarMap);
+    	stdVarMap = checkForDuplicates(workbook.getVariateVariables(),true);
+    	addErrorForDuplicates(errors,stdVarMap);
+    }
+    
+    private Map<String, List<MeasurementVariable>> checkForDuplicates( 
+		List<MeasurementVariable> workbookVariables, boolean isVariate) throws MiddlewareQueryException {
+    	Map<String, List<MeasurementVariable>> stdVarMap = new LinkedHashMap<String, List<MeasurementVariable>>();
         for (MeasurementVariable measurementVariable : workbookVariables) {
-            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
-            if (!psmMap.containsKey(temp)) {
-                psmMap.put(temp, measurementVariable.getName());
+            PhenotypicType type = isVariate?PhenotypicType.VARIATE:PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
+            //need to retrieve standard variable because of synonyms
+            Integer standardVariableId = getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(
+            		measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), type);
+            String key = null;
+            if (standardVariableId != null) {
+                key = Integer.toString(standardVariableId);
             } else {
-                initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
-                errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
+            	key = measurementVariable.getProperty().toLowerCase() + "-" + 
+            		  measurementVariable.getScale().toLowerCase() + "-" + 
+            		  measurementVariable.getMethod().toLowerCase() + "-" + 
+            		  (type==null?measurementVariable.getLabel().toLowerCase():type.getGroup());
             }
+            List<MeasurementVariable> vars = stdVarMap.get(key);
+            if(vars==null) {
+            	vars = new ArrayList<MeasurementVariable>();
+            	stdVarMap.put(key, vars);
+            }
+            vars.add(measurementVariable);
         }
+        return stdVarMap;
+	}
+
+	private void addErrorForDuplicates(Map<String, List<Message>> errors, Map<String, List<MeasurementVariable>> map) {
+    	for (String key : map.keySet()) {
+			List<MeasurementVariable> vars = map.get(key);
+			if(vars.size()>1) {//has duplicate
+				StringBuilder duplicates = new StringBuilder();
+				String delimiter = "";
+				for (MeasurementVariable measurementVariable : vars) {
+					duplicates.append(delimiter);
+					delimiter = ", ";
+					duplicates.append(measurementVariable.getName());
+				}
+				for (MeasurementVariable measurementVariable : vars) {
+					initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
+					errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).
+						add(new Message("error.duplicate.psmr", duplicates.toString()));
+				}
+			}
+		}
+    }
+	
+	private void addErrorForDuplicates(List<Message> errors, Map<String, List<MeasurementVariable>> map) {
+    	for (String key : map.keySet()) {
+			List<MeasurementVariable> vars = map.get(key);
+			if(vars.size()>1) {//has duplicate
+				StringBuilder duplicates = new StringBuilder();
+				String delimiter = "";
+				for (MeasurementVariable measurementVariable : vars) {
+					duplicates.append(delimiter);
+					delimiter = ", ";
+					duplicates.append(measurementVariable.getName());
+				}
+				errors.add(new Message("error.duplicate.psmr", duplicates.toString()));
+			}
+		}
     }
 
     private void checkForInvalidLabel(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
@@ -463,15 +505,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 if (svar.getStoredIn() != null) {
                     if (svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
                         mvar.setRequired(true);
-                        if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
-                            mvar.setRequired(true);
-                            return true;
-                        }
+                        return true;
                     }
                 }
-
             }
         }
+
         return false;
     }
 
@@ -483,9 +522,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             if (varId != null) {
                 StandardVariable svar = ontology.getStandardVariable(varId);
 
-                    if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
-                        return true;
-                    }
+                if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
+                    mvar.setRequired(true);
+                    return true;
+                }
 
             }
 
@@ -546,10 +586,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
         }
 
-        if (!isPlotExists(ontology, workbook.getFactors())) {
-            initializeIfNull(errors, Constants.MISSING_PLOT);
-            // DMV : TODO change implem so that backend is agnostic to UI when determining messages
-            errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
+        if(workbook.getImportType()==null || workbook.getImportType().intValue()==DataSetType.PLOT_DATA.getId()) {
+	        if (!isPlotExists(ontology, workbook.getFactors())) {
+	            initializeIfNull(errors, Constants.MISSING_PLOT);
+	            // DMV : TODO change implem so that backend is agnostic to UI when determining messages
+	            errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
+	        }
         }
 
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
@@ -680,17 +722,47 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             if (observationCount < maxNumOfIterations) {
                 maxNumOfIterations = observationCount;
             }
+            List<String> duplicateTrialInstances = new ArrayList<String>();
+            boolean isMeansDataImport = 
+            		workbook.getImportType()!=null && 
+            		workbook.getImportType().intValue()==DataSetType.MEANS_DATA.getId();
             for (int i = 0; i < maxNumOfIterations; i++) {
                 MeasurementRow row = workbook.getObservations().get(i);
                 trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
                 if (locationIds.add(trialInstanceNumber)) {
                     Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
                     if (locationId != null) {//same location and study
-                        initializeIfNull(errors, Constants.GLOBAL);
-                        errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", trialInstanceNumber));
+                    	duplicateTrialInstances.add(trialInstanceNumber);
                     }
                 }
             }
+            boolean hasDuplicateTrialInstances = false;
+            if(!duplicateTrialInstances.isEmpty() && workbook.getStudyId()!=null) {
+            	//check import type first
+            	List<Integer> variateIds = new ArrayList<Integer>();
+        		//check at least one variate
+        		variateIds.add(workbook.getVariates().get(0).getTermId());
+        		int numberOfVariatesData = 
+        				getPhenotypeDao().countVariatesDataOfStudy(
+        						isMeansDataImport?
+        								workbook.getMeansDatasetId():
+        								workbook.getMeasurementDatesetId(), 
+        						variateIds);
+        		if(numberOfVariatesData>0) {
+        			hasDuplicateTrialInstances = true;
+        		}          	
+            }
+            if(hasDuplicateTrialInstances) {
+            	initializeIfNull(errors, Constants.GLOBAL);
+            	StringBuilder trialInstanceNumbers = new StringBuilder();
+            	for (String trialInstanceNo : duplicateTrialInstances) {
+            		trialInstanceNumbers.append(trialInstanceNo);
+            		trialInstanceNumbers.append(",");                    
+				}
+            	errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", 
+            			trialInstanceNumbers.toString().substring(0, trialInstanceNumbers.toString().length()-1)));
+            }
+            	
         }
     }
 

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.utils.test;
 
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

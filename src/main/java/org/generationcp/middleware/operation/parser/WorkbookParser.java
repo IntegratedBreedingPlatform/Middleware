@@ -49,7 +49,9 @@ public class WorkbookParser {
     public static final int END_DATE_ROW_INDEX = 5;
     public static final int STUDY_TYPE_ROW_INDEX = 6;
 
+    public static final int STUDY_DETAILS_LABEL_COLUMN_INDEX = 0;
     public static final int STUDY_DETAILS_VALUE_COLUMN_INDEX = 1;
+    public static final String PMKEY_LABEL = "PMKEY";
 
     private int currentRow;
     private List<Message> errorMessages;
@@ -106,7 +108,6 @@ public class WorkbookParser {
      * @param file
      * @return workbook
      * @throws org.generationcp.middleware.exceptions.WorkbookParserException
-     *
      */
     public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation) throws WorkbookParserException {
 
@@ -198,12 +199,17 @@ public class WorkbookParser {
         String study = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_NAME_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String title = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TITLE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String pmKey = getCellStringValue(wb, DESCRIPTION_SHEET, PMKEY_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String objective = getCellStringValue(wb, DESCRIPTION_SHEET, OBJECTIVE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String startDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String endDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String pmKeyLabel = getCellStringValue(wb, DESCRIPTION_SHEET, PMKEY_ROW_INDEX, STUDY_DETAILS_LABEL_COLUMN_INDEX);
+        int rowAdjustMent = 0;
+        if(pmKeyLabel!=null && !pmKeyLabel.trim().equals(PMKEY_LABEL)) {
+        	rowAdjustMent++;
+        }
+        String objective = getCellStringValue(wb, DESCRIPTION_SHEET, OBJECTIVE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String startDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String endDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
 
         //determine study type
-        String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
 
 
@@ -439,9 +445,11 @@ public class WorkbookParser {
             List<MeasurementVariable> variables = new ArrayList<MeasurementVariable>();
 
             for (int col = 0; col < factors.size() + variates.size(); col++) {
+                String columnName = getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col);
                 if (col < factors.size()) {
 
-                    if (!factors.get(col).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
+
+                    if (columnName == null || !factors.get(col).getName().toUpperCase().equals(columnName.toUpperCase())) {
                         // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
                     } else {
@@ -450,7 +458,7 @@ public class WorkbookParser {
 
                 } else {
 
-                    if (!variates.get(col - factors.size()).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
+                    if (columnName == null || !variates.get(col - factors.size()).getName().toUpperCase().equals(columnName.toUpperCase())) {
                         // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
                     } else {
@@ -470,7 +478,7 @@ public class WorkbookParser {
                     continue;
                 }
 
-                List<MeasurementData> measurementData = new ArrayList<MeasurementData>();
+                List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 
                 for (int col = 0; col < factors.size() + variates.size(); col++) {
                     // danielv -- commented out because this is no longer relevant. Stock id is computed later on in the process
@@ -483,13 +491,18 @@ public class WorkbookParser {
                     if (variables.get(col).getName().equals("GYLD")) {
                         LOG.debug(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
                     }
-                    measurementData.add(new MeasurementData(variables.get(col).getName(),
+
+                    MeasurementData data = new MeasurementData(variables.get(col).getName(),
                             getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)
-                    ));
+                    );
+
+                    data.setMeasurementVariable(variables.get(col));
+
+                    dataList.add(data);
                 }
 
                 // danielv -- made use of new constructor to make it clear that only the measurement data is needed at this point. The other values are computed later on in the process
-                observations.add(new MeasurementRow(measurementData));
+                observations.add(new MeasurementRow(dataList));
                 /*observations.add(new MeasurementRow(stockId, DEFAULT_GEOLOCATION_ID, measurementData));//note that the locationid will be replaced inside*/
                 currentRow++;
             }

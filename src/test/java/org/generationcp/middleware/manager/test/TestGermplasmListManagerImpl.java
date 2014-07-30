@@ -28,7 +28,7 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -199,8 +199,12 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testAddGermplasmLists() throws Exception {
-        List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
-        GermplasmList germplasmList = new GermplasmList(null, "Test List #2", Long.valueOf(20120305), 
+    	List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
+    	GermplasmList germplasmList = new GermplasmList(null, "Test List #1", Long.valueOf(20120305), 
+                "LST", Integer.valueOf(1), "Test List #1 for GCP-92", null, 1);
+        germplasmLists.add(germplasmList);
+        
+        germplasmList = new GermplasmList(null, "Test List #2", Long.valueOf(20120305), 
                 "LST", Integer.valueOf(1), "Test List #2 for GCP-92", null, 1);
         germplasmLists.add(germplasmList);
 
@@ -358,8 +362,9 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
 
     @Test
     public void testDeleteGermplasmListData() throws Exception {
+    	testAddGermplasmLists();
+        testAddGermplasmListDatas();
         List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
-
         Debug.println(INDENT, "Test Case #1: test deleteGermplasmListDataByListId");
         GermplasmList germplasmList = manager.getGermplasmListByName("Test List #1", 0, 1, 
                 Operation.EQUAL, Database.LOCAL).get(0);
@@ -526,7 +531,7 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     	//String q = "HB2009DS";
         String q = "dinurado";  
     	
-        List<GermplasmList> results = manager.searchForGermplasmList(q, Operation.EQUAL);
+        List<GermplasmList> results = manager.searchForGermplasmList(q, Operation.EQUAL, true);
         Debug.println(INDENT, "searchForGermplasmList(" + q + ")");
         for(GermplasmList g : results){
           Debug.println(INDENT, g.getId() + " : " + g.getName());
@@ -569,7 +574,6 @@ public class TestGermplasmListManagerImpl extends TestOutputFormatter{
     	GermplasmListNewColumnsInfo listInfo = manager.getAdditionalColumnsForList(-14);
     	listInfo.print(0);
     }
-    
     
     @AfterClass
     public static void tearDown() throws Exception {

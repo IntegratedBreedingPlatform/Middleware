@@ -13,7 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Test;
 

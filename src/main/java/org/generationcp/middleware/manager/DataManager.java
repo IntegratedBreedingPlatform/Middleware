@@ -21,6 +21,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.FolderBuilder;
+import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -976,6 +977,11 @@ public abstract class DataManager extends DatabaseBroker{
         }
     }
 
+    protected void logAndThrowException(String message) throws MiddlewareQueryException {
+        LOG.error(message);
+        throw new MiddlewareQueryException(message);
+    }
+
 
     /**
      * Logs an error based on the given message using the given Logger parameter.
@@ -1008,7 +1014,7 @@ public abstract class DataManager extends DatabaseBroker{
      * Retrieves the positive ids from the given list of ids
      * 
      * @param ids   The positive list of ids
-     * @return
+     * @return the positive ids from the given list
      */
     protected List<Integer> getPositiveIds(List<Integer> ids) {
         List<Integer> positiveIds = new ArrayList<Integer>();
@@ -1024,7 +1030,7 @@ public abstract class DataManager extends DatabaseBroker{
      * Retrieves the negative ids from the given list of ids
      * 
      * @param ids   The negative list of ids
-     * @return
+     * @return the negative ids from the given list
      */
     protected List<Integer> getNegativeIds(List<Integer> ids) {
         List<Integer> negativeIds = new ArrayList<Integer>();
@@ -1174,5 +1180,9 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final GeolocationPropertySaver getGeolocationPropertySaver() {
     	return new GeolocationPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ListInventoryBuilder getListInventoryBuilder() {
+    	return new ListInventoryBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

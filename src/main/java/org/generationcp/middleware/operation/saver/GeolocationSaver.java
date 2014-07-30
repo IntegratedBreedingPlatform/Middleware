@@ -56,6 +56,17 @@ public class GeolocationSaver extends Saver {
 			else {
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
+			if (geolocation.getVariates() != null) {
+			    for (Variable var : geolocation.getVariates().getVariables()) {
+			        if (var.getPhenotypeId() == null) {
+			            getPhenotypeSaver().save(row.getExperimentId(), var);
+			        } else {
+			            getPhenotypeSaver().saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(),
+			                    var.getVariableType().getStandardVariable().getStoredIn().getId(), var.getValue(), 
+			                    getPhenotypeDao().getById(var.getPhenotypeId()));
+			        }
+			    }
+			}
 			return geolocation;
 		}
 		return null;
@@ -180,5 +191,54 @@ public class GeolocationSaver extends Saver {
 		VariableList variableList = getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
 		
 		return saveGeolocation(variableList, row, isNursery, false);
+	}
+	
+	public void setGeolocation(Geolocation geolocation, int termId, int storedInId, String value) {
+		if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+			geolocation.setDescription(value);
+			
+		} else if (TermId.LATITUDE_STORAGE.getId() == storedInId) {
+			geolocation.setLatitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
+			
+		} else if (TermId.LONGITUDE_STORAGE.getId() == storedInId) {
+			geolocation.setLongitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
+			
+		} else if (TermId.DATUM_STORAGE.getId() == storedInId) {
+			geolocation.setGeodeticDatum(value);
+			
+		} else if (TermId.ALTITUDE_STORAGE.getId() == storedInId) {
+			geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
+		}	
+	}
+	
+	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, 
+			VariableList variableList, MeasurementRow row, boolean isNursery, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		Geolocation geolocation = null;
+		
+		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+			String trialInstanceNumber = null;
+			for (Variable variable : variableList.getVariables()) {
+				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
+				String value = variable.getValue();				
+				if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+					trialInstanceNumber = value;
+					break;
+				}
+			}
+			if(isNursery && trialInstanceNumber==null) {
+				trialInstanceNumber = "1";
+			}
+			//check if existing
+			Integer locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+			if (isDeleteTrialObservations) {
+			    locationId = null;
+			}
+			geolocation = createOrUpdate(variableList, row, locationId);
+			geolocation.setDescription(trialInstanceNumber);
+			getGeolocationDao().saveOrUpdate(geolocation);
+			return geolocation;
+		}
+		return null;
 	}
 }

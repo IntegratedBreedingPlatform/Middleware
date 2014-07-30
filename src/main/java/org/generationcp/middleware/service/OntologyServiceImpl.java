@@ -18,11 +18,13 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClass;
@@ -48,6 +50,16 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
         return getOntologyDataManager().getStandardVariable(stdVariableId);
     }
+    
+	@Override
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		return getOntologyDataManager().getStandardVariables(standardVariableIds);
+	}
+	
+	@Override
+	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		return getOntologyDataManager().getStandardVariableSummaries(standardVariableIds);
+	}
 
     @Override
     public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId)
@@ -370,5 +382,14 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     @Override
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
     	return getOntologyDataManager().validateDeleteStandardVariableEnumeration(standardVariableId, enumerationId);
+    }
+    
+    @Override
+    public List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException {
+    	return getStandardVariableBuilder().findAllByProperty(propertyId);
+    }
+    
+    public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+    	return getTermBuilder().getAllInventoryScales();
     }
 }

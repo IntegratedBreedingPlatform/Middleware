@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,12 +43,9 @@ import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
-import org.generationcp.middleware.pojos.gdms.Qtl;
-import org.generationcp.middleware.pojos.gdms.QtlDataRow;
-import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -69,7 +67,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     private static final String DART_VALUES         = "DartValues";
     private static final String MARKER              = "Marker";
     
-    private static final int NUMBER_OF_ROWS = 10 ; //210 * 260;
+    private static final int NUMBER_OF_ROWS = 10; //210 * 260; 
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -103,7 +101,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
                 remarks, dataType, missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
     }
     
-    private List<Object> createMarkerMarkeRecords() {
+    private List<Object> createMarkerRecords() {
 
         Integer markerId = null; // Will be set/overridden by the function
         String markerType = null; // Will be set/overridden by the function
@@ -146,7 +144,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype,
                 ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp,
                 amplification);
-        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
+        MarkerAlias markerAlias = new MarkerAlias(null, markerId, alias);
         MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
                 minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
                 fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
@@ -173,9 +171,12 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         // AccMetadataSet Additional Fields
         Integer gId = 1;
         Integer nameId = 1;
+        Integer sampleId = 1;
 
         // MarkerMetadataSet Additional Field
         Integer markerId = 1;
+        Integer markerSampleId = 1;
+        Integer accSampleId = 1;
 
         // AlleleValues Additional Fields
         Integer anId = null; // Will be set/overridden by the function
@@ -212,18 +213,18 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
         Dataset dataset = createDataset();
 
-        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
-        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        AccMetadataSet accMetadataSet = new AccMetadataSet(null, datasetId, gId, nameId, sampleId);
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(null, datasetId, markerId, markerSampleId);
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
         AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue,
                 peakHeight);
-        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
+        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue, markerSampleId, accSampleId);
         DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate,
                 picValue, discordance);
         MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize,
                 populationType, mapDataDescription, scoringScheme, mapId);
-        MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId);
-        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+        MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId, markerSampleId, accSampleId);
+        Marker marker = (Marker) createMarkerRecords().get(0);
 
         records.put(DATASET, dataset);
         records.put(ACC_METADATA_SET, accMetadataSet);
@@ -240,93 +241,76 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     }
 
     @Test
-    public void testSetQTL() throws Exception {
-        Integer datasetId = null; // Will be set/overridden by the function
-        Integer userId = 123;
-
-        Integer qtlId = null; // Will be set/overridden by the function
-        Integer mapId = 1;
-        Float minPosition = 0f;
-        Float maxPosition = 8f;
-        Integer traitId = 1001; // "DE";
-        String experiment = "";
-        Integer effect = 0;
-        Float scoreValue = 2.5f;
-        Float rSquare = 10f;
-        String linkageGroup = "LG06";
-        String interactions = "";
-        String leftFlankingMarker = "Ah4-101";
-        String rightFlankingMarker = "GM2536";
-        Float position = 34.71f;
-        Float clen = 0f;
-        String seAdditive = null;
-        String hvParent = null;
-        String hvAllele = null;
-        String lvParent = null;
-        String lvAllele = null;
-
-        String qtlName = "TestQTL";
-
-        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-
-        Dataset dataset = createDataset();
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
-
-        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect,
-                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker, rightFlankingMarker, position,
-                clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);
-
-        Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
-
-        List<QtlDataRow> dataRows = new ArrayList<QtlDataRow>();
-        dataRows.add(new QtlDataRow(qtl, qtlDetails));
-
-        Boolean addStatus = manager.setQTL(dataset, datasetUser, dataRows);
-
-        assertTrue(addStatus);
-
-        Debug.println("testSetQTL() Added: ");
-        Debug.println(INDENT, datasetUser.toString());
-        Debug.println(INDENT, dataset.toString());
-        Debug.printObjects(INDENT, dataRows);
-    }
-
-    @Test
     public void testSetDart() throws Exception {
+    	
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
         if (dataset.getDatasetName().length() > 30){
             dataset.setDatasetName(dataset.getDatasetName().substring(0, 30));
         }
-        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
-        Marker marker = (Marker) mappingRecords.get(MARKER);
-        AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
-        DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
 
-        List<DartDataRow> dataRows = new ArrayList<DartDataRow>();
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
+        List<DartValues> dartValueList = new ArrayList<DartValues>();
+        
+        int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
+            
+        	mappingRecords = createMappingRecords();
+        	
+        	Marker marker = (Marker) mappingRecords.get(MARKER);
+        	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_DART.getValue());
+            marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
-            markerMetadataSet.setMarkerId(-1);
+            
+            AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+            accMetadataSet.setGermplasmId(id);
+            
+            MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+            markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
-            dataRows.add(new DartDataRow(accMetadataSet, alleleValues, dartValues));
+            
+            AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+            alleleValues.setMarkerId(marker.getMarkerId());
+            alleleValues.setGid(accMetadataSet.getGermplasmId());
+            alleleValueList.add(alleleValues);
+            
+            DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
+            dartValues.setMarkerId(marker.getMarkerId());
+            dartValueList.add(dartValues);
+
+            id--;
         }
 
-        Boolean addStatus = manager.setDart(dataset, datasetUser, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setDart(dataset, datasetUser, markers, markerMetadataSets, 
+                accMetadataSets, dartValueList, alleleValueList);
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetDArT() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, alleleValueList);
+            Debug.printObjects(INDENT * 2, dartValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
+        
+        /* TO VERIFY RESULTS IN DB:
+			select * from gdms_dataset where dataset_id = <datasetId>;
+        	select * from gdms_dataset_users order by dataset_id limit 1;
+    		select * from gdms_marker order by marker_id limit <NUMBER_OF_ROWS>;
+        	select * from gdms_marker_metadataset where dataset_id = <datasetId>;
+        	select * from gdms_acc_metadataset where dataset_id = <datasetId>;
+        	select * from gdms_allele_values where dataset_id = <datasetId>;
+        	select * from gdms_dart_values where dataset_id = <datasetId>;
+         */
     }
 
     @Test
@@ -337,71 +321,125 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         if (dataset.getDatasetName().length() > 30){
             dataset.setDatasetName(dataset.getDatasetName().substring(0, 30));
         }
-        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
-        Marker marker = (Marker) mappingRecords.get(MARKER);
-        AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
 
-
-        List<SSRDataRow> dataRows = new ArrayList<SSRDataRow>();
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
+        
+        int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
+
+            mappingRecords = createMappingRecords();
+        	
+            Marker marker = (Marker) mappingRecords.get(MARKER);
+        	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_SSR.getValue());
+            marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
-            markerMetadataSet.setMarkerId(-1);
+            
+            AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+            accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
+            MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+            markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
-            dataRows.add(new SSRDataRow(accMetadataSet, alleleValues));
+            
+            AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+            alleleValues.setMarkerId(marker.getMarkerId());
+            alleleValues.setGid(accMetadataSet.getGermplasmId());
+            alleleValueList.add(alleleValues);
+            
+            id--;
         }
 
-        Boolean addStatus = manager.setSSR(dataset, datasetUser, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setSSR(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, alleleValueList);
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetSSR() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, alleleValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
+        
+        /* TO VERIFY RESULTS IN DB:
+			select * from gdms_dataset where dataset_id = <datasetId>;
+    		select * from gdms_dataset_users order by dataset_id limit 1;
+    		select * from gdms_marker order by marker_id limit <NUMBER_OF_ROWS>;
+    		select * from gdms_marker_metadataset where dataset_id = <datasetId>;
+    		select * from gdms_acc_metadataset where dataset_id = <datasetId>;
+    		select * from gdms_allele_values where dataset_id = <datasetId>;
+         */
     }
 
     @Test
     public void testSetSNP() throws Exception {
+    	
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
         if (dataset.getDatasetName().length() > 30){
             dataset.setDatasetName(dataset.getDatasetName().substring(0, 30));
         }
-        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
-        Marker marker = (Marker) mappingRecords.get(MARKER);
-        CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
-        List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<CharValues> charValueList = new ArrayList<CharValues>();
+
+        int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
+        	
+            mappingRecords = createMappingRecords();
+        	
+        	Marker marker = (Marker) mappingRecords.get(MARKER);
+        	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
+            marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
-            markerMetadataSet.setMarkerId(-1);
+            
+            AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+            accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
+            MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+            markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
-            dataRows.add(new SNPDataRow(accMetadataSet, charValues));
+
+            CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
+            charValues.setMarkerId(marker.getMarkerId());
+            charValues.setGid(accMetadataSet.getGermplasmId());
+            charValueList.add(charValues);
+
+            id--;
         }
         
-        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, charValueList);
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetSNP() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, charValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
+        /* TO VERIFY RESULTS IN DB:
+			select * from gdms_dataset where dataset_id = <datasetId>;
+	    	select * from gdms_dataset_users order by dataset_id limit 1;
+    		select * from gdms_marker order by marker_id limit <NUMBER_OF_ROWS>;
+	    	select * from gdms_marker_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_acc_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_char_values where dataset_id = <datasetId>;
+         */
     }
     
 
@@ -409,12 +447,8 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     public void testSetMappingABH() throws Exception {
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
         MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
-        MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
-        Marker marker = (Marker) mappingRecords.get(MARKER);
 
         // Dataset Fields
         String datasetName = "Map_Pop GCP-832 Test";
@@ -437,126 +471,235 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
         dataset.setDataType(dataType);
         dataset.setGenus(genus);
 
-        List<MappingABHRow> dataRows = new ArrayList<MappingABHRow>();
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
+        
+        int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
+
+            mappingRecords = createMappingRecords();
+        	
+            Marker marker = (Marker) mappingRecords.get(MARKER);
+        	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_MAPPING.getValue());
+            marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
-            markerMetadataSet.setMarkerId(-1);
+            
+            AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+            accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
+            MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+            markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
-            dataRows.add(new MappingABHRow(accMetadataSet, mappingPopValues));
+            
+            MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
+            mappingPopValues.setMarkerId(marker.getMarkerId());
+            mappingPopValues.setGid(accMetadataSet.getGermplasmId());
+            mappingPopValueList.add(mappingPopValues);
+
+            id--;
         }
         
-        Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, markers, markerMetadataSets, dataRows);
+        Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, markers, 
+                markerMetadataSets, accMetadataSets, mappingPopValueList);
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetMappingABH() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, mappingPop);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, mappingPopValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
+        
+        /* TO VERIFY RESULTS IN DB:
+			select * from gdms_dataset where dataset_id = <datasetId>;
+	    	select * from gdms_dataset_users order by dataset_id limit 1;
+    		select * from gdms_marker order by marker_id limit <NUMBER_OF_ROWS>;
+	    	select * from gdms_marker_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_acc_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_mapping_pop_values where dataset_id = <datasetId>;
+	     */
     }
 
     @Test
     public void testSetMappingAllelicSNP() throws Exception {
+    	
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
         if (dataset.getDatasetName().length() > 30){
             dataset.setDatasetName(dataset.getDatasetName().substring(0, 30));
         }
-        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
         MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
-        MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
-        Marker marker = (Marker) mappingRecords.get(MARKER);
-        CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
-        List<MappingAllelicSNPRow> dataRows = new ArrayList<MappingAllelicSNPRow>();
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
+        List<CharValues> charValueList = new ArrayList<CharValues>();
+        
+        int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
+            
+        	mappingRecords = createMappingRecords();
+        	
+        	Marker marker = (Marker) mappingRecords.get(MARKER);
+        	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_MAPPING.getValue());
+            marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
-            markerMetadataSet.setMarkerId(-1);
+            
+            AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+            accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
+            MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+            markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
-            dataRows.add(new MappingAllelicSNPRow(accMetadataSet, mappingPopValues, charValues));
+            
+            MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
+            mappingPopValues.setMarkerId(marker.getMarkerId());
+            mappingPopValues.setGid(accMetadataSet.getGermplasmId());
+            mappingPopValueList.add(mappingPopValues);
+            
+            CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
+            charValues.setMarkerId(marker.getMarkerId());
+            charValues.setGid(accMetadataSet.getGermplasmId());
+            charValueList.add(charValues);
+            
+            id--;
         }
 
         Boolean addStatus = manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, 
-                markers, markerMetadataSets, dataRows);
+                markers, markerMetadataSets, accMetadataSets, mappingPopValueList, charValueList);
 
         assertTrue(addStatus);
         
         Debug.println(INDENT, "testSetMappingAllelicSNP() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, mappingPop);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, mappingPopValueList);
+            Debug.printObjects(INDENT * 2, charValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
+        /* TO VERIFY RESULTS IN DB:
+			select * from gdms_dataset where dataset_id = <datasetId>;
+	    	select * from gdms_dataset_users order by dataset_id limit 1;
+    		select * from gdms_marker order by marker_id limit <NUMBER_OF_ROWS>;
+	    	select * from gdms_marker_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_acc_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_mapping_pop_values where dataset_id = <datasetId>;
+	    	select * from gdms_char_values where dataset_id = <datasetId>;
+	     */
     }
 
     @Test
     public void testSetMappingAllelicSSRDArT() throws Exception {
+    	
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
         dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random() * 100)); // Used to insert a new dataset
         if (dataset.getDatasetName().length() > 30){
             dataset.setDatasetName(dataset.getDatasetName().substring(0, 30));
         }
-        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
         MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
-        MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
-        Marker marker = (Marker) mappingRecords.get(MARKER);
-        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random() * 100)); // Remove line to test duplicate marker entries
-        AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
-        DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
 
-        List<MappingAllelicSSRDArTRow> dataRows = new ArrayList<MappingAllelicSSRDArTRow>();
         List<Marker> markers = new ArrayList<Marker>();
         List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+        List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
+        List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
+        List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
+        List<DartValues> dartValueList = new ArrayList<DartValues>();
+        
+        int id = -1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
+            
+        	mappingRecords = createMappingRecords();
+        	
+        	Marker marker = (Marker) mappingRecords.get(MARKER);
+        	marker.setMarkerId(id);
             marker.setMarkerType(GdmsType.TYPE_MAPPING.getValue());
+            marker.setMarkerName(marker.getMarkerName() + id);
             markers.add(marker);
-            markerMetadataSet.setMarkerId(-1);
+            
+            AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+            accMetadataSet.setGermplasmId(id);
+            accMetadataSets.add(accMetadataSet);
+            
+            MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+            markerMetadataSet.setMarkerId(marker.getMarkerId());
             markerMetadataSets.add(markerMetadataSet);
-            dataRows.add(new MappingAllelicSSRDArTRow(accMetadataSet, mappingPopValues, alleleValues, dartValues));
+            
+            MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
+            mappingPopValues.setMarkerId(marker.getMarkerId());
+            mappingPopValues.setGid(accMetadataSet.getGermplasmId());
+            mappingPopValueList.add(mappingPopValues);
+            
+            AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+            alleleValues.setMarkerId(marker.getMarkerId());
+            alleleValues.setGid(accMetadataSet.getGermplasmId());
+            alleleValueList.add(alleleValues);
+            
+            DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
+            dartValues.setMarkerId(marker.getMarkerId());
+            dartValueList.add(dartValues);
+
+            id--;
         }
 
         Boolean addStatus = manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, markers, 
-                markerMetadataSets, dataRows);
+                markerMetadataSets, accMetadataSets, mappingPopValueList, alleleValueList, dartValueList);
 
         assertTrue(addStatus);
                 
         Debug.println(INDENT, "testSetMappingAllelicSSRDArT() Added: ");
         printUploadedData(dataset, datasetUser, markers, markerMetadataSets, mappingPop);
-        if (dataRows.size() < 20) {
-            Debug.printObjects(INDENT * 2, dataRows);
+        if (accMetadataSets.size() < 20) {
+            Debug.printObjects(INDENT * 2, accMetadataSets);
+            Debug.printObjects(INDENT * 2, mappingPopValueList);
+            Debug.printObjects(INDENT * 2, alleleValueList);
+            Debug.printObjects(INDENT * 2, dartValueList);
         } else {
-            Debug.println(INDENT * 2, "#Data Rows Added: " + dataRows.size());
+            Debug.println(INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
         }
+        /* TO VERIFY RESULTS IN DB:
+			select * from gdms_dataset where dataset_id = <datasetId>;
+	    	select * from gdms_dataset_users order by dataset_id limit 1;
+    		select * from gdms_marker order by marker_id limit <NUMBER_OF_ROWS>;
+	    	select * from gdms_marker_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_acc_metadataset where dataset_id = <datasetId>;
+	    	select * from gdms_mapping_pop_values where dataset_id = <datasetId>;
+	    	select * from gdms_allele_values where dataset_id = <datasetId>;
+	    	select * from gdms_dart_values where dataset_id = <datasetId>;
+	     */
+
     }
     
     private void printUploadedData(Dataset dataset, DatasetUsers datasetUser, 
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, MappingPop mappingPop){
+    	
         Debug.println(INDENT * 2, dataset.toString());
         Debug.println(INDENT * 2, datasetUser.toString());
         if (mappingPop != null){
             Debug.println(INDENT * 2, mappingPop.toString());
         }
-        if (markers.size() < 20) {
+        if (markers != null && markers.size() < 20) {
             Debug.printObjects(INDENT * 2, markers);
         } else {
             Debug.println(INDENT * 2, "#Markers Added: " + markers.size());
         }
-        if (markerMetadataSets.size() < 20) {
+        if (markerMetadataSets != null && markerMetadataSets.size() < 20) {
             Debug.printObjects(INDENT * 2, markerMetadataSets);
         } else {
             Debug.println(INDENT * 2, "#MarkerMetadataSets Added: " + markerMetadataSets.size());
@@ -575,7 +718,11 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     		datasets = manager.getDatasetsByType(type);
 		}
     	if (datasets.size() > 0){
-			return datasets.get(0);
+    		for (Dataset dataset : datasets){
+    			if (dataset.getDatasetId() < 0){
+    				return dataset;
+    			}
+    		}
     	}
     	Debug.println("No dataset of type " + type + " found in the local database for testing");
     	return null;
@@ -653,6 +800,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
     	Dataset dataset = getTestDatasetByType(gdmsType, null);
     	if (dataset == null){
+    		Debug.println(INDENT, "Please upload dataset of type " + gdmsType.getValue() + " first before testing update.");
     		return;
     	}
     	
@@ -662,18 +810,20 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	List<DartDataRow> rows = manager.getDartDataRows(datasetId);
     	Debug.println("ROWS BEFORE: ");
     	Debug.printObjects(INDENT, rows);
-    	
+
+		// Update markers
+    	List<Marker> markers = manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+
+		// No change in markerMetadataSet
+    	List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+
     	// Update existing rows
     	List<DartDataRow> updatedRows = new ArrayList<DartDataRow>();
+
     	for (DartDataRow row : rows){
 
-    		// Update marker
-    		Marker marker = row.getMarker();
-			marker.setRemarks(marker.getRemarks() + updateId);
-
-    		// No change in accMetadataSet and markerMetadataSet
+    		// No change in accMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-    		MarkerMetadataSet markerMetadataSet = row.getMarkerMetadataSet();
     		
     		// Update alleleValues
     		AlleleValues alleleValues = updateAlleleValues(row.getAlleleValues(), updateId);
@@ -681,25 +831,20 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     		// Update dartValues
     		DartValues dartValues = updateDartValues(row.getDartValues(), updateId);
     		
-    		updatedRows.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues, dartValues));
+    		updatedRows.add(new DartDataRow(accMetadataSet, alleleValues, dartValues));
     	}    	
     	
-    	// Add (or update) a row - existing dataset, new mappingPopValues, new accMetadataSet, new markerMetadataset
+    	// Add (or update) a row - existing dataset, new alleleValues, new dartValues, new accMetadataSet
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
     	AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
-    	Marker marker = (Marker) mappingRecords.get(MARKER);
-        if (updatedRows.size() > 0){
-        	marker = (Marker) updatedRows.get(0).getMarker();
-        } 
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
-        DartDataRow newRow = new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues, dartValues); 
+        DartDataRow newRow = new DartDataRow(accMetadataSet, alleleValues, dartValues); 
 		updatedRows.add(newRow);
     	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
-    	manager.updateDart(dataset, updatedRows);
+    	manager.updateDart(dataset, markers, markerMetadataSets, updatedRows);
     	
     	Dataset datasetAfter = manager.getDatasetById(datasetId);
     	Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
@@ -718,53 +863,48 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
     	Dataset dataset = getTestDatasetByType(gdmsType, null);
     	if (dataset == null){
+    		Debug.println(INDENT, "Please upload dataset of type " + gdmsType.getValue() + " first before testing update.");
     		return;
     	}
     	
        	Integer datasetId = dataset.getDatasetId();
+       	
     	updateDataset(dataset, updateId.toString());
     	
     	List<SNPDataRow> rows = manager.getSNPDataRows(datasetId);
     	Debug.println("ROWS BEFORE: ");
     	Debug.printObjects(INDENT, rows);
-    	
+
+		// Update markers
+    	List<Marker> markers = manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+
+		// No change in markerMetadataSet
+    	List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+
     	// Update existing rows
-    	boolean isMarkerUpdated = false;
     	List<SNPDataRow> updatedRows = new ArrayList<SNPDataRow>();
+    	
     	for (SNPDataRow row : rows){
 
-    		// Update marker
-    		Marker marker = row.getMarker();
-    		if (!isMarkerUpdated){
-    			marker.setRemarks(marker.getRemarks() + updateId);
-    			isMarkerUpdated = true;
-    		}
-
-    		// No change in accMetadataSet and markerMetadataSet
+    		// No change in accMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-    		MarkerMetadataSet markerMetadataSet = row.getMarkerMetadataSet();
-    		
+    		    		
     		// Update dartValues
     		CharValues charValues = updateCharValues(row.getCharValues(), updateId.toString());
     		
-    		updatedRows.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues));
+    		updatedRows.add(new SNPDataRow(accMetadataSet, charValues));
     	}    	
     	
-    	// Add (or update) a row - existing dataset, new mappingPopValues, new accMetadataSet, new markerMetadataset
+    	// Add (or update) a row - existing dataset, new charValues, new accMetadataSet
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
     	AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
-    	Marker marker = (Marker) mappingRecords.get(MARKER);
-        if (updatedRows.size() > 0){
-        	marker = (Marker) updatedRows.get(0).getMarker();
-        } 
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
-        SNPDataRow newRow = new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues); 
+        SNPDataRow newRow = new SNPDataRow(accMetadataSet, charValues); 
 		updatedRows.add(newRow);
     	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
-    	manager.updateSNP(dataset, updatedRows);
+    	manager.updateSNP(dataset, markers, markerMetadataSets, updatedRows);
     	
     	Dataset datasetAfter = manager.getDatasetById(datasetId);
     	Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
@@ -783,6 +923,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
     	Dataset dataset = getTestDatasetByType(gdmsType, null);
     	if (dataset == null){
+    		Debug.println(INDENT, "Please upload dataset of type " + gdmsType.getValue() + " first before testing update.");
     		return;
     	}
     	
@@ -792,40 +933,37 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	List<SSRDataRow> rows = manager.getSSRDataRows(datasetId);
     	Debug.println("ROWS BEFORE: ");
     	Debug.printObjects(INDENT, rows);
-    	
+
+		// Update markers
+    	List<Marker> markers = manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+
+		// No change in markerMetadataSet
+    	List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+
     	// Update existing rows
     	List<SSRDataRow> updatedRows = new ArrayList<SSRDataRow>();
+
     	for (SSRDataRow row : rows){
 
-    		// Update marker
-    		Marker marker = row.getMarker();
-			marker.setRemarks(marker.getRemarks() + updateId);
-
-    		// No change in accMetadataSet and markerMetadataSet
+    		// No change in accMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-    		MarkerMetadataSet markerMetadataSet = row.getMarkerMetadataSet();
     		
     		// Update alleleValues
     		AlleleValues alleleValues = updateAlleleValues(row.getAlleleValues(), updateId);
 
-    		updatedRows.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues));
+    		updatedRows.add(new SSRDataRow(accMetadataSet, alleleValues));
     	}    	
     	
-    	// Add (or update) a row - existing dataset, new mappingPopValues, new accMetadataSet, new markerMetadataset
+    	// Add (or update) a row - existing dataset, new alleleValues, new accMetadataSet, new markerMetadataset
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
     	AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
-    	Marker marker = (Marker) mappingRecords.get(MARKER);
-        if (updatedRows.size() > 0){
-        	marker = (Marker) updatedRows.get(0).getMarker();
-        } 
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
-        SSRDataRow newRow = new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues); 
+        SSRDataRow newRow = new SSRDataRow(accMetadataSet, alleleValues); 
 		updatedRows.add(newRow);
     	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
-    	manager.updateSSR(dataset, updatedRows);
+    	manager.updateSSR(dataset, markers, markerMetadataSets, updatedRows);
     	
     	Dataset datasetAfter = manager.getDatasetById(datasetId);
     	Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
@@ -843,12 +981,19 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
     	Dataset dataset = getTestDatasetByType(gdmsType, null);
     	if (dataset == null){
+    		Debug.println(INDENT, "Please upload dataset of type " + gdmsType.getValue() + " first before testing update.");
     		return;
     	}
     	
     	Integer datasetId = dataset.getDatasetId();
     	updateDataset(dataset, updateId);
     	
+		// Update markers
+    	List<Marker> markers = manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+
+		// No change in markerMetadataSet
+    	List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+
     	//Update mappingPop
     	MappingPop mappingPop = manager.getMappingPopByDatasetId(datasetId);
     	updateMappingPop(mappingPop, updateId);
@@ -864,32 +1009,22 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     		// Update mappingPopValues
     		MappingPopValues mappingPopValues = updateMappingPopValues(row.getMappingPopValues(), updateId);
     		
-    		// Update marker
-    		Marker marker = row.getMarker();
-			marker.setRemarks(marker.getRemarks() + updateId);
-
-    		// No change in accMetadataSet and markerMetadataSet
+    		// No change in accMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-    		MarkerMetadataSet markerMetadataSet = row.getMarkerMetadataSet();
     		
-    		updatedRows.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues));
+    		updatedRows.add(new MappingABHRow(accMetadataSet, mappingPopValues));
     	}    	
     	
     	// Add (or update) a row - existing dataset, new mappingPopValues, new accMetadataSet, new markerMetadataset
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
     	AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
-    	Marker marker = (Marker) mappingRecords.get(MARKER);
-        if (updatedRows.size() > 0){
-        	marker = (Marker) updatedRows.get(0).getMarker();
-        } 
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
-        MappingABHRow newRow = new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues); 
+        MappingABHRow newRow = new MappingABHRow(accMetadataSet, mappingPopValues); 
 		updatedRows.add(newRow);
     	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
-    	manager.updateMappingABH(dataset, mappingPop, updatedRows);
+    	manager.updateMappingABH(dataset, mappingPop, markers, markerMetadataSets, updatedRows);
     	
     	Dataset datasetAfter = manager.getDatasetById(datasetId);
     	Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
@@ -911,12 +1046,19 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
     	Dataset dataset = getTestDatasetByType(gdmsType, GdmsType.TYPE_SNP);
     	if (dataset == null){
+    		Debug.println(INDENT, "Please upload dataset of type " + gdmsType.getValue() + " first before testing update.");
     		return;
     	}
     	
     	Integer datasetId = dataset.getDatasetId();
     	updateDataset(dataset, updateId);
     	
+		// Update markers
+    	List<Marker> markers = manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+
+		// No change in markerMetadataSet
+    	List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+
     	//Update mappingPop
     	MappingPop mappingPop = manager.getMappingPopByDatasetId(datasetId);
     	updateMappingPop(mappingPop, updateId);
@@ -932,36 +1074,26 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     		// Update mappingPopValues
     		MappingPopValues mappingPopValues = updateMappingPopValues(row.getMappingPopValues(), updateId);
     		
-    		// Update marker
-    		Marker marker = row.getMarker();
-			marker.setRemarks(marker.getRemarks() + updateId);
-
-    		// No change in accMetadataSet and markerMetadataSet
+    		// No change in accMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-    		MarkerMetadataSet markerMetadataSet = row.getMarkerMetadataSet();
-    		
+    		    		
     		// Update charValues
     		CharValues charValues = updateCharValues(row.getCharValues(), updateId);
     		
-    		updatedRows.add(new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, charValues));
+    		updatedRows.add(new MappingAllelicSNPRow(accMetadataSet, mappingPopValues, charValues));
     	}    	
     	
     	// Add (or update) a row - existing dataset, new mappingPopValues, new accMetadataSet, new markerMetadataset
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
     	AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
-    	Marker marker = (Marker) mappingRecords.get(MARKER);
-        if (updatedRows.size() > 0){
-        	marker = (Marker) updatedRows.get(0).getMarker();
-        } 
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
-        MappingAllelicSNPRow newRow = new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, charValues); 
+        MappingAllelicSNPRow newRow = new MappingAllelicSNPRow(accMetadataSet, mappingPopValues, charValues); 
 		updatedRows.add(newRow);
     	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
-    	manager.updateMappingAllelicSNP(dataset, mappingPop, updatedRows);
+    	manager.updateMappingAllelicSNP(dataset, mappingPop, markers, markerMetadataSets, updatedRows);
     	
     	Dataset datasetAfter = manager.getDatasetById(datasetId);
     	Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
@@ -971,7 +1103,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	Debug.printObject(0, "MAPPINGPOP AFTER: " + mappingPopAfter);
     	assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
     	
-    	List<MappingABHRow> rowsAfter = manager.getMappingABHRows(datasetId);
+    	List<MappingAllelicSNPRow> rowsAfter = manager.getMappingAllelicSNPRows(datasetId);
     	Debug.println("ROWS AFTER: ");
     	Debug.printObjects(INDENT, rowsAfter);
     }
@@ -983,12 +1115,19 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
 
     	Dataset dataset = getTestDatasetByType(gdmsType, GdmsType.TYPE_SSR);
     	if (dataset == null){
+    		Debug.println(INDENT, "Please upload dataset of type " + gdmsType.getValue() + " first before testing update.");
     		return;
     	}
     	
     	Integer datasetId = dataset.getDatasetId();
     	updateDataset(dataset, updateId.toString());
     	
+		// Update markers
+    	List<Marker> markers = manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+
+		// No change in markerMetadataSet
+    	List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
+
     	//Update mappingPop
     	MappingPop mappingPop = manager.getMappingPopByDatasetId(datasetId);
     	updateMappingPop(mappingPop, updateId.toString());
@@ -996,7 +1135,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	List<MappingAllelicSSRDArTRow> rows = manager.getMappingAllelicSSRDArTRows(datasetId);
     	Debug.println("ROWS BEFORE: ");
     	Debug.printObjects(INDENT, rows);
-    	
+
     	// Update existing rows
     	List<MappingAllelicSSRDArTRow> updatedRows = new ArrayList<MappingAllelicSSRDArTRow>();
     	for (MappingAllelicSSRDArTRow row : rows){
@@ -1004,40 +1143,30 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     		// Update mappingPopValues
     		MappingPopValues mappingPopValues = updateMappingPopValues(row.getMappingPopValues(), updateId.toString());
     		
-    		// Update marker
-    		Marker marker = row.getMarker();
-			marker.setRemarks(marker.getRemarks() + updateId);
-
-    		// No change in accMetadataSet and markerMetadataSet
+    		// No change in accMetadataSet
     		AccMetadataSet accMetadataSet = row.getAccMetadataSet();
-    		MarkerMetadataSet markerMetadataSet = row.getMarkerMetadataSet();
-    		
+    		    		
     		// Update alleleValues
     		AlleleValues alleleValues = updateAlleleValues(row.getAlleleValues(), updateId);
 
     		// Update dartValues
     		DartValues dartValues = updateDartValues(row.getDartValues(), updateId);
     		
-    		updatedRows.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, alleleValues, dartValues));
+    		updatedRows.add(new MappingAllelicSSRDArTRow(accMetadataSet, mappingPopValues, alleleValues, dartValues));
     	}    	
     	
     	// Add (or update) a row - existing dataset, new mappingPopValues, new accMetadataSet, new markerMetadataset
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
     	AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
-        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
-    	Marker marker = (Marker) mappingRecords.get(MARKER);
-        if (updatedRows.size() > 0){
-        	marker = (Marker) updatedRows.get(0).getMarker();
-        } 
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
-        MappingAllelicSSRDArTRow newRow = new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, alleleValues, dartValues); 
+        MappingAllelicSSRDArTRow newRow = new MappingAllelicSSRDArTRow(accMetadataSet, mappingPopValues, alleleValues, dartValues); 
 		updatedRows.add(newRow);
     	Debug.println("ADD OR UPDATE ROW: " + newRow);
     	
     	//UPDATE
-    	manager.updateMappingAllelicSSRDArT(dataset, mappingPop, updatedRows);
+    	manager.updateMappingAllelicSSRDArT(dataset, mappingPop, markers, markerMetadataSets, updatedRows);
     	
     	Dataset datasetAfter = manager.getDatasetById(datasetId);
     	Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
@@ -1047,7 +1176,7 @@ public class TestGenotypicDataManagerImplUploadFunctions extends TestOutputForma
     	Debug.printObject(0, "MAPPINGPOP AFTER: " + mappingPopAfter);
     	assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
     	
-    	List<MappingABHRow> rowsAfter = manager.getMappingABHRows(datasetId);
+    	List<MappingAllelicSSRDArTRow> rowsAfter = manager.getMappingAllelicSSRDArTRows(datasetId);
     	Debug.println("ROWS AFTER: ");
     	Debug.printObjects(INDENT, rowsAfter);
     }

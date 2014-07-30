@@ -128,7 +128,7 @@ public class User implements Serializable, BeanFormState {
      * Get a copy of this {@link User} object.
      * Note that this method will not copy the {@link User#userid} field.
      * 
-     * @return
+     * @return the copy of the User object
      */
     public User copy() {
         User user = new User();

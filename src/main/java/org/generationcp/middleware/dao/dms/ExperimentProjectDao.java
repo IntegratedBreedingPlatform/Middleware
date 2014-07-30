@@ -23,6 +23,8 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -185,4 +187,22 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			return 0;
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	public Integer getExperimentIdByProjectId(int projectId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("projectId", projectId));
+			criteria.setProjection(Projections.property("experiment.ndExperimentId"));
+			List<Integer> list = criteria.list();
+			if (list != null && !list.isEmpty()) {
+				return list.get(0);
+			}
+		} 
+		catch (HibernateException e) {
+			logAndThrowException("Error at getExperimentIdByProjectId=" + projectId + ", " + " query at ExperimentProjectDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
+	
 }

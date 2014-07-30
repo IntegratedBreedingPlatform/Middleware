@@ -13,12 +13,11 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * POJO for gdms_marker_metadataset table.
@@ -31,106 +30,126 @@ public class MarkerMetadataSet implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    public static final String GET_MARKER_ID_BY_DATASET_ID = 
-            "SELECT marker_id " +
-            "FROM gdms_marker_metadataset " +
-            "WHERE dataset_id = :datasetId " +
-            "ORDER BY marker_id;";
-
-    public static final String GET_MARKERS_BY_GID_AND_DATASETS = 
-            "SELECT DISTINCT marker_id " + 
-            "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset " +
-            "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id " + 
-            "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " +
-            "    AND gdms_acc_metadataset.gid = :gid " + 
-            "ORDER BY gdms_marker_metadataset.marker_id ";
+    @Id
+    @Column(name = "marker_metadataset_id")
+    private Integer markerMetadataSetId;
     
-    public static final String COUNT_MARKERS_BY_GID_AND_DATASETS = 
-            "SELECT COUNT(DISTINCT marker_id) " + 
-            "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset " +
-            "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id " + 
-            "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " +
-            "    AND gdms_acc_metadataset.gid = :gid " + 
-            "ORDER BY gdms_marker_metadataset.marker_id ";
+    @Basic(optional = false)
+    @Column(name = "dataset_id")
+    private Integer datasetId;
+
+    @Basic(optional = false)
+    @Column(name = "marker_id")
+    private Integer markerId;
+
+    @Column(name = "marker_sample_id")
+    private Integer markerSampleId;
     
-    public static final String GET_BY_MARKER_IDS = 
-            "SELECT * " +
-            "FROM gdms_marker_metadataset " +
-            "WHERE  marker_id IN (:markerIdList) ";
-   
-    public static final String COUNT_MARKER_BY_DATASET_IDS = 
-            "SELECT COUNT(DISTINCT marker_id) " 
-            + "FROM gdms_marker_metadataset "
-            + "WHERE dataset_id IN (:datasetIds)";
-
-
-
-    @EmbeddedId
-    protected MarkerMetadataSetPK id;
-
     public MarkerMetadataSet() {
     }
 
-    public MarkerMetadataSet(MarkerMetadataSetPK id) {
-        this.id = id;
-    }
-        
-    public MarkerMetadataSet(Integer datasetId, Integer markerId) {
-        this.id = new MarkerMetadataSetPK(datasetId, markerId);
-    }
-    
-    public MarkerMetadataSetPK getId() {
-        return id;
-    }
+	public MarkerMetadataSet(Integer markerMetadataSetId,
+			Integer datasetId, Integer markerId, Integer markerSampleId) {
+		this.markerMetadataSetId = markerMetadataSetId;
+		this.datasetId = datasetId;
+		this.markerId = markerId;
+		this.markerSampleId = markerSampleId;
+	}
 
-    public void setId(MarkerMetadataSetPK id) {
-        this.id = id;
-    }
+	public Integer getMarkerMetadataSetId() {
+		return markerMetadataSetId;
+	}
 
-    public Integer getDatasetId() {
-        return id.getDatasetId();
-    }
-    
-    public void setDatasetId(Integer datasetId) {
-        id.setDatasetId(datasetId);
-    }
-    
-    public Integer getMarkerId() {
-        return id.getMarkerId();
-    }
-    
-    public void setMarkerId(Integer markerId) {
-        id.setMarkerId(markerId);
-    }
+	public void setMarkerMetadataSetId(Integer markerMetadataSetId) {
+		this.markerMetadataSetId = markerMetadataSetId;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof MarkerMetadataSet)) {
-            return false;
-        }
+	public Integer getDatasetId() {
+		return datasetId;
+	}
 
-        MarkerMetadataSet rhs = (MarkerMetadataSet) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(id, rhs.id).isEquals();
-    }
+	public void setDatasetId(Integer datasetId) {
+		this.datasetId = datasetId;
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(37, 101).append(id).toHashCode();
-    }
+	public Integer getMarkerId() {
+		return markerId;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("MarkerMetadataSet [id=");
-        builder.append(id);
-        builder.append("]");
-        return builder.toString();
-    }
+	public void setMarkerId(Integer markerId) {
+		this.markerId = markerId;
+	}
+
+	public Integer getMarkerSampleId() {
+		return markerSampleId;
+	}
+
+	public void setMarkerSampleId(Integer markerSampleId) {
+		this.markerSampleId = markerSampleId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((datasetId == null) ? 0 : datasetId.hashCode());
+		result = prime * result
+				+ ((markerId == null) ? 0 : markerId.hashCode());
+		result = prime
+				* result
+				+ ((markerMetadataSetId == null) ? 0 : markerMetadataSetId
+						.hashCode());
+		result = prime * result
+				+ ((markerSampleId == null) ? 0 : markerSampleId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MarkerMetadataSet other = (MarkerMetadataSet) obj;
+		if (datasetId == null) {
+			if (other.datasetId != null)
+				return false;
+		} else if (!datasetId.equals(other.datasetId))
+			return false;
+		if (markerId == null) {
+			if (other.markerId != null)
+				return false;
+		} else if (!markerId.equals(other.markerId))
+			return false;
+		if (markerMetadataSetId == null) {
+			if (other.markerMetadataSetId != null)
+				return false;
+		} else if (!markerMetadataSetId.equals(other.markerMetadataSetId))
+			return false;
+		if (markerSampleId == null) {
+			if (other.markerSampleId != null)
+				return false;
+		} else if (!markerSampleId.equals(other.markerSampleId))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MarkerMetadataSet [markerMetadataSetId=");
+		builder.append(markerMetadataSetId);
+		builder.append(", markerSampleId=");
+		builder.append(markerSampleId);
+		builder.append(", datasetId=");
+		builder.append(datasetId);
+		builder.append(", markerId=");
+		builder.append(markerId);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

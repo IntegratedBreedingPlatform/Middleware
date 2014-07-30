@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -30,12 +32,12 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GidNidElement;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -541,12 +543,26 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
     }
 
     @Test
-    public void testGetGidAndNidByGermplasmNames() throws Exception {
-        List<String> germplasmNames = Arrays.asList("C 65 CU 79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65");
+    public void testGetGermplasmDetailsByGermplasmNames() throws Exception {
+        List<String> germplasmNames = Arrays.asList("C 65 CU   79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65", " BASMATI   370");
         // SQL TO VERIFY (CENTRAL AND LOCAL): select gid, nid, nval from names where nval in (:germplasmNames);
         
-        List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
-        Debug.printObjects(results);
+        List<GermplasmNameDetails> results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.NORMAL);
+        Debug.println(INDENT, "GetGermplasmByNameModes.NORMAL:");
+        Debug.printObjects(INDENT, results);
+        
+        results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.SPACES_REMOVED);
+        Debug.println(INDENT, "GetGermplasmByNameModes.SPACES_REMOVED:");
+        Debug.printObjects(INDENT, results);
+
+        results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.STANDARDIZED);
+        Debug.println(INDENT, "GetGermplasmByNameModes.STANDARDIZED:");
+        Debug.printObjects(INDENT, results);
+
+        results = manager.getGermplasmNameDetailsByGermplasmNames(germplasmNames, GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES);
+        Debug.println(INDENT, "GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES:");
+        Debug.printObjects(INDENT, results);
+
     }
 
     @Test
@@ -656,6 +672,14 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
     @Test
     public void testGetAllMethods() throws Exception {
         List<Method> results = manager.getAllMethods();
+        assertNotNull(results);
+        assertTrue(!results.isEmpty());
+        Debug.printObjects(INDENT, results);
+    }
+
+    @Test
+    public void testGetAllMethodsNotGenerative() throws Exception {
+        List<Method> results = manager.getAllMethodsNotGenerative();
         assertNotNull(results);
         assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
@@ -782,7 +806,7 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
       String q = "dinurado";
       boolean includeParents = true;
             
-      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, includeParents);
+      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, includeParents, true);
       
       Debug.println(INDENT, "searchForGermplasm(" + q + "): ");
       for(Germplasm g : results){
@@ -828,10 +852,51 @@ public class TestGermplasmDataManagerImpl extends TestOutputFormatter{
         Debug.println(INDENT, "getAttributeValuesByTypeAndGIDList(" + attributeType + ", " + gids + "): ");
         Debug.println(INDENT, results.toString());
     }
+    
+    @Test
+    public void getMethodClasses() throws MiddlewareQueryException{
+    	List<Term> terms = manager.getMethodClasses();
+    	System.out.println(terms);
+    }
   
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
     }
     
+    @Test
+    public void testUpdateGermplasm() throws Exception {
+    	//use wheat local database
+    	Integer gid = -35457;
+    	List<Germplasm> gList = new ArrayList<Germplasm>();
+    	Germplasm oldG = manager.getGermplasmByGID(gid);
+    	oldG.setGrplce(gid);
+		gList.add(oldG);
+        manager.updateGermplasm(gList);
+        Germplasm newG = manager.getGermplasmByGID(gid);
+        assertNull(newG);
+        //revert changes to Germplasm
+        oldG.setGrplce(0);
+		gList.add(oldG);
+        manager.updateGermplasm(gList);
+        Debug.println(INDENT, "testUpdateGermplasm(" + gid + ")");
+    }
+    
+    @Test
+    public void testGetMethodByName() throws Exception {
+        String name = "breeders seed";
+        Method method = manager.getMethodByName(name);
+        assertNotNull(method);
+        Debug.println(INDENT, "testGetMethodByName("+name+"): ");
+        Debug.println(INDENT, method);
+    }
+    
+    @Test
+    public void testGetMethodByCode() throws Exception {
+        String code = "VBS";
+        Method method = manager.getMethodByCode(code);
+        assertNotNull(method);
+        Debug.println(INDENT, "testGetMethodByCode("+code+"): ");
+        Debug.println(INDENT, method);
+    }
 }

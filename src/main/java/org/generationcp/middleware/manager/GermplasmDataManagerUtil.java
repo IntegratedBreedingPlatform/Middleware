@@ -299,8 +299,9 @@ public class GermplasmDataManagerUtil{
 
     
     public static String removeSpaces(String string){
-    	if(string==null)
+    	if(string == null){
     		return "";
+    	}
         StringTokenizer tokenizer = new StringTokenizer(string);
         StringBuffer withSpacesRemoved = new StringBuffer();
         while (tokenizer.hasMoreTokens()) {
@@ -316,7 +317,7 @@ public class GermplasmDataManagerUtil{
      * ICIS Germplasm Name standardization rules. Returns false otherwise.
      * 
      * @param c
-     * @return
+     * @return true if c is a special name character
      */
     public static boolean isGermplasmNameSpecialChar(char c) {
         char specialCharacters[] = { '-', '\'', '[', ']', '+', '.' };
@@ -342,6 +343,26 @@ public class GermplasmDataManagerUtil{
             nameToUse = standardizedName;
         }
         return nameToUse;
+    }
+
+    public static List<String> getNamesToUseByMode(List<String> names, GetGermplasmByNameModes mode){
+    	List<String> namesToUse = new ArrayList<String>();
+
+        for (String name : names) {
+            String nameToUse = "";
+            if (mode == GetGermplasmByNameModes.NORMAL) {
+                nameToUse = name;
+            } else if (mode == GetGermplasmByNameModes.SPACES_REMOVED
+                    || mode == GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES) {
+                String nameWithSpacesRemoved = GermplasmDataManagerUtil.removeSpaces(name);
+                nameToUse = nameWithSpacesRemoved.toString();
+            } else if (mode == GetGermplasmByNameModes.STANDARDIZED) {
+                String standardizedName = GermplasmDataManagerUtil.standardizeName(name);
+                nameToUse = standardizedName;
+            }
+            namesToUse.add(nameToUse);
+        }
+        return namesToUse;
     }
 
     public static List<String> createNamePermutations(String name){

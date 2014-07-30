@@ -14,6 +14,8 @@ package org.generationcp.middleware.domain.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementRow {
@@ -95,7 +97,34 @@ public class MeasurementRow {
 		if(label!=null && dataList!=null && !dataList.isEmpty()) {
 			for (MeasurementData data : dataList) {
 				if(label!=null && data.getLabel()!=null && label.equals(data.getLabel())) {
-					return data.getValue();
+					if (data.getcValueId() != null) {
+						return data.getcValueId().toString();
+					}
+					else {
+						return data.getValue();
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public MeasurementData getMeasurementData(String label) {
+		if(label!=null && dataList!=null && !dataList.isEmpty()) {
+			for (MeasurementData data : dataList) {
+				if(label!=null && data.getLabel()!=null && label.equals(data.getLabel())) {
+					return data;
+				}
+			}
+		}
+		return null;
+	}
+
+	public MeasurementData getMeasurementData(Integer termId) {
+		if (termId != null && dataList != null && !dataList.isEmpty()) {
+			for (MeasurementData data : dataList) {
+				if (data.getMeasurementVariable() != null && data.getMeasurementVariable().getTermId() == termId) {
+					return data;
 				}
 			}
 		}
@@ -120,6 +149,41 @@ public class MeasurementRow {
 			}
 		}
 		return variables;
+	}
+	
+	public String getMeasurementDataValue(Integer id) {
+		List<MeasurementVariable> variables = getMeasurementVariables();
+		String label = null;
+		for (MeasurementVariable variable : variables) {
+			if (variable.getTermId() == id) {
+				label = variable.getName();
+			}
+		}
+		
+		return label != null ? getMeasurementDataValue(label) : null;
+	}
+	
+	public Integer getRange() {
+		String strRange = getMeasurementDataValue(TermId.RANGE_NO.getId());
+		return strRange != null && NumberUtils.isNumber(strRange) ? Double.valueOf(strRange).intValue() : null;
+	}
+	
+	public Integer getColumn() {
+		String strRange = getMeasurementDataValue(TermId.COLUMN_NO.getId());
+		return strRange != null && NumberUtils.isNumber(strRange) ? Double.valueOf(strRange).intValue() : null;
+	}
+	
+	public String getKeyIdentifier() {
+		String trialInstanceNumber = getMeasurementDataValue(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		if (trialInstanceNumber == null) {
+			trialInstanceNumber = "1";
+		}
+		String plotNumber = getMeasurementDataValue(TermId.PLOT_NO.getId());
+		if (plotNumber == null || plotNumber.isEmpty()) {
+			plotNumber = getMeasurementDataValue(TermId.PLOT_NNO.getId());
+		}
+		String entryNumber = getMeasurementDataValue(TermId.ENTRY_NO.getId());
+		return trialInstanceNumber + "-" + plotNumber + "-" + entryNumber;
 	}
 	
 	@Override
@@ -148,5 +212,16 @@ public class MeasurementRow {
 		}
 	}
 	
-	
+	public MeasurementRow copy() {
+		List<MeasurementData> newDataList = null;
+		if (this.dataList != null && !this.dataList.isEmpty()) {
+			newDataList = new ArrayList<MeasurementData>();
+			for (MeasurementData data : this.dataList) {
+				newDataList.add(data.copy());
+			}
+		}
+		MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
+		row.setExperimentId(this.experimentId);
+		return row;
+	}
 }

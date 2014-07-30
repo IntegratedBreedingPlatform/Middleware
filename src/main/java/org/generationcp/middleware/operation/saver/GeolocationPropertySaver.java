@@ -61,10 +61,10 @@ public class GeolocationPropertySaver extends Saver {
 	}
 	
 	private int getMaxRank(List<GeolocationProperty> properties) {
-		int maxRank = -1;
+		int maxRank = 1;
 		for (GeolocationProperty property : properties) {
-			if (property.getRank() > maxRank) {
-				maxRank = property.getRank();
+			if (property.getRank() >= maxRank) {
+				maxRank = property.getRank() + 1;
 			}
 		}
 		return maxRank;
@@ -77,5 +77,23 @@ public class GeolocationPropertySaver extends Saver {
 			}
 		}
 		return null;
+	}
+
+	public void saveOrUpdate(Geolocation geolocation, int typeId, String value) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		GeolocationProperty property = null;
+		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
+			property = findProperty(geolocation.getProperties(), typeId);
+		}
+		if (property == null) {
+			property = new GeolocationProperty();
+			property.setGeolocationPropertyId(getGeolocationPropertyDao().getNegativeId("geolocationPropertyId"));
+			property.setRank(getMaxRank(geolocation.getProperties()));
+			property.setGeolocation(geolocation);
+			property.setType(typeId);
+			geolocation.getProperties().add(property);
+		}
+		property.setValue(value);
+		getGeolocationPropertyDao().saveOrUpdate(property);
 	}
 }

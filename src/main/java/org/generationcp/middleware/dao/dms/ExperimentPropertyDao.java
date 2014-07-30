@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -259,7 +260,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			        .append(" INNER JOIN nd_experiment bexp ON bexp.nd_geolocation_id = bval.nd_geolocation_id ")
 				    .append(" AND bexp.nd_geolocation_id = :geolocationId ")
 				    .append(" INNER JOIN nd_experiment_project bep ON bep.nd_experiment_id = bexp.nd_experiment_id ")
-				    .append(" AND bep.project_id = :datasetId) ");
+				    .append(" AND bep.project_id = :datasetId ")
+				    .append(" WHERE bval.type_id = ").append(TermId.BLOCK_ID.getId()).append(")");
 	            }
 	            sql.append(" ORDER BY eproj.nd_experiment_id ").append(order);
 	            
@@ -305,6 +307,27 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         }
         
         return fieldmaps;
+    }
+    
+    public int countExperimentPropObservations(int datasetId, String nonEditableFactors) throws MiddlewareQueryException {
+        try {
+            
+            StringBuilder sql = new StringBuilder()
+                .append("SELECT COUNT(eprop.nd_experimentprop_id) ")
+                .append("FROM nd_experiment e ")
+                .append("INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
+                .append("INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id ")
+                .append("WHERE ep.project_id = ").append(datasetId)
+                .append(" AND eprop.type_id NOT IN (").append(nonEditableFactors)
+                .append(")");
+            Query query = getSession().createSQLQuery(sql.toString());
+        
+            return ((BigInteger) query.uniqueResult()).intValue();
+                        
+        } catch(HibernateException e) {
+            logAndThrowException("Error at countExperimentPropObservations=" + datasetId + " at ExperimentPropertyDao: " + e.getMessage(), e);
+        }
+        return 0;
     }
     
     private List<FieldMapDatasetInfo> createFieldMapDatasetInfo(List<Object[]> list) {
@@ -570,6 +593,31 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             }
         }
         return value; 
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<String> getTreatmentFactorValues(int levelId, int amountId, int measurementDatasetId) throws MiddlewareQueryException {
+        try {
+            
+            StringBuilder sql = new StringBuilder()
+                .append("SELECT DISTINCT ep.value ")
+                .append(" FROM nd_experimentprop ep ")
+                .append(" INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = ep.nd_experiment_id ")
+                .append("   AND eproj.project_id = ").append(measurementDatasetId)
+                .append(" INNER JOIN nd_experimentprop levelprop ON levelprop.nd_experiment_id = ep.nd_experiment_id ")
+                .append("   AND levelprop.type_id = ").append(levelId)
+                .append(" WHERE ep.type_id = ").append(amountId) 
+                .append(" ORDER BY CAST(levelprop.value AS UNSIGNED) ");
+
+            Query query = getSession().createSQLQuery(sql.toString());
+        
+            return query.list();
+                        
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getTreatmentFactorValues=" + levelId + ", " + amountId + ", " + measurementDatasetId 
+            		+ " at ExperimentPropertyDao: " + e.getMessage(), e);
+        }
+        return new ArrayList<String>();
     }
     
 }

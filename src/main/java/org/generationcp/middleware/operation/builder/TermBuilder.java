@@ -15,15 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermProperty;
 
 public class TermBuilder extends Builder {
 
@@ -40,7 +39,7 @@ public class TermBuilder extends Builder {
 		return term;
 	}
 	
-	public Term mapCVTermToTerm(CVTerm cVTerm) throws MiddlewareQueryException {
+	public static Term mapCVTermToTerm(CVTerm cVTerm) throws MiddlewareQueryException {
 		Term term = null;
 		
 		if (cVTerm != null){
@@ -125,18 +124,18 @@ public class TermBuilder extends Builder {
 
 	public Term findOrSaveTermByName(String name, CvId cv) throws MiddlewareQueryException, MiddlewareException {
 		Term term = findTermByName(name, cv);
-		if (term == null) {
-			term = getTermSaver().save(name, name, cv);
-			//assign unclassified trait class
-			setWorkingDatabase(Database.CENTRAL);
-			CVTerm cvTerm = getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
-			Integer typeClass = null;
-			if(cvTerm != null)
-				typeClass = TermId.GENERAL_TRAIT_CLASS.getId();
-			else
-				typeClass = TermId.ONTOLOGY_TRAIT_CLASS.getId();
-			getCvTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), typeClass);
-		}
+        if (term == null) {
+        	term = getTermSaver().save(name, name, cv);
+        	//assign unclassified trait class
+        	setWorkingDatabase(Database.CENTRAL);
+        	CVTerm cvTerm = getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
+        	Integer typeClass = null;
+        	if(cvTerm != null)
+        		typeClass = TermId.GENERAL_TRAIT_CLASS.getId();
+        	else
+        		typeClass = TermId.ONTOLOGY_TRAIT_CLASS.getId();
+        	getCvTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), typeClass);
+        }
         return term;
 	}
 	
@@ -162,5 +161,14 @@ public class TermBuilder extends Builder {
 			
 		}
 		return term;
+	}
+	
+	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+		List<Scale> list = new ArrayList<Scale>();
+		setWorkingDatabase(Database.CENTRAL);
+		list.addAll(getCvTermDao().getAllInventoryScales());
+		setWorkingDatabase(Database.LOCAL);
+		list.addAll(getCvTermDao().getAllInventoryScales());
+		return list;
 	}
 }

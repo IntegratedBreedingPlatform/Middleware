@@ -13,12 +13,11 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * POJO for acc_metadataset table.
@@ -32,144 +31,147 @@ public class AccMetadataSet implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    public static final String GET_NAME_IDS_BY_GERMPLASM_IDS = 
-            "SELECT nid " +
-            "FROM gdms_acc_metadataset " +
-            "WHERE gid IN (:gIdList)";
+    @Id
+    @Column(name = "acc_metadataset_id")
+    private Integer accMetadataSetId;
     
-    public static final String GET_NIDS_BY_DATASET_IDS = 
-            "SELECT DISTINCT(nid) " +
-            "FROM gdms_acc_metadataset " +
-            "WHERE dataset_id IN (:datasetId) ";
-    
-    public static final String GET_NIDS_BY_DATASET_IDS_FILTER_BY_GIDS = 
-            "AND gid NOT IN (:gids)";
+    @Basic(optional = false)
+    @Column(name = "dataset_id")
+    private Integer datasetId;
 
-    public static final String GET_ACC_METADATASETS_BY_GIDS = 
-            "SELECT gid, nid, dataset_id " +
-            "FROM gdms_acc_metadataset " +
-            "WHERE gid IN (:gids) ";
-    
-    public static final String GET_ACC_METADATASETS_BY_DATASET_ID_AND_IN_GIDS = 
-        "SELECT gid, nid " +
-        "FROM gdms_acc_metadataset " +
-        "WHERE gid IN (:gids) " +
-        "AND dataset_id = :datasetId";
-    
-    public static final String GET_ACC_METADATASETS_BY_DATASET_ID_AND_NOT_IN_GIDS = 
-        "SELECT gid, nid " +
-        "FROM gdms_acc_metadataset " +
-        "WHERE gid NOT IN (:gids) " +
-        "AND dataset_id = :datasetId";
-    
-    public static final String COUNT_ACC_METADATASETS_BY_GIDS = 
-            "SELECT COUNT(*) " +
-            "FROM gdms_acc_metadataset " +
-            "WHERE gid IN (:gids) ";
-    
-    public static final String GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS_SELECT = 
-            "SELECT DISTINCT nid " ;
-    
-    public static final String COUNT_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS_SELECT = 
-            "SELECT COUNT(DISTINCT nid) " ;
-    
-    public static final String GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS_FROM = 
-        "FROM gdms_acc_metadataset gam "+
-        "INNER JOIN gdms_marker_metadataset gmm on gmm.dataset_id = gam.dataset_id " + 
-        "WHERE gam.dataset_id IN (:represnos) " ;
-    
-    public static final String GET_NIDS_BY_DATASET_IDS_FILTER_BY_MARKER_IDS = 
-            "AND gmm.marker_id IN (:markerids) " ;
-    
-    public static final String GET_NIDS_BY_DATASET_IDS_FILTER_NOT_BY_GIDS = 
-            "AND gam.gid NOT IN (:gids) " ; 
-  
-    public static final String GET_NIDS_BY_DATASET_IDS_ORDER = 
-    		"ORDER BY nid DESC";
+    @Basic(optional = false)
+    @Column(name = "gid")
+    private Integer germplasmId;
 
-    public static final String GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS = 
-            "SELECT DISTINCT nid from gdms_acc_metadataset gam "+
-            "INNER JOIN gdms_marker_metadataset gmm on gmm.dataset_id = gam.dataset_id " + 
-            "WHERE gam.dataset_id IN (:represnos) " ;
+    @Basic(optional = false)
+    @Column(name = "nid")
+    private Integer nameId;
     
-    public static final String COUNT_NIDS_BY_DATASET_IDS = 
-    		"SELECT COUNT(DISTINCT nid) FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
-
-    @EmbeddedId
-    protected AccMetadataSetPK id;
+    @Column(name = "acc_sample_id")
+    private Integer accSampleId;
 
     public AccMetadataSet() {
-        this.id = new AccMetadataSetPK();
     }
 
-    public AccMetadataSet(AccMetadataSetPK id) {
-        this.id = id;
-    }
-        
-    public AccMetadataSet(Integer datasetId, Integer germplasmId, Integer nameId) {
-        this.id = new AccMetadataSetPK(datasetId, germplasmId, nameId);
-    }
+    public AccMetadataSet(Integer accMetadataSetId, Integer datasetId,
+			Integer germplasmId, Integer nameId, Integer sampleId) {
+		super();
+		this.accMetadataSetId = accMetadataSetId;
+		this.datasetId = datasetId;
+		this.germplasmId = germplasmId;
+		this.nameId = nameId;
+		this.accSampleId = sampleId;
+	}
 
-    public AccMetadataSetPK getId() {
-        return id;
-    }
-    
-    public void setId(AccMetadataSetPK id) {
-        this.id = id;
-    }
-    
-    public Integer getDatasetId(){
-        return id.getDatasetId();
-    }
+	public Integer getAccMetadataSetId() {
+		return accMetadataSetId;
+	}
 
-    public void setDatasetId(Integer datasetId){
-        id.setDatasetId(datasetId);
-    }
+	public void setAccMetadataSetId(Integer accMetadataSetId) {
+		this.accMetadataSetId = accMetadataSetId;
+	}
 
-    public Integer getGermplasmId(){
-        return id.getGermplasmId();
-    }
+	public Integer getDatasetId() {
+		return datasetId;
+	}
 
-    public void setGermplasmId(Integer germplasmId){
-        id.setGermplasmId(germplasmId);
-    }
-    
-    public Integer getNameId(){
-        return id.getNameId();
-    }
-    
-    public void setNameId(Integer nameId){
-        id.setNameId(nameId);
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof AccMetadataSet)) {
-            return false;
-        }
+	public void setDatasetId(Integer datasetId) {
+		this.datasetId = datasetId;
+	}
 
-        AccMetadataSet rhs = (AccMetadataSet) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(id, rhs.id).isEquals();
-    }
+	public Integer getGermplasmId() {
+		return germplasmId;
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(id).toHashCode();
-    }
+	public void setGermplasmId(Integer germplasmId) {
+		this.germplasmId = germplasmId;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("AccMetadataSet [id=");
-        builder.append(id);
-        builder.append("]");
-        return builder.toString();
-    }
+	public Integer getNameId() {
+		return nameId;
+	}
+
+	public void setNameId(Integer nameId) {
+		this.nameId = nameId;
+	}
+
+	public Integer getAccSampleId() {
+		return accSampleId;
+	}
+
+	public void setAccSampleId(Integer accSampleId) {
+		this.accSampleId = accSampleId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((accMetadataSetId == null) ? 0 : accMetadataSetId.hashCode());
+		result = prime * result
+				+ ((datasetId == null) ? 0 : datasetId.hashCode());
+		result = prime * result
+				+ ((germplasmId == null) ? 0 : germplasmId.hashCode());
+		result = prime * result + ((nameId == null) ? 0 : nameId.hashCode());
+		result = prime * result
+				+ ((accSampleId == null) ? 0 : accSampleId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AccMetadataSet other = (AccMetadataSet) obj;
+		if (accMetadataSetId == null) {
+			if (other.accMetadataSetId != null)
+				return false;
+		} else if (!accMetadataSetId.equals(other.accMetadataSetId))
+			return false;
+		if (datasetId == null) {
+			if (other.datasetId != null)
+				return false;
+		} else if (!datasetId.equals(other.datasetId))
+			return false;
+		if (germplasmId == null) {
+			if (other.germplasmId != null)
+				return false;
+		} else if (!germplasmId.equals(other.germplasmId))
+			return false;
+		if (nameId == null) {
+			if (other.nameId != null)
+				return false;
+		} else if (!nameId.equals(other.nameId))
+			return false;
+		if (accSampleId == null) {
+			if (other.accSampleId != null)
+				return false;
+		} else if (!accSampleId.equals(other.accSampleId))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("AccMetadataSet [accMetadataSetId=");
+		builder.append(accMetadataSetId);
+		builder.append(", datasetId=");
+		builder.append(datasetId);
+		builder.append(", germplasmId=");
+		builder.append(germplasmId);
+		builder.append(", nameId=");
+		builder.append(nameId);
+		builder.append(", sampleId=");
+		builder.append(accSampleId);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

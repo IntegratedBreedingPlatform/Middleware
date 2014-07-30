@@ -26,7 +26,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -91,6 +93,9 @@ public class GermplasmListData implements Serializable{
 
     @OneToMany(mappedBy = "listData", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ListDataProperty> properties;
+    
+    @Transient
+    private ListDataInventory inventoryInfo;
     
     public GermplasmListData() {
 
@@ -214,6 +219,14 @@ public class GermplasmListData implements Serializable{
 	public void setProperties(List<ListDataProperty> properties) {
 		this.properties.clear();
 		this.properties.addAll(properties);
+	}
+
+	public ListDataInventory getInventoryInfo() {
+		return inventoryInfo;
+	}
+
+	public void setInventoryInfo(ListDataInventory inventoryInfo) {
+		this.inventoryInfo = inventoryInfo;
 	}
 
 	@Override

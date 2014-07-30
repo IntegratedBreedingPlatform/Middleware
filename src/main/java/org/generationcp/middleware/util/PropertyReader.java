@@ -43,7 +43,6 @@ public class PropertyReader{
             configFile.load(TermId.class.getClassLoader().getResourceAsStream(propertyFile));
         } catch (IOException e) {
             LOG.error(ERROR_MESSAGE + propertyFile, e); 
-//            throw new MiddlewareException(ERROR_MESSAGE + propertyFile, e);
         }
     }
 

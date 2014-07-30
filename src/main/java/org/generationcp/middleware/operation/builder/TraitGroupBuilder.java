@@ -35,7 +35,7 @@ public class TraitGroupBuilder extends Builder {
      * Gets the Trait Classes with properties and standard variables in a hierarchy 
      * from both Central and Local databases based on the given class type.
      * 
-     * @return
+     * @return list of trait class references
      * @throws MiddlewareQueryException
      */
 	@Deprecated
@@ -66,7 +66,7 @@ public class TraitGroupBuilder extends Builder {
      * Gets all the Trait Classes with properties and standard variables in a hierarchical structure 
      * from both Central and Local databases
      * 
-     * @return
+     * @return list of all trait class references in a hierarchy
      * @throws MiddlewareQueryException
      */
     public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException {
@@ -97,7 +97,7 @@ public class TraitGroupBuilder extends Builder {
     /** 
      * Gets all the Trait Classes in a hierarchical structure from both Central and Local databases
      * 
-     * @return
+     * @return list of all trait classes
      * @throws MiddlewareQueryException
      */
     @Deprecated
@@ -153,7 +153,7 @@ public class TraitGroupBuilder extends Builder {
 	 * Gets trait classes from central and local of the given class type
 	 * 
 	 * @param classType
-	 * @return
+	 * @return list of all trait classes
 	 * @throws MiddlewareQueryException
 	 */
     @Deprecated
