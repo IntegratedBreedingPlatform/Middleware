@@ -274,7 +274,7 @@ public class WorkbookSaver extends Saver {
         List<Integer> deletedList = new ArrayList<Integer>();
         if (variableList != null) {
             for (MeasurementVariable var : variableList) {
-                if (var.getOperation().equals(Operation.DELETE)) {
+                if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
                     deletedList.add(Integer.valueOf(var.getTermId()));
                 }
             }
