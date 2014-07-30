@@ -270,18 +270,17 @@ public class WorkbookSaver extends Saver {
 	    deleteDeletedVariables(workbook.getConstants());
 	}
 	
-	private void deleteDeletedVariablesInObservations(List<MeasurementVariable> variableList, List<MeasurementRow> observations) {
-	    List<Integer> deletedList = new ArrayList<Integer>();
-	    if (variableList != null) {
-    	    for (MeasurementVariable var : variableList) {
-    	        if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
+    private void deleteDeletedVariablesInObservations(List<MeasurementVariable> variableList, List<MeasurementRow> observations) {
+        List<Integer> deletedList = new ArrayList<Integer>();
+        if (variableList != null) {
+            for (MeasurementVariable var : variableList) {
+                if (var.getOperation().equals(Operation.DELETE)) {
                     deletedList.add(Integer.valueOf(var.getTermId()));
                 }
             }
-	    }
-	    if (deletedList != null) {
+        }
+        if (deletedList != null) {
             for (Integer termId : deletedList) {
-                if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
                 //remove from measurement rows
                 int index = 0;
                 int varIndex = 0;
@@ -294,9 +293,7 @@ public class WorkbookSaver extends Saver {
                             varIndex++;
                         }
                     }
-                    if (varIndex < row.getDataList().size()) {
-                        row.getDataList().remove(varIndex);
-                    }
+                    row.getDataList().remove(varIndex);
                     index++;
                 }
             }
