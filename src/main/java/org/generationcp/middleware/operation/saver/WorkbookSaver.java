@@ -425,6 +425,7 @@ public class WorkbookSaver extends Saver {
 		Map<String, Integer> locationMap = new HashMap<String, Integer>();
 		if (observations != null) {
 			for (MeasurementRow row : observations) {
+			    geolocationId = row.getLocationId();
 				if (geolocationId != null && geolocationId != 0) { //if geolocationId already exists, no need to create the geolocation
 					row.setLocationId(geolocationId);
 				}
