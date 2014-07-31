@@ -120,13 +120,19 @@ public class DataSetBuilder extends Builder {
                         datasetType = prop.getValue();
                     }
                 }
-	            if (Integer.parseInt(datasetType) == DataSetType.SUMMARY_DATA.getId() 
-	                    || (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId())
-	                    && Integer.parseInt(datasetType) != DataSetType.MEANS_DATA.getId()
-	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId))) {
-	                trialDataset = dataset.getSubjectProject();
-	                break;
-	            }
+                if (datasetType != null) {
+    	            if (Integer.parseInt(datasetType) == DataSetType.SUMMARY_DATA.getId() 
+    	                    || (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId())
+    	                    && Integer.parseInt(datasetType) != DataSetType.MEANS_DATA.getId()
+    	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId))) {
+    	                trialDataset = dataset.getSubjectProject();
+    	                break;
+    	            }
+                } else if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
+                        && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
+                    trialDataset = dataset.getSubjectProject();
+                    break;
+                }
 	        }
 	    }
 	    return trialDataset;
