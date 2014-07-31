@@ -12,7 +12,7 @@ public class ProgramFavorite {
 	
 	public enum FavoriteType {
 		LOCATION("LOCATION"),
-		METHOD("METHOD")
+		METHOD("METHODS")
 		;
 		
 		private final String name;
