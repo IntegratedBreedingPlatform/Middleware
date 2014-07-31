@@ -284,16 +284,23 @@ public class WorkbookSaver extends Saver {
                 //remove from measurement rows
                 int index = 0;
                 int varIndex = 0;
+                boolean found = false;
                 for (MeasurementRow row : observations) {
                     if (index == 0) {
                         for (MeasurementData var : row.getDataList()) {
                             if (var.getMeasurementVariable().getTermId() == termId.intValue()) {
+                            	found = true;
                                 break;
                             }
                             varIndex++;
                         }
                     }
-                    row.getDataList().remove(varIndex);
+                    if (found) {
+                    	row.getDataList().remove(varIndex);
+                    }
+                    else {
+                    	break;
+                    }
                     index++;
                 }
             }
