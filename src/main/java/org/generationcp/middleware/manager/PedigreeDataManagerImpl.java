@@ -39,9 +39,10 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public PedigreeDataManagerImpl() {
     }
 
-    public PedigreeDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+    public PedigreeDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, 
+    		String localDatabaseName, String centralDatabaseName) {
         super(sessionProviderForLocal, sessionProviderForCentral);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public PedigreeDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {

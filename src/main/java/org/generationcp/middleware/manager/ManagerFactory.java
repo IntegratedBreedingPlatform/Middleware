@@ -274,7 +274,7 @@ public class ManagerFactory implements Serializable {
     }
 
     public PedigreeDataManager getPedigreeDataManager() {
-        return new PedigreeDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new PedigreeDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public CrossStudyDataManager getCrossStudyDataManager() {
