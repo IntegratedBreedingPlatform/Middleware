@@ -40,6 +40,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
@@ -2370,6 +2371,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
             return new Method();
         }
+	}
+
+	@Override
+	public List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid)
+			throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("gid",gid);
+		List<Germplasm> germplasms = getGermplasmListDataDAO().
+				callStoredProcedureForList("getProgenitorsByGID",
+						params,Germplasm.class);
+		if(germplasms!=null) {
+			for (Germplasm germplasm : germplasms) {
+				germplasm.setPreferredName(getPreferredNameByGID(germplasm.getGid()));
+			}
+		}
+		return germplasms;
 	}
     
 }

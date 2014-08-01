@@ -1353,4 +1353,7 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Method getMethodByName(String name) throws MiddlewareQueryException;
+    
+    List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid) throws MiddlewareQueryException;
+    
 }

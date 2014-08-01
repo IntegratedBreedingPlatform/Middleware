@@ -124,14 +124,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
                 if (germplasmOfNode.getGnpgs() > 2) {
                     // if there are more parents, get and add each of them
-                    List<Germplasm> otherParents = new ArrayList<Germplasm>();
-
-                    if (germplasmOfNode.getGid() < 0 && setWorkingDatabase(Database.LOCAL)) {
-                        otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                    } else if (germplasmOfNode.getGid() > 0 && setWorkingDatabase(Database.CENTRAL)) {
-                        otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                    }
-
+                    List<Germplasm> otherParents = germplasmDataManager.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
                     for (Germplasm otherParent : otherParents) {
                         GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
                         nodeForOtherParent.setGermplasm(otherParent);
@@ -202,14 +195,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
                 if (germplasmOfNode.getGnpgs() > 2) {
                     // if there are more parents, get and add each of them
-                    List<Germplasm> otherParents = new ArrayList<Germplasm>();
-
-                    if (germplasmOfNode.getGid() < 0 && setWorkingDatabase(Database.LOCAL)) {
-                        otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                    } else if (germplasmOfNode.getGid() > 0 && setWorkingDatabase(Database.CENTRAL)) {
-                        otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                    }
-
+                    List<Germplasm> otherParents = germplasmDataManager.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
                     for (Germplasm otherParent : otherParents) {
                         GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
                         nodeForOtherParent.setGermplasm(otherParent);
