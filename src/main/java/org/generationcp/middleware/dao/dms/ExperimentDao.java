@@ -308,4 +308,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
             logAndThrowException("Error in deleteExperimentsByStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
         }
     }
+	
+	public void deleteTrialExperimentsOfStudy(int datasetId) throws MiddlewareQueryException {
+        
+        try {
+            this.flush();
+            
+            // Delete experiments
+            Query statement = getSession().createSQLQuery("DELETE g, gp, e, ep, es, epheno, pheno, eprop " +
+                       "FROM nd_geolocation g " +
+                       "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id " +
+                       "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id " + 
+                       "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id " +
+                       "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id " + 
+                       "LEFT JOIN nd_experiment_phenotype epheno ON e.nd_experiment_id = epheno.nd_experiment_id " +
+                       "LEFT JOIN phenotype pheno ON epheno.phenotype_id = pheno.phenotype_id " +
+                       "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " +
+                       "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
+            
+            statement.executeUpdate();     
+            this.flush();
+            this.clear();
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in deleteTrialExperimentsOfStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
+        }
+    }
 }

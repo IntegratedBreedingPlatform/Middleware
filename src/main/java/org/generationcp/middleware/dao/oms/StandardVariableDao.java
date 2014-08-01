@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao.oms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.oms.TermSummary;
@@ -94,22 +95,37 @@ public class StandardVariableDao {
 	private StandardVariableSummary mapResults(Object[] queryResult) {
 		if(queryResult != null) {
 			StandardVariableSummary variable = new StandardVariableSummary((Integer)queryResult[0], (String)queryResult[1], (String) queryResult[2]);	
-			variable.setProperty(createTermSummary(Integer.valueOf((String)queryResult[3]), (String)queryResult[4], (String) queryResult[5]));
-			variable.setMethod(createTermSummary(Integer.valueOf((String)queryResult[6]), (String)queryResult[7], (String) queryResult[8]));
-			variable.setScale(createTermSummary(Integer.valueOf((String)queryResult[9]), (String)queryResult[10], (String) queryResult[11]));
-			variable.setIsA(createTermSummary(Integer.valueOf((String)queryResult[12]), (String)queryResult[13], (String) queryResult[14]));
-			variable.setStoredIn(createTermSummary(Integer.valueOf((String)queryResult[15]), (String)queryResult[16], (String) queryResult[17]));
-			variable.setDataType(createTermSummary(Integer.valueOf((String)queryResult[18]), (String)queryResult[19], (String) queryResult[20]));
-			variable.setPhenotypicType(PhenotypicType.valueOf((String) queryResult[21]));
+			
+			variable.setProperty(createTermSummary(convertToId(queryResult[3]), (String) queryResult[4], (String) queryResult[5]));
+			variable.setMethod(createTermSummary(convertToId(queryResult[6]), (String) queryResult[7], (String) queryResult[8]));
+			variable.setScale(createTermSummary(convertToId(queryResult[9]), (String) queryResult[10], (String) queryResult[11]));
+			variable.setIsA(createTermSummary(convertToId(queryResult[12]), (String) queryResult[13], (String) queryResult[14]));
+			variable.setStoredIn(createTermSummary(convertToId(queryResult[15]), (String) queryResult[16], (String) queryResult[17]));
+			variable.setDataType(createTermSummary(convertToId(queryResult[18]), (String) queryResult[19], (String) queryResult[20]));
+			
+			variable.setPhenotypicType(queryResult[21] != null ? PhenotypicType.valueOf((String) queryResult[21]) : null);
 			return variable;
 		}
 		return null;
 	}
 	
-	private TermSummary createTermSummary(Integer id, String name, String definition) {
-		if(id != null) {
-			return new TermSummary(id, name, definition);
+	private Integer convertToId(Object rawValue) {		
+		if(rawValue != null) {
+			try {
+				return Integer.valueOf((String) rawValue);
+			} catch(NumberFormatException nfe) {
+				LOG.debug("Failed to convert column's raw value to an Integer Id. Raw value was: " + rawValue);
+				return null;
+			}			
 		}
 		return null;
+	}
+	
+	private TermSummary createTermSummary(Integer id, String name, String definition) {
+		if(id == null && StringUtils.isBlank(name) && StringUtils.isBlank(definition)) {
+			// Avoid creating an empty TermSummary
+			return null;
+		}
+		return new TermSummary(id, name, definition);
 	}
 }

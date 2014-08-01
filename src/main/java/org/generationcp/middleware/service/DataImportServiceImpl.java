@@ -64,12 +64,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
      */
     @Override
     public int saveDataset(Workbook workbook) throws MiddlewareQueryException {
-        return saveDataset(workbook, false);
+        return saveDataset(workbook, false, false);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int saveDataset(Workbook workbook, boolean retainValues) throws MiddlewareQueryException {
+    public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -92,6 +92,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         try {
 
             trans = session.beginTransaction();
+            
+            boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
+            if (isUpdate) {
+                getWorkbookSaver().saveWorkbookVariables(workbook);
+                getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+            }
 
             variableMap = getWorkbookSaver().saveVariables(workbook);
 
@@ -114,7 +120,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
             trans2 = session.beginTransaction();
 
-            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues);
+            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations);
 
             trans2.commit();
 
@@ -325,7 +331,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             	key = measurementVariable.getProperty().toLowerCase() + "-" + 
             		  measurementVariable.getScale().toLowerCase() + "-" + 
             		  measurementVariable.getMethod().toLowerCase() + "-" + 
-            		  type==null?measurementVariable.getLabel().toLowerCase():type.getGroup();
+            		  (type==null?measurementVariable.getLabel().toLowerCase():type.getGroup());
             }
             List<MeasurementVariable> vars = stdVarMap.get(key);
             if(vars==null) {

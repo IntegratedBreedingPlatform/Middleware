@@ -23,10 +23,7 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
@@ -487,7 +484,7 @@ public interface FieldbookService {
      * @return all treatment levels
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException;
+    List<StandardVariableReference> getAllTreatmentLevels(List<Integer> hiddenFields) throws MiddlewareQueryException;
     
     /**
      * Fetch all the possible pairs of the treatment level variable.
@@ -497,7 +494,7 @@ public interface FieldbookService {
      * @return list of all possible treatment pairs
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException;
+    List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException;
 
     /**
      * Returns the study type.
@@ -752,6 +749,8 @@ public interface FieldbookService {
 	 */
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method, PhenotypicType role) 
 			throws MiddlewareQueryException;
+
+    public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID) throws MiddlewareQueryException;
 	
 	/**
 	 * Return the measurement rows of a given dataset.

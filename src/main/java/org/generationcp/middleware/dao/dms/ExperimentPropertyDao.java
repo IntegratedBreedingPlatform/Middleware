@@ -595,4 +595,29 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         return value; 
     }
     
+    @SuppressWarnings("unchecked")
+	public List<String> getTreatmentFactorValues(int levelId, int amountId, int measurementDatasetId) throws MiddlewareQueryException {
+        try {
+            
+            StringBuilder sql = new StringBuilder()
+                .append("SELECT DISTINCT ep.value ")
+                .append(" FROM nd_experimentprop ep ")
+                .append(" INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = ep.nd_experiment_id ")
+                .append("   AND eproj.project_id = ").append(measurementDatasetId)
+                .append(" INNER JOIN nd_experimentprop levelprop ON levelprop.nd_experiment_id = ep.nd_experiment_id ")
+                .append("   AND levelprop.type_id = ").append(levelId)
+                .append(" WHERE ep.type_id = ").append(amountId) 
+                .append(" ORDER BY CAST(levelprop.value AS UNSIGNED) ");
+
+            Query query = getSession().createSQLQuery(sql.toString());
+        
+            return query.list();
+                        
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getTreatmentFactorValues=" + levelId + ", " + amountId + ", " + measurementDatasetId 
+            		+ " at ExperimentPropertyDao: " + e.getMessage(), e);
+        }
+        return new ArrayList<String>();
+    }
+    
 }

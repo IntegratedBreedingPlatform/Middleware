@@ -1,7 +1,9 @@
 package org.generationcp.middleware.operation.destroyer;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -38,7 +40,7 @@ public class StudyDestroyer extends Destroyer {
 			for (ProjectProperty property : study.getProperties()) {
 				if (property.getTypeId().equals(TermId.STUDY_STATUS.getId())) {
 					found = true;
-					if (property.getValue() != null && !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
+					if (property.getValue() == null || !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
 						property.setValue(String.valueOf(TermId.DELETED_STUDY.getId()));
 						getProjectPropertyDao().saveOrUpdate(property);
 					}
@@ -67,14 +69,15 @@ public class StudyDestroyer extends Destroyer {
 	}
 	
 	private void renameStudyAndDatasets(DmsProject study) throws MiddlewareQueryException {
-		String uuid = UUID.randomUUID().toString();
-		study.setName(study.getName() + "#" + uuid);
+		DateFormat format = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+		String tstamp = format.format(new Date());
+		study.setName(study.getName() + "#" + tstamp);
 		getDmsProjectDao().save(study);
 		
 		List<DmsProject> datasets = getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
 		if (datasets != null) {
 			for (DmsProject dataset : datasets) {
-				dataset.setName(dataset.getName() + "#" + uuid);
+				dataset.setName(dataset.getName() + "#" + tstamp);
 				getDmsProjectDao().save(dataset);
 			}
 		}

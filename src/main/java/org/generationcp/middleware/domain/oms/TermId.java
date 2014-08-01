@@ -127,6 +127,8 @@ public enum TermId {
     //(32769)
     , RANGE_NO (8410)
     //(32770)
+    ,ROW (8581)
+    ,COL (8582)
     , BLOCK_NAME (8221)
     , COLUMNS_IN_BLOCK (32772)
     , RANGES_IN_BLOCK (32773)

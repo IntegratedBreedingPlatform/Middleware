@@ -114,12 +114,25 @@ public class DataSetBuilder extends Builder {
 	    List<ProjectRelationship> datasets = study.getRelatedBys();
 	    if (datasets != null) {
 	        for (ProjectRelationship dataset : datasets) {
-	            if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
-	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
-	                
-	                trialDataset = dataset.getSubjectProject();
-	                break;
-	            }
+	            String datasetType = null; 
+                for (ProjectProperty prop : dataset.getSubjectProject().getProperties()) {
+                    if (prop.getTypeId() == TermId.DATASET_TYPE.getId()) {
+                        datasetType = prop.getValue();
+                    }
+                }
+                if (datasetType != null) {
+    	            if (Integer.parseInt(datasetType) == DataSetType.SUMMARY_DATA.getId() 
+    	                    || (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId())
+    	                    && Integer.parseInt(datasetType) != DataSetType.MEANS_DATA.getId()
+    	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId))) {
+    	                trialDataset = dataset.getSubjectProject();
+    	                break;
+    	            }
+                } else if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
+                        && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
+                    trialDataset = dataset.getSubjectProject();
+                    break;
+                }
 	        }
 	    }
 	    return trialDataset;
@@ -127,8 +140,16 @@ public class DataSetBuilder extends Builder {
 	
 	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
 		DataSet dataset = build(datasetId);
+		List<Integer> siblingVariables = getVariablesOfSiblingDatasets(datasetId);
 		boolean isMeasurementDataset = isMeasurementDataset(dataset);
-		VariableTypeList variables = filterDatasetVariables(dataset.getVariableTypes(), !isTrial, isMeasurementDataset); 
+		VariableTypeList variables = null;
+		if (isMeasurementDataset) {
+			variables = filterVariables(dataset.getVariableTypes(), siblingVariables);
+		}
+		else {
+			variables = dataset.getVariableTypes();
+		}
+		variables = filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
 		long expCount = getStudyDataManager().countExperiments(datasetId);
 		List<Experiment> experiments = getStudyDataManager().getExperiments(datasetId, 0, (int)expCount, variables);
 		List<MeasurementVariable> factorList = getMeasurementVariableTransformer().transform(variables.getFactors(), true);
@@ -153,7 +174,8 @@ public class DataSetBuilder extends Builder {
 				boolean isOccAndNurseryAndMeasurementDataset = variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isNursery && isMeasurementDataset;
 				boolean isMeasurementDatasetAndIsTrialFactors = isMeasurementDataset 
 						&& PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStandardVariable().getStoredIn().getId());
-				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors) {
+				boolean isTrialAndOcc = !isNursery && variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId();
+				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors || isTrialAndOcc) {
 					newVariables.add(variable);
 				}
 			}
@@ -168,5 +190,22 @@ public class DataSetBuilder extends Builder {
 		return datasetName.toUpperCase().startsWith("MEASUREMENT EFEC_") 
 				|| datasetName.toUpperCase().startsWith("MEASUREMENT EFECT_")
 				|| !datasetName.toUpperCase().startsWith("TRIAL_") && datasetType == DataSetType.PLOT_DATA;
+	}
+	
+	private List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
+		setWorkingDatabase(datasetId);
+		return getProjectPropertyDao().getVariablesOfSiblingDatasets(datasetId);
+	}
+	
+	private VariableTypeList filterVariables(VariableTypeList variables, List<Integer> filters) {
+		VariableTypeList newList = new VariableTypeList();
+		if (variables != null && !variables.getVariableTypes().isEmpty()) {
+			for (VariableType variable : variables.getVariableTypes()) {
+				if (!filters.contains(variable.getId()) || variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					newList.add(variable);
+				}
+			}
+		}
+		return newList;
 	}
 }

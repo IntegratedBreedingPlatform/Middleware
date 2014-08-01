@@ -39,8 +39,7 @@ public class FieldmapBlockInfo implements Serializable{
 	/** machine row capacity */
 	private int machineRowCapacity;
 	
-	/** The is new. */
-	private boolean isNew;
+	private boolean isNewBlock;
 	
 	private List<String> deletedPlots;
 	
@@ -61,7 +60,7 @@ public class FieldmapBlockInfo implements Serializable{
         this.rowsInBlock = rowsInBlock;
         this.rangesInBlock = rangesInBlock;
         this.numberOfRowsInPlot = numberOfRowsInPlot;
-        this.isNew = isNew;
+        this.isNewBlock = isNew;
     }
 	
     public FieldmapBlockInfo(int blockId, int rowsInBlock, int rangesInBlock,
@@ -72,7 +71,7 @@ public class FieldmapBlockInfo implements Serializable{
         this.numberOfRowsInPlot = numberOfRowsInPlot;
         this.plantingOrder = plantingOrder;
         this.machineRowCapacity = machineRowCapacity;
-        this.isNew = isNew;
+        this.isNewBlock = isNew;
         this.deletedPlots = deletedPlots;
         this.fieldId = fieldId;
     }
@@ -148,22 +147,12 @@ public class FieldmapBlockInfo implements Serializable{
 		this.numberOfRowsInPlot = numberOfRowsInPlot;
 	}
 
-	/**
-	 * Checks if is new.
-	 *
-	 * @return true, if is new
-	 */
-	public boolean isNew() {
-		return isNew;
+	public boolean isNewBlock() {
+		return isNewBlock;
 	}
 
-	/**
-	 * Sets the new.
-	 *
-	 * @param isNew the new new
-	 */
-	public void setNew(boolean isNew) {
-		this.isNew = isNew;
+	public void setNewBlock(boolean isNewBlock) {
+		this.isNewBlock = isNewBlock;
 	}
 
 	/**
@@ -227,7 +216,7 @@ public class FieldmapBlockInfo implements Serializable{
         final int prime = 31;
         int result = 1;
         result = prime * result + blockId;
-        result = prime * result + (isNew ? 1231 : 1237);
+        result = prime * result + (isNewBlock ? 1231 : 1237);
         result = prime * result + machineRowCapacity;
         result = prime * result + numberOfRowsInPlot;
         result = prime * result + plantingOrder;
@@ -247,7 +236,7 @@ public class FieldmapBlockInfo implements Serializable{
         FieldmapBlockInfo other = (FieldmapBlockInfo) obj;
         if (blockId != other.blockId)
             return false;
-        if (isNew != other.isNew)
+        if (isNewBlock != other.isNewBlock)
             return false;
         if (machineRowCapacity != other.machineRowCapacity)
             return false;
@@ -278,7 +267,7 @@ public class FieldmapBlockInfo implements Serializable{
         builder.append(", machineRowCapacity=");
         builder.append(machineRowCapacity);
         builder.append(", isNew=");
-        builder.append(isNew);
+        builder.append(isNewBlock);
         builder.append("]");
         return builder.toString();
     }

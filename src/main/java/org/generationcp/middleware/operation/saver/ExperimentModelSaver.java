@@ -77,7 +77,7 @@ public class ExperimentModelSaver extends Saver {
 			
 		}
 		
-		if (!isUpdated){
+		if (!isUpdated && experimentId==0){
 			TermId myExperimentType = null;
 			if (values instanceof StudyValues) {
 				myExperimentType = TermId.STUDY_EXPERIMENT;

@@ -36,18 +36,13 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -69,7 +64,6 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -248,11 +242,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         long startTime = System.currentTimeMillis();
 
         try {
-            trans = session.beginTransaction(); 
+            trans = session.beginTransaction();
             
             List<Integer> deletedVariateIds = getDeletedVariateIds(workbook.getVariates());
-
-            saveTrialObservations(workbook);
             
             List<MeasurementVariable> variates = workbook.getVariates();
             List<MeasurementVariable> factors = workbook.getFactors();
@@ -260,12 +252,29 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             int i = 0;
             getWorkbookSaver().saveWorkbookVariables(workbook);
+            getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
             
-            final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook); 		
+            final Map<String, ?> variableMap = getWorkbookSaver().saveVariables(workbook);
+            
+            // unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
             Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
             Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+            
+            // unpack maps
+            // Strings
             List<String> trialHeaders = headerMap.get("trialHeaders");
+            
+            //VariableTypeLists
             VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+            
+            //get the trial dataset id
+            Integer trialDatasetId = workbook.getTrialDatasetId();
+            if (trialDatasetId == null) {
+                trialDatasetId = getWorkbookBuilder().getTrialDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+            }             
+            
+            //save trial observations
+            getWorkbookSaver().saveTrialObservations(workbook);
             
             Integer measurementDatasetId = workbook.getMeasurementDatesetId();
             if (measurementDatasetId == null) {
@@ -342,15 +351,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 + ((System.currentTimeMillis() - startTime)/60));
         
     }
-		
-	private void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
-		setWorkingDatabase(Database.LOCAL);
-		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
-			for (MeasurementRow trialObservation : workbook.getTrialObservations()) {
-				getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery());
-			}
-		}
-	}
 
 	@Override
 	public List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException {
@@ -803,46 +803,27 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public List<StandardVariableReference> getAllTreatmentLevels() throws MiddlewareQueryException {
+	public List<StandardVariableReference> getAllTreatmentLevels(List<Integer> hiddenFields) throws MiddlewareQueryException {
 		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
 		setWorkingDatabase(Database.CENTRAL);
-		list.addAll(getCvTermDao().getAllTreatmentLevels());
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, true));
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, false));
 		setWorkingDatabase(Database.LOCAL);
-		list.addAll(getCvTermDao().getAllTreatmentLevels());
-		
-		for (Iterator<StandardVariableReference> iter = list.iterator(); iter.hasNext(); ) {
-			boolean hasPairInCentral = false, hasPairInLocal = false;
-			StandardVariableReference ref =  iter.next();
-			setWorkingDatabase(ref.getId());
-			CVTermRelationship relationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(ref.getId(), TermId.HAS_PROPERTY.getId());
-			
-			if (relationship != null) {
-				int propertyId = relationship.getObjectId();
-				setWorkingDatabase(Database.CENTRAL);
-				hasPairInCentral = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId);
-				if (!hasPairInCentral) {
-					setWorkingDatabase(Database.LOCAL);
-					hasPairInLocal = getCvTermDao().hasPossibleTreatmentPairs(ref.getId(), propertyId);
-				}
-			}
-			
-			if (!hasPairInCentral && !hasPairInLocal) {
-				iter.remove();
-			}
-		}
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, true));
+		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, false));
 		
 		Collections.sort(list);
 		return list;
 	}
 	
 	@Override
-	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId) throws MiddlewareQueryException {
+	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException {
 		List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
 		
 		setWorkingDatabase(Database.CENTRAL);
-		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 		setWorkingDatabase(Database.LOCAL);
-		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId));
+		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 		
 		List<Integer> termIds = new ArrayList<Integer>();
 		Map<Integer, CVTerm> termMap = new HashMap<Integer, CVTerm>();
@@ -1073,10 +1054,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		return variable;
 	}
-	
-	@Override
+
+    @Override
+    public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID) throws MiddlewareQueryException {
+        getWorkbookBuilder().setTreatmentFactorValues(treatmentFactors, measurementDatasetID);
+    }
+
+    @Override
 	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
-		return getDataSetBuilder().buildCompleteDataset(datasetId, false);
+		return getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
 	}
 	
 	@Override
@@ -1091,7 +1077,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		setWorkingDatabase(Database.CENTRAL);
 		map.putAll(getNameDao().getNamesByGidsInMap(gids));
 		setWorkingDatabase(Database.LOCAL);
-		map.putAll(getNameDao().getNamesByGidsInMap(gids));
+		Map<Integer, List<Name>> locals = getNameDao().getNamesByGidsInMap(gids);
+		if (locals != null && !locals.isEmpty()) {
+			for (Integer key : locals.keySet()) {
+				List<Name> names = locals.get(key);
+				if (map.containsKey(key)) {
+					map.get(key).addAll(names);
+				}
+				else {
+					map.put(key, names);
+				}
+			}
+		}
 		
 		return map;
 	}

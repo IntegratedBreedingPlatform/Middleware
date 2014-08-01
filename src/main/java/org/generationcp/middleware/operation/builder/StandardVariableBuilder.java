@@ -12,6 +12,7 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -80,6 +82,21 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariables;
 	}
 	
+	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException {
+		StandardVariableSummary summary = null;
+		if(standardVariableId != null) {
+			if(setWorkingDatabase(standardVariableId)) {
+				summary =  getStandardVariableDao().getStandardVariableSummary(standardVariableId);
+			}
+			
+			//Special handling for standard variables loaded from local databases.
+			if(summary != null && summary.getId() < 0) {
+				populateCentralDatabaseReferences(Arrays.asList(summary));
+			}
+		}
+		return summary;
+	}
+	
 	/**
 	 * Loads a list of {@link StandardVariableSummary}'s for the given set of standard variable ids from standard_variable_summary database view.
 	 * 
@@ -109,11 +126,104 @@ public class StandardVariableBuilder extends Builder {
 			}	
 			if(!negativeIds.isEmpty()) {
 				if(setWorkingDatabase(Database.LOCAL)) {		
-					result.addAll(getStandardVariableDao().getStarndardVariableSummaries(negativeIds));
+					List<StandardVariableSummary> localVariables = getStandardVariableDao().getStarndardVariableSummaries(negativeIds);
+					populateCentralDatabaseReferences(localVariables);
+					result.addAll(localVariables);
 				}
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Standard variables in local databases can have some CV Terms local and
+	 * some referring to the CV Terms in central database. This method populates
+	 * those standard variable summary fields by loading full CVTerm's for them
+	 * from central database as the DB view 'standarad_variable_summary' view
+	 * can not do that automatically.
+	 * 
+	 */
+	private void populateCentralDatabaseReferences(List<StandardVariableSummary> summaries) throws MiddlewareQueryException {
+		if(summaries == null || summaries.isEmpty()) {
+			return;
+		}
+		
+		// Collect IDs of all cental database references (+ve IDs) in ontology star components of the local standard variables.
+		Set<Integer> cvTermsToLoad = new HashSet<Integer>();		
+		for(StandardVariableSummary summary : summaries) {
+			if(summary.getProperty() != null && summary.getProperty().getId() > 0) {
+				cvTermsToLoad.add(summary.getProperty().getId());
+			}
+			if(summary.getMethod() != null && summary.getMethod().getId() > 0) {
+				cvTermsToLoad.add(summary.getMethod().getId());
+			}
+			if(summary.getScale() != null && summary.getScale().getId() > 0) {
+				cvTermsToLoad.add(summary.getScale().getId());
+			}
+			if(summary.getDataType() != null && summary.getDataType().getId() > 0) {
+				cvTermsToLoad.add(summary.getDataType().getId());
+			}
+			if(summary.getStoredIn() != null && summary.getStoredIn().getId() > 0) {
+				cvTermsToLoad.add(summary.getStoredIn().getId());
+			}
+			//isA (class) relationship is always going to be NULL for all standard variables in local DB 
+			//because we never save it linked to the standard variable. It is derived from the Property.
+			//See further hackery for it further below.
+		}
+		
+		setWorkingDatabase(Database.CENTRAL);
+		
+		List<CVTerm> cvTerms = getCvTermDao().getByIds(new ArrayList<Integer>(cvTermsToLoad));
+		Map<Integer, CVTerm> cvTermMap = new HashMap<Integer, CVTerm>();
+		for(CVTerm term : cvTerms) {
+			cvTermMap.put(term.getCvTermId(), term);
+		}
+		
+		for(StandardVariableSummary summary : summaries) {
+			if(summary.getProperty() != null && summary.getProperty().getId() > 0) {
+				CVTerm prop = cvTermMap.get(summary.getProperty().getId());
+				if(prop != null) {
+					summary.setProperty(new TermSummary(prop.getCvTermId(), prop.getName(), prop.getDefinition()));
+				}
+			}
+			if(summary.getMethod() != null && summary.getMethod().getId() > 0) {
+				CVTerm method = cvTermMap.get(summary.getMethod().getId());
+				if(method != null) {
+					summary.setMethod(new TermSummary(method.getCvTermId(), method.getName(), method.getDefinition()));
+				}
+			}
+			if(summary.getScale() != null && summary.getScale().getId() > 0) {
+				CVTerm scale = cvTermMap.get(summary.getScale().getId());
+				if(scale != null) {
+					summary.setScale(new TermSummary(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
+				}
+			}
+			if(summary.getDataType() != null && summary.getDataType().getId() > 0) {
+				CVTerm dataType = cvTermMap.get(summary.getDataType().getId());
+				if(dataType != null) {
+					summary.setDataType(new TermSummary(dataType.getCvTermId(), dataType.getName(), dataType.getDefinition()));
+				}
+			}
+			if(summary.getStoredIn() != null && summary.getStoredIn().getId() > 0) {
+				CVTerm storedIn = cvTermMap.get(summary.getStoredIn().getId());
+				if(storedIn != null) {  
+					summary.setStoredIn(new TermSummary(storedIn.getCvTermId(), storedIn.getName(), storedIn.getDefinition()));
+				}
+			}
+			
+			//Special hackery for the isA (class) part of the relationship!
+			//Earlier isA (class) part of the standard variables ontology star used to be linked to standard variables directly.
+			//Now in local databases, this relationship is linked to the Property of the standard variable. (facepalm).
+			if (summary.getProperty() != null){
+		        setWorkingDatabase(summary.getProperty().getId());
+				List<CVTermRelationship> propertyCvTermRelationships = getCvTermRelationshipDao().getBySubject(summary.getProperty().getId());
+				Term isAOfProperty = createTerm(propertyCvTermRelationships, TermId.IS_A);
+				if(isAOfProperty != null) {
+					summary.setIsA(new TermSummary(isAOfProperty.getId(), isAOfProperty.getName(), isAOfProperty.getDefinition()));
+				}
+		    }
+		}
+		
 	}
 
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {

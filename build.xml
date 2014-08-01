@@ -42,7 +42,6 @@
 	<target name="copyConfig">
 		<copy todir="src/main/resources" overwrite="true">
 			<fileset dir="${basedir}/pipeline/config/ci" id="fromDir">
-				<include name="IBPDatasource.properties" />
 				<include name="workbench.properties" />
 			</fileset>
 		</copy>

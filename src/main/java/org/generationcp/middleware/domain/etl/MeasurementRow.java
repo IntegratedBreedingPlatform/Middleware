@@ -152,15 +152,20 @@ public class MeasurementRow {
 	}
 	
 	public String getMeasurementDataValue(Integer id) {
-		List<MeasurementVariable> variables = getMeasurementVariables();
-		String label = null;
-		for (MeasurementVariable variable : variables) {
-			if (variable.getTermId() == id) {
-				label = variable.getName();
-			}
-		}
+		if(dataList!=null && !dataList.isEmpty()) {
+            for (MeasurementData data : dataList) {
+                if(data.getMeasurementVariable().getTermId() == id.intValue()) {
+                    if (data.getcValueId() != null) {
+                        return data.getcValueId().toString();
+                    }
+                    else {
+                        return data.getValue();
+                    }
+                }
+            }
+        }
 		
-		return label != null ? getMeasurementDataValue(label) : null;
+		return null;
 	}
 	
 	public Integer getRange() {

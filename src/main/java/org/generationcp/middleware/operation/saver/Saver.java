@@ -20,6 +20,7 @@ import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
+import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
@@ -137,5 +138,9 @@ public abstract class Saver extends DatabaseBroker{
  
     protected final StudyDataManager getStudyDataManager() {
         return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ExperimentDestroyer getExperimentDestroyer() {
+        return new ExperimentDestroyer(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

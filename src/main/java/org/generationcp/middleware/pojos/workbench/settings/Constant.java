@@ -19,6 +19,7 @@ public class Constant  implements Serializable {
 	private Double minRange;
 	private Double maxRange;
 	private Operation operation;
+	private boolean isTrial;
 	private int id;
         private int storedIn;
 	
@@ -28,7 +29,8 @@ public class Constant  implements Serializable {
 	
 	public Constant(String name, String description, String property,
 			String scale, String method, String role, String datatype,
-			String value, Integer dataTypeId, Double minRange, Double maxRange) {
+			String value, Integer dataTypeId, Double minRange, Double maxRange,
+			boolean isTrial) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -41,6 +43,7 @@ public class Constant  implements Serializable {
 		this.dataTypeId = dataTypeId;
 		this.minRange = minRange;
 		this.maxRange = maxRange;
+		this.isTrial = isTrial;
 	}
 
 	public String getName() {
@@ -157,5 +160,19 @@ public class Constant  implements Serializable {
     public void setStoredIn(int storedIn) {
         this.storedIn = storedIn;
     }
+
+	/**
+	 * @return the isTrial
+	 */
+	public boolean isTrial() {
+		return isTrial;
+	}
+
+	/**
+	 * @param isTrial the isTrial to set
+	 */
+	public void setTrial(boolean isTrial) {
+		this.isTrial = isTrial;
+	}
 
 }

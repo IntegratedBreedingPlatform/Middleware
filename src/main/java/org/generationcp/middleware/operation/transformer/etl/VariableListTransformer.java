@@ -164,7 +164,7 @@ public class VariableListTransformer extends Transformer {
 				VariableType varType = varTypes.get(i);
 				MeasurementData trialData = null;
 				for (MeasurementData aData : trialMD) {
-					if (aData.getLabel().equalsIgnoreCase(varType.getLocalName())) {
+					if (aData.getMeasurementVariable().getTermId() == varType.getId()) {
 						trialData = aData;
 						break;
 					}
@@ -172,10 +172,12 @@ public class VariableListTransformer extends Transformer {
 				
 				if (trialData != null) {
 					String value = trialData.getValue();
+					Integer phenotypeId = trialData.getPhenotypeId();
 										
 					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT ||
 						varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {//include variate
 						Variable variable = new Variable(varType, value);
+						variable.setPhenotypeId(phenotypeId);
 						variableList.add(variable);
 					}
 				}

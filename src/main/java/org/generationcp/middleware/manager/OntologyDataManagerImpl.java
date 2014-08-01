@@ -33,7 +33,6 @@ import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -83,6 +81,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
 		return getStandardVariableBuilder().getStandardVariableSummaries(standardVariableIds);
+	}
+	
+	@Override
+	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException {
+		return getStandardVariableBuilder().getStandardVariableSummary(standardVariableId);
 	}
 
     @Override

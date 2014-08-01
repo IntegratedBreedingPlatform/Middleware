@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.hibernate.Session;
 
 public class ProjectPropertySaver extends Saver {
 
@@ -115,6 +116,9 @@ public class ProjectPropertySaver extends Saver {
 		saveProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank());
 		saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank());
 		saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(variableType.getStandardVariable().getId()), variableType.getRank());
+		if (variableType.getTreatmentLabel() != null && !variableType.getTreatmentLabel().isEmpty()) {
+			saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType.getRank());
+		}
 	}
 	
 	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
@@ -160,7 +164,9 @@ public class ProjectPropertySaver extends Saver {
 					rank++;
 				}
 				else if (variable.getOperation() == Operation.UPDATE) {
-					updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
+					if (variable.getTermId() != TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+						updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
+					}
 				}
 				else if (variable.getOperation() == Operation.DELETE) {
 					deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId(), geolocation);
@@ -202,12 +208,17 @@ public class ProjectPropertySaver extends Saver {
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
 			if (isConstant) {
-				insertVariable(project, variable, rank);
-				//Variable var = new Variable(createVariableType(variable, rank), variable.getValue());
-				//setWorkingDatabase(Database.LOCAL);
-				//int experimentId = getExperimentProjectDao().getExperimentIdByProjectId(project.getProjectId());
-				//getPhenotypeSaver().save(experimentId, var);
-				getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { //a trial constant
+					int datasetRank = getNextRank(trialDataset);
+					int measurementRank = getNextRank(measurementDataset);
+					insertVariable(trialDataset, variable, datasetRank);
+					insertVariable(measurementDataset, variable, measurementRank);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
+				else { // a study constant
+					insertVariable(project, variable, rank);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
 			}
 			else {
 				int measurementRank = getNextRank(measurementDataset);
@@ -240,6 +251,9 @@ public class ProjectPropertySaver extends Saver {
 		varType.setLocalDescription(variable.getDescription());
 		varType.setRank(rank);
 		
+		if (variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
+			varType.setTreatmentLabel(variable.getTreatmentLabel());
+		}
 		return varType;
 	}
 	
@@ -263,8 +277,15 @@ public class ProjectPropertySaver extends Saver {
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
 			if (isConstant) {
-				updateVariable(project, variable);
-				getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { //a trial constant
+					updateVariable(trialDataset, variable);
+					updateVariable(measurementDataset, variable);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
+				else { //a study constant
+					updateVariable(project, variable);
+					getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
+				}
 			}
 			else {
 				updateVariable(measurementDataset, variable);
@@ -323,10 +344,13 @@ public class ProjectPropertySaver extends Saver {
 			int storedInId, int termId, Geolocation geolocation) throws MiddlewareQueryException {
 		
 		setWorkingDatabase(Database.LOCAL);
+		Session session = getCurrentSessionForLocal();
 		deleteVariable(project, termId);
 		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(storedInId)) {
 			deleteVariable(trialDataset, termId);
 			deleteVariable(measurementDataset, termId);
+			session.flush();
+            session.clear();
 			if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
 			}
@@ -338,6 +362,7 @@ public class ProjectPropertySaver extends Saver {
 		else if (storedInId == TermId.OBSERVATION_VARIATE.getId()
 				|| storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
 			deleteVariable(project, termId); //for constants
+			deleteVariable(trialDataset, termId); //for constants
 			deleteVariable(measurementDataset, termId); //for variates
 			//remove phoenotype value
 			List<Integer> ids = Arrays.asList(project.getProjectId(), trialDataset.getProjectId(), measurementDataset.getProjectId());

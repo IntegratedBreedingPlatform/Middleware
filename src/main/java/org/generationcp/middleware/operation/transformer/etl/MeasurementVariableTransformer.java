@@ -52,7 +52,7 @@ public class MeasurementVariableTransformer extends Transformer {
 	    return measurementVariables;
 	}
 	
-	public List<MeasurementVariable> transform(VariableList variableList, boolean isFactor) {
+	public List<MeasurementVariable> transform(VariableList variableList, boolean isFactor, boolean isStudy) {
 		
 	    List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 	    
@@ -61,6 +61,9 @@ public class MeasurementVariableTransformer extends Transformer {
 	        	VariableType variableType = variable.getVariableType();
 	            StandardVariable stdVariable = variableType.getStandardVariable();
 	            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+	            if (!isFactor && !isStudy) {  //for trial constants
+	            	label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
+	            }
 	            
 	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), 
 	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
