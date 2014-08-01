@@ -438,10 +438,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Germplasm getGermplasmWithPrefName(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return (Germplasm) getGermplasmDao().getByGIDWithPrefName(gid);
-        }
-        return null;
+    	Germplasm germplasm = getGermplasmByGID(gid);
+    	if(germplasm!=null) {
+    		Name preferredName = getPreferredNameByGID(germplasm.getGid());
+    		germplasm.setPreferredName(preferredName);
+    	}
+        return germplasm;
     }
 
     @Override
