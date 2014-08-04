@@ -600,7 +600,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         try {
             
             StringBuilder sql = new StringBuilder()
-                .append("SELECT DISTINCT ep.value ")
+                .append("SELECT DISTINCT levelprop.value level_value, ep.value ")
                 .append(" FROM nd_experimentprop ep ")
                 .append(" INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = ep.nd_experiment_id ")
                 .append("   AND eproj.project_id = ").append(measurementDatasetId)
@@ -610,8 +610,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" ORDER BY CAST(levelprop.value AS UNSIGNED) ");
 
             Query query = getSession().createSQLQuery(sql.toString());
-        
-            return query.list();
+            List<Object[]> list =  query.list();         
+            List<String> returnData = new ArrayList();
+            if (list != null && list.size() > 0) {
+            	 for (Object[] row : list) {
+            		 returnData.add((String)row[1]);      
+                 }
+            	 
+            }
+            return returnData;
                         
         } catch(HibernateException e) {
             logAndThrowException("Error at getTreatmentFactorValues=" + levelId + ", " + amountId + ", " + measurementDatasetId 
