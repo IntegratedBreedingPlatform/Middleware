@@ -547,8 +547,11 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     	System.out.println(fieldbookService.getListDataProject(listId));
     }
     
+    @Test
     public void testDeleteListDataProjects() throws Exception {
+    	int projectId = -422;
     	
+    	fieldbookService.deleteListDataProjects(projectId, GermplasmListType.ADVANCED);
     }
     
 }

@@ -44,4 +44,22 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
         }
         return list;    	
 	}
+
+	public void deleteByListIdWithList(int listId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			SQLQuery statement = getSession().createSQLQuery("delete ldp, lst " +
+	                   "from listdata_project ldp, listnms lst " + 
+					   "where ldp.list_id = lst.listid and ldp.list_id = " + listId);
+			statement.executeUpdate();	   
+			
+	        this.flush();
+	        this.clear();
+	
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(), e);
+		}
+	}
+	
 }

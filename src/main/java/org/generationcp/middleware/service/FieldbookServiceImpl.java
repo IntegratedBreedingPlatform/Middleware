@@ -1153,11 +1153,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+		//when used in advanced, it will delete all the advance lists (list data projects)
 		requireLocalDatabaseInstance();
 		List<GermplasmList> lists = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (lists != null && !lists.isEmpty()) {
 			for (GermplasmList list : lists) {
-				getListDataProjectDAO().deleteByListId(list.getId());
+				getListDataProjectDAO().deleteByListIdWithList(list.getId());
 			}
 		}
 	}
