@@ -21,7 +21,7 @@ public class ListDataProjectSaver extends Saver {
 
 	public int saveOrUpdateListDataProject(int projectId,
 			GermplasmListType type, Integer originalListId,
-			List<ListDataProject> listDatas) throws MiddlewareQueryException {
+			List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
 		
 		requireLocalDatabaseInstance();
 
@@ -34,10 +34,10 @@ public class ListDataProjectSaver extends Saver {
 		}
 		
 		if (originalListId != null) {
-			updateGermplasmListInfo(snapList, originalListId);
+			updateGermplasmListInfo(snapList, originalListId, userId);
 		}
 		else {
-			setDefaultGermplasmListInfo(snapList);
+			setDefaultGermplasmListInfo(snapList,userId);
 		}
 		
 		getGermplasmListDAO().saveOrUpdate(snapList);
@@ -75,25 +75,28 @@ public class ListDataProjectSaver extends Saver {
 		return snapList;
 	}
 	
-	private void updateGermplasmListInfo(GermplasmList snapList, int originalListId) throws MiddlewareQueryException {
+	private void updateGermplasmListInfo(GermplasmList germplasmList, int originalListId, int userId) throws MiddlewareQueryException {
 		setWorkingDatabase(originalListId);
 		GermplasmList origList = getGermplasmListDAO().getById(originalListId);
 		requireLocalDatabaseInstance();
 		if (origList != null) {
-			snapList.setListLocation(origList.getListLocation());
-			snapList.setUserId(origList.getUserId());
-			snapList.setNotes(origList.getNotes());
-			snapList.setsDate(origList.getsDate());
-			snapList.seteDate(origList.geteDate());
+			germplasmList.setListLocation(origList.getListLocation());
+			germplasmList.setUserId(origList.getUserId());
+			germplasmList.setNotes(origList.getNotes());
+			germplasmList.setsDate(origList.getsDate());
+			germplasmList.seteDate(origList.geteDate());
+			germplasmList.setName(origList.getName());
+			germplasmList.setUserId(origList.getUserId());
+			germplasmList.setDescription(origList.getDescription());
 		}
 		else {
-			setDefaultGermplasmListInfo(snapList);
+			setDefaultGermplasmListInfo(germplasmList,userId);
 		}
 	}
 
-	private void setDefaultGermplasmListInfo(GermplasmList snapList) {
+	private void setDefaultGermplasmListInfo(GermplasmList snapList, int userId) {
 		snapList.setListLocation(null);
-		snapList.setUserId(0); //database default
+		snapList.setUserId(userId); //database default
 		snapList.setNotes(null);
 		snapList.setsDate(null);
 		snapList.seteDate(null);

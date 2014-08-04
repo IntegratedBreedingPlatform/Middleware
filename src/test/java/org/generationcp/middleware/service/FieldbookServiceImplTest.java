@@ -512,7 +512,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     	list.get(0).setListDataProjectId(null);
 //    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.NURSERY, originalListId, list);
 //    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.TRIAL, originalListId, list);
-    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, list);
+    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, list, 0);
 //    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.CHECK, null, list);
     }
     

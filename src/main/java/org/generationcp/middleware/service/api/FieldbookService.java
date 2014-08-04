@@ -791,6 +791,14 @@ public interface FieldbookService {
 	int countGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
 	
 	/**
+	 * Count list data project germplasm list data by list id.
+	 *
+	 * @param listId the list id
+	 * @return the int
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	int countListDataProjectGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
+	/**
 	 * Gets the method by code.
 	 *
 	 * @param code the code
@@ -838,7 +846,7 @@ public interface FieldbookService {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list) throws MiddlewareQueryException;
+	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId) throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves a list data project

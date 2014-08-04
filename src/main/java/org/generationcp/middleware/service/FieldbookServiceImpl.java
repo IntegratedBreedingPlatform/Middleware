@@ -1106,6 +1106,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return (int)getGermplasmListManager().countGermplasmListDataByListId(listId);
 	}
 	
+	
+	
+	@Override
+	public int countListDataProjectGermplasmListDataByListId(Integer listId)
+			throws MiddlewareQueryException {
+		return (int)getGermplasmListManager().countListDataProjectGermplasmListDataByListId(listId);
+	}
+
 	@Override
 	public Method getMethodById(int id) throws MiddlewareQueryException {
 	    return getGermplasmDataManager().getMethodByID(id);
@@ -1166,7 +1174,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public int saveOrUpdateListDataProject(int projectId,
 			GermplasmListType type, Integer originalListId,
-			List<ListDataProject> listDatas) throws MiddlewareQueryException {
+			List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
 		
         requireLocalDatabaseInstance();
         int listId = 0;
@@ -1176,7 +1184,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         try {
             trans = session.beginTransaction(); 
 
-    		listId = getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId, listDatas);
+    		listId = getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
 		
             trans.commit();
         } catch (Exception e) {
