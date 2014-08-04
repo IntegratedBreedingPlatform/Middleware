@@ -507,7 +507,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     	list.get(0).setEntryId(1);
     	list.get(0).setEntryCode("ABC1");
     	list.get(0).setGermplasmId(1);
-    	list.get(0).setGroupName("CROSS1");
+    	//list.get(0).setGroupName("CROSS1");
     	list.get(0).setSeedSource("SOURCE1");
     	list.get(0).setListDataProjectId(null);
 //    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.NURSERY, originalListId, list);

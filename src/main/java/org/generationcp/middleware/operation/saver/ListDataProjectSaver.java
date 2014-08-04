@@ -48,8 +48,7 @@ public class ListDataProjectSaver extends Saver {
 		
 		if (listDatas != null) {
 			for (ListDataProject listDataProject : listDatas) {
-				listDataProject.setListDataProjectId(getListDataProjectDAO().getNegativeId("listDataProjectId"));
-				listDataProject.setList(snapList);
+				prepareListDataProjectForSaving(listDataProject, snapList);
 				getListDataProjectDAO().save(listDataProject);
 			}
 		}
@@ -109,5 +108,28 @@ public class ListDataProjectSaver extends Saver {
 			gList = tempList.get(0);
 		}
 		return gList;
+	}
+	
+	private void prepareListDataProjectForSaving(ListDataProject listDataProject, GermplasmList snapList) throws MiddlewareQueryException {
+		listDataProject.setListDataProjectId(getListDataProjectDAO().getNegativeId("listDataProjectId"));
+		listDataProject.setList(snapList);
+		if (listDataProject.getCheckType() == null) {
+			listDataProject.setCheckType(0);
+		}
+		if (listDataProject.getEntryId() == null) {
+			listDataProject.setEntryId(0);
+		}
+		if (listDataProject.getEntryCode() == null) {
+			listDataProject.setEntryCode("-");
+		}
+		if (listDataProject.getSeedSource() == null) {
+			listDataProject.setSeedSource("-");
+		}
+		if (listDataProject.getDesignation() == null) {
+			listDataProject.setDesignation("-");
+		}
+		if (listDataProject.getGroupName() == null) {
+			listDataProject.setGroupName("-");
+		}
 	}
 }
