@@ -77,7 +77,9 @@ public class ListDataProjectSaver extends Saver {
 	}
 	
 	private void updateGermplasmListInfo(GermplasmList snapList, int originalListId) throws MiddlewareQueryException {
+		setWorkingDatabase(originalListId);
 		GermplasmList origList = getGermplasmListDAO().getById(originalListId);
+		requireLocalDatabaseInstance();
 		if (origList != null) {
 			snapList.setListLocation(origList.getListLocation());
 			snapList.setUserId(origList.getUserId());

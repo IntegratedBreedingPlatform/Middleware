@@ -500,7 +500,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     public void testSaveOrUpdateListDataProject() throws Exception {
     	List<ListDataProject> list = new ArrayList<ListDataProject>();
     	int projectId = -422;
-    	Integer originalListId = -1;
+    	Integer originalListId = 1;
     	list.add(new ListDataProject());
     	list.get(0).setCheckType(1);
     	list.get(0).setDesignation("DESIG1");
