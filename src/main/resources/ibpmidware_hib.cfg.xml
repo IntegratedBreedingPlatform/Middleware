@@ -39,7 +39,7 @@
         <mapping class="org.generationcp.middleware.pojos.UserDefinedField"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
-        <mapping class="org.generationcp.middleware.pojos.ListProjectData"/>
+        <mapping class="org.generationcp.middleware.pojos.ListDataProject"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/>
         <mapping class="org.generationcp.middleware.pojos.Installation"/>
         <mapping class="org.generationcp.middleware.pojos.ListDataProperty"/>
