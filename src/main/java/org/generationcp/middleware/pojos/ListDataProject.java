@@ -25,7 +25,7 @@ public class ListDataProject implements Serializable {
 	private Integer listDataProjectId;
 	
     @ManyToOne(targetEntity = GermplasmList.class)
-    @JoinColumn(name = "listid", nullable = false)
+    @JoinColumn(name = "list_id", nullable = false)
     @NotFound(action = NotFoundAction.IGNORE)
     private GermplasmList list;
 
