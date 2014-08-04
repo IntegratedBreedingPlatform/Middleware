@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -819,4 +821,38 @@ public interface FieldbookService {
 	 * Deletes a study (logical delete).
 	 */
 	void deleteStudy(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns germplasm lists by project id.
+	 * @param projectId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<GermplasmList> getGermplasmListsByProjectId(int projectId) throws MiddlewareQueryException;
+	
+	/**
+	 * Creates or Update a snapshot.
+	 * @param projectId
+	 * @param snapshotType
+	 * @param list
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, List<ListDataProject> list) throws MiddlewareQueryException;
+
+	/**
+	 * Retrieves a snapshot
+	 * @param listId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ListDataProject> getSnapshot(int listId) throws MiddlewareQueryException;
+	
+	/** 
+	 * Deletes a snapshot given the project_id and the snapshot type.
+	 * @param projectId
+	 * @param snapshotType
+	 * @throws MiddlewareQueryException
+	 */
+	void deleteSnapshots(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException;
 }

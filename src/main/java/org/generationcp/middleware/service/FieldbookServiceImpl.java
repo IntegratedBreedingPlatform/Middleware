@@ -40,6 +40,7 @@ import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -52,6 +53,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
@@ -1130,5 +1132,30 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
              rollbackTransaction(trans);
              logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
          }
+	}
+	
+	@Override
+	public List<GermplasmList> getGermplasmListsByProjectId(int projectId) throws MiddlewareQueryException {
+		//TODO: implement method
+		return null;
+	}
+	
+	@Override
+	public int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, List<ListDataProject> list) throws MiddlewareQueryException {
+		//TODO: implement method
+		return 0;
+	}
+	
+	@Override
+	public List<ListDataProject> getSnapshot(int listId) throws MiddlewareQueryException {
+		//TODO: implement method
+		return null;
+	}
+
+	@Override
+	public void deleteSnapshots(int projectId, GermplasmListType snapshotType)
+			throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		
 	}
 }
