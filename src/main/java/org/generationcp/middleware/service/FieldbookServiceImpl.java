@@ -36,7 +36,12 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.*;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.TreatmentVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
@@ -1135,38 +1140,37 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException {
-		//TODO: implement method
-		//added snapshot type since we would use this to get the specific list
+	public List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+//		setWorkingDatabase(projectId);
+//		return getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		return null;
 	}
 	
 	@Override
-	public List<ListDataProject> getSnapshot(int listId) throws MiddlewareQueryException {
-		//TODO: implement method
-		//this should retrieve the associate germplasm as well already
+	public List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException {
+//		setWorkingDatabase(listId);
+//		return getListDataProjectDAO().getByListId(listId);
 		return null;
 	}
 
 	@Override
-	public void deleteSnapshots(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
+	public void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+//		requireLocalDatabaseInstance();
+//		List<GermplasmList> lists = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+//		if (lists != null && !lists.isEmpty()) {
+//			for (GermplasmList list : lists) {
+//				getListDataProjectDAO().deleteByListId(list.getId());
+//			}
+//		}
+	}
+
+	@Override
+	public int saveOrUpdateListDataProject(int projectId,
+			GermplasmListType type, Integer originalListId,
+			List<ListDataProject> listDatas) throws MiddlewareQueryException {
 		
-	}
-
-	@Override
-	public int saveOrUpdateSnapshot(int projectId,
-			GermplasmListType snapshotType, int originalListId,
-			List<ListDataProject> list) throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
+//		return getListDataProjectSaver().saveOrUpdateSnapshot(projectId, type, originalListId, listDatas);
 		return 0;
 	}
 
-	@Override
-	public int saveOrUpdateSnapshot(int projectId,
-			GermplasmListType snapshotType, GermplasmList newList,
-			List<ListDataProject> listData) throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }

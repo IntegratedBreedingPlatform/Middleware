@@ -14,14 +14,14 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 @Entity
-@Table(name = "list_data_project")
+@Table(name = "listdata_project")
 public class ListDataProject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
     @Basic(optional = false)
-    @Column(name = "list_project_id")
+    @Column(name = "listdata_project_id")
 	private Integer listDataProjectId;
 	
     @ManyToOne(targetEntity = GermplasmList.class)

@@ -828,41 +828,32 @@ public interface FieldbookService {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException;
+	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type) throws MiddlewareQueryException;
 	
 	/**
-	 * Creates or Update a snapshot.
+	 * Creates or Update a list data project.
 	 * @param projectId
-	 * @param snapshotType
+	 * @param type
 	 * @param list
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, int originalListId, List<ListDataProject> list) throws MiddlewareQueryException;
+	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list) throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves a snapshot
+	 * Retrieves a list data project
 	 * @param listId
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<ListDataProject> getSnapshot(int listId) throws MiddlewareQueryException;
+	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
 	
 	/** 
-	 * Deletes a snapshot given the project_id and the snapshot type.
+	 * Deletes a list data project given the project_id and the type.
 	 * @param projectId
-	 * @param snapshotType
+	 * @param type
 	 * @throws MiddlewareQueryException
 	 */
-	void deleteSnapshots(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException;
-	
-	/**
-	 * Creates or updates a snapshot.
-	 * @param newList
-	 * @param listData
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, GermplasmList newList, List<ListDataProject> listData) throws MiddlewareQueryException;
+	void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException;
 	
 }
