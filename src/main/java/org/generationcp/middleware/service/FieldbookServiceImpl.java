@@ -1135,8 +1135,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public List<GermplasmList> getGermplasmListsByProjectId(int projectId) throws MiddlewareQueryException {
+	public List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException {
 		//TODO: implement method
+		//added snapshot type since we would use this to get the specific list
 		return null;
 	}
 	
@@ -1149,6 +1150,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<ListDataProject> getSnapshot(int listId) throws MiddlewareQueryException {
 		//TODO: implement method
+		//this should retrieve the associate germplasm as well already
 		return null;
 	}
 

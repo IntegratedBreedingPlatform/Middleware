@@ -828,7 +828,7 @@ public interface FieldbookService {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmList> getGermplasmListsByProjectId(int projectId) throws MiddlewareQueryException;
+	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException;
 	
 	/**
 	 * Creates or Update a snapshot.
