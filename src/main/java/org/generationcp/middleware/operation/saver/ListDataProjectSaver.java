@@ -101,8 +101,10 @@ public class ListDataProjectSaver extends Saver {
 	}
 	
 	private GermplasmList getGermplasmList(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+		setWorkingDatabase(projectId);
 		GermplasmList gList = null;
 		List<GermplasmList> tempList = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		requireLocalDatabaseInstance();
 		if (tempList != null && !tempList.isEmpty()) {
 			gList = tempList.get(0);
 		}
