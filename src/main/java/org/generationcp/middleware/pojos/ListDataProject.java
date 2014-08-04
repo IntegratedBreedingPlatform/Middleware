@@ -181,4 +181,17 @@ public class ListDataProject implements Serializable {
 		this.groupName = groupName;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ListDataProject [listDataProjectId=" + listDataProjectId
+				+ ", list=" + list + ", germplasmId=" + germplasmId
+				+ ", checkType=" + checkType + ", entryId=" + entryId
+				+ ", entryCode=" + entryCode + ", seedSource=" + seedSource
+				+ ", designation=" + designation + ", groupName=" + groupName
+				+ "]";
+	}
+
 }

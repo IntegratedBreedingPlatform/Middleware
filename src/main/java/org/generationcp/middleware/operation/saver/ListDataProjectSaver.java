@@ -48,6 +48,7 @@ public class ListDataProjectSaver extends Saver {
 		
 		if (listDatas != null) {
 			for (ListDataProject listDataProject : listDatas) {
+				listDataProject.setListDataProjectId(getListDataProjectDAO().getNegativeId("listDataProjectId"));
 				listDataProject.setList(snapList);
 				getListDataProjectDAO().save(listDataProject);
 			}

@@ -509,20 +509,42 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     	list.get(0).setGermplasmId(1);
     	list.get(0).setGroupName("CROSS1");
     	list.get(0).setSeedSource("SOURCE1");
-    	list.get(0).setListDataProjectId(projectId);
+    	list.get(0).setListDataProjectId(null);
 //    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.NURSERY, originalListId, list);
 //    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.TRIAL, originalListId, list);
-//    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, list);
-    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.CHECK, null, list);
+    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, list);
+//    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.CHECK, null, list);
     }
     
     @Test
     public void testGetGermplasmListsByProjectId() throws Exception {
-    	
+    	int projectId = -422;
+    	System.out.println("NURSERY");
+    	List<GermplasmList> lists = fieldbookService.getGermplasmListsByProjectId(projectId, GermplasmListType.NURSERY);
+    	for (GermplasmList list : lists) {
+    		System.out.println(list);
+    	}
+    	System.out.println("TRIAL");
+    	lists = fieldbookService.getGermplasmListsByProjectId(projectId, GermplasmListType.TRIAL);
+    	for (GermplasmList list : lists) {
+    		System.out.println(list);
+    	}
+    	System.out.println("ADVANCED");
+    	lists = fieldbookService.getGermplasmListsByProjectId(projectId, GermplasmListType.ADVANCED);
+    	for (GermplasmList list : lists) {
+    		System.out.println(list);
+    	}
+    	System.out.println("CHECK");
+    	lists = fieldbookService.getGermplasmListsByProjectId(projectId, GermplasmListType.CHECK);
+    	for (GermplasmList list : lists) {
+    		System.out.println(list);
+    	}
     }
     
+    @Test
     public void testGetListDataProject() throws Exception {
-    	
+    	int listId = -31;
+    	System.out.println(fieldbookService.getListDataProject(listId));
     }
     
     public void testDeleteListDataProjects() throws Exception {
