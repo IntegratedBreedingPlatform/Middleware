@@ -188,6 +188,7 @@ public class MeasurementData {
 					return possibleValue.getDescription();
 				}
 			}
+			return this.value; //this would return the value from the db
 		}
 		else {
 			if(this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null && this.getMeasurementVariable().getDataTypeDisplay().equalsIgnoreCase("N")){
