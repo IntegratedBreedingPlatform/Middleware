@@ -1142,12 +1142,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, List<ListDataProject> list) throws MiddlewareQueryException {
-		//TODO: implement method
-		return 0;
-	}
-	
-	@Override
 	public List<ListDataProject> getSnapshot(int listId) throws MiddlewareQueryException {
 		//TODO: implement method
 		//this should retrieve the associate germplasm as well already
@@ -1155,9 +1149,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteSnapshots(int projectId, GermplasmListType snapshotType)
-			throws MiddlewareQueryException {
+	public void deleteSnapshots(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public int saveOrUpdateSnapshot(int projectId,
+			GermplasmListType snapshotType, int originalListId,
+			List<ListDataProject> list) throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int saveOrUpdateSnapshot(int projectId,
+			GermplasmListType snapshotType, GermplasmList newList,
+			List<ListDataProject> listData) throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

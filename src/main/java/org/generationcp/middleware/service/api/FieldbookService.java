@@ -838,7 +838,7 @@ public interface FieldbookService {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, List<ListDataProject> list) throws MiddlewareQueryException;
+	int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, int originalListId, List<ListDataProject> list) throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves a snapshot
@@ -855,4 +855,14 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	void deleteSnapshots(int projectId, GermplasmListType snapshotType) throws MiddlewareQueryException;
+	
+	/**
+	 * Creates or updates a snapshot.
+	 * @param newList
+	 * @param listData
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	int saveOrUpdateSnapshot(int projectId, GermplasmListType snapshotType, GermplasmList newList, List<ListDataProject> listData) throws MiddlewareQueryException;
+	
 }
