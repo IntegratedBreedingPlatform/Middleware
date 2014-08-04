@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
@@ -368,5 +369,21 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
                 }
         return new ArrayList<GermplasmList>();
     }
-    
+ 
+    @SuppressWarnings("unchecked")
+	public List<GermplasmList> getByProjectIdAndType(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+    	List<GermplasmList> list = new ArrayList<GermplasmList>();
+        try {
+            Criteria criteria = getSession().createCriteria(GermplasmList.class);
+            criteria.add(Restrictions.eq("projectId", projectId));
+            criteria.add(Restrictions.eq("type", type.name()));
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            return criteria.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByProjectId(projectId=" + projectId + ") query from GermplasmList: "
+                    + e.getMessage(), e);
+        }
+        return list;    	
+    }
 }

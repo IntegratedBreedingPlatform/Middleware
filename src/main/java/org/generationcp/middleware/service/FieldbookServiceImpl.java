@@ -1141,27 +1141,25 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type) throws MiddlewareQueryException {
-//		setWorkingDatabase(projectId);
-//		return getGermplasmListDAO().getByProjectIdAndType(projectId, type);
-		return null;
+		setWorkingDatabase(projectId);
+		return getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 	}
 	
 	@Override
 	public List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException {
-//		setWorkingDatabase(listId);
-//		return getListDataProjectDAO().getByListId(listId);
-		return null;
+		setWorkingDatabase(listId);
+		return getListDataProjectDAO().getByListId(listId);
 	}
 
 	@Override
 	public void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException {
-//		requireLocalDatabaseInstance();
-//		List<GermplasmList> lists = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
-//		if (lists != null && !lists.isEmpty()) {
-//			for (GermplasmList list : lists) {
-//				getListDataProjectDAO().deleteByListId(list.getId());
-//			}
-//		}
+		requireLocalDatabaseInstance();
+		List<GermplasmList> lists = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		if (lists != null && !lists.isEmpty()) {
+			for (GermplasmList list : lists) {
+				getListDataProjectDAO().deleteByListId(list.getId());
+			}
+		}
 	}
 
 	@Override
@@ -1169,8 +1167,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			GermplasmListType type, Integer originalListId,
 			List<ListDataProject> listDatas) throws MiddlewareQueryException {
 		
-//		return getListDataProjectSaver().saveOrUpdateSnapshot(projectId, type, originalListId, listDatas);
-		return 0;
-	}
+        requireLocalDatabaseInstance();
+        int listId = 0;
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction(); 
 
+    		listId = getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId, listDatas);
+		
+            trans.commit();
+        } catch (Exception e) {
+        	e.printStackTrace();
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveOrUpdateListDataProject(): " + e.getMessage(), e, LOG);
+        }
+        return listId;
+	}
 }

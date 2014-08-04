@@ -32,6 +32,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -39,6 +40,7 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -493,4 +495,38 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     		}
     	}
     }
+    
+    @Test
+    public void testSaveOrUpdateListDataProject() throws Exception {
+    	List<ListDataProject> list = new ArrayList<ListDataProject>();
+    	int projectId = -422;
+    	Integer originalListId = -1;
+    	list.add(new ListDataProject());
+    	list.get(0).setCheckType(1);
+    	list.get(0).setDesignation("DESIG1");
+    	list.get(0).setEntryId(1);
+    	list.get(0).setEntryCode("ABC1");
+    	list.get(0).setGermplasmId(1);
+    	list.get(0).setGroupName("CROSS1");
+    	list.get(0).setSeedSource("SOURCE1");
+    	list.get(0).setListDataProjectId(projectId);
+//    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.NURSERY, originalListId, list);
+//    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.TRIAL, originalListId, list);
+//    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.ADVANCED, originalListId, list);
+    	fieldbookService.saveOrUpdateListDataProject(projectId, GermplasmListType.CHECK, null, list);
+    }
+    
+    @Test
+    public void testGetGermplasmListsByProjectId() throws Exception {
+    	
+    }
+    
+    public void testGetListDataProject() throws Exception {
+    	
+    }
+    
+    public void testDeleteListDataProjects() throws Exception {
+    	
+    }
+    
 }
