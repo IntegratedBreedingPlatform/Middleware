@@ -635,7 +635,7 @@ public class WorkbookSaver extends Saver {
 	    
 		TimerWatch watch = new TimerWatch("save trial experiments", LOG);
 		ExperimentValues trialDatasetValues = createTrialExperimentValues(locationId, trialVariates);
-		getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.PLOT, trialDatasetValues);
+		getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
 		watch.stop();
 	}
 	
