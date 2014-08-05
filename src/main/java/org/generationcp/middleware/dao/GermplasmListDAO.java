@@ -42,6 +42,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            
+            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -55,6 +61,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            
+            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            
             criteria.setProjection(Projections.rowCount());
             Long count = (Long) criteria.uniqueResult();
             
@@ -76,7 +88,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            criteria.createAlias("list", "l");
 	            criteria.setProjection(Projections.distinct(Projections.property("list")));
 	            criteria.add(Restrictions.eq("gid", gid));
-	            criteria.add(Restrictions.ne("l.status", STATUS_DELETED));
+	            criteria.add(Restrictions.ne("l.status", STATUS_DELETED));	            
+	            
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
 	            criteria.addOrder(Order.asc("l.id"));
@@ -92,7 +105,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
     public long countByGID(Integer gid) throws MiddlewareQueryException {
 	try {
 		if (gid != null){
-				Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+				Criteria criteria = getSession().createCriteria(GermplasmListData.class);				
 				criteria.createAlias("list", "l");
 				criteria.add(Restrictions.eq("gid", gid));
 				criteria.add(Restrictions.ne("l.status", STATUS_DELETED));
@@ -110,6 +123,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
 
+            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            
             if (operation == null || operation == Operation.EQUAL) {
                 criteria.add(Restrictions.eq("name", name));
             } else if (operation == Operation.LIKE) {
@@ -131,7 +149,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setProjection(Projections.rowCount());
-
+            
+            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            
             if (operation == null || operation == Operation.EQUAL) {
                 criteria.add(Restrictions.eq("name", name));
             } else if (operation == Operation.LIKE) {
@@ -151,6 +174,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            Criteria criteria = getSession().createCriteria(GermplasmList.class);
 	            criteria.add(Restrictions.eq("status", status));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            
+	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
 	            return criteria.list();
@@ -168,6 +197,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            Criteria criteria = getSession().createCriteria(GermplasmList.class);
 	            criteria.add(Restrictions.eq("status", status));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            
+	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            
 	            criteria.setProjection(Projections.rowCount());
 	            return ((Long) criteria.uniqueResult()).longValue(); 
         	}
@@ -187,6 +222,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.or(topFolder, nullFolder));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            
+            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             criteria.addOrder(Order.asc("name"));
@@ -204,6 +245,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.or(topFolder, nullFolder));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            
+            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
@@ -243,6 +290,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            Criteria criteria = getSession().createCriteria(GermplasmList.class);
 	            criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            
+	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
 	            criteria.addOrder(Order.asc("name"));
@@ -268,6 +321,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            Criteria criteria = getSession().createCriteria(GermplasmList.class);
 	            criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            
+	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            
 	            criteria.setProjection(Projections.rowCount());
 	            return ((Long) criteria.uniqueResult()).longValue(); 
         	}
@@ -378,6 +437,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.add(Restrictions.eq("projectId", projectId));
             criteria.add(Restrictions.eq("type", type.name()));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            
             return criteria.list();
 
         } catch (HibernateException e) {
