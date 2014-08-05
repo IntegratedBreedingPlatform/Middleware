@@ -103,31 +103,41 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
             trans = session.beginTransaction();
             // check if scale, property and method exists first
-            Term scale = findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
-            if (scale == null) {
-                stdVariable.setScale(getTermSaver().save(stdVariable.getScale().getName(),
-                        stdVariable.getScale().getDefinition(), CvId.SCALES));
-                if (LOG.isDebugEnabled()){
-                    LOG.debug("new scale with id = " + stdVariable.getScale().getId());
-                }
+            Term scale = null;
+            if(stdVariable!=null && stdVariable.getScale()!=null){
+            	scale = findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
+	            if (scale == null) {
+	                stdVariable.setScale(getTermSaver().save(stdVariable.getScale().getName(),
+	                        stdVariable.getScale().getDefinition(), CvId.SCALES));
+	                if (LOG.isDebugEnabled()){
+	                    LOG.debug("new scale with id = " + stdVariable.getScale().getId());
+	                }
+	            }
             }
-            Term property = findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
-            if (property == null) {
-                stdVariable.setProperty(getTermSaver().save(stdVariable.getProperty().getName(),
-                        stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
-                if (LOG.isDebugEnabled()){
-                    LOG.debug("new property with id = " + stdVariable.getProperty().getId());
-                }
+            Term property = null;
+            if(stdVariable!=null && stdVariable.getProperty()!=null){
+            	findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
+	            if (property == null) {
+	                stdVariable.setProperty(getTermSaver().save(stdVariable.getProperty().getName(),
+	                        stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
+	                if (LOG.isDebugEnabled()){
+	                    LOG.debug("new property with id = " + stdVariable.getProperty().getId());
+	                }
+	            }
             }
-            Term method = findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
-            if (method == null) {
-                stdVariable.setMethod(getTermSaver().save(stdVariable.getMethod().getName(),
-                        stdVariable.getMethod().getDefinition(), CvId.METHODS));
-                if (LOG.isDebugEnabled()){
-                    LOG.debug("new method with id = " + stdVariable.getMethod().getId());
-                }
+            Term method = null;
+            if(stdVariable!=null && stdVariable.getMethod()!=null){
+            	findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
+	            if (method == null) {
+	                stdVariable.setMethod(getTermSaver().save(stdVariable.getMethod().getName(),
+	                        stdVariable.getMethod().getDefinition(), CvId.METHODS));
+	                if (LOG.isDebugEnabled()){
+	                    LOG.debug("new method with id = " + stdVariable.getMethod().getId());
+	                }
+	            }
             }
-            if (findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale()
+            if (stdVariable.getProperty()==null || stdVariable.getScale()==null || stdVariable.getMethod()==null || 
+            		findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale()
                     .getName(), stdVariable.getMethod().getName()) == null) {
                 getStandardVariableSaver().save(stdVariable);
             }

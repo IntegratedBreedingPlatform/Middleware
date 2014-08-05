@@ -140,6 +140,7 @@ public class OntologyServiceImplTest extends TestOutputFormatter {
 
     @Test
     public void testAddStandardVariable() throws MiddlewareQueryException {
+        StandardVariable stdVar = createNewStandardVariable(CHARACTER_VARIABLE);    
     }
     
     @Test
