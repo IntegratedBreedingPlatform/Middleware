@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -30,6 +31,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
@@ -651,12 +653,29 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		// Get gids from listdata (from db instance based on listId):
 		// SELECT * FROM listdata WHERE listid = :listId;
 		setWorkingDatabase(listId);
-		List<GermplasmListData> listData = getGermplasmListDataDAO().getByListId(listId, 0, Integer.MAX_VALUE);
 		
 		// Get sourceName from listnms (from db instance based on listId):
 		// SELECT listname FROM listnms WHERE listid = :listId;
 		GermplasmList germplasmList = getGermplasmListDAO().getById(listId);
+		List<GermplasmListData> listData = null;
 		
+		if (germplasmList.getType() != null && germplasmList.getType().equalsIgnoreCase(GermplasmListType.ADVANCED.name())) {
+			
+			germplasmList = getGermplasmListDAO().getById(listId);
+			List<ListDataProject> listDataProjects = getListDataProjectDAO().getByListId(listId);
+			listData = new ArrayList<GermplasmListData>();
+			if (listDataProjects != null) {
+				for (ListDataProject listDataProject : listDataProjects) {
+					listData.add(new GermplasmListData(listDataProject.getListDataProjectId(), listDataProject.getList(), listDataProject.getGermplasmId(), 
+							listDataProject.getEntryId(), listDataProject.getEntryCode(), listDataProject.getSeedSource(), listDataProject.getDesignation(), 
+							listDataProject.getGroupName(), 1, null));
+				}
+			}
+		}
+		else { 
+			listData = getGermplasmListDataDAO().getByListId(listId, 0, Integer.MAX_VALUE);
+		}
+
 		// Get gids
 		List<Integer> gids = new ArrayList<Integer>();
 		for (GermplasmListData datum : listData){
