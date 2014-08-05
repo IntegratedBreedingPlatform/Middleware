@@ -13,37 +13,33 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
-import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+public class CvTermDaoTest extends MiddlewareIntegrationTest {
 
-public class CvTermDaoTest{
-
-    private static HibernateUtil hibernateUtil;
     private static CVTermDao dao;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
         dao = new CVTermDao();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(centralSessionUtil.getCurrentSession());
     }
 
     @Test
@@ -183,7 +179,6 @@ public class CvTermDaoTest{
     public static void tearDown() throws Exception {
         dao.setSession(null);
         dao = null;
-        hibernateUtil.shutdown();
     }
 
 }

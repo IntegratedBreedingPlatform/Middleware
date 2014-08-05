@@ -12,26 +12,20 @@
 
 package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.util.Debug;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProjectUserInfoDAOTest{
+public class ProjectUserInfoDAOTest extends MiddlewareIntegrationTest {
 
-    private HibernateUtil hibernateUtil;
     private ProjectUserInfoDAO dao;
 
     @Before
     public void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench"));
         dao = new ProjectUserInfoDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(workbenchSessionUtil.getCurrentSession());
     }
 
     @Test
@@ -47,13 +41,5 @@ public class ProjectUserInfoDAOTest{
         
         
     }
-
-    @After
-    public void tearDown() throws Exception {
-        dao.setSession(null);
-        dao = null;
-        hibernateUtil.shutdown();
-    }
-
 }
 

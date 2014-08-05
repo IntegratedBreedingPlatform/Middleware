@@ -164,7 +164,9 @@ public class ProjectPropertySaver extends Saver {
 					rank++;
 				}
 				else if (variable.getOperation() == Operation.UPDATE) {
-					updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
+					if (variable.getTermId() != TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+						updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
+					}
 				}
 				else if (variable.getOperation() == Operation.DELETE) {
 					deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId(), geolocation);

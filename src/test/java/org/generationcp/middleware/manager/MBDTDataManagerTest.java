@@ -1,20 +1,11 @@
 package org.generationcp.middleware.manager;
 
-import com.mchange.v2.c3p0.DriverManagerDataSourceFactory;
-import org.generationcp.middleware.domain.mbdt.SelectedGenotypeEnum;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.api.MBDTDataManager;
-import org.generationcp.middleware.pojos.mbdt.MBDTGeneration;
-import org.generationcp.middleware.pojos.mbdt.MBDTProjectData;
-import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,17 +13,26 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
+import javax.sql.DataSource;
+
+import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.domain.mbdt.SelectedGenotypeEnum;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.MBDTDataManager;
+import org.generationcp.middleware.pojos.mbdt.MBDTGeneration;
+import org.generationcp.middleware.pojos.mbdt.MBDTProjectData;
+import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.mchange.v2.c3p0.DriverManagerDataSourceFactory;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Daniel Villafuerte
  */
-
-
-public class MBDTDataManagerTest
-        extends TestOutputFormatter {
+public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
     private MBDTDataManager dut;
     private DataSource dataSource;
@@ -45,17 +45,9 @@ public class MBDTDataManagerTest
     public static final int[] SAMPLE_SELECTED_MARKER_IDS = new int[]{-1, -2, -3};
     public static final int[] SAMPLE_SELECTED_ACCESSION_GIDS = new int[]{1, 2, 3, 4, 5, 6};
     public static final List<Integer> SAMPLE_PARENT_GIDS = new ArrayList<Integer>();
-    private static ManagerFactory managerFactory;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "local");
-
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "central");
-        managerFactory = new ManagerFactory(local, central);
-
         SAMPLE_PARENT_GIDS.add(4);
         SAMPLE_PARENT_GIDS.add(5);
         SAMPLE_PARENT_GIDS.add(6);
@@ -64,10 +56,9 @@ public class MBDTDataManagerTest
     @Before
     public void prepareDatabaseItems() throws Exception {
         dut = managerFactory.getMbdtDataManager();
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "local");
-
-        dataSource = DriverManagerDataSourceFactory.create(local.getDriverName(), local.getUrl(), local.getUsername(), local.getPassword());
+		dataSource = DriverManagerDataSourceFactory.create(
+				localConnectionParameters.getDriverName(), localConnectionParameters.getUrl(),
+				localConnectionParameters.getUsername(), localConnectionParameters.getPassword());
     }
 
     protected void executeUpdate(String sql) throws Exception {

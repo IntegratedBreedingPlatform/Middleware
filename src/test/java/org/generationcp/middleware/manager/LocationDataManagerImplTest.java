@@ -18,35 +18,25 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class LocationDataManagerImplTest extends TestOutputFormatter{
+public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static LocationDataManager manager;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = 
-                new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = 
-                new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getLocationDataManager();
+        manager = managerFactory.getLocationDataManager();
     }
 
     @Test
@@ -388,11 +378,5 @@ public class LocationDataManagerImplTest extends TestOutputFormatter{
         assertNotNull(provinces);
         assertTrue(provinces.size() > 0);
         Debug.printObjects(3, provinces);
-    }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
-    }
-    
+    }    
 }

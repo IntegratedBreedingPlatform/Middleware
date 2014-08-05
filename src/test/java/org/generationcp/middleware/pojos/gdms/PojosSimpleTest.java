@@ -13,40 +13,26 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.util.List;
 
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
-import org.generationcp.middleware.pojos.gdms.AlleleValues;
-import org.generationcp.middleware.pojos.gdms.CharValues;
-import org.generationcp.middleware.pojos.gdms.Dataset;
-import org.generationcp.middleware.pojos.gdms.Map;
-import org.generationcp.middleware.pojos.gdms.MappingData;
-import org.generationcp.middleware.pojos.gdms.MappingPop;
-import org.generationcp.middleware.pojos.gdms.MappingPopValues;
-import org.generationcp.middleware.pojos.gdms.Marker;
-import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SuppressWarnings("rawtypes")
-public class PojosSimpleTest extends TestOutputFormatter{
+public class PojosSimpleTest extends DataManagerIntegrationTest {
 
-    private static HibernateUtil hibernateUtil;
-
+    private static Session session;
+    
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
+        session = managerFactory.getSessionProviderForCentral().getSession();
     }
     
     @Test
     public void testAccMetadataSet() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM AccMetadataSet");
         query.setMaxResults(5);
         List results = query.list();
@@ -61,7 +47,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testAlleleValues() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM AlleleValues");
         query.setMaxResults(5);
         List results = query.list();
@@ -76,7 +61,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testCharValues() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM CharValues");
         query.setMaxResults(5);
         List results = query.list();
@@ -91,7 +75,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testDataset() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Dataset");
         query.setMaxResults(5);
         List results = query.list();
@@ -106,7 +89,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testMap() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Map");
         query.setMaxResults(5);
         List results = query.list();
@@ -121,7 +103,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testMappingData() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM MappingData");
         query.setMaxResults(5);
         List results = query.list();
@@ -136,7 +117,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testMappingPop() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM MappingPop");
         query.setMaxResults(5);
         List results = query.list();
@@ -151,7 +131,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testMappingPopValues() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM MappingPopValues");
         query.setMaxResults(5);
         List results = query.list();
@@ -166,7 +145,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testMarker() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Marker");
         query.setMaxResults(5);
         List results = query.list();
@@ -181,7 +159,6 @@ public class PojosSimpleTest extends TestOutputFormatter{
 
     @Test
     public void testMarkerMetadataSet() {
-        Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM MarkerMetadataSet");
         query.setMaxResults(5);
         List results = query.list();
@@ -193,10 +170,4 @@ public class PojosSimpleTest extends TestOutputFormatter{
             Debug.println(INDENT, element);
         }
     } 
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        hibernateUtil.shutdown();
-    }
-
 }

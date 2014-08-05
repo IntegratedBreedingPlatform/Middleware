@@ -12,33 +12,26 @@
 package org.generationcp.middleware.manager;
 
 import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class UserDataManagerImplTest extends TestOutputFormatter{
+public class UserDataManagerImplTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static UserDataManager manager;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getUserDataManager();
+        manager = managerFactory.getUserDataManager();
     }
 
     @Test
@@ -291,8 +284,4 @@ public class UserDataManagerImplTest extends TestOutputFormatter{
                             + manager.isValidUserLogin(invaliduser, invalidpass));
     }
 
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
-    }
 }

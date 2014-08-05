@@ -23,18 +23,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.ServiceIntegraionTest;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -43,33 +43,22 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class FieldbookServiceImplTest extends TestOutputFormatter{
+public class FieldbookServiceImplTest extends ServiceIntegraionTest {
         
-    private static ServiceFactory serviceFactory;
     private static FieldbookService fieldbookService;
     private static DataImportService dataImportService;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters(
-                "testDatabaseConfig.properties", "central");
-
-        serviceFactory = new ServiceFactory(local, central);
-
         fieldbookService = serviceFactory.getFieldbookService();
         dataImportService = serviceFactory.getDataImportService();
     }
@@ -504,12 +493,4 @@ public class FieldbookServiceImplTest extends TestOutputFormatter{
     		}
     	}
     }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        if (serviceFactory != null) {
-            serviceFactory.close();
-        }
-    }
-
 }

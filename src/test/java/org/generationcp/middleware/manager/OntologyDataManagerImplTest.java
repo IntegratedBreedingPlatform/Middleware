@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
@@ -60,7 +61,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 @SuppressWarnings("unused")
-public class OntologyDataManagerImplTest extends TestOutputFormatter {
+public class OntologyDataManagerImplTest extends DataManagerIntegrationTest {
 
     private static final Integer CV_TERM_ID = 1010;
     private static final String CV_TERM_NAME = "Study Information";
@@ -68,15 +69,11 @@ public class OntologyDataManagerImplTest extends TestOutputFormatter {
     
     private static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
 	
-	private static ManagerFactory factory;
 	private static OntologyDataManager manager;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-		DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-		factory = new ManagerFactory(local, central);
-		manager = factory.getNewOntologyDataManager();
+		manager = managerFactory.getNewOntologyDataManager();
 	}
 
 	@Test
@@ -542,13 +539,6 @@ public class OntologyDataManagerImplTest extends TestOutputFormatter {
 		Debug.println(INDENT, "testCountTermsByCvId() - Count All Properties: " + count);
 		count = manager.countTermsByCvId(CvId.SCALES);		
 		Debug.println(INDENT, "testCountTermsByCvId() - Count All Scales: " + count);
-	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		if (factory != null) {
-			factory.close();
-		}
 	}
 	
 	@Test

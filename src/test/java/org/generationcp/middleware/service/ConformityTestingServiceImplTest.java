@@ -1,15 +1,23 @@
 package org.generationcp.middleware.service;
 
 
-import com.mchange.v2.c3p0.DriverManagerDataSourceFactory;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.conformity.ConformityGermplasmInput;
 import org.generationcp.middleware.domain.conformity.UploadInput;
 import org.generationcp.middleware.exceptions.ConformityException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
-import org.generationcp.middleware.service.ConformityTestingServiceImpl;
 import org.generationcp.middleware.service.api.ConformityTestingService;
 import org.junit.After;
 import org.junit.Before;
@@ -17,22 +25,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Map;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.mchange.v2.c3p0.DriverManagerDataSourceFactory;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Daniel Villafuerte
  */
 @RunWith(JUnit4.class)
-public class ConformityTestingServiceImplTest {
+public class ConformityTestingServiceImplTest extends DataManagerIntegrationTest {
 
 
     /**
@@ -89,19 +89,15 @@ public class ConformityTestingServiceImplTest {
     @Before
     public void setup() {
         try {
-            DatabaseConnectionParameters localParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-            DatabaseConnectionParameters centralParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-            ManagerFactory factory = new ManagerFactory(localParameters, centralParameters);
-            PedigreeDataManager pedigreeDataManager = factory.getPedigreeDataManager();
-            GenotypicDataManager genotypicDataManager = factory.getGenotypicDataManager();
+            PedigreeDataManager pedigreeDataManager = managerFactory.getPedigreeDataManager();
+            GenotypicDataManager genotypicDataManager = managerFactory.getGenotypicDataManager();
 
             conformityTestingService = new ConformityTestingServiceImpl(genotypicDataManager, pedigreeDataManager);
+			dataSource = DriverManagerDataSourceFactory.create(
+					localConnectionParameters.getDriverName(), localConnectionParameters.getUrl(),
+					localConnectionParameters.getUsername(),
+					localConnectionParameters.getPassword());
 
-            dataSource = DriverManagerDataSourceFactory.create(localParameters.getDriverName(), localParameters.getUrl(), localParameters.getUsername(), localParameters.getPassword());
-
-//            for (String prepScript : PREP_SCRIPTS) {
-//                executeUpdate(prepScript);
-//            }
         } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
@@ -110,9 +106,7 @@ public class ConformityTestingServiceImplTest {
 
     @After
     public void cleanup() throws Exception {
-//        for (String cleanupScript : CLEANUP_SCRIPTS) {
-//            executeUpdate(cleanupScript);
-//        }
+
     }
 
     @Test

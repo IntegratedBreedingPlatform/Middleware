@@ -15,116 +15,167 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
-import org.junit.Assert;
-
-import org.generationcp.middleware.dao.ToolConfigurationDAO;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
+import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.TemplateSetting;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
+import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
+import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
+import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
+public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
-    private static WorkbenchDataManager manager;
-    private static HibernateUtil hibernateUtil;
+    private static WorkbenchDataManagerImpl manager;
+    
+    private static Project commonTestProject;
+    private static User testUser1, testUser2;
+    private static Person testPerson1, testPerson2;
+    private static ProjectActivity testProjectActivity1, testProjectActivity2;
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() throws MiddlewareQueryException  {
+        HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(workbenchSessionUtil.getSessionFactory());
+        manager = new WorkbenchDataManagerImpl(sessionProvider);        
 
-        DatabaseConnectionParameters workbenchDb = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
-        hibernateUtil = new HibernateUtil(workbenchDb.getHost(), workbenchDb.getPort(), workbenchDb.getDbName(),
-                                workbenchDb.getUsername(), workbenchDb.getPassword());
-        HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
-        manager = new WorkbenchDataManagerImpl(sessionProvider);
+        testPerson1 = createTestPersonData();
+        manager.addPerson(testPerson1);
+        testPerson2 = createTestPersonData();
+        manager.addPerson(testPerson2);
+        
+        testUser1 = createTestUserData();
+        testUser1.setPersonid(testPerson1.getId());
+        manager.addUser(testUser1);
+        testUser2 = createTestUserData();
+        testUser2.setPersonid(testPerson2.getId());
+        manager.addUser(testUser2);
+        
+        commonTestProject = createTestProjectData();
+        commonTestProject.setUserId(testUser1.getUserid());
+        manager.addProject(commonTestProject);
+        
+        testProjectActivity1 = createTestProjectActivityData(commonTestProject, testUser1);
+        manager.addProjectActivity(testProjectActivity1);
+        
+        testProjectActivity2 = createTestProjectActivityData(commonTestProject, testUser2);
+        manager.addProjectActivity(testProjectActivity2);
+    }
+    
+    @AfterClass
+    public static void tearDown() throws MiddlewareQueryException {
+    	manager.deleteProjectActivity(testProjectActivity1);
+    	manager.deleteProjectActivity(testProjectActivity2);
+    	
+    	manager.deletePerson(testPerson1);
+    	manager.deletePerson(testPerson1);
+    	
+    	manager.deleteUser(testUser1);
+    	manager.deleteUser(testUser2);
+    	
+    	manager.deleteProject(commonTestProject);
     }
   
     @Test
     public void testAddUser() throws MiddlewareQueryException {
-        User user = new User();
-        //user.setUserid(1000);
+        User user = createTestUserData();
+        Integer result = manager.addUser(user);
+        Assert.assertNotNull("Expected id of a newly saved record in workbench_user.", result);
+        
+        User readUser = manager.getUserById(result);
+        Assert.assertEquals(user.getName(), readUser.getName());
+        manager.deleteUser(readUser);
+    }
+
+	private static User createTestUserData() {
+		User user = new User();
         user.setInstalid(-1);
         user.setStatus(-1);
         user.setAccess(-1);
-        user.setUserid(-1);
         user.setType(-1);
-        user.setName("user_test");
+        user.setName("user_test" + new Random().nextInt());
         user.setPassword("user_password");
-        user.setPersonid(1000);
+        user.setPersonid(1);
         user.setAdate(20120101);
         user.setCdate(20120101);
-
-        // add user
-        manager.addUser(user);
-        Debug.println(INDENT, "testAddUser(): " + user);
-    }
+		return user;
+	}
 
     @Test
     public void testAddPerson() throws MiddlewareQueryException {
-        Person person = new Person();
-        //person.setId(1000);
+        Person person = createTestPersonData();
+        Integer result = manager.addPerson(person);
+        Assert.assertNotNull("Expected id of a newly saved record in persons.", result);
+        
+        Person readPerson = manager.getPersonById(result);
+        Assert.assertEquals(person.getLastName(), readPerson.getLastName());  
+        manager.deletePerson(readPerson);
+    }
+
+	private static Person createTestPersonData() {
+		Person person = new Person();
         person.setInstituteId(1);
-        person.setFirstName("Lich");
-        person.setMiddleName("Frozen");
-        person.setLastName("King");
+        person.setFirstName("Test");
+        person.setMiddleName("M");
+        person.setLastName("Person " + new Random().nextInt());
         person.setPositionName("King of Icewind Dale");
         person.setTitle("His Highness");
-        person.setExtension("1");
-        person.setFax("2");
+        person.setExtension("Ext");
+        person.setFax("Fax");
         person.setEmail("lichking@blizzard.com");
         person.setNotes("notes");
-        person.setContact("3");
+        person.setContact("Contact");
         person.setLanguage(-1);
-        person.setPhone("4");
-
-        // add the person
-        manager.addPerson(person);
-        Debug.println(INDENT, "testAddPerson(): " + person);
-    }
+        person.setPhone("Phone");
+		return person;
+	}
 
     @Test
     public void testAddProject() throws MiddlewareQueryException {
-        Project project = new Project();
+        Project project = createTestProjectData();
+        manager.addProject(project);
+        Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
+        manager.deleteProject(project);
+    }
 
+	private static Project createTestProjectData() throws MiddlewareQueryException {
+		Project project = new Project();
         project.setUserId(1);
-        project.setProjectName("Project Name " + new Random().nextInt(10000));
+        project.setProjectName("Test Project " + new Random().nextInt(10000));
         project.setStartDate(new Date(System.currentTimeMillis()));
         project.setTemplate(manager.getWorkflowTemplateByName("MARS").get(0));
         project.setTemplateModified(Boolean.FALSE);
@@ -132,63 +183,48 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
         project.setLocalDbName("ibdbv2_maize_1_local");
         project.setCentralDbName("ibdbv2_maize_central");
         project.setLastOpenDate(new Date(System.currentTimeMillis()));
-
-        // add the project
-        manager.addProject(project);
-        Debug.println(INDENT, "testAddProject(): " + project);
-    }
+		return project;
+	}
 
     @Test
     public void testAddProjectActivity() throws MiddlewareQueryException {
-        ProjectActivity projectActivity = new ProjectActivity();
-        projectActivity.setProject(manager.getProjectById(41L));
-        projectActivity.setName("Fieldbook");
-        projectActivity.setDescription("Launch FieldBook");
-        projectActivity.setUser(manager.getUserById(1));
-        projectActivity.setCreatedAt(new Date(System.currentTimeMillis()));
+        
+    	ProjectActivity projectActivity = createTestProjectActivityData(commonTestProject, testUser1);
 
-        // add the project activity
-        manager.addProjectActivity(projectActivity);
-        Debug.println(INDENT, "testAddProjectActivity(): " + projectActivity);
+        Integer result = manager.addProjectActivity(projectActivity);
+        Assert.assertNotNull("Expected id of a newly saved record in workbench_project_activity", result);
+        
+        manager.deleteProjectActivity(projectActivity);
     }
 
     @Test
     public void testAddIbdbUserMap() throws MiddlewareQueryException {
+    	IbdbUserMap userMap = new IbdbUserMap();
+    	userMap.setProjectId(commonTestProject.getProjectId());
+        userMap.setIbdbUserId(testUser1.getUserid() * -1);
+    	userMap.setWorkbenchUserId(testUser1.getUserid());
 
-        User u = manager.getAllUsers().get(0);
-        Assert.assertNotNull("there should be at least 1 user", u);
-
-        Project p = manager.getProjectsByUser(u).get(0);
-        Assert.assertNotNull("there should be at least 1 project in user_id " + u.getUserid(), p);
-
-        IbdbUserMap userMap = new IbdbUserMap();
-    	userMap.setProjectId(p.getProjectId());
-        userMap.setIbdbUserId(u.getUserid() * -1);
-    	userMap.setWorkbenchUserId(u.getUserid());
-
-        // add the IBDB User Map
-        Integer result = manager.addIbdbUserMap(userMap);
-        Assert.assertNotNull("Should return a new user_map id",result);
-
-        Debug.println(INDENT, "testAddIbdbUserMap(): " + userMap);
+    	Integer result = manager.addIbdbUserMap(userMap);
+        Assert.assertNotNull("Expected id of a newly saved record in workbench_ibdb_user_map", result);
     }
 
     @Test
     public void testAddProjectLocationMap() throws MiddlewareQueryException {
         ProjectLocationMap projectLocationMap = new ProjectLocationMap();
     	projectLocationMap.setLocationId(1L);
-    	projectLocationMap.setProject(manager.getProjectById(1L));
+    	projectLocationMap.setProject(commonTestProject);
 
-        // add the Add Project Location Map
         Integer result = manager.addProjectLocationMap(projectLocationMap);
-        Assert.assertNotNull("Should return a result, id of the newly added projectlocationmap",result);
-
-        Debug.println(INDENT, "testAddProjectLocationMap(): " + projectLocationMap);
+        Assert.assertNotNull("Expected id of a newly saved record in workbench_project_loc_map",result);
+        
+        manager.deleteProjectLocationMap(projectLocationMap);
     }
     
     @Test
     public void testGetProjects() throws MiddlewareQueryException {
         List<Project> projects = manager.getProjects();
+        Assert.assertNotNull(projects);
+        Assert.assertTrue(!projects.isEmpty());
         Debug.printObjects(INDENT, projects);
     }
 
@@ -196,64 +232,63 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
     public void testGetToolWithName() throws MiddlewareQueryException {
         String toolName = "fieldbook";
         Tool tool = manager.getToolWithName(toolName);
+        Assert.assertNotNull(tool);
         Debug.println(INDENT, "testGetToolWithName(" + toolName + "): " + tool);
     }
 
     @Test
-    public void testGetProjectById() throws MiddlewareQueryException {
-        Long id = manager.getProjects().get(0).getProjectId();
-        Project project = manager.getProjectById(id);
-        Debug.println(INDENT, "testGetProjectById(" + id + "): " + project);
-    }
-
-    @Test
     public void testGetProjectByName() throws MiddlewareQueryException {
-        String name = "Test Cowpea 1";// "Replace with project name to search";
-        Project project = manager.getProjectByName(name);
-        Debug.println(INDENT, "testGetProjectByName(" + name + "): " + project);
+        Project project = manager.getProjectByName(commonTestProject.getProjectName());
+        Assert.assertEquals(commonTestProject.getProjectName(), project.getProjectName());
     }
 
     @Test
     public void testGetUserByName() throws MiddlewareQueryException {
-        String name = "user_test";
-        User user = (User) manager.getUserByName(name, 0, 1, Operation.EQUAL).get(0);
-        Debug.println(INDENT, "testGetUserByName(name=" + name + "):" + user);
+        User user = (User) manager.getUserByName(testUser1.getName(), 0, 1, Operation.EQUAL).get(0);
+        Assert.assertEquals(testUser1.getName(), user.getName());
+        Assert.assertEquals(testUser1.getUserid(), user.getUserid());
     }
 
     @Test
     public void testAddWorkbenchDataset() throws MiddlewareQueryException {
-        // Assumption: There is at least one project in the db
-        Project project = manager.getProjectById(1L); // First project in db
+        WorkbenchDataset dataset = createTestWorkbenchDataset(commonTestProject);
+        Integer result = manager.addWorkbenchDataset(dataset);
+        Assert.assertNotNull("Expected id of the newly added record in workbench_dataset", result);
+        manager.deleteWorkbenchDataset(dataset);
+    }
 
-        WorkbenchDataset dataset = new WorkbenchDataset();
-        dataset.setName("Test Dataset");
+	private WorkbenchDataset createTestWorkbenchDataset(Project project) {
+		WorkbenchDataset dataset = new WorkbenchDataset();
+        dataset.setName("Test Dataset" + new Random().nextInt());
         dataset.setDescription("Test Dataset Description");
         dataset.setCreationDate(new Date(System.currentTimeMillis()));
         dataset.setProject(project);
-        manager.addWorkbenchDataset(dataset);
-        Debug.println(INDENT, "testAddWorkbenchDataset(): " + dataset);
-    }
+		return dataset;
+	}
 
-    @Test
-    public void testGetWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
-        Long projectId = 1L;
-        List<WorkbenchDataset> list = manager.getWorkbenchDatasetByProjectId(projectId, 0, 10);
-        Debug.println(INDENT, "testGetWorkbenchDatasetByProjectId(" + projectId + "): ");
+	@Test
+	public void testGetWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
+		WorkbenchDataset dataset = createTestWorkbenchDataset(commonTestProject);
+		manager.addWorkbenchDataset(dataset);
 
-        if (list.isEmpty()) {
-            Debug.println(INDENT, "  No records found.");
-        }
-
-        for (WorkbenchDataset d : list) {
-            Debug.println(INDENT, d.getDatasetId() + ": " + d.getName());
-        }
-    }
+		List<WorkbenchDataset> list = manager.getWorkbenchDatasetByProjectId(commonTestProject.getProjectId(), 0, 10);
+		Assert.assertTrue(list.contains(dataset));
+		manager.deleteWorkbenchDataset(dataset);
+	}
 
     @Test
     public void testCountWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
-        Long projectId = 1L;
-        long result = manager.countWorkbenchDatasetByProjectId(projectId);
-        Debug.println(INDENT, "testCountWorkbenchDatasetByProjectId(" + projectId + "): " + result);
+        WorkbenchDataset dataset1 = createTestWorkbenchDataset(commonTestProject);
+        manager.addWorkbenchDataset(dataset1);
+        
+        WorkbenchDataset dataset2 = createTestWorkbenchDataset(commonTestProject);
+        manager.addWorkbenchDataset(dataset2);
+        
+        long result = manager.countWorkbenchDatasetByProjectId(commonTestProject.getProjectId());
+        Assert.assertEquals(2, result);
+        
+        manager.deleteWorkbenchDataset(dataset1);
+        manager.deleteWorkbenchDataset(dataset2);
     }
 
     @Test
@@ -317,69 +352,47 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
     @Test
     public void testAddProjectUserRoles() throws MiddlewareQueryException {
         
-        Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
-        int userId = manager.getAllUsers().get((manager.getAllUsers().size())-1).getUserid();
-        List<ProjectUserRole> projectUsers = new ArrayList<ProjectUserRole>();
-
-        Project project1 = manager.getProjectById(projectId);
-        User user1 = manager.getUserById(userId);
         Role role1 = manager.getAllRoles().get(0);
         Role role2 = manager.getAllRoles().get(1);
 
-        ProjectUserRole newRecord1 = new ProjectUserRole(project1, user1, role1);
-        ProjectUserRole newRecord2 = new ProjectUserRole(project1, user1, role2);
+        ProjectUserRole projUsrRole1 = new ProjectUserRole(commonTestProject, testUser1, role1);
+        ProjectUserRole projUsrRole2 = new ProjectUserRole(commonTestProject, testUser1, role2);
 
-        projectUsers.add(newRecord1);
-        projectUsers.add(newRecord2);
+        List<ProjectUserRole> projectUserRoles = new ArrayList<ProjectUserRole>();
+		projectUserRoles.add(projUsrRole1);
+		projectUserRoles.add(projUsrRole2);
 
-        // add the projectUsers
-        List<Integer> projectUsersAdded = manager.addProjectUserRole(projectUsers);
+        List<Integer> rolesAdded = manager.addProjectUserRole(projectUserRoles);
+        Assert.assertEquals(2, rolesAdded.size());
 
-        Debug.println(INDENT, "testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded.size());
+        Debug.println(INDENT, "testAddProjectUsers(projectId=" + commonTestProject.getProjectId() + ") ADDED: " + rolesAdded.size());
+        
+        long result = manager.countUsersByProjectId(commonTestProject.getProjectId());
+        Assert.assertEquals(1, result);
+        
+        manager.deleteProjectUserRole(projUsrRole1);
+        manager.deleteProjectUserRole(projUsrRole2);
     }
 
     @Test
     public void testGetUsersByProjectId() throws MiddlewareQueryException {
-        Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
-        List<User> users = manager.getUsersByProjectId(projectId);
-        Debug.println(INDENT, "testGetUsersByProjectId(" + projectId + "): ");
-
-        if (users.isEmpty()) {
-            Debug.println(INDENT, "  No records found.");
-        }
-
-        for (User u : users) {
-            Debug.println(INDENT, u.getUserid() + ": " + u.getName());
-        }
-    }
-
-    @Test
-    public void testCountUsersByProjectId() throws MiddlewareQueryException {
-    	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
-        long result = manager.countUsersByProjectId(projectId);
-        Debug.println(INDENT, "testCountUsersByProjectId(" + projectId + "): " + result);
+        List<User> users = manager.getUsersByProjectId(commonTestProject.getProjectId());
+        Assert.assertNotNull(users);
+        Assert.assertEquals(1, users.size());
+        Assert.assertEquals(testUser1, users.get(0));
     }
 
     @Test
     public void testGetActivitiesByProjectId() throws MiddlewareQueryException {
-    	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
-        List<ProjectActivity> list = manager.getProjectActivitiesByProjectId(projectId, 0, 10);
-        Debug.println(INDENT, "testGetActivitiesByProjectId(" + projectId + "): ");
-
-        if (list.isEmpty()) {
-            Debug.println(INDENT, "  No records found.");
-        }
-
-        for (ProjectActivity m : list) {
-            Debug.println(INDENT, m);
-        }
+        List<ProjectActivity> results = manager.getProjectActivitiesByProjectId(commonTestProject.getProjectId(), 0, 10);
+        Assert.assertNotNull(results);
+        Assert.assertEquals(2, results.size());
     }
-
+    
     @Test
     public void testCountActivitiesByProjectId() throws MiddlewareQueryException {
-    	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
-        long result = manager.countProjectActivitiesByProjectId(projectId);
-        Debug.println(INDENT, "testCountActivitiesByProjectId(" + projectId + "): " + result);
+        long result = manager.countProjectActivitiesByProjectId(commonTestProject.getProjectId());
+        Assert.assertEquals(2, result);
     }
 
     @Test
@@ -412,7 +425,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
             manager.updateToolConfiguration(toolConfig);
 
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
-            dao.setSession(hibernateUtil.getCurrentSession());
+            dao.setSession(workbenchSessionUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
             Debug.println(INDENT, "testUpdateToolConfiguration(toolId=" + toolId + "): ");
@@ -431,7 +444,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
         if (toolConfig != null){
             manager.deleteToolConfiguration(toolConfig);
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
-            dao.setSession(hibernateUtil.getCurrentSession());
+            dao.setSession(workbenchSessionUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
             Debug.println(INDENT, "testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
@@ -464,7 +477,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
                 + ", configKey=" + configKey + "): " + toolConfig);
     }
 
- @Test
+    @Test
     public void testAddCropType() throws MiddlewareQueryException {
         CropType cropType = new CropType("Coconut");
         
@@ -498,11 +511,9 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetLocalIbdbUserId() throws MiddlewareQueryException {
-        Integer workbenchUserId = Integer.valueOf(1);
-        Long projectId = Long.valueOf(3);
-        Integer localIbdbUserId = manager.getLocalIbdbUserId(workbenchUserId, projectId);
+        Integer localIbdbUserId = manager.getLocalIbdbUserId(testUser1.getUserid(), commonTestProject.getProjectId());
         Assert.assertNotNull(localIbdbUserId); 
-        Debug.println(INDENT, "testGetLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId=" + projectId + "): "
+        Debug.println(INDENT, "testGetLocalIbdbUserId(workbenchUserId=" + testUser1.getUserid() + ", projectId=" + commonTestProject.getProjectId() + "): "
                 + localIbdbUserId);
     }
 
@@ -578,65 +589,32 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testAddProjectUserMysqlAccount() throws MiddlewareQueryException {
-    	Project project = manager.getProjects().get((manager.getProjects().size())-1);
-        User user = manager.getAllUsers().get((manager.getAllUsers().size())-1);
-
-        ProjectUserMysqlAccount recordToSave = new ProjectUserMysqlAccount();
-        recordToSave.setProject(project);
-        recordToSave.setUser(user);
-        recordToSave.setMysqlUsername("username " + new Random().nextInt(10000));
+    	ProjectUserMysqlAccount recordToSave = new ProjectUserMysqlAccount();
+        recordToSave.setProject(commonTestProject);
+        recordToSave.setUser(testUser1);
+        recordToSave.setMysqlUsername("sample " + new Random().nextInt(10000));
         recordToSave.setMysqlPassword("password");
 
         Integer idSaved = manager.addProjectUserMysqlAccount(recordToSave);
-        Assert.assertNotNull(idSaved);
+        Assert.assertNotNull("Expected id of the newly saved record in workbench_project_user_mysql_account", idSaved);
         Debug.println(INDENT, "Id of record saved: " + idSaved);
-
+        
+        manager.deleteProjectUserMysqlAccount(recordToSave);
+        
     }
-
+    
     @Test
     public void testAddProjectUserMysqlAccounts() throws MiddlewareQueryException {
 
-        Project project1 = new Project();
-        project1.setUserId(1);
-        project1.setProjectName("Project Name " + new Random().nextInt(10000));
-        project1.setStartDate(new Date(System.currentTimeMillis()));
-        project1.setTemplate(manager.getWorkflowTemplateByName("MARS").get(0));
-        project1.setTemplateModified(Boolean.FALSE);
-        project1.setCropType(manager.getCropTypeByName(CropType.MAIZE));
-        project1.setLocalDbName("ibdbv2_maize_1_local");
-        project1.setCentralDbName("ibdbv2_maize_central");
-        project1.setLastOpenDate(new Date(System.currentTimeMillis()));
-        manager.addProject(project1);
+    	ProjectUserMysqlAccount account = new ProjectUserMysqlAccount();
+        account.setProject(commonTestProject);
+        account.setUser(testUser1);
+        account.setMysqlUsername("sample "+ new Random().nextInt(10000));
+        account.setMysqlPassword("password");
 
-        Project project2 = new Project();
-        project2.setUserId(1);
-        project2.setProjectName("Project Name " + new Random().nextInt(10000));
-        project2.setStartDate(new Date(System.currentTimeMillis()));
-        project2.setTemplate(manager.getWorkflowTemplateByName("MARS").get(0));
-        project2.setTemplateModified(Boolean.FALSE);
-        project2.setCropType(manager.getCropTypeByName(CropType.MAIZE));
-        project2.setLocalDbName("ibdbv2_maize_1_local");
-        project2.setCentralDbName("ibdbv2_maize_central");
-        project2.setLastOpenDate(new Date(System.currentTimeMillis()));
-        manager.addProject(project2);
-
-        User user = manager.getAllUsers().get((manager.getAllUsers().size())-1);
-
-        ProjectUserMysqlAccount recordToSave1 = new ProjectUserMysqlAccount();
-        recordToSave1.setProject(project1);
-        recordToSave1.setUser(user);
-        recordToSave1.setMysqlUsername("sample "+ new Random().nextInt(10000));
-        recordToSave1.setMysqlPassword("password");
-
-        ProjectUserMysqlAccount recordToSave2 = new ProjectUserMysqlAccount();
-        recordToSave2.setProject(project2);
-        recordToSave2.setUser(user);
-        recordToSave2.setMysqlUsername("sample" + new Random().nextInt(10000));
-        recordToSave2.setMysqlPassword("password");
 
         List<ProjectUserMysqlAccount> records = new ArrayList<ProjectUserMysqlAccount>();
-        records.add(recordToSave1);
-        records.add(recordToSave2);
+        records.add(account);
         List<Integer> idsSaved = manager.addProjectUserMysqlAccounts(records);
         Assert.assertNotNull(idsSaved);
         Assert.assertTrue(!idsSaved.isEmpty());
@@ -645,18 +623,16 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
         for(Integer id : idsSaved){
             Debug.println(INDENT, id.toString());
         }
-
-        manager.deleteProject(project1);
-        manager.deleteProject(project2);
+       
+        manager.deleteProjectUserMysqlAccount(account);
     }
 
     @Test
     public void testGetProjectUserMysqlAccountByProjectIdAndUserId() throws MiddlewareQueryException {
-        //This test assumes that there is a record in workbench_project_user_mysql_account
-        //with project id = 1 and user id = 1
         ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(
-                Integer.valueOf(1), Integer.valueOf(1));
+                commonTestProject.getProjectId().intValue(), testUser1.getUserid());
         Assert.assertNotNull(record);
+        Assert.assertEquals(testProjectActivity1, record);
         Debug.println(INDENT, record.toString());
     }
 
@@ -672,26 +648,20 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
         }
     }
 
-   @Test
+    @Test
     public void testAddProjectBackup() throws MiddlewareQueryException {
         ProjectBackup projectBackup = new ProjectBackup();    
-        
-        //projectBackup.setProjectBackupId(1L);
-        projectBackup.setProjectId(1L);
+        projectBackup.setProjectId(commonTestProject.getProjectId());
         projectBackup.setBackupPath("target/resource");
         projectBackup.setBackupTime(Calendar.getInstance().getTime());
-        // add user
+
         manager.saveOrUpdateProjectBackup(projectBackup);
         Assert.assertNotNull(projectBackup);
-        
-        Debug.println(INDENT, "testAddProjectBackup(): " + projectBackup);
-
     }
 
     @Test
     public void testGetProjectBackupsByProject() throws MiddlewareQueryException {
-        Project project = manager.getProjectById(1L);
-        List<ProjectBackup> projectBackups = manager.getProjectBackups(project);
+        List<ProjectBackup> projectBackups = manager.getProjectBackups(commonTestProject);
         Assert.assertNotNull(projectBackups);
         Assert.assertTrue(!projectBackups.isEmpty());
         
@@ -782,36 +752,24 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetLastOpenedProject() throws MiddlewareQueryException {
-    	Integer userId = manager.getAllUsers().get(0).getUserid();
-    	Project results = manager.getLastOpenedProject(userId);
+    	Project results = manager.getLastOpenedProject(testUser1.getUserid());
         Assert.assertNotNull(results);
         Debug.println(INDENT, results.toString());
     }
 
-    @Test
-    public void testGetPersonById() throws MiddlewareQueryException {
-    	int id = manager.getAllPersons().get(0).getId();
-    	Person results = manager.getPersonById(id);
-        Assert.assertNotNull(results);
-        Debug.println(INDENT, results.toString());
-    }
-
-    @Test
-    public void testGetProjectActivitiesByProjectId() throws MiddlewareQueryException {
-    	long projectId = manager.getProjectById(41L).getProjectId();
-    	List<ProjectActivity> results = manager.getProjectActivitiesByProjectId(projectId, 1, 50);
-    	Assert.assertNotNull(results);
-        Assert.assertTrue(!results.isEmpty());
-        
-        for (ProjectActivity result : results){
-        	Debug.println(INDENT, result.toString());
-       }
-    }
+	private static ProjectActivity createTestProjectActivityData(Project project, User user) {
+		ProjectActivity projectActivity = new ProjectActivity();
+        projectActivity.setProject(project);
+        projectActivity.setName("Project Activity" + new Random().nextInt());
+        projectActivity.setDescription("Some project activity");
+        projectActivity.setUser(user);
+        projectActivity.setCreatedAt(new Date(System.currentTimeMillis()));
+		return projectActivity;
+	}
 
     @Test
     public void testGetProjectLocationMapByProjectId() throws MiddlewareQueryException {
-    	long projectId = manager.getProjects().get(0).getProjectId();
-    	List<ProjectLocationMap> results = manager.getProjectLocationMapByProjectId(projectId, 1, 50);
+    	List<ProjectLocationMap> results = manager.getProjectLocationMapByProjectId(commonTestProject.getProjectId(), 1, 50);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
@@ -822,17 +780,14 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetProjectUserRoleById() throws MiddlewareQueryException {
-    	Integer id = manager.getProjects().get(0).getUserId();
-    	ProjectUserRole userrole = manager.getProjectUserRoleById(id);
+    	ProjectUserRole userrole = manager.getProjectUserRoleById(testUser1.getUserid());
     	Assert.assertNotNull(userrole);
         Debug.println(INDENT, userrole.toString());
     }
 
     @Test
     public void testGetQuestionsByUserId() throws MiddlewareQueryException {
-    	//Integer userId = Integer.valueOf(1); //change the user id
-    	Integer userId = manager.getProjects().get(0).getUserId();
-    	List<SecurityQuestion> results = manager.getQuestionsByUserId(userId);
+    	List<SecurityQuestion> results = manager.getQuestionsByUserId(testUser1.getUserid());
 
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
@@ -852,8 +807,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetProjectMethodByProject() throws MiddlewareQueryException {
-    	Project project = manager.getProjectById(41L);
-    	List<ProjectMethod> results = manager.getProjectMethodByProject(project, 0, 100);
+    	List<ProjectMethod> results = manager.getProjectMethodByProject(commonTestProject, 0, 100);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
@@ -861,8 +815,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetProjectsByUser() throws MiddlewareQueryException {
-    	User user = manager.getAllUsers().get(0);
-    	List<Project> results = manager.getProjectsByUser(user);
+    	List<Project> results = manager.getProjectsByUser(testUser1);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
@@ -870,8 +823,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetProjectUserRolesByProject() throws MiddlewareQueryException {
-    	Project project = manager.getProjects().get(0);
-    	List<ProjectUserRole> results = manager.getProjectUserRolesByProject(project);
+    	List<ProjectUserRole> results = manager.getProjectUserRolesByProject(commonTestProject);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
@@ -879,20 +831,20 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetUserById() throws MiddlewareQueryException {
-    	int id = 1;
-    	User user = manager.getUserById(id);
+    	User user = manager.getUserById(testUser1.getUserid());
     	Assert.assertNotNull(user);
-    	Debug.println(INDENT, "testGetUserById("+id+"): ");
     	Debug.println(INDENT, user.toString());
     }
 
     @Test
     public void testGetWorkbenchDatasetById() throws MiddlewareQueryException  {
-    	Long datasetId = 1L; //change datasetId value
-    	WorkbenchDataset result = manager.getWorkbenchDatasetById(datasetId);
-    	Assert.assertNotNull(result);
-    	Debug.println(INDENT, "testGetWorkbenchDatasetById("+datasetId+"): ");
-    	Debug.println(INDENT, result.toString());
+    	WorkbenchDataset testDataset = createTestWorkbenchDataset(commonTestProject);
+        Integer result = manager.addWorkbenchDataset(testDataset);
+               
+    	WorkbenchDataset readDataset = manager.getWorkbenchDatasetById(new Long(result));
+    	Assert.assertNotNull(readDataset);
+    	Assert.assertEquals(testDataset, readDataset);
+    	manager.deleteWorkbenchDataset(testDataset);    	
     }
 
     @Test
@@ -928,34 +880,9 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testDeletePerson() throws MiddlewareQueryException  {
-        Person person = manager.getAllPersons().get((manager.getAllPersons().size())-1);
+        Person person = createTestPersonData();
+        manager.addPerson(person);
     	manager.deletePerson(person);
-        Debug.println(INDENT, "Record is successfully deleted");
-    }
-
-    /* TODO: Lets disable this test case for the meantime as the delete fxn left behind by abro differs from the ff transaction, (Please add a separate jira ticket for this) */
-    /*
-    @Test
-    public void testDeleteProject() throws MiddlewareQueryException  {
-        Project project = manager.getProjects().get((manager.getProjects().size())-1);
-
-    	manager.deleteProject(project);
-        Debug.println(INDENT, "Record is successfully deleted");
-    } */
-
-    @Test
-    public void testDeleteProjectActivity() throws MiddlewareQueryException  {
-    	
-        ProjectActivity projectActivity = new ProjectActivity();
-        projectActivity.setProject(manager.getProjectById(1L));
-        projectActivity.setName("Fieldbook");
-        projectActivity.setDescription("Launch FieldBook");
-        projectActivity.setUser(manager.getUserById(1));
-        projectActivity.setCreatedAt(new Date(System.currentTimeMillis()));
-
-        // add the project activity
-        manager.addProjectActivity(projectActivity);
-    	manager.deleteProjectActivity(projectActivity);
         Debug.println(INDENT, "Record is successfully deleted");
     }
 
@@ -983,7 +910,7 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
 
     @Test
     public void testGetUserInfo() throws MiddlewareQueryException  {
-    	UserInfo results = manager.getUserInfo(manager.getAllUsers().get(0).getUserid());
+    	UserInfo results = manager.getUserInfo(testUser1.getUserid());
     	Assert.assertNotNull(results);
         Debug.println(INDENT, results.toString());
     }
@@ -1005,156 +932,6 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
             Debug.println(INDENT, " ID = " + id);
         }
     }
-
-    @Test
-    public void testSaveProject() throws MiddlewareQueryException {
-      Project project1 = new Project();
-      project1.setProjectId((long)manager.getProjects().get(manager.getProjects().size()-1).getProjectId()+1);
-      project1.setUserId(1);
-      project1.setProjectName("Project Name " + new Random().nextInt(10000));
-      project1.setStartDate(new Date(System.currentTimeMillis()));
-      project1.setTemplate(manager.getWorkflowTemplateByName("MARS").get(0));
-      project1.setTemplateModified(Boolean.FALSE);
-      project1.setCropType(manager.getCropTypeByName(CropType.MAIZE));
-      project1.setLocalDbName("ibdbv2_maize_1_local");
-      project1.setCentralDbName("ibdbv2_maize_central");
-      project1.setLastOpenDate(new Date(System.currentTimeMillis()));
-
-      Project project2 = new Project();
-      project2.setProjectId((long)manager.getProjects().get(manager.getProjects().size()-1).getProjectId()+2);
-      project2.setUserId(1);
-      project2.setProjectName("Project Name " + new Random().nextInt(10000));
-      project2.setStartDate(new Date(System.currentTimeMillis()));
-      project2.setTemplate(manager.getWorkflowTemplateByName("MARS").get(0));
-      project2.setTemplateModified(Boolean.FALSE);
-      project2.setCropType(manager.getCropTypeByName(CropType.MAIZE));
-      project2.setLocalDbName("ibdbv2_maize_1_local");
-      project2.setCentralDbName("ibdbv2_maize_central");
-      project2.setLastOpenDate(new Date(System.currentTimeMillis()));
-
-      WorkflowTemplate marsTemplate = new WorkflowTemplate();
-      marsTemplate.setTemplateId(1L);
-
-      project1.setTemplate(marsTemplate);
-      project2.setTemplate(marsTemplate);
-
-      manager.saveOrUpdateProject(project1);
-      manager.saveOrUpdateProject(project2);
-      
-      // Adding Project Locations
-      List<ProjectLocationMap> projectLocationMapList = new ArrayList<ProjectLocationMap>();
-
-      ProjectLocationMap projectLocationMap1 = new ProjectLocationMap();
-      projectLocationMap1.setProject(manager.getProjects().get(manager.getProjects().size()-2));
-      projectLocationMap1.setLocationId(Long.valueOf(3));
-
-      ProjectLocationMap projectLocationMap2 = new ProjectLocationMap();
-      projectLocationMap2.setProject(manager.getProjects().get(manager.getProjects().size()-1));
-      projectLocationMap2.setLocationId(Long.valueOf(4));
-
-      projectLocationMapList.add(projectLocationMap1);
-      projectLocationMapList.add(projectLocationMap2);
-
-      projectLocationMapList.add(projectLocationMap1);
-      projectLocationMapList.add(projectLocationMap2);
-
-      manager.addProjectLocationMap(projectLocationMapList);
-      
-      // Adding Project Method
-      List<ProjectMethod> projectMethodList = new ArrayList<ProjectMethod>();
-
-      ProjectMethod projectMethod1 = new ProjectMethod();
-      projectMethod1.setProject(manager.getProjects().get(manager.getProjects().size()-2));
-      projectMethod1.setMethodId(5);
-
-      ProjectMethod projectMethod2 = new ProjectMethod();
-      projectMethod2.setProject(manager.getProjects().get(manager.getProjects().size()-1));
-      projectMethod2.setMethodId(6);
-
-      projectMethodList.add(projectMethod1);
-      projectMethodList.add(projectMethod2);
-
-      manager.addProjectMethod(projectMethodList);
-
-      // Adding Project Activity
-      List<ProjectActivity> projectActivityList = new ArrayList<ProjectActivity>();
-
-      ProjectActivity projectActivity1 = new ProjectActivity();
-      projectActivity1.setProject(manager.getProjects().get(manager.getProjects().size()-2));
-      projectActivity1.setName("Activity 1");
-      projectActivity1.setDescription("Test Description for Activity 1");
-      projectActivity1.setCreatedAt(new Date(System.currentTimeMillis()));
-      projectActivity1.setUser(manager.getUserById(Integer.valueOf(1)));
-
-      ProjectActivity projectActivity2 = new ProjectActivity();
-      projectActivity2.setProject(manager.getProjects().get(manager.getProjects().size()-1));
-      projectActivity2.setName("Activity 2");
-      projectActivity2.setDescription("Test Description for Activity 2");
-      projectActivity2.setCreatedAt(new Date(System.currentTimeMillis()));
-      projectActivity2.setUser(manager.getUserById(Integer.valueOf(1)));
-
-      projectActivityList.add(projectActivity1);
-      projectActivityList.add(projectActivity2);
-
-      manager.addProjectActivity(projectActivityList);
-
-      Debug.println(INDENT, project1);
-      Debug.println(INDENT, project2);
-
-    }
-
-    // delete dependencies first, before deleting the project
-    private void deleteProject(Project project) {
-
-        Long projectId = project.getProjectId();
-        try {
-
-            List<ProjectActivity> projectActivities = manager.getProjectActivitiesByProjectId(projectId, 0,
-                    (int) manager.countProjectActivitiesByProjectId(projectId));
-            for (ProjectActivity projectActivity : projectActivities) {
-                manager.deleteProjectActivity(projectActivity);
-            }
-
-            List<ProjectMethod> projectMethods = manager.getProjectMethodByProject(project, 0,
-                    (int) manager.countMethodIdsByProjectId(projectId));
-            for (ProjectMethod projectMethod : projectMethods) {
-                manager.deleteProjectMethod(projectMethod);
-            }
-
-            List<ProjectUserRole> projectUsers = manager.getProjectUserRolesByProject(project);
-            for (ProjectUserRole projectUser : projectUsers) {
-                manager.deleteProjectUserRole(projectUser);
-            }
-
-            List<WorkbenchDataset> datasets = manager.getWorkbenchDatasetByProjectId(projectId, 0,
-                    (int) manager.countWorkbenchDatasetByProjectId(projectId));
-            for (WorkbenchDataset dataset : datasets) {
-                manager.deleteWorkbenchDataset(dataset);
-            }
-
-            List<ProjectLocationMap> projectLocationMaps = manager.getProjectLocationMapByProjectId(projectId, 0,
-                    (int) manager.countLocationIdsByProjectId(projectId));
-            //manager.deleteProjectLocationMap(projectLocationMaps);
-            for (ProjectLocationMap projectLocationMap : projectLocationMaps) {
-                manager.deleteProjectLocationMap(projectLocationMap);
-            }
-
-            manager.deleteProject(project);
-
-        } catch (MiddlewareQueryException e) {
-            Debug.println(INDENT, "Error in deleteProject(): " + e.getMessage());
-        }
-
-    }
-
-    @SuppressWarnings("unused")
-    private void deleteAllProjects() throws MiddlewareQueryException {
-        List<Project> projects = manager.getProjects();
-        for (Project project : projects) {
-            deleteProject(project);
-        }
-    }
-    
 
     @Test
     public void testGetTemplateSettings() throws MiddlewareQueryException {
@@ -1328,10 +1105,4 @@ public class WorkbenchDataManagerImplTest extends TestOutputFormatter{
         return new TemplateSetting(templateSettingId, projectId, name, tool, configuration, isDefault);
     }
 
-    
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        hibernateUtil.shutdown();
-    }
 }

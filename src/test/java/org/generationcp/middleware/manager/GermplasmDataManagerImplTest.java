@@ -20,45 +20,32 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.manager.GetGermplasmByNameModes;
-import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 // Test using RICE database
-public class GermplasmDataManagerImplTest extends TestOutputFormatter{
+public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static GermplasmDataManager manager;
     private static LocationDataManager locationManager;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = 
-                new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = 
-                new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getGermplasmDataManager();
-        locationManager = factory.getLocationDataManager();
+        manager = managerFactory.getGermplasmDataManager();
+        locationManager = managerFactory.getLocationDataManager();
     }
 
     @Test
@@ -858,12 +845,7 @@ public class GermplasmDataManagerImplTest extends TestOutputFormatter{
     	List<Term> terms = manager.getMethodClasses();
     	System.out.println(terms);
     }
-  
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
-    }
-    
+      
     @Test
     public void testUpdateGermplasm() throws Exception {
     	//use wheat local database

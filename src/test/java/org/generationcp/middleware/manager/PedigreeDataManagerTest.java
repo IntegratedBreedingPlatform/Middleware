@@ -17,31 +17,24 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.MockDataUtil;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class PedigreeDataManagerTest extends TestOutputFormatter{
+public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static PedigreeDataManager pedigreeManager;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        pedigreeManager = factory.getPedigreeDataManager();
+        pedigreeManager = managerFactory.getPedigreeDataManager();
     }
     
     @Test
@@ -334,10 +327,4 @@ public class PedigreeDataManagerTest extends TestOutputFormatter{
         Debug.println(INDENT, "testGetPedigreeLine(" + gid + ", " + locationID + "):" + results.size());
         Debug.printObjects(INDENT, results);
     }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
-    }
-
 }

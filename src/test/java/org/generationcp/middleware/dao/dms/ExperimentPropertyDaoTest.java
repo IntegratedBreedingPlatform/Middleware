@@ -17,27 +17,22 @@ import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 
-import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ExperimentPropertyDaoTest{
+public class ExperimentPropertyDaoTest extends MiddlewareIntegrationTest {
 
-    private static HibernateUtil hibernateUtil;
     private static ExperimentPropertyDao dao;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
         dao = new ExperimentPropertyDao();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(centralSessionUtil.getCurrentSession());
     }
-
 
     @Test
     public void testGetFieldMapLabels() throws Exception {
@@ -54,7 +49,6 @@ public class ExperimentPropertyDaoTest{
     public static void tearDown() throws Exception {
         dao.setSession(null);
         dao = null;
-        hibernateUtil.shutdown();
     }
 
 }

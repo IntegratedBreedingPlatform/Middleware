@@ -114,12 +114,25 @@ public class DataSetBuilder extends Builder {
 	    List<ProjectRelationship> datasets = study.getRelatedBys();
 	    if (datasets != null) {
 	        for (ProjectRelationship dataset : datasets) {
-	            if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
-	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
-	                
-	                trialDataset = dataset.getSubjectProject();
-	                break;
-	            }
+	            String datasetType = null; 
+                for (ProjectProperty prop : dataset.getSubjectProject().getProperties()) {
+                    if (prop.getTypeId() == TermId.DATASET_TYPE.getId()) {
+                        datasetType = prop.getValue();
+                    }
+                }
+                if (datasetType != null) {
+    	            if (Integer.parseInt(datasetType) == DataSetType.SUMMARY_DATA.getId() 
+    	                    || (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId())
+    	                    && Integer.parseInt(datasetType) != DataSetType.MEANS_DATA.getId()
+    	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId))) {
+    	                trialDataset = dataset.getSubjectProject();
+    	                break;
+    	            }
+                } else if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
+                        && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
+                    trialDataset = dataset.getSubjectProject();
+                    break;
+                }
 	        }
 	    }
 	    return trialDataset;

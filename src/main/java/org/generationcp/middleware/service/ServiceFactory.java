@@ -63,7 +63,7 @@ public class ServiceFactory implements Serializable {
     }
     
     public ServiceFactory(String propertyFile) {
-        LOG.trace("Created ManagerFactory instance");
+        LOG.trace("Created ServiceFactory instance");
         
         Properties prop = new Properties();
     
@@ -152,7 +152,7 @@ public class ServiceFactory implements Serializable {
      */
     public ServiceFactory(String hibernateConfigurationFilename, DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
             throws ConfigException {
-        LOG.trace("Created ManagerFactory instance");
+        LOG.trace("Created ServiceFactory instance");
         
         if (hibernateConfigurationFilename != null) {
             this.hibernateConfigurationFilename = hibernateConfigurationFilename;

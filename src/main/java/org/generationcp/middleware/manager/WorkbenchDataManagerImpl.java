@@ -516,7 +516,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo=" + projectUserInfo + "): "
+            logAndThrowException("Cannot delete ProjectUserInfo: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo=" + projectUserInfo + "): "
                     + e.getMessage(), e);
         }
     }
@@ -531,23 +531,22 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProject(mysqlaccount=" + mysqlaccount + "): "
+            logAndThrowException("Cannot delete ProjectUserMysqlAccount: WorkbenchDataManager.deleteProjectUserMysqlAccount(mysqlaccount=" + mysqlaccount + "): "
                     + e.getMessage(), e);
         }
     }
     @Override
     public void deleteProject(Project project) throws MiddlewareQueryException {
-    	
-        try{
-        	getProjectDao().deleteProject(project.getProjectName());
-           
-            
+        Transaction trans = null;
+        Session session = getCurrentSession();        
+        try {
+            trans = session.beginTransaction();
+            getProjectDao().deleteProject(project.getProjectName());
+            trans.commit();
         } catch (Exception e) {
-           
+            rollbackTransaction(trans);
             logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): "
                     + e.getMessage(), e);
-            
-            
         }
     }
 

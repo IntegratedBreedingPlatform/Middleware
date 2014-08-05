@@ -164,7 +164,7 @@ public class VariableListTransformer extends Transformer {
 				VariableType varType = varTypes.get(i);
 				MeasurementData trialData = null;
 				for (MeasurementData aData : trialMD) {
-					if (aData.getLabel().equalsIgnoreCase(varType.getLocalName())) {
+					if (aData.getMeasurementVariable().getTermId() == varType.getId()) {
 						trialData = aData;
 						break;
 					}

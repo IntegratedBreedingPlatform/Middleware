@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -55,37 +56,26 @@ import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class StudyDataManagerImplTest extends TestOutputFormatter{
+public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
     private static final Integer STUDY_ID   = 10010;
     private static final Integer DATASET_ID = 10045;
 
-    private static ManagerFactory factory;
     private static StudyDataManager manager;
     private static OntologyDataManager ontologyManager;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-                "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getNewStudyDataManager();
-        ontologyManager = factory.getNewOntologyDataManager();
+        manager = managerFactory.getNewStudyDataManager();
+        ontologyManager = managerFactory.getNewOntologyDataManager();
     }
 
     @Test
@@ -814,13 +804,6 @@ public class StudyDataManagerImplTest extends TestOutputFormatter{
         int storedInId = 1043;
         long count = manager.countExperimentsByVariable(variableId, storedInId);
         Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
-    }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        if (factory != null) {
-            factory.close();
-        }
     }
 
     private Variable createVariable(int termId, String value, int rank) throws Exception {

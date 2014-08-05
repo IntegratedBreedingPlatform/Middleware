@@ -19,6 +19,8 @@ public class StandardVariableSummary {
 	private TermSummary storedIn;
 
 	private PhenotypicType phenotypicType;
+	
+	private boolean hasPair;
 
 	public StandardVariableSummary(Integer id, String name, String description) {
 		this.term = new TermSummary(id, name, description);
@@ -96,6 +98,20 @@ public class StandardVariableSummary {
 		this.phenotypicType = phenotypicType;
 	}
 	
+	/**
+	 * @return the hasPair
+	 */
+	public boolean isHasPair() {
+		return hasPair;
+	}
+
+	/**
+	 * @param hasPair the hasPair to set
+	 */
+	public void setHasPair(boolean hasPair) {
+		this.hasPair = hasPair;
+	}
+
 	@Override
 	public int hashCode() {
 		return getId();

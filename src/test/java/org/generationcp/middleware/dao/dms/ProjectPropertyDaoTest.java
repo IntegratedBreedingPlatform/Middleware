@@ -18,24 +18,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.hibernate.HibernateUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ProjectPropertyDaoTest{
+public class ProjectPropertyDaoTest extends MiddlewareIntegrationTest {
 
-    private static HibernateUtil hibernateUtil;
     private static ProjectPropertyDao dao;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
         dao = new ProjectPropertyDao();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(centralSessionUtil.getCurrentSession());
     }
 
     @Test
@@ -62,7 +58,6 @@ public class ProjectPropertyDaoTest{
     public static void tearDown() throws Exception {
         dao.setSession(null);
         dao = null;
-        hibernateUtil.shutdown();
     }
 
 }

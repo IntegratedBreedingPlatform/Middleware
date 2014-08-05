@@ -17,7 +17,7 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class GermplasmNameStandardizationTest{
+public class GermplasmDataManagerUtilTest{
 
     @Test
     public void testNameStandardization() throws Exception {
