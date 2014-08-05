@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
@@ -961,5 +962,16 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException {
 		return getListInventoryBuilder().retrieveLotCountsForListEntries(listId, entryIds);
 	}
-
+	
+	@Override
+	public void cancelReservedInventory(List<ReservedInventoryKey> lotEntries) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		
+		for(ReservedInventoryKey entry : lotEntries){
+			Integer lotId = entry.getLotId();
+			Integer lrecId = entry.getLrecId();
+			
+			getTransactionDao().cancelReservationsForLotEntryAndLrecId(lotId,lrecId);
+		}
+	}
 }

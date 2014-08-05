@@ -15,7 +15,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
@@ -28,6 +30,7 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
@@ -545,5 +548,15 @@ public class InventoryDataManagerImplTest extends DataManagerIntegrationTest {
 		for (LotDetails lot : lots){
 			System.out.println(lot);
 		}
+    }
+    
+    @Test
+    public void testCancelReservedInventory() throws MiddlewareQueryException{
+    	int lrecId = -520659;
+    	int lotId = 340597;
+    	
+    	List<ReservedInventoryKey> lotEntries = new ArrayList<ReservedInventoryKey>();
+    	lotEntries.add(new ReservedInventoryKey(1, lrecId, lotId));
+    	manager.cancelReservedInventory(lotEntries);
     }
 }
