@@ -38,6 +38,9 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
 		                                                 "from project p " + 
+		                                                 " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id" +
+                                      					 " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + 
+                                      						TermId.STUDY_HAS_FOLDER.getId() +") " +
 					                                     "where p.name = '" + name + "'" +
 					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId() +
 					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
@@ -57,6 +60,9 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
 		                                                 "from project p " +
+		                                                 " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id" +
+		                                                 					" NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + 
+		                                                 						TermId.STUDY_HAS_FOLDER.getId() +") " +
 					                                     "where p.name = '" + name + "'"+
 					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
 					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
