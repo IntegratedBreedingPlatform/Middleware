@@ -37,7 +37,7 @@ public class ListDataProjectSaver extends Saver {
 			updateGermplasmListInfo(snapList, originalListId, userId);
 		}
 		else {
-			setDefaultGermplasmListInfo(snapList,userId);
+			setDefaultGermplasmListInfo(snapList,userId);			
 		}
 		
 		getGermplasmListDAO().saveOrUpdate(snapList);
@@ -66,7 +66,6 @@ public class ListDataProjectSaver extends Saver {
 		snapList.setStatus(1);
 		snapList.setType(type.name());
 		snapList.setParent(null);
-		snapList.setListRef(originalListId);
 		Long dateLong = Long.valueOf(System.currentTimeMillis());
 		String name = type.name() + "-" + dateLong;
 		snapList.setName(name);
@@ -88,6 +87,7 @@ public class ListDataProjectSaver extends Saver {
 			germplasmList.setName(origList.getName());
 			germplasmList.setUserId(origList.getUserId());
 			germplasmList.setDescription(origList.getDescription());
+			germplasmList.setListRef(originalListId);
 		}
 		else {
 			setDefaultGermplasmListInfo(germplasmList,userId);
@@ -100,6 +100,7 @@ public class ListDataProjectSaver extends Saver {
 		snapList.setNotes(null);
 		snapList.setsDate(null);
 		snapList.seteDate(null);
+		snapList.setListRef(null);
 	}
 	
 	private GermplasmList getGermplasmList(int projectId, GermplasmListType type) throws MiddlewareQueryException {
