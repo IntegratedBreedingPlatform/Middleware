@@ -100,6 +100,7 @@ public class ExperimentModelSaver extends Saver {
 			case SUMMARY: return TermId.SUMMARY_EXPERIMENT;
 			case SAMPLE: return TermId.SAMPLE_EXPERIMENT;
 			case STUDY_INFORMATION: return TermId.STUDY_INFORMATION;
+			case TRIAL_ENVIRONMENT: return TermId.TRIAL_ENVIRONMENT_EXPERIMENT;
 		}
 		return null;
 	}

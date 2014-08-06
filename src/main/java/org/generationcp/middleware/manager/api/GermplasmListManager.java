@@ -559,5 +559,5 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException
      */
     GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException;
-    
+    long countListDataProjectGermplasmListDataByListId(Integer id) throws MiddlewareQueryException;
 }
