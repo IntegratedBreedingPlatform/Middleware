@@ -393,6 +393,25 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		}
     }
     
+    public void cancelReservationsForLotEntryAndLrecId(Integer lotId, Integer lrecId) throws MiddlewareQueryException{
+    	try {
+    		String sql = "UPDATE ims_transaction " +
+    		"SET trnstat = 9, " +
+    		"trndate = :currentDate " +
+    		"WHERE trnstat = 0 AND lotId = :lotId " +
+    		"AND recordId = :lrecId " +
+    		"AND trnqty < 0 " + 
+    		"AND sourceType = 'LIST'";
+    		Query query = getSession().createSQLQuery(sql)
+    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameter("lotId", lotId)
+    			.setParameter("lrecId", lrecId);
+    		query.executeUpdate();
+		} catch (Exception e) {
+			logAndThrowException("Error at cancelReservationsForListEntries(lotId:" + lotId + ", lrecId:" + lrecId + ") at TransactionDAO: " + e.getMessage(), e);
+		}
+    }
+    
     public void cancelUnconfirmedTransactionsForGermplasms(List<Integer> gids) throws MiddlewareQueryException{
     	try {
     		String sql = "UPDATE ims_transaction " +

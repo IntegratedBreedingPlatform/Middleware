@@ -2338,6 +2338,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		ids.add(TermId.SEED_INCREASE_METHOD_CLASS.getId());
 		ids.add(TermId.SEED_ACQUISITION_METHOD_CLASS.getId());
 		ids.add(TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
+		ids.add(TermId.CROSSING_METHODS_CLASS.getId());
+		ids.add(TermId.MUTATION_METHODS_CLASS.getId());
+		ids.add(TermId.GENETIC_MODIFICATION_CLASS.getId());
+		ids.add(TermId.CYTOGENETIC_MANIPULATION.getId());
 		
 		return getTermBuilder().getTermsByIds(ids);
 		

@@ -13,12 +13,14 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
@@ -191,4 +193,16 @@ public interface CrossStudyDataManager{
      * @throws MiddlewareQueryException 
      */
     TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException;
+    
+	/**
+	 * Retrieve a list of germplasm and location information matching a given
+	 * set of trial environment ids. Empty list if no matches are found. Never
+	 * returns {@code null}.
+	 * 
+	 * 
+	 * @param environmentIds
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+    List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds) throws MiddlewareQueryException;
 }

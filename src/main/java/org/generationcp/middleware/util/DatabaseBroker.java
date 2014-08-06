@@ -13,6 +13,7 @@ package org.generationcp.middleware.util;
 
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -495,6 +496,10 @@ public class DatabaseBroker {
     
     protected final StandardVariableDao getStandardVariableDao() {
     	return new StandardVariableDao(getActiveSession());
+    }
+    
+    protected final BreedersQueryDao getBreedersQueryDao() {
+    	return new BreedersQueryDao(getActiveSession());
     }
 
     protected final CVTermRelationshipDao getCvTermRelationshipDao() {

@@ -637,5 +637,15 @@ public interface InventoryDataManager{
      * @throws MiddlewareQueryException
      */
     List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Cancels all the reserved inventories given the Map of LrecId and LotId of specific list
+     * 
+     * @param Map<lotId,lrecId>
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    void cancelReservedInventory(List<org.generationcp.middleware.pojos.ims.ReservedInventoryKey> lotEntries) throws MiddlewareQueryException; 
 
 }

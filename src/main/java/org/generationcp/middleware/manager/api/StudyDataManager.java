@@ -798,5 +798,15 @@ public interface StudyDataManager{
      */
 	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers)
 			throws MiddlewareQueryException;
+	
+	/**
+     * Determines if the data for the specified Trial contains at least 2 replicates with values
+     *
+     * @param project_id the project id
+     * @param location_id the location id
+     * @return true or false
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) throws MiddlewareQueryException;
 
 }

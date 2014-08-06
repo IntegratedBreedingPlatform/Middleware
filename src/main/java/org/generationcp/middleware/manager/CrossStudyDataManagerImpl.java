@@ -12,8 +12,10 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -21,6 +23,7 @@ import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
@@ -129,5 +132,19 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     @Override
     public TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException{
     	return getTrialEnvironmentBuilder().getEnvironmentsForTraits(traitIds);
+    }
+    
+    @Override
+    public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds) throws MiddlewareQueryException {
+    	List<GermplasmLocationInfo> result = new ArrayList<GermplasmLocationInfo>();
+    	if(environmentIds != null && !environmentIds.isEmpty()) {
+	    	if(setWorkingDatabase(Database.CENTRAL)) {
+	    		result.addAll(getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
+	    	}
+	    	if(setWorkingDatabase(Database.LOCAL)) {
+	    		result.addAll(getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
+	    	}
+    	}
+    	return result;
     }
 }

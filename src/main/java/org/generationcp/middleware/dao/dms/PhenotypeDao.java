@@ -992,6 +992,34 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     "Error in getPhenotypeByProjectExperimentAndType("    + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(), e);
         }
         return null;
-	} 
+	}
+	
+	
+	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId){
+		
+		StringBuilder sql = new StringBuilder()
+		.append(" SELECT phenotype.observable_id,count(phenotype.observable_id) ")
+		.append(" FROM  ")
+		.append(" nd_experiment_project a ")
+		.append(" INNER JOIN nd_experiment nd_exp ON a.nd_experiment_id = nd_exp.nd_experiment_id ")
+		.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
+		.append(" LEFT JOIN nd_experiment_phenotype nd_exp_pheno ON nd_exp.nd_experiment_id = nd_exp_pheno.nd_experiment_id ")
+		.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ")
+		.append(" where a.project_id = ").append(projectId)
+		.append(" and nd_exp.nd_geolocation_id = ").append(locationId)
+		.append(" and (phenotype.value <> '' and phenotype.value is not null) ")
+		.append(" group by nd_exp.nd_geolocation_id, nd_exp_stock.stock_id, phenotype.observable_id ")
+		.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
+		
+		SQLQuery query = getSession().createSQLQuery(sql.toString());
+		
+		if (query.list().size() > 0){
+			return true;
+		}else{
+			return false;
+		}
+		
+		
+	}
 	
 }

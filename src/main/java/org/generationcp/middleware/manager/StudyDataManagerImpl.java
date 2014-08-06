@@ -1307,6 +1307,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		
 	}
 
+	
+	@Override
+	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId)
+			throws MiddlewareQueryException {
+		
+		this.setWorkingDatabase(projectId);
+		return getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId);
+	}
+
 
 
 	
