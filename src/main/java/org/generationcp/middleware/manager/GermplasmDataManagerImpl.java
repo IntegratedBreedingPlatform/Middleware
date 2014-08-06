@@ -2044,10 +2044,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public Germplasm getGermplasmWithMethodType(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return (Germplasm) getGermplasmDao().getByGIDWithMethodType(gid);
-        }
-        return null;
+    	Germplasm germplasm = getGermplasmByGID(gid);
+    	if(germplasm!=null) {
+    		germplasm.setMethod(getMethodByID(germplasm.getMethodId()));
+    	}
+    	return germplasm;
     }
     
     @Override
@@ -2379,9 +2380,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", centralDatabaseName);
-		params.put("gid",gid);
+		params.put("v_gid",gid);
+		params.put("v_pro_no",null);
 		List<Germplasm> germplasms = getGermplasmListDataDAO().
-				callStoredProcedureForList("getProgenitorsByGID",
+				callStoredProcedureForList("getGermplasmProgenitors",
 						params,Germplasm.class);
 		if(germplasms!=null) {
 			for (Germplasm germplasm : germplasms) {
