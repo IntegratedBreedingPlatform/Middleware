@@ -28,11 +28,6 @@ public enum ToolName {
     // BreedingView native app
     ,breeding_view
     
-    // fieldbook native app
-    ,breeding_manager
-    ,fieldbook
-    ,ibfb_germplasm_import
-
     // MBDT native app
     ,mbdt
     
