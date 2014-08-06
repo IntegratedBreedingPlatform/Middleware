@@ -63,6 +63,7 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
@@ -1130,5 +1131,31 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
              rollbackTransaction(trans);
              logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
          }
+	}
+
+	@Override
+	public List<Long> getFavoriteProjectLocationIds()
+			throws MiddlewareQueryException {
+		List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE);
+		List<Long> longVals = new ArrayList();
+		if(favList != null && !favList.isEmpty()){
+			for(ProgramFavorite fav : favList){
+				longVals.add(Long.valueOf(Integer.toString(fav.getEntityId())));
+			}
+		}
+		return longVals;
+	}
+
+	@Override
+	public List<Integer> getFavoriteProjectMethods()
+			throws MiddlewareQueryException {
+		List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE);
+		List<Integer> ids = new ArrayList();
+		if(favList != null && !favList.isEmpty()){
+			for(ProgramFavorite fav : favList){
+				ids.add(fav.getEntityId());
+			}
+		}
+		return ids;
 	}
 }

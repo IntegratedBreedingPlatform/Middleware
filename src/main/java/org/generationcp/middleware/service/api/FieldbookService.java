@@ -819,4 +819,21 @@ public interface FieldbookService {
 	 * Deletes a study (logical delete).
 	 */
 	void deleteStudy(int studyId) throws MiddlewareQueryException;
+	 /**
+     * Gets the favorite project location ids.
+     *
+     * @param projectId the project id
+     * @return the favorite project location ids
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Long> getFavoriteProjectLocationIds() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the favorite project methods.
+     *
+     * @param projectId the project id
+     * @return the favorite project methods
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Integer> getFavoriteProjectMethods() throws MiddlewareQueryException;
 }
