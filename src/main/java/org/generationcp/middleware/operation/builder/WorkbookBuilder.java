@@ -24,6 +24,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -48,6 +49,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class WorkbookBuilder extends Builder {
@@ -292,9 +294,8 @@ public class WorkbookBuilder extends Builder {
             	boolean isConstant = false;
                 if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
                     StandardVariable stdVariable = getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
-                    if (isNursery && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
-                    		|| !isNursery && (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
-                    				|| PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId()))) {
+                    if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
+                    		|| PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
                     	
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
                         
@@ -312,9 +313,24 @@ public class WorkbookBuilder extends Builder {
                         	}
                         }
                         else if (PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
-                        	//constants, no need to retrieve the value
+                        	//constants, no need to retrieve the value if it's a trial study
                         	isConstant = true;
-                        	value = "";
+                        	if (isNursery) {
+                        		List<Phenotype> phenotypes = getPhenotypeDao().getByProjectAndType(trialDatasetId, stdVariable.getId());
+                        		//expects only 1 value for nursery
+                        		if (phenotypes != null && !phenotypes.isEmpty()) {
+                        			if (phenotypes.get(0).getcValueId() != null) {  //categorical constant
+                        				Enumeration enumeration = stdVariable.getEnumeration(phenotypes.get(0).getcValueId());
+                        				value = enumeration.getDescription();
+                        			}
+                        			else {
+                        				value = phenotypes.get(0).getValue();
+                        			}
+                        		}
+                        	}
+                        	else {
+                        		value = "";
+                        	}
                         }
                         else /*if (isNursery)*/ { //set trial env for nursery studies
                         	setWorkingDatabase(id);

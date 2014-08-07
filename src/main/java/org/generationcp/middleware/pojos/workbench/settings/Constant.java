@@ -1,7 +1,9 @@
 package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.manager.Operation;
 
 public class Constant  implements Serializable {
@@ -21,7 +23,9 @@ public class Constant  implements Serializable {
 	private Operation operation;
 	private boolean isTrial;
 	private int id;
-        private int storedIn;
+    private int storedIn;
+    private String label;
+	private List<ValueReference> possibleValues;
 	
 	public Constant(){
 		super();
@@ -173,6 +177,34 @@ public class Constant  implements Serializable {
 	 */
 	public void setTrial(boolean isTrial) {
 		this.isTrial = isTrial;
+	}
+
+	/**
+	 * @return the label
+	 */
+	public String getLabel() {
+		return label;
+	}
+
+	/**
+	 * @param label the label to set
+	 */
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	/**
+	 * @return the possibleValues
+	 */
+	public List<ValueReference> getPossibleValues() {
+		return possibleValues;
+	}
+
+	/**
+	 * @param possibleValues the possibleValues to set
+	 */
+	public void setPossibleValues(List<ValueReference> possibleValues) {
+		this.possibleValues = possibleValues;
 	}
 
 }
