@@ -81,7 +81,12 @@ public class WorkbookBuilder extends Builder {
                  *  
                  * */
 		
-		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
+		StudyDetails studyDetails = null;
+		if (id < 0) {
+		    studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
+		} else {
+		    studyDetails = getStudyDataManager().getStudyDetails(Database.CENTRAL, studyType, id);
+		}
 		
 		Study study = getStudyBuilder().createStudy(id);
 		//watch.stop();
