@@ -121,6 +121,7 @@ public class WorkbookBuilder extends Builder {
 			getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
 			conditionVariables = study.getConditions();
 			constantVariables = study.getConstants();
+			trialConstantVariables = getTrialConstants(workbook.getTrialDatasetId());
 		}
 		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(conditionVariables, true, true);
 		List<MeasurementVariable> factors = buildFactors(variables, isTrial);		
@@ -750,24 +751,30 @@ public class WorkbookBuilder extends Builder {
 				List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 				for (Variable variable : experiment.getFactors().getVariables()) {
 					MeasurementData measurementData = null;
+					MeasurementVariable measurementVariable = getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList); 
 	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 	            		Integer id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                         		variable.getDisplayValue(), false, 
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
                                 id,
-                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
+                                measurementVariable);
 	            	}
 	            	else {
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                                 variable.getValue(), false, 
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-                                getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList));
+                                measurementVariable);
+	            	}
+	            	
+	            	if (experiments.size() == 1) {
+	            		measurementVariable.setValue(variable.getValue());
 	            	}
 	            	dataList.add(measurementData);
 				}
 		        for (Variable variable : experiment.getVariates().getVariables()) {
 					MeasurementData measurementData = null;
+					MeasurementVariable measurementVariable = getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList); 
 					Integer id = null;
 	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 	            		id = variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
@@ -776,8 +783,11 @@ public class WorkbookBuilder extends Builder {
                             variable.getValue(), true,  
                             getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
                             id,
-                            getMeasurementVariableByName(variable.getVariableType().getLocalName(), variateList));
+                            measurementVariable);
                     measurementData.setPhenotypeId(variable.getPhenotypeId());
+	            	if (experiments.size() == 1) {
+	            		measurementVariable.setValue(variable.getValue());
+	            	}
 	            	dataList.add(measurementData);
                 }
 	        
