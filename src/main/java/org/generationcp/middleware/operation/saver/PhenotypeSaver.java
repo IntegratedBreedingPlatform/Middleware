@@ -84,6 +84,7 @@ public class PhenotypeSaver extends Saver{
     
     public void saveOrUpdate(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype)
             throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
         phenotype = createPhenotype(variableId, storedIn, value, phenotype);
         saveOrUpdate(experimentId, phenotype);
     }
