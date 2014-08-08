@@ -974,7 +974,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                 .append(") AND e.nd_experiment_id = ").append(experimentId);
             SQLQuery query = getSession().createSQLQuery(sql.toString());
             
-            System.out.println(sql.toString());
+            LOG.debug(sql.toString());
             
             List<Object[]> list = query.list();
             Phenotype phenotype = null;
