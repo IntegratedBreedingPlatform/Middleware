@@ -35,8 +35,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
-import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
-import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -207,18 +205,6 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
     	Integer result = manager.addIbdbUserMap(userMap);
         Assert.assertNotNull("Expected id of a newly saved record in workbench_ibdb_user_map", result);
     }
-
-    @Test
-    public void testAddProjectLocationMap() throws MiddlewareQueryException {
-        ProjectLocationMap projectLocationMap = new ProjectLocationMap();
-    	projectLocationMap.setLocationId(1L);
-    	projectLocationMap.setProject(commonTestProject);
-
-        Integer result = manager.addProjectLocationMap(projectLocationMap);
-        Assert.assertNotNull("Expected id of a newly saved record in workbench_project_loc_map",result);
-        
-        manager.deleteProjectLocationMap(projectLocationMap);
-    }
     
     @Test
     public void testGetProjects() throws MiddlewareQueryException {
@@ -312,43 +298,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         long result = manager.countWorkbenchDatasetByName(name, Operation.EQUAL);
         Debug.println(INDENT, "testCountWorkbenchDatasetByName(name=" + name + "): " + result);
     }
-
-    @Test
-    public void testGetLocationIdsByProjectId() throws MiddlewareQueryException {
-        Long projectId = 1L;
-        List<Long> ids = manager.getLocationIdsByProjectId(projectId, 0, 10);
-        Debug.println(INDENT, "testgetLocationIdsByProjectId(" + projectId + "): " + ids);
-    }
-
-    @Test
-    public void testCountLocationIdsByProjectId() throws MiddlewareQueryException {
-        Long projectId = 1L;
-        long result = manager.countLocationIdsByProjectId(projectId);
-        Debug.println(INDENT, "testCountLocationIdsByProjectId(" + projectId + "): " + result);
-    }
-
-    @Test
-    public void testGetMethodsByProjectId() throws MiddlewareQueryException {
-        Long projectId = 1L;
-        List<Integer> list = manager.getMethodIdsByProjectId(projectId, 0, 10);
-        Debug.println(INDENT, "testGetMethodsByProjectId(" + projectId + "): ");
-
-        if (list.isEmpty()) {
-            Debug.println(INDENT, "  No records found.");
-        }
-
-        for (Integer m : list) {
-            Debug.println(INDENT, m);
-        }
-    }
-
-    @Test
-    public void testCountMethodsByProjectId() throws MiddlewareQueryException {
-        Long projectId = 1L;
-        long result = manager.countMethodIdsByProjectId(projectId);
-        Debug.println(INDENT, "testCountMethodsByProjectId(" + projectId + "): " + result);
-    }
-
+    
     @Test
     public void testAddProjectUserRoles() throws MiddlewareQueryException {
         
@@ -768,17 +718,6 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 	}
 
     @Test
-    public void testGetProjectLocationMapByProjectId() throws MiddlewareQueryException {
-    	List<ProjectLocationMap> results = manager.getProjectLocationMapByProjectId(commonTestProject.getProjectId(), 1, 50);
-    	Assert.assertNotNull(results);
-        Assert.assertTrue(!results.isEmpty());
-        
-        for (ProjectLocationMap result : results){
-        	Debug.println(INDENT, result.toString());
-       }
-    }
-
-    @Test
     public void testGetProjectUserRoleById() throws MiddlewareQueryException {
     	ProjectUserRole userrole = manager.getProjectUserRoleById(testUser1.getUserid());
     	Assert.assertNotNull(userrole);
@@ -805,13 +744,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         Debug.printObjects(INDENT, results);
     }
 
-    @Test
-    public void testGetProjectMethodByProject() throws MiddlewareQueryException {
-    	List<ProjectMethod> results = manager.getProjectMethodByProject(commonTestProject, 0, 100);
-    	Assert.assertNotNull(results);
-        Assert.assertTrue(!results.isEmpty());
-        Debug.printObjects(INDENT, results);
-    }
+    
 
     @Test
     public void testGetProjectsByUser() throws MiddlewareQueryException {
@@ -921,16 +854,6 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
-    }
-
-    @Test
-    public void testGetBreedingMethodIdsByWorkbenchProjectId() throws MiddlewareQueryException {
-        Integer projectId = 1;
-        List<Integer> ids = manager.getBreedingMethodIdsByWorkbenchProjectId(projectId);
-        Debug.println(INDENT, "testGetBreedingMethodIdsByWorkbenchProjectId(projectId=" + projectId + "): " + ids.size());
-        for (Integer id : ids){
-            Debug.println(INDENT, " ID = " + id);
-        }
     }
 
     @Test
