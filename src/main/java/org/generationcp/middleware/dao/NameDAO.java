@@ -329,8 +329,8 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 	public List<String> getAllMatchingNames(String prefix, String suffix) throws MiddlewareQueryException {
     	List<String> names = new ArrayList<String>();
     	try {
-    		String keyword1 = prefix + "%" + suffix + "(%)";
-    		String keyword2 = GermplasmDataManagerUtil.standardizeName(prefix) + "%" + GermplasmDataManagerUtil.standardizeName(suffix) + "(%)";
+    		String keyword1 = prefix + "%" + suffix + "%";
+    		String keyword2 = GermplasmDataManagerUtil.standardizeName(prefix) + "%" + GermplasmDataManagerUtil.standardizeName(suffix) + "%";
     		StringBuilder sql = new StringBuilder();
     		sql.append("SELECT nval FROM names ")
     			.append(" WHERE (nval LIKE '").append(keyword1).append("'")
