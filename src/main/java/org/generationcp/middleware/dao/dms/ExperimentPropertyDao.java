@@ -434,7 +434,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             if (NumberUtils.isNumber((String) row[10])) {
                 label.setRange(Integer.parseInt((String) row[10]));
             }
-            if(blockNo != null && !blockNo.equalsIgnoreCase("null") && NumberUtils.isNumber(blockNo)){
+            if((rep == null || rep.equals("null")) &&  
+            		blockNo != null && !blockNo.equalsIgnoreCase("null") && NumberUtils.isNumber(blockNo)){
             	label.setRep(Integer.parseInt(blockNo));
             }
             label.setBlockNo(getIntegerValue(blockNo));
