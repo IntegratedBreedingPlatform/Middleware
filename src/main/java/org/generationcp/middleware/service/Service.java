@@ -31,6 +31,7 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
+import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
@@ -160,4 +161,9 @@ public abstract class Service extends DatabaseBroker {
     protected final ListDataProjectSaver getListDataProjectSaver() {
         return new ListDataProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
+
+    protected final NameBuilder getNameBuilder() {
+    	return new NameBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }

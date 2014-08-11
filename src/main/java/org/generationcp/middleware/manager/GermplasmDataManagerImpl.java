@@ -2305,6 +2305,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		
 	}
 
-	
-    
+	@Override
+	public int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count) throws MiddlewareQueryException {
+		return getNameBuilder().getMaximumSequence(isBulk, prefix, suffix, count);
+	}
 }

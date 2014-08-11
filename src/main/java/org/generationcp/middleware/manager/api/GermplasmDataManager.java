@@ -1421,4 +1421,14 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteProgramFavorite(ProgramFavorite favorite) throws MiddlewareQueryException;
+
+    /**
+     * Returns the maximum number in the sequence.
+     * @param prefix
+     * @param suffix
+     * @param nameType
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count) throws MiddlewareQueryException; 
 }

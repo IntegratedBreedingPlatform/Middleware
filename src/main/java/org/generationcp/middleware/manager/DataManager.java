@@ -23,6 +23,7 @@ import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.FolderBuilder;
 import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
+import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
@@ -1184,5 +1185,9 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final ListInventoryBuilder getListInventoryBuilder() {
     	return new ListInventoryBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final NameBuilder getNameBuilder() {
+        return new NameBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }
