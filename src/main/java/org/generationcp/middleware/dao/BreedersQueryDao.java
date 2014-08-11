@@ -30,7 +30,7 @@ public class BreedersQueryDao {
 			long startTime = System.nanoTime();
 			try {
 				SQLQuery query = this.session
-						.createSQLQuery("SELECT gtd.envt_id, gtd.gid, tsl.locationName, tsl.isoabbr "
+						.createSQLQuery("SELECT gtd.envt_id, gtd.gid, gtd.entry_designation, tsl.locationName, tsl.isoabbr "
 								+ " FROM germplasm_trial_details gtd "
 								+ " join trial_study_locations tsl on gtd.envt_id=tsl.envtId "
 								+ " where gtd.envt_id in (:envIds) GROUP BY (gid);");
@@ -41,7 +41,7 @@ public class BreedersQueryDao {
 				
 				for(Object qResult : queryResult) {
 					Object[] row = (Object[]) qResult;
-					result.add(new GermplasmLocationInfo((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3]));
+					result.add(new GermplasmLocationInfo((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3], (String) row[4]));
 				}
 			} catch(HibernateException he) {
 				throw new MiddlewareQueryException(

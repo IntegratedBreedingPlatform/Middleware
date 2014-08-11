@@ -4,14 +4,16 @@ public class GermplasmLocationInfo {
 
 	private final Integer environmentId;
 	private final Integer gid;
+	private final String germplasmName;	
 	private final String locationName;
-	private final String isoabbr;
+	private final String countryName;
 
-	public GermplasmLocationInfo(Integer environmentId, Integer gid, String locationName, String isoabbr) {
+	public GermplasmLocationInfo(Integer environmentId, Integer gid, String germplasmName, String locationName, String countryName) {
 		this.environmentId = environmentId;
 		this.gid = gid;
+		this.germplasmName = germplasmName;
 		this.locationName = locationName;
-		this.isoabbr = isoabbr;
+		this.countryName = countryName;
 	}
 
 	public Integer getEnvironmentId() {
@@ -26,8 +28,11 @@ public class GermplasmLocationInfo {
 		return locationName;
 	}
 
-	public String getIsoabbr() {
-		return isoabbr;
+	public String getCountryName() {
+		return countryName;
 	}
 
+	public String getGermplasmName() {
+		return germplasmName;
+	}
 }
