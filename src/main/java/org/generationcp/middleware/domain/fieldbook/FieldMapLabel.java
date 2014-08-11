@@ -40,6 +40,7 @@ public class FieldMapLabel implements Serializable{
     
     /** The rep. */
     private Integer rep; // null if isTrial = false
+    private Integer blockNo;
 
     /** The plot no. */
     private Integer plotNo;
@@ -463,5 +464,13 @@ public class FieldMapLabel implements Serializable{
         Debug.println(indent, "Start Year = " + startYear);
         Debug.println(indent, "Pedigree = " + pedigree);
     }
+
+	public Integer getBlockNo() {
+		return blockNo;
+	}
+
+	public void setBlockNo(Integer blockNo) {
+		this.blockNo = blockNo;
+	}
 
 }
