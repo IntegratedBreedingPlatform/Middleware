@@ -147,4 +147,18 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     	}
     	return result;
     }
+
+	@Override
+	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
+    	List<Integer> result = new ArrayList<Integer>();
+    	if(gids != null && !gids.isEmpty()) {
+	    	if(setWorkingDatabase(Database.CENTRAL)) {
+	    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
+	    	}
+	    	if(setWorkingDatabase(Database.LOCAL)) {
+	    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
+	    	}
+    	}
+    	return result;
+	}
 }

@@ -34,5 +34,19 @@ public class BreedersQueryDaoIntegrationTest extends MiddlewareIntegrationTest {
 		List<GermplasmLocationInfo> result = dao.getGermplasmLocationInfoByEnvironmentIds(environmentIds);
 		Assert.assertEquals(89, result.size());
 	}
+	
+	@Test
+	public void testGetEnvironmentIdsForGermplasm() throws MiddlewareQueryException {
+		HashSet<Integer> gids = new HashSet<Integer>();
+		gids.add(2586617);
+		
+		List<Integer> result = dao.getTrialEnvironmentIdsForGermplasm(gids);
+		Assert.assertEquals(42, result.size());
+		
+		gids = new HashSet<Integer>();
+
+		result = dao.getTrialEnvironmentIdsForGermplasm(gids);
+		Assert.assertEquals(0, result.size());		
+	}
 
 }

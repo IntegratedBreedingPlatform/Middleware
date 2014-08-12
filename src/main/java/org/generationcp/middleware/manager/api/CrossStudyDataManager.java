@@ -205,4 +205,13 @@ public interface CrossStudyDataManager{
 	 * @throws MiddlewareQueryException
 	 */
     List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds) throws MiddlewareQueryException;
+
+	/**
+	 * Retrieve the environment info for a list of Germplasm. Find out which experiments plants have been involved in.
+	 * 
+	 * @param gids : germplasm ids
+	 * @return envIds : environmentIds
+	 * @throws MiddlewareQueryException
+	 */
+    List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException;
 }

@@ -53,4 +53,31 @@ public class BreedersQueryDao {
 		}		
 		return result;
 	}
+
+	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
+		List<Integer> result = new ArrayList<Integer>();
+		if(gids != null && !gids.isEmpty()) {
+			long startTime = System.nanoTime();
+			try {
+				SQLQuery query = this.session
+						.createSQLQuery("SELECT DISTINCT gtd.envt_id FROM germplasm_trial_details gtd "
+								+ "where gtd.gid in (:gids);");
+				query.setParameterList("gids", gids);
+				
+				@SuppressWarnings("rawtypes")
+				List queryResult = query.list();
+				
+				for(Object qResult : queryResult) {
+					result.add((Integer) qResult);
+				}
+			} catch(HibernateException he) {
+				throw new MiddlewareQueryException(
+						String.format("Hibernate error occured. Cause: %s", he.getCause().getMessage()));
+			}
+			
+			long elapsedTime = System.nanoTime() - startTime;
+			LOG.debug(String.format("Time taken: %f ms.", ((double) elapsedTime/1000000L )));
+		}		
+		return result;
+	}
 }
