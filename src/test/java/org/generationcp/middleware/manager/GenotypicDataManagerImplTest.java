@@ -11,10 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -71,6 +67,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 // Test using Groundnut Database
 public class GenotypicDataManagerImplTest extends TestOutputFormatter{
 
@@ -115,6 +113,15 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
         
         List<Name> results = manager.getNamesByNameIds(nameIds);
         Debug.println("testGetNamesByNameIds(" + nameIds + ") RESULTS: " + results.size() + " = " + results);
+    }
+
+    @Test
+    public void testGetMapNameByMapId() throws Exception {
+        Integer mapID = 5; // FROM CENTRAL GROUNDNUT DATABASE
+        String expectedName = "RIL-1 (TAG 24 x ICGV 86031)";
+
+        String retrievedName = manager.getMapNameById(mapID);
+        assertEquals(expectedName, retrievedName);
     }
 
     @Test

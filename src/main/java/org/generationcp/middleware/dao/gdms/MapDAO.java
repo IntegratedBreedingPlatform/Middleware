@@ -75,6 +75,9 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     public static final String GET_MAP_ID_BY_NAME = 
     		"SELECT map_id FROM gdms_map WHERE map_name = :mapName LIMIT 0,1";
 
+    public static final String GET_MAP_NAME_BY_ID=
+        		"SELECT map_name FROM gdms_map WHERE map_id = :mapId";
+
     public static final String GET_MAP_AND_MARKER_COUNT_BY_MARKERS = 
     		"SELECT CONCAT(m.map_name, ''), COUNT(k.marker_id) " +
     		"FROM gdms_map m " +
@@ -330,6 +333,21 @@ public class MapDAO extends GenericDAO<Map, Integer>{
         return map;        
     }
 
+    public Map getById(Integer mapId) throws MiddlewareQueryException {
+        Map map = null;
+
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("mapId", mapId));
+            map = (Map) criteria.uniqueResult();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getById query from Map: " + e.getMessage(), e);
+        }
+
+        return map;
+    }
+
     
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
 
@@ -406,6 +424,20 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     		logAndThrowException("Error with getMapIdByName(" + mapName + ") in MapDAO: " + e.getMessage(), e);
     	}
     	return null;
+    }
+
+    public String getMapNameById(Integer mapId) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(GET_MAP_NAME_BY_ID);
+            query.setParameter("mapId", mapId);
+            return (String) query.addScalar("map_name", StringType.class.newInstance()).uniqueResult();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
+        } catch (Exception e) {
+            logAndThrowException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
+        }
+        return null;
     }
     
     @SuppressWarnings("rawtypes")
