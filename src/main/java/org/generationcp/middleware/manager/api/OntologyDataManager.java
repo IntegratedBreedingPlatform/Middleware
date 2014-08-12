@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
@@ -596,6 +597,13 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
-
+    
+    /**
+     * Returns synonyms (if any) of given term (not limited to standard variable)
+     * 
+     * @param termId
+     * @return
+     */
+    List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
 	
 }

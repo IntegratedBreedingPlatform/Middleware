@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -1104,6 +1106,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
     	return getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
     }
+
+    
+	@Override
+	public List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException {
+		List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(termId);
+		return getNameSynonymBuilder().create(synonyms);
+	}
 
 
 }
