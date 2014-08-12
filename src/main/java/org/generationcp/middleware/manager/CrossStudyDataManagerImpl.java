@@ -54,8 +54,8 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 
 
     @Override
-    public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
-        return getTrialEnvironmentBuilder().getAllTrialEnvironments();
+    public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
+        return getTrialEnvironmentBuilder().getAllTrialEnvironments(includePublicData);
     }
     
     @SuppressWarnings("unchecked")

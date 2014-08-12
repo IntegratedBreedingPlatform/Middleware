@@ -33,10 +33,12 @@ public interface CrossStudyDataManager{
     /**
      * Retrieves a list of all trial environments.
      * 
+     * @param includePublicData flag to indicate whether public (central) data should be querried.
+     * 
      * @return TrialEnvironments
      * @throws MiddlewareQueryException
      */
-    TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException;
+    TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException;
     
     /**
      * Retrieves a list of all trial environments by batch.
