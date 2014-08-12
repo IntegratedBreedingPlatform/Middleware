@@ -232,9 +232,56 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public long countGermplasmByName(String name, Operation operation) throws MiddlewareQueryException {
-        List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-        return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countByName", new Object[] { names, operation }, new Class[] {
-                List.class, Operation.class });
+        long count = 0;
+        
+        setWorkingDatabase(Database.LOCAL);
+        count = getGermplasmDao().countByName(name, operation, null, null);
+        
+        setWorkingDatabase(Database.CENTRAL);
+        count = count + getGermplasmDao().countByName(name, operation, null, null);
+        
+        return count;
+    }
+    
+    @Override
+	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+    	List<Germplasm> germplasms = new ArrayList<Germplasm>();
+    	
+    	//get first all the IDs from LOCAL and CENTRAL
+    	List<Integer> germplasmIds = new ArrayList<Integer>();
+    	setWorkingDatabase(Database.LOCAL);
+    	germplasmIds.addAll(getGermplasmDao().getIdsByName(name, start, numOfRows));
+    	setWorkingDatabase(Database.CENTRAL);
+    	germplasmIds.addAll(getGermplasmDao().getIdsByName(name, start, numOfRows));
+    	
+    	// check if there is a LOCAL germplasm
+    	boolean hasLocalIds = false;
+    	for(Integer id : germplasmIds){
+    		if(id < 0){
+    			hasLocalIds = true;
+    			break;
+    		}
+    	}
+    	// check if there is a CENTRAL germplasm
+    	boolean hasCentralIds = false;
+    	for(Integer id : germplasmIds){
+    		if(id < 0){
+    			hasCentralIds = true;
+    			break;
+    		}
+    	}
+    	
+    	if(hasLocalIds){
+    		setWorkingDatabase(Database.LOCAL);
+    		germplasms.addAll(getGermplasmDao().getGermplasmByIds(germplasmIds, start, numOfRows));
+    	}
+    	
+    	if(hasCentralIds){
+    		setWorkingDatabase(Database.CENTRAL);
+    		germplasms.addAll(getGermplasmDao().getGermplasmByIds(germplasmIds, start, numOfRows));
+    	}
+    	
+    	return germplasms;
     }
 
     @Override

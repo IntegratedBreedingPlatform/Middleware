@@ -85,6 +85,20 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
+    
+    /**
+     * Searches for all germplasm records which matches the given name.
+     * It will match records having the given name as it is,
+     *
+     * @param name - search string for the name of the germplasm
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @return List of Germplasm POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
+    
 
     /**
      * Returns the number of germplasm records with any name matching the given
