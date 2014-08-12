@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
@@ -322,6 +323,26 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         }
         
         return map;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<String> getAllMatchingNames(String prefix, String suffix) throws MiddlewareQueryException {
+    	List<String> names = new ArrayList<String>();
+    	try {
+    		String keyword1 = prefix + "%" + suffix + "%";
+    		String keyword2 = GermplasmDataManagerUtil.standardizeName(prefix) + "%" + GermplasmDataManagerUtil.standardizeName(suffix) + "%";
+    		StringBuilder sql = new StringBuilder();
+    		sql.append("SELECT nval FROM names ")
+    			.append(" WHERE (nval LIKE '").append(keyword1).append("'")
+    			.append(" OR nval LIKE '").append(keyword2).append("')");
+
+    		Query query = getSession().createSQLQuery(sql.toString());
+    		return query.list();
+     		
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAllMatchingNames(" + prefix + ", " + suffix + ") query from Name " + e.getMessage(), e);
+    	}
+    	return names;
     }
     
 }

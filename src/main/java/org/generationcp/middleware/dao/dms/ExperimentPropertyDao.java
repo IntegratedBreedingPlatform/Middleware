@@ -89,7 +89,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             INNER JOIN stock s ON es.stock_id = s.stock_id  
             LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id
             AND epropRep.type_id =  8210  AND eproj.project_id = pr.subject_project_id 
-            AND epropRep.value IS NOT NULL  AND epropRep.value <> ''  
+            AND epropRep.value IS NOT NULL  AND epropRep.value <> ''
+            LEFT JOIN nd_experimentprop epropBlock ON eproj.nd_experiment_id = epropBlock.nd_experiment_id
+            AND epropBlock.type_id =  8220  AND eproj.project_id = pr.subject_project_id 
+            AND epropBlock.value IS NOT NULL  AND epropBlock.value <> ''    
             INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id        
             AND epropPlot.type_id IN (8200, 8380) AND eproj.project_id = pr.subject_project_id        
             AND epropPlot.value IS NOT NULL  AND epropPlot.value <> ''  
@@ -128,6 +131,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , ppStartDate.value as startDate ") 
                 .append(" , gpSeason.value as season ")
                 .append(" , siteId.value AS siteId")
+                .append(" , epropBlock.value AS blockNo ")
                 .append(" FROM ")
                 .append(" nd_experiment_project eproj ")
                 .append(" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
@@ -140,6 +144,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id ")
                 .append("       AND epropRep.type_id =  " + TermId.REP_NO.getId()  + "  AND eproj.project_id = pr.subject_project_id ") // 8210
                 .append("       AND epropRep.value IS NOT NULL  AND epropRep.value <> '' ")
+                .append(" LEFT JOIN nd_experimentprop epropBlock ON eproj.nd_experiment_id = epropBlock.nd_experiment_id ")
+                .append("       AND epropBlock.type_id =  " + TermId.BLOCK_NO.getId()  + "  AND eproj.project_id = pr.subject_project_id ") // 8220
+                .append("       AND epropBlock.value IS NOT NULL  AND epropBlock.value <> '' ")
                 .append(" INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id ")
                 .append("       AND epropPlot.type_id IN ("+ TermId.PLOT_NO.getId() + ", "+ TermId.PLOT_NNO.getId() +")  ") //8200, 8380
                 .append("       AND eproj.project_id = pr.subject_project_id ")
@@ -181,6 +188,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("startDate")
                     .addScalar("season")
                     .addScalar("siteId")
+                    .addScalar("blockNo")
                     ;
             query.setParameter("projectId", projectId);
             List<Object[]> list =  query.list();           
@@ -222,6 +230,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , s.dbxref_id AS gid ")
                 .append(" , ppStartDate.value as startDate ") 
                 .append(" , gpSeason.value as season ")
+                .append(" , epropBlock.value AS blockNo ")
                 .append(" FROM ")
                 .append("  nd_geolocationprop blk ")
                 .append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ")
@@ -235,6 +244,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("  INNER JOIN stock s ON es.stock_id = s.stock_id ")
                 .append("  LEFT JOIN nd_experimentprop epropRep ON epropRep.nd_experiment_id = e.nd_experiment_id ")
                 .append("    AND epropRep.type_id = ").append(TermId.REP_NO.getId()).append(" AND epropRep.value <> '' ")
+                .append("  LEFT JOIN nd_experimentprop epropBlock ON epropBlock.nd_experiment_id = e.nd_experiment_id ")
+                .append("    AND epropBlock.type_id = ").append(TermId.BLOCK_NO.getId()).append(" AND epropBlock.value <> '' ")                
                 .append("  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = e.nd_experiment_id ")
                 .append("    AND epropPlot.type_id IN (").append(TermId.PLOT_NO.getId()).append(", ")
                             .append(TermId.PLOT_NNO.getId()).append(") ").append(" AND epropPlot.value <> '' ")
@@ -285,6 +296,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("gid")
                         .addScalar("startDate")
                         .addScalar("season")
+                        .addScalar("blockNo")
                         ;
                 
                 if (blockId != null) {
@@ -404,6 +416,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             String entryNumber = ((String) row[5]);
             String germplasmName = (String) row[6]; 
             String rep = (String) row[7];
+            String blockNo = (String) row[18];
             String plotNo = (String) row[8];
             Integer gid = (Integer) row[14];
             String startDate = (String) row[15];
@@ -421,6 +434,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             if (NumberUtils.isNumber((String) row[10])) {
                 label.setRange(Integer.parseInt((String) row[10]));
             }
+            if((rep == null || rep.equals("null")) &&  
+            		blockNo != null && !blockNo.equalsIgnoreCase("null") && NumberUtils.isNumber(blockNo)){
+            	label.setRep(Integer.parseInt(blockNo));
+            }
+            label.setBlockNo(getIntegerValue(blockNo));
             label.setStudyName((String) row[13]);
             label.setGid(gid);
             label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
@@ -519,7 +537,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             label.setGid((Integer) row[16]);
             label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
             label.setSeason(Season.getSeason((String) row[18]));
-
+            label.setBlockNo(getIntegerValue(row[19]));
+            
             String trialKey = getTrialKey((Integer) row[0], (Integer) row[3]);
             FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
             if (trial == null) {
