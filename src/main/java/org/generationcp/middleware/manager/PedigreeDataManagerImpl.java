@@ -166,20 +166,21 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
                 
                 Germplasm parent = germplasmDataManager.getGermplasmWithPrefName(germplasmOfNode.getGpid1());
                 
+                
                 if (parent != null) {
 
                     Germplasm grandParent1 = germplasmDataManager.getGermplasmWithPrefName(parent.getGpid1());   
                     if(grandParent1 != null){
-                    GermplasmPedigreeTreeNode nodeForGrandParent1 = new GermplasmPedigreeTreeNode();
-                    nodeForGrandParent1.setGermplasm(grandParent1);
-                    node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent1, level - 1));
+                    	GermplasmPedigreeTreeNode nodeForGrandParent1 = new GermplasmPedigreeTreeNode();
+                    	nodeForGrandParent1.setGermplasm(grandParent1);
+                    	node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent1, level - 1));
                     }
                     
                     Germplasm grandParent2 = germplasmDataManager.getGermplasmWithPrefName(parent.getGpid2());   
                     if(grandParent2 != null){
                         GermplasmPedigreeTreeNode nodeForGrandParent2 = new GermplasmPedigreeTreeNode();
-                    nodeForGrandParent2.setGermplasm(grandParent2);
-                    node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent2, level - 1));
+                        nodeForGrandParent2.setGermplasm(grandParent2);
+                        node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent2, level - 1));
                     }
                         
                 }
@@ -189,7 +190,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
                 if (femaleParent != null) {
                     GermplasmPedigreeTreeNode nodeForFemaleParent = new GermplasmPedigreeTreeNode();
                     nodeForFemaleParent.setGermplasm(femaleParent);
-                    node.getLinkedNodes().add(addParents(nodeForFemaleParent, level - 1));
+                    node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForFemaleParent, level - 1));
                 }
 
                 // get and add male parent
@@ -197,7 +198,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
                 if (maleParent != null) {
                     GermplasmPedigreeTreeNode nodeForMaleParent = new GermplasmPedigreeTreeNode();
                     nodeForMaleParent.setGermplasm(maleParent);
-                    node.getLinkedNodes().add(addParents(nodeForMaleParent, level - 1));
+                    node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForMaleParent, level - 1));
                 }
 
                 if (germplasmOfNode.getGnpgs() > 2) {
@@ -213,7 +214,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
                     for (Germplasm otherParent : otherParents) {
                         GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
                         nodeForOtherParent.setGermplasm(otherParent);
-                        node.getLinkedNodes().add(addParents(nodeForOtherParent, level - 1));
+                        node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForOtherParent, level - 1));
                     }
                 }           
             }
