@@ -110,7 +110,7 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+            "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
 		    "      OR desig LIKE :q OR listname LIKE :q " +
 		    "      OR desig LIKE :qNoSpaces " +
 		    "      OR desig LIKE :qStandardized " +
@@ -121,7 +121,7 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid " +
+            "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED') AND liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid " +
             "      OR desig LIKE :q OR listname LIKE :q" +
             "      OR desig LIKE :qNoSpaces " +
             "      OR desig LIKE :qStandardized " +
@@ -132,7 +132,8 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+            "WHERE " + 
+            " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
             "      OR desig = :q OR listname = :q " +
             "      OR desig = :qNoSpaces " +
             "      OR desig = :qStandardized " +
