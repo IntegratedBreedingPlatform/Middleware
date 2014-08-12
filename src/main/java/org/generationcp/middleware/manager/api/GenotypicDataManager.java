@@ -214,6 +214,8 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<String> getAllMarkerNamesFromMarkersOnMap() throws MiddlewareQueryException;
+
+    String getMapNameById(Integer mapID) throws MiddlewareQueryException;
     
     /**
      * Counts all the dataset names.

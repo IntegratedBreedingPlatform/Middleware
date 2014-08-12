@@ -44,8 +44,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private PersonDAO personDao;
     private ProjectActivityDAO projectActivityDao;
     private ProjectDAO projectDao;
-    private ProjectLocationMapDAO projectLocationMapDao;
-    private ProjectMethodDAO projectMethodDao;
     private ProjectUserMysqlAccountDAO projectUserMysqlAccountDao;
     private ProjectUserRoleDAO projectUserRoleDao;
     private ProjectUserMysqlAccountDAO projectUserMysqlAccountDAO;
@@ -122,22 +120,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         }
         projectDao.setSession(getCurrentSession());
         return projectDao;
-    }
-    
-    private ProjectLocationMapDAO getProjectLocationMapDao() {
-        if (projectLocationMapDao == null){
-            projectLocationMapDao = new ProjectLocationMapDAO();
-        }
-        projectLocationMapDao.setSession(getCurrentSession());
-        return projectLocationMapDao;
-    }
-    
-    private ProjectMethodDAO getProjectMethodDao() {
-        if (projectMethodDao == null){
-            projectMethodDao = new ProjectMethodDAO();
-        }
-        projectMethodDao.setSession(getCurrentSession());
-        return projectMethodDao;
     }
     
     private ProjectUserMysqlAccountDAO getProjectUserMysqlAccountDao() {
@@ -420,12 +402,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                deleteProjectActivity(projectActivity);
             } 
 
-            List<ProjectMethod> projectMethods = getProjectMethodByProject(project, 0,
-                    (int) countMethodIdsByProjectId(projectId));
-            for (ProjectMethod projectMethod : projectMethods) {
-               deleteProjectMethod(projectMethod);
-            }
-
             List<ProjectUserRole> projectUsers = getProjectUserRolesByProject(project);
             for (ProjectUserRole projectUser : projectUsers) {
                 deleteProjectUserRole(projectUser);
@@ -445,13 +421,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             for (WorkbenchDataset dataset : datasets) {
                 deleteWorkbenchDataset(dataset);
             }
-            
-            List<ProjectLocationMap> projectLocationMaps = getProjectLocationMapByProjectId(projectId, 0,
-                    (int) countLocationIdsByProjectId(projectId));
-            //manager.deleteProjectLocationMap(projectLocationMaps);
-            for (ProjectLocationMap projectLocationMap : projectLocationMaps) {
-                deleteProjectLocationMap(projectLocationMap);
-            } 
             
             List<ProjectUserInfo> projectUserInfos = getByProjectId(projectId.intValue());
             for (ProjectUserInfo projectUserInfo : projectUserInfos) {
@@ -815,27 +784,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public long countWorkbenchDatasetByName(String name, Operation op) throws MiddlewareQueryException {
         return getWorkbenchDatasetDao().countByName(name, op);
     }
-
-    @Override
-    public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
-        return getProjectLocationMapDao().getLocationIdsByProjectId(projectId, start, numOfRows);
-    }
-
-    @Override
-    public long countLocationIdsByProjectId(Long projectId) throws MiddlewareQueryException {
-        return getProjectLocationMapDao().countLocationIdsByProjectId(projectId);
-    }
-
-    @Override
-    public List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
-        return getProjectMethodDao().getByProjectId(projectId, start, numOfRows);
-    }
-
-    @Override
-    public long countMethodIdsByProjectId(Long projectId) throws MiddlewareQueryException {
-        return getProjectMethodDao().countByProjectId(projectId);
-    }
-
+    
     @Override
     public Integer addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException {
         ProjectUserRole projectUserRole = new ProjectUserRole();
@@ -978,183 +927,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
         return idSaved;
     }
-
-    @Override
-    public Integer addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException {
-        List<ProjectLocationMap> list = new ArrayList<ProjectLocationMap>();
-        list.add(projectLocationMap);
-        List<Integer> ids = addProjectLocationMap(list);
-        return ids.size() > 0 ? ids.get(0) : null;
-    }
-
-    public List<Integer> addProjectLocationMap(List<ProjectLocationMap> projectLocationMapDatas) throws MiddlewareQueryException {
-        return addOrUpdateProjectLocationMapData(projectLocationMapDatas, Operation.ADD);
-    }
-
-    private List<Integer> addOrUpdateProjectLocationMapData(List<ProjectLocationMap> projectLocationMapDatas, Operation operation)
-            throws MiddlewareQueryException {
-        Session session = getCurrentSession();
-        if (session == null) {
-            return new ArrayList<Integer>();
-        }
-
-        Transaction trans = null;
-        List<Integer> idsSaved = new ArrayList<Integer>();
-        try {
-            // begin save transaction
-            trans = session.beginTransaction();
-
-            ProjectLocationMapDAO dao = getProjectLocationMapDao();
-
-            for (ProjectLocationMap projectLocationMapData : projectLocationMapDatas) {
-                ProjectLocationMap recordSaved = dao.saveOrUpdate(projectLocationMapData);
-                idsSaved.add(recordSaved.getId());
-            }
-
-            trans.commit();
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while adding ProjectLocation: WorkbenchDataManager.addOrUpdateProjectLocationMapData(projectLocationMapDatas="
-                            + projectLocationMapDatas + ", operation=" + operation + "): " + e.getMessage(), e);
-        }
-
-        return idsSaved;
-    }
-    
-
-  
+      
     public List<ProjectUserInfo> getByProjectId(Integer projectId)
             throws MiddlewareQueryException {
         return getProjectUserInfoDao().getByProjectId(projectId);
 
     }
-
-    @Override
-    public List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows)
-            throws MiddlewareQueryException {
-        return getProjectLocationMapDao().getByProjectId(projectId, start, numOfRows);
-
-    }
-
-    @Override
-    public List<Long> getFavoriteProjectLocationIds(Long projectId, int start, int numOfRows) throws MiddlewareQueryException{
-        List<ProjectLocationMap> projectLocationMaps = this.getProjectLocationMapByProjectId(projectId,start,numOfRows);
-        List<Long> locationIds = new ArrayList<Long>();
-        for (ProjectLocationMap pLoc : projectLocationMaps) {
-            locationIds.add(pLoc.getLocationId());
-        }
-
-        return locationIds;
-    }
-
-
-
-    @Override
-    public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException {
-        Session session = getCurrentSession();
-        Transaction trans = null;
-
-        try {
-            trans = session.beginTransaction();
-            getProjectLocationMapDao().makeTransient(projectLocationMap);
-            trans.commit();
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while deleting ProjectLocationMap: WorkbenchDataManager.deleteProjectLocationMap(projectLocationMap="
-                            + projectLocationMap + "): " + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public Integer addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException {
-        List<ProjectMethod> list = new ArrayList<ProjectMethod>();
-        list.add(projectMethod);
-        List<Integer> ids = addProjectMethod(list);
-        return ids.size() > 0 ? ids.get(0) : null;
-    }
-
-    @Override
-    public List<Integer> addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException {
-        return addOrUpdateProjectMethodData(projectMethodList, Operation.ADD);
-    }
-
-    private List<Integer> addOrUpdateProjectMethodData(List<ProjectMethod> projectMethodList, Operation operation) throws MiddlewareQueryException {
-        Session session = getCurrentSession();
-        if (session == null) {
-            return new ArrayList<Integer>();
-        }
-
-        Transaction trans = null;
-
-        List<Integer> idsSaved = new ArrayList<Integer>();
-        try {
-            // begin save transaction
-            trans = session.beginTransaction();
-
-            ProjectMethodDAO dao = getProjectMethodDao();
-
-            for (ProjectMethod projectMethodListData : projectMethodList) {
-                ProjectMethod recordSaved = dao.saveOrUpdate(projectMethodListData);
-                idsSaved.add(recordSaved.getProjectMethodId());
-            }
-            // end transaction, commit to database
-            trans.commit();
-
-            // remove ProjectMethod data from session cache
-            for (ProjectMethod projectMethodListData : projectMethodList) {
-                session.evict(projectMethodListData);
-            }
-            session.evict(projectMethodList);
-
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while adding ProjectMethod: WorkbenchDataManager.addOrUpdateProjectMethodData(projectMethodList="
-                            + projectMethodList + ", operation=" + operation + "): " + e.getMessage(), e);
-        }
-
-        return idsSaved;
-    }
-
-    @Override
-    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException {
-        return getProjectMethodDao().getProjectMethodByProject(project, start, numOfRows);
-
-    }
-
-    @Override
-    public List<Integer> getFavoriteProjectMethods(Project project, int start, int numOfRows) throws  MiddlewareQueryException {
-        List<Integer> results = new ArrayList<Integer>();
-
-        try {
-            for (ProjectMethod pm : getProjectMethodDao().getProjectMethodByProject(project,start,numOfRows)) {
-                results.add(pm.getMethodId());
-            }
-       } catch (Exception e) {
-           logAndThrowException("Error encountered while getting project methods");
-       }
-
-        return  results;
-    }
-
-    @Override
-    public void deleteProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException {
-        Session session = getCurrentSession();
-        Transaction trans = null;
-
-        try {
-            trans = session.beginTransaction();
-            getProjectMethodDao().makeTransient(projectMethod);
-            trans.commit();
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException("Error encountered while deleting ProjectMethod: WorkbenchDataManager.deleteProjectMethod(projectMethod="
-                            + projectMethod + "): " + e.getMessage(), e);
-        }
-    }
-
+    
     @Override
     public Integer addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException {
         List<ProjectActivity> list = new ArrayList<ProjectActivity>();
@@ -1676,11 +1455,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return getUserDao().changePassword(username, password);
     }
     
-    @Override
-    public List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException{
-        return getProjectMethodDao().getBreedingMethodIdsByWorkbenchProjectId(projectId);
-    }
-
     @Override
     public List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory() throws MiddlewareQueryException {
         return getWorkbenchSidebarCategoryDao().getAll();

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
@@ -71,6 +72,7 @@ public class Workbook {
 	private List<MeasurementRow> originalObservations;
 
 	private Integer importType;
+	private List<StandardVariable> expDesignVariables;
 	
 	public void reset() {
 		trialHeaders = null;
@@ -819,6 +821,14 @@ public class Workbook {
 
 	public void setMeansDatasetId(Integer meansDatasetId) {
 		this.meansDatasetId = meansDatasetId;
+	}
+
+	public List<StandardVariable> getExpDesignVariables() {
+		return expDesignVariables;
+	}
+
+	public void setExpDesignVariables(List<StandardVariable> expDesignVariables) {
+		this.expDesignVariables = expDesignVariables;
 	}
 	
 	

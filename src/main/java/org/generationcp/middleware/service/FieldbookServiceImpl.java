@@ -36,10 +36,16 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.*;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.TreatmentVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -52,6 +58,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
@@ -63,6 +70,7 @@ import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
@@ -1099,6 +1107,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return (int)getGermplasmListManager().countGermplasmListDataByListId(listId);
 	}
 	
+	
+	
+	@Override
+	public int countListDataProjectGermplasmListDataByListId(Integer listId)
+			throws MiddlewareQueryException {
+		return (int)getGermplasmListManager().countListDataProjectGermplasmListDataByListId(listId);
+	}
+
 	@Override
 	public Method getMethodById(int id) throws MiddlewareQueryException {
 	    return getGermplasmDataManager().getMethodByID(id);
@@ -1131,4 +1147,78 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
              logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
          }
 	}
+	
+	@Override
+    public List<Long> getFavoriteProjectLocationIds()
+            throws MiddlewareQueryException {
+        List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE);
+        List<Long> longVals = new ArrayList();
+        if(favList != null && !favList.isEmpty()){
+            for(ProgramFavorite fav : favList){
+                longVals.add(Long.valueOf(Integer.toString(fav.getEntityId())));
+            }
+        }
+        return longVals;
+    }
+
+	@Override
+    public List<Integer> getFavoriteProjectMethods()
+            throws MiddlewareQueryException {
+        List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE);
+        List<Integer> ids = new ArrayList();
+        if(favList != null && !favList.isEmpty()){
+            for(ProgramFavorite fav : favList){
+                ids.add(fav.getEntityId());
+            }
+        }
+        return ids;
+    }
+	
+	@Override
+    public List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+        setWorkingDatabase(projectId);
+        return getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+    }
+	
+	@Override
+    public List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException {
+        setWorkingDatabase(listId);
+        return getListDataProjectDAO().getByListId(listId);
+    }
+	
+	@Override
+    public void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException {
+        //when used in advanced, it will delete all the advance lists (list data projects)
+        requireLocalDatabaseInstance();
+        List<GermplasmList> lists = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+        if (lists != null && !lists.isEmpty()) {
+            for (GermplasmList list : lists) {
+                getListDataProjectDAO().deleteByListIdWithList(list.getId());
+            }
+        }
+    }
+	
+	@Override
+    public int saveOrUpdateListDataProject(int projectId,
+            GermplasmListType type, Integer originalListId,
+            List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
+        
+        requireLocalDatabaseInstance();
+        int listId = 0;
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction(); 
+
+            listId = getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
+        
+            trans.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveOrUpdateListDataProject(): " + e.getMessage(), e, LOG);
+        }
+        return listId;
+    }
 }

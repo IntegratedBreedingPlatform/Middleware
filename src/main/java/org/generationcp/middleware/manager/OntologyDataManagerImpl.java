@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -103,41 +105,34 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
             trans = session.beginTransaction();
             // check if scale, property and method exists first
-            Term scale = null;
-            if(stdVariable!=null && stdVariable.getScale()!=null){
-            	scale = findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
-	            if (scale == null) {
-	                stdVariable.setScale(getTermSaver().save(stdVariable.getScale().getName(),
-	                        stdVariable.getScale().getDefinition(), CvId.SCALES));
-	                if (LOG.isDebugEnabled()){
-	                    LOG.debug("new scale with id = " + stdVariable.getScale().getId());
-	                }
-	            }
+        	Term scale = findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
+            if (scale == null) {
+                stdVariable.setScale(getTermSaver().save(stdVariable.getScale().getName(),
+                        stdVariable.getScale().getDefinition(), CvId.SCALES));
+                if (LOG.isDebugEnabled()){
+                    LOG.debug("new scale with id = " + stdVariable.getScale().getId());
+                }
             }
-            Term property = null;
-            if(stdVariable!=null && stdVariable.getProperty()!=null){
-            	findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
-	            if (property == null) {
-	                stdVariable.setProperty(getTermSaver().save(stdVariable.getProperty().getName(),
-	                        stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
-	                if (LOG.isDebugEnabled()){
-	                    LOG.debug("new property with id = " + stdVariable.getProperty().getId());
-	                }
-	            }
+	            
+            Term property = findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
+            if (property == null) {
+                stdVariable.setProperty(getTermSaver().save(stdVariable.getProperty().getName(),
+                stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
+                if (LOG.isDebugEnabled()){
+                	LOG.debug("new property with id = " + stdVariable.getProperty().getId());
+            	}
             }
-            Term method = null;
-            if(stdVariable!=null && stdVariable.getMethod()!=null){
-            	findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
-	            if (method == null) {
-	                stdVariable.setMethod(getTermSaver().save(stdVariable.getMethod().getName(),
-	                        stdVariable.getMethod().getDefinition(), CvId.METHODS));
-	                if (LOG.isDebugEnabled()){
-	                    LOG.debug("new method with id = " + stdVariable.getMethod().getId());
-	                }
-	            }
+            
+            Term method = findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
+            if (method == null) {
+            	stdVariable.setMethod(getTermSaver().save(stdVariable.getMethod().getName(),
+            	stdVariable.getMethod().getDefinition(), CvId.METHODS));
+            	if (LOG.isDebugEnabled()){
+            		LOG.debug("new method with id = " + stdVariable.getMethod().getId());
+            	}
             }
-            if (stdVariable.getProperty()==null || stdVariable.getScale()==null || stdVariable.getMethod()==null || 
-            		findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale()
+            
+            if (findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale()
                     .getName(), stdVariable.getMethod().getName()) == null) {
                 getStandardVariableSaver().save(stdVariable);
             }
@@ -1111,6 +1106,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
     	return getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
     }
+
+    
+	@Override
+	public List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException {
+		List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(termId);
+		return getNameSynonymBuilder().create(synonyms);
+	}
 
 
 }

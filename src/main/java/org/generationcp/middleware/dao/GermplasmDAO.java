@@ -133,6 +133,50 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
         return new ArrayList<Germplasm>();
     }
+    
+    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getIdsByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+    	try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT DISTINCT n.gid FROM names n LEFT JOIN germplsm g ON g.gid = n.gid AND g.gid!=g.grplce  "
+            		+ "WHERE n.nval = :name ");
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("name", name);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return query.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getIdsByName(name=" + name + ") query from GermplasmDAO: " + e.getMessage(), e);
+        }
+    	
+        return new ArrayList<Integer>();
+    }
+    
+	@SuppressWarnings("unchecked")
+	public List<Germplasm> getGermplasmByIds(List<Integer> germplasmIds, int start, int numOfRows) throws MiddlewareQueryException {
+		try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g WHERE g.gid!=grplce "
+            		+ "AND g.gid IN (:ids) ");
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameterList("ids", germplasmIds);
+            query.addEntity("g", Germplasm.class);
+
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return query.list();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGermplasmByIds(ids=" + germplasmIds.toString() + ") query from Germplasm: " + e.getMessage(), e);
+        }
+        return new ArrayList<Germplasm>();
+	} 
 
     @Deprecated
     @SuppressWarnings("unchecked")    
@@ -174,7 +218,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     public long countByName(String name, Operation operation, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND ");
+            queryString.append("SELECT COUNT(DISTINCT n.gid) FROM names n LEFT OUTER JOIN germplsm g ON g.gid = n.gid AND g.gid!=g.grplce WHERE ");
 
             if (operation == null || operation == Operation.EQUAL) {
                 queryString.append("n.nval = :name ");
@@ -1099,6 +1143,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             resultMap.put(gid, methodId);
         }
         return resultMap;
-    }    
+    }   
     
 }

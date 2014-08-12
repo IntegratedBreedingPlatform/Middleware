@@ -54,8 +54,8 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 
 
     @Override
-    public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
-        return getTrialEnvironmentBuilder().getAllTrialEnvironments();
+    public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
+        return getTrialEnvironmentBuilder().getAllTrialEnvironments(includePublicData);
     }
     
     @SuppressWarnings("unchecked")
@@ -147,4 +147,18 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     	}
     	return result;
     }
+
+	@Override
+	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
+    	List<Integer> result = new ArrayList<Integer>();
+    	if(gids != null && !gids.isEmpty()) {
+	    	if(setWorkingDatabase(Database.CENTRAL)) {
+	    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
+	    	}
+	    	if(setWorkingDatabase(Database.LOCAL)) {
+	    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
+	    	}
+    	}
+    	return result;
+	}
 }

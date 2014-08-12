@@ -30,7 +30,7 @@ public class BreedersQueryDao {
 			long startTime = System.nanoTime();
 			try {
 				SQLQuery query = this.session
-						.createSQLQuery("SELECT gtd.envt_id, gtd.gid, tsl.locationName, tsl.isoabbr "
+						.createSQLQuery("SELECT gtd.envt_id, gtd.gid, gtd.entry_designation, tsl.locationName, tsl.isoabbr "
 								+ " FROM germplasm_trial_details gtd "
 								+ " join trial_study_locations tsl on gtd.envt_id=tsl.envtId "
 								+ " where gtd.envt_id in (:envIds) GROUP BY (gid);");
@@ -41,7 +41,34 @@ public class BreedersQueryDao {
 				
 				for(Object qResult : queryResult) {
 					Object[] row = (Object[]) qResult;
-					result.add(new GermplasmLocationInfo((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3]));
+					result.add(new GermplasmLocationInfo((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3], (String) row[4]));
+				}
+			} catch(HibernateException he) {
+				throw new MiddlewareQueryException(
+						String.format("Hibernate error occured. Cause: %s", he.getCause().getMessage()));
+			}
+			
+			long elapsedTime = System.nanoTime() - startTime;
+			LOG.debug(String.format("Time taken: %f ms.", ((double) elapsedTime/1000000L )));
+		}		
+		return result;
+	}
+
+	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
+		List<Integer> result = new ArrayList<Integer>();
+		if(gids != null && !gids.isEmpty()) {
+			long startTime = System.nanoTime();
+			try {
+				SQLQuery query = this.session
+						.createSQLQuery("SELECT DISTINCT gtd.envt_id FROM germplasm_trial_details gtd "
+								+ "where gtd.gid in (:gids);");
+				query.setParameterList("gids", gids);
+				
+				@SuppressWarnings("rawtypes")
+				List queryResult = query.list();
+				
+				for(Object qResult : queryResult) {
+					result.add((Integer) qResult);
 				}
 			} catch(HibernateException he) {
 				throw new MiddlewareQueryException(

@@ -43,7 +43,7 @@ public class CrossStudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetAllTrialEnvironments() throws Exception {
-		TrialEnvironments environments = manager.getAllTrialEnvironments();
+		TrialEnvironments environments = manager.getAllTrialEnvironments(false);
 		environments.print(INDENT);
 		Debug.println(INDENT, "#RECORDS: " + environments.size());
 	}

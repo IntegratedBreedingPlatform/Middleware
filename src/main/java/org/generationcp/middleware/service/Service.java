@@ -31,6 +31,7 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
+import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
@@ -41,6 +42,7 @@ import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
+import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
@@ -156,4 +158,12 @@ public abstract class Service extends DatabaseBroker {
     	return new StudyDestroyer(sessionProviderForLocal, sessionProviderForCentral);
     }
 
+    protected final ListDataProjectSaver getListDataProjectSaver() {
+        return new ListDataProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final NameBuilder getNameBuilder() {
+    	return new NameBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }

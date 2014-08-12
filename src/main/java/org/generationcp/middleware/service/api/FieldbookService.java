@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -789,6 +791,14 @@ public interface FieldbookService {
 	int countGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
 	
 	/**
+	 * Count list data project germplasm list data by list id.
+	 *
+	 * @param listId the list id
+	 * @return the int
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	int countListDataProjectGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
+	/**
 	 * Gets the method by code.
 	 *
 	 * @param code the code
@@ -819,4 +829,57 @@ public interface FieldbookService {
 	 * Deletes a study (logical delete).
 	 */
 	void deleteStudy(int studyId) throws MiddlewareQueryException;
+	
+	 /**
+     * Gets the favorite project location ids.
+     *
+     * @param projectId the project id
+     * @return the favorite project location ids
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Long> getFavoriteProjectLocationIds() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the favorite project methods.
+     *
+     * @param projectId the project id
+     * @return the favorite project methods
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Integer> getFavoriteProjectMethods() throws MiddlewareQueryException;
+	
+	/**
+	 * Returns germplasm lists by project id.
+	 * @param projectId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type) throws MiddlewareQueryException;
+	
+	/**
+	 * Creates or Update a list data project.
+	 * @param projectId
+	 * @param type
+	 * @param list
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId) throws MiddlewareQueryException;
+
+	/**
+	 * Retrieves a list data project
+	 * @param listId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
+	
+	/** 
+	 * Deletes a list data project given the project_id and the type.
+	 * @param projectId
+	 * @param type
+	 * @throws MiddlewareQueryException
+	 */
+	void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException;
+	
 }

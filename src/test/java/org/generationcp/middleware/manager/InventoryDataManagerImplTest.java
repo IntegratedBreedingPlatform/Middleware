@@ -483,7 +483,7 @@ public class InventoryDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetInventoryDetailsByGermplasmList() throws Exception{
-    	Integer listId = 1426;
+    	Integer listId = -39;
     	List<InventoryDetails> result = manager.getInventoryDetailsByGermplasmList(listId);
     	Debug.printObjects(INDENT, result);
     }

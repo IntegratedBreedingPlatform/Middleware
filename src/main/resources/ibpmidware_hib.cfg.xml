@@ -39,6 +39,7 @@
         <mapping class="org.generationcp.middleware.pojos.UserDefinedField"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
+        <mapping class="org.generationcp.middleware.pojos.ListDataProject"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/>
         <mapping class="org.generationcp.middleware.pojos.Installation"/>
         <mapping class="org.generationcp.middleware.pojos.ListDataProperty"/>
@@ -76,7 +77,6 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchDataset"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Project"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectActivity"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.ProjectMethod"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserRole"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>
@@ -84,7 +84,6 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowStep"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.ProjectLocationMap"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectBackup"/>
@@ -121,6 +120,7 @@
         <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProject"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
         <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
+        <mapping class="org.generationcp.middleware.pojos.dms.ProgramFavorite"/>
 
         <mapping class="org.generationcp.middleware.pojos.mbdt.MBDTProjectData"/>
         <mapping class="org.generationcp.middleware.pojos.mbdt.MBDTGeneration"/>

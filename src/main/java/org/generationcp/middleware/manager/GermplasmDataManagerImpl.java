@@ -30,6 +30,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -40,7 +41,6 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
@@ -49,11 +49,12 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.pojos.germplasm.BackcrossElement;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCross;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
 import org.generationcp.middleware.pojos.germplasm.SingleGermplasmCrossElement;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -362,6 +363,48 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return getNameDao().
 				callStoredProcedureForObject("countGermplasmByName",
 						params,Long.class);
+
+    }
+    
+    @Override
+	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+    	List<Germplasm> germplasms = new ArrayList<Germplasm>();
+    	
+    	//get first all the IDs from LOCAL and CENTRAL
+    	List<Integer> germplasmIds = new ArrayList<Integer>();
+    	setWorkingDatabase(Database.LOCAL);
+    	germplasmIds.addAll(getGermplasmDao().getIdsByName(name, start, numOfRows));
+    	setWorkingDatabase(Database.CENTRAL);
+    	germplasmIds.addAll(getGermplasmDao().getIdsByName(name, start, numOfRows));
+    	
+    	// check if there is a LOCAL germplasm
+    	boolean hasLocalIds = false;
+    	for(Integer id : germplasmIds){
+    		if(id < 0){
+    			hasLocalIds = true;
+    			break;
+    		}
+    	}
+    	// check if there is a CENTRAL germplasm
+    	boolean hasCentralIds = false;
+    	for(Integer id : germplasmIds){
+    		if(id < 0){
+    			hasCentralIds = true;
+    			break;
+    		}
+    	}
+    	
+    	if(hasLocalIds){
+    		setWorkingDatabase(Database.LOCAL);
+    		germplasms.addAll(getGermplasmDao().getGermplasmByIds(germplasmIds, start, numOfRows));
+    	}
+    	
+    	if(hasCentralIds){
+    		setWorkingDatabase(Database.CENTRAL);
+    		germplasms.addAll(getGermplasmDao().getGermplasmByIds(germplasmIds, start, numOfRows));
+    	}
+    	
+    	return germplasms;
     }
 
     @Override
@@ -2397,4 +2440,148 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return germplasms;
 	}
     
+	public List<ProgramFavorite> getProgramFavorites(FavoriteType type)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		return this.getProgramFavoriteDao().getProgramFavorites(type);
+	}
+
+	@Override
+	public int countProgramFavorites(FavoriteType type)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		return this.getProgramFavoriteDao().countProgramFavorites(type);
+	}
+	
+	@Override
+	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		return this.getProgramFavoriteDao().getProgramFavorites(type, max);
+	}
+
+	@Override
+	public void saveProgramFavorites(List<ProgramFavorite> list)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		int favoriteSaved = 0;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+
+			for (ProgramFavorite favorite : list) {
+
+				Integer negativeId = dao.getNegativeId("id");
+				favorite.setProgramFavoriteId(negativeId);
+				dao.save(favorite);
+				favoriteSaved++;
+
+				if (favoriteSaved % JDBC_BATCH_SIZE == 0) {
+					// flush a batch of inserts and release memory
+					dao.flush();
+					dao.clear();
+				}
+			}
+			// end transaction, commit to database
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list="
+					+ list + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+
+	}
+
+	@Override
+	public void saveProgramFavorite(ProgramFavorite favorite)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+			Integer negativeId = dao.getNegativeId("id");
+			favorite.setProgramFavoriteId(negativeId);
+			dao.save(favorite);
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite="
+					+ favorite + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+		
+	}
+
+	@Override
+	public void deleteProgramFavorites(List<ProgramFavorite> list)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		int favoriteDeleted = 0;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+
+			for (ProgramFavorite favorite : list) {
+
+				dao.makeTransient(favorite);
+
+				if (favoriteDeleted % JDBC_BATCH_SIZE == 0) {
+					// flush a batch of inserts and release memory
+					dao.flush();
+					dao.clear();
+				}
+			}
+			// end transaction, commit to database
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list="
+					+ list + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+		
+	}
+
+	@Override
+	public void deleteProgramFavorite(ProgramFavorite favorite)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+		Transaction trans = null;
+
+		try {
+			trans = session.beginTransaction();
+			ProgramFavoriteDAO dao = getProgramFavoriteDao();
+			dao.makeTransient(favorite);
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite="
+					+ favorite + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+		
+	}
+
+	@Override
+	public int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count) throws MiddlewareQueryException {
+		return getNameBuilder().getMaximumSequence(isBulk, prefix, suffix, count);
+	}
+	
 }

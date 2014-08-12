@@ -23,6 +23,8 @@ import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.FolderBuilder;
 import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
+import org.generationcp.middleware.operation.builder.NameBuilder;
+import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
 import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
@@ -1106,6 +1108,10 @@ public abstract class DataManager extends DatabaseBroker{
     protected final VariableTypeBuilder getVariableTypeBuilder() {
     	return new VariableTypeBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final NameSynonymBuilder getNameSynonymBuilder() {
+    	return new NameSynonymBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
 
     protected final StudySearcherByNameStartSeasonCountry getProjectSearcher() {
     	return new StudySearcherByNameStartSeasonCountry(sessionProviderForLocal, sessionProviderForCentral);
@@ -1193,5 +1199,9 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final ListInventoryBuilder getListInventoryBuilder() {
     	return new ListInventoryBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final NameBuilder getNameBuilder() {
+        return new NameBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

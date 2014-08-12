@@ -127,10 +127,12 @@ public class TrialEnvironmentBuilder extends Builder {
 		return value;
 	}
 	
-	public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
+	public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
 		TrialEnvironments environments = new TrialEnvironments();
-		setWorkingDatabase(Database.CENTRAL);
-		environments.addAll(getGeolocationDao().getAllTrialEnvironments());
+		if(includePublicData) {
+			setWorkingDatabase(Database.CENTRAL);
+			environments.addAll(getGeolocationDao().getAllTrialEnvironments());
+		}
 		
 		setWorkingDatabase(Database.LOCAL);
 		List<TrialEnvironment> localEnvironments = getGeolocationDao().getAllTrialEnvironments();

@@ -445,47 +445,6 @@ public interface WorkbenchDataManager {
     long countWorkbenchDatasetByName(String name, Operation op) throws MiddlewareQueryException;
     
     /**
-     * Returns a list of {@link Location} ids by project id.
-     *
-     * @param projectId - the project id to match
-     * @param start - the starting record
-     * @param numOfRows - the number of rows to retrieve
-     * @return the list of {@link Location} ids
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
-    
-    /**
-     * Returns the number of {@link Location} ids by project id.
-     *
-     * @param projectId - the project id to match
-     * @return the number of {@link Location} ids
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    long countLocationIdsByProjectId(Long projectId) throws MiddlewareQueryException;
-
-    /**
-     * Returns a list of method id by project id.
-     *
-     * @param projectId - the project id to match
-     * @param start - the starting record
-     * @param numOfRows - the number of rows to retrieve
-     * @return the list of method ids
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
-
-    /**
-     * Returns the number of method ids by project id.
-     *
-     * @param projectId - the project id to match
-     * @return the number of method ids
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    long countMethodIdsByProjectId(Long projectId) throws MiddlewareQueryException;
-    
-    
-    /**
      * Adds a single project user given a Project object, a User object, and a Role object.
      *
      * @param project the project
@@ -514,85 +473,6 @@ public interface WorkbenchDataManager {
      */
     List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException;
 
-    /**
-     * Adds a project location.
-     *
-     * @param projectLocationMap - the project location map
-     * @return the id of the {@code ProjectLocationMap} record inserted
-     * in the database.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Integer addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
-    
-    /**
-     * Adds project locations.
-     *
-     * @param projectLocationMapList - the project location map list
-     * @return Returns the ids of the {@code ProjectLocationMap} record added
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Integer> addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws MiddlewareQueryException;
-    
-    
-    /**
-     * Gets the project location map by project id.
-     *
-     * @param projectId - the project id
-     * @param start - the start row
-     * @param numOfRows - the number of rows to retrieve
-     * @return the project location map by project id
-     * @throws MiddlewareQueryException the MiddlewareQueryException
-     */
-    List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
-    
-
-    /**
-     * Delete project location map.
-     *
-     * @param projectLocationMap the project location map
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
-
-    /**
-     * Adds project method.
-     *
-     * @param projectMethod - the project method
-     * @return Returns the id of the {@code ProjectMethod} record added
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Integer addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
-    
-    /**
-     * Adds project methods.
-     *
-     * @param projectMethodList - the project method list
-     * @return Returns the ids of the {@code ProjectUserRole} records added
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Integer> addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException;
-
-    
-    /**
-     * Gets the project method by project.
-     *
-     * @param project - the project to match
-     * @param start - the start row
-     * @param numOfRows - the number of rows to retrieve
-     * @return the list of ProjectMethod records retrieved
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException;
-    
-
-    /**
-     * Delete project method.
-     *
-     * @param projectMethod - the project method
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    void deleteProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
-    
     /**
      * Adds a project activity.
      *
@@ -978,37 +858,6 @@ public interface WorkbenchDataManager {
      */
     ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException;
     
-    /**
-     * Retrieves ids of the breeding methods selected for a given workbench project.
-     *
-     * @param projectId the project id
-     * @return List of breeding method IDs
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException;
-
-    /**
-     * Gets the favorite project location ids.
-     *
-     * @param projectId the project id
-     * @param start the start
-     * @param numOfRows the num of rows
-     * @return the favorite project location ids
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Long> getFavoriteProjectLocationIds(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
-
-    /**
-     * Gets the favorite project methods.
-     *
-     * @param project the project
-     * @param start the start
-     * @param numOfRows the num of rows
-     * @return the favorite project methods
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Integer> getFavoriteProjectMethods(Project project, int start, int numOfRows) throws  MiddlewareQueryException;
-
     /**
      * Gets the all workbench sidebar category.
      *

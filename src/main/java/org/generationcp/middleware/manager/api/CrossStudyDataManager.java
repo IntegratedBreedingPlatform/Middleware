@@ -33,10 +33,12 @@ public interface CrossStudyDataManager{
     /**
      * Retrieves a list of all trial environments.
      * 
+     * @param includePublicData flag to indicate whether public (central) data should be querried.
+     * 
      * @return TrialEnvironments
      * @throws MiddlewareQueryException
      */
-    TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException;
+    TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException;
     
     /**
      * Retrieves a list of all trial environments by batch.
@@ -205,4 +207,13 @@ public interface CrossStudyDataManager{
 	 * @throws MiddlewareQueryException
 	 */
     List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds) throws MiddlewareQueryException;
+
+	/**
+	 * Retrieve the environment info for a list of Germplasm. Find out which experiments plants have been involved in.
+	 * 
+	 * @param gids : germplasm ids
+	 * @return envIds : environmentIds
+	 * @throws MiddlewareQueryException
+	 */
+    List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException;
 }

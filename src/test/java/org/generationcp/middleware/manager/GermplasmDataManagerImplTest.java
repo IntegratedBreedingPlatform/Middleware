@@ -75,7 +75,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetGermplasmByName() throws Exception {
-        String name = "IR 10";
+        String name = "CML502RLT";
         
         List<Germplasm> germplasmList = manager.getGermplasmByName(
                             name, 0, 5, GetGermplasmByNameModes.NORMAL, 
@@ -101,10 +101,17 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         germplasmList = manager.getGermplasmByName(name, 0, 
                 Long.valueOf(manager.countGermplasmByName(name, Operation.LIKE)).intValue(), 
                 Operation.LIKE);
+    }
+    
+    @Test
+    public void testGetGermplasmByNameForCentralAndLocal() throws Exception {
+        String name = "CML502RLT";
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 
+        			 Long.valueOf(manager.countGermplasmByName(name, Operation.EQUAL)).intValue());
 
-        Debug.println(INDENT, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name 
-                + "): " + germplasmList.size());
-        Debug.printObjects(INDENT, germplasmList);
+        Debug.println(INDENT, "testGetGermplasmByNameForCentralAndLocal(" 
+                + name + "): " + germplasmList.size());
+        Debug.printObjects(INDENT, germplasmList);        
     }
 
     @Test

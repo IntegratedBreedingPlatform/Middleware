@@ -215,6 +215,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         Collections.sort(mapInfoList);
         return mapInfoList;
     }
+
+
     
     private void getMarkerNamesOfMapInfoFromCentral(List<MapInfo> mapInfoList) throws MiddlewareQueryException{
 
@@ -300,8 +302,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	return super.getAllFromCentralAndLocalByMethod(getMarkerDao(), "getMarkerNamesByIds", 
     			new Object[]{markerIds}, new Class[]{List.class});
     }
-    
-    
+
+    @Override
+    public String getMapNameById(Integer mapID) throws MiddlewareQueryException {
+        if (mapID < 0) {
+            setWorkingDatabase(Database.LOCAL);
+        } else {
+            setWorkingDatabase(Database.CENTRAL);
+        }
+
+        return getMapDao().getMapNameById(mapID);
+    }
+
     @Override
     public long countDatasetNames(Database instance) throws MiddlewareQueryException {
         return super.countFromInstanceByMethod(getDatasetDao(), instance, "countByName", new Object[]{}, new Class[]{});

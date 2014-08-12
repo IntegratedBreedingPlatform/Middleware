@@ -149,6 +149,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				callStoredProcedureForObject("countGermplasmListDataByListId",
 						params,Long.class);
     }
+    
+    @Override
+    public long countListDataProjectGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
+        
+    	return countFromInstanceByIdAndMethod(getListDataProjectDAO(), id, "countByListId", 
+    				new Object[] {id}, new Class[] {Integer.class});
+    }
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListIdAndGID(Integer listId, Integer gid) throws MiddlewareQueryException {
