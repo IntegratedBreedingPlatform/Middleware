@@ -12,7 +12,9 @@
 package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -25,7 +27,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
+import org.hibernate.Hibernate;
 
 public class DatasetProjectSaver extends Saver {
 
@@ -138,5 +142,23 @@ public class DatasetProjectSaver extends Saver {
 		relationships.add(relationship);
 		
 		return relationships;
+	}
+	
+	public void addPropertiesIfNotExisting(int datasetId, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		
+		DmsProject datasetProject = getDmsProjectDao().getById(datasetId);
+		Hibernate.initialize(datasetProject.getProperties());
+		Map<Integer, ProjectProperty> existingPropertiesMap = new HashMap<Integer, ProjectProperty>();
+		for (ProjectProperty property : datasetProject.getProperties()) {
+			existingPropertiesMap.put(property.getProjectPropertyId(), property);
+		}		
+		VariableTypeList additionalProperties = new VariableTypeList();
+		for(VariableType variableType: variableTypeList.getVariableTypes()){
+			if(!existingPropertiesMap.containsKey(variableType.getId())) {
+				additionalProperties.add(variableType);
+			}
+		}
+		getProjectPropertySaver().saveProjectProperties(datasetProject, additionalProperties);
 	}
 }

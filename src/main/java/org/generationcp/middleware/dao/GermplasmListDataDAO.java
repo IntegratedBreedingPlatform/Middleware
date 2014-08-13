@@ -35,6 +35,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	private static final Integer STATUS_DELETED = 9;
 	
+	@Deprecated
     @SuppressWarnings("unchecked")
     public List<GermplasmListData> getByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
         try {

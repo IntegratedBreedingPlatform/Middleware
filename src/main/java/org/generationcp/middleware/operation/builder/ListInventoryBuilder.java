@@ -39,11 +39,10 @@ public class ListInventoryBuilder extends Builder {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public List<GermplasmListData> retrieveLotCountsForList(Integer listId, Integer start, Integer numOfRows) throws MiddlewareQueryException{
-		List<GermplasmListData> listEntries = null;
+	public List<GermplasmListData> retrieveLotCountsForList(Integer listId, Integer start, Integer numOfRows, 
+			List<GermplasmListData> listEntries) throws MiddlewareQueryException{
 		
 		if (setWorkingDatabase(listId)){
-			listEntries = getGermplasmListDataDAO().getByListId(listId, start, numOfRows);
 			
 			List<Integer> listEntryIds = new ArrayList<Integer>();
 			List<Integer> gids = new ArrayList<Integer>();
@@ -127,12 +126,9 @@ public class ListInventoryBuilder extends Builder {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public List<GermplasmListData> retrieveInventoryLotsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException{
-		List<GermplasmListData> listEntries = null;
-		
+	public List<GermplasmListData> retrieveInventoryLotsForList(Integer listId, 
+			int start, int numOfRows, List<GermplasmListData> listEntries) throws MiddlewareQueryException{
 		if (setWorkingDatabase(listId)){
-			listEntries = getGermplasmListDataDAO().getByListId(listId, start, numOfRows);
-			
 			List<Integer> listEntryIds = new ArrayList<Integer>();
 			List<Integer> gids = new ArrayList<Integer>();
 			for (GermplasmListData entry : listEntries){

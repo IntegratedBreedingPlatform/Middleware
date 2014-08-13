@@ -88,9 +88,18 @@ public abstract class DataManager extends DatabaseBroker{
     public DataManager(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
     	super(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    /**
+     * Instantiates a new data manager given session providers for local and central.
+     */
+    public DataManager(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, String localDatabaseName, String centralDatabaseName) {
+    	super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    }
 
+    
     /**
      * Instantiates a new data manager given sessions for local and central.
+     * TODO - must remove once all constructors of data managers passes the localDatabaseName and centralDatabaseName 
      * 
      * @param sessionForLocal
      * @param sessionForCentral

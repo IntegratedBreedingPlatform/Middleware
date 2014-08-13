@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,9 +63,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     public InventoryDataManagerImpl() {
     }
-
+    
     public InventoryDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public InventoryDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral,
+    		String localDatabaseName, String centralDatabaseName) {
+        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public InventoryDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
@@ -647,6 +653,18 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         return report;
     }
     
+    private List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
+    	setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("listid",id);
+		params.put("start",start);
+		params.put("numOfRows",numOfRows);
+		return getGermplasmListDataDAO().
+				callStoredProcedureForList("getGermplasmListDataByListId",
+						params,GermplasmListData.class);
+    }
+    
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
 			Integer listId) throws MiddlewareQueryException {
@@ -674,7 +692,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			}
 		}
 		else { 
-			listData = getGermplasmListDataDAO().getByListId(listId, 0, Integer.MAX_VALUE);
+			listData = getGermplasmListDataByListId(listId,0,Integer.MAX_VALUE);
 		}
 
 		// Get gids
@@ -957,12 +975,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException {
-		return getListInventoryBuilder().retrieveInventoryLotsForList(listId, start, numOfRows);
+		List<GermplasmListData> listEntries = getGermplasmListDataByListId(listId, start, numOfRows);
+		return getListInventoryBuilder().retrieveInventoryLotsForList(listId, start, numOfRows, listEntries);
 	}
 	
     @Override
     public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-    	return getListInventoryBuilder().retrieveLotCountsForList(id, start, numOfRows);
+    	List<GermplasmListData> listEntries = getGermplasmListDataByListId(id, start, numOfRows);
+    	return getListInventoryBuilder().retrieveLotCountsForList(id, start, numOfRows, listEntries);
     }
 
 	@Override

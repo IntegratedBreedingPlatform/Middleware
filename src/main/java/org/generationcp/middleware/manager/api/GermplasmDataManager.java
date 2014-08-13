@@ -97,6 +97,7 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
     
 
@@ -1408,6 +1409,8 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Method getMethodByName(String name) throws MiddlewareQueryException;
+    
+    List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid) throws MiddlewareQueryException;
     
     /**
      * Gets the list of favorite methods/locations

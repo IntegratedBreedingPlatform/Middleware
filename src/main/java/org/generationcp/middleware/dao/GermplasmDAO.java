@@ -37,11 +37,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     private static final String STATUS_DELETED = "9";
 
+    @Deprecated
     @Override
     public Germplasm getById(Integer gid,  boolean lock) throws MiddlewareQueryException {
     	return getById(gid);
     }
     	
+    @Deprecated
     @Override
     public Germplasm getById(Integer gid) throws MiddlewareQueryException {
         try {
@@ -60,6 +62,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return null;
     }
     
+    @Deprecated
     @SuppressWarnings("unchecked")
     public List<Germplasm> getByPrefName(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -74,6 +77,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
 
+    @Deprecated
     public long countByPrefName(String name) throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(Germplasm.COUNT_BY_PREF_NAME);
@@ -85,6 +89,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return 0;
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     public List<Germplasm> getByName(String name, Operation operation, Integer status, GermplasmNameType type, int start, int numOfRows)
             throws MiddlewareQueryException {
@@ -173,6 +178,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
 	} 
 
+    @Deprecated
     @SuppressWarnings("unchecked")    
     public List<Germplasm> getByName(List<String> names, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
         try {            
@@ -208,6 +214,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     }
 
 
+    @Deprecated
     public long countByName(String name, Operation operation, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
@@ -246,6 +253,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return 0;
     }
     
+    @Deprecated
     public long countByName(List<String> names, Operation operation) throws MiddlewareQueryException {
         try {
             if (names != null){
@@ -473,6 +481,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
    }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     public List<Germplasm> getGermplasmDescendantByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -490,6 +499,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
 
+    @Deprecated
     public Germplasm getProgenitorByGID(Integer gid, Integer pro_no) throws MiddlewareQueryException {
         try {
             if (gid != null & pro_no != null){
@@ -517,6 +527,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return null;
     }
 
+    @Deprecated
     public long countGermplasmDescendantByGID(Integer gid) throws MiddlewareQueryException {
         try {
             if (gid != null){
@@ -531,6 +542,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return 0;
     }
 
+    @Deprecated
     public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         List<Germplasm> toreturn = new ArrayList<Germplasm>();
         try {
@@ -559,6 +571,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return toreturn;
     }
     
+    @Deprecated
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
         try {
             if (gid != null){
@@ -744,6 +757,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
+    @Deprecated
     @SuppressWarnings("rawtypes")
     public Germplasm getByGIDWithMethodType(Integer gid) throws MiddlewareQueryException {
         try {

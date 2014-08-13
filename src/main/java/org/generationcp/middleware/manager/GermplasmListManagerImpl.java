@@ -13,7 +13,9 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
@@ -21,6 +23,7 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.User;
@@ -41,9 +44,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     public GermplasmListManagerImpl() {
     }
-
+    
     public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, String localDatabaseName, String centralDatabaseName) {
+        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public GermplasmListManagerImpl(Session sessionForLocal, Session sessionForCentral) {
@@ -121,19 +128,26 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-
-    	return getFromInstanceByIdAndMethod(getGermplasmListDataDAO(), id, "getByListId", 
-    				new Object[] {id, start, numOfRows},
-    				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
+    	setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("listid",id);
+		params.put("start",start);
+		params.put("numOfRows",numOfRows);
+		return getGermplasmListDataDAO().
+				callStoredProcedureForList("getGermplasmListDataByListId",
+						params,GermplasmListData.class);
     }
-    
-    
 
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
-        
-    	return countFromInstanceByIdAndMethod(getGermplasmListDataDAO(), id, "countByListId", 
-    				new Object[] {id}, new Class[] {Integer.class});
+    	setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("id",id);
+		return getGermplasmListDataDAO().
+				callStoredProcedureForObject("countGermplasmListDataByListId",
+						params,Long.class);
     }
     
     @Override
@@ -153,22 +167,27 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
-    	
-        if (setWorkingDatabase(listId)) {
-            return getGermplasmListDataDAO().getByListIdAndEntryId(listId, entryId);
-        }
-        
-        return null;
+    	setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("listId",listId);
+		params.put("entryId",entryId);
+		return getGermplasmListDataDAO().
+				callStoredProcedureForObject("getGermplasmListDataByListIdAndEntryId",
+						params,GermplasmListData.class);
     }
     
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
-    	
-        if (setWorkingDatabase(listId)) {
-            return getGermplasmListDataDAO().getByListIdAndLrecId(listId, lrecId);
-        }
-        
-        return null;
+    	setWorkingDatabase(Database.LOCAL);
+		Map<String,Object> params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", centralDatabaseName);
+		params.put("listId",listId);
+		params.put("lrecId",lrecId);
+		return getGermplasmListDataDAO().
+				callStoredProcedureForObject("getGermplasmListDataByListIdAndLrecId",
+						params,GermplasmListData.class);
+		
     }
 
     @Override
@@ -663,5 +682,4 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	}
     	return null;
 	}
-    
 }

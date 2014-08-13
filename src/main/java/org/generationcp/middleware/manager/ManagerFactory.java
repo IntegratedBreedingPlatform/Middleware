@@ -63,6 +63,9 @@ public class ManagerFactory implements Serializable {
     private HibernateSessionProvider sessionProviderForLocal;
     private HibernateSessionProvider sessionProviderForCentral;
     
+    private String localDatabaseName;
+    private String centralDatabaseName;
+    
     public ManagerFactory() {
     }
     
@@ -101,6 +104,9 @@ public class ManagerFactory implements Serializable {
                     centralUsername, centralPassword);
     
             openSessionFactory(paramsForLocal, paramsForCentral);
+            
+            centralDatabaseName = centralDbname;
+            localDatabaseName = localDbname;
             
             // FIXME: Do we really want to hide these exceptions?
         } catch (URISyntaxException e) {
@@ -161,8 +167,7 @@ public class ManagerFactory implements Serializable {
         if (hibernateConfigurationFilename != null) {
             this.hibernateConfigurationFilename = hibernateConfigurationFilename;
         }
-        
-         try {
+        try {
             openSessionFactory(paramsForLocal, paramsForCentral);
         }
         catch (FileNotFoundException e) {
@@ -259,14 +264,17 @@ public class ManagerFactory implements Serializable {
         
         sessionProviderForLocal = new HibernateSessionPerThreadProvider(sessionFactoryForLocal);
         sessionProviderForCentral = new HibernateSessionPerThreadProvider(sessionFactoryForCentral);
+        this.localDatabaseName = paramsForLocal.getDbName();
+        this.centralDatabaseName = paramsForCentral.getDbName();
+         
     }
 
     public GermplasmDataManager getGermplasmDataManager() {
-        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public PedigreeDataManager getPedigreeDataManager() {
-        return new PedigreeDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new PedigreeDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public CrossStudyDataManager getCrossStudyDataManager() {
@@ -274,7 +282,7 @@ public class ManagerFactory implements Serializable {
     }
 
     public GermplasmListManager getGermplasmListManager() {
-        return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public LocationDataManager getLocationDataManager() {
@@ -301,7 +309,7 @@ public class ManagerFactory implements Serializable {
         if (sessionProviderForLocal == null) {
             throw new ConfigException("The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");
         } else {
-            return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+            return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
         }
     }
     
@@ -357,4 +365,22 @@ public class ManagerFactory implements Serializable {
         
         LOG.trace("Closing ManagerFactory... DONE");
     }
+
+	public String getLocalDatabaseName() {
+		return localDatabaseName;
+	}
+
+	public void setLocalDatabaseName(String localDatabaseName) {
+		this.localDatabaseName = localDatabaseName;
+	}
+
+	public String getCentralDatabaseName() {
+		return centralDatabaseName;
+	}
+
+	public void setCentralDatabaseName(String centralDatabaseName) {
+		this.centralDatabaseName = centralDatabaseName;
+	}
+    
+    
 }
