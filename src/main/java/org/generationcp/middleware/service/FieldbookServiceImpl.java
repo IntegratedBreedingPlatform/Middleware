@@ -676,9 +676,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	
     	List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
     	setWorkingDatabase(Database.CENTRAL);
-    	variables.addAll(getCvTermDao().getByIds(variableIdList));
+    	variables.addAll(getCvTermDao().getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(), TermId.CATEGORICAL_VARIABLE.getId()));
     	setWorkingDatabase(Database.LOCAL);
-    	variables.addAll(getCvTermDao().getByIds(variableIdList));
+    	variables.addAll(getCvTermDao().getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(), TermId.CATEGORICAL_VARIABLE.getId()));
     	
     	for (CVTerm variable : variables) {
     		list.add(new StandardVariableReference(variable.getCvTermId()

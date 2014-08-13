@@ -213,6 +213,47 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return terms;
 	}
 	
+	public List<CVTerm> getValidCvTermsByIds(List<Integer> ids, int storedInId, int dataTypeId) throws MiddlewareQueryException {
+        List<CVTerm> terms = new ArrayList<CVTerm>();
+        
+        if (ids != null && ids.size() > 0) {
+            try {
+                StringBuffer queryString = new StringBuffer()
+                .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition ")
+                .append("FROM cvterm cvt ") 
+                .append("INNER JOIN cvterm_relationship datatype ON datatype.subject_id = cvt.cvterm_id ")
+                .append(" AND datatype.type_id = ").append(TermId.HAS_TYPE.getId())
+                .append(" INNER JOIN cvterm_relationship stored_in ON datatype.subject_id = stored_in.subject_id ") 
+                .append(" AND stored_in.type_id = ").append(TermId.STORED_IN.getId())
+                .append(" WHERE cvt.cvterm_id in (:ids)")
+                .append(" AND (stored_in.object_id <> :storedIn OR (stored_in.object_id = :storedIn ")
+                .append(" AND datatype.object_id = :datatype))");
+                
+                SQLQuery query = getSession().createSQLQuery(queryString.toString());
+                query.setParameterList("ids", ids);
+                query.setParameter("storedIn", storedInId);
+                query.setParameter("datatype", dataTypeId);
+                
+                List<Object[]> list =  query.list();
+                
+                for (Object[] row : list){
+                    Integer id = (Integer) row[0]; 
+                    String name = (String) row [1];
+                    String definition = (String) row[2]; 
+                    
+                    CVTerm cvTerm = new CVTerm();
+                    cvTerm.setCvTermId(id);
+                    cvTerm.setName(name);
+                    cvTerm.setDefinition(definition);
+                    terms.add(cvTerm);
+                }
+            } catch (HibernateException e) {
+                logAndThrowException("Error at getValidCvTermsByIds=" + ids + " query on CVTermDao: " + e.getMessage(), e);                
+            }
+        }
+        return terms;
+	}
+	
 	public List<CVTerm> getVariablesByType(List<Integer> types, Integer storedIn) throws MiddlewareQueryException {
         List<CVTerm> terms = new ArrayList<CVTerm>();
         
