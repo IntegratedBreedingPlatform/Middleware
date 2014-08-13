@@ -243,11 +243,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         	params.put("type",null);
         }
         
-        if (start != 0) {
-        	params.put("start",start);
-        } else {
-        	params.put("start",null);
-        }
+        params.put("start",start);
         
         if (numOfRows != 0) {
         	params.put("numOfRows",numOfRows);
@@ -288,11 +284,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		params.put("status",null);
         params.put("type",null);
 
-        if (start != 0) {
-        	params.put("start",start);
-        } else {
-        	params.put("start",null);
-        }
+        params.put("start",start);
         
         if (numOfRows != 0) {
         	params.put("numOfRows",numOfRows);
