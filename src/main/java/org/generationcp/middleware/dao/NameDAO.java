@@ -331,10 +331,12 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     	try {
     		String keyword1 = prefix + "%" + suffix + "%";
     		String keyword2 = GermplasmDataManagerUtil.standardizeName(prefix) + "%" + GermplasmDataManagerUtil.standardizeName(suffix) + "%";
+    		keyword1 = keyword1.replaceAll("\\s", "");
+    		keyword2 = keyword2.replaceAll("\\s", "");
     		StringBuilder sql = new StringBuilder();
     		sql.append("SELECT nval FROM names ")
-    			.append(" WHERE (nval LIKE '").append(keyword1).append("'")
-    			.append(" OR nval LIKE '").append(keyword2).append("')");
+    			.append(" WHERE (REPLACE(nval, ' ', '') LIKE '").append(keyword1).append("'")
+    			.append(" OR REPLACE(nval, ' ', '') LIKE '").append(keyword2).append("')");
 
     		Query query = getSession().createSQLQuery(sql.toString());
     		return query.list();

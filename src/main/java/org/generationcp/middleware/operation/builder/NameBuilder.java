@@ -28,14 +28,12 @@ public class NameBuilder extends Builder {
 	}
 	
 	private int getMaximumSequenceInNames(boolean isBulk, Set<String> names, String prefix, String suffix, int plantsSelected) {
+		prefix = prefix.toUpperCase();
+		suffix = suffix.toUpperCase();
 		String standardizedPrefix = GermplasmDataManagerUtil.standardizeName(prefix);
 		String standardizedSuffix = GermplasmDataManagerUtil.standardizeName(suffix);
-		String regex1, regex2 = null;
+		String regex1, regex2, regex3 = null;
 		if (isBulk) {
-//			regex = "^[\\Q" + prefix + "\\E|\\Q" + standardizedPrefix + "\\E]" 
-//					+ "[" + plantsSelected + "]" 
-//					+ "[\\Q" + suffix + "\\E|\\Q" + standardizedSuffix + "\\E]"
-//					+ "[\\(]?([\\d\\s]*)[\\)]?$";
 			regex1 = "^\\Q" + prefix + "\\E" 
 					+ (plantsSelected > 1 ? "[" + plantsSelected + "]" : "")
 					+ "\\Q" + suffix + "\\E"
@@ -44,36 +42,45 @@ public class NameBuilder extends Builder {
 					+ (plantsSelected > 1 ? "[" + plantsSelected + "]" : "") 
 					+ "\\Q" + standardizedSuffix + "\\E"
 					+ "[\\(]?([\\d\\s]*)[\\)]?$";
+			regex3 = "^\\Q" + prefix.replaceAll("\\s", "") + "\\E" 
+					+ (plantsSelected > 1 ? "[" + plantsSelected + "]" : "")
+					+ "\\Q" + suffix.replaceAll("\\s", "") + "\\E"
+					+ "[\\(]?([\\d\\s]*)[\\)]?$";
 		}
 		else {
-//			regex = "^[\\Q" + prefix + "\\E|\\Q" + standardizedPrefix + "\\E]([\\d\\s]*)[\\Q" + suffix + "\\E|\\Q" + standardizedSuffix + "\\E]$";
 			regex1 = "^\\Q" + prefix + "\\E([\\d\\s]*)\\Q" + suffix + "\\E$";
 			regex2 = "^\\Q" + standardizedPrefix + "\\E([\\d\\s]*)\\Q" + standardizedSuffix + "\\E$";
+			regex3 = "^\\Q" + prefix.replaceAll("\\s", "") + "\\E([\\d\\s]*)\\Q" + suffix.replaceAll("\\s", "") + "\\E$";
 		}
-		Pattern pattern1 = Pattern.compile(regex1);
-		Pattern pattern2 = Pattern.compile(regex2);
+		Pattern pattern1 = Pattern.compile(regex1); //original version (upper case) may or may not be standardized
+		Pattern pattern2 = Pattern.compile(regex2); //standardized upper case version
+		Pattern pattern3 = Pattern.compile(regex3); //without spaces in uppder case version
 		
 		int maxSequence = -1;
 		for (String name : names) {
-			Matcher matcher1 = pattern1.matcher(name);
-			Matcher matcher2 = pattern2.matcher(name);
+			Matcher matcher1 = pattern1.matcher(name.toUpperCase());
+			Matcher matcher2 = pattern2.matcher(name.toUpperCase());
+			Matcher matcher3 = pattern3.matcher(name.toUpperCase().replaceAll("\\s", ""));
 			boolean found1 = matcher1.find();
 			boolean found2 = matcher2.find();
-			Matcher matcher = found1 ? matcher1 : matcher2;
-			int groupCount = matcher.groupCount();
-			if ((found1 || found2) && groupCount > 0) {
-				String countString = matcher.group(1).trim();
-				int count = 0;
-				if (countString != null) {
-					if ("".equals(countString)) {
-						count = 0;
+			boolean found3 = matcher3.find();
+			Matcher matcher = found1 ? matcher1 : (found2 ? matcher2 : (found3 ? matcher3 : null));
+			if (matcher != null) {
+				int groupCount = matcher.groupCount();
+				if (groupCount > 0) {
+					String countString = matcher.group(1).trim();
+					int count = 0;
+					if (countString != null) {
+						if ("".equals(countString)) {
+							count = 0;
+						}
+						else {
+							count = Integer.valueOf(countString);
+						}
 					}
-					else {
-						count = Integer.valueOf(countString);
+					if (count > maxSequence) {
+						maxSequence = count;
 					}
-				}
-				if (count > maxSequence) {
-					maxSequence = count;
 				}
 			}
 		}
