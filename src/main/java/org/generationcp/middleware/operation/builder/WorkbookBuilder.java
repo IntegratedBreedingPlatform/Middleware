@@ -327,6 +327,9 @@ public class WorkbookBuilder extends Builder {
                         				value = phenotypes.get(0).getValue();
                         			}
                         		}
+                        		if (value == null) {
+                        			value = "";
+                        		}
                         	}
                         	else {
                         		value = "";
