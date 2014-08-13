@@ -367,6 +367,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     }
     
+    @Deprecated
     @Override
 	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
     	List<Germplasm> germplasms = new ArrayList<Germplasm>();
@@ -389,7 +390,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	// check if there is a CENTRAL germplasm
     	boolean hasCentralIds = false;
     	for(Integer id : germplasmIds){
-    		if(id < 0){
+    		if(id > 0){
     			hasCentralIds = true;
     			break;
     		}

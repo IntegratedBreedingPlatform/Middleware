@@ -97,6 +97,7 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
     
 
