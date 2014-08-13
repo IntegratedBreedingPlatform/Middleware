@@ -257,7 +257,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         params.put("searchPublicData",1);
         
 		return getNameDao().
-				callStoredProcedureForList("searchGermplasmsByName",
+				callStoredProcedureForList("searchGermplasmByName",
 						params,Germplasm.class);
         
     }
@@ -298,7 +298,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         params.put("searchPublicData",1);
         
 		return getNameDao().
-				callStoredProcedureForList("searchGermplasmsByName",
+				callStoredProcedureForList("searchGermplasmByName",
 						params,Germplasm.class);
     }
 
@@ -2256,7 +2256,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			params.put("searchType", searchType);
 			params.put("searchPublicData",searchPublicData?1:0);
 			List<Germplasm> germplasmsByGid = getGermplasmListDataDAO().
-					callStoredProcedureForList("searchGermplasmsByID",
+					callStoredProcedureForList("searchGermplasmByID",
 							params,Germplasm.class);
 			if(germplasmsByGid!=null) {
 				result.addAll(germplasmsByGid);
@@ -2279,7 +2279,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		params.put("numOfRows", null);
 		params.put("searchPublicData",searchPublicData?1:0);
 		List<Germplasm> germplasmsByName = getGermplasmListDataDAO().
-				callStoredProcedureForList("searchGermplasmsByName",
+				callStoredProcedureForList("searchGermplasmByName",
 						params,Germplasm.class);
 		if(germplasmsByName!=null) {
 			result.addAll(germplasmsByName);
