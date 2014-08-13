@@ -27,6 +27,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.oms.Term;
@@ -1311,7 +1312,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         Transaction trans = null;
 
         int germplasmsSaved = 0;
-        List<Integer> idGermplasmsSaved = new ArrayList<Integer>();
+        List<Integer> isGermplasmsSaved = new ArrayList<Integer>();
         try {
             trans = session.beginTransaction();
             GermplasmDAO dao = getGermplasmDao();
@@ -1331,7 +1332,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 name.setGermplasmId(negativeId);
 
                 Germplasm germplasmSaved = dao.save(germplasm);
-                idGermplasmsSaved.add(germplasmSaved.getGid());
+                isGermplasmsSaved.add(germplasmSaved.getGid());
                 nameDao.save(name);
                 germplasmsSaved++;
 
@@ -1350,7 +1351,145 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } finally {
             session.flush();
         }
-        return idGermplasmsSaved;
+        return isGermplasmsSaved;
+    }
+    
+    public Integer addUserDefinedField(UserDefinedField field) throws MiddlewareQueryException{
+    	requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer isUdfldSaved = 0;
+        try {
+        	trans = session.beginTransaction();
+            UserDefinedFieldDAO dao =  getUserDefinedFieldDao();
+            
+            // Auto-assign negative IDs for new local DB records
+            Integer negativeId = dao.getNegativeId("fldno");
+            field.setFldno(negativeId);
+            UserDefinedField udflds = dao.save(field);
+            isUdfldSaved++;
+
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(fields="
+                    + isUdfldSaved + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        
+        return isUdfldSaved;
+    }
+    
+    public List<Integer> addUserDefinedFields(List<UserDefinedField> fields) throws MiddlewareQueryException{
+    	requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        List<Integer> isUdfldSaved = new ArrayList<Integer>();
+        try {
+        	trans = session.beginTransaction();
+            UserDefinedFieldDAO dao =  getUserDefinedFieldDao();
+            
+            int udfldSaved = 0;
+            for (UserDefinedField field : fields) {
+
+                // Auto-assign negative IDs for new local DB records
+                Integer negativeId = dao.getNegativeId("fldno");
+                field.setFldno(negativeId);
+                
+                UserDefinedField udflds = dao.save(field);
+                isUdfldSaved.add(udflds.getFldno());
+                udfldSaved++;
+
+                if (udfldSaved % JDBC_BATCH_SIZE == 0) {
+                    // flush a batch of inserts and release memory
+                    dao.flush();
+                    dao.clear();
+                }
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields="
+                    + fields + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        
+        return isUdfldSaved;
+    }
+    
+    public Integer addAttribute(Attribute attr) throws MiddlewareQueryException{
+    	requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer isAttrSaved = 0;
+        try {
+        	trans = session.beginTransaction();
+            AttributeDAO dao =  getAttributeDao();
+            
+            // Auto-assign negative IDs for new local DB records
+            Integer negativeId = dao.getNegativeId("aid");
+            attr.setAid(negativeId);
+            Attribute newAttr = dao.save(attr);
+            isAttrSaved++;
+
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Attribute: GermplasmDataManager.addAttribute(addAttribute="
+                    + attr + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        
+        return isAttrSaved;
+    }
+    
+    public List<Integer> addAttributes(List<Attribute> attrs) throws MiddlewareQueryException{
+    	requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        List<Integer> isAttrSaved = new ArrayList<Integer>();
+        try {
+        	trans = session.beginTransaction();
+        	AttributeDAO dao =  getAttributeDao();
+            
+            int attrSaved = 0;
+            for (Attribute attr : attrs) {
+
+                // Auto-assign negative IDs for new local DB records
+                Integer negativeId = dao.getNegativeId("aid");
+                attr.setAid(negativeId);
+                
+                Attribute newAttr = dao.save(attr);
+                isAttrSaved.add(newAttr.getAid());
+                attrSaved++;
+
+                if (attrSaved % JDBC_BATCH_SIZE == 0) {
+                    // flush a batch of inserts and release memory
+                    dao.flush();
+                    dao.clear();
+                }
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addAttributes(attrs="
+                    + isAttrSaved + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        
+        return isAttrSaved;
     }
 
     @Override

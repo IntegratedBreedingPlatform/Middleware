@@ -1143,6 +1143,46 @@ public interface GermplasmDataManager {
     List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
     
     /**
+     * Given a UserDefinedField object, add new record for the
+     * given parameter.
+     *
+     * @param field - the UserDefinedField object
+     * @return the id of the new UserDefinedField record added
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer addUserDefinedField(UserDefinedField field) throws MiddlewareQueryException;
+    
+    /**
+     * Given a list of UserDefinedField objects, add new records for the
+     * given parameter.
+     *
+     * @param fields - the list of UserDefinedField objects
+     * @return the list of ids of the new UserDefinedField records added
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Integer> addUserDefinedFields(List<UserDefinedField> fields) throws MiddlewareQueryException;
+    
+    /**
+     * Given a Attribute object, add new record for the
+     * given parameter.
+     *
+     * @param attr - the Attribute object
+     * @return the id of the new Attribute record added
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer addAttribute(Attribute attr) throws MiddlewareQueryException;
+    
+    /**
+     * Given a list of Attribute objects, add new records for the
+     * given parameter.
+     *
+     * @param attrs - the list of Attribute objects
+     * @return the id of the new Attribute record added
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Integer> addAttributes(List<Attribute> attrs) throws MiddlewareQueryException;
+    
+    /**
      * Gets the germplasm Id and name Id from the names table with the given germplasm names.
      *
      * @param germplasmNames the germplasm names

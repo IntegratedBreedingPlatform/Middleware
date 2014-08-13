@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
@@ -613,8 +614,11 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
-        String tableName="LOCATION";
-        String fieldType="LTYPE";
+//        String tableName="LOCATION";
+//        String fieldType="LTYPE";
+        
+        String tableName="ATRIBUTS";
+        String fieldType="ATTRIBUTE";
         List<UserDefinedField> userDefineField = manager
                 .getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
         Debug.println(INDENT, "testGetUserDefineFieldByTableNameAndType(type=" + tableName 
@@ -887,5 +891,44 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         assertNotNull(method);
         Debug.println(INDENT, "testGetMethodByCode("+code+"): ");
         Debug.println(INDENT, method);
+    }
+    
+    @Test
+    public void testAddUserDefinedField() throws Exception {
+        UserDefinedField field = new UserDefinedField();
+        field.setFtable("ATRIBUTS");
+        field.setFtype("ATTRIBUTE");
+        field.setFcode("MATURITY");
+        field.setFname("Maturity class");
+        field.setFfmt("MCLASS,ASSIGNED,C");
+        field.setFdesc("-");
+        field.setLfldno(0);
+        field.setUser(new User(-1));
+        field.setFdate(20041116);
+        field.setScaleid(0);
+        
+        Integer success = manager.addUserDefinedField(field);
+        assertTrue(success > 0);
+        
+        Debug.println(INDENT, "testAddUserDefinedField("+field+"): ");
+        Debug.println(INDENT, success);
+    }
+    
+    @Test
+    public void testAddAttribute() throws Exception {
+        Attribute attr = new Attribute();
+        attr.setGermplasmId(237431);
+        attr.setTypeId(-1);
+        attr.setUserId(-1);
+        attr.setAval("EARLY");
+        attr.setLocationId(31);
+        attr.setReferenceId(0);
+        attr.setAdate(20041116);
+        
+        Integer success = manager.addAttribute(attr);
+        assertTrue(success > 0);
+        
+        Debug.println(INDENT, "testAddAttribute("+attr+"): ");
+        Debug.println(INDENT, success);
     }
 }
