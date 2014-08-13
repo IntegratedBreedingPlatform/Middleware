@@ -283,6 +283,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else if (op == Operation.LIKE) {
         	params.put("searchType","LIKE");
         }
+		
+
+		params.put("status",null);
+        params.put("type",null);
 
         if (start != 0) {
         	params.put("start",start);

@@ -121,6 +121,7 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
         String expectedName = "RIL-1 (TAG 24 x ICGV 86031)";
 
         String retrievedName = manager.getMapNameById(mapID);
+        Debug.println(retrievedName);
         assertEquals(expectedName, retrievedName);
     }
 
