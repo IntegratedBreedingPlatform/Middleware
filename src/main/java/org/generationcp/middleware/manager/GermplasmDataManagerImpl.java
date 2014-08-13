@@ -312,6 +312,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		params.put("central_db_name", centralDatabaseName);
 		params.put("name",nameToUse);
 		params.put("altname",null);
+		params.put("altname2",null);
 		
 		if (op == null || op == Operation.EQUAL) {
 			params.put("searchType","EQUAL");
@@ -358,6 +359,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else if (operation == Operation.LIKE) {
         	params.put("searchType","LIKE");
         }
+		
+		params.put("status",null);
+        params.put("type",null);
+        
 		params.put("searchPublicData",1);
 
         return getNameDao().
