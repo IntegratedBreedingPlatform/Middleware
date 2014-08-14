@@ -12,6 +12,7 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -55,6 +56,11 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 public class WorkbookBuilder extends Builder {
 	
 	private Map<String, String> labelMap = new HashMap<String, String> ();
+	private static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), 
+			TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(), TermId.BLOCKS_PER_REPLICATE.getId(), 
+			TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
+			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(), 
+			TermId.NO_OF_CBLKS_LATINIZE.getId());
 	
 	public WorkbookBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                   HibernateSessionProvider sessionProviderForCentral) {
@@ -289,6 +295,7 @@ public class WorkbookBuilder extends Builder {
             List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
             setTreatmentFactorValues(treatmentFactors, dataSetId);
             List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
+            List<MeasurementVariable> experimentalDesignVariables = new ArrayList<MeasurementVariable>();
             
             for (ProjectProperty projectProperty : projectProperties) {
             	boolean isConstant = false;
@@ -371,8 +378,12 @@ public class WorkbookBuilder extends Builder {
 	                        measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 	                        measurementVariable.setFactor(true);
 	                        measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+	                        measurementVariable.setPossibleValues(getMeasurementVariableTransformer().transformPossibleValues(stdVariable.getEnumerations()));
 	                        
-	                        if (isConstant) {
+	                        if (EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+	                        	experimentalDesignVariables.add(measurementVariable);
+	                        }
+	                        else if (isConstant) {
 	                        	constants.add(measurementVariable);
 	                        }
 	                        else {
@@ -389,6 +400,7 @@ public class WorkbookBuilder extends Builder {
             workbook.setConditions(conditions);
             workbook.setConstants(constants);
             workbook.setTreatmentFactors(treatmentFactors);
+            workbook.setExperimentalDesignVariables(experimentalDesignVariables);
             return workbook;
 	}
 	
