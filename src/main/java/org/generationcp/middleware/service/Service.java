@@ -58,6 +58,11 @@ public abstract class Service extends DatabaseBroker {
         super(sessionProviderForLocal, sessionProviderForCentral);		
 	}
 	
+	public Service(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral,
+			String localDatabaseName, String centralDatabaseName) {
+        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    }
+	
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
         log.error(e.getMessage(), e);
         if(e instanceof PhenotypeException) {
@@ -87,15 +92,15 @@ public abstract class Service extends DatabaseBroker {
     }
 
     protected final GermplasmDataManager getGermplasmDataManager() {
-        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
     
     protected final GermplasmListManager getGermplasmListManager() {
-        return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
     
     protected final InventoryDataManager getInventoryDataManager() {
-        return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
     
     protected final LocationDataManager getLocationDataManager() {

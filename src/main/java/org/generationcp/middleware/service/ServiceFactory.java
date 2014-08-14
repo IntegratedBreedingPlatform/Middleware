@@ -59,6 +59,9 @@ public class ServiceFactory implements Serializable {
     private HibernateSessionProvider sessionProviderForLocal;
     private HibernateSessionProvider sessionProviderForCentral;
     
+    private String localDatabaseName;
+    private String centralDatabaseName;
+    
     public ServiceFactory() {
     }
     
@@ -224,6 +227,7 @@ public class ServiceFactory implements Serializable {
             
             LOG.info("Opening SessionFactory for local database...");
             sessionFactoryForLocal = cfg.buildSessionFactory();
+            localDatabaseName = paramsForLocal.getDbName();
         }
     
         // if central database parameters were specified,
@@ -243,6 +247,7 @@ public class ServiceFactory implements Serializable {
 
             LOG.info("Opening SessionFactory for central database...");
             sessionFactoryForCentral = cfg.buildSessionFactory();
+            centralDatabaseName = paramsForCentral.getDbName();
         }
         
         // if no local and central database parameters were set,
@@ -262,7 +267,7 @@ public class ServiceFactory implements Serializable {
     }
 
     public FieldbookService getFieldbookService(){
-        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public OntologyService getOntologyService(){
@@ -270,7 +275,7 @@ public class ServiceFactory implements Serializable {
     }
     
     public InventoryService getInventoryService() {
-    	return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    	return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
 
@@ -298,4 +303,21 @@ public class ServiceFactory implements Serializable {
         
         LOG.trace("Closing ManagerFactory... DONE");
     }
+
+	public String getLocalDatabaseName() {
+		return localDatabaseName;
+	}
+
+	public void setLocalDatabaseName(String localDatabaseName) {
+		this.localDatabaseName = localDatabaseName;
+	}
+
+	public String getCentralDatabaseName() {
+		return centralDatabaseName;
+	}
+
+	public void setCentralDatabaseName(String centralDatabaseName) {
+		this.centralDatabaseName = centralDatabaseName;
+	}
+    
 }

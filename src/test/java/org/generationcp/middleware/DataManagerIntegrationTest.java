@@ -28,7 +28,9 @@ public class DataManagerIntegrationTest extends MiddlewareIntegrationTest {
 
 		managerFactory = new ManagerFactory();
 		managerFactory.setSessionProviderForCentral(sessionProviderForCentral);
-		managerFactory.setSessionProviderForLocal(sessionProviderForLocal);		
+		managerFactory.setSessionProviderForLocal(sessionProviderForLocal);
+		managerFactory.setLocalDatabaseName(localConnectionParameters.getDbName());
+		managerFactory.setCentralDatabaseName(centralConnectionParams.getDbName());
 	}
 	
 	@BeforeClass

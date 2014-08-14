@@ -27,7 +27,9 @@ public class ServiceIntegraionTest extends MiddlewareIntegrationTest {
 
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setSessionProviderForCentral(sessionProviderForCentral);
-		serviceFactory.setSessionProviderForLocal(sessionProviderForLocal);		
+		serviceFactory.setSessionProviderForLocal(sessionProviderForLocal);
+		serviceFactory.setLocalDatabaseName(localConnectionParameters.getDbName());
+		serviceFactory.setCentralDatabaseName(centralConnectionParams.getDbName());
 	}
 	
 	@BeforeClass

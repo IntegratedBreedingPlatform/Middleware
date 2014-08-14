@@ -35,8 +35,9 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
     public InventoryServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+            HibernateSessionProvider sessionProviderForCentral, 
+            String localDatabaseName, String centralDatabaseName) {
+        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
 	@Override

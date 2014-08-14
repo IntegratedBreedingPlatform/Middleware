@@ -322,11 +322,11 @@ public class ManagerFactory implements Serializable {
     }
     
     public FieldbookService getFieldbookMiddlewareService() throws ConfigException {
-        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
     
     public InventoryService getInventoryMiddlewareService() throws ConfigException {
-        return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
     
     public DataImportService getDataImportService() throws ConfigException {

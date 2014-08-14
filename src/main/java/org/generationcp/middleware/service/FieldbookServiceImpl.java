@@ -86,8 +86,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+            HibernateSessionProvider sessionProviderForCentral,
+            String localDatabaseName, String centralDatabaseName) {
+        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     @Override
