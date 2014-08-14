@@ -136,6 +136,7 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
+		List<MeasurementVariable> expDesignVariables = new ArrayList<MeasurementVariable>();
 		
 		//watch.stop();
 		
@@ -217,7 +218,12 @@ public class WorkbookBuilder extends Builder {
 		                        measurementVariable.setFactor(true);
 		                        measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 		                        
-		                        conditions.add(measurementVariable);
+		                        if (EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+		                        	expDesignVariables.add(measurementVariable);
+		                        }
+		                        else {
+		                        	conditions.add(measurementVariable);
+		                        }
 	                        }
 	                    }
 	                }
@@ -230,6 +236,7 @@ public class WorkbookBuilder extends Builder {
 		workbook.setConstants(constants);
 		workbook.setObservations(observations);
 		workbook.setTreatmentFactors(treatmentFactors);
+		workbook.setExperimentalDesignVariables(expDesignVariables);
 		
 		//if (isTrial) {
 		List<MeasurementRow> trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
