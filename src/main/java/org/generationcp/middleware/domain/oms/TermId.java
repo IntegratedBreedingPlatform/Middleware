@@ -211,6 +211,11 @@ public enum TermId {
     , RESOLVABLE_INCOMPLETE_ROW_COL (10145)
     , RESOLVABLE_INCOMPLETE_BLOCK_LATIN (10166)
     , RESOLVABLE_INCOMPLETE_ROW_COL_LATIN (10167)
+    
+    //Replications Map values
+    , REPS_IN_SINGLE_ROW (8143)
+    , REPS_IN_SINGLE_COL (8144)
+    , REPS_IN_ADJACENT_COLS( 8145)
 
     //Selection Variates Properties
     , BREEDING_METHOD_PROP (2670)
