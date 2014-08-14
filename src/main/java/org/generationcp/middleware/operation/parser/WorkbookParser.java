@@ -101,7 +101,9 @@ public class WorkbookParser {
         }
         return wb;
     }
-
+    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation) throws WorkbookParserException {
+    	return parseFile(file, performValidation, true);
+    }
     /**
      * Parses given file and transforms it into a Workbook
      *
@@ -109,7 +111,7 @@ public class WorkbookParser {
      * @return workbook
      * @throws org.generationcp.middleware.exceptions.WorkbookParserException
      */
-    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation) throws WorkbookParserException {
+    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation,  boolean isReadVariate) throws WorkbookParserException {
 
         currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
         Workbook wb;
@@ -160,7 +162,9 @@ public class WorkbookParser {
             currentWorkbook.setConditions(readMeasurementVariables(wb, "CONDITION"));
             currentWorkbook.setFactors(readMeasurementVariables(wb, "FACTOR"));
             currentWorkbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
-            currentWorkbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
+            if(isReadVariate){
+            	currentWorkbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
+            }
 
             /*// check if required CONDITION is present for specific study types
             if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N && locationId == 0) {
