@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -345,6 +346,35 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             logAndThrowException("Error with getAllMatchingNames(" + prefix + ", " + suffix + ") query from Name " + e.getMessage(), e);
     	}
     	return names;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public boolean checkIfMatches(String name) throws MiddlewareQueryException {
+    	try {
+    		String keyword1 = name.replaceAll("\\s", "");
+    		String keyword2 = GermplasmDataManagerUtil.standardizeName(name).replaceAll("\\s", "");
+    		String keyword = null;
+    		if (keyword1.equals(keyword2)) {
+    			keyword = keyword1;
+    		}
+    		StringBuilder sql = new StringBuilder();
+    		sql.append("SELECT COUNT(nid) FROM names ");
+    		if (keyword == null) {
+    			sql.append(" WHERE REPLACE(nval, ' ', '') IN ('").append(keyword1).append("', ").append("'").append(keyword2).append("')");
+    		} 
+    		else {
+    			sql.append(" WHERE REPLACE(nval, ' ', '') = '").append(keyword).append("'");
+    		}
+
+    		Query query = getSession().createSQLQuery(sql.toString());
+    		List<BigInteger> result = query.list();
+    		return result.get(0).intValue() > 0;
+    		
+     		
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAllMatchingNames(" + name + ") query from Name " + e.getMessage(), e);
+    	}
+    	return false;
     }
     
 }

@@ -1488,4 +1488,14 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count) throws MiddlewareQueryException; 
+    
+    /**
+     * check if name and standardized version of it already exists. 
+     * @param prefix
+     * @param count
+     * @param suffix
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    boolean checkIfMatches(String name) throws MiddlewareQueryException;
 }

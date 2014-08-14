@@ -9,6 +9,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
+import org.generationcp.middleware.util.TimerWatch;
 
 public class NameBuilder extends Builder {
 
@@ -19,12 +20,17 @@ public class NameBuilder extends Builder {
 
 	public int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count) throws MiddlewareQueryException {
 		Set<String> names = new HashSet<String>();
+		TimerWatch timer = new TimerWatch("Retrieve all matched names (local)");
 		setWorkingDatabase(Database.LOCAL);
 		names.addAll(getNameDao().getAllMatchingNames(prefix, suffix));
+		timer.restart("Retrieve all method names (central)");
 		setWorkingDatabase(Database.CENTRAL);
 		names.addAll(getNameDao().getAllMatchingNames(prefix, suffix));
-		
-		return getMaximumSequenceInNames(isBulk, names, prefix, suffix, count);
+
+		timer.restart("get maximum sequence");
+		int max = getMaximumSequenceInNames(isBulk, names, prefix, suffix, count);
+		timer.stop();
+		return max;
 	}
 	
 	private int getMaximumSequenceInNames(boolean isBulk, Set<String> names, String prefix, String suffix, int plantsSelected) {

@@ -2725,4 +2725,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return getNameBuilder().getMaximumSequence(isBulk, prefix, suffix, count);
 	}
 	
+	@Override
+	public boolean checkIfMatches(String name) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		boolean isMatch = getNameDao().checkIfMatches(name);
+		if (!isMatch) {
+			setWorkingDatabase(Database.CENTRAL);
+			isMatch = getNameDao().checkIfMatches(name);
+		}
+		return isMatch;
+	}
+	
 }
