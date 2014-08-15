@@ -262,8 +262,10 @@ public class Workbook {
 			if(studyConstants != null)
 				list.addAll(studyConstants);
 		} else {
-			if(trialConditions == null && trialConstants == null) {
+			if(trialConditions == null) {
 				trialConditions = getTrialConditions();
+			}
+			if (trialConstants == null) {
 				trialConstants = getTrialConstants();
 			}
 			if(trialConditions != null)
