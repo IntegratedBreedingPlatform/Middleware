@@ -287,8 +287,11 @@ public class WorkbookBuilder extends Builder {
             List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true, true);
             List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false, true);
             List<TreatmentVariable> treatmentFactors = buildTreatmentFactors(variables);
-            setTreatmentFactorValues(treatmentFactors, dataSetId);
-            List<ProjectProperty> projectProperties = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0).getProperties();
+            if(dataSetId != null){
+            	setTreatmentFactorValues(treatmentFactors, dataSetId);
+            }
+            DmsProject dmsProject = getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0);
+            List<ProjectProperty> projectProperties = dmsProject != null ?  dmsProject.getProperties() : new ArrayList();
             
             for (ProjectProperty projectProperty : projectProperties) {
             	boolean isConstant = false;
