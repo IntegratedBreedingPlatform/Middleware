@@ -92,7 +92,7 @@ public class MeasurementVariableTransformer extends Transformer {
             return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
         }
 	
-	private List<ValueReference> transformPossibleValues(List<Enumeration> enumerations) {
+	public List<ValueReference> transformPossibleValues(List<Enumeration> enumerations) {
 		List<ValueReference> list = new ArrayList<ValueReference>();
 		
 		if (enumerations != null) {

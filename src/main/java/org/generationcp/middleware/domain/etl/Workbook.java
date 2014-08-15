@@ -53,7 +53,8 @@ public class Workbook {
 	private List<MeasurementVariable> studyConstants;
 	private List<MeasurementVariable> trialConditions;
 	private List<MeasurementVariable> trialConstants;
-	private List<TreatmentVariable> treatmentFactors; 
+	private List<TreatmentVariable> treatmentFactors;
+	private ExperimentalDesignVariable experimentalDesignVariables;
 	private Map<String, ?> variableMap;
 	
 	private boolean isCheckFactorAddedOnly;
@@ -830,8 +831,19 @@ public class Workbook {
 	public void setExpDesignVariables(List<StandardVariable> expDesignVariables) {
 		this.expDesignVariables = expDesignVariables;
 	}
-	
-	
-	
+
+	/**
+	 * @return the experimentalDesignVariables
+	 */
+	public ExperimentalDesignVariable getExperimentalDesignVariables() {
+		return experimentalDesignVariables;
+	}
+
+	/**
+	 * @param experimentalDesignVariables the experimentalDesignVariables to set
+	 */
+	public void setExperimentalDesignVariables(List<MeasurementVariable> list) {
+		this.experimentalDesignVariables = new ExperimentalDesignVariable(list);
+	}
 	
 }
