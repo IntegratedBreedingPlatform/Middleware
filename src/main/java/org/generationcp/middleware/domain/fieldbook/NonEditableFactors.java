@@ -46,7 +46,10 @@ public enum NonEditableFactors {
 	COLUMN_NO(TermId.COLUMN_NO.getId()), 
 	
 	/** The range no. */
-	RANGE_NO(TermId.RANGE_NO.getId());
+	RANGE_NO(TermId.RANGE_NO.getId()),
+	
+	TRIAL_INSTANCE(TermId.TRIAL_INSTANCE_FACTOR.getId());
+	
 	
 	/** The id. */
 	private int id;
