@@ -65,7 +65,10 @@ public class MtaDAO extends GenericDAO<Mta, Integer>{
         try {
             this.flush();
 
-            SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_mta WHERE dataset_id = " + datasetId);
+            SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_mta_metadata WHERE mta_id in (select mta_id from gdms_mta where dataset_id = " + datasetId + ")");
+            statement.executeUpdate();
+
+            statement = getSession().createSQLQuery("DELETE FROM gdms_mta where dataset_id = " + datasetId);
             statement.executeUpdate();
 
             this.flush();
