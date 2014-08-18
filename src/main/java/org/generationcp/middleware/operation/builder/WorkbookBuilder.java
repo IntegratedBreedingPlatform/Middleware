@@ -170,7 +170,7 @@ public class WorkbookBuilder extends Builder {
                         
                         Double minRange = null, maxRange = null;
                         if (stdVariable.getConstraints() != null) {
-                                minRange = stdVariable.getConstraints().getMaxValue();
+                                minRange = stdVariable.getConstraints().getMinValue();
                                 maxRange = stdVariable.getConstraints().getMaxValue();
                         }
                         
@@ -235,7 +235,7 @@ public class WorkbookBuilder extends Builder {
                         
                         Double minRange = null, maxRange = null;
                         if (stdVariable.getConstraints() != null) {
-                                minRange = stdVariable.getConstraints().getMaxValue();
+                                minRange = stdVariable.getConstraints().getMinValue();
                                 maxRange = stdVariable.getConstraints().getMaxValue();
                         }
                         MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), getLocalName(projectProperty.getRank(), projectProperties),//projectProperty.getValue(), 
