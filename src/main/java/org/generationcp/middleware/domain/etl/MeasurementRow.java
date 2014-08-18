@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
@@ -228,5 +229,29 @@ public class MeasurementRow {
 		MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
 		row.setExperimentId(this.experimentId);
 		return row;
+	}
+	
+	public MeasurementRow copy(List<MeasurementVariable> variableList) {
+		List<MeasurementData> newDataList = null;
+		if (this.dataList != null && !this.dataList.isEmpty()) {
+			newDataList = new ArrayList<MeasurementData>();
+			for (MeasurementData data : this.dataList) {	
+				MeasurementVariable var = getMatchingMeasurementVariable(variableList, data.getMeasurementVariable());
+				newDataList.add(data.copy(var));
+			}
+		}
+		MeasurementRow row = new MeasurementRow(this.stockId, this.locationId, newDataList);
+		row.setExperimentId(this.experimentId);
+		return row;
+	}
+	private MeasurementVariable getMatchingMeasurementVariable(List<MeasurementVariable> variableList, MeasurementVariable originalVariable){
+		if(variableList != null && originalVariable != null){
+			for(MeasurementVariable var : variableList){
+				if(var.getTermId() == originalVariable.getTermId()){
+					return var;
+				}
+			}
+		}
+		return originalVariable;
 	}
 }

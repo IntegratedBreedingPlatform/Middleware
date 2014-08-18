@@ -215,4 +215,10 @@ public class MeasurementData {
 		data.setcValueId(this.cValueId);
 		return data;
 	}
+	public MeasurementData copy(MeasurementVariable oldVar) {
+		MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, oldVar);
+		data.setPhenotypeId(this.phenotypeId);
+		data.setcValueId(this.cValueId);
+		return data;
+	}
 }
