@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -323,4 +324,27 @@ public class MeasurementVariable {
     public void setOperation(Operation operation) {
         this.operation = operation;
     }
+    
+    public MeasurementVariable copy() {
+		MeasurementVariable var = new MeasurementVariable();
+	    var.setTermId(termId);
+	    var.setName(name);
+		var.setDescription(description);
+		var.setScale(scale);
+		var.setMethod(method);
+		var.setProperty(property);
+		var.setDataType(dataType);
+		var.setValue(value);
+		var.setLabel(label);
+		var.setStoredIn(storedIn);
+		var.setFactor(isFactor);
+		var.setDataTypeId(dataTypeId);
+		var.setPossibleValues(possibleValues);
+		var.setMinRange(minRange);
+		var.setMaxRange(maxRange);
+		var.setRequired(required);
+	    var.setTreatmentLabel(treatmentLabel);
+	    var.setOperation(operation);		
+		return var;
+	}
 }

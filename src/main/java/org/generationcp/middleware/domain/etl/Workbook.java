@@ -71,7 +71,10 @@ public class Workbook {
 	private List<MeasurementRow> trialObservations;
 	
 	private List<MeasurementRow> originalObservations;
-	private Map<Object, String> originalImportConditionAndConstantsData;
+	
+	private List<MeasurementVariable> importConditionsCopy;
+	private List<MeasurementVariable> importConstantsCopy;
+	private List<MeasurementRow> importTrialObservationsCopy;
 
 	private Integer importType;
 	private List<StandardVariable> expDesignVariables;
@@ -849,13 +852,30 @@ public class Workbook {
 		this.experimentalDesignVariables = new ExperimentalDesignVariable(list);
 	}
 
-	public Map<Object, String> getOriginalImportConditionAndConstantsData() {
-		return originalImportConditionAndConstantsData;
+	public List<MeasurementVariable> getImportConditionsCopy() {
+		return importConditionsCopy;
 	}
 
-	public void setOriginalImportConditionAndConstantsData(
-			Map<Object, String> originalImportConditionAndConstantsData) {
-		this.originalImportConditionAndConstantsData = originalImportConditionAndConstantsData;
+	public void setImportConditionsCopy(
+			List<MeasurementVariable> importConditionsCopy) {
+		this.importConditionsCopy = importConditionsCopy;
 	}
+
+	public List<MeasurementVariable> getImportConstantsCopy() {
+		return importConstantsCopy;
+	}
+
+	public void setImportConstantsCopy(List<MeasurementVariable> importConstantsCopy) {
+		this.importConstantsCopy = importConstantsCopy;
+	}
+
+	public List<MeasurementRow> getImportTrialObservationsCopy() {
+		return importTrialObservationsCopy;
+	}
+
+	public void setImportTrialObservationsCopy(
+			List<MeasurementRow> importTrialObservationsCopy) {
+		this.importTrialObservationsCopy = importTrialObservationsCopy;
+	}	
 	
 }

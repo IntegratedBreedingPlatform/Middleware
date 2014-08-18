@@ -190,7 +190,7 @@ public enum TermId {
 	, PLANTS_SELECTED (8263)
 	
 	//Manage Settings
-	, NURSERY_TYPE (77777)
+	, NURSERY_TYPE (8065)
 		
     //Experimental Design
     , EXPERIMENT_DESIGN_FACTOR (8135)
