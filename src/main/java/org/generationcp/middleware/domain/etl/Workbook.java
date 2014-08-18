@@ -71,6 +71,7 @@ public class Workbook {
 	private List<MeasurementRow> trialObservations;
 	
 	private List<MeasurementRow> originalObservations;
+	private Map<Object, String> originalImportConditionAndConstantsData;
 
 	private Integer importType;
 	private List<StandardVariable> expDesignVariables;
@@ -846,6 +847,15 @@ public class Workbook {
 	 */
 	public void setExperimentalDesignVariables(List<MeasurementVariable> list) {
 		this.experimentalDesignVariables = new ExperimentalDesignVariable(list);
+	}
+
+	public Map<Object, String> getOriginalImportConditionAndConstantsData() {
+		return originalImportConditionAndConstantsData;
+	}
+
+	public void setOriginalImportConditionAndConstantsData(
+			Map<Object, String> originalImportConditionAndConstantsData) {
+		this.originalImportConditionAndConstantsData = originalImportConditionAndConstantsData;
 	}
 	
 }
