@@ -249,6 +249,7 @@ public class WorkbookBuilder extends Builder {
                         measurementVariable.setPossibleValues(getMeasurementVariableTransformer().transformPossibleValues(stdVariable.getEnumerations()));
 
                         expDesignVariables.add(measurementVariable);
+                        setValueInCondition(conditions, value, stdVariable.getId());
                     }
                 }
 	        }
@@ -268,6 +269,17 @@ public class WorkbookBuilder extends Builder {
 		//}
 		//watch.stop();
 		return workbook;
+	}
+	
+	private void setValueInCondition(List<MeasurementVariable> conditions, String value, int id) {
+		if (conditions != null && !conditions.isEmpty()) {
+			for (MeasurementVariable condition : conditions) {
+				if (condition.getTermId() == id) {
+					condition.setValue(value);
+					break;
+				}
+			}
+		}
 	}
 	
 	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
