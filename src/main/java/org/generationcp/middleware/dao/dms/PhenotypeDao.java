@@ -853,7 +853,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     }
                     sql.append(variateIds.get(i));
                 }
-                sql.append(") AND value IS NOT NULL AND value <> ''");
+                sql.append(") AND ((value IS NOT NULL AND value <> '') OR (cvalue_id IS NOT NULL AND cvalue_id <> ''))");
+                
              Query query = getSession().createSQLQuery(sql.toString());
         
                 return ((BigInteger) query.uniqueResult()).intValue();
