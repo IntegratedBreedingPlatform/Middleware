@@ -2384,10 +2384,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	
         Set<Germplasm> result = new LinkedHashSet<Germplasm>();
     	
-        String searchType = "EQUAL";
-        if((q.contains("%") || q.contains("_")) && o.equals(Operation.LIKE)){
+        String searchType;
+        if(o.equals(Operation.EQUAL)){
+        	searchType = "EQUAL";
+        }
+        else{
         	searchType = "LIKE";
         }
+        
         Map<String,Object> params = null;
         //search by gid
         if(q.matches("\\d+")) {
