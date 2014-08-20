@@ -279,7 +279,7 @@ public class WorkbookSaver extends Saver {
                 }
             }
         }
-        if (deletedList != null) {
+        if (deletedList != null && observations != null) {
             for (Integer termId : deletedList) {
                 //remove from measurement rows
                 int index = 0;

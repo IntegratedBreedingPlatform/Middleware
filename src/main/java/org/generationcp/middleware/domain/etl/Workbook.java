@@ -878,4 +878,7 @@ public class Workbook {
 		this.importTrialObservationsCopy = importTrialObservationsCopy;
 	}	
 	
+	public void resetTrialConditions() {
+		this.trialConditions = null;
+	}
 }
