@@ -2434,9 +2434,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if(includeParents){
         	List<Integer> parentGids = new ArrayList<Integer>();
             for(Germplasm g: result){
-                if(g!=null && g.getGpid1()!=null)
+                if(g!=null && g.getGpid1()!=null && g.getGpid1()!=0)
                     parentGids.add(g.getGpid1());
-                if(g!=null && g.getGpid2()!=null)
+                if(g!=null && g.getGpid2()!=null && g.getGpid2()!=0)
                     parentGids.add(g.getGpid2());
             }
             if(parentGids.size()>0){
