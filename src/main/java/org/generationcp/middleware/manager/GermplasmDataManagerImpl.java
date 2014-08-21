@@ -2394,7 +2394,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         
         Map<String,Object> params = null;
         //search by gid
-        if(q.matches("\\d+")) {
+        if(q.matches("\\d+") || q.matches("-\\d+")) {
         	params = new LinkedHashMap<String,Object>();
 			params.put("central_db_name", centralDatabaseName);
 			params.put("gid",q);
