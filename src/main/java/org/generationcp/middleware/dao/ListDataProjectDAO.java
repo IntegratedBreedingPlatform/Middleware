@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -38,6 +39,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
         try {
             Criteria criteria = getSession().createCriteria(ListDataProject.class);
             criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
+            criteria.addOrder(Order.asc("entryId"));
             return criteria.list();
 
         } catch (HibernateException e) {
