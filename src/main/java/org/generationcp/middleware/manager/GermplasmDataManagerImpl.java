@@ -246,10 +246,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         
         params.put("start",start);
         
-        if (numOfRows != 0) {
+        if (numOfRows <= 5000) {
         	params.put("numOfRows",numOfRows);
         } else {
-        	params.put("numOfRows",null);
+        	params.put("numOfRows",5000);
         }
         params.put("searchPublicData",1);
         
@@ -287,10 +287,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         params.put("start",start);
         
-        if (numOfRows != 0) {
+        if (numOfRows <= 5000) {
         	params.put("numOfRows",numOfRows);
         } else {
-        	params.put("numOfRows",null);
+        	params.put("numOfRows",5000);
         }
         params.put("searchPublicData",1);
         
@@ -2420,8 +2420,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		params.put("searchType", searchType);
 		params.put("status", null);
 		params.put("type", null);
-		params.put("start", null);
-		params.put("numOfRows", null);
+		params.put("start", 0);
+		params.put("numOfRows", 5000);
 		params.put("searchPublicData",searchPublicData?1:0);
 		List<Germplasm> germplasmsByName = getGermplasmListDataDAO().
 				callStoredProcedureForList("searchGermplasmByName",
