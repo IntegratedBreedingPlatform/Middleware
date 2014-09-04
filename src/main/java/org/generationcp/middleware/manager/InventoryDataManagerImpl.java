@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -135,6 +136,18 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             return getLotDao().getByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, start, numOfRows);
         }
         return new ArrayList<Lot>();
+    }
+    
+    @Override
+    public Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String type, Integer entityId, Integer locationId, Integer scaleId)
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(Database.LOCAL)) {
+            List<Lot> lots = getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(type, Arrays.asList(new Integer[]{entityId}), locationId, scaleId);
+            if(lots!=null && !lots.isEmpty()) {
+            	return lots.get(0);
+            }
+        }
+        return null;
     }
 
     @Override

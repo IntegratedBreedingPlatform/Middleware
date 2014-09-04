@@ -92,6 +92,17 @@ public interface InventoryDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Lot> getLotsByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Lot record with entity type, location id, scale id matching the given parameters.
+     *
+     * @param type the type
+     * @param locationId the location id
+     * @param scaleId the location id
+     * @return Lot POJO
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String type, Integer entityId, Integer locationId, Integer scaleId) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Lot records with entity type and location id
