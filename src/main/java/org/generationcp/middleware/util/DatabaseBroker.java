@@ -47,30 +47,7 @@ import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.dms.StockPropertyDao;
 import org.generationcp.middleware.dao.dms.StudySearchDao;
-import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
-import org.generationcp.middleware.dao.gdms.CharValuesDAO;
-import org.generationcp.middleware.dao.gdms.DartValuesDAO;
-import org.generationcp.middleware.dao.gdms.DatasetDAO;
-import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
-import org.generationcp.middleware.dao.gdms.MapDAO;
-import org.generationcp.middleware.dao.gdms.MappingDataDAO;
-import org.generationcp.middleware.dao.gdms.MappingPopDAO;
-import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
-import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
-import org.generationcp.middleware.dao.gdms.MarkerDAO;
-import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
-import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
-import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
-import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
-import org.generationcp.middleware.dao.gdms.MarkerUserInfoDetailsDAO;
-import org.generationcp.middleware.dao.gdms.MtaDAO;
-import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
-import org.generationcp.middleware.dao.gdms.QtlDAO;
-import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
-import org.generationcp.middleware.dao.gdms.TrackDataDAO;
-import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
+import org.generationcp.middleware.dao.gdms.*;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
@@ -83,6 +60,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
+import org.generationcp.middleware.pojos.gdms.ExtendedMarkerInfo;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -156,6 +134,7 @@ public class DatabaseBroker {
     private MarkerDAO markerDao;
     private MarkerDetailsDAO markerDetailsDao;
     private MarkerInfoDAO markerInfoDao;
+    private ExtendedMarkerInfoDAO extendedMarkerInfoDAO;
     private MarkerMetadataSetDAO markerMetadataSetDao;
     private MarkerOnMapDAO markerOnMapDao;
     private MarkerUserInfoDAO markerUserInfoDao;
@@ -752,6 +731,15 @@ public class DatabaseBroker {
         }
         markerInfoDao.setSession(getActiveSession());
         return markerInfoDao;
+    }
+
+    protected final ExtendedMarkerInfoDAO getExtendedMarkerInfoDao() {
+        if (extendedMarkerInfoDAO == null) {
+            extendedMarkerInfoDAO = new ExtendedMarkerInfoDAO();
+        }
+
+        extendedMarkerInfoDAO.setSession(getActiveSession());
+        return extendedMarkerInfoDAO;
     }
 
     protected final MarkerMetadataSetDAO getMarkerMetadataSetDao() {

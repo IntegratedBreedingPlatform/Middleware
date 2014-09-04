@@ -21,48 +21,7 @@ import org.generationcp.middleware.manager.GdmsTable;
 import org.generationcp.middleware.manager.GdmsType;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
-import org.generationcp.middleware.pojos.gdms.AlleleValues;
-import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
-import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
-import org.generationcp.middleware.pojos.gdms.CharValues;
-import org.generationcp.middleware.pojos.gdms.DartDataRow;
-import org.generationcp.middleware.pojos.gdms.DartValues;
-import org.generationcp.middleware.pojos.gdms.Dataset;
-import org.generationcp.middleware.pojos.gdms.DatasetElement;
-import org.generationcp.middleware.pojos.gdms.DatasetUsers;
-import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
-import org.generationcp.middleware.pojos.gdms.Map;
-import org.generationcp.middleware.pojos.gdms.MapDetailElement;
-import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MappingABHRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
-import org.generationcp.middleware.pojos.gdms.MappingPop;
-import org.generationcp.middleware.pojos.gdms.MappingPopValues;
-import org.generationcp.middleware.pojos.gdms.MappingValueElement;
-import org.generationcp.middleware.pojos.gdms.Marker;
-import org.generationcp.middleware.pojos.gdms.MarkerAlias;
-import org.generationcp.middleware.pojos.gdms.MarkerDetails;
-import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
-import org.generationcp.middleware.pojos.gdms.MarkerInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
-import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
-import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
-import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
-import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
-import org.generationcp.middleware.pojos.gdms.Mta;
-import org.generationcp.middleware.pojos.gdms.MtaMetadata;
-import org.generationcp.middleware.pojos.gdms.ParentElement;
-import org.generationcp.middleware.pojos.gdms.Qtl;
-import org.generationcp.middleware.pojos.gdms.QtlDataElement;
-import org.generationcp.middleware.pojos.gdms.QtlDataRow;
-import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
-import org.generationcp.middleware.pojos.gdms.QtlDetails;
-import org.generationcp.middleware.pojos.gdms.SNPDataRow;
-import org.generationcp.middleware.pojos.gdms.SSRDataRow;
-import org.generationcp.middleware.pojos.gdms.TrackData;
-import org.generationcp.middleware.pojos.gdms.TrackMarker;
+import org.generationcp.middleware.pojos.gdms.*;
 
 /**
  * This is the API for retrieving and storing genotypic data.
@@ -541,6 +500,23 @@ public interface GenotypicDataManager{
      */
     List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, 
             int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Retrieves a list of marker info based on the specified marker type from the marker_retrieval_info view
+     *
+     *
+     *
+     * @param markerType - the marker type to match. If null, application will use SSR as the marker type
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<ExtendedMarkerInfo> getMarkerInfoDataByMarkerType(String markerType) throws MiddlewareQueryException;
+
+    List<ExtendedMarkerInfo> getMarkerInfoDataLikeMarkerName(String partialMarkerName) throws MiddlewareQueryException;
+
+    List<ExtendedMarkerInfo> getMarkerInfoByMarkerNames(List<String> markerNames) throws MiddlewareQueryException;
 
     /**
      * Gets the allelic values by gid.

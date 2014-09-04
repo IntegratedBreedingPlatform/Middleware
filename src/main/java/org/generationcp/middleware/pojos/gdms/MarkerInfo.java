@@ -14,10 +14,7 @@ package org.generationcp.middleware.pojos.gdms;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -29,6 +26,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 @Entity
 @Table(name = "gdms_marker_retrieval_info")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class MarkerInfo implements Serializable{
 
     private static final long serialVersionUID = 1L;
@@ -88,8 +86,6 @@ public class MarkerInfo implements Serializable{
     @Column(name = "genotypes_count")
     private BigInteger genotypesCount;
 
-
-    
     public MarkerInfo() {
         super();
     }

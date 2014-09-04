@@ -24,42 +24,7 @@ import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
-import org.generationcp.middleware.pojos.gdms.AlleleValues;
-import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
-import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
-import org.generationcp.middleware.pojos.gdms.CharValues;
-import org.generationcp.middleware.pojos.gdms.DartValues;
-import org.generationcp.middleware.pojos.gdms.Dataset;
-import org.generationcp.middleware.pojos.gdms.DatasetElement;
-import org.generationcp.middleware.pojos.gdms.DatasetUsers;
-import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
-import org.generationcp.middleware.pojos.gdms.Map;
-import org.generationcp.middleware.pojos.gdms.MapDetailElement;
-import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MappingPop;
-import org.generationcp.middleware.pojos.gdms.MappingPopValues;
-import org.generationcp.middleware.pojos.gdms.MappingValueElement;
-import org.generationcp.middleware.pojos.gdms.Marker;
-import org.generationcp.middleware.pojos.gdms.MarkerAlias;
-import org.generationcp.middleware.pojos.gdms.MarkerDetails;
-import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
-import org.generationcp.middleware.pojos.gdms.MarkerInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
-import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
-import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
-import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
-import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
-import org.generationcp.middleware.pojos.gdms.Mta;
-import org.generationcp.middleware.pojos.gdms.MtaMetadata;
-import org.generationcp.middleware.pojos.gdms.ParentElement;
-import org.generationcp.middleware.pojos.gdms.Qtl;
-import org.generationcp.middleware.pojos.gdms.QtlDataElement;
-import org.generationcp.middleware.pojos.gdms.QtlDataRow;
-import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
-import org.generationcp.middleware.pojos.gdms.QtlDetails;
-import org.generationcp.middleware.pojos.gdms.TrackData;
-import org.generationcp.middleware.pojos.gdms.TrackMarker;
+import org.generationcp.middleware.pojos.gdms.*;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.AfterClass;
@@ -2432,6 +2397,33 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
         if(factory != null) {
         	factory.close();
         }
+    }
+
+    @Test
+    public void testGetMarkerByType() throws Exception {
+        List<ExtendedMarkerInfo> markers = manager.getMarkerInfoDataByMarkerType("SSR");
+        assertNotNull(markers);
+
+        assertTrue(markers.size() != 0);
+    }
+
+    @Test
+    public void testGetMarkersLikeMarkerName() throws Exception {
+        List<ExtendedMarkerInfo> markers = manager.getMarkerInfoDataLikeMarkerName("ga");
+        assertNotNull(markers);
+
+        assertTrue(markers.size() != 0);
+    }
+
+    @Test
+    public void testGetMarkerInfosByMarkerNames() throws Exception {
+        List<String> paramList = new ArrayList<String>();
+        paramList.add("GA1");
+        paramList.add("GA2");
+        List<ExtendedMarkerInfo> markers = manager.getMarkerInfoByMarkerNames(paramList);
+        assertNotNull(markers);
+
+        assertTrue(markers.size() == paramList.size());
     }
 
 }

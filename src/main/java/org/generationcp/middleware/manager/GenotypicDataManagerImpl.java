@@ -45,49 +45,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
-import org.generationcp.middleware.pojos.gdms.AlleleValues;
-import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
-import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
-import org.generationcp.middleware.pojos.gdms.CharValues;
-import org.generationcp.middleware.pojos.gdms.DartDataRow;
-import org.generationcp.middleware.pojos.gdms.DartValues;
-import org.generationcp.middleware.pojos.gdms.Dataset;
-import org.generationcp.middleware.pojos.gdms.DatasetElement;
-import org.generationcp.middleware.pojos.gdms.DatasetUsers;
-import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
-import org.generationcp.middleware.pojos.gdms.Map;
-import org.generationcp.middleware.pojos.gdms.MapDetailElement;
-import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MappingABHRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
-import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
-import org.generationcp.middleware.pojos.gdms.MappingPop;
-import org.generationcp.middleware.pojos.gdms.MappingPopValues;
-import org.generationcp.middleware.pojos.gdms.MappingValueElement;
-import org.generationcp.middleware.pojos.gdms.Marker;
-import org.generationcp.middleware.pojos.gdms.MarkerAlias;
-import org.generationcp.middleware.pojos.gdms.MarkerDetails;
-import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
-import org.generationcp.middleware.pojos.gdms.MarkerInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
-import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
-import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
-import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
-import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerUserInfoDetails;
-import org.generationcp.middleware.pojos.gdms.Mta;
-import org.generationcp.middleware.pojos.gdms.MtaMetadata;
-import org.generationcp.middleware.pojos.gdms.ParentElement;
-import org.generationcp.middleware.pojos.gdms.Qtl;
-import org.generationcp.middleware.pojos.gdms.QtlDataElement;
-import org.generationcp.middleware.pojos.gdms.QtlDataRow;
-import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
-import org.generationcp.middleware.pojos.gdms.QtlDetails;
-import org.generationcp.middleware.pojos.gdms.SNPDataRow;
-import org.generationcp.middleware.pojos.gdms.SSRDataRow;
-import org.generationcp.middleware.pojos.gdms.TrackData;
-import org.generationcp.middleware.pojos.gdms.TrackMarker;
+import org.generationcp.middleware.pojos.gdms.*;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Session;
@@ -548,6 +506,25 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<String> methods = Arrays.asList("countByMarkerName", "getByMarkerName");
         return (List<MarkerInfo>) super.getFromCentralAndLocalByMethod(getMarkerInfoDao(), methods, start, numOfRows,
                 new Object[]{markerName}, new Class[]{String.class});
+    }
+
+    @Override
+    public List<ExtendedMarkerInfo> getMarkerInfoDataByMarkerType(String markerType) throws MiddlewareQueryException {
+        /*List<String> methods = Arrays.asList("countByMarkerType", "getByMarkerType");*/
+        return (List<ExtendedMarkerInfo>) super.getAllFromCentralAndLocalByMethod(getExtendedMarkerInfoDao(), "getByMarkerType",
+                new Object[]{markerType}, new Class[]{String.class});
+    }
+
+    @Override
+    public List<ExtendedMarkerInfo> getMarkerInfoDataLikeMarkerName(String partialMarkerName) throws MiddlewareQueryException {
+        return (List<ExtendedMarkerInfo>) super.getAllFromCentralAndLocalByMethod(getExtendedMarkerInfoDao(), "getLikeMarkerName",
+                new Object[] {partialMarkerName}, new Class[] {String.class});
+    }
+
+    @Override
+    public List<ExtendedMarkerInfo> getMarkerInfoByMarkerNames(List<String> markerNames) throws MiddlewareQueryException {
+        return (List<ExtendedMarkerInfo>) super.getAllFromCentralAndLocalByMethod(getExtendedMarkerInfoDao(), "getByMarkerNames",
+                        new Object[] {markerNames}, new Class[] {List.class});
     }
 
     @Override
