@@ -2198,7 +2198,7 @@ public interface GenotypicDataManager{
      * @param users the users
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void setMTA(Dataset dataset, DatasetUsers users, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList) throws MiddlewareQueryException;
+    void setMTA(Dataset dataset, DatasetUsers users, List<Mta> mtaList, MtaMetadata mtaMetadata) throws MiddlewareQueryException;
 
     //GCP-8565
     /**

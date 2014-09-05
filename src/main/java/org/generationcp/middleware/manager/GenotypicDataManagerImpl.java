@@ -2656,7 +2656,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         	mtaDao.merge(mta);
         	
         	MtaMetadataDAO mtaMetadataDao = getMtaMetadataDao();
-            mtaMetadata.setMtaId(id);
+            mtaMetadata.setDatasetID(dataset.getDatasetId());
             mtaMetadataDao.merge(mtaMetadata);
 
             trans.commit();
@@ -2667,7 +2667,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public void setMTA(Dataset dataset, DatasetUsers users, List<Mta> mtaList, List<MtaMetadata> mtaMetadataList) 
+    public void setMTA(Dataset dataset, DatasetUsers users, List<Mta> mtaList, MtaMetadata mtaMetadata)
             throws MiddlewareQueryException {
         
         if (dataset == null){
@@ -2677,9 +2677,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
         
-        if (mtaList.size() != mtaMetadataList.size()){
+        /*if (mtaList.size() != mtaMetadataList.size()){
         	logAndThrowException("Error in GenotypicDataManager.addMTAs: mtaList and mtaMetadataList must have the same size");
-        }
+        }*/
 
         try {
             trans = session.beginTransaction();
@@ -2708,8 +2708,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             	mta.setDatasetId(dataset.getDatasetId());
             	mtaDao.merge(mta);
             	
-            	MtaMetadata mtaMetadata = mtaMetadataList.get(i);
-            	mtaMetadata.setMtaId(id);
+
+            	mtaMetadata.setDatasetID(dataset.getDatasetId());
             	mtaMetadataDao.merge(mtaMetadata);
 
             	id--;
@@ -2762,8 +2762,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	if (mtaMetadata == null){
     		logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata must not be null.");
     	}
-    	if (mtaMetadata.getMtaId() == null){
-    		logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata.mtaId must not be null.");
+    	if (mtaMetadata.getDatasetID() == null){
+    		logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata.datasetID must not be null.");
     	}
     	
         Session session = requireLocalDatabaseInstance();

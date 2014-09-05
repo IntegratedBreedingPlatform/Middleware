@@ -2160,7 +2160,7 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
         manager.addMTA(dataset, mta, mtaMetadata, users);
         
         // non-null id means the records were inserted.
-        assertTrue(mta.getMtaId() != null && mtaMetadata.getMtaId() != null); 
+        assertTrue(mta.getMtaId() != null && mtaMetadata.getDatasetID() != null);
         
         Debug.println("MTA added: ");
         Debug.printObject(INDENT, mta);
@@ -2186,7 +2186,7 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
         manager.addMTA(dataset, mta, mtaMetadata, users);
         
         // non-null id means the records were inserted.
-        assertTrue(mta.getMtaId() != null && mtaMetadata.getMtaId() != null); 
+        assertTrue(mta.getMtaId() != null && mtaMetadata.getDatasetID() != null);
         
         Debug.println("MTA added: ");
         Debug.printObject(INDENT, dataset);
@@ -2207,19 +2207,17 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
     			"alleleB", "alleleAPhenotype", "alleleBPhenotype", 5.4f, 6.5f, 7.6f, 8.7f, "correctionMethod",
     			9.8f, 10.9f, "dominance", "evidence", "reference", "notes"));
        
-        List<MtaMetadata> mtaMetadataList = new ArrayList<MtaMetadata>();
-        mtaMetadataList.add(new MtaMetadata(null, "project1", "population", 100, "Thousand"));
-        mtaMetadataList.add(new MtaMetadata(null, "project2", "population", 1, "Million"));
+        MtaMetadata metadata = new MtaMetadata(null, "project1", "population", 100, "Thousand");
         
         DatasetUsers users = new DatasetUsers(null, 1);
-        manager.setMTA(dataset, users, mtaList, mtaMetadataList);
+        manager.setMTA(dataset, users, mtaList, metadata);
         
         // Non-null id means the record was inserted.
-        assertTrue(mtaList.get(0).getMtaId() != null && mtaMetadataList.get(0).getMtaId() != null); 
+        assertTrue(mtaList.get(0).getMtaId() != null && metadata.getDatasetID() != null);
         
         Debug.println("MTAs added: ");
         Debug.printObjects(INDENT, mtaList);
-        Debug.printObjects(INDENT, mtaMetadataList);
+        Debug.printObject(INDENT, metadata);
     }
     
     @Test
