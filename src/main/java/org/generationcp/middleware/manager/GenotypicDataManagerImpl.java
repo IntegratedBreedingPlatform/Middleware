@@ -810,7 +810,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), "countAccMetadataSetsByGids",
+        return super.countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countAccMetadataSetsByGids",
                 new Object[]{gids}, new Class[]{List.class});
     }
 
