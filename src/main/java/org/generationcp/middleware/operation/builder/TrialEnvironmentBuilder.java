@@ -35,6 +35,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -51,9 +52,10 @@ public class TrialEnvironmentBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException {
+	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareQueryException {
 		if (this.setWorkingDatabase(datasetId)) {
-		    DataSet dataSet = getDataSetBuilder().build(datasetId);
+			DmsProject project = getDataSetBuilder().getTrialDataset(studyId, datasetId);
+			DataSet dataSet = getDataSetBuilder().build(project.getProjectId());
 		    Study study = getStudyBuilder().createStudy(dataSet.getStudyId());
 		
 		    VariableTypeList trialEnvironmentVariableTypes = getTrialEnvironmentVariableTypes(study, dataSet);

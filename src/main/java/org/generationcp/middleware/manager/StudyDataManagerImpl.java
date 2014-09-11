@@ -429,7 +429,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) 
             throws MiddlewareQueryException {
-        return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(datasetId);
+    	if (this.setWorkingDatabase(datasetId)) {
+	    	DmsProject study = getProjectRelationshipDao().
+	    			getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
+	        return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(),datasetId);
+    	}
+    	return null;
     }
 
     @Override
