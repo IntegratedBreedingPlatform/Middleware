@@ -192,13 +192,16 @@ public class ProjectPropertySaver extends Saver {
 		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStoredIn())) {
 			int datasetRank = getNextRank(trialDataset);
 			int measurementRank = getNextRank(measurementDataset);
-			//insertVariable(project, variable, rank);
+			
 			insertVariable(trialDataset, variable, datasetRank);
-			insertVariable(measurementDataset, variable, measurementRank);
+			
 			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 			}
 			else {
+			    //GCP-9659
+			    insertVariable(measurementDataset, variable, measurementRank);
+			    
 				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
 				setWorkingDatabase(Database.LOCAL);
 				getGeolocationDao().saveOrUpdate(geolocation);

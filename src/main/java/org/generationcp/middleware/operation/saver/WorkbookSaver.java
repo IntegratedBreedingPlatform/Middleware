@@ -800,12 +800,25 @@ public class WorkbookSaver extends Saver {
 		
 		VariableTypeList newList = new VariableTypeList();
 		
+		
+		
         if (!isTrialFactorInDataset(effectVariables)) {
-    		newList.addAll(trialVariables);
-        	effectVariables.allocateRoom(trialVariables.size());
+            if (trialVariables != null) {
+                int index = 1;
+                for (VariableType var : trialVariables.getVariableTypes()) {
+                    if (var.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() 
+                            || TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() != var.getStandardVariable().getStoredIn().getId()) {
+                        var.setRank(index);
+                        newList.add(var);
+                        index++;
+                    }
+                }
+            }
+            
+        	effectVariables.allocateRoom(newList.size());
         }
         newList.addAll(effectVariables);
-		
+        		
 		return newList;
 	}
 	
