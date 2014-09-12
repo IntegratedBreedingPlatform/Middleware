@@ -70,7 +70,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -609,7 +608,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                                 String pedigree = null;
                                 try {
                                     pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
-                                } catch (Throwable e) {
+                                } catch (MiddlewareQueryException e) {
                                     //do nothing
                                 }
 
@@ -728,7 +727,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                                 String pedigree = null;
                                 try {
                                     pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
-                                } catch (Throwable e) {
+                                } catch (MiddlewareQueryException e) {
                                     //do nothing
                                 }
 
@@ -816,13 +815,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             trans.commit();
             return project.getProjectId();
         } catch (Exception e) {
-            rollbackTransaction(trans);
-            throw new MiddlewareQueryException
-                    ("Error encountered with addSubFolder(parentFolderId="
-                            + parentFolderId + ", name=" + name
-                            + ", description=" + description + "): " + e.getMessage(),
-                            e);
-        } catch (Error e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException
                     ("Error encountered with addSubFolder(parentFolderId="
