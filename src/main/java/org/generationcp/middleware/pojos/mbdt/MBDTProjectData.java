@@ -166,6 +166,15 @@ public class MBDTProjectData implements Serializable {
         }
         return true;
     }
+	
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((projectID == null) ? 0 : projectID.hashCode());
+		result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+		return result;
+	}
 
     @Override
     public String toString() {
