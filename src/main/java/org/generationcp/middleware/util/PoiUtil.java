@@ -398,15 +398,13 @@ public class PoiUtil {
 
 
     /**
-     * **** COLUMN *********
+     ******* COLUMN *********
      */
     
-    
-    /*
-     * returns true if all cells in a column is empty or null
-     * returns false if one or more cells in the column is empty or null.
+    /**
+     * @return true if all cells in a column is empty or null
+     *  false if one or more cells in the column is empty or null.
      */
-    @SuppressWarnings("finally")
     public static Boolean columnIsEmpty(Sheet sheet, int columnIndex) {
         Boolean b = true;
         int index = 0;
@@ -425,18 +423,14 @@ public class PoiUtil {
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        } finally {
-            return b;
         }
-
-
+        return b;
     }
 
-    /*
-     * returns false if all cells in a column is not empty or null
-     * returns true if one or more cells in the column is empty or null.
+    /**
+     * @return false if all cells in a column is not empty or null
+     * true if one or more cells in the column is empty or null.
      */
-    @SuppressWarnings("finally")
     public static Boolean columnHasEmpty(Sheet sheet, int columnIndex) {
         Boolean b = false;
         int index = 0;
@@ -454,11 +448,8 @@ public class PoiUtil {
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        } finally {
-            return b;
         }
-
-
+        return b;
     }
 
     public static Boolean isEmpty(Sheet sheet, int rowIndex, int columnIndex) {
@@ -467,10 +458,9 @@ public class PoiUtil {
         return row == null || getCellValue(row.getCell(columnIndex)) == null || getCellValue(row.getCell(columnIndex)).toString().equalsIgnoreCase("");
     }
 
-    /*
-     * returns the content of the column into an array
+    /**
+     * @return the content of the column into an array
      */
-    @SuppressWarnings("finally")
     public static String[] asStringArrayColumn(Sheet sheet, int columnIndex) {
 
         List<String> contents = new ArrayList<String>();
@@ -494,11 +484,8 @@ public class PoiUtil {
             }
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        } finally {
-            return contents.toArray(new String[0]);
         }
-
-
+        return contents.toArray(new String[0]);
     }
 
     /******* ROW **********/
