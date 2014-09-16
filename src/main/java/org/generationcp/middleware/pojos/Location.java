@@ -17,9 +17,12 @@ import java.util.Comparator;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -96,17 +99,9 @@ public class Location implements Serializable, Comparable<Location>{
     @Column(name = "lrplce")
     private Integer lrplce;
     
-    @Basic(optional = true)
-    @Column(name = "latitude")
-    private Double latitude;
-    
-    @Basic(optional = true)
-    @Column(name = "longitude")
-    private Double longitude;
-    
-    @Basic(optional = true)
-    @Column(name = "altitude")
-    private Double altitude;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "locid")
+	private Georef georef;
     
     @Transient
     private Integer parentLocationId;
@@ -114,7 +109,8 @@ public class Location implements Serializable, Comparable<Location>{
     @Transient
     private String parentLocationName;
 
-    public static final String GET_ALL_BREEDING_LOCATIONS = "SELECT locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce, nnpid FROM location WHERE ltype IN (410, 411, 412) ORDER BY lname";
+    public static final String GET_ALL_BREEDING_LOCATIONS = "SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt " +
+    		"FROM location l left join georef g on l.locid = g.locid WHERE l.ltype IN (410, 411, 412) ORDER BY lname";
     public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
     public static final String GET_LOCATION_NAMES_BY_GIDS =
             "SELECT gid, g.glocn, lname "
@@ -236,28 +232,54 @@ public class Location implements Serializable, Comparable<Location>{
         this.descriptions = descriptions;
     }*/
 
-    public Double getLatitude() {
-		return latitude;
+    public Georef getGeoref() {
+		return georef;
+	}
+
+	public void setGeoref(Georef georef) {
+		this.georef = georef;
+	}
+	
+	public Double getLatitude() {
+    	if(georef!=null) {
+    		return georef.getLat();
+    	}
+    	return null;
 	}
 
 	public void setLatitude(Double latitude) {
-		this.latitude = latitude;
+		if(georef==null) {
+			georef = new Georef(locid);
+		}
+    	georef.setLat(latitude);
 	}
 
 	public Double getLongitude() {
-		return longitude;
+		if(georef!=null) {
+    		return georef.getLon();
+    	}
+    	return null;
 	}
 
 	public void setLongitude(Double longitude) {
-		this.longitude = longitude;
+		if(georef==null) {
+			georef = new Georef(locid);
+		}
+    	georef.setLon(longitude);
 	}
 
 	public Double getAltitude() {
-		return altitude;
+		if(georef!=null) {
+    		return georef.getAlt();
+    	}
+    	return null;
 	}
 
 	public void setAltitude(Double altitude) {
-		this.altitude = altitude;
+		if(georef==null) {
+			georef = new Georef(locid);
+		}
+    	georef.setAlt(altitude);
 	}
 
 	@Override
@@ -339,11 +361,11 @@ public class Location implements Serializable, Comparable<Location>{
         builder.append(", lrplce=");
         builder.append(lrplce);
         builder.append(", latitude=");
-        builder.append(latitude);
+        builder.append(georef!=null?georef.getLat():null);
         builder.append(", longitude=");
-        builder.append(longitude);
+        builder.append(georef!=null?georef.getLon():null);
         builder.append(", altitude=");
-        builder.append(altitude);
+        builder.append(georef!=null?georef.getAlt():null);
         builder.append(", parentLocationName=");
         builder.append(parentLocationName);
         builder.append("]");

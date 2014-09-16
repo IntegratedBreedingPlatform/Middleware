@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.hibernate.*;
@@ -255,8 +256,17 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
                     Integer snl1id = (Integer) result[7];
                     Integer cntryid = (Integer) result[8];
                     Integer lrplce = (Integer) result[9];
-
+                    Double latitude = (Double) result[10];
+                    Double longitude = (Double) result[11];
+                    Double altitude = (Double) result[12];
+                    
                     Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
+                    Georef georef = new Georef();
+                    georef.setLocid(locid);
+                    georef.setLat(latitude);
+                    georef.setLon(longitude);
+                    georef.setAlt(altitude);
+                    location.setGeoref(georef);
                     locationList.add(location);
                 }
             }
@@ -282,17 +292,18 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
     public List<LocationDetails> getLocationDetails(Integer locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("select lname as location_name,locid,l.ltype as ltype,");
-            queryString.append(" l.latitude, l.longitude, l.altitude,");
+            queryString.append("select l.lname as location_name,l.locid,l.ltype as ltype,");
+            queryString.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,");
             queryString.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,");
             queryString.append(" ud.fname as location_type,");
             queryString.append(" ud.fdesc as location_description");
             queryString.append(" from location l");
+            queryString.append(" left join georef g on l.locid = g.locid");
             queryString.append(" left join cntry c on l.cntryid = c.cntryid");
             queryString.append(" left join udflds ud on ud.fldno = l.ltype");
 
             if (locationId != null) {
-                queryString.append(" where locid = :id");
+                queryString.append(" where l.locid = :id");
 
                 SQLQuery query = getSession().createSQLQuery(queryString.toString());
                 query.setParameter("id", locationId);
@@ -310,22 +321,37 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         }
         return null;
     }
+    
+    @Override
+    public Location saveOrUpdate(Location location) throws MiddlewareQueryException {
+        try {
+            location = (Location)super.saveOrUpdate(location);
+            if(location.getGeoref()!=null) {
+            	location.getGeoref().setLocid(location.getLocid());
+            	getSession().saveOrUpdate(location.getGeoref());
+            }
+            return location;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in saveOrUpdate(location): " + e.getMessage(), e);
+        }
+    }
 
     public List<LocationDetails> getLocationDetails(List<Integer> locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("select lname as location_name,locid,l.ltype as ltype,");
-            queryString.append(" l.latitude, l.longitude, l.altitude,");
-            queryString.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,");
+            queryString.append("select l.lname as location_name,l.locid,l.ltype as ltype, c.cntryid as cntryid,");
+            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,");
+            queryString.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,");
             queryString.append(" ud.fname as location_type,");
             queryString.append(" ud.fdesc as location_description");
             queryString.append(" from location l");
+            queryString.append(" left join georef g on l.locid = g.locid");
             queryString.append(" left join cntry c on l.cntryid = c.cntryid");
             queryString.append(" left join udflds ud on ud.fldno = l.ltype");
-
+            
             if (locationId != null) {
 
-                queryString.append(" where locid = :id");
+                queryString.append(" where l.locid = :id");
 
                 SQLQuery query = getSession().createSQLQuery(queryString.toString());
                 query.setParameterList("id", locationId);
