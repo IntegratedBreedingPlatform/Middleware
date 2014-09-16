@@ -298,7 +298,7 @@ public class ManagerFactory implements Serializable {
     }
     
     public StudyDataManager getNewStudyDataManager() throws ConfigException {
-    	return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    	return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
     public OntologyDataManager getNewOntologyDataManager() throws ConfigException {

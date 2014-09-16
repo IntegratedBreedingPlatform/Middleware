@@ -84,7 +84,7 @@ public abstract class Service extends DatabaseBroker {
     }
 
     protected final StudyDataManager getStudyDataManager() {
-        return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
     
     protected final OntologyDataManager getOntologyDataManager() {

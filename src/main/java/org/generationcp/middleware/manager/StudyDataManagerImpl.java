@@ -83,6 +83,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     public StudyDataManagerImpl() {
     }
+    
+    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
+            HibernateSessionProvider sessionProviderForCentral,
+            String localDatabaseName, String centralDatabaseName) {
+		super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+		germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, 
+				sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+		locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+	}
 
     public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
                                 HibernateSessionProvider sessionProviderForCentral) {
