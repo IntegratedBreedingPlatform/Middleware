@@ -82,6 +82,18 @@ public class LocationDetails implements Serializable,
     @Basic(optional = false)
     @Column(name = "location_description")
     private String             location_description;
+    
+    @Basic(optional = true)
+    @Column(name = "latitude")
+    private Double latitude;
+    
+    @Basic(optional = true)
+    @Column(name = "longitude")
+    private Double longitude;
+    
+    @Basic(optional = true)
+    @Column(name = "altitude")
+    private Double altitude;
 
     /*
      * @OneToMany(mappedBy = "location") private Set<Locdes> descriptions = new
@@ -167,7 +179,31 @@ public class LocationDetails implements Serializable,
         this.location_description = location_description;
     }
 
-    @Override
+    public Double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public Double getAltitude() {
+		return altitude;
+	}
+
+	public void setAltitude(Double altitude) {
+		this.altitude = altitude;
+	}
+
+	@Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -198,6 +234,11 @@ public class LocationDetails implements Serializable,
         builder.append(location_abbreviation);
         builder.append(", location_name=");
         builder.append(location_name);
+        builder.append(latitude);
+        builder.append(", longitude=");
+        builder.append(longitude);
+        builder.append(", altitude=");
+        builder.append(altitude);
         builder.append("]");
         return builder.toString();
     }

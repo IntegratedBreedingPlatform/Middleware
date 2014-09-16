@@ -282,8 +282,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
     public List<LocationDetails> getLocationDetails(Integer locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("select lname as location_name,locid,l.ltype as ltype, c.cntryid as cntryid,");
-            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,");
+            queryString.append("select lname as location_name,locid,l.ltype as ltype,");
+            queryString.append(" l.latitude, l.longitude, l.altitude,");
+            queryString.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,");
             queryString.append(" ud.fname as location_type,");
             queryString.append(" ud.fdesc as location_description");
             queryString.append(" from location l");
@@ -313,8 +314,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
     public List<LocationDetails> getLocationDetails(List<Integer> locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("select lname as location_name,locid,l.ltype as ltype, c.cntryid as cntryid,");
-            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,");
+            queryString.append("select lname as location_name,locid,l.ltype as ltype,");
+            queryString.append(" l.latitude, l.longitude, l.altitude,");
+            queryString.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,");
             queryString.append(" ud.fname as location_type,");
             queryString.append(" ud.fdesc as location_description");
             queryString.append(" from location l");

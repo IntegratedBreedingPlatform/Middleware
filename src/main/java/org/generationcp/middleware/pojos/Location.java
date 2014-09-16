@@ -96,6 +96,18 @@ public class Location implements Serializable, Comparable<Location>{
     @Column(name = "lrplce")
     private Integer lrplce;
     
+    @Basic(optional = true)
+    @Column(name = "latitude")
+    private Double latitude;
+    
+    @Basic(optional = true)
+    @Column(name = "longitude")
+    private Double longitude;
+    
+    @Basic(optional = true)
+    @Column(name = "altitude")
+    private Double altitude;
+    
     @Transient
     private Integer parentLocationId;
     
@@ -224,7 +236,31 @@ public class Location implements Serializable, Comparable<Location>{
         this.descriptions = descriptions;
     }*/
 
-    @Override
+    public Double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public Double getAltitude() {
+		return altitude;
+	}
+
+	public void setAltitude(Double altitude) {
+		this.altitude = altitude;
+	}
+
+	@Override
     public int hashCode() {
         return this.getLocid();
     }
@@ -302,6 +338,12 @@ public class Location implements Serializable, Comparable<Location>{
         builder.append(cntryid);
         builder.append(", lrplce=");
         builder.append(lrplce);
+        builder.append(", latitude=");
+        builder.append(latitude);
+        builder.append(", longitude=");
+        builder.append(longitude);
+        builder.append(", altitude=");
+        builder.append(altitude);
         builder.append(", parentLocationName=");
         builder.append(parentLocationName);
         builder.append("]");
