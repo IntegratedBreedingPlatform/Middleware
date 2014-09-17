@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -378,5 +379,40 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
         assertNotNull(provinces);
         assertTrue(provinces.size() > 0);
         Debug.printObjects(3, provinces);
-    }    
+    }
+
+    @Test
+    public void testGeorefIntegration() throws Exception {
+        // retrieve all breeding location
+        List<Location> breedingLocations = manager.getAllBreedingLocations();
+
+        assertTrue(breedingLocations.size() > 0);   // must have a data
+
+        Location aculcoLoc = manager.getLocationByID(10548);    // this location exists on maize central
+
+        // aculco is in wheat
+        if (aculcoLoc != null) {
+
+            // aculcoLoc has a georef
+            assertNotNull(aculcoLoc.getGeoref());
+
+            // check equivalency
+            assertTrue(aculcoLoc.getGeoref().getLat() == 20.51707);
+            assertTrue(aculcoLoc.getGeoref().getLon() == -100.21179);
+            assertTrue(aculcoLoc.getGeoref().getAlt() == 1920);
+
+            // test LocationDAO.getLocationDetails()
+            List<LocationDetails> locationDetails = manager.getLocationDetailsByLocId(aculcoLoc.getLocid(),0,Integer.MAX_VALUE);
+
+            locationDetails.get(0).getLongitude();
+            locationDetails.get(0).getLatitude();
+            locationDetails.get(0).getAltitude();
+
+            assertTrue(aculcoLoc.getGeoref().getLat().equals(locationDetails.get(0).getLatitude()) );
+            assertTrue(aculcoLoc.getGeoref().getLon().equals(locationDetails.get(0).getLongitude()) );
+            assertTrue(aculcoLoc.getGeoref().getAlt().equals(locationDetails.get(0).getAltitude()) );
+        }
+
+    }
+
 }
