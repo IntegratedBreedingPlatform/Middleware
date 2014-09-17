@@ -256,9 +256,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
                     Integer snl1id = (Integer) result[7];
                     Integer cntryid = (Integer) result[8];
                     Integer lrplce = (Integer) result[9];
-                    Double latitude = (Double) result[10];
-                    Double longitude = (Double) result[11];
-                    Double altitude = (Double) result[12];
+                    Double latitude = (Double) result[11];
+                    Double longitude = (Double) result[12];
+                    Double altitude = (Double) result[13];
                     
                     Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
                     Georef georef = new Georef();
