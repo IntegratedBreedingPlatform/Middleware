@@ -39,10 +39,10 @@
     
     <!-- Set the log levels -->
     <logger name="org.generationcp" level="TRACE"/>
-    <logger name="org.hibernate.cfg" level="INFO"/>
-    <logger name="org.hibernate.SQL" level="INFO"/>
+    <logger name="org.hibernate.cfg" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
     <logger name="org.hibernate.type" level="INFO"/>
-    <logger name="org.hibernate.cache" level="INFO"/>
-    <logger name="org.hibernate.transaction" level="INFO"/>
+    <logger name="org.hibernate.cache" level="DEBUG"/>
+    <logger name="org.hibernate.transaction" level="DEBUG"/>
     <logger name="org.springframework" level="WARN"/>
 </configuration>
