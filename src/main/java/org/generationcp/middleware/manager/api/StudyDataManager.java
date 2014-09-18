@@ -792,5 +792,14 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
 	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) throws MiddlewareQueryException;
-
+	
+	
+	/**
+	 * Determines the {@link StudyType} for study identified by the provided studyId.
+	 * 
+	 * @param studyId Identifier of the study to determine study type for.
+	 * @return {@link StudyType} of the study. Returns {@code null} if study type can not be determined for the given study.
+	 * @throws MiddlewareQueryException if any error occurs during data access.
+	 */
+	public StudyType getStudyType(int studyId) throws MiddlewareQueryException;
 }
