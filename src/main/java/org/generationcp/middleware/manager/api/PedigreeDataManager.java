@@ -90,6 +90,14 @@ public interface PedigreeDataManager{
     GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException;
 
     /**
+     *
+     * @param gid
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException;
+
+    /**
      * Returns the GermplasmPedigreeTree object which represents the derivative
      * neighborhood for the germplasm identified by the given gid. The
      * derivative neighborhood is created by tracing back the source parents

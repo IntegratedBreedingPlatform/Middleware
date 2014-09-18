@@ -62,6 +62,18 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException {
         return generatePedigreeTree(gid, level, false);
     }
+
+    @Override
+    public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
+        Map<String, Object> params = new LinkedHashMap<String, Object>();
+        params.put("central_db_name", centralDatabaseName);
+        params.put("v_gid", gid);
+        params.put("include_derivative", includeDerivativeLine);
+        return getGermplasmDao().
+                callStoredProcedureForObject("countMaxPedigreeLevel",
+                        params, Integer.class);
+    }
     
     @Override
     public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException {
@@ -522,6 +534,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * @return the given Germplasm list with its parents added to it
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasms, Germplasm currentGermplasm, int locationID) throws MiddlewareQueryException {
 		// get parents of node
         if (currentGermplasm.getGnpgs() == -1) {
