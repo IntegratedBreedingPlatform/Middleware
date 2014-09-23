@@ -173,6 +173,10 @@ public class VariableListTransformer extends Transformer {
 				if (trialData != null) {
 					String value = trialData.getValue();
 					Integer phenotypeId = trialData.getPhenotypeId();
+					
+                    if (trialData.getcValueId() != null) {
+                        value = trialData.getcValueId();
+                    }
 										
 					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT ||
 						varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {//include variate
