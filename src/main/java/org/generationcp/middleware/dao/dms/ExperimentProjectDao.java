@@ -83,15 +83,7 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 	@SuppressWarnings("unchecked")
 	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows) throws MiddlewareQueryException {
 		try {
-			/*
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.eq("projectId", projectId));
-			criteria.createAlias("experiment", "experiment").add(Restrictions.in("experiment.typeId", getIds(types)));
-			criteria.setMaxResults(numOfRows);
-			criteria.setFirstResult(start);
-			return criteria.list();
-			*/
-			
+
 			List <Integer> lists = new ArrayList<Integer>();
 			for (TermId termId : types) {
 				lists.add(termId.getId());
