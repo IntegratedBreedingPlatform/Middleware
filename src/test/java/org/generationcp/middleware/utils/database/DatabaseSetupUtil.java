@@ -26,6 +26,7 @@ import java.util.Properties;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,15 +36,23 @@ public class DatabaseSetupUtil{
 	
 	private static String SQL_SCRIPTS_FOLDER = "sql";
 	private static String START_SQL_SCRIPTS = "/start";
-	private static String END_SQL_SCRIPTS = "/end";
 		
 	private static String LOCAL_SCRIPT = "/local";
 	private static String CENTRAL_SCRIPT = "/central";
 	private static String WORKBENCH_SCRIPT = "/workbench";	
 	private static String MYSQL_PATH = "";
+	private static String TEST_DB_REQUIRED_PREFIX = "test_";
 		
-	@BeforeClass
-    public static void setUp() throws Exception{
+	@Test
+	public void testCreateDb() throws Exception{
+		Assert.assertTrue("Database should return true if the DB for local, central and workbench has a prefix 'test_'", DatabaseSetupUtil.startSqlScripts());
+	}
+	@Test
+	public void testDestroyDb() throws Exception{
+		Assert.assertTrue("Database should return true if the DB for local, central and workbench has a prefix 'test_'", DatabaseSetupUtil.endSqlScripts());
+	}
+	
+    private static void setUp() throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
 		localConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
 		centralConnectionParams = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
@@ -88,19 +97,35 @@ public class DatabaseSetupUtil{
 		return scriptsMap;
 	}
 	
-	@Test
-	public void startSqlScripts(){
+	private static boolean isTestDatabase(String dbName){
+		if(dbName != null && dbName.startsWith(TEST_DB_REQUIRED_PREFIX)){
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean startSqlScripts() throws Exception{
 		try {						
+			setUp();
 			Map<String, List<File>> scriptsMap = setupScripts(START_SQL_SCRIPTS);
-			
-			runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+centralConnectionParams.getDbName()+"`; USE `"+centralConnectionParams.getDbName()+"`;", centralConnectionParams);
-			runAllSetupScripts(scriptsMap.get(CENTRAL_SCRIPT), centralConnectionParams);
-
-			runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+localConnectionParameters.getDbName()+"`; USE `"+localConnectionParameters.getDbName()+"`;", localConnectionParameters);
-			runAllSetupScripts(scriptsMap.get(LOCAL_SCRIPT), localConnectionParameters);
-			
-			runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+workbenchConnectionParameters.getDbName()+"`; USE `"+workbenchConnectionParameters.getDbName()+"`;", workbenchConnectionParameters);
-			runAllSetupScripts(scriptsMap.get(WORKBENCH_SCRIPT), workbenchConnectionParameters);
+			if(isTestDatabase(centralConnectionParams.getDbName())){
+				runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+centralConnectionParams.getDbName()+"`; USE `"+centralConnectionParams.getDbName()+"`;", centralConnectionParams);
+				runAllSetupScripts(scriptsMap.get(CENTRAL_SCRIPT), centralConnectionParams);
+			}else{
+				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+			}
+			if(isTestDatabase(localConnectionParameters.getDbName())){
+				runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+localConnectionParameters.getDbName()+"`; USE `"+localConnectionParameters.getDbName()+"`;", localConnectionParameters);
+				runAllSetupScripts(scriptsMap.get(LOCAL_SCRIPT), localConnectionParameters);
+			}else{
+				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+			}
+			if(isTestDatabase(workbenchConnectionParameters.getDbName())){
+				runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+workbenchConnectionParameters.getDbName()+"`; USE `"+workbenchConnectionParameters.getDbName()+"`;", workbenchConnectionParameters);
+				runAllSetupScripts(scriptsMap.get(WORKBENCH_SCRIPT), workbenchConnectionParameters);
+			}else{
+				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -117,15 +142,27 @@ public class DatabaseSetupUtil{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		return true;
 	}
-	
-	@Test
-	public void endSqlScripts(){
+		
+	public static boolean endSqlScripts() throws Exception{
 		try {
-			runSQLCommand("DROP DATABASE IF EXISTS `"+localConnectionParameters.getDbName()+"`; ", localConnectionParameters);
-			runSQLCommand("DROP DATABASE IF EXISTS `"+centralConnectionParams.getDbName()+"`; ", centralConnectionParams);
-			runSQLCommand("DROP DATABASE IF EXISTS `"+workbenchConnectionParameters.getDbName()+"`; ", workbenchConnectionParameters);
+			setUp();
+			if(isTestDatabase(localConnectionParameters.getDbName())){
+				runSQLCommand("DROP DATABASE IF EXISTS `"+localConnectionParameters.getDbName()+"`; ", localConnectionParameters);
+			}else{
+				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+			}
+			if(isTestDatabase(centralConnectionParams.getDbName())){
+				runSQLCommand("DROP DATABASE IF EXISTS `"+centralConnectionParams.getDbName()+"`; ", centralConnectionParams);
+			}else{
+				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+			}
+			if(isTestDatabase(workbenchConnectionParameters.getDbName())){
+				runSQLCommand("DROP DATABASE IF EXISTS `"+workbenchConnectionParameters.getDbName()+"`; ", workbenchConnectionParameters);
+			}else{
+				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -138,26 +175,11 @@ public class DatabaseSetupUtil{
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		
+		}
+		return true;
 	} 
 	
-	public static void executeQuery(Connection connection, String query) throws SQLException {
-        Statement stmt = connection.createStatement();
-
-        try {
-            stmt.execute(query);
-        }
-        catch (SQLException e) {
-            throw e;
-        }
-        finally {
-            if (stmt != null) {
-                stmt.close();
-            }
-        }
-    }
-	
+		
 	private static void runAllSetupScripts(List<File> fileList, DatabaseConnectionParameters connectionParams){
 		
         try {        	
@@ -187,7 +209,7 @@ public class DatabaseSetupUtil{
                     //,"--execute=source " + sqlFile.getAbsoluteFile()
                   
             );
-            pb.redirectInput(ProcessBuilder.Redirect.from(sqlFile));
+            //pb.redirectInput(ProcessBuilder.Redirect.from(sqlFile));
         }
         else {
             pb = new ProcessBuilder(mysqlAbsolutePath
@@ -199,7 +221,7 @@ public class DatabaseSetupUtil{
                     ,"--database=" + connectionParams.getDbName()
                     //,"--execute=source " + sqlFile.getAbsoluteFile() 
             );
-            pb.redirectInput(ProcessBuilder.Redirect.from(sqlFile));
+           // pb.redirectInput(ProcessBuilder.Redirect.from(sqlFile));
         }
 
         Process mysqlProcess = pb.start();
