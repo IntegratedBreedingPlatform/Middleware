@@ -290,7 +290,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
     @Test
     public void testAddStandardVariableEnumeration() throws Exception {
         int standardVariableId = 22554;
-        String name = "8";
+        String name = "Name_" + new Random().nextInt(10000);
         String description = "Fully exserted";
         StandardVariable standardVariable = manager.getStandardVariable(standardVariableId);
         Enumeration validValue = new Enumeration(null, name, description, 1);
@@ -314,7 +314,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
     public void testUpdateStandardVariableEnumeration() throws Exception {
         // Case 1: NEW VALID VALUE
         int standardVariableId = 22554;
-        String name = "8";
+        String name = "Name_" + new Random().nextInt(10000);
         String description = "Fully exserted";
         StandardVariable standardVariable = manager.getStandardVariable(standardVariableId);
         Enumeration validValue = new Enumeration(null, name, description, 1);
