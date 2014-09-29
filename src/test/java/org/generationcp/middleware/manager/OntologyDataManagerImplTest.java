@@ -46,6 +46,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
+import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -61,14 +62,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 @SuppressWarnings("unused")
-public class OntologyDataManagerImplTest extends DataManagerIntegrationTest {
+public class OntologyDataManagerImplTest extends DataManagerIntegrationTest implements OntologyDataManagerImplTestConstants {
 
-    private static final Integer CV_TERM_ID = 1010;
-    private static final String CV_TERM_NAME = "Study Information";
-    private static final Integer STD_VARIABLE_ID = 8350; // 8310; 
-    
-    private static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
-	
 	private static OntologyDataManager manager;
 
 	@BeforeClass
@@ -460,15 +455,15 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest {
 		Debug.println(INDENT, "Test findMethodByName");
 		
 		// term doesn't exist
-		Term term = manager.findMethodByName("foo bar");
+		Term term = manager.findMethodByName(TERM_NAME_NOT_EXISTING);
 		assertNull(term);
 		
 		// term exist but isn't a method
-		term = manager.findMethodByName("PANH");
+		term = manager.findMethodByName(TERM_NAME_NOT_METHOD);
 		assertNull(term);
 		
 		// term does exist in central
-		term = manager.findMethodByName("Vegetative Stage");
+		term = manager.findMethodByName(TERM_NAME_IN_CENTRAL);
 		assertNotNull(term);
 		term.print(INDENT);
 		Debug.println(INDENT, "");
