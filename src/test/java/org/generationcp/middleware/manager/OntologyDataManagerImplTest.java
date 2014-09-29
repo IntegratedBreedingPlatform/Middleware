@@ -387,7 +387,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Integer methodId = Integer.valueOf(4030);
 		
 		Integer varid = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
-		assertNotNull(varid);
+		assertNotNull (varid);
 		Debug.println(INDENT, "testGetStandadardVariableIdByPropertyScaleMethod() Results: " + varid);
 	}*/
 	
@@ -625,15 +625,15 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	@Test
 	public void testFindTermByName() throws Exception {
 		// term doesn't exist
-		Term term = manager.findTermByName("foo bar", CvId.METHODS);
+		Term term = manager.findTermByName(TERM_NAME_NOT_EXISTING, CvId.METHODS);
 		assertNull(term);
 		
 		// term exist but isn't a method
-		term = manager.findTermByName("PANH", CvId.METHODS);
+		term = manager.findTermByName(TERM_NAME_NOT_METHOD, CvId.METHODS);
 		assertNull(term);
 		
 		// term does exist in central
-		term = manager.findTermByName("Vegetative Stage", CvId.METHODS);
+		term = manager.findTermByName(TERM_NAME_IN_CENTRAL, CvId.METHODS);
 		assertNotNull(term);
 		term.print(INDENT);
 		Debug.println(INDENT, "");
