@@ -25,10 +25,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.NameSynonym;
-import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
@@ -42,20 +39,12 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -687,21 +676,23 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	@Test
 	public void testFindTermsByNameOrSynonym() throws Exception {
 		// term doesn't exist
-		List<Term> terms = manager.findTermsByNameOrSynonym("foo bar", CvId.METHODS);
+		List<Term> terms = manager.findTermsByNameOrSynonym(TERM_NAME_NOT_EXISTING, CvId.METHODS);
 		assertSame(terms.size(), 0);
 		
 		// term exist but isn't a method
-		terms = manager.findTermsByNameOrSynonym("PANH", CvId.METHODS);
+		terms = manager.findTermsByNameOrSynonym(TERM_NAME_NOT_METHOD, CvId.METHODS);
 		assertSame(terms.size(), 0);
 		
 		// term does exist in central
-		terms = manager.findTermsByNameOrSynonym("Vegetative Stage", CvId.METHODS);
+		terms = manager.findTermsByNameOrSynonym(TERM_NAME_IN_CENTRAL, CvId.METHODS);
 		assertNotNull(terms);
+        assertTrue(!terms.isEmpty());
+
 		terms.get(0).print(INDENT);
 		Debug.println(INDENT, "");
 		
 		// name is in synonyms
-		terms = manager.findTermsByNameOrSynonym("Accession Name", CvId.VARIABLES);
+		terms = manager.findTermsByNameOrSynonym(TERM_NAME_IS_IN_SYNONYMS, CvId.VARIABLES);
 		assertNotNull(terms);
 		terms.get(0).print(INDENT);
 		Debug.println(INDENT, "");
@@ -827,12 +818,12 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
     @Test
     public void testGetStandardVariablesByMethod() throws MiddlewareQueryException {
-        List<StandardVariable> vars = manager.getStandardVariables(null, null, Integer.valueOf(20643), null);
+        List<StandardVariable> vars = manager.getStandardVariables(null, null,OntologyDataManagerImplTestConstants.NONEXISTING_STANDARD_VARIABLE, null);
         
         assertFalse(vars.isEmpty());
         
         StandardVariable expectedVar = new StandardVariable();
-        expectedVar.setId(20954);
+        expectedVar.setId(EXPECTED_STANDARD_VARIABLE);
         assertTrue(vars.contains(expectedVar));
         
         for (StandardVariable var : vars){
@@ -842,12 +833,12 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
     @Test
     public void testGetStandardVariablesByScale() throws MiddlewareQueryException {
-        List<StandardVariable> vars = manager.getStandardVariables(null, null, null, Integer.valueOf(20392));
+        List<StandardVariable> vars = manager.getStandardVariables(null, null, null,NONEXISTING_STANDARD_VARIABLE);
         
         assertFalse(vars.isEmpty());
         
         StandardVariable expectedVar = new StandardVariable();
-        expectedVar.setId(20953);
+        expectedVar.setId(EXPECTED_STANDARD_VARIABLE);
         assertTrue(vars.contains(expectedVar));
        
         for (StandardVariable var : vars){
@@ -855,7 +846,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
         }
     }
 
-	
+
     @Test
     public void testAddOrUpdateTermAndRelationshipFoundInCentral() throws Exception {
         String name = "Season";
