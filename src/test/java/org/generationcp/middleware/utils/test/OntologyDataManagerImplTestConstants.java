@@ -8,26 +8,40 @@ public interface OntologyDataManagerImplTestConstants {
 
     // this should not exist in the db
     public static String TERM_NAME_NOT_EXISTING = "foo bar";
+    public static int TERM_ID_NOT_EXISTING = 999999;
 
     // term exists but not a method
     public static String TERM_NAME_NOT_METHOD = "PANH";
+    public static int TERM_ID_NOT_METHOD = 22066;
 
     // term does exist in central
     public static String TERM_NAME_IN_CENTRAL = "Vegetative Stage";
+    public static int TERM_ID_IN_CENTRAL = 20732;
 
     // term name is in synonyms
     public static String TERM_NAME_IS_IN_SYNONYMS = "Accession Name";
 
-    // this Standard Variables (ids) should exist in the Database
-    public static int NONEXISTING_STANDARD_VARIABLE = 20643;
-    public static int EXPECTED_STANDARD_VARIABLE = 20954;
+    public static String TERM_SYNONYM = "THR";
 
+    // PSMT ID's
+    public static int NONEXISTING_TERM_PROPERTY_ID = 20109;
+    public static int EXPECTED_TERM_PROPERTY_ID = 20961;
+
+    public static int NONEXISTING_TERM_SCALE_ID = 20392;
+    public static int EXPECTED_TERM_SCALE_ID = 20953;
+
+    public static int NONEXISTING_TERM_METHOD_ID = 20643;
+    public static int EXPECTED_TERM_METHOD_ID = 20954;
+
+    public static int NONEXISTING_TERM_TRAIT_CLASS_ID = 1410;
+    public static int EXPECTED_TERM_TRAIT_CLASS_ID = 21744;
 
     /* OLD constants used by the tests */
     public static final Integer CV_TERM_ID = 1010;
     public static final String CV_TERM_NAME = "Study Information";
     public static final Integer STD_VARIABLE_ID = 8350; // 8310;
     public static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
+
 
 
 }
