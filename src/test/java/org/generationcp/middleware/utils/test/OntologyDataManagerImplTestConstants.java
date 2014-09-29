@@ -41,7 +41,7 @@ public interface OntologyDataManagerImplTestConstants {
     public static final String CV_TERM_NAME = "Study Information";
     public static final Integer STD_VARIABLE_ID = 8350; // 8310;
     public static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
-
+    public static final int OBJECT_ID = 1340;
 
 
 }

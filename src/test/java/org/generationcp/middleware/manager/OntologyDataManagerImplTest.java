@@ -127,7 +127,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		myOwnScale.setDefinition(myOwnScale.getName() + " - Description.");
 		myOwnPlantHeight.setScale(myOwnScale);
 		
-		myOwnPlantHeight.setIsA(new Term(1340, "Agronomic", "Agronomic"));
+		myOwnPlantHeight.setIsA(new Term(OBJECT_ID, "Agronomic", "Agronomic"));
 		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
 		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
 		
@@ -852,7 +852,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
         String name = "Season";
         String definition = "Growing Season " + (int) (Math.random() * 100); // add random number to see the update
         try{
-            manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340, null);
+            manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), OBJECT_ID, null);
         } catch (MiddlewareException e){
             Debug.println(INDENT, "MiddlewareException expected: \"" + e.getMessage() + "\"");
             assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
@@ -865,7 +865,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
         String name = "Study condition NEW";
         String definition = "Study condition NEW class " + (int) (Math.random() * 100); // add random number to see the update
         Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
-        Term newTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340, null);
+        Term newTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), OBJECT_ID, null);
         Debug.println(INDENT, "Original:  " + origTerm);
         Debug.println(INDENT, "Updated :  " + newTerm);
         
@@ -880,7 +880,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
         String definition = "Land slope " + (int) (Math.random() * 100); // add random number to see the update
         Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
         try{
-            manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
+            manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), OBJECT_ID);
         } catch (MiddlewareException e){
             Debug.println(INDENT, "MiddlewareException expected: \"" + e.getMessage() + "\"");
             assertTrue(e.getMessage().contains("Cannot update terms in central"));
@@ -894,10 +894,10 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
         Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
         if (origTerm == null){ // first run, add before update
-            origTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340, null);
+            origTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), OBJECT_ID, null);
         }
 
-        manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
+        manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), OBJECT_ID);
         Term newTerm = manager.findTermByName(name, CvId.PROPERTIES);
         Debug.println(INDENT, "Original:  " + origTerm);
         Debug.println(INDENT, "Updated :  " + newTerm);
