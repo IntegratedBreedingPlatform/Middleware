@@ -18,7 +18,7 @@ public class BreedersQueryDao {
 	private Session session;
 	
 	public BreedersQueryDao(Session session) {
-		assert this.session != null : "Hibernate session is required to instantiare BreedersQueryDao.";
+		assert session != null : "Hibernate session is required to instantiare BreedersQueryDao.";
 		this.session = session;
 	}
 	
