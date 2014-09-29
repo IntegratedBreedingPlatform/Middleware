@@ -15,26 +15,26 @@ public interface OntologyDataManagerImplTestConstants {
     public static int TERM_ID_NOT_METHOD = 22066;
 
     // term does exist in central
-    public static String TERM_NAME_IN_CENTRAL = "Vegetative Stage";
-    public static int TERM_ID_IN_CENTRAL = 20732;
+    public static String TERM_NAME_IN_CENTRAL = "Applied";
+    public static int TERM_ID_IN_CENTRAL = 4020;
 
     // term name is in synonyms
-    public static String TERM_NAME_IS_IN_SYNONYMS = "Accession Name";
+    public static String TERM_NAME_IS_IN_SYNONYMS = "NREP";
 
-    public static String TERM_SYNONYM = "THR";
+    public static String TERM_SYNONYM = "nblocks";
 
     // PSMT ID's
     public static int NONEXISTING_TERM_PROPERTY_ID = 20109;
-    public static int EXPECTED_TERM_PROPERTY_ID = 20961;
+    public static int EXPECTED_TERM_PROPERTY_ID = 20002;
 
     public static int NONEXISTING_TERM_SCALE_ID = 20392;
-    public static int EXPECTED_TERM_SCALE_ID = 20953;
+    public static int EXPECTED_TERM_SCALE_ID = 6015;
 
     public static int NONEXISTING_TERM_METHOD_ID = 20643;
-    public static int EXPECTED_TERM_METHOD_ID = 20954;
+    public static int EXPECTED_TERM_METHOD_ID = 4020;
 
-    public static int NONEXISTING_TERM_TRAIT_CLASS_ID = 1410;
-    public static int EXPECTED_TERM_TRAIT_CLASS_ID = 21744;
+    public static int NONEXISTING_TERM_TRAIT_CLASS_ID = 21744;
+    public static int EXPECTED_TERM_TRAIT_CLASS_ID = 1410;
 
     /* OLD constants used by the tests */
     public static final Integer CV_TERM_ID = 1010;
@@ -43,5 +43,7 @@ public interface OntologyDataManagerImplTestConstants {
     public static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
     public static final int OBJECT_ID = 1340;
 
+    public static final Integer CATEGORICAL_VARIABLE_TERM_ID = 8371;
+    public static final Integer CROP_SESCND_VALID_VALUE_FROM_CENTRAL = 10290;
 
 }
