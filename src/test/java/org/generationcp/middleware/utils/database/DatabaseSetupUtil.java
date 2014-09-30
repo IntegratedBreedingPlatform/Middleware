@@ -1,21 +1,13 @@
 package org.generationcp.middleware.utils.database;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +19,6 @@ import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DatabaseSetupUtil{
@@ -66,17 +57,15 @@ public class DatabaseSetupUtil{
     }
 	
 	private static Map<String, List<File>> setupScripts(String sqlFolderPrefix) throws FileNotFoundException, URISyntaxException{
-		Map<String, List<File>> scriptsMap = new HashMap<String, List<File>>();
-		scriptsMap.put(CENTRAL_SCRIPT, new ArrayList());
+		Map<String, List<File>> scriptsMap = new HashMap<String, List<File>>();		
 		
-		scriptsMap.put(WORKBENCH_SCRIPT, new ArrayList());
 		try{
 			File centralFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+sqlFolderPrefix+CENTRAL_SCRIPT).toURI());
 			if(centralFile != null && centralFile.isDirectory()){
 				scriptsMap.put(CENTRAL_SCRIPT, Arrays.asList(centralFile.listFiles()));	
 			}
 		}catch(FileNotFoundException e){
-			scriptsMap.put(CENTRAL_SCRIPT, new ArrayList());
+			scriptsMap.put(CENTRAL_SCRIPT, new ArrayList<File>());
 		}
 		try{
 			File localFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+sqlFolderPrefix+LOCAL_SCRIPT).toURI());
@@ -84,7 +73,7 @@ public class DatabaseSetupUtil{
 				scriptsMap.put(LOCAL_SCRIPT,  Arrays.asList(localFile.listFiles()));	
 			}
 		}catch(FileNotFoundException e){
-			scriptsMap.put(LOCAL_SCRIPT, new ArrayList());
+			scriptsMap.put(LOCAL_SCRIPT, new ArrayList<File>());
 		}
 		try{
 			File wbFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+sqlFolderPrefix+WORKBENCH_SCRIPT).toURI());
@@ -92,7 +81,7 @@ public class DatabaseSetupUtil{
 				scriptsMap.put(WORKBENCH_SCRIPT,  Arrays.asList(wbFile.listFiles()));	
 			}
 		}catch(FileNotFoundException e){
-			scriptsMap.put(WORKBENCH_SCRIPT, new ArrayList());
+			scriptsMap.put(WORKBENCH_SCRIPT, new ArrayList<File>());
 		}		
 		return scriptsMap;
 	}
@@ -127,20 +116,20 @@ public class DatabaseSetupUtil{
 				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (ConfigException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
@@ -164,35 +153,29 @@ public class DatabaseSetupUtil{
 				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (ConfigException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 		return true;
 	} 
 	
 		
-	private static void runAllSetupScripts(List<File> fileList, DatabaseConnectionParameters connectionParams){
-		
-        try {        	
-        	if(fileList != null && !fileList.isEmpty()){        	        		
-        		for(int index = 0 ; index < fileList.size() ; index++){
-        			File sqlFile = fileList.get(index);
-        			runScriptFromFile(sqlFile, connectionParams);
-        		}        		
-        	}
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-		//
+	private static void runAllSetupScripts(List<File> fileList, DatabaseConnectionParameters connectionParams) throws Exception{		          
+    	if(fileList != null && !fileList.isEmpty()){        	        		
+    		for(int index = 0 ; index < fileList.size() ; index++){
+    			File sqlFile = fileList.get(index);
+    			runScriptFromFile(sqlFile, connectionParams);
+    		}        		
+    	}       
 	}
 	
 	private static boolean runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
@@ -200,16 +183,15 @@ public class DatabaseSetupUtil{
         String mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
        
         if (connectionParams.getPassword() == null || connectionParams.getPassword().equalsIgnoreCase("")) {
+              
             pb = new ProcessBuilder(mysqlAbsolutePath
-                    ,"--host=" + connectionParams.getHost()
+            		,"--host=" + connectionParams.getHost()
                     ,"--port=" + connectionParams.getPort()
                     ,"--user=" + connectionParams.getUsername()
                     ,"--default-character-set=utf8"
-                    ,"--database=" + connectionParams.getDbName()
-                    //,"--execute=source " + sqlFile.getAbsoluteFile()
-                  
+                    ,connectionParams.getDbName()
+                    ,"--execute=source " + sqlFile.getAbsoluteFile()
             );
-            //pb.redirectInput(ProcessBuilder.Redirect.from(sqlFile));
         }
         else {
             pb = new ProcessBuilder(mysqlAbsolutePath
@@ -218,13 +200,12 @@ public class DatabaseSetupUtil{
                      ,"--user=" + connectionParams.getUsername()
                     , "--password=" + connectionParams.getPassword()
                     ,"--default-character-set=utf8"
-                    ,"--database=" + connectionParams.getDbName()
-                    //,"--execute=source " + sqlFile.getAbsoluteFile() 
+                    ,connectionParams.getDbName()
+                    ,"--execute=source " + sqlFile.getAbsoluteFile()                     
             );
-           // pb.redirectInput(ProcessBuilder.Redirect.from(sqlFile));
         }
 
-        Process mysqlProcess = pb.start();
+        Process mysqlProcess = pb.start();        
         readProcessInputAndErrorStream(mysqlProcess);
         int exitValue = mysqlProcess.waitFor();        
         if (exitValue != 0) {
@@ -271,34 +252,30 @@ public class DatabaseSetupUtil{
         return true;
     }
 	 private static String readProcessInputAndErrorStream(Process process) throws IOException {
-	    	/* Added while loop to get input stream because process.waitFor() has a problem
-	         * Reference: 
-	         * http://stackoverflow.com/questions/5483830/process-waitfor-never-returns
-	         */
-	        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-	        String line = null;
-	        while ( (line = reader.readLine()) != null) {
-	            //System.out.println(line);
-	        }
-	        reader.close();
-	        /* When the process writes to stderr the output goes to a fixed-size buffer. 
-	         * If the buffer fills up then the process blocks until the buffer gets emptied. 
-	         * So if the buffer doesn't empty then the process will hang.
-	         * http://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process
-	         */
-	        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-	        StringBuilder errorOut = new StringBuilder();
-	        while ((line = errorReader.readLine()) != null) {
-	            errorOut.append(line);
-	            //    System.err.println(line);
-	        }
+    	/* Added while loop to get input stream because process.waitFor() has a problem
+         * Reference: 
+         * http://stackoverflow.com/questions/5483830/process-waitfor-never-returns
+         */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line = null;
+        while ( (line = reader.readLine()) != null) {
+            //System.out.println(line);
+        }
+        reader.close();
+        /* When the process writes to stderr the output goes to a fixed-size buffer. 
+         * If the buffer fills up then the process blocks until the buffer gets emptied. 
+         * So if the buffer doesn't empty then the process will hang.
+         * http://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process
+         */
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        StringBuilder errorOut = new StringBuilder();
+        while ((line = errorReader.readLine()) != null) {
+            errorOut.append(line);
+            //    System.err.println(line);
+        }
 
-	        errorReader.close();
+        errorReader.close();
 
-	        return errorOut.toString();
-	    }
-	 
-
-
-		
+        return errorOut.toString();
+    }	 
 }
