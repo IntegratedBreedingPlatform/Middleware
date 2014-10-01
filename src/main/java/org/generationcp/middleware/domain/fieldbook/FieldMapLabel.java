@@ -393,7 +393,10 @@ public class FieldMapLabel implements Serializable{
     
 
     public String getPlotCoordinate() {
-		return "Col " + getColumn() + " Range " + getRange();
+    	if (getColumn() != null && getRange() != null) {
+    		return "Col " + getColumn() + " Range " + getRange();
+    	} 
+    	return "";
 	}
 
 	public void setPlotCoordinate(String plotCoordinate) {

@@ -1214,10 +1214,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
     					if (dataset.getTrialInstances() != null) {
     						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-                            	if (blockInfo == null && trial.getBlockId() != null) {
+                            	if (trial.getBlockId() != null) {
                             		blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
+                            		trial.updateBlockInformation(blockInfo);
                             	}
-    							trial.updateBlockInformation(blockInfo);
     							if (isGetLocation) {
 	    							trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
                                     trial.setSiteName(trial.getLocationName());

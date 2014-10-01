@@ -486,6 +486,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         trialInstance.setSiteName(siteName);
         trialInstance.setLocationName(siteName);
         trialInstance.setLocationId(siteId);
+        trialInstance.setBlockId(blockId);
         trialInstance.setTrialInstanceNo(trialInstanceNo);
         /*
         trialInstance.setBlockName(blockName);
