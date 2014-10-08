@@ -11,16 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.NameSynonym;
@@ -43,6 +33,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.*;
 
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -67,6 +60,25 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return saveDataset(workbook, false, false);
     }
 
+	/**
+	 * Transaction 1 : Transform Variables and save new Ontology Terms
+	 *  Send : xls workbook
+	 *   Return : Map of 3 sub maps with transformed variables (ontology fully loaded) - here is how it was loaded :
+	 *    -- headers : Strings
+	 *        //         headerMap.put("trialHeaders", trialHeaders);
+	 *        // -- variableTypeLists (VariableTypeList)
+	 *        //          variableTypeMap.put("trialVariableTypeList", trialVariableTypeList);
+	 *        //          variableTypeMap.put("trialVariables", trialVariables);
+	 *        //          variableTypeMap.put("effectVariables", effectVariables);
+	 *        // -- measurementVariables (List<MeasurementVariable>)
+	 *        //          measurementVariableMap.put("trialMV", trialMV);
+	 *        //          measurementVariableMap.put("effectMV", effectMV);
+	 * @param workbook
+	 * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
+	 * @param isDeleteObservations
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
     @SuppressWarnings("unchecked")
     @Override
     public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException {
@@ -75,19 +87,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         Transaction trans = null;
         Map<String, ?> variableMap = null;
         TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", LOG);
-
-        // Transaction 1 : Transform Variables and save new Ontology Terms
-        // Send : xls workbook
-        // Return : Map of 3 sub maps with transformed variables (ontology fully loaded) - here is how it was loaded :
-        // -- headers : Strings
-        //         headerMap.put("trialHeaders", trialHeaders);
-        // -- variableTypeLists (VariableTypeList)
-        //          variableTypeMap.put("trialVariableTypeList", trialVariableTypeList);
-        //          variableTypeMap.put("trialVariables", trialVariables);
-        //          variableTypeMap.put("effectVariables", effectVariables);
-        // -- measurementVariables (List<MeasurementVariable>)
-        //          measurementVariableMap.put("trialMV", trialMV);
-        //          measurementVariableMap.put("effectMV", effectMV);
 
         try {
 

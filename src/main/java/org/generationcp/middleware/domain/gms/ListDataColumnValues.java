@@ -1,8 +1,8 @@
 package org.generationcp.middleware.domain.gms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 public class ListDataColumnValues implements Serializable {
 

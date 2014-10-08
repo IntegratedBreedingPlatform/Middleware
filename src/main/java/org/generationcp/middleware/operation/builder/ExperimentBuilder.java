@@ -11,30 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.ExperimentStock;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.pojos.dms.*;
+
+import java.util.*;
 
 public class ExperimentBuilder extends Builder {
 
@@ -74,7 +57,6 @@ public class ExperimentBuilder extends Builder {
 	}
 	
 	private Map<Integer, StockModel> getStockModelMap(List<ExperimentProject> experimentProjects)  throws MiddlewareQueryException{
-		//TimerWatch watch = new TimerWatch("Build experiments");
 		Map<Integer, StockModel> stockModelMap = new HashMap<Integer, StockModel>();
 		List<Integer> stockIds = new ArrayList<Integer>();
 		for (ExperimentProject experimentProject  : experimentProjects) {
@@ -83,7 +65,7 @@ public class ExperimentBuilder extends Builder {
 				stockIds.add(experimentStocks.get(0).getStock().getStockId());
 		}
 		stockModelMap = getStockBuilder().get(stockIds);
-		//watch.stop();
+
 		return stockModelMap;
 	}
 	
@@ -92,16 +74,15 @@ public class ExperimentBuilder extends Builder {
 		
 		if (setWorkingDatabase(projectId)) {
 			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
-			//watch.stop();
-			//System.out.println("experimentProjects.size() = " + experimentProjects.size());
+
 			//daniel
 			//to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 			Map<Integer, StockModel> stockModelMap = getStockModelMap(experimentProjects);
-			//TimerWatch watch1 = new TimerWatch("Create experiments");
+
 			for (ExperimentProject experimentProject : experimentProjects) {
 				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
 			}
-			//watch1.stop();
+
 		}
 		return experiments;
 	}

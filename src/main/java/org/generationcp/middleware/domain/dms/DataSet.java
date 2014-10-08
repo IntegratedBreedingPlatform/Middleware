@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import org.generationcp.middleware.util.Debug;
 
 /** 
  * Contains the details of a dataset.

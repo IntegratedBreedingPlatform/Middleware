@@ -11,16 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -31,12 +21,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -48,6 +33,8 @@ import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Implementation of the InventoryDataManager interface.
@@ -682,12 +669,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
 			Integer listId) throws MiddlewareQueryException {
 		
-		// Get gids from listdata (from db instance based on listId):
-		// SELECT * FROM listdata WHERE listid = :listId;
+
 		setWorkingDatabase(listId);
 		
-		// Get sourceName from listnms (from db instance based on listId):
-		// SELECT listname FROM listnms WHERE listid = :listId;
 		GermplasmList germplasmList = getGermplasmListDAO().getById(listId);
 		List<GermplasmListData> listData = null;
 		
@@ -716,26 +700,10 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			}
 		}
 
-		// Get from ims_lot and ims_transaction (local):
-		// SELECT lot.lotid, lot.userid, lot.eid as gid, lot.locid, lot.scaleid,
-		// tran.sourceid, tran.amount
-		// FROM ims_lot lot
-		// JOIN ims_transaction tran ON lot.lotid = tran.lotid
-		// WHERE lot.status = 0 AND lot.eid in (:gids) ;
+
 
 		setWorkingDatabase(Database.LOCAL);
 		List<InventoryDetails> inventoryDetails = getTransactionDao().getInventoryDetailsByGids(gids);
-		
-		// Get location name, user name, scale name of inventory details from the databases
-		
-			// Get locationName from location (from db instance based on locationId):
-			// SELECT lname FROM location WHERE locid = :locationId;
-			
-			// Get userName from users (from db instance based on userId):
-			// SELECT uname FROM users where userid = :userId;
-			
-			// Get scaleName from cvterm (from db instance based on scaleId):
-			// SELECT name FROM cvterm where cvterm_id = scaleId;
 		
 		Set<Integer> centralLocationIds = new HashSet<Integer>();
 		Set<Integer> centralUserIds = new HashSet<Integer>();
@@ -848,32 +816,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
 			throws MiddlewareQueryException {
 
-		// Get germplasmName from names (both local and central);
-		// SELECT gid, nval FROM names WHERE gid IN (:gids);
-		
-		List<Name> gidNames = super.getAllFromCentralAndLocalByMethod(getNameDao(), 
+		List<Name> gidNames = super.getAllFromCentralAndLocalByMethod(getNameDao(),
 									"getNamesByGids", new Object[]{gids}, new Class[]{List.class});
-
-		// Get from ims_lot and ims_transaction (local):
-		// SELECT lot.lotid, lot.userid, lot.eid as gid, lot.locid, lot.scaleid,
-		// tran.sourceid, tran.amount
-		// FROM ims_lot lot
-		// JOIN ims_transaction tran ON lot.lotid = tran.lotid
-		// WHERE lot.status = 0 AND lot.eid in (:gids) ;
 
 		setWorkingDatabase(Database.LOCAL);
 		List<InventoryDetails> inventoryDetails = getTransactionDao().getInventoryDetailsByGids(gids);
-		
-		// Get location name, user name, scale name of inventory details from the databases
-		
-			// Get locationName from location (from db instance based on locationId):
-			// SELECT lname FROM location WHERE locid = :locationId;
-			
-			// Get userName from users (from db instance based on userId):
-			// SELECT uname FROM users where userid = :userId;
-			
-			// Get scaleName from cvterm (from db instance based on scaleId):
-			// SELECT name FROM cvterm where cvterm_id = scaleId;
 		
 		Set<Integer> centralLocationIds = new HashSet<Integer>();
 		Set<Integer> centralUserIds = new HashSet<Integer>();

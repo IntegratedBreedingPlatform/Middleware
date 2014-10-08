@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /** 
  * Contains the min and max constraints of a variable.

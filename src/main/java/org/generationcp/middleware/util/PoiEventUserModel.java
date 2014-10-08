@@ -11,16 +11,14 @@
  *
  *******************************************************************************/
 package org.generationcp.middleware.util;
-import java.io.InputStream;
-import org.apache.poi.xssf.eventusermodel.XSSFReader;
+
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import java.io.InputStream;
 
 public class PoiEventUserModel {
 	

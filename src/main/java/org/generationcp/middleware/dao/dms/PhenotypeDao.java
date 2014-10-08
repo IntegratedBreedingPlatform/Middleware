@@ -11,23 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
-import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
-import org.generationcp.middleware.domain.h2h.CategoricalValue;
-import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
-import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
-import org.generationcp.middleware.domain.h2h.Observation;
-import org.generationcp.middleware.domain.h2h.ObservationKey;
-import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.domain.h2h.TraitObservation;
+import org.generationcp.middleware.domain.h2h.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -39,6 +25,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * DAO class for {@link Phenotype}.

@@ -12,25 +12,14 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
-import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
-import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
-import org.generationcp.middleware.domain.h2h.Observation;
-import org.generationcp.middleware.domain.h2h.ObservationKey;
-import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.domain.h2h.TraitObservation;
+import org.generationcp.middleware.domain.h2h.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+
+import java.util.*;
 
 public class TraitBuilder extends Builder{
 

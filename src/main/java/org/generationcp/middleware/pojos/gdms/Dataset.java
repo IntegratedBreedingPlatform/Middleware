@@ -11,14 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * POJO for dataset table.

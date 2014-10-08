@@ -1,7 +1,5 @@
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.gms.ListDataColumn;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -10,6 +8,8 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import java.util.List;
 
 public class ListDataPropertySaver extends Saver {
 

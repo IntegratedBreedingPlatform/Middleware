@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.gms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
 import java.util.List;
-
-import org.generationcp.middleware.util.Debug;
 
 /**
  * Data Transfer Object for specifying properties (columns) for

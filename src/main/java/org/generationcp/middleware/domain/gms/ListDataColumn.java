@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.gms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Data Transfer Object for ListDataProperty POJO

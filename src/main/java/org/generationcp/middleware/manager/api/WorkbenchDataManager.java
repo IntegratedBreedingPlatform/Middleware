@@ -11,16 +11,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.*;
+
+import java.util.List;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project

@@ -546,19 +546,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		builder.append("]");
 		return builder.toString();
 	}
-/*
+
 	@Override
 	public int compareTo(InventoryDetails o) {
         if (this.gid != null && o != null) {
-            return this.getGermplasmName().compareTo(o.getGermplasmName());
-        }
-        return 0;
-	}
-*/
-	@Override
-	public int compareTo(InventoryDetails o) {
-        if (this.gid != null && o != null) {
-            //return this.getGermplasmName().compareTo(o.getGermplasmName());
+
         	return this.entryId.compareTo(o.entryId);
         }
         return 0;

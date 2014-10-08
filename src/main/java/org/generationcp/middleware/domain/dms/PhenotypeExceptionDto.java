@@ -1,8 +1,8 @@
 package org.generationcp.middleware.domain.dms;
 
-import java.util.Set;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.util.Set;
 
 public class PhenotypeExceptionDto {
 	

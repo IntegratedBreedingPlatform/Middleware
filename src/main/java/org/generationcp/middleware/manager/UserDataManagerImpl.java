@@ -11,10 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
@@ -28,6 +24,10 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implementation of the UserDataManager interface. To instantiate this

@@ -11,11 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
  * Contains the details of a trial environment - id and variables.

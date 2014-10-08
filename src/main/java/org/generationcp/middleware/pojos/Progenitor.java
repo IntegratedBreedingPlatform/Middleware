@@ -11,13 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 /**
  * POJO for progntrs table.
@@ -36,12 +31,6 @@ public class Progenitor implements Serializable{
     @Basic(optional = false)
     @Column(name = "pid")
     private Integer pid;
-
-    /*
-     * @ManyToOne(targetEntity = Germplasm.class)
-     * @JoinColumn(name = "gid", nullable = false, insertable=false,
-     *                  updatable=false) private Germplasm germplasm;
-     **/
 
     public Progenitor() {
     }

@@ -11,18 +11,13 @@
   *******************************************************************************/
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * POJO for location details query.
@@ -95,11 +90,6 @@ public class LocationDetails implements Serializable,
     @Column(name = "altitude")
     private Double altitude;
 
-    /*
-     * @OneToMany(mappedBy = "location") private Set<Locdes> descriptions = new
-     * HashSet<Locdes>();
-     */
-
     public LocationDetails() {
     }
 
@@ -119,12 +109,6 @@ public class LocationDetails implements Serializable,
         this.location_description = location_description;
 
     }
-
-    /*
-     * public Set<Locdes> getDescriptions() { return descriptions; } public void
-     * setDescriptions(Set<Locdes> descriptions) { this.descriptions =
-     * descriptions; }
-     */
 
     @Override
     public int hashCode() {

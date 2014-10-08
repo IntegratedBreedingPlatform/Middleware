@@ -11,17 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.*;
 
 
 public class Workbook {
@@ -398,10 +394,6 @@ public class Workbook {
         return variableList;
     }
 	
-//	public List<MeasurementVariable> getTrialFactors() {
-//		return getVariables(conditions, false);
-//	}
-
     public boolean isCheckFactorAddedOnly() {
         return isCheckFactorAddedOnly;
     }

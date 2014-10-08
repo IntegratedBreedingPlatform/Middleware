@@ -11,14 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -30,6 +22,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * DAO class for {@link Qtl}.
@@ -453,12 +448,6 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
  	   Map<Integer, String> qtlNames = new HashMap<Integer, String>();
  	   
        try {
-           /*
-               SELECT DISTINCT qtl_id, qtl_name 
-               FROM gdms_qtl 
-               WHERE qtl_id IN (:qtlIds);
-            */
-
            StringBuilder sqlString = new StringBuilder()
            .append("SELECT DISTINCT qtl_id, CONCAT(qtl_name, '')  ")
            .append("FROM gdms_qtl  ")

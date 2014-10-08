@@ -11,35 +11,22 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.oms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.PropertyReference;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * DAO class for {@link CVTerm}.
@@ -830,14 +817,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
         
         try {
-            /*
-             SELECT cvterm_id, name, definition, cvr.object_id
-             FROM cvterm cvt JOIN cvterm_relationship cvr 
-                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225
-                 WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)
-                 ORDER BY cvr.object_id;
-            */ 
-
             StringBuffer sqlString = new StringBuffer()
                 .append("SELECT cvterm_id, name, definition, cvr.object_id ")
                 .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
@@ -892,13 +871,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         Collections.sort(traitClassIds);   
         
         try {
-            /*
-             SELECT cvterm_id, name, definition, cvr.object_id
-             FROM cvterm cvt JOIN cvterm_relationship cvr 
-                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225 AND cvr.object_id IN (:traitClassIds)
-                 WHERE cv_id = 1010
-                 ORDER BY cvr.object_id;
-            */ 
 
             StringBuffer sqlString = new StringBuffer()
                 .append("SELECT cvterm_id, name, definition, cvr.object_id ")
@@ -964,14 +936,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         Collections.sort(propertyIds);   
         
         try {
-            /*
-             SELECT cvterm_id, name, definition, cvr.object_id 
-             FROM cvterm cvt JOIN cvterm_relationship cvr 
-                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1200 AND cvr.object_id IN (:propertyIds)
-                 ORDER BY cvr.object_id;
-                        
-            */ 
-
             StringBuffer sqlString = new StringBuffer()
                 .append("SELECT cvterm_id, name, definition, cvr.object_id ")
                 .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
@@ -982,8 +946,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             
             SQLQuery query = getSession().createSQLQuery(sqlString.toString());
             query.setParameterList("propertyIds", propertyIds);
-            
-            //Debug.println(4, sqlString.toString());
             
             List<Object[]> list = query.list();
             
@@ -1100,9 +1062,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                 }
             }
             
-            // Return only if it belongs to a trait class via the 'is a' of the property of the standard variable
-            // standardVariableIds = getStandardVariablesBelongingToTraitClass(standardVariableIds);
-                                    
+
         } catch(HibernateException e) {
                 logAndThrowException("Error at getStandardVariableIds :" + e.getMessage(), e);
         }

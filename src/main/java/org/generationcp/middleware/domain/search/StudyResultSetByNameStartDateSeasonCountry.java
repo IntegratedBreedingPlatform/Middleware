@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.search;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -22,6 +19,9 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.operation.searcher.Searcher;
 import org.generationcp.middleware.pojos.Country;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudyResultSetByNameStartDateSeasonCountry extends Searcher implements StudyResultSet {
 

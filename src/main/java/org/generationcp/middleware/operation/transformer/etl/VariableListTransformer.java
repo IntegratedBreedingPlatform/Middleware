@@ -1,14 +1,6 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -16,6 +8,9 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VariableListTransformer extends Transformer {
 	
@@ -103,7 +98,6 @@ public class VariableListTransformer extends Transformer {
 				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
-						//variableList.add(new Variable(variableType, nonTrialMD.get(i).getValue()));
 						variableIndexesList.add(i);
 					}
 					i++;
@@ -229,7 +223,7 @@ public class VariableListTransformer extends Transformer {
 			int rank = 1;
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name", studyDetails.getStudyName(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TITLE, "STUDY_TITLE", "Study title", studyDetails.getTitle(), rank);
-			/*rank = addVariableIfNecessary(variables, variableTypeList, TermId.PM_KEY, "PM_KEY", "Project Management Key", studyDetails.getPmKey(), rank);*/
+
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective", studyDetails.getObjective(), rank);
 			rank = addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TYPE, "STUDY_TYPE", "Study type", 
 					(studyDetails.getStudyType()!=null?Integer.toString(studyDetails.getStudyType().getId()):null), rank);

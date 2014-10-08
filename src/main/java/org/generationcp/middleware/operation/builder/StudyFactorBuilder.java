@@ -11,13 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+
+import java.util.List;
 
 public class StudyFactorBuilder extends Builder {
 

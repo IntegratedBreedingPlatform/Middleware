@@ -11,14 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.io.Serializable;
+import java.util.*;
 
 /** 
  * List of variables and types.

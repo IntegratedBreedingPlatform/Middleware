@@ -12,30 +12,9 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.NameSynonym;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StandardVariableSummary;
-import org.generationcp.middleware.domain.dms.VariableConstraints;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.PropertyReference;
-import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitClass;
-import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -48,6 +27,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class OntologyDataManagerImpl extends DataManager implements OntologyDataManager{
 
@@ -805,11 +786,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
             throws MiddlewareException, MiddlewareQueryException{
-        /*if (standardVariableId >= 0){
-            throw new MiddlewareException("Error in addOrUpdateStandardVariableConstraints: " +
-            		"Cannot update the constraints of standard variables from Central database.");
-        }
-        */
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -1027,21 +1003,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             }
         }
     }
-/*        
-    private void deleteCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareQueryException, MiddlewareException {
-        Term typeTerm = getTermById(typeId);
-        if (typeTerm != null) {
-            CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
-            if(cvRelationship != null){ 
-                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
-                    throw new MiddlewareException("Error in deleteCvTermRelationship: Relationship found in central - cannot be deleted.");
-                }
-    
-                getTermRelationshipSaver().deleteRelationship(cvRelationship);
-            }
-        }
-    }
-*/
+
     @Override
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
         List<Property> properties = getPropertyBuilder().getAllPropertiesWithTraitClass();

@@ -1,9 +1,9 @@
 package org.generationcp.middleware.operation.destroyer;
 
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+
+import java.util.List;
 
 public class ExperimentDestroyer extends Destroyer {
 

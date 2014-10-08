@@ -12,12 +12,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 public class StudyDetails implements Serializable{
     
@@ -28,8 +28,6 @@ public class StudyDetails implements Serializable{
 	private String studyName;
 	
 	private String title;
-	
-	/*private String pmKey;*/
 	
 	private String objective;
 	
@@ -69,7 +67,6 @@ public class StudyDetails implements Serializable{
             long parentFolderId, String trialDatasetName, String measurementDatasetName) {
         this.studyName = studyName;
         this.title = title;
-        /*this.pmKey = pmKey;*/
         this.objective = objective;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -135,14 +132,6 @@ public class StudyDetails implements Serializable{
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
-	/*public String getPmKey() {
-		return pmKey;
-	}
-
-	public void setPmKey(String pmKey) {
-		this.pmKey = pmKey;
-	}*/
 
 	public String getObjective() {
 		return objective;
@@ -312,7 +301,6 @@ public class StudyDetails implements Serializable{
         result = prime * result + ((objective == null) ? 0 : objective.hashCode());
         result = prime * result + (int) (parentFolderId ^ (parentFolderId >>> 32));
         result = prime * result + ((piName == null) ? 0 : piName.hashCode());
-        /*result = prime * result + ((pmKey == null) ? 0 : pmKey.hashCode());*/
         result = prime * result + ((season == null) ? 0 : season.hashCode());
         result = prime * result + ((siteName == null) ? 0 : siteName.hashCode());
         result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
@@ -359,11 +347,6 @@ public class StudyDetails implements Serializable{
                 return false;
         } else if (!piName.equals(other.piName))
             return false;
-        /*if (pmKey == null) {
-            if (other.pmKey != null)
-                return false;
-        } else if (!pmKey.equals(other.pmKey))
-            return false;*/
         if (season != other.season)
             return false;
         if (siteName == null) {
@@ -406,8 +389,6 @@ public class StudyDetails implements Serializable{
         builder.append(studyName);
         builder.append(", title=");
         builder.append(title);
-        /*builder.append(", pmKey=");
-        builder.append(pmKey);*/
         builder.append(", objective=");
         builder.append(objective);
         builder.append(", startDate=");
@@ -443,7 +424,6 @@ public class StudyDetails implements Serializable{
         Debug.println(indent + 3, "Id: " + id);
 		Debug.println(indent + 3, "Name: " + studyName);
 	    Debug.println(indent + 3, "Title: " + title);
-	    /*Debug.println(indent + 3, "PM Key: " + pmKey);*/
 	    Debug.println(indent + 3, "Objective: " + objective);
 	    Debug.println(indent + 3, "Start Date: " + startDate);
 	    Debug.println(indent + 3, "End Date: " + endDate);

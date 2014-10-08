@@ -3,7 +3,6 @@ package org.generationcp.middleware.dao.gdms;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.ExtendedMarkerInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
@@ -71,8 +70,6 @@ public class ExtendedMarkerInfoDAO extends GenericDAO<ExtendedMarkerInfo, Intege
         try {
             SQLQuery query = getSession().createSQLQuery(GET_BY_MARKER_TYPE);
             query.setParameter("markerType", type);
-            /*query.setFirstResult(start);
-            query.setMaxResults(numOfRows);*/
             List results = query.list();
 
             ArrayList<ExtendedMarkerInfo> toReturn = new ArrayList<ExtendedMarkerInfo>();

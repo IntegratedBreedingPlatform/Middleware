@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.helper;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+
+import java.util.List;
 
 public class ProjectPropertiesHelper {
 

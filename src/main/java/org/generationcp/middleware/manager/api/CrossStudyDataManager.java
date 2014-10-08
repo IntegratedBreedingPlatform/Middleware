@@ -12,20 +12,14 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
-import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
-import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
-import org.generationcp.middleware.domain.h2h.GermplasmPair;
-import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
-import org.generationcp.middleware.domain.h2h.Observation;
-import org.generationcp.middleware.domain.h2h.TraitObservation;
+import org.generationcp.middleware.domain.h2h.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+
+import java.util.List;
+import java.util.Set;
 
 
 public interface CrossStudyDataManager{

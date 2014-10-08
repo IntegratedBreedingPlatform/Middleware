@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -22,6 +19,9 @@ import org.generationcp.middleware.manager.GdmsType;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.*;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * This is the API for retrieving and storing genotypic data.

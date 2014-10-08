@@ -11,16 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.Properties;
-
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.util.ResourceFinder;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.util.Properties;
 
 /**
  * Database connection parameters: host, port, dbName, url, driverName, userName and password.

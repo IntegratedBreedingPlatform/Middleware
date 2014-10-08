@@ -11,20 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.LogicalExpression;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link Method}.

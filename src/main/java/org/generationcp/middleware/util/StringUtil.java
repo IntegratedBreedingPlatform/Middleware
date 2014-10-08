@@ -11,11 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.Collection;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Contains utility classes for String formatting, format checking and conversion.

@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -23,6 +21,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * DAO class for {@link ProgramFavoriteDao}.

@@ -11,13 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
 
 
 /**

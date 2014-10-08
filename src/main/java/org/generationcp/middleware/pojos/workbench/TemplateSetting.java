@@ -11,16 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 /**
  * POJO for the template_setting table in the workbench database.

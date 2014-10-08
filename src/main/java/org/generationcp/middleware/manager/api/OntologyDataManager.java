@@ -12,26 +12,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Operation;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.NameSynonym;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StandardVariableSummary;
-import org.generationcp.middleware.domain.dms.VariableConstraints;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitClass;
-import org.generationcp.middleware.domain.oms.TraitClassReference;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Operation;
 
 /**
  * This is the API for retrieving ontology data from the CHADO schema.

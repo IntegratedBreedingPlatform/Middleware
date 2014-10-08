@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.generationcp.middleware.util.Debug;
 
 /** 
  * Contains the details of an experiment - id, factors, variates.

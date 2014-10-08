@@ -12,11 +12,11 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the field map label needed by the Field Map tool:

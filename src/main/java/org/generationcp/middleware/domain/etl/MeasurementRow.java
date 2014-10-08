@@ -11,13 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.poi.ss.util.WorkbookUtil;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MeasurementRow {
 

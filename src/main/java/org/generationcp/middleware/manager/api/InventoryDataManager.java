@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -23,6 +20,9 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * This is the API for retrieving information about Lots and Transactions.

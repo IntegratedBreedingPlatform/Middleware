@@ -11,18 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API for managing Location information.

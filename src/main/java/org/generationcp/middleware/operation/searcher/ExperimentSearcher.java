@@ -11,16 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.searcher;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+
+import java.util.*;
 
 public class ExperimentSearcher extends Searcher {
 

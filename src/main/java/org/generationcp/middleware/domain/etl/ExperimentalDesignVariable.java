@@ -1,10 +1,10 @@
 package org.generationcp.middleware.domain.etl;
 
-import java.util.List;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.util.List;
 
 public class ExperimentalDesignVariable {
 

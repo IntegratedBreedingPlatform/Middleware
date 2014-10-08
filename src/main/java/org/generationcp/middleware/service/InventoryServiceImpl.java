@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -24,6 +21,9 @@ import org.generationcp.middleware.service.api.InventoryService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the API for inventory management system.

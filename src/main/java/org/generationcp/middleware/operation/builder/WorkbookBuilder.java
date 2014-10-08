@@ -11,36 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.TreatmentVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -52,6 +26,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+
+import java.util.*;
 
 public class WorkbookBuilder extends Builder {
 	
@@ -124,7 +100,7 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementVariable> factors = buildFactors(variables, isTrial);		
 		List<MeasurementVariable> constants = buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(buildStudyMeasurementVariables(trialConstantVariables, false, false));
-		List<MeasurementVariable> variates = buildVariates(variables, constants); //buildVariates(experiments);
+		List<MeasurementVariable> variates = buildVariates(variables, constants);
 		List<MeasurementVariable> expDesignVariables = new ArrayList<MeasurementVariable>();
 		
 		//set possible values of breeding method
@@ -445,7 +421,7 @@ public class WorkbookBuilder extends Builder {
 	    for (Experiment experiment : experiments) {
 	        int experimentId = experiment.getId();
 	        VariableList factors = experiment.getFactors();
-	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes); //experiment.getVariates();
+	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes);
 	        List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
 	        
 	        if (isTrial) {
@@ -898,7 +874,7 @@ public class WorkbookBuilder extends Builder {
 	    for (Experiment experiment : experiments) {
 	        int experimentId = experiment.getId();
 	        VariableList factors = experiment.getFactors();
-	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes); //experiment.getVariates();
+	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes);
 	        List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
 	        
 	        for (MeasurementVariable factor : factorList) {

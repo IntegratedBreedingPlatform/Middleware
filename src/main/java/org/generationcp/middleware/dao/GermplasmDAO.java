@@ -11,12 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -28,6 +22,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -628,29 +628,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return toreturn;
     }
 
-/*    public List<Germplasm> getDerivativeChildren(Integer gid) throws MiddlewareQueryException {
-        List<Germplasm> toreturn = new ArrayList<Germplasm>();
-        try {
-            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_DERIVATIVE_CHILDREN);
-            query.addEntity("g", Germplasm.class);
-            query.addEntity("n", Name.class);
-            query.setParameter("gid", gid);
-
-            for (Object resultObject : query.list()) {
-                Object[] result = (Object[]) resultObject;
-                Germplasm germplasm = (Germplasm) result[0];
-                Name prefName = (Name) result[1];
-                germplasm.setPreferredName(prefName);
-                toreturn.add(germplasm);
-            }
-
-        } catch (HibernateException e) {
-            logAndThrowException("Error with getDerivativeChildren(gid=" + gid + ") query from Germplasm: " + e.getMessage(),
-                    e);
-        }
-        return toreturn;
-    }
- */   
     public List<Germplasm> getChildren(Integer gid, char methodType) throws MiddlewareQueryException {
         List<Germplasm> toreturn = new ArrayList<Germplasm>();
         try {
@@ -717,11 +694,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                *   output: next number in "IR NNNNN..." sequence
                */
                 
-//          SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE);
-//          query.setParameter("prefix", prefix);
-//          query.setParameter("prefixLike", prefix + "%");
-//                
-        
             BigInteger nextNumberInSequence = (BigInteger) query.uniqueResult();
             
             if (nextNumberInSequence != null){
@@ -829,140 +801,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
-    /**
-     * @SuppressWarnings("unchecked") public List<Germplasm>
-     *                                getByExample(Germplasm sample, int start,
-     *                                int numOfRows) { Example sampleGermplasm =
-     *                                Example.create(sample) .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                Criteria mainCriteria =
-     *                                getSession().createCriteria
-     *                                (Germplasm.class);
-     *                                mainCriteria.add(sampleGermplasm);
-     * 
-     *                                if(sample.getMethod() != null) { Example
-     *                                sampleMethod =
-     *                                Example.create(sample.getMethod())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("method").add(
-     *                                sampleMethod); }
-     * 
-     *                                if(sample.getLocation() != null) { Example
-     *                                sampleLocation =
-     *                                Example.create(sample.getLocation())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("location").
-     *                                add(sampleLocation); }
-     * 
-     *                                if(sample.getUser() != null) { Example
-     *                                sampleUser =
-     *                                Example.create(sample.getUser())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("user").add(
-     *                                sampleUser); }
-     * 
-     *                                if(sample.getReference() != null) {
-     *                                Example sampleRef =
-     *                                Example.create(sample.getReference())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("reference").
-     *                                add(sampleRef); }
-     * 
-     *                                if(sample.getAttributes() != null &&
-     *                                !sample.getAttributes().isEmpty()) {
-     *                                Set<Attribute> attrs =
-     *                                sample.getAttributes(); Criteria
-     *                                attributesCriteria =
-     *                                mainCriteria.createCriteria("attributes");
-     *                                for(Attribute attr : attrs) { Example
-     *                                sampleAttribute = Example.create(attr)
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                attributesCriteria.add(sampleAttribute); }
-     *                                }
-     * 
-     *                                mainCriteria.setFirstResult(start);
-     *                                mainCriteria.setMaxResults(numOfRows);
-     *                                return mainCriteria.list(); }
-     * 
-     *                                public long countByExample(Germplasm
-     *                                sample) { Example sampleGermplasm =
-     *                                Example.create(sample) .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                Criteria mainCriteria =
-     *                                getSession().createCriteria
-     *                                (Germplasm.class);
-     *                                mainCriteria.add(sampleGermplasm);
-     * 
-     *                                if(sample.getMethod() != null) { Example
-     *                                sampleMethod =
-     *                                Example.create(sample.getMethod())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("method").add(
-     *                                sampleMethod); }
-     * 
-     *                                if(sample.getLocation() != null) { Example
-     *                                sampleLocation =
-     *                                Example.create(sample.getLocation())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("location").
-     *                                add(sampleLocation); }
-     * 
-     *                                if(sample.getUser() != null) { Example
-     *                                sampleUser =
-     *                                Example.create(sample.getUser())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("user").add(
-     *                                sampleUser); }
-     * 
-     *                                if(sample.getReference() != null) {
-     *                                Example sampleRef =
-     *                                Example.create(sample.getReference())
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                mainCriteria.createCriteria("reference").
-     *                                add(sampleRef); }
-     * 
-     *                                if(sample.getAttributes() != null &&
-     *                                !sample.getAttributes().isEmpty()) {
-     *                                Set<Attribute> attrs =
-     *                                sample.getAttributes(); Criteria
-     *                                attributesCriteria =
-     *                                mainCriteria.createCriteria("attributes");
-     *                                for(Attribute attr : attrs) { Example
-     *                                sampleAttribute = Example.create(attr)
-     *                                .ignoreCase()
-     *                                .enableLike(MatchMode.ANYWHERE);
-     * 
-     *                                attributesCriteria.add(sampleAttribute); }
-     *                                }
-     * 
-     *                                mainCriteria.setProjection
-     *                                (Projections.rowCount()); Long count =
-     *                                return ((Long) mainCriteria.uniqueResult()).longValue();
-     *                                }
-     **/
 
-    
-    
     /**
      * Get Germplasms with names like Q or germplasms part of list with names like Q
      * @param q - the search term to be used
@@ -996,7 +835,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             }
             p1_query.setParameter("gid", q);
             p1_query.addEntity("germplsm", Germplasm.class);
-            //p1_query.setParameter("deletedStatus", STATUS_DELETED);
+
             result.addAll(p1_query.list());
             
             //Second priority, get germplasms with nVal like q
@@ -1057,30 +896,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             }
             
             //Third priority, get germplasms in list with listname like (full text search) q
-            /**
-            SQLQuery p3_query1;
-            if(o.equals(Operation.EQUAL))
-                p3_query1 = getSession().createSQLQuery(Germplasm.SEARCH_LIST_ID_BY_LIST_NAME_EQUAL);
-            else
-                p3_query1 = getSession().createSQLQuery(Germplasm.SEARCH_LIST_ID_BY_LIST_NAME);
-            p3_query1.setParameter("q", q);
-            p3_query1.setParameter("deletedStatus", STATUS_DELETED);
-            
-            List p3_result1 = p3_query1.list();
-            
-            if(p3_result1.size()>0 && p3_result1.get(0)!=null){            
-                SQLQuery p3_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_LIST_ID);
-                p3_query2.setParameterList("listids", p3_result1);
-                p3_query2.addEntity("germplsm", Germplasm.class);
-                //result.addAll(p3_query2.list());
-                List p3_query2_list = p3_query2.list();
-                for(Object g : p3_query2_list){
-                    if(!result.contains(g))
-                        result.add((Germplasm) g);
-                }
-            }
-            **/
-            
+
             //Add parents to results if specified by "includeParents" flag
             if(includeParents){
                 for(Germplasm g: result){
@@ -1099,7 +915,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     }
                 }
                 
-                //result.addAll(resultParents);
                 for(Object g2 : resultParents){
                     if(!result.contains(g2))
                         result.add((Germplasm) g2);

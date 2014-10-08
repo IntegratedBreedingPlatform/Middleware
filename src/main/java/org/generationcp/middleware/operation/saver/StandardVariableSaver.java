@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -28,12 +26,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.ErrorCode;
-import org.generationcp.middleware.pojos.oms.CV;
-import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermProperty;
-import org.generationcp.middleware.pojos.oms.CVTermRelationship;
-import org.generationcp.middleware.pojos.oms.CVTermSynonym;
+import org.generationcp.middleware.pojos.oms.*;
 import org.generationcp.middleware.util.StringUtil;
+
+import java.util.List;
 
 public class StandardVariableSaver extends Saver {
 
@@ -97,13 +93,7 @@ public class StandardVariableSaver extends Saver {
        	saveRelationship(varId, TermId.HAS_METHOD.getId(), stdVar.getMethod());
        	saveRelationship(varId, TermId.HAS_TYPE.getId(), stdVar.getDataType());
 		saveRelationship(varId, TermId.STORED_IN.getId(), stdVar.getStoredIn());
-		//if(stdVar.getIsA()!=null) {//optional
-		//	saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
-		//}
-//		if (stdVar.getCropOntologyId() != null) {
-//		    saveOrUpdateCropOntologyId(stdVar.getProperty().getId(), stdVar.getCropOntologyId());
-//		}
-		
+
 		saveEnumerations(varId, stdVar.getEnumerations());
 				
 		return stdVar.getId();
@@ -134,12 +124,6 @@ public class StandardVariableSaver extends Saver {
         requireLocalDatabaseInstance();
         
         validateInputEnumeration(variable, enumeration);
-        
-//        // Check if cv entry of enumeration already exists
-//        // Add cv entry of the standard variable if none found
-//        if (cvId == null){
-//            cvId = createCv(variable).getCvId();
-//        }
         
         //Save cvterm entry of the new valid value
         CVTerm cvTerm = createCvTerm(enumeration, cvId);
@@ -353,9 +337,6 @@ public class StandardVariableSaver extends Saver {
             }
         }
         
-//        if (standardVariable.getCropOntologyId() != null) {
-//            saveOrUpdateCropOntologyId(standardVariable.getProperty().getId(), standardVariable.getCropOntologyId());
-//        }
     }
     
     public String validate(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException {
@@ -363,8 +344,6 @@ public class StandardVariableSaver extends Saver {
         StringBuilder errorCodes = null;
         
         Term term = getTermBuilder().findTermByName(standardVariable.getName(), CvId.VARIABLES);
-        //remove this because we don't allow updates on variable name, so this scenario will never occur.
-//        if (term != null && (operation == Operation.ADD || operation == Operation.UPDATE && term.getId() != standardVariable.getId())) {
         if (term != null && operation == Operation.ADD) {
             errorCodes = new StringBuilder();
             errorCodes.append(ErrorCode.NON_UNIQUE_NAME.getCode());

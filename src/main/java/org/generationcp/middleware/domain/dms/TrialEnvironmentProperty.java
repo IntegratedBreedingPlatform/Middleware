@@ -1,8 +1,8 @@
 package org.generationcp.middleware.domain.dms;
 
-import java.util.Map;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.util.Map;
 
 public class TrialEnvironmentProperty {
 

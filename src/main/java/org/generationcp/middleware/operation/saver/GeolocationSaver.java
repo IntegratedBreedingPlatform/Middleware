@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -25,6 +23,8 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.util.StringUtil;
+
+import java.util.ArrayList;
 
 public class GeolocationSaver extends Saver {
 

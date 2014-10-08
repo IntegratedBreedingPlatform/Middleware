@@ -23,25 +23,12 @@ public class StudySearcherByGid extends Searcher {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	// TODO: DELETE? UNUSED? 
-/*	public List<StudyReference> searchStudies(GidStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {
-		int gid = filter.getGid();
-		List<StudyReference> studyRefs = new ArrayList<StudyReference>();
-		
-			Set<Study> studies = new HashSet<Study>();
-			List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(TermId.GID.getId(), Integer.toString(gid));
-			for (DmsProject project : projects)	 {
-				//studies.add(getStudyBuilder().createStudy(project));
-			}
-		
-		return studyRefs;
-	}
-*/	
+
 	public long countStudies(GidStudyQueryFilter filter) throws MiddlewareQueryException {
 		int gid = filter.getGid();
 		long count = 0;
 		if (setWorkingDatabase(gid)) {
-			//count = getDmsProjectDao().countProjectsByFolder(folderId);
+			// empty block
 		}
 		return count;
 	}

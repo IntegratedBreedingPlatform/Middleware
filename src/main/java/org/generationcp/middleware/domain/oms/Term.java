@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /** 
  * Contains the details of a Term - id, vocabularyId, name, definition, nameSynonyms, obsolete.

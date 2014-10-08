@@ -11,13 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.List;
 
 public class MeasurementVariable {
     

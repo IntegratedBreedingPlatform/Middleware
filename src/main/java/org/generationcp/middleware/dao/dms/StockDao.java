@@ -11,14 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -31,6 +23,9 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * DAO class for {@link StockModel}.
@@ -181,14 +176,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
    	    List<StockModel> stocks = new ArrayList<StockModel>();
    	    
         try {
-            /*
-                SELECT DISTINCT s.*
-                FROM nd_experiment_project eproj 
-                    INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
-                           AND eproj.project_id = @project_id
-                    INNER JOIN stock s ON es.stock_id = s.stock_id
-             */
-            
+
             StringBuilder sql = new StringBuilder()
                     .append("SELECT DISTINCT s.* ")
                     .append("FROM nd_experiment_project eproj  ")

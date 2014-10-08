@@ -11,10 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -27,6 +23,10 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link Map}.
@@ -155,8 +155,7 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
     	
     	nameLike = nameLike.toLowerCase();
-    	//nameLike = nameLike.replaceAll("'", "");
-    	
+
         SQLQuery query = getSession().createSQLQuery(GET_MAP_DETAILS_BY_NAME);
         query.setString("nameLike", nameLike);
         query.setFirstResult(start);
@@ -352,8 +351,7 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
 
     	nameLike = nameLike.toLowerCase();
-    	//nameLike = nameLike.replaceAll("'", "");
-    	
+
         SQLQuery query = getSession().createSQLQuery(COUNT_MAP_DETAILS_BY_NAME);
         query.setString("nameLike", nameLike);
         

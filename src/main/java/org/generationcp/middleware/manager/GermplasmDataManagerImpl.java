@@ -12,25 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.oms.Term;
@@ -38,18 +20,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmNameDetails;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.ProgenitorPK;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.pojos.germplasm.BackcrossElement;
@@ -60,6 +31,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this
@@ -1030,9 +1003,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
            results.addAll(getLocationDao().getLocationByIds(negs));
         }
         
-        //loc.getLname();
-        
-        Collections.sort(results, new Comparator<Object>() {  
+        Collections.sort(results, new Comparator<Object>() {
             @Override  
             public int compare(Object obj1, Object obj2) {  
                 Location loc1 = (Location)obj1;  
@@ -1071,9 +1042,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
               for (Location l : locations) {
                   Country c = this.getCountryById(l.getCntryid());
                   UserDefinedField udf = this.getUserDefinedFieldByID(l.getLtype());
-
-                  // hack, reset working database to local
-                  //setWorkingDatabase(Database.LOCAL);
 
                   LocationDetails ld = new LocationDetails();
                   ld.setCntryid(l.getCntryid());

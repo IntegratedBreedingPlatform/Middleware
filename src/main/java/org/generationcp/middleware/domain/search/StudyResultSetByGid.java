@@ -11,14 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.search;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.operation.searcher.Searcher;
+
+import java.util.List;
 
 public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 

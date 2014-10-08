@@ -11,13 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.ims;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,6 +21,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * DAO class for {@link Lot}.

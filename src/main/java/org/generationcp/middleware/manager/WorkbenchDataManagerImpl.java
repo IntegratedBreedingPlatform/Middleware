@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -26,6 +23,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of the WorkbenchDataManager interface. To instantiate this
@@ -447,7 +447,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             	deleteTemplateSetting(templateSetting);
             }
             
-            //deleteProject(project);
     	}catch (Exception e) {
               
                 logAndThrowException("Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): "
@@ -1039,12 +1038,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         Integer idSaved = null;
         try {
             trans = session.beginTransaction();
-            //            Do specific add/update operations here
-            //            if(Operation.ADD.equals(op)) {
-            //                
-            //            } else if (Operation.UPDATE.equals(op)) {
-            //                
-            //            }
             ToolConfiguration recordSaved = getToolConfigurationDao().saveOrUpdate(toolConfig);
             idSaved = recordSaved.getConfigId();
 
@@ -1369,10 +1362,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             	List<ProjectBackup> result = getProjectBackupDao().getProjectBackupByBackupPath(projectBackup.getBackupPath());
             	
                 if (result != null && result.size() > 0) {
-                	//ProjectBackup existingBackup = result.get(0);
-                	//existingBackup.setBackupTime(projectBackup.getBackupTime());
-                	//projectBackup = existingBackup;
-                	
                 	result.get(0).setBackupTime(projectBackup.getBackupTime());
                 	projectBackup = result.get(0);
                 }

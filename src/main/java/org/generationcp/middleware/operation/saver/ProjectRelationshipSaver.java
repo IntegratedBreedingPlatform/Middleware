@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -22,6 +19,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProjectRelationshipSaver extends Saver {
 

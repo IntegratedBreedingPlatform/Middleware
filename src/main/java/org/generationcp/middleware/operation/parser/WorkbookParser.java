@@ -68,8 +68,6 @@ public class WorkbookParser {
 
     private final static String[] SECTION_NAMES = new String[]{"CONDITION", "FACTOR", "CONSTANT", "VARIATE"};
 
-//    private static final int DEFAULT_GEOLOCATION_ID = 1;
-
     /**
      * Added handling for parsing the file if its xls or xlsx
      *
@@ -130,11 +128,9 @@ public class WorkbookParser {
 
                 if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
                     errorMessages.add(new Message("error.missing.sheet.description"));
-                    /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
             } catch (IllegalArgumentException e) {
                 errorMessages.add(new Message("error.missing.sheet.description"));
-                /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
             } catch (Exception e) {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
@@ -144,11 +140,9 @@ public class WorkbookParser {
 
                 if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
                     errorMessages.add(new Message("error.missing.sheet.observation"));
-                    /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
             } catch (IllegalArgumentException e) {
                 errorMessages.add(new Message("error.missing.sheet.observation"));
-                /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
             } catch (Exception e) {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
@@ -166,11 +160,6 @@ public class WorkbookParser {
             	currentWorkbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
             }
 
-            /*// check if required CONDITION is present for specific study types
-            if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N && locationId == 0) {
-                errorMessages.add(new Message("error.missing.trial.factor"));
-            }*/
-
             if (errorMessages.size() > 0 && performValidation) {
                 throw new WorkbookParserException(errorMessages);
             }
@@ -186,8 +175,6 @@ public class WorkbookParser {
 
     public void parseAndSetObservationRows(File file, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
         try {
-            //InputStream inp = new FileInputStream(file);
-            //Workbook wb = new HSSFWorkbook(inp);
             Workbook wb = getCorrectWorkbook(file);
 
             currentRow = 0;
@@ -216,13 +203,6 @@ public class WorkbookParser {
         String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX-rowAdjustMent, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
 
-
-        /*if (study != null) {
-            if (study.trim().equals("")) errorMessages.add(new Message("error.blank.study.name"));
-        }
-        if (title != null) {
-            if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
-        }*/
 
         // GCP-6991 and GCP-6992
         if (study == null || StringUtils.isEmpty(study)) {
@@ -271,27 +251,12 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.start.is.after.current.date"));
         }
         
-        /*if (endDate != null && endDate.after(currentDate)) {
-            errorMessages.add(new Message("error.end.is.after.current.date"));
-        }*/
-
-
         if (studyTypeValue == null) {
             studyTypeValue = StudyType.N;
         }
 
         StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
         
-        /* for debugging purposes
-        LOG.debug("Study:" + study);
-        LOG.debug("Title:" + title);
-        LOG.debug("PMKey:" + pmKey);
-        LOG.debug("Objective:" + objective);
-        LOG.debug("Start Date:" + startDate.toString());
-        LOG.debug("End Date:" + endDate.toString());
-        LOG.debug("Study Type:" + studyType);
-        */
-
         while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
             currentRow++;
         }
@@ -303,7 +268,6 @@ public class WorkbookParser {
 
         try {
 
-            /*currentRow++; //Skip empty row*/
             while (rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
                 currentRow++;
             }
@@ -399,17 +363,6 @@ public class WorkbookParser {
 
                 measurementVariables.add(var);
 
-                /* for debugging purposes
-                LOG.debug("");
-	            LOG.debug(""+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
-	            LOG.debug("Description:"+getCellStringValue(wb,currentSheet,currentRow,1));
-	            LOG.debug("Property:"+getCellStringValue(wb,currentSheet,currentRow,2));
-	            LOG.debug("Scale:"+getCellStringValue(wb,currentSheet,currentRow,3));
-	            LOG.debug("Method:"+getCellStringValue(wb,currentSheet,currentRow,4));
-	            LOG.debug("Data Type:"+getCellStringValue(wb,currentSheet,currentRow,5));
-	            LOG.debug("Value:"+getCellStringValue(wb,currentSheet,currentRow,6));
-	            LOG.debug("Label:"+getCellStringValue(wb,currentSheet,currentRow,7));
-				*/
                 currentRow++;
             }
 
@@ -470,7 +423,6 @@ public class WorkbookParser {
                     }
 
                 }
-                /*measurementDataLabel.add(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));*/
             }
 
             currentRow++;
@@ -485,12 +437,6 @@ public class WorkbookParser {
                 List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 
                 for (int col = 0; col < factors.size() + variates.size(); col++) {
-                    // danielv -- commented out because this is no longer relevant. Stock id is computed later on in the process
-                    // danielv -- this also resolves the nullpointerexception at GCP-6415
-                    /*if (col == 0) {
-                        stockId = Long.parseLong(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
-                    }*/
-
                     // TODO verify usefulness / validity of next statement.
                     if (variables.get(col).getName().equals("GYLD")) {
                         LOG.debug(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
@@ -569,51 +515,5 @@ public class WorkbookParser {
         DataFormatter formatter = new DataFormatter();
         return (String) formatter.formatCellValue(cell, formulaEval);
     }
-
-    /*
-
-    This approach currently abandoned because there are standard variables that do not have the proper associated data type.
-
-    public static String getCellStringValue(Cell cell, int dataTypeId) {
-        try {
-
-            if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
-                    || dataTypeId == TermId.CLASS.getId()) {
-                return cell.getStringCellValue();
-            } else if (dataTypeId == TermId.DATE_VARIABLE.getId()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                Date date = cell.getDateCellValue();
-                return sdf.format(date);
-            } else if (dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() ) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss:nnn");
-                Date date = cell.getDateCellValue();
-                return sdf.format(date);
-            } else if (dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || dataTypeId == TermId.NUMERIC_DBID_VARIABLE.getId()
-                    || dataTypeId == TermId.NUMERIC_VARIABLE.getId()) {
-                try {
-                    double doubleVal = cell.getNumericCellValue();
-                    if ((doubleVal % 1) == 0) {
-                        return Integer.toString((int) doubleVal);
-                    } else {
-                        return Double.toString(doubleVal);
-                    }
-                } catch (Exception e) {
-                    String s = cell.getStringCellValue();
-                    Double doubleVal = Double.parseDouble(s);
-                    if ((doubleVal % 1) == 0) {
-                        return Integer.toString(doubleVal.intValue());
-                    } else {
-                        return Double.toString(doubleVal);
-                    }
-                }
-            } else {
-                throw new Exception();
-            }
-        } catch (Exception e) {
-            LOG.error("Error retrieving value for cell in column " +
-                    cell.getColumnIndex() + " and row " + cell.getRowIndex() + " with type (term id) " + dataTypeId);
-            return "";
-        }
-    }*/
 
 }

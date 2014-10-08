@@ -11,20 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.dms;
 
+import org.generationcp.middleware.domain.dms.VariableList;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.generationcp.middleware.domain.dms.VariableList;
 
 /**
  * 

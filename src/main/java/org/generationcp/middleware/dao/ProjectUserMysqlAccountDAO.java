@@ -14,9 +14,10 @@ package org.generationcp.middleware.dao;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.hibernate.Criteria;
-import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
   
 /**
  * DAO class for {@link ProjectUserMysqlAccount}.

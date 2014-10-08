@@ -12,16 +12,8 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 /**
  * POJO for gdms_marker_user_info table.

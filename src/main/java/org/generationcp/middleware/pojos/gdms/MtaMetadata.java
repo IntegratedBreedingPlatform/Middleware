@@ -11,12 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for the gdms_mta_metadata table.
@@ -32,7 +31,6 @@ public class MtaMetadata implements Serializable{
     
     @Id
     @Column(name = "dataset_id")
-    /*private Integer mtaId;*/
     private Integer datasetID;
     
 	@Column(name = "project")

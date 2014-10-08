@@ -11,26 +11,17 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.User;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * POJO for workbench_project table.
@@ -271,8 +262,6 @@ public class Project implements Serializable{
         builder.append(startDate);
         builder.append(", userId=");
         builder.append(userId);
-        //builder.append(", template=");
-        //builder.append(template);
         builder.append(", cropType=");
         builder.append(cropType);
         builder.append(", localDbName=");

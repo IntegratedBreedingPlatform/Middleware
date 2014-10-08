@@ -11,12 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.SetOperation;
@@ -25,6 +19,12 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * DAO class for {@link AccMetadataSet}.
@@ -351,30 +351,6 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         			+ ") query from AccMetadataSet " + e.getMessage(), e);
         }
         return dataValues;
-//
-// 	    List<AccMetadataSet> toReturn = new ArrayList<AccMetadataSet>();
-//         try {
-//             if (datasetId != null){
-//                 SQLQuery query = getSession().createSQLQuery("SELECT * FROM gdms_acc_metadataset where dataset_id = :datasetId "); 
-//                 query.setParameter("datasetId", datasetId);
-//
-//                 List results = query.list();
-//                 for (Object o : results) {
-//                     Object[] result = (Object[]) o;
-//                     if (result != null) {
-//                         Integer datasetId2 =  (Integer) result[0];
-//                         Integer gid = (Integer) result[1];
-//                         Integer nid = (Integer) result[2];
-//
-//                         AccMetadataSet dataElement = new AccMetadataSet(datasetId2, gid, nid);
-//                         toReturn.add(dataElement);
-//                     }
-//                 }
-//             }
-//         } catch (HibernateException e) {
-//             logAndThrowException("Error with getAccMetadataSetsByDatasetId(datasetId=" + datasetId + ") query from AccMetadataSet " + e.getMessage(), e);
-//         }
-//         return toReturn;
  	}
 
 	@SuppressWarnings("rawtypes")

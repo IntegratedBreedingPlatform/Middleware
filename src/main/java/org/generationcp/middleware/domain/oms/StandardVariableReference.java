@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 
 /**

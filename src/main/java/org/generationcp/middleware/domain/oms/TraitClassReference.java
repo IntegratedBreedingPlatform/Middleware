@@ -11,13 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.util.Debug;
 
 
 /**

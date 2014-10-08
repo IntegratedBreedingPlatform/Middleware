@@ -11,12 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.util.Debug;
 
 /**
  * The Standard Variable with term, property, scale, method, data type, etc.
