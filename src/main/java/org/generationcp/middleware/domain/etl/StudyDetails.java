@@ -185,10 +185,7 @@ public class StudyDetails implements Serializable{
 	}
 	
 	public boolean isNursery() {
-		if (this.studyType != null && this.studyType==StudyType.N) {
-			return true;
-		}
-		return false;
+		return this.studyType != null && this.studyType == StudyType.N;
 	}
 	
 	public String getTrialDatasetName() {
