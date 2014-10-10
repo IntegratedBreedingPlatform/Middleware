@@ -174,15 +174,16 @@ public class Variable  implements Serializable, Comparable<Variable> {
 		return variableType.hashCode();
 	}
 	
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (!(obj instanceof Variable)) return false;
 		Variable other = (Variable) obj;
 		return other.getVariableType().equals(getVariableType()) &&
-			   equals(other.getValue(), getValue());
+			   stringEquals(other.getValue(), getValue());
 	}
 	
-	private boolean equals(String s1, String s2) {
+	private boolean stringEquals(String s1, String s2) {
 		if (s1 == null && s2 == null) return true;
 		if (s1 == null) return false;
 		if (s2 == null) return false;
