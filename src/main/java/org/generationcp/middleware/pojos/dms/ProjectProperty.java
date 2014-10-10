@@ -138,7 +138,7 @@ public class ProjectProperty implements Serializable {
         builder.append("ProjectProperty [projectPropertyId=");
         builder.append(projectPropertyId);
         builder.append(", project=");
-        builder.append(project);
+        builder.append(project.getName());
         builder.append(", typeId=");
         builder.append(typeId);
         builder.append(", value=");
