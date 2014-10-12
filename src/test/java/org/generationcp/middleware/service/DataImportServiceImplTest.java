@@ -33,7 +33,6 @@ import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.utils.test.Debug;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
