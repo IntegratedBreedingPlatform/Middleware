@@ -202,27 +202,13 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
     
+    // The local (-ve) id generator
     public Integer getNegativeId(String idName) throws MiddlewareQueryException {
-        try {
-            Criteria crit = getSession().createCriteria(getPersistentClass());
-            crit.setProjection(Projections.min(idName));
-            Integer minId = (Integer) crit.uniqueResult();
-            if (minId != null) {
-                if (minId.intValue() >= 0) {
-                    minId = Integer.valueOf(-1);
-                } else {
-                    minId = Integer.valueOf(minId.intValue() - 1);
-                }
-            } else {
-                minId = Integer.valueOf(-1);
-            }
-
-            return minId;
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getNegativeId(idName=" + idName + "): " + e.getMessage(), e);
-        }
+        // HACK!!!! - divert all -ve ID generation to +ve ID generation for single merged DB model.
+    	return getPositiveId(idName);
     }
     
+    // The +ve id generator
     public Integer getPositiveId(String idName) throws MiddlewareQueryException {
         try {
             Criteria crit = getSession().createCriteria(getPersistentClass());
@@ -237,7 +223,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             } else {
                 maxId = Integer.valueOf(1);
             }
-
+            LOG.debug("Returning maxId " + maxId + " for entity " + getPersistentClass().getName());
             return maxId;
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getPositiveId(idName=" + idName + "): " + e.getMessage(), e);
@@ -246,8 +232,8 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     
     public static Integer getLastId(Session session, Database instance, String tableName, String idName) throws MiddlewareQueryException {
     	try {
-    		String selectCol = (instance == Database.LOCAL ? "MIN" : "MAX") + "(" + idName + ")";
-    		SQLQuery query = session.createSQLQuery("SELECT " + selectCol + " FROM " + tableName);
+    		// HACK!!!! - change all ID generation to grow in +ve direction for single merged DB model.
+    		SQLQuery query = session.createSQLQuery("SELECT MAX(" + idName + ") FROM " + tableName);
     		Integer result = (Integer) query.uniqueResult();
     		
     		return result != null ? result : 0;    		
