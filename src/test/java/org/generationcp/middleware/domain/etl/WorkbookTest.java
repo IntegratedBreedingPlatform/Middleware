@@ -16,11 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 
 public class WorkbookTest {
@@ -43,6 +38,14 @@ public class WorkbookTest {
 	public static final String REPLICATION_FACTOR = "REPLICATION FACTOR";
 	public static final String BLOCKING_FACTOR = "BLOCKING FACTOR";
 	
+	public static final String PROP_BREEDING_METHOD = "Breeding Method";
+	public static final String PROP_INSTITUTE = "Institute";
+	public static final String PROP_STUDY = "Study";
+	public static final String PROP_STUDY_TITLE = "Study Title";
+	public static final String PROP_START_DATE = "Start Date";
+	public static final String PROP_END_DATE = "End Date";
+	public static final String PROP_OBJECTIVE = "Study Objective";
+	
 	//SCALES
 	public static final String DBCV = "DBCV";
 	public static final String DBID = "DBID";
@@ -56,6 +59,7 @@ public class WorkbookTest {
 	public static final String KG_HA = "kg/ha";
 	public static final String GRAMS = "grams";
 	public static final String CM = "cm";
+	public static final String SCALE_TEXT = "Text";
 			
 	//METHODS
 	public static final String ASSIGNED = "ASSIGNED";
@@ -64,6 +68,10 @@ public class WorkbookTest {
 	public static final String APPLIED = "APPLIED";
 	public static final String NOT_SPECIFIED = "NOT SPECIFIED";
 	public static final String SELECTED = "SELECTED";
+	public static final String DESCRIBED = "Described";
+	public static final String MEASURED = "Measured";
+	
+	
 			
 	//LABELS
 	public static final String STUDY = "STUDY";
