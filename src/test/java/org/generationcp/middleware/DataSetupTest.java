@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.generationcp.middleware.dao.oms.CVDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -13,51 +11,21 @@ import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.oms.CV;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Debug;
-import org.hibernate.Transaction;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class DataSetupTest extends ServiceIntegraionTest {
 
-	private static CVTermDao cvTermDao;
-	private static CVDao cvDao;
-	
 	private static DataImportService dataImportService;
 	
 	@BeforeClass
 	public static void setUp() {
-		cvTermDao = new CVTermDao();
-		cvDao = new CVDao();
-		cvTermDao.setSession(centralSessionUtil.getCurrentSession());
-		cvDao.setSession(centralSessionUtil.getCurrentSession());
-		
 		dataImportService = serviceFactory.getDataImportService();
 	}
 	
-	@Test
-	@Ignore
-	public void testAddCVTerm() throws MiddlewareQueryException {
-		
-		CV cv = cvDao.getById(1000);	
-		CVTerm term = new CVTerm();		
-		term.setCv(cv.getCvId());
-		int randomInt = new Random().nextInt();
-		term.setName("Test CV Term " + randomInt);
-		term.setDefinition("Test CV Term Definition " + randomInt);
-		term.setCvTermId(cvTermDao.getPositiveId("cvTermId"));
-		term.setIsObsolete(false);
-		term.setIsRelationshipType(false);
-		
-		Transaction tx = centralSessionUtil.getCurrentSession().beginTransaction();
-		cvTermDao.save(term);
-		tx.commit();
-	}
-	
+
     @Test
     public void testCreateNursery() throws MiddlewareQueryException {
         
