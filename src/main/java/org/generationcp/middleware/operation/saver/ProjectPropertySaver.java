@@ -140,9 +140,6 @@ public class ProjectPropertySaver extends Saver {
 	public void saveProjectProperties(DmsProject study, DmsProject trialDataset, DmsProject measurementDataset, 
 			List<MeasurementVariable> variables, boolean isConstant) throws MiddlewareQueryException {
 		
-		if (study.getProjectId() > 0) {
-			throw new MiddlewareQueryException("can not update central projectproperty values");
-		}
 		setWorkingDatabase(Database.LOCAL);
 		if (variables != null) {
 			
