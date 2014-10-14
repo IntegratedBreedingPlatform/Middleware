@@ -11,6 +11,12 @@ import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Debug;
 import org.junit.BeforeClass;
@@ -19,10 +25,14 @@ import org.junit.Test;
 public class DataSetupTest extends ServiceIntegraionTest {
 
 	private static DataImportService dataImportService;
+	private static GermplasmDataManager germplasmManager;
+	private static GermplasmListManager germplasmListManager;
 	
 	@BeforeClass
 	public static void setUp() {
 		dataImportService = serviceFactory.getDataImportService();
+		germplasmManager = managerFactory.getGermplasmDataManager();
+		germplasmListManager = managerFactory.getGermplasmListManager();
 	}
 	
 
@@ -139,5 +149,55 @@ public class DataSetupTest extends ServiceIntegraionTest {
 		
 		return variable;
 	}
+	
+	@Test
+	public void testCreateGermplasmList() throws MiddlewareQueryException {
+		
+		int randomInt = new Random().nextInt(1000);
+		
+		Integer gid1 = addGermplasm("CML502");
+		Integer gid2 = addGermplasm("CLQRCWQ109");
+		Integer gid3 = addGermplasm("CLQRCWQ55");
+		Integer gid4 = addGermplasm("CML165");
+		
+		GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		
+		germplasmListManager.addGermplasmList(germplasmList);
+		
+        List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
 
+        germplasmListData.add(new GermplasmListData(null, germplasmList, gid1, 1, "1", "AF06A-251-2", "CML502", "GP Group 1", 0, 0));
+        germplasmListData.add(new GermplasmListData(null, germplasmList, gid2, 2, "2", "AF06A-251-4", "CLQRCWQ109", "GP Group 1", 0, 0));
+        germplasmListData.add(new GermplasmListData(null, germplasmList, gid3, 3, "3", "AF06A-251-9", "CLQRCWQ55", "GP Group 1", 0, 0));
+        germplasmListData.add(new GermplasmListData(null, germplasmList, gid4, 4, "4", "AF05B-5252-2", "CML165", "GP Group 1", 0, 0));
+
+        germplasmListManager.addGermplasmListData(germplasmListData);
+	}
+
+
+	private Integer addGermplasm(String germplasmName) throws MiddlewareQueryException {
+		Germplasm g = new Germplasm();
+        g.setGdate(Integer.valueOf(20141014));
+        g.setGnpgs(Integer.valueOf(0));
+        g.setGpid1(Integer.valueOf(0));
+        g.setGpid2(Integer.valueOf(0));
+        g.setGrplce(Integer.valueOf(0));
+        g.setLocationId(Integer.valueOf(1));
+        g.setMethodId(Integer.valueOf(1));
+        g.setMgid(Integer.valueOf(1));
+        g.setUserId(Integer.valueOf(1));
+        g.setReferenceId(Integer.valueOf(1));
+
+        Name n = new Name();
+        n.setLocationId(Integer.valueOf(1));
+        n.setNdate(Integer.valueOf(20141014));
+        n.setNval(germplasmName);
+        n.setReferenceId(Integer.valueOf(1));
+        n.setTypeId(Integer.valueOf(1));
+        n.setUserId(Integer.valueOf(1));
+
+        germplasmManager.addGermplasm(g, n);
+        
+        return g.getGid();
+	}
 }

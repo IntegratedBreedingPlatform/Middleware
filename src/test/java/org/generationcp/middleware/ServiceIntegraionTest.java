@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
  * Base class with some common functionality required for Middleware services integration
  * tests (i.e. tests that require actual workbehch, central and local databse connections).
  */
-public class ServiceIntegraionTest extends MiddlewareIntegrationTest {
+public class ServiceIntegraionTest extends DataManagerIntegrationTest {
 	protected static ServiceFactory serviceFactory;
 	
 	static {
