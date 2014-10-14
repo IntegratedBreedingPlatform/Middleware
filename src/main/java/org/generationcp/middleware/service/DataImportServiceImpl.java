@@ -11,13 +11,25 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.etl.*;
-import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.etl.Constants;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
@@ -33,9 +45,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.*;
 
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -394,23 +403,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             throw new WorkbookParserException(messages);
         }
     }
-
-    private boolean nameMatches(String name, Term term) throws MiddlewareQueryException {
-        String actualTermName = term.getName();
-        boolean matches = actualTermName.equalsIgnoreCase(name);
-        if (!matches) {
-            List<NameSynonym> synonyms = getStandardVariableBuilder().createSynonyms(term.getId());
-            for (NameSynonym synonym : synonyms) {
-                if (name.equalsIgnoreCase(synonym.getName())) {
-                    matches = true;
-                    break;
-                }
-            }
-        }
-
-        return matches;
-    }
-
 
     @Override
     @Deprecated
