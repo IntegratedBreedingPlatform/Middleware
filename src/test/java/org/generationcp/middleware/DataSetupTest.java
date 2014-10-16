@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -18,30 +20,59 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.service.api.FieldbookService;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataSetupTest extends ServiceIntegraionTest {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(DataSetupTest.class);
 
 	private static DataImportService dataImportService;
 	private static GermplasmDataManager germplasmManager;
 	private static GermplasmListManager germplasmListManager;
+	private static FieldbookService middlewareFieldbookService;
+	
+	private static final int NUMBER_OF_GERMPLASM = 20;
+	private static final String GERMPLSM_PREFIX = "CIMMYT-Maize-";
 	
 	@BeforeClass
 	public static void setUp() {
 		dataImportService = serviceFactory.getDataImportService();
 		germplasmManager = managerFactory.getGermplasmDataManager();
 		germplasmListManager = managerFactory.getGermplasmListManager();
+		middlewareFieldbookService = serviceFactory.getFieldbookService();
 	}
 	
-
     @Test
     public void testCreateNursery() throws MiddlewareQueryException {
         
+		int randomInt = new Random().nextInt(100);
+		
+		//Germplasm
+		Integer[] gids = new Integer[NUMBER_OF_GERMPLASM];
+		for (int i = 0; i < NUMBER_OF_GERMPLASM; i++) {
+			gids[i] = createGermplasm(GERMPLSM_PREFIX + i);
+		}
+				
+		//Germplasm list
+		GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		germplasmListManager.addGermplasmList(germplasmList);
+		
+		//Germplasm list data
+        List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
+        for (int i = 0; i < NUMBER_OF_GERMPLASM; i++) {
+        	germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i, GERMPLSM_PREFIX + i + " Source", GERMPLSM_PREFIX + i, "CIMMYT Maize GP Group A", 0, 0));
+		}
+        germplasmListManager.addGermplasmListData(germplasmListData);
+        
+        
+        // Now the Nursery creation via the Workbook
+        
     	Workbook workbook = new Workbook();
-    	int randomInt = new Random().nextInt(1000);
-    	
     	// Basic Details
     	StudyDetails studyDetails = new StudyDetails();
     	studyDetails.setStudyType(StudyType.N);
@@ -96,37 +127,101 @@ public class DataSetupTest extends ServiceIntegraionTest {
     	
     	//Factors
     	List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-    	factors.add(createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO", "Germplasm entry - enumerated (number)", 
+    	MeasurementVariable entryFactor = createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO", "Germplasm entry - enumerated (number)", 
     			"Germplasm entry", WorkbookTest.ENUMERATED, WorkbookTest.NUMBER, 
-    			WorkbookTest.NUMERIC, null, WorkbookTest.ENTRY, TermId.ENTRY_NUMBER_STORAGE.getId(), true));
+    			WorkbookTest.NUMERIC, null, WorkbookTest.ENTRY, TermId.ENTRY_NUMBER_STORAGE.getId(), true);
+		factors.add(entryFactor);
     	
-    	factors.add(createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION", "Germplasm identifier - assigned (DBCV)", 
-    			"Germplasm id", WorkbookTest.ASSIGNED, WorkbookTest.DBCV, 
-    			WorkbookTest.CHAR, null, WorkbookTest.ENTRY, TermId.ENTRY_DESIGNATION_STORAGE.getId(), true));
+    	MeasurementVariable designationFactor = createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION", "Germplasm designation - assigned (DBCV)", 
+    			"Germplasm Designation", WorkbookTest.ASSIGNED, WorkbookTest.DBCV, 
+    			WorkbookTest.CHAR, null, WorkbookTest.DESIG, TermId.ENTRY_DESIGNATION_STORAGE.getId(), true);
+		factors.add(designationFactor);
     	
-    	factors.add(createMeasurementVariable(TermId.CROSS.getId(), "CROSS", "The pedigree string of the germplasm", 
+    	MeasurementVariable crossFactor = createMeasurementVariable(TermId.CROSS.getId(), "CROSS", "The pedigree string of the germplasm", 
     			"Cross history", WorkbookTest.ASSIGNED, WorkbookTest.PEDIGREE_STRING, 
-    			WorkbookTest.CHAR, null, WorkbookTest.ENTRY, TermId.GERMPLASM_ENTRY_STORAGE.getId(), true));
+    			WorkbookTest.CHAR, null, WorkbookTest.CROSS, TermId.GERMPLASM_ENTRY_STORAGE.getId(), true);
+		factors.add(crossFactor);
     	
-    	factors.add(createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)", 
+    	MeasurementVariable gidFactor = createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)", 
     			"Germplasm id", WorkbookTest.ASSIGNED, WorkbookTest.DBID, 
-    			WorkbookTest.NUMERIC, null, WorkbookTest.ENTRY, TermId.ENTRY_GID_STORAGE.getId(), true));
+    			WorkbookTest.NUMERIC, null, WorkbookTest.GID, TermId.ENTRY_GID_STORAGE.getId(), true);
+		factors.add(gidFactor);
     	
-    	factors.add(createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO", "Field plot - enumerated (number)", 
+    	MeasurementVariable plotFactor = createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO", "Field plot - enumerated (number)", 
     			"Field plot", WorkbookTest.ENUMERATED, WorkbookTest.NUMBER, 
-    			WorkbookTest.NUMERIC, null, WorkbookTest.PLOT, TermId.TRIAL_DESIGN_INFO_STORAGE.getId(), true));
+    			WorkbookTest.NUMERIC, null, WorkbookTest.PLOT, TermId.TRIAL_DESIGN_INFO_STORAGE.getId(), true);
+		factors.add(plotFactor);
+		
     	workbook.setFactors(factors);
     	
     	//Variates
     	List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
-    	variates.add(createMeasurementVariable(20316, "EH", "Height between the base of a plant to the insertion of the top (uppermost) ear of the same plant in centimeter (cm).", 
+    	MeasurementVariable variate = createMeasurementVariable(20316, "EH", "Height between the base of a plant to the insertion of the top (uppermost) ear of the same plant in centimeter (cm).", 
     			"Ear height", WorkbookTest.MEASURED, WorkbookTest.CM, WorkbookTest.NUMERIC, 
-    			null, WorkbookTest.PLOT, TermId.OBSERVATION_VARIATE.getId(), false));
+    			null, WorkbookTest.PLOT, TermId.OBSERVATION_VARIATE.getId(), false);
+		variates.add(variate);
     	
     	workbook.setVariates(variates);
+
+    	// Observations
+		List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		MeasurementRow row;
+		List<MeasurementData> dataList;
+		for (int i = 0; i < NUMBER_OF_GERMPLASM; i++) {
+			row = new MeasurementRow();
+			dataList = new ArrayList<MeasurementData>();
+			MeasurementData entryData = new MeasurementData(entryFactor.getLabel(), String.valueOf(i));
+			entryData.setMeasurementVariable(entryFactor);
+			dataList.add(entryData);
+			
+			MeasurementData designationData = new MeasurementData(designationFactor.getLabel(), GERMPLSM_PREFIX + i);
+			designationData.setMeasurementVariable(designationFactor);
+			dataList.add(designationData);
+			
+			MeasurementData crossData = new MeasurementData(crossFactor.getLabel(), GERMPLSM_PREFIX + i + "MP-" + i + "/" + GERMPLSM_PREFIX + i + "FP-" + i);
+			crossData.setMeasurementVariable(crossFactor);
+			dataList.add(crossData);
+			
+			MeasurementData gidData = new MeasurementData(gidFactor.getLabel(),  String.valueOf(gids[i]));
+			gidData.setMeasurementVariable(gidFactor);
+			dataList.add(gidData);
+			
+			MeasurementData plotData = new MeasurementData(plotFactor.getLabel(), String.valueOf(i));
+			plotData.setMeasurementVariable(plotFactor);
+			dataList.add(plotData);
+			
+			MeasurementData variateData = new MeasurementData(variate.getLabel(), String.valueOf(new Random().nextInt(100)));
+			variateData.setMeasurementVariable(variate);
+			dataList.add(variateData);
+			
+			row.setDataList(dataList);
+			observations.add(row);
+		}
+		workbook.setObservations(observations);
     	    	
         int id = dataImportService.saveDataset(workbook, true, false);
-        Debug.print(studyDetails.getStudyName() + " created with id = " + id);
+        LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + id);
+        
+        //Load and check some basics
+        Workbook nurseryWorkbook = middlewareFieldbookService.getNurseryDataSet(id);
+        Assert.assertNotNull(nurseryWorkbook);
+        
+        StudyDetails nurseryStudyDetails = nurseryWorkbook.getStudyDetails();
+		Assert.assertNotNull(nurseryStudyDetails);
+		Assert.assertNotNull(nurseryStudyDetails.getId());
+		
+        Assert.assertEquals(studyDetails.getStudyName(), nurseryStudyDetails.getStudyName());
+        Assert.assertEquals(studyDetails.getTitle(), nurseryStudyDetails.getTitle());
+        Assert.assertEquals(studyDetails.getObjective(), nurseryStudyDetails.getObjective());
+        Assert.assertEquals(studyDetails.getStartDate(), nurseryStudyDetails.getStartDate());
+        Assert.assertEquals(studyDetails.getEndDate(), nurseryStudyDetails.getEndDate());
+        Assert.assertEquals(studyDetails.getStudyType(), nurseryStudyDetails.getStudyType());
+                
+        //Assert.assertEquals(conditions.size(), nurseryWorkbook.getConditions().size());
+        Assert.assertEquals(constants.size(), nurseryWorkbook.getConstants().size());
+        //Assert.assertEquals(factors.size(), nurseryWorkbook.getFactors().size());
+        Assert.assertEquals(variates.size(), nurseryWorkbook.getVariates().size());
+        Assert.assertEquals(observations.size(), nurseryWorkbook.getObservations().size());        
     }
     
 	private MeasurementVariable createMeasurementVariable(int termId, String name, String description, 
@@ -150,32 +245,7 @@ public class DataSetupTest extends ServiceIntegraionTest {
 		return variable;
 	}
 	
-	@Test
-	public void testCreateGermplasmList() throws MiddlewareQueryException {
-		
-		int randomInt = new Random().nextInt(1000);
-		
-		Integer gid1 = addGermplasm("CML502");
-		Integer gid2 = addGermplasm("CLQRCWQ109");
-		Integer gid3 = addGermplasm("CLQRCWQ55");
-		Integer gid4 = addGermplasm("CML165");
-		
-		GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
-		
-		germplasmListManager.addGermplasmList(germplasmList);
-		
-        List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
-
-        germplasmListData.add(new GermplasmListData(null, germplasmList, gid1, 1, "1", "AF06A-251-2", "CML502", "GP Group 1", 0, 0));
-        germplasmListData.add(new GermplasmListData(null, germplasmList, gid2, 2, "2", "AF06A-251-4", "CLQRCWQ109", "GP Group 1", 0, 0));
-        germplasmListData.add(new GermplasmListData(null, germplasmList, gid3, 3, "3", "AF06A-251-9", "CLQRCWQ55", "GP Group 1", 0, 0));
-        germplasmListData.add(new GermplasmListData(null, germplasmList, gid4, 4, "4", "AF05B-5252-2", "CML165", "GP Group 1", 0, 0));
-
-        germplasmListManager.addGermplasmListData(germplasmListData);
-	}
-
-
-	private Integer addGermplasm(String germplasmName) throws MiddlewareQueryException {
+	private Integer createGermplasm(String germplasmName) throws MiddlewareQueryException {
 		Germplasm g = new Germplasm();
         g.setGdate(Integer.valueOf(20141014));
         g.setGnpgs(Integer.valueOf(0));
