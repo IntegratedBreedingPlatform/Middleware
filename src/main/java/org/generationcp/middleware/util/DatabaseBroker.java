@@ -194,60 +194,10 @@ public class DatabaseBroker {
      * 
      */
     public Session getCurrentSessionForCentral() {
-        if (sessionForCentral != null) {
-            return sessionForCentral;
-        } else if (sessionProviderForCentral != null) {
-            return sessionProviderForCentral.getSession();
-        }
-
-        return null;
+    	//HACK : Diverting all calls to get central session to only ever return the local session.
+        return getCurrentSessionForLocal();
     }
 
-    /**
-     * Utility method that returns the appropriate {@link Session} based on the given database instance.
-     * 
-     * @param instance
-     * @return The session based on the given database instance
-     * @throws MiddlewareQueryException
-     *             if a {@link Session} for the specified database instance is not available
-     */
-    protected Session getSession(Database instance) throws MiddlewareQueryException {
-        if (instance == Database.CENTRAL) {
-        	this.activeDatabase = instance;
-            Session session = getCurrentSessionForCentral();
-            if (session == null) {
-                throw new MiddlewareQueryException("Error in getSession(Database.CENTRAL): The central instance was specified "
-                        + "but there is no database connection for central provided.");
-            }
-
-            return session;
-        } else if (instance == Database.LOCAL) {
-        	this.activeDatabase = instance;
-            Session session = getCurrentSessionForLocal();
-            if (session == null) {
-                throw new MiddlewareQueryException("Error in getSession(Database.LOCAL): The local instance was specified "
-                        + "but there is no database connection for local provided.");
-            }
-
-            return session;
-        }
-
-        return null;
-    }
-
-    /**
-     * Utility method that returns the appropriate {@link Session} based on the specified <code>id</code>.
-     * 
-     * @param id
-     * @return the {@link Session} for the central database if the specified
-     *         <code>id</code> is positive or equal to zero, otherwise, this
-     *         method returns the {@link Session} for the local database.
-     * @throws MiddlewareQueryException
-     */
-    protected Session getSession(int id) {
-        return id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
-    }
-    
     protected Database getActiveDatabase() {
     	return activeDatabase;
     }
@@ -304,46 +254,22 @@ public class DatabaseBroker {
         return activeSession;
     }
 
-    /**
-     * Sets the current active session - either local or central.
-     * @param session
-     */
-    protected void setActiveSession(Session session) {
-        this.activeSession = session;
-    }
-
-    /**
-     * Sets the active session based on the given instance. <br/>
-     * Returns true if the active session is not null.      <br/>
-     * @param instance 
-     *          The database instance - either Database.LOCAL or Database.CENTRAL
-     */
     protected boolean setWorkingDatabase(Database instance) {
-        if (instance == Database.LOCAL) {
-            activeSession = getCurrentSessionForLocal();
-            activeDatabase = instance;
-        } else if (instance == Database.CENTRAL) {
-            activeSession = getCurrentSessionForCentral();
-            activeDatabase = instance;
-        }
+        //HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
+    	activeSession = getCurrentSessionForLocal();
+        activeDatabase = Database.LOCAL;
+        
         if (activeSession != null) {
             return true;
         }
         return false;
     }
 
-    /**
-     * Sets the active session based on the given ID.   <br/>
-     * If the id is positive, the central connection is assigned as the active session. <br/> 
-     * If the id is negative, the local connection is assigned as the active session.  <br/>
-     * Returns true if the active session is not null. <br/>
-     * 
-     * @param id
-     */
     protected boolean setWorkingDatabase(Integer id) {
     	if (id != null) {
-	        activeSession = id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
-	        activeDatabase = id >= 0 ? Database.CENTRAL : Database.LOCAL;
+    		//HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
+	        activeSession = getCurrentSessionForLocal();
+	        activeDatabase = Database.LOCAL;
 	        if (activeSession != null) {
 	            return true;
 	        }
@@ -351,36 +277,13 @@ public class DatabaseBroker {
         return false;
     }
 
-    /**
-     * Sets the active session based on the session.     <br/>
-     * Returns true if the active session is not null.   <br/>
-     * 
-     * @param session The session to assign
-     */
-    protected boolean setWorkingDatabase(Session session) {
-        activeSession = session;
-        activeDatabase = session == getCurrentSessionForCentral() ? Database.CENTRAL : Database.LOCAL;
-        if (activeSession != null) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Sets the active session based on the given instance.     <br/>
-     * Returns true if the active session is not null.          <br/>
-     * @param instance  The database instance - either Database.LOCAL or Database.CENTRAL
-     * @param dao   The DAO to set the active session into
-     */
     @SuppressWarnings("rawtypes")
     protected boolean setWorkingDatabase(Database instance, GenericDAO dao) {
-        if (instance == Database.LOCAL) {
-            activeSession = getCurrentSessionForLocal();
-            activeDatabase = instance;
-        } else if (instance == Database.CENTRAL) {
-            activeSession = getCurrentSessionForCentral();
-            activeDatabase = instance;
-        }
+        
+    	//HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
+    	activeSession = getCurrentSessionForLocal();
+        activeDatabase = Database.LOCAL;
+        
         if (activeSession != null) {
             return setDaoSession(dao, activeSession);
         }
@@ -398,13 +301,9 @@ public class DatabaseBroker {
      */
     @SuppressWarnings("rawtypes")
     protected boolean setWorkingDatabase(Integer id, GenericDAO dao) {
-        if (id < 0) {
-            activeSession = getCurrentSessionForLocal();
-            activeDatabase = Database.LOCAL;
-        } else if (id >= 0) {
-            activeSession = getCurrentSessionForCentral();
-            activeDatabase = Database.CENTRAL;
-        }
+    	//HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
+    	activeSession = getCurrentSessionForLocal();
+        activeDatabase = Database.LOCAL;
         if (activeSession != null) {
             return setDaoSession(dao, activeSession);
         }
