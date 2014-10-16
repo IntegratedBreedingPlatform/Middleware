@@ -86,7 +86,8 @@ public class CropType implements Serializable{
     }
 
     public String getCentralDbName() {
-        return centralDbName;
+    	// HACK: hard coded to return the same single DB per crop.
+        return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
     }
 
     public void setCentralDbName(String centralDbName) {
@@ -98,7 +99,8 @@ public class CropType implements Serializable{
     }
     
     public String getLocalDatabaseNameWithProjectId(Long projectId) {
-        return String.format("ibdbv2_%s_%s_local", cropName.trim().toLowerCase().replaceAll("\\s+", "_"), projectId);
+    	// HACK: hard coded to return the same single DB per crop.
+    	return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
     }
 
     @Override
