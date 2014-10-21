@@ -1182,7 +1182,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	updateFieldMapWithBlockInformation(infos, blockInfo, false);
     }
     
-    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
+    protected void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
     	Map<Integer, String> locationMap = new HashMap<Integer, String>();
     	if (infos != null) {
     		for (FieldMapInfo info : infos) {
@@ -1298,7 +1298,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId);
 	}
 
-
-
-	
+	public void setLocationDataManager(LocationDataManager locationDataManager) {
+		this.locationDataManager = locationDataManager;
+	}
 }

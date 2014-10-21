@@ -48,6 +48,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -56,13 +57,17 @@ import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.utils.test.Debug;
+import org.generationcp.middleware.utils.test.FieldMapDataUtil;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
@@ -1279,4 +1284,70 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     	return list;
     }
     
+    @Test
+    public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
+    	LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+    	
+    	FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, 
+    			FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK, 
+    			FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, 
+    			FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+    	
+    	StudyDataManagerImpl localManager = ((StudyDataManagerImpl) manager);
+    	
+    	List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+    	
+    	localManager.setLocationDataManager(locationDataManager);
+    		
+    	try {
+    		Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+    		localManager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
+    		
+    		FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+    		
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + trialInstance.getRowsInBlock() + " instead.", 
+    				FieldMapDataUtil.ROWS_IN_BLOCK, trialInstance.getRowsInBlock().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + trialInstance.getRangesInBlock() + " instead.", 
+    				FieldMapDataUtil.RANGES_IN_BLOCK, trialInstance.getRangesInBlock().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got " + trialInstance.getRowsPerPlot() + " instead.", 
+    				FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, trialInstance.getRowsPerPlot().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + trialInstance.getPlantingOrder() + " instead.", 
+    				FieldMapDataUtil.PLANTING_ORDER, trialInstance.getPlantingOrder().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + trialInstance.getMachineRowCapacity() + " instead.", 
+    				FieldMapDataUtil.MACHINE_ROW_CAPACITY, trialInstance.getMachineRowCapacity().intValue());
+    	} catch (MiddlewareQueryException e) {
+    		Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
+    	}
+    }
+    
+    @Test
+    public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
+    	LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+    	
+    	FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, 
+    			FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK, 
+    			FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, 
+    			FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+    	
+    	StudyDataManagerImpl localManager = ((StudyDataManagerImpl) manager);
+    	
+    	List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+    	FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+    	trialInstance.setBlockId(null);
+    	
+    	localManager.setLocationDataManager(locationDataManager);
+    		
+    	try {
+    		Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+    		localManager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
+    		
+    		Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
+    		Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+    		Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot() + " instead.", trialInstance.getRowsPerPlot());
+    		Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder() + " instead.", trialInstance.getPlantingOrder());
+    		Assert.assertNull("Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.", trialInstance.getMachineRowCapacity());
+    	} catch (MiddlewareQueryException e) {
+    		Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
+    	}
+    }
 }
