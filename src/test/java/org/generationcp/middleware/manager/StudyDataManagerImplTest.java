@@ -44,9 +44,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -180,7 +178,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
             Debug.println(INDENT, "\t" + resultSet.next());
             System.out.flush();
         }
-        // long before = resultSet.size();
         /*
          * to test deleted study, uncomment line above, then run in mysql:
          * update projectprop set value = 12990 where type_id = 8006 and
@@ -1049,9 +1046,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException {
         List<Integer> nurseryIdList = new ArrayList<Integer>();
         
-        //ORIGINAL CODE
-        //nurseryIdList.addAll(Arrays.asList(Integer.valueOf(-1)));
-
         //REPLACED BY THIS TO MAKE THE JUNIT WORK - Get the first nursery from the db
         List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails();
         if (studyDetailsList != null && studyDetailsList.size() > 0) {
@@ -1085,47 +1079,20 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     @Test
     public void testSaveFieldMapProperties() throws MiddlewareQueryException {
         List<Integer> trialIdList = new ArrayList<Integer>();
-        
-        //ORIGINAL CODE
-        //trialIdList.add(new Integer(-186));
-        //int geolocationId = -123; //please specify the geolocation id used by the trial 
 
         //REPLACED BY THIS TO MAKE THE JUNIT WORK
-        int geolocationId = 0;
         List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails();
         if (studyDetailsList != null && studyDetailsList.size() > 0){
             for (StudyDetails study : studyDetailsList){
                 if (study.getStudyType() == StudyType.T){
                     trialIdList.add(study.getId());
-                    geolocationId = study.getSiteId();
                     break;
                 }
             }
         }
          
         List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
-        //info.setBlockName("Block Name 1");
-//        if (info != null) {
-//            info.get(0).setFieldbookId(-186);
-//        }
-        //info.setColumnsInBlock(7);
-        //info.setRangesInBlock(8);
-        //info.setPlantingOrder(1);
-//        int columnCount = 1, rangeCount = 1;
-        /*
-        for (FieldMapLabel label : info.getFieldMapLabels()) {
-            label.setColumn(columnCount);
-            label.setRange(rangeCount++);
-            if (rangeCount > 8) {
-                columnCount++;
-                rangeCount = 1;
-            }
-            if (columnCount > 7) {
-                break;
-            }
-        }*/
-        //TODO
-//    	List<FieldMapInfo> info = createFieldmapData();
+
         manager.saveOrUpdateFieldmapProperties(info, -1, false);
     }
     
@@ -1215,7 +1182,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     	
     	List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
     	PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
-    	//phenotypeOutlier.setPhenotypeOutlierId(-1);
     	phenotypeOutlier.setPhenotypeId(1);
     	phenotypeOutlier.setValue("hello");
     	
@@ -1243,47 +1209,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
             }
         }
     }
-    
-    private List<FieldMapInfo> createFieldmapData() {
-    	List<FieldMapInfo> list = new ArrayList<FieldMapInfo>();
-    	
-    	FieldMapInfo info = new FieldMapInfo();
-    	info.setFieldbookId(-8);
-    	info.setTrial(true);
-    	info.setFieldbookName("TrialTest");
-    	info.setDatasets(new ArrayList<FieldMapDatasetInfo>());
-    	list.add(info);
-    	
-    	FieldMapDatasetInfo dataset = new FieldMapDatasetInfo();
-    	dataset.setDatasetId(-9);
-    	dataset.setDatasetName("Trial Dataset");
-    	dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
-    	info.getDatasets().add(dataset);
-    	
-    	FieldMapTrialInstanceInfo trial = new FieldMapTrialInstanceInfo();
-    	trial.setBlockId(26190);
-    	trial.setBlockName("TEST BLOCK 1");
-    	trial.setRowsInBlock(20);
-    	trial.setDeletedPlots(Arrays.asList("3,1"));
-    	trial.setFieldId(26189);
-    	trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
-    	trial.setMachineRowCapacity(2);
-    	trial.setRangesInBlock(20);
-    	trial.setRowsPerPlot(2);
-    	trial.setGeolocationId(-3);
-    	dataset.getTrialInstances().add(trial);
-    	
-    	FieldMapLabel label = new FieldMapLabel();
-    	label.setExperimentId(-1915);
-    	label.setGeolocationId(-3);
-    	label.setColumn(1);
-    	label.setRange(1);
-    	label.setSiteName("site name");
-    	trial.getFieldMapLabels().add(label);
-    	
-    	return list;
-    }
-    
+        
     @Test
     public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
     	LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
