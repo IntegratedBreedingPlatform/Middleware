@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -18,6 +19,7 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -60,7 +62,7 @@ public class DataSetupTest extends ServiceIntegraionTest {
 				
 		//Germplasm list
 		GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
-		germplasmListManager.addGermplasmList(germplasmList);
+		Integer germplasmListId = germplasmListManager.addGermplasmList(germplasmList);
 		
 		//Germplasm list data
         List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
@@ -199,11 +201,29 @@ public class DataSetupTest extends ServiceIntegraionTest {
 		}
 		workbook.setObservations(observations);
     	    	
-        int id = dataImportService.saveDataset(workbook, true, false);
-        LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + id);
+		// Save the workbook
+        int nurseryStudyId = dataImportService.saveDataset(workbook, true, false);
+        LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + nurseryStudyId);
         
+
+        // Convert germplasm list we created into ListDataProject entries
+        List<ListDataProject> listDataProjects = new ArrayList<ListDataProject>();
+        for(GermplasmListData gpListData : germplasmListData) {
+        	ListDataProject listDataProject = new ListDataProject();
+        	listDataProject.setCheckType(0);
+        	listDataProject.setGermplasmId(gpListData.getGid());
+        	listDataProject.setDesignation(gpListData.getDesignation());
+        	listDataProject.setEntryId(gpListData.getEntryId());
+        	listDataProject.setEntryCode(gpListData.getEntryCode());
+        	listDataProject.setSeedSource(gpListData.getSeedSource());
+        	listDataProject.setGroupName(gpListData.getGroupName());
+        	listDataProjects.add(listDataProject);
+        }        
+        // Add listdata_project entries        
+        int nurseryListId = middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId, GermplasmListType.NURSERY, germplasmListId, listDataProjects, 1);
+                
         //Load and check some basics
-        Workbook nurseryWorkbook = middlewareFieldbookService.getNurseryDataSet(id);
+        Workbook nurseryWorkbook = middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);
         Assert.assertNotNull(nurseryWorkbook);
         
         StudyDetails nurseryStudyDetails = nurseryWorkbook.getStudyDetails();
@@ -221,7 +241,11 @@ public class DataSetupTest extends ServiceIntegraionTest {
         Assert.assertEquals(constants.size(), nurseryWorkbook.getConstants().size());
         //Assert.assertEquals(factors.size(), nurseryWorkbook.getFactors().size());
         Assert.assertEquals(variates.size(), nurseryWorkbook.getVariates().size());
-        Assert.assertEquals(observations.size(), nurseryWorkbook.getObservations().size());        
+        Assert.assertEquals(observations.size(), nurseryWorkbook.getObservations().size());
+        
+        //Assert list data got saved with Nursery
+        List<ListDataProject> listDataProject = middlewareFieldbookService.getListDataProject(nurseryListId);
+        Assert.assertEquals(germplasmListData.size(), listDataProject.size());
     }
     
 	private MeasurementVariable createMeasurementVariable(int termId, String name, String description, 
