@@ -70,7 +70,7 @@ public class WorkbookTest {
 	public static final String SELECTED = "SELECTED";
 	public static final String DESCRIBED = "Described";
 	public static final String MEASURED = "Measured";
-	
+	public static final String DRY_AND_WEIGH = "Dry and weigh";
 	
 			
 	//LABELS

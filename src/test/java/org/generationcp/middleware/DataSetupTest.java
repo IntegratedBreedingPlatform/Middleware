@@ -158,9 +158,9 @@ public class DataSetupTest extends ServiceIntegraionTest {
     	
     	//Variates
     	List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
-    	MeasurementVariable variate = createMeasurementVariable(20316, "EH", "Height between the base of a plant to the insertion of the top (uppermost) ear of the same plant in centimeter (cm).", 
-    			"Ear height", WorkbookTest.MEASURED, WorkbookTest.CM, WorkbookTest.NUMERIC, 
-    			null, WorkbookTest.PLOT, TermId.OBSERVATION_VARIATE.getId(), false);
+    	MeasurementVariable variate = createMeasurementVariable(18000, "Grain_yield", "Grain yield -dry and weigh (kg/ha)", 
+    			WorkbookTest.GRAIN_YIELD, WorkbookTest.DRY_AND_WEIGH, WorkbookTest.KG_HA, WorkbookTest.NUMERIC, 
+                null, WorkbookTest.PLOT, TermId.OBSERVATION_VARIATE.getId(), false);
 		variates.add(variate);
     	
     	workbook.setVariates(variates);
