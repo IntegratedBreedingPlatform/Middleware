@@ -39,7 +39,7 @@ public class DataSetupTest extends ServiceIntegraionTest {
 	private static FieldbookService middlewareFieldbookService;
 	
 	private static final int NUMBER_OF_GERMPLASM = 20;
-	private static final String GERMPLSM_PREFIX = "CIMMYT-Maize-";
+	private static final String GERMPLSM_PREFIX = "GP-VARIETY-";
 	
 	@BeforeClass
 	public static void setUp() {
@@ -67,7 +67,7 @@ public class DataSetupTest extends ServiceIntegraionTest {
 		//Germplasm list data
         List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
         for (int i = 0; i < NUMBER_OF_GERMPLASM; i++) {
-        	germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i, GERMPLSM_PREFIX + i + " Source", GERMPLSM_PREFIX + i, "CIMMYT Maize GP Group A", 0, 0));
+        	germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i, GERMPLSM_PREFIX + i + " Source", GERMPLSM_PREFIX + i, GERMPLSM_PREFIX + "Group A", 0, 0));
 		}
         germplasmListManager.addGermplasmListData(germplasmListData);
         
