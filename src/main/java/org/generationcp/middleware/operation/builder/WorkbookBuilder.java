@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -73,6 +74,7 @@ public class WorkbookBuilder extends Builder {
 		Study study = getStudyBuilder().createStudy(id);
 		
 		int dataSetId = getMeasurementDataSetId(id, studyDetails.getStudyName());
+		checkMeasurementDataset(Integer.valueOf(dataSetId));
 		workbook.setMeasurementDatesetId(dataSetId);
 		
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
@@ -231,6 +233,13 @@ public class WorkbookBuilder extends Builder {
 		return workbook;
 	}
 	
+	protected void checkMeasurementDataset(Integer dataSetId) throws MiddlewareQueryException{
+		//if study has no measurementDataset, throw an error as it is an invalid template
+		if (dataSetId == null || dataSetId.equals(0)) {
+        	throw new MiddlewareQueryException(ErrorCode.STUDY_FORMAT_INVALID.getCode(), "The term you entered is invalid");
+        }
+	}
+	
 	private void setValueInCondition(List<MeasurementVariable> conditions, String value, int id) {
 		if (conditions != null && !conditions.isEmpty()) {
 			for (MeasurementVariable condition : conditions) {
@@ -282,6 +291,8 @@ public class WorkbookBuilder extends Builder {
             		trialDatasetId = dataset.getId();
             	}
             }
+
+            checkMeasurementDataset(dataSetId);
             
             workbook.setMeasurementDatesetId(dataSetId);
             workbook.setTrialDatasetId(trialDatasetId);
