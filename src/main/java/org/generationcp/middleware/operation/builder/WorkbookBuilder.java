@@ -91,8 +91,7 @@ public class WorkbookBuilder extends Builder {
 			trialConstantVariables = getTrialConstants(workbook.getTrialDatasetId());
 			
 			variables = removeTrialDatasetVariables(variables, conditionVariables, constantVariables);
-		}
-		else {
+		} else {
 			getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
 			conditionVariables = study.getConditions();
 			constantVariables = study.getConstants();
@@ -142,8 +141,8 @@ public class WorkbookBuilder extends Builder {
                         String value = null;
                         if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
                         	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
-                        }
-                        else if (!isTrial) { //set trial env for nursery studies
+                        } else if (!isTrial) { 
+                        	//set trial env for nursery studies
                         	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
@@ -186,13 +185,11 @@ public class WorkbookBuilder extends Builder {
 	                        
 	                        if (EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 	                        	expDesignVariables.add(measurementVariable);
-	                        }
-	                        else {
+	                        } else {
 	                        	conditions.add(measurementVariable);
 	                        }
                         }
-                    }
-                    else if (isTrial && stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()
+                    } else if (isTrial && stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()
                     		&& EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
                     	
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
@@ -260,8 +257,9 @@ public class WorkbookBuilder extends Builder {
                 List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
                 if (datasetRefList != null) {
                 	StudyType studyType = StudyType.N;
-                	if(!isNursery)
+                	if(!isNursery) {
                 		studyType = StudyType.T;
+                	}
                 	Database database = id > 0 ? Database.CENTRAL : Database.LOCAL;
                     StudyDetails studyDetails = getStudyDataManager().getStudyDetails(database, studyType, id);
                     workbook.setStudyDetails(studyDetails);
@@ -269,8 +267,7 @@ public class WorkbookBuilder extends Builder {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
                                 datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
                             dataSetId = datasetRef.getId();
-                        }
-                        else if (datasetRef.getName().equals("TRIAL_" + studyDetails.getStudyName())) {
+                        } else if (datasetRef.getName().equals("TRIAL_" + studyDetails.getStudyName())) {
                         	trialDatasetId = datasetRef.getId();
                         }
                     }
@@ -335,31 +332,29 @@ public class WorkbookBuilder extends Builder {
                         	if (value == null) {
                         		value = "";
                         	}
-                        }
-                        else if (PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
+                        } else if (PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
                         	//constants, no need to retrieve the value if it's a trial study
                         	isConstant = true;
                         	if (isNursery) {
                         		List<Phenotype> phenotypes = getPhenotypeDao().getByProjectAndType(trialDatasetId, stdVariable.getId());
                         		//expects only 1 value for nursery
                         		if (phenotypes != null && !phenotypes.isEmpty()) {
-                        			if (phenotypes.get(0).getcValueId() != null) {  //categorical constant
+                        			if (phenotypes.get(0).getcValueId() != null) {
+                        				//categorical constant
                         				Enumeration enumeration = stdVariable.getEnumeration(phenotypes.get(0).getcValueId());
                         				value = enumeration.getDescription();
-                        			}
-                        			else {
+                        			} else {
                         				value = phenotypes.get(0).getValue();
                         			}
                         		}
                         		if (value == null) {
                         			value = "";
                         		}
-                        	}
-                        	else {
+                        	} else {
                         		value = "";
                         	}
-                        }
-                        else { //set trial env for nursery studies
+                        } else { 
+                        	//set trial env for nursery studies
                         	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
@@ -402,11 +397,9 @@ public class WorkbookBuilder extends Builder {
 	                        
 	                        if (EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 	                        	experimentalDesignVariables.add(measurementVariable);
-	                        }
-	                        else if (isConstant) {
+	                        } else if (isConstant) {
 	                        	constants.add(measurementVariable);
-	                        }
-	                        else {
+	                        } else {
 	                        	conditions.add(measurementVariable);
 	                        }
                         }
@@ -469,8 +462,7 @@ public class WorkbookBuilder extends Builder {
 		                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
 		                                id,
 		                                factor);
-			            	}
-			            	else {
+			            	} else {
 		                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
 		                                variable.getValue(), isEditable, 
 		                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
@@ -608,8 +600,7 @@ public class WorkbookBuilder extends Builder {
             	for (MeasurementVariable factor : factors) {
             		if (factor.getName().equals(key)) {
             			treatment.setLevelVariable(factor);
-            		}
-            		else {
+            		} else {
             			treatment.setValueVariable(factor);
             		}
             	}
@@ -626,11 +617,11 @@ public class WorkbookBuilder extends Builder {
             if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
                 
                 for (VariableType variable : variables.getFactors().getVariableTypes()) {
-                    if (((isTrial && 
+                    if ((isTrial && 
                             variable.getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) ||
                             (PhenotypicType.TRIAL_DESIGN.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
                             || PhenotypicType.GERMPLASM.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
-                            || PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))))
+                            || PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId())))
                     		) {
                     	
                         factorList.add(variable);
@@ -679,8 +670,7 @@ public class WorkbookBuilder extends Builder {
 			    		filteredVariables.add(variable);
 			    	}
 			    }
-		    }
-		    else {
+		    } else {
 		    	filteredVariables = variables;
 		    }
 		    
@@ -776,8 +766,7 @@ public class WorkbookBuilder extends Builder {
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
                                 id,
                                 measurementVariable);
-	            	}
-	            	else {
+	            	} else {
                         measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                                 variable.getValue(), false, 
                                 getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
@@ -904,8 +893,7 @@ public class WorkbookBuilder extends Builder {
 	                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
 	                                id,
 	                                factor);
-		            	}
-		            	else {
+		            	} else {
 	                        measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
 	                                variable.getValue(), isEditable, 
 	                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
