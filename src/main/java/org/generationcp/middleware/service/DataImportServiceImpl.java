@@ -40,6 +40,7 @@ import java.util.*;
 public class DataImportServiceImpl extends Service implements DataImportService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
+    public static final int MAX_VARIABLE_NAME_LENGTH = 32;
 
     public DataImportServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -153,13 +154,17 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException {
         WorkbookParser parser = new WorkbookParser();
 
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
+                getSessionProviderForLocal(), getSessionProviderForCentral());
+
         // partially parse the file to parse the description sheet only at first
-        Workbook workbook = parser.parseFile(file, true);
+        return strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology);
+    }
+
+    protected Workbook strictParseWorkbook(File file, WorkbookParser parser, Workbook workbook,OntologyDataManager ontology) throws MiddlewareQueryException, WorkbookParserException {
         // perform validations on the parsed data that require db access
         List<Message> messages = new LinkedList<Message>();
 
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
-                getSessionProviderForLocal(), getSessionProviderForCentral());
 
         if (!isEntryExists(ontology, workbook.getFactors())) {
             messages.add(new Message("error.entry.doesnt.exist"));
@@ -172,6 +177,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
             messages.add(new Message("error.missing.trial.condition"));
         }
+
+        messages.addAll(validateMeasurmentVariableNameLengths(workbook.getAllVariables()));
 
         if (messages.size() > 0) {
             throw new WorkbookParserException(messages);
@@ -194,6 +201,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         checkForInvalidLabel(workbook, messages);
 
         return workbook;
+    }
+
+    protected List<Message> validateMeasurmentVariableNameLengths(List<MeasurementVariable> variableList) {
+        List<Message> messages = new ArrayList<Message>();
+
+        for (MeasurementVariable mv : variableList) {
+            if (mv.getName().length() > MAX_VARIABLE_NAME_LENGTH) {
+                messages.add(new Message("error.trim.measurement.variable",mv.getName()));
+            }
+        }
+
+        return messages;
     }
 
     private List<Message> checkForEmptyRequiredVariables(Workbook workbook) {
@@ -494,7 +513,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return id;
     }
 
-    private Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    protected Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
             PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
             Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
@@ -513,7 +532,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return false;
     }
 
-    private Boolean isPlotExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    protected Boolean isPlotExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
             PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
             Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
@@ -532,7 +551,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return false;
     }
 
-    private Boolean isTrialInstanceNumberExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    protected Boolean isTrialInstanceNumberExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
 
             StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
