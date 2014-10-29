@@ -11,7 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
@@ -342,6 +344,28 @@ public class StandardVariable implements Serializable{
 	 */
 	public void setOverridenEnumerations(Map<Integer, Integer> overridenEnumerations) {
 		this.overridenEnumerations = overridenEnumerations;
+	}
+
+	public boolean isNumeric() {
+		if(dataType!=null && dataType.getId() == TermId.NUMERIC_VARIABLE.getId()) {
+			return true; 
+		} else if(isNumericCategoricalVariate()) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isNumericCategoricalVariate() {
+		if(storedIn!=null && storedIn.getId() == TermId.CATEGORICAL_VARIATE.getId() && 
+			enumerations!=null &&!enumerations.isEmpty()) {
+			for (Enumeration enumeration : enumerations){
+	            if (enumeration.getName()==null || !NumberUtils.isNumber(enumeration.getName().trim())){
+	                return false;
+	            }
+	        }
+			return true;
+		}
+		return false;
 	}
 	
 	
