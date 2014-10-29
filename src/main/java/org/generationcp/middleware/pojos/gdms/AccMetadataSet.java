@@ -117,38 +117,51 @@ public class AccMetadataSet implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		AccMetadataSet other = (AccMetadataSet) obj;
 		if (accMetadataSetId == null) {
-			if (other.accMetadataSetId != null)
-				return false;
-		} else if (!accMetadataSetId.equals(other.accMetadataSetId))
-			return false;
+			if (other.accMetadataSetId != null) {
+                return false;
+            }
+		} else if (!accMetadataSetId.equals(other.accMetadataSetId)) {
+            return false;
+        }
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (germplasmId == null) {
-			if (other.germplasmId != null)
-				return false;
-		} else if (!germplasmId.equals(other.germplasmId))
-			return false;
+			if (other.germplasmId != null) {
+                return false;
+            }
+		} else if (!germplasmId.equals(other.germplasmId)) {
+            return false;
+        }
 		if (nameId == null) {
-			if (other.nameId != null)
-				return false;
-		} else if (!nameId.equals(other.nameId))
-			return false;
+			if (other.nameId != null) {
+                return false;
+            }
+		} else if (!nameId.equals(other.nameId)) {
+            return false;
+        }
 		if (accSampleId == null) {
-			if (other.accSampleId != null)
-				return false;
-		} else if (!accSampleId.equals(other.accSampleId))
-			return false;
+			if (other.accSampleId != null) {
+                return false;
+            }
+		} else if (!accSampleId.equals(other.accSampleId)) {
+            return false;
+        }
 		return true;
 	}
 

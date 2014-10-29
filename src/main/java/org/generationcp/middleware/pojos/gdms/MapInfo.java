@@ -137,53 +137,72 @@ public class MapInfo implements Serializable, Comparable<MapInfo>{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MapInfo other = (MapInfo) obj;
         if (linkageGroup == null) {
-            if (other.linkageGroup != null)
+            if (other.linkageGroup != null) {
                 return false;
-        } else if (!linkageGroup.equals(other.linkageGroup))
+            }
+        } else if (!linkageGroup.equals(other.linkageGroup)) {
             return false;
+        }
         if (mapId == null) {
-            if (other.mapId != null)
+            if (other.mapId != null) {
                 return false;
-        } else if (!mapId.equals(other.mapId))
+            }
+        } else if (!mapId.equals(other.mapId)) {
             return false;
+        }
         if (mapName == null) {
-            if (other.mapName != null)
+            if (other.mapName != null) {
                 return false;
-        } else if (!mapName.equals(other.mapName))
+            }
+        } else if (!mapName.equals(other.mapName)) {
             return false;
+        }
         if (mapType == null) {
-            if (other.mapType != null)
+            if (other.mapType != null) {
                 return false;
-        } else if (!mapType.equals(other.mapType))
+            }
+        } else if (!mapType.equals(other.mapType)) {
             return false;
+        }
         if (mapUnit == null) {
-            if (other.mapUnit != null)
+            if (other.mapUnit != null) {
                 return false;
-        } else if (!mapUnit.equals(other.mapUnit))
+            }
+        } else if (!mapUnit.equals(other.mapUnit)) {
             return false;
+        }
         if (markerId == null) {
-            if (other.markerId != null)
+            if (other.markerId != null) {
                 return false;
-        } else if (!markerId.equals(other.markerId))
+            }
+        } else if (!markerId.equals(other.markerId)) {
             return false;
+        }
         if (markerName == null) {
-            if (other.markerName != null)
+            if (other.markerName != null) {
                 return false;
-        } else if (!markerName.equals(other.markerName))
+            }
+        } else if (!markerName.equals(other.markerName)) {
             return false;
+        }
         if (startPosition == null) {
-            if (other.startPosition != null)
+            if (other.startPosition != null) {
                 return false;
-        } else if (!startPosition.equals(other.startPosition))
+            }
+        } else if (!startPosition.equals(other.startPosition)) {
             return false;
+        }
         return true;
     }
 

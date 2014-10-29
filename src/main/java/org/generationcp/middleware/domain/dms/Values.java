@@ -72,28 +72,37 @@ public abstract class Values {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		Values other = (Values) obj;
 		if (germplasmId == null) {
-			if (other.germplasmId != null)
-				return false;
-		} else if (!germplasmId.equals(other.germplasmId))
-			return false;
+			if (other.germplasmId != null) {
+                return false;
+            }
+		} else if (!germplasmId.equals(other.germplasmId)) {
+            return false;
+        }
 		if (locationId == null) {
-			if (other.locationId != null)
-				return false;
-		} else if (!locationId.equals(other.locationId))
-			return false;
+			if (other.locationId != null) {
+                return false;
+            }
+		} else if (!locationId.equals(other.locationId)) {
+            return false;
+        }
 		if (variableList == null) {
-			if (other.variableList != null)
-				return false;
-		} else if (!variableList.equals(other.variableList))
-			return false;
+			if (other.variableList != null) {
+                return false;
+            }
+		} else if (!variableList.equals(other.variableList)) {
+            return false;
+        }
 		return true;
 	}
 

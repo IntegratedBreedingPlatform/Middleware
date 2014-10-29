@@ -109,18 +109,23 @@ public class ProjectRelationship implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ProjectRelationship other = (ProjectRelationship) obj;
 		if (projectRelationshipId == null) {
-			if (other.projectRelationshipId != null)
-				return false;
-		} else if (!projectRelationshipId.equals(other.projectRelationshipId))
-			return false;
+			if (other.projectRelationshipId != null) {
+                return false;
+            }
+		} else if (!projectRelationshipId.equals(other.projectRelationshipId)) {
+            return false;
+        }
 		return true;
 	}
 

@@ -77,28 +77,37 @@ public class MappingAllelicSNPRow{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MappingAllelicSNPRow other = (MappingAllelicSNPRow) obj;
         if (accMetadataSet == null) {
-            if (other.accMetadataSet != null)
+            if (other.accMetadataSet != null) {
                 return false;
-        } else if (!accMetadataSet.equals(other.accMetadataSet))
+            }
+        } else if (!accMetadataSet.equals(other.accMetadataSet)) {
             return false;
+        }
         if (mappingPopValues == null) {
-            if (other.mappingPopValues != null)
+            if (other.mappingPopValues != null) {
                 return false;
-        } else if (!mappingPopValues.equals(other.mappingPopValues))
+            }
+        } else if (!mappingPopValues.equals(other.mappingPopValues)) {
             return false;
+        }
         if (charValues == null) {
-            if (other.charValues != null)
+            if (other.charValues != null) {
                 return false;
-        } else if (!charValues.equals(other.charValues))
+            }
+        } else if (!charValues.equals(other.charValues)) {
             return false;
+        }
         return true;
     }
 

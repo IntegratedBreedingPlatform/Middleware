@@ -167,58 +167,79 @@ public class MappingValueElement implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		MappingValueElement other = (MappingValueElement) obj;
 		if (accSampleId == null) {
-			if (other.accSampleId != null)
-				return false;
-		} else if (!accSampleId.equals(other.accSampleId))
-			return false;
+			if (other.accSampleId != null) {
+                return false;
+            }
+		} else if (!accSampleId.equals(other.accSampleId)) {
+            return false;
+        }
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (gid == null) {
-			if (other.gid != null)
-				return false;
-		} else if (!gid.equals(other.gid))
-			return false;
+			if (other.gid != null) {
+                return false;
+            }
+		} else if (!gid.equals(other.gid)) {
+            return false;
+        }
 		if (mappingPopType == null) {
-			if (other.mappingPopType != null)
-				return false;
-		} else if (!mappingPopType.equals(other.mappingPopType))
-			return false;
+			if (other.mappingPopType != null) {
+                return false;
+            }
+		} else if (!mappingPopType.equals(other.mappingPopType)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (markerSampleId == null) {
-			if (other.markerSampleId != null)
-				return false;
-		} else if (!markerSampleId.equals(other.markerSampleId))
-			return false;
+			if (other.markerSampleId != null) {
+                return false;
+            }
+		} else if (!markerSampleId.equals(other.markerSampleId)) {
+            return false;
+        }
 		if (markerType == null) {
-			if (other.markerType != null)
-				return false;
-		} else if (!markerType.equals(other.markerType))
-			return false;
+			if (other.markerType != null) {
+                return false;
+            }
+		} else if (!markerType.equals(other.markerType)) {
+            return false;
+        }
 		if (parentAGid == null) {
-			if (other.parentAGid != null)
-				return false;
-		} else if (!parentAGid.equals(other.parentAGid))
-			return false;
+			if (other.parentAGid != null) {
+                return false;
+            }
+		} else if (!parentAGid.equals(other.parentAGid)) {
+            return false;
+        }
 		if (parentBGid == null) {
-			if (other.parentBGid != null)
-				return false;
-		} else if (!parentBGid.equals(other.parentBGid))
-			return false;
+			if (other.parentBGid != null) {
+                return false;
+            }
+		} else if (!parentBGid.equals(other.parentBGid)) {
+            return false;
+        }
 		return true;
 	}
 

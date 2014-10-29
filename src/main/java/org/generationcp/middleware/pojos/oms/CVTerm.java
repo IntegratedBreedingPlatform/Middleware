@@ -179,48 +179,65 @@ public class CVTerm implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		CVTerm other = (CVTerm) obj;
 		if (cvId == null) {
-			if (other.cvId != null)
-				return false;
-		} else if (!cvId.equals(other.cvId))
-			return false;
+			if (other.cvId != null) {
+                return false;
+            }
+		} else if (!cvId.equals(other.cvId)) {
+            return false;
+        }
 		if (cvTermId == null) {
-			if (other.cvTermId != null)
-				return false;
-		} else if (!cvTermId.equals(other.cvTermId))
-			return false;
+			if (other.cvTermId != null) {
+                return false;
+            }
+		} else if (!cvTermId.equals(other.cvTermId)) {
+            return false;
+        }
 		if (dbxRefId == null) {
-			if (other.dbxRefId != null)
-				return false;
-		} else if (!dbxRefId.equals(other.dbxRefId))
-			return false;
+			if (other.dbxRefId != null) {
+                return false;
+            }
+		} else if (!dbxRefId.equals(other.dbxRefId)) {
+            return false;
+        }
 		if (definition == null) {
-			if (other.definition != null)
-				return false;
-		} else if (!definition.equals(other.definition))
-			return false;
+			if (other.definition != null) {
+                return false;
+            }
+		} else if (!definition.equals(other.definition)) {
+            return false;
+        }
 		if (isObsolete == null) {
-			if (other.isObsolete != null)
-				return false;
-		} else if (!isObsolete.equals(other.isObsolete))
-			return false;
+			if (other.isObsolete != null) {
+                return false;
+            }
+		} else if (!isObsolete.equals(other.isObsolete)) {
+            return false;
+        }
 		if (isRelationshipType == null) {
-			if (other.isRelationshipType != null)
-				return false;
-		} else if (!isRelationshipType.equals(other.isRelationshipType))
-			return false;
+			if (other.isRelationshipType != null) {
+                return false;
+            }
+		} else if (!isRelationshipType.equals(other.isRelationshipType)) {
+            return false;
+        }
 		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
+			if (other.name != null) {
+                return false;
+            }
+		} else if (!name.equals(other.name)) {
+            return false;
+        }
 		return true;
 	}
 

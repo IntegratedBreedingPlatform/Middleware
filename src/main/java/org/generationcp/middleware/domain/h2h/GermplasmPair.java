@@ -84,17 +84,22 @@ public class GermplasmPair{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         GermplasmPair other = (GermplasmPair) obj;
-        if (gid1 != other.gid1)
+        if (gid1 != other.gid1) {
             return false;
-        if (gid2 != other.gid2)
+        }
+        if (gid2 != other.gid2) {
             return false;
+        }
         return true;
     }
 

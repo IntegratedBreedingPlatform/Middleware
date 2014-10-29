@@ -310,69 +310,95 @@ public class StudyDetails implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         StudyDetails other = (StudyDetails) obj;
         if (endDate == null) {
-            if (other.endDate != null)
+            if (other.endDate != null) {
                 return false;
-        } else if (!endDate.equals(other.endDate))
+            }
+        } else if (!endDate.equals(other.endDate)) {
             return false;
+        }
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         if (measurementDatasetName == null) {
-            if (other.measurementDatasetName != null)
+            if (other.measurementDatasetName != null) {
                 return false;
-        } else if (!measurementDatasetName.equals(other.measurementDatasetName))
+            }
+        } else if (!measurementDatasetName.equals(other.measurementDatasetName)) {
             return false;
+        }
         if (objective == null) {
-            if (other.objective != null)
+            if (other.objective != null) {
                 return false;
-        } else if (!objective.equals(other.objective))
+            }
+        } else if (!objective.equals(other.objective)) {
             return false;
-        if (parentFolderId != other.parentFolderId)
+        }
+        if (parentFolderId != other.parentFolderId) {
             return false;
+        }
         if (piName == null) {
-            if (other.piName != null)
+            if (other.piName != null) {
                 return false;
-        } else if (!piName.equals(other.piName))
+            }
+        } else if (!piName.equals(other.piName)) {
             return false;
-        if (season != other.season)
+        }
+        if (season != other.season) {
             return false;
+        }
         if (siteName == null) {
-            if (other.siteName != null)
+            if (other.siteName != null) {
                 return false;
-        } else if (!siteName.equals(other.siteName))
+            }
+        } else if (!siteName.equals(other.siteName)) {
             return false;
+        }
         if (startDate == null) {
-            if (other.startDate != null)
+            if (other.startDate != null) {
                 return false;
-        } else if (!startDate.equals(other.startDate))
+            }
+        } else if (!startDate.equals(other.startDate)) {
             return false;
+        }
         if (studyName == null) {
-            if (other.studyName != null)
+            if (other.studyName != null) {
                 return false;
-        } else if (!studyName.equals(other.studyName))
+            }
+        } else if (!studyName.equals(other.studyName)) {
             return false;
-        if (studyType != other.studyType)
+        }
+        if (studyType != other.studyType) {
             return false;
+        }
         if (title == null) {
-            if (other.title != null)
+            if (other.title != null) {
                 return false;
-        } else if (!title.equals(other.title))
+            }
+        } else if (!title.equals(other.title)) {
             return false;
+        }
         if (trialDatasetName == null) {
-            if (other.trialDatasetName != null)
+            if (other.trialDatasetName != null) {
                 return false;
-        } else if (!trialDatasetName.equals(other.trialDatasetName))
+            }
+        } else if (!trialDatasetName.equals(other.trialDatasetName)) {
             return false;
+        }
         return true;
     }
     

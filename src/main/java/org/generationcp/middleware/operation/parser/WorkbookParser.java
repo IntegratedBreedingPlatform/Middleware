@@ -222,7 +222,9 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.start.date.invalid"));
         } else {
             try {
-                if (startDateStr != null && !startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
+                if (startDateStr != null && !startDateStr.equals("")) {
+                    startDate = dateFormat.parse(startDateStr);
+                }
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.start.date.invalid"));
             }
@@ -231,7 +233,9 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.end.date.invalid"));
         } else {
             try {
-                if (endDateStr != null && !endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
+                if (endDateStr != null && !endDateStr.equals("")) {
+                    endDate = dateFormat.parse(endDateStr);
+                }
             } catch (ParseException e) {
                 errorMessages.add(new Message("error.end.date.invalid"));
             }

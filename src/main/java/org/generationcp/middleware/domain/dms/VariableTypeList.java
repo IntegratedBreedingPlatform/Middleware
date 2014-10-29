@@ -31,8 +31,9 @@ public class VariableTypeList implements Serializable{
 		variableTypes.add(variableType);
 		
 			idVarTypeMap.put(Integer.toString(variableType.getId()), variableType);
-		if(variableType.getLocalName() != null)
-			nameVarTypeMap.put(variableType.getLocalName(), variableType);
+		if(variableType.getLocalName() != null) {
+            nameVarTypeMap.put(variableType.getLocalName(), variableType);
+        }
 	}
 	
 	public void addAll(VariableTypeList variableTypes) {
@@ -41,8 +42,9 @@ public class VariableTypeList implements Serializable{
 		        this.variableTypes.add(variableType);
 		        
 		        	idVarTypeMap.put(Integer.toString(variableType.getId()), variableType);
-				if(variableType.getLocalName() != null)
-					nameVarTypeMap.put(variableType.getLocalName(), variableType);
+				if(variableType.getLocalName() != null) {
+                    nameVarTypeMap.put(variableType.getLocalName(), variableType);
+                }
 				
 			}
 		}

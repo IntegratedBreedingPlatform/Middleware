@@ -382,7 +382,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
                 variables.addAll(variates.getVariables());
             }
 
-            for (Variable variable : variables)
+            for (Variable variable : variables) {
                 if (!("GID".equals(variable.getVariableType().getLocalName().trim()))) {
                     String value = variable.getDisplayValue();
                     Debug.println(INDENT, "Data Type is "
@@ -390,6 +390,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
                     Debug.println(INDENT, "\t" + experiment.getId() + "  :  "
                             + variable.getVariableType().getStandardVariable().getName() + "  :  " + value);
                 }
+            }
         }
     }
 
@@ -1036,10 +1037,11 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetParentFolder() throws MiddlewareQueryException{
     	DmsProject proj = manager.getParentFolder(10010);
-    	if(proj==null)
-    		Debug.println(INDENT, "Parent is null");
-    	else
-    		Debug.println(INDENT, "Parent is NOT null");
+    	if(proj==null) {
+            Debug.println(INDENT, "Parent is null");
+        } else {
+            Debug.println(INDENT, "Parent is NOT null");
+        }
     }
     
     @Test
@@ -1158,7 +1160,9 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     	
     	DataSet dataSet = manager.getDataSet(-9999);
     	
-    	if (dataSet==null) return;
+    	if (dataSet==null) {
+            return;
+        }
     	
 		for (VariableType vType: dataSet.getVariableTypes().getVariates().getVariableTypes()){
 			cvTermIds.add(vType.getStandardVariable().getId());

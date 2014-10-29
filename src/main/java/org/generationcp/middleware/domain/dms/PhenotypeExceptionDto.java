@@ -75,18 +75,23 @@ public class PhenotypeExceptionDto {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		PhenotypeExceptionDto other = (PhenotypeExceptionDto) obj;
 		if (standardVariableId == null) {
-			if (other.standardVariableId != null)
-				return false;
-		} else if (!standardVariableId.equals(other.standardVariableId))
-			return false;
+			if (other.standardVariableId != null) {
+                return false;
+            }
+		} else if (!standardVariableId.equals(other.standardVariableId)) {
+            return false;
+        }
 		return true;
 	}
 

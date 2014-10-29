@@ -163,11 +163,13 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
            
             Criteria criteria = getSession().createCriteria(Method.class);
 
-            if (type != null && !type.isEmpty())
+            if (type != null && !type.isEmpty()) {
                 criteria.add(Restrictions.eq("mtype", type));
+            }
 
-            if (name != null && !name.isEmpty())
-                criteria.add(Restrictions.like("mname","%" + name.trim() + "%"));
+            if (name != null && !name.isEmpty()) {
+                criteria.add(Restrictions.like("mname", "%" + name.trim() + "%"));
+            }
 
 
             if (group != null && !group.isEmpty()) {

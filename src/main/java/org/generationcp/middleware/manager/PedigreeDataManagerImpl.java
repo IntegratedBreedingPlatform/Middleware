@@ -83,10 +83,11 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
             rootNode.setGermplasm(root);
             if (level > 1) {
-                if(includeDerivativeLines == true)
+                if(includeDerivativeLines == true) {
                     rootNode = addParents(rootNode, level);
-                else
+                } else {
                     rootNode = addParentsExcludeDerivativeLines(rootNode, level);
+                }
             }
             tree.setRoot(rootNode);
             return tree;

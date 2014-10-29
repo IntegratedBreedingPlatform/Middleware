@@ -91,8 +91,12 @@ public class Enumeration implements Serializable, Comparable<Enumeration> {
 
 	@Override
 	public int compareTo(Enumeration other) {
-		if (rank < other.rank) return -1;
-		if (rank > other.rank) return 1;
+		if (rank < other.rank) {
+            return -1;
+        }
+		if (rank > other.rank) {
+            return 1;
+        }
 		return name.compareTo(other.name);
 	}
 }

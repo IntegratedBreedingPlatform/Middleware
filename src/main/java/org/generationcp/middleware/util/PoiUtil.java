@@ -666,7 +666,9 @@ public class PoiUtil {
 
     public static String rowAsString(Sheet sheet, int rowIndex, String delimiter) {
         Row row = sheet.getRow(rowIndex);
-        if (row == null) return "";
+        if (row == null) {
+            return "";
+        }
         int startCell = row.getFirstCellNum();
         int endCell = row.getLastCellNum() - 1;
 

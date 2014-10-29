@@ -59,23 +59,30 @@ public class QtlDataRow{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         QtlDataRow other = (QtlDataRow) obj;
         if (qtl == null) {
-            if (other.qtl != null)
+            if (other.qtl != null) {
                 return false;
-        } else if (!qtl.equals(other.qtl))
+            }
+        } else if (!qtl.equals(other.qtl)) {
             return false;
+        }
         if (qtlDetails == null) {
-            if (other.qtlDetails != null)
+            if (other.qtlDetails != null) {
                 return false;
-        } else if (!qtlDetails.equals(other.qtlDetails))
+            }
+        } else if (!qtlDetails.equals(other.qtlDetails)) {
             return false;
+        }
         return true;
     }
 

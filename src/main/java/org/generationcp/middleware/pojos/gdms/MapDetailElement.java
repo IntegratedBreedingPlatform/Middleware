@@ -124,38 +124,51 @@ public class MapDetailElement implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MapDetailElement other = (MapDetailElement) obj;
         if (linkageGroup == null) {
-            if (other.linkageGroup != null)
+            if (other.linkageGroup != null) {
                 return false;
-        } else if (!linkageGroup.equals(other.linkageGroup))
+            }
+        } else if (!linkageGroup.equals(other.linkageGroup)) {
             return false;
+        }
         if (mapName == null) {
-            if (other.mapName != null)
+            if (other.mapName != null) {
                 return false;
-        } else if (!mapName.equals(other.mapName))
+            }
+        } else if (!mapName.equals(other.mapName)) {
             return false;
+        }
         if (mapType == null) {
-            if (other.mapType != null)
+            if (other.mapType != null) {
                 return false;
-        } else if (!mapType.equals(other.mapType))
+            }
+        } else if (!mapType.equals(other.mapType)) {
             return false;
+        }
         if (markerCount == null) {
-            if (other.markerCount != null)
+            if (other.markerCount != null) {
                 return false;
-        } else if (!markerCount.equals(other.markerCount))
+            }
+        } else if (!markerCount.equals(other.markerCount)) {
             return false;
+        }
         if (maxStartPosition == null) {
-            if (other.maxStartPosition != null)
+            if (other.maxStartPosition != null) {
                 return false;
-        } else if (!maxStartPosition.equals(other.maxStartPosition))
+            }
+        } else if (!maxStartPosition.equals(other.maxStartPosition)) {
             return false;
+        }
         return true;
     }
 

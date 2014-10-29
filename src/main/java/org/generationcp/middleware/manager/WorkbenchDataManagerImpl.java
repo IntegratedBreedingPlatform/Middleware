@@ -408,10 +408,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             }
            
  	    List<ProjectUserMysqlAccount> mysqlaccounts = getProjectUserMysqlAccountDAO().getByProjectId(project.getProjectId().intValue());
-            if(mysqlaccounts != null)
-            	for (ProjectUserMysqlAccount mysqlaccount : mysqlaccounts) {
-            		deleteProjectUserMysqlAccount(mysqlaccount);
+            if(mysqlaccounts != null) {
+                for (ProjectUserMysqlAccount mysqlaccount : mysqlaccounts) {
+                    deleteProjectUserMysqlAccount(mysqlaccount);
                 }
+            }
            
             		
            
@@ -1341,7 +1342,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     
     @Override
     public List<ProjectBackup> getProjectBackups(Project project) throws MiddlewareQueryException {
-        if (project == null || project.getProjectId() == null) return null;
+        if (project == null || project.getProjectId() == null) {
+            return null;
+        }
         
         return getProjectBackupDao().getProjectBackups(project.getProjectId());
     }

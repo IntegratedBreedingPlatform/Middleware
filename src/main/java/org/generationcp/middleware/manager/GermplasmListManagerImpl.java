@@ -349,8 +349,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             }
             
             // end transaction, commit to database
-            if(!trans.wasCommitted())
-              trans.commit();
+            if(!trans.wasCommitted()) {
+                trans.commit();
+            }
             
         } catch (Exception e) {
             rollbackTransaction(trans);

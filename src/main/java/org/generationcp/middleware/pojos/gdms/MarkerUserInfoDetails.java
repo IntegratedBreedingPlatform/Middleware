@@ -95,33 +95,44 @@ public class MarkerUserInfoDetails{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		MarkerUserInfoDetails other = (MarkerUserInfoDetails) obj;
 		if (contact == null) {
-			if (other.contact != null)
-				return false;
-		} else if (!contact.equals(other.contact))
-			return false;
+			if (other.contact != null) {
+                return false;
+            }
+		} else if (!contact.equals(other.contact)) {
+            return false;
+        }
 		if (contactId == null) {
-			if (other.contactId != null)
-				return false;
-		} else if (!contactId.equals(other.contactId))
-			return false;
+			if (other.contactId != null) {
+                return false;
+            }
+		} else if (!contactId.equals(other.contactId)) {
+            return false;
+        }
 		if (institute == null) {
-			if (other.institute != null)
-				return false;
-		} else if (!institute.equals(other.institute))
-			return false;
+			if (other.institute != null) {
+                return false;
+            }
+		} else if (!institute.equals(other.institute)) {
+            return false;
+        }
 		if (principalInvestigator == null) {
-			if (other.principalInvestigator != null)
-				return false;
-		} else if (!principalInvestigator.equals(other.principalInvestigator))
-			return false;
+			if (other.principalInvestigator != null) {
+                return false;
+            }
+		} else if (!principalInvestigator.equals(other.principalInvestigator)) {
+            return false;
+        }
 		return true;
 	}
 

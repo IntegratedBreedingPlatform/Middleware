@@ -97,18 +97,23 @@ public class ProjectBackup implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ProjectBackup other = (ProjectBackup) obj;
         if (projectBackupId == null) {
-            if (other.projectBackupId != null)
+            if (other.projectBackupId != null) {
                 return false;
-        } else if (!projectBackupId.equals(other.projectBackupId))
+            }
+        } else if (!projectBackupId.equals(other.projectBackupId)) {
             return false;
+        }
         return true;
     }
 

@@ -56,23 +56,30 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		GermplasmListNewColumnsInfo other = (GermplasmListNewColumnsInfo) obj;
 		if (columnValuesMap == null) {
-			if (other.columnValuesMap != null)
-				return false;
-		} else if (!columnValuesMap.equals(other.columnValuesMap))
-			return false;
+			if (other.columnValuesMap != null) {
+                return false;
+            }
+		} else if (!columnValuesMap.equals(other.columnValuesMap)) {
+            return false;
+        }
 		if (listId == null) {
-			if (other.listId != null)
-				return false;
-		} else if (!listId.equals(other.listId))
-			return false;
+			if (other.listId != null) {
+                return false;
+            }
+		} else if (!listId.equals(other.listId)) {
+            return false;
+        }
 		return true;
 	}
 

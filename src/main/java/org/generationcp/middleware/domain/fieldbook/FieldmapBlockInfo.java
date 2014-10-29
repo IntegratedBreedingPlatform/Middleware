@@ -227,27 +227,37 @@ public class FieldmapBlockInfo implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         FieldmapBlockInfo other = (FieldmapBlockInfo) obj;
-        if (blockId != other.blockId)
+        if (blockId != other.blockId) {
             return false;
-        if (isNewBlock != other.isNewBlock)
+        }
+        if (isNewBlock != other.isNewBlock) {
             return false;
-        if (machineRowCapacity != other.machineRowCapacity)
+        }
+        if (machineRowCapacity != other.machineRowCapacity) {
             return false;
-        if (numberOfRowsInPlot != other.numberOfRowsInPlot)
+        }
+        if (numberOfRowsInPlot != other.numberOfRowsInPlot) {
             return false;
-        if (plantingOrder != other.plantingOrder)
+        }
+        if (plantingOrder != other.plantingOrder) {
             return false;
-        if (rangesInBlock != other.rangesInBlock)
+        }
+        if (rangesInBlock != other.rangesInBlock) {
             return false;
-        if (rowsInBlock != other.rowsInBlock)
+        }
+        if (rowsInBlock != other.rowsInBlock) {
             return false;
+        }
         return true;
     }
 

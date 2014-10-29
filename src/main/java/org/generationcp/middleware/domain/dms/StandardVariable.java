@@ -280,8 +280,12 @@ public class StandardVariable implements Serializable{
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof StandardVariable)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof StandardVariable)) {
+            return false;
+        }
 		StandardVariable other = (StandardVariable) obj;
 		return other.getId() == getId();
 	}

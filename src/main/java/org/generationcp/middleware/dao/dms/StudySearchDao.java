@@ -147,8 +147,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	public long countStudiesBySeason(Season season) throws MiddlewareQueryException {
 		try {
 			int valueId = 0;
-			if (season == Season.DRY) valueId = TermId.SEASON_DRY.getId();
-			else if (season == Season.WET) valueId = TermId.SEASON_WET.getId();
+			if (season == Season.DRY) {
+                valueId = TermId.SEASON_DRY.getId();
+            } else if (season == Season.WET) {
+                valueId = TermId.SEASON_WET.getId();
+            }
 			
 			if (valueId != 0) {
 				SQLQuery query = getSession().createSQLQuery(
@@ -186,8 +189,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
 			int valueId = 0;
-			if (season == Season.DRY) valueId = 10290;
-			else if (season == Season.WET) valueId = 10300;
+			if (season == Season.DRY) {
+                valueId = 10290;
+            } else if (season == Season.WET) {
+                valueId = 10300;
+            }
 			
 			if (valueId != 0) {
 			SQLQuery query = getSession().createSQLQuery(

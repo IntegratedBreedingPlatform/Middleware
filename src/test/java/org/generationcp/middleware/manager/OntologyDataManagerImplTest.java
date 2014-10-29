@@ -174,10 +174,12 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest {
 		assertSame(stdVar.getStoredIn(), stdVar2.getStoredIn());
 		assertSame(stdVar.getPhenotypicType(), stdVar2.getPhenotypicType());
 		assertSame(stdVar.getConstraints(), stdVar2.getConstraints());
-		if (stdVar.getName() != null)
-			assertTrue(stdVar.getName().equals(stdVar2.getName()));
-		if (stdVar.getDescription() != null)
-			assertTrue(stdVar.getDescription().equals(stdVar2.getDescription()));
+		if (stdVar.getName() != null) {
+            assertTrue(stdVar.getName().equals(stdVar2.getName()));
+        }
+		if (stdVar.getDescription() != null) {
+            assertTrue(stdVar.getDescription().equals(stdVar2.getDescription()));
+        }
 		assertSame(stdVar.getEnumerations(), stdVar2.getEnumerations());
 
 		Debug.println(INDENT, "testCopyStandardVariable(): \n    " + stdVar + "\n    " + stdVar2);

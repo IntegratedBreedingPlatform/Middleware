@@ -98,16 +98,30 @@ public class MtaMetadata implements Serializable{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         MtaMetadata that = (MtaMetadata) o;
 
-        if (datasetID != null ? !datasetID.equals(that.datasetID) : that.datasetID != null) return false;
-        if (population != null ? !population.equals(that.population) : that.population != null) return false;
-        if (populationSize != null ? !populationSize.equals(that.populationSize) : that.populationSize != null) return false;
-        if (populationUnits != null ? !populationUnits.equals(that.populationUnits) : that.populationUnits != null) return false;
-        if (project != null ? !project.equals(that.project) : that.project != null) return false;
+        if (datasetID != null ? !datasetID.equals(that.datasetID) : that.datasetID != null) {
+            return false;
+        }
+        if (population != null ? !population.equals(that.population) : that.population != null) {
+            return false;
+        }
+        if (populationSize != null ? !populationSize.equals(that.populationSize) : that.populationSize != null) {
+            return false;
+        }
+        if (populationUnits != null ? !populationUnits.equals(that.populationUnits) : that.populationUnits != null) {
+            return false;
+        }
+        if (project != null ? !project.equals(that.project) : that.project != null) {
+            return false;
+        }
 
         return true;
     }

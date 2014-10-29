@@ -225,27 +225,63 @@ public class ExtendedMarkerInfo extends MarkerInfo{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
 
         ExtendedMarkerInfo that = (ExtendedMarkerInfo) o;
 
-        if (elongationTemp != null ? !elongationTemp.equals(that.elongationTemp) : that.elongationTemp != null) return false;
-        if (expectedProductSize != null ? !expectedProductSize.equals(that.expectedProductSize) : that.expectedProductSize != null) return false;
-        if (forwardPrimerTemp != null ? !forwardPrimerTemp.equals(that.forwardPrimerTemp) : that.forwardPrimerTemp != null) return false;
-        if (fragmentSizeExpected != null ? !fragmentSizeExpected.equals(that.fragmentSizeExpected) : that.fragmentSizeExpected != null) return false;
-        if (fragmentSizeObserved != null ? !fragmentSizeObserved.equals(that.fragmentSizeObserved) : that.fragmentSizeObserved != null) return false;
-        if (maxAllele != null ? !maxAllele.equals(that.maxAllele) : that.maxAllele != null) return false;
-        if (minAllele != null ? !minAllele.equals(that.minAllele) : that.minAllele != null) return false;
-        if (motifType != null ? !motifType.equals(that.motifType) : that.motifType != null) return false;
-        if (numberOfRepeats != null ? !numberOfRepeats.equals(that.numberOfRepeats) : that.numberOfRepeats != null) return false;
-        if (positionOnSequence != null ? !positionOnSequence.equals(that.positionOnSequence) : that.positionOnSequence != null) return false;
-        if (restrictionEnzyme != null ? !restrictionEnzyme.equals(that.restrictionEnzyme) : that.restrictionEnzyme != null) return false;
-        if (reversePrimerTemp != null ? !reversePrimerTemp.equals(that.reversePrimerTemp) : that.reversePrimerTemp != null) return false;
-        if (sequence != null ? !sequence.equals(that.sequence) : that.sequence != null) return false;
-        if (sequenceLength != null ? !sequenceLength.equals(that.sequenceLength) : that.sequenceLength != null) return false;
-        if (ssrNumber != null ? !ssrNumber.equals(that.ssrNumber) : that.ssrNumber != null) return false;
+        if (elongationTemp != null ? !elongationTemp.equals(that.elongationTemp) : that.elongationTemp != null) {
+            return false;
+        }
+        if (expectedProductSize != null ? !expectedProductSize.equals(that.expectedProductSize) : that.expectedProductSize != null) {
+            return false;
+        }
+        if (forwardPrimerTemp != null ? !forwardPrimerTemp.equals(that.forwardPrimerTemp) : that.forwardPrimerTemp != null) {
+            return false;
+        }
+        if (fragmentSizeExpected != null ? !fragmentSizeExpected.equals(that.fragmentSizeExpected) : that.fragmentSizeExpected != null) {
+            return false;
+        }
+        if (fragmentSizeObserved != null ? !fragmentSizeObserved.equals(that.fragmentSizeObserved) : that.fragmentSizeObserved != null) {
+            return false;
+        }
+        if (maxAllele != null ? !maxAllele.equals(that.maxAllele) : that.maxAllele != null) {
+            return false;
+        }
+        if (minAllele != null ? !minAllele.equals(that.minAllele) : that.minAllele != null) {
+            return false;
+        }
+        if (motifType != null ? !motifType.equals(that.motifType) : that.motifType != null) {
+            return false;
+        }
+        if (numberOfRepeats != null ? !numberOfRepeats.equals(that.numberOfRepeats) : that.numberOfRepeats != null) {
+            return false;
+        }
+        if (positionOnSequence != null ? !positionOnSequence.equals(that.positionOnSequence) : that.positionOnSequence != null) {
+            return false;
+        }
+        if (restrictionEnzyme != null ? !restrictionEnzyme.equals(that.restrictionEnzyme) : that.restrictionEnzyme != null) {
+            return false;
+        }
+        if (reversePrimerTemp != null ? !reversePrimerTemp.equals(that.reversePrimerTemp) : that.reversePrimerTemp != null) {
+            return false;
+        }
+        if (sequence != null ? !sequence.equals(that.sequence) : that.sequence != null) {
+            return false;
+        }
+        if (sequenceLength != null ? !sequenceLength.equals(that.sequenceLength) : that.sequenceLength != null) {
+            return false;
+        }
+        if (ssrNumber != null ? !ssrNumber.equals(that.ssrNumber) : that.ssrNumber != null) {
+            return false;
+        }
 
         return true;
     }

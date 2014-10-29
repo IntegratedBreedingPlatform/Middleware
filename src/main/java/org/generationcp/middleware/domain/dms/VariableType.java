@@ -99,8 +99,12 @@ public class VariableType implements Serializable, Comparable<VariableType>{
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof VariableType)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof VariableType)) {
+            return false;
+        }
 		VariableType other = (VariableType) obj;
 		return other.getId() == getId();
 	}

@@ -239,93 +239,128 @@ public class Dataset implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		Dataset other = (Dataset) obj;
 		if (dataType == null) {
-			if (other.dataType != null)
-				return false;
-		} else if (!dataType.equals(other.dataType))
-			return false;
+			if (other.dataType != null) {
+                return false;
+            }
+		} else if (!dataType.equals(other.dataType)) {
+            return false;
+        }
 		if (datasetDesc == null) {
-			if (other.datasetDesc != null)
-				return false;
-		} else if (!datasetDesc.equals(other.datasetDesc))
-			return false;
+			if (other.datasetDesc != null) {
+                return false;
+            }
+		} else if (!datasetDesc.equals(other.datasetDesc)) {
+            return false;
+        }
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (datasetName == null) {
-			if (other.datasetName != null)
-				return false;
-		} else if (!datasetName.equals(other.datasetName))
-			return false;
+			if (other.datasetName != null) {
+                return false;
+            }
+		} else if (!datasetName.equals(other.datasetName)) {
+            return false;
+        }
 		if (datasetType == null) {
-			if (other.datasetType != null)
-				return false;
-		} else if (!datasetType.equals(other.datasetType))
-			return false;
+			if (other.datasetType != null) {
+                return false;
+            }
+		} else if (!datasetType.equals(other.datasetType)) {
+            return false;
+        }
 		if (email == null) {
-			if (other.email != null)
-				return false;
-		} else if (!email.equals(other.email))
-			return false;
+			if (other.email != null) {
+                return false;
+            }
+		} else if (!email.equals(other.email)) {
+            return false;
+        }
 		if (genus == null) {
-			if (other.genus != null)
-				return false;
-		} else if (!genus.equals(other.genus))
-			return false;
+			if (other.genus != null) {
+                return false;
+            }
+		} else if (!genus.equals(other.genus)) {
+            return false;
+        }
 		if (institute == null) {
-			if (other.institute != null)
-				return false;
-		} else if (!institute.equals(other.institute))
-			return false;
+			if (other.institute != null) {
+                return false;
+            }
+		} else if (!institute.equals(other.institute)) {
+            return false;
+        }
 		if (method == null) {
-			if (other.method != null)
-				return false;
-		} else if (!method.equals(other.method))
-			return false;
+			if (other.method != null) {
+                return false;
+            }
+		} else if (!method.equals(other.method)) {
+            return false;
+        }
 		if (missingData == null) {
-			if (other.missingData != null)
-				return false;
-		} else if (!missingData.equals(other.missingData))
-			return false;
+			if (other.missingData != null) {
+                return false;
+            }
+		} else if (!missingData.equals(other.missingData)) {
+            return false;
+        }
 		if (principalInvestigator == null) {
-			if (other.principalInvestigator != null)
-				return false;
-		} else if (!principalInvestigator.equals(other.principalInvestigator))
-			return false;
+			if (other.principalInvestigator != null) {
+                return false;
+            }
+		} else if (!principalInvestigator.equals(other.principalInvestigator)) {
+            return false;
+        }
 		if (purposeOfStudy == null) {
-			if (other.purposeOfStudy != null)
-				return false;
-		} else if (!purposeOfStudy.equals(other.purposeOfStudy))
-			return false;
+			if (other.purposeOfStudy != null) {
+                return false;
+            }
+		} else if (!purposeOfStudy.equals(other.purposeOfStudy)) {
+            return false;
+        }
 		if (remarks == null) {
-			if (other.remarks != null)
-				return false;
-		} else if (!remarks.equals(other.remarks))
-			return false;
+			if (other.remarks != null) {
+                return false;
+            }
+		} else if (!remarks.equals(other.remarks)) {
+            return false;
+        }
 		if (score == null) {
-			if (other.score != null)
-				return false;
-		} else if (!score.equals(other.score))
-			return false;
+			if (other.score != null) {
+                return false;
+            }
+		} else if (!score.equals(other.score)) {
+            return false;
+        }
 		if (species == null) {
-			if (other.species != null)
-				return false;
-		} else if (!species.equals(other.species))
-			return false;
+			if (other.species != null) {
+                return false;
+            }
+		} else if (!species.equals(other.species)) {
+            return false;
+        }
 		if (uploadTemplateDate == null) {
-			if (other.uploadTemplateDate != null)
-				return false;
-		} else if (!uploadTemplateDate.equals(other.uploadTemplateDate))
-			return false;
+			if (other.uploadTemplateDate != null) {
+                return false;
+            }
+		} else if (!uploadTemplateDate.equals(other.uploadTemplateDate)) {
+            return false;
+        }
 		return true;
 	}
 

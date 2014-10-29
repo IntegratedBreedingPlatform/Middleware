@@ -880,8 +880,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         try {
 
-            if (method.getMid() == null || method.getMid() > 0)
+            if (method.getMid() == null || method.getMid() > 0) {
                 throw new Exception("method has no Id or is not a local method");
+            }
 
             trans = session.beginTransaction();
             MethodDAO dao = getMethodDao();
@@ -2402,10 +2403,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if(includeParents){
         	List<Integer> parentGids = new ArrayList<Integer>();
             for(Germplasm g: result){
-                if(g!=null && g.getGpid1()!=null && g.getGpid1()!=0)
+                if(g!=null && g.getGpid1()!=null && g.getGpid1()!=0) {
                     parentGids.add(g.getGpid1());
-                if(g!=null && g.getGpid2()!=null && g.getGpid2()!=0)
+                }
+                if(g!=null && g.getGpid2()!=null && g.getGpid2()!=0) {
                     parentGids.add(g.getGpid2());
+                }
             }
             if(parentGids.size()>0){
             	for (Integer gid : parentGids) {
