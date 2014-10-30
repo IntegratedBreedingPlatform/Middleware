@@ -14,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -39,6 +40,9 @@ public class DataImportServiceImplTest {
     @InjectMocks
     private DataImportServiceImpl dataImportService;
 
+    public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[]{"1234", "word@", "_+world=", "!!world!!", "&&&"};
+    public static final String[] STRINGS_WITH_VALID_CHARACTERS = new String[]{"i_am_groot", "hello123world", "%%bangbang", "something_something", "zawaruldoisbig"};
+
     @Test
     public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
         DataImportServiceImpl moleDataImportService = spy(dataImportService);
@@ -58,10 +62,11 @@ public class DataImportServiceImplTest {
             fail("We expects workbookParserException to be thrown");
         } catch (WorkbookParserException e) {
 
-            verify(moleDataImportService).validateMeasurmentVariableNameLengths(workbook.getAllVariables());
+            verify(moleDataImportService).validateMeasurementVariableName(workbook.getAllVariables());
 
+            final String[] errorTypes = {DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH,DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
             for (Message error : e.getErrorMessages()) {
-                assertEquals("All errors should contain a error.trim.measurement.variable error", error.getMessageKey(), "error.trim.measurement.variable");
+                assertTrue("All errors should contain either ERROR_INVALID_VARIABLE_NAME_CHARACTERS or ERROR_INVALID_VARIABLE_NAME_LENGTH", Arrays.asList(errorTypes).contains(error.getMessageKey()));
             }
         }
     }
@@ -88,6 +93,20 @@ public class DataImportServiceImplTest {
         assertEquals("messages should be empty",0,messages.size());
     }
 
+    @Test
+    public void testValidateMeasurmentVariableNameCharacters() throws Exception {
+        List<MeasurementVariable> measurementVariables = getValidNamedMeasurementVariables();
+        measurementVariables.addAll(getInvalidNamedMeasurementVariables());
+
+        List<Message> messages = dataImportService.validateMeasurmentVariableNameCharacters(measurementVariables);
+
+        assertEquals("we should only have messages same size with the STRINGS_WITH_INVALID_CHARACTERS count", STRINGS_WITH_INVALID_CHARACTERS.length,messages.size());
+
+        for (Message message : messages) {
+            assertTrue("returned messages should contain the names from the set of invalid strings list", Arrays.asList(STRINGS_WITH_INVALID_CHARACTERS).contains(message.getMessageParams()[0]));
+        }
+    }
+
     protected List<MeasurementVariable> initializeTestMeasurementVariables() {
         List<MeasurementVariable> measurementVariables = getShortNamedMeasurementVariables();
 
@@ -95,9 +114,13 @@ public class DataImportServiceImplTest {
         for (int i = 0; i < INVALID_VARIABLES_COUNT; i++) {
             MeasurementVariable mv = new MeasurementVariable();
 
-            mv.setName("[" + i + "]_MEASUREMENT_VARIABLE_WITH_NAME_UP_TO_THIRTY_TWO_CHARACTERS");
+            mv.setName("NUM_" + i + "_MEASUREMENT_VARIABLE_WITH_NAME_UP_TO_THIRTY_TWO_CHARACTERS");
             measurementVariables.add(mv);
         }
+
+        // also add those invalid variables to add to the main test
+        measurementVariables.addAll(getInvalidNamedMeasurementVariables());
+
         return measurementVariables;
     }
 
@@ -107,9 +130,33 @@ public class DataImportServiceImplTest {
         // 5 short names
         for (int i = 0; i < VALID_VARIABLES_COUNT; i++) {
             MeasurementVariable mv = new MeasurementVariable();
-            mv.setName("["+ i +"]_SHORT");
+            mv.setName("NUM_"+ i +"_SHORT");
             measurementVariables.add(mv);
         }
         return measurementVariables;
     }
+
+    private List<MeasurementVariable> getInvalidNamedMeasurementVariables() {
+        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+
+        for (int i = 0; i < STRINGS_WITH_INVALID_CHARACTERS.length; i++) {
+            MeasurementVariable mv = new MeasurementVariable();
+            mv.setName(STRINGS_WITH_INVALID_CHARACTERS[i]);
+            measurementVariables.add(mv);
+        }
+        return measurementVariables;
+    }
+
+    private List<MeasurementVariable> getValidNamedMeasurementVariables() {
+        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+
+        for (int i = 0; i < STRINGS_WITH_VALID_CHARACTERS.length; i++) {
+            MeasurementVariable mv = new MeasurementVariable();
+            mv.setName(STRINGS_WITH_VALID_CHARACTERS[i]);
+            measurementVariables.add(mv);
+        }
+        return measurementVariables;
+    }
+
+
 }

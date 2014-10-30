@@ -43,6 +43,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
     public static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
     public static final String ERROR_DUPLICATE_PSMR = "error.duplicate.psmr";
+    public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
+    public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 
     public DataImportServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -66,7 +68,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	/**
 	 * Transaction 1 : Transform Variables and save new Ontology Terms
 	 *  Send : xls workbook
-	 *   Return : Map of 3 sub maps with transformed variables (ontology fully loaded) - here is how it was loaded :
+	 *   Return : Map of 3 sub maps with transformed allVariables (ontology fully loaded) - here is how it was loaded :
 	 *    -- headers : Strings
 	 *        //         headerMap.put("trialHeaders", trialHeaders);
 	 *        // -- variableTypeLists (VariableTypeList)
@@ -180,7 +182,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             messages.add(new Message(ERROR_MISSING_TRIAL_CONDITION));
         }
 
-        messages.addAll(validateMeasurmentVariableNameLengths(workbook.getAllVariables()));
+        messages.addAll(validateMeasurementVariableName(workbook.getAllVariables()));
 
         if (!messages.isEmpty()) {
             throw new WorkbookParserException(messages);
@@ -205,12 +207,33 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return workbook;
     }
 
+    protected List<Message> validateMeasurementVariableName(List<MeasurementVariable> allVariables) {
+        List<Message> messages = new ArrayList<Message>();
+
+        messages.addAll(validateMeasurmentVariableNameLengths(allVariables));
+        messages.addAll(validateMeasurmentVariableNameCharacters(allVariables));
+
+        return messages;
+    }
+
     protected List<Message> validateMeasurmentVariableNameLengths(List<MeasurementVariable> variableList) {
         List<Message> messages = new ArrayList<Message>();
 
         for (MeasurementVariable mv : variableList) {
             if (mv.getName().length() > MAX_VARIABLE_NAME_LENGTH) {
-                messages.add(new Message("error.trim.measurement.variable",mv.getName()));
+                messages.add(new Message(ERROR_INVALID_VARIABLE_NAME_LENGTH,mv.getName()));
+            }
+        }
+
+        return messages;
+    }
+
+    protected List<Message> validateMeasurmentVariableNameCharacters(List<MeasurementVariable> variableList) {
+        List<Message> messages = new ArrayList<Message>();
+
+        for (MeasurementVariable mv : variableList) {
+            if (!mv.getName().matches("^[^0-9][\\w\\d%]*$")) {
+                messages.add(new Message(ERROR_INVALID_VARIABLE_NAME_CHARACTERS,mv.getName()));
             }
         }
 
