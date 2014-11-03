@@ -1004,7 +1004,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ")
 		.append(" where a.project_id = ").append(projectId)
 		.append(" and nd_exp.nd_geolocation_id = ").append(locationId)
-		.append(" and (phenotype.value <> '' and phenotype.value is not null) ")
+		.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
+		.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
 		.append(" group by nd_exp.nd_geolocation_id, nd_exp_stock.stock_id, phenotype.observable_id ")
 		.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
 		
