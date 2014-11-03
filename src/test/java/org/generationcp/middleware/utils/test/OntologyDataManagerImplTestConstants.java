@@ -45,5 +45,7 @@ public interface OntologyDataManagerImplTestConstants {
 
     public static final Integer CATEGORICAL_VARIABLE_TERM_ID = 8371;
     public static final Integer CROP_SESCND_VALID_VALUE_FROM_CENTRAL = 10290;
-
+    
+    public static final String[] CENTRAL_COMMON_HEADERS = new String[] { "ENTRY_NO", "PLOT",
+  		"TRIAL", "STUDY" };
 }
