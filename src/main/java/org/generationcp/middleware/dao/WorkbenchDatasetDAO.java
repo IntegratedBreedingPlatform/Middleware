@@ -11,9 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -23,6 +20,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link WorkbenchDataset}.

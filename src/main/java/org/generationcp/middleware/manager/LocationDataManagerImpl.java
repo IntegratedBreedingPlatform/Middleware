@@ -12,34 +12,19 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.LocationType;
-import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.LocdesType;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Implementation of the LocationDataManager interface. To instantiate this
@@ -236,8 +221,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             results.addAll(getLocationDao().getLocationByIds(negs));
         }
 
-        //loc.getLname();
-
         Collections.sort(results, new Comparator() {
             @Override
             public int compare(Object obj1, Object obj2) {
@@ -276,9 +259,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             for (Location l : locations) {
                 Country c = this.getCountryById(l.getCntryid());
                 UserDefinedField udf = this.getUserDefinedFieldByID(l.getLtype());
-
-                // hack, reset working database to local
-                //setWorkingDatabase(Database.LOCAL);
 
                 LocationDetails ld = new LocationDetails();
                 ld.setCntryid(l.getCntryid());

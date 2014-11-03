@@ -11,26 +11,17 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmNameDetails;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+
+import java.util.List;
+import java.util.Map;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -1003,30 +994,6 @@ public interface GermplasmDataManager {
      */
     Integer addBibliographicReference(Bibref bibref) throws MiddlewareQueryException;
 
-
-    /*
-     * Returns the Germplasm records with field values matching the specified
-     * values on the given sample Germplasm object. The following fields will be
-     * checked for matches: method, gnpgs, gpid1, gpid2, user, location, gdate,
-     * reference, mgid, and attributes.
-     * 
-     * @param sample
-     * @param start
-     * @param numOfRows
-     * @return List of Germplasm POJOs
-     */
-    // List<Germplasm> getGermplasmByExample(Germplasm sample, int start, int numOfRows);
-
-    /*
-     * Returns the number of Germplasm records with field values matching the
-     * specified values on the given sample Germplasm object. The following
-     * fields will be checked for matches: method, gnpgs, gpid1, gpid2, user,
-     * location, gdate, reference, mgid, and attributes.
-     * 
-     * @param sample
-     * @return
-     */
-    // long countGermplasmByExample(Germplasm sample);
 
     /**
      * Stores in the database the given valid Attribute object.

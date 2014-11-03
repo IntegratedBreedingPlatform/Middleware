@@ -1,9 +1,9 @@
 package org.generationcp.middleware.domain.inventory;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.Location;
+
+import java.io.Serializable;
 
 public class LotDetails implements Serializable{
 	

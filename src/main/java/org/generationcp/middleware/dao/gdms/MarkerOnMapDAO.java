@@ -11,17 +11,17 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link MarkerOnMap}.
@@ -71,12 +71,6 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
         Map<Integer, List<String>> markerMaps = new HashMap<Integer, List<String>>();
         
         try {
-            /*
-                SELECT DISTINCT map_name, marker_id 
-                FROM gdms_map map INNER JOIN gdms_markers_onmap markermap ON map.map_id = markermap.map_id
-                WHERE markermap.marker_id IN (@markerIds);
-            */
-
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT DISTINCT marker_id, CONCAT(map_name,'') ")
             .append("FROM gdms_map map INNER JOIN gdms_markers_onmap markermap ON map.map_id = markermap.map_id ")
@@ -115,8 +109,6 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
         List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
 
         try {
-            // SELECT * FROM gdms_markers_onmap WHERE map_id = -2 ORDER BY linkage_group, start_position;
-
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT markeronmap_id, map_id, marker_id, start_position, end_position, linkage_group ")
             .append("FROM gdms_markers_onmap  ")

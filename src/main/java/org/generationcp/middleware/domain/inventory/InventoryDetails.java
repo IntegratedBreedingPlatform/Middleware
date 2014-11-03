@@ -411,98 +411,135 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		InventoryDetails other = (InventoryDetails) obj;
 		if (amount == null) {
-			if (other.amount != null)
-				return false;
-		} else if (!amount.equals(other.amount))
-			return false;
+			if (other.amount != null) {
+                return false;
+            }
+		} else if (!amount.equals(other.amount)) {
+            return false;
+        }
 		if (comment == null) {
-			if (other.comment != null)
-				return false;
-		} else if (!comment.equals(other.comment))
-			return false;
+			if (other.comment != null) {
+                return false;
+            }
+		} else if (!comment.equals(other.comment)) {
+            return false;
+        }
 		if (entryId == null) {
-			if (other.entryId != null)
-				return false;
-		} else if (!entryId.equals(other.entryId))
-			return false;
+			if (other.entryId != null) {
+                return false;
+            }
+		} else if (!entryId.equals(other.entryId)) {
+            return false;
+        }
 		if (germplasmName == null) {
-			if (other.germplasmName != null)
-				return false;
-		} else if (!germplasmName.equals(other.germplasmName))
-			return false;
+			if (other.germplasmName != null) {
+                return false;
+            }
+		} else if (!germplasmName.equals(other.germplasmName)) {
+            return false;
+        }
 		if (gid == null) {
-			if (other.gid != null)
-				return false;
-		} else if (!gid.equals(other.gid))
-			return false;
+			if (other.gid != null) {
+                return false;
+            }
+		} else if (!gid.equals(other.gid)) {
+            return false;
+        }
 		if (index == null) {
-			if (other.index != null)
-				return false;
-		} else if (!index.equals(other.index))
-			return false;
+			if (other.index != null) {
+                return false;
+            }
+		} else if (!index.equals(other.index)) {
+            return false;
+        }
 		if (locationId == null) {
-			if (other.locationId != null)
-				return false;
-		} else if (!locationId.equals(other.locationId))
-			return false;
+			if (other.locationId != null) {
+                return false;
+            }
+		} else if (!locationId.equals(other.locationId)) {
+            return false;
+        }
 		if (locationName == null) {
-			if (other.locationName != null)
-				return false;
-		} else if (!locationName.equals(other.locationName))
-			return false;
+			if (other.locationName != null) {
+                return false;
+            }
+		} else if (!locationName.equals(other.locationName)) {
+            return false;
+        }
 		if (lotId == null) {
-			if (other.lotId != null)
-				return false;
-		} else if (!lotId.equals(other.lotId))
-			return false;
+			if (other.lotId != null) {
+                return false;
+            }
+		} else if (!lotId.equals(other.lotId)) {
+            return false;
+        }
 		if (parentage == null) {
-			if (other.parentage != null)
-				return false;
-		} else if (!parentage.equals(other.parentage))
-			return false;
+			if (other.parentage != null) {
+                return false;
+            }
+		} else if (!parentage.equals(other.parentage)) {
+            return false;
+        }
 		if (scaleId == null) {
-			if (other.scaleId != null)
-				return false;
-		} else if (!scaleId.equals(other.scaleId))
-			return false;
+			if (other.scaleId != null) {
+                return false;
+            }
+		} else if (!scaleId.equals(other.scaleId)) {
+            return false;
+        }
 		if (scaleName == null) {
-			if (other.scaleName != null)
-				return false;
-		} else if (!scaleName.equals(other.scaleName))
-			return false;
+			if (other.scaleName != null) {
+                return false;
+            }
+		} else if (!scaleName.equals(other.scaleName)) {
+            return false;
+        }
 		if (source == null) {
-			if (other.source != null)
-				return false;
-		} else if (!source.equals(other.source))
-			return false;
+			if (other.source != null) {
+                return false;
+            }
+		} else if (!source.equals(other.source)) {
+            return false;
+        }
 		if (sourceId == null) {
-			if (other.sourceId != null)
-				return false;
-		} else if (!sourceId.equals(other.sourceId))
-			return false;
+			if (other.sourceId != null) {
+                return false;
+            }
+		} else if (!sourceId.equals(other.sourceId)) {
+            return false;
+        }
 		if (sourceName == null) {
-			if (other.sourceName != null)
-				return false;
-		} else if (!sourceName.equals(other.sourceName))
-			return false;
+			if (other.sourceName != null) {
+                return false;
+            }
+		} else if (!sourceName.equals(other.sourceName)) {
+            return false;
+        }
 		if (userId == null) {
-			if (other.userId != null)
-				return false;
-		} else if (!userId.equals(other.userId))
-			return false;
+			if (other.userId != null) {
+                return false;
+            }
+		} else if (!userId.equals(other.userId)) {
+            return false;
+        }
 		if (userName == null) {
-			if (other.userName != null)
-				return false;
-		} else if (!userName.equals(other.userName))
-			return false;
+			if (other.userName != null) {
+                return false;
+            }
+		} else if (!userName.equals(other.userName)) {
+            return false;
+        }
 		return true;
 	}
 	
@@ -546,19 +583,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		builder.append("]");
 		return builder.toString();
 	}
-/*
+
 	@Override
 	public int compareTo(InventoryDetails o) {
         if (this.gid != null && o != null) {
-            return this.getGermplasmName().compareTo(o.getGermplasmName());
-        }
-        return 0;
-	}
-*/
-	@Override
-	public int compareTo(InventoryDetails o) {
-        if (this.gid != null && o != null) {
-            //return this.getGermplasmName().compareTo(o.getGermplasmName());
+
         	return this.entryId.compareTo(o.entryId);
         }
         return 0;

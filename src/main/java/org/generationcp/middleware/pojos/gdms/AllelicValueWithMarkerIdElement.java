@@ -121,43 +121,58 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         AllelicValueWithMarkerIdElement other = (AllelicValueWithMarkerIdElement) obj;
         if (accSampleId == null) {
-            if (other.accSampleId != null)
+            if (other.accSampleId != null) {
                 return false;
-        } else if (!accSampleId.equals(other.accSampleId))
+            }
+        } else if (!accSampleId.equals(other.accSampleId)) {
             return false;
+        }
         if (data == null) {
-            if (other.data != null)
+            if (other.data != null) {
                 return false;
-        } else if (!data.equals(other.data))
+            }
+        } else if (!data.equals(other.data)) {
             return false;
+        }
         if (gid == null) {
-            if (other.gid != null)
+            if (other.gid != null) {
                 return false;
-        } else if (!gid.equals(other.gid))
+            }
+        } else if (!gid.equals(other.gid)) {
             return false;
+        }
         if (markerId == null) {
-            if (other.markerId != null)
+            if (other.markerId != null) {
                 return false;
-        } else if (!markerId.equals(other.markerId))
+            }
+        } else if (!markerId.equals(other.markerId)) {
             return false;
+        }
         if (markerSampleId == null) {
-            if (other.markerSampleId != null)
+            if (other.markerSampleId != null) {
                 return false;
-        } else if (!markerSampleId.equals(other.markerSampleId))
+            }
+        } else if (!markerSampleId.equals(other.markerSampleId)) {
             return false;
+        }
         if (peakHeight == null) {
-            if (other.peakHeight != null)
+            if (other.peakHeight != null) {
                 return false;
-        } else if (!peakHeight.equals(other.peakHeight))
+            }
+        } else if (!peakHeight.equals(other.peakHeight)) {
             return false;
+        }
         return true;
     }
 

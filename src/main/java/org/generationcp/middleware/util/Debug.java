@@ -11,11 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
-import java.lang.reflect.Field;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * The Class Debug. Used to print debug information. 

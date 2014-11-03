@@ -1,10 +1,10 @@
 package org.generationcp.middleware.pojos.workbench.settings;
 
-import java.io.Serializable;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.manager.Operation;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class Factor  implements Serializable {
 

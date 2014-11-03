@@ -12,13 +12,8 @@
 
 package org.generationcp.middleware.pojos.oms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * 
@@ -126,18 +121,23 @@ public class CVTermRelationship implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		CVTermRelationship other = (CVTermRelationship) obj;
 		if (cvTermRelationshipId == null) {
-			if (other.cvTermRelationshipId != null)
-				return false;
-		} else if (!cvTermRelationshipId.equals(other.cvTermRelationshipId))
-			return false;
+			if (other.cvTermRelationshipId != null) {
+                return false;
+            }
+		} else if (!cvTermRelationshipId.equals(other.cvTermRelationshipId)) {
+            return false;
+        }
 		return true;
 	}
 

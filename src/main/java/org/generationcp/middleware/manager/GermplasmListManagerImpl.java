@@ -11,19 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.User;
@@ -32,6 +25,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this
@@ -347,11 +342,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             
             for (GermplasmList germplasmList : germplasmLists) {
             	           	
-            	//delete GermplasmList
-            	
-            	//getting a hibernate NonUniqueObjectException when the one below is used GCP-880
-                //getGermplasmListDAO().makeTransient(germplasmList);
-            	
             	germplasmList.setStatus(9);
             	updateGermplasmList(germplasmList);
             	
@@ -359,8 +349,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             }
             
             // end transaction, commit to database
-            if(!trans.wasCommitted())
-              trans.commit();
+            if(!trans.wasCommitted()) {
+                trans.commit();
+            }
             
         } catch (Exception e) {
             rollbackTransaction(trans);

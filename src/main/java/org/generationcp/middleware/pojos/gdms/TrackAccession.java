@@ -11,12 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for the gdms_track_acc table.
@@ -101,33 +100,44 @@ public class TrackAccession implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		TrackAccession other = (TrackAccession) obj;
 		if (accSampleId == null) {
-			if (other.accSampleId != null)
-				return false;
-		} else if (!accSampleId.equals(other.accSampleId))
-			return false;
+			if (other.accSampleId != null) {
+                return false;
+            }
+		} else if (!accSampleId.equals(other.accSampleId)) {
+            return false;
+        }
 		if (nid == null) {
-			if (other.nid != null)
-				return false;
-		} else if (!nid.equals(other.nid))
-			return false;
+			if (other.nid != null) {
+                return false;
+            }
+		} else if (!nid.equals(other.nid)) {
+            return false;
+        }
 		if (trackAccId == null) {
-			if (other.trackAccId != null)
-				return false;
-		} else if (!trackAccId.equals(other.trackAccId))
-			return false;
+			if (other.trackAccId != null) {
+                return false;
+            }
+		} else if (!trackAccId.equals(other.trackAccId)) {
+            return false;
+        }
 		if (trackId == null) {
-			if (other.trackId != null)
-				return false;
-		} else if (!trackId.equals(other.trackId))
-			return false;
+			if (other.trackId != null) {
+                return false;
+            }
+		} else if (!trackId.equals(other.trackId)) {
+            return false;
+        }
 		return true;
 	}
 

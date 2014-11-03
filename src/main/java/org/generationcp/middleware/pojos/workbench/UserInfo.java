@@ -11,16 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * POJO for workbench_user_info table.

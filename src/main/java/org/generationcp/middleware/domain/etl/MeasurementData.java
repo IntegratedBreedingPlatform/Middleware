@@ -11,11 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
-import java.util.List;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.List;
 
 public class MeasurementData {
 	
@@ -30,8 +30,6 @@ public class MeasurementData {
 	private String dataType;
 	
 	private Integer phenotypeId;
-	
-//	private Integer valueId;
 	
 	private MeasurementVariable measurementVariable;
 	
@@ -54,7 +52,6 @@ public class MeasurementData {
 	
 	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId) {
 		this(label, value, isEditable, dataType);
-//		this.valueId = valueId;
 		if (valueId != null) {
 			this.cValueId = valueId.toString();
 		}
@@ -71,7 +68,6 @@ public class MeasurementData {
 	
 	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId, MeasurementVariable mvar) {
 		this(label, value, isEditable, dataType, mvar);
-//		this.valueId = valueId;
 		if (valueId != null) {
 			this.cValueId = valueId.toString();
 		}
@@ -139,20 +135,6 @@ public class MeasurementData {
 	public void setDataType(String dataType) {
 		this.dataType = dataType;
 	}
-
-//	/**
-//	 * @return the valueId
-//	 */
-//	public Integer getValueId() {
-//		return valueId;
-//	}
-//
-//	/**
-//	 * @param valueId the valueId to set
-//	 */
-//	public void setValueId(Integer valueId) {
-//		this.valueId = valueId;
-//	}
 
 	/**
 	 * @return the measurementVariable

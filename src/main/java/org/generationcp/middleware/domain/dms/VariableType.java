@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /** 
  * Contains the details of a variable type - local name, local description and rank.
@@ -99,8 +99,12 @@ public class VariableType implements Serializable, Comparable<VariableType>{
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof VariableType)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof VariableType)) {
+            return false;
+        }
 		VariableType other = (VariableType) obj;
 		return other.getId() == getId();
 	}

@@ -12,16 +12,8 @@
 
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 /**
  * POJO for gdms_marker_user_info table.
@@ -143,28 +135,37 @@ public class MarkerUserInfo implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		MarkerUserInfo other = (MarkerUserInfo) obj;
 		if (markerUserInfoDetails == null) {
-			if (other.markerUserInfoDetails != null)
-				return false;
-		} else if (!markerUserInfoDetails.equals(other.markerUserInfoDetails))
-			return false;
+			if (other.markerUserInfoDetails != null) {
+                return false;
+            }
+		} else if (!markerUserInfoDetails.equals(other.markerUserInfoDetails)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (userInfoId == null) {
-			if (other.userInfoId != null)
-				return false;
-		} else if (!userInfoId.equals(other.userInfoId))
-			return false;
+			if (other.userInfoId != null) {
+                return false;
+            }
+		} else if (!userInfoId.equals(other.userInfoId)) {
+            return false;
+        }
 		return true;
 	}
 

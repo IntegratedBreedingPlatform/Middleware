@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.io.Serializable;
 
 /**
  * Placeholder POJO for Gid-Nid Pairs Element

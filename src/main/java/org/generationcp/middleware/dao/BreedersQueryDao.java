@@ -1,9 +1,5 @@
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.HibernateException;
@@ -11,6 +7,10 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class BreedersQueryDao {
     

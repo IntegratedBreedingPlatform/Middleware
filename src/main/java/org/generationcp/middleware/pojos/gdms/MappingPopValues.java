@@ -11,13 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * POJO for gdms_mapping_pop_values table.
@@ -146,48 +141,65 @@ public class MappingPopValues implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		MappingPopValues other = (MappingPopValues) obj;
 		if (accSampleId == null) {
-			if (other.accSampleId != null)
-				return false;
-		} else if (!accSampleId.equals(other.accSampleId))
-			return false;
+			if (other.accSampleId != null) {
+                return false;
+            }
+		} else if (!accSampleId.equals(other.accSampleId)) {
+            return false;
+        }
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (gid == null) {
-			if (other.gid != null)
-				return false;
-		} else if (!gid.equals(other.gid))
-			return false;
+			if (other.gid != null) {
+                return false;
+            }
+		} else if (!gid.equals(other.gid)) {
+            return false;
+        }
 		if (mapCharValue == null) {
-			if (other.mapCharValue != null)
-				return false;
-		} else if (!mapCharValue.equals(other.mapCharValue))
-			return false;
+			if (other.mapCharValue != null) {
+                return false;
+            }
+		} else if (!mapCharValue.equals(other.mapCharValue)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (markerSampleId == null) {
-			if (other.markerSampleId != null)
-				return false;
-		} else if (!markerSampleId.equals(other.markerSampleId))
-			return false;
+			if (other.markerSampleId != null) {
+                return false;
+            }
+		} else if (!markerSampleId.equals(other.markerSampleId)) {
+            return false;
+        }
 		if (mpId == null) {
-			if (other.mpId != null)
-				return false;
-		} else if (!mpId.equals(other.mpId))
-			return false;
+			if (other.mpId != null) {
+                return false;
+            }
+		} else if (!mpId.equals(other.mpId)) {
+            return false;
+        }
 		return true;
 	}
 

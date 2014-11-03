@@ -11,12 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.util.Debug;
 
 /**
  * The Standard Variable with term, property, scale, method, data type, etc.
@@ -42,7 +44,7 @@ public class StandardVariable implements Serializable{
     
     private PhenotypicType phenotypicType;
     
-    private VariableConstraints constraints;  // may be null
+    private VariableConstraints constraints;
     
     private List<Enumeration> enumerations;
     
@@ -54,9 +56,7 @@ public class StandardVariable implements Serializable{
     }
     
 	public StandardVariable(Term property, Term scale, Term method,
-			Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType,
-			VariableConstraints constraints,
-			List<Enumeration> enumerations) {
+			Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType) {
 		this.property = property;
 		this.scale = scale;
 		this.method = method;
@@ -64,20 +64,19 @@ public class StandardVariable implements Serializable{
 		this.storedIn = storedIn;
 		this.isA = isA;
 		this.phenotypicType = phenotypicType;
-		this.constraints = constraints;
-		this.enumerations = enumerations;
 	}
 
     /* Copy constructor. Used by the copy method */
     private StandardVariable(StandardVariable stdVar) {
     	this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(),
 			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getIsA(), 
-			stdVar.getPhenotypicType(), stdVar.getConstraints(),
-			stdVar.getEnumerations());
+			stdVar.getPhenotypicType());
     	this.setId(0);  
     	this.setName(stdVar.getName());
     	this.setDescription(stdVar.getDescription());
     	this.setCropOntologyId(stdVar.getCropOntologyId());
+    	this.setConstraints(stdVar.getConstraints());
+		this.setEnumerations(stdVar.getEnumerations());
 	}
     
 	public int getId() {
@@ -248,16 +247,16 @@ public class StandardVariable implements Serializable{
 	}
 	
 	public boolean hasEnumerations() {
-		return (enumerations != null && enumerations.size() > 0);
+		return enumerations != null && !enumerations.isEmpty();
 	}
 	
 	public StandardVariable copy() {
 		return new StandardVariable(this);
 	}
 	
-	public void print(int indent) {
-		Debug.println(indent, "Standard Variable: ");
-		indent += 3;
+	public void print(int previousIndent) {
+		Debug.println(previousIndent, "Standard Variable: ");
+		int indent = previousIndent + 3;
 		Debug.println(indent, "term: " + term);
 		Debug.println(indent, "property: " + property);
 		Debug.println(indent, "method " + method);
@@ -280,8 +279,12 @@ public class StandardVariable implements Serializable{
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof StandardVariable)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (obj instanceof StandardVariable == false) {
+            return false;
+        }
 		StandardVariable other = (StandardVariable) obj;
 		return other.getId() == getId();
 	}
@@ -338,6 +341,28 @@ public class StandardVariable implements Serializable{
 	 */
 	public void setOverridenEnumerations(Map<Integer, Integer> overridenEnumerations) {
 		this.overridenEnumerations = overridenEnumerations;
+	}
+
+	public boolean isNumeric() {
+		if(dataType!=null && dataType.getId() == TermId.NUMERIC_VARIABLE.getId()) {
+			return true; 
+		} else if(isNumericCategoricalVariate()) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isNumericCategoricalVariate() {
+		if(storedIn!=null && storedIn.getId() == TermId.CATEGORICAL_VARIATE.getId() && 
+			enumerations!=null &&!enumerations.isEmpty()) {
+			for (Enumeration enumeration : enumerations){
+	            if (enumeration.getName()==null || !NumberUtils.isNumber(enumeration.getName().trim())){
+	                return false;
+	            }
+	        }
+			return true;
+		}
+		return false;
 	}
 	
 	

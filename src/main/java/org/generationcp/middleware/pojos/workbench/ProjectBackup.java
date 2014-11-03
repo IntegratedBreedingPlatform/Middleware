@@ -11,17 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * POJO for workbench_project_backup table.
@@ -103,18 +97,23 @@ public class ProjectBackup implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ProjectBackup other = (ProjectBackup) obj;
         if (projectBackupId == null) {
-            if (other.projectBackupId != null)
+            if (other.projectBackupId != null) {
                 return false;
-        } else if (!projectBackupId.equals(other.projectBackupId))
+            }
+        } else if (!projectBackupId.equals(other.projectBackupId)) {
             return false;
+        }
         return true;
     }
 

@@ -11,12 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.LocationDto;
@@ -30,6 +24,8 @@ import org.hibernate.*;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.*;
 
 /**
  * DAO class for {@link Location}.
@@ -132,19 +128,23 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         try {
 
             Integer countryId = null;
-            if (country != null)
+            if (country != null) {
                 countryId = country.getCntryid();
+            }
 
             Criteria criteria = getSession().createCriteria(Location.class);
 
-            if (countryId != null)
+            if (countryId != null) {
                 criteria.add(Restrictions.eq("cntryid", countryId));
+            }
 
-            if (type != null)
+            if (type != null) {
                 criteria.add(Restrictions.eq("ltype", type));
+            }
 
-            if (name != null && !name.isEmpty())
+            if (name != null && !name.isEmpty()) {
                 criteria.add(Restrictions.like("lname", "%" + name.trim() + "%"));
+            }
 
             criteria.addOrder(Order.asc("lname"));
 

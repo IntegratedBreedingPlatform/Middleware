@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /** 
  * Contains the details of a study - id, conditions and constants.
@@ -164,8 +164,12 @@ public class Study implements Serializable{
 
 	@Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof Study)) return false;
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Study)) {
+            return false;
+        }
         Study other = (Study) obj;
         return getId() == other.getId();
     }

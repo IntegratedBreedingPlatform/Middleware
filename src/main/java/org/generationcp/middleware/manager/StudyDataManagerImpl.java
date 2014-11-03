@@ -11,37 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.Stocks;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
-import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.fieldbook.*;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -72,6 +46,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
@@ -260,9 +236,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			int numOfRows, VariableTypeList varTypeList)
 			throws MiddlewareQueryException {
     	clearSessions();
-		if(varTypeList == null)
+		if(varTypeList == null) {
 			return getExperiments(dataSetId, start, numOfRows);
-		else{
+		} else {
 			return getExperimentBuilder().build(
 	                dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, varTypeList);
 		}
@@ -472,7 +448,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) 
             throws MiddlewareQueryException {
         List<DataSet> datasets = getDataSetsByType(studyId, dataSetType);
-        if (datasets != null && datasets.size() >= 1) {
+        if (datasets != null && !datasets.isEmpty()) {
             return datasets.get(0);
         }
         return null;
@@ -610,7 +586,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
                     List<FieldMapTrialInstanceInfo> trialInstances =
                             fieldMapDatasetInfo.getTrialInstances();
-                    if (trialInstances != null && trialInstances.size() > 0) {
+                    if (trialInstances != null && !trialInstances.isEmpty()) {
                         for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
                             List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
                             for (FieldMapLabel label : labels) {
@@ -640,7 +616,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
             throws MiddlewareQueryException {
 
-        if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
+        if (info != null && !info.isEmpty()) {
 
             requireLocalDatabaseInstance();
             Session session = getCurrentSessionForLocal();
@@ -729,7 +705,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 for (FieldMapDatasetInfo fieldMapDatasetInfo : datasetInfoList) {
                     List<FieldMapTrialInstanceInfo> trialInstances =
                             fieldMapDatasetInfo.getTrialInstances();
-                    if (trialInstances != null && trialInstances.size() > 0) {
+                    if (trialInstances != null && !trialInstances.isEmpty()) {
                         for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
                             List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
                             for (FieldMapLabel label : labels) {
@@ -900,10 +876,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
-        if (id > 0)
+        if (id > 0) {
             requireCentralDatabaseInstance();
-        else
+        } else {
             requireLocalDatabaseInstance();
+        }
         DmsProject folderParentFolder = getProjectRelationshipDao()
                 .getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
         DmsProject studyParentFolder = getProjectRelationshipDao()
@@ -1136,7 +1113,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	List<Integer> localPerson = new ArrayList<Integer>();
 	    	
 	    	for (StudyDetails detail : studyDetails) {
-	    		if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
+	    		if (detail.getSiteId() != null) {
 	    			if (detail.getSiteId() > 0) {
 	    				centralSite.add(detail.getSiteId());
 	    			}
@@ -1144,7 +1121,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    				localSite.add(detail.getSiteId());
 	    			}
 	    		}
-	    		if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
+	    		if (detail.getPiId() != null) {
 	    			if (detail.getPiId() > 0) {
 	    				centralPerson.add(detail.getPiId());
 	    			}
@@ -1175,10 +1152,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	}
 	    	
 	    	for (StudyDetails detail : studyDetails) {
-	    		if (/*(detail.getSiteName() == null || "".equals(detail.getSiteName().trim())) &&*/ detail.getSiteId() != null) {
+	    		if (detail.getSiteId() != null) {
 	    			detail.setSiteName(siteMap.get(detail.getSiteId()));
 	    		}
-	    		if (/*(detail.getPiName() == null || "".equals(detail.getPiName().trim())) &&*/ detail.getPiId() != null) {
+	    		if (detail.getPiId() != null) {
 	    			detail.setPiName(personMap.get(detail.getPiId()));
 	    		}
 	    	}
@@ -1206,7 +1183,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	updateFieldMapWithBlockInformation(infos, blockInfo, false);
     }
     
-    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
+    protected void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
     	Map<Integer, String> locationMap = new HashMap<Integer, String>();
     	if (infos != null) {
     		for (FieldMapInfo info : infos) {
@@ -1214,10 +1191,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
     					if (dataset.getTrialInstances() != null) {
     						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-                            	if (blockInfo == null && trial.getBlockId() != null) {
+                            	if (trial.getBlockId() != null) {
                             		blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
+                            		trial.updateBlockInformation(blockInfo);
                             	}
-    							trial.updateBlockInformation(blockInfo);
     							if (isGetLocation) {
 	    							trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
                                     trial.setSiteName(trial.getLocationName());
@@ -1322,7 +1299,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId);
 	}
 
-
-
-	
+	public void setLocationDataManager(LocationDataManager locationDataManager) {
+		this.locationDataManager = locationDataManager;
+	}
 }

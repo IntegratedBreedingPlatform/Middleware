@@ -56,23 +56,30 @@ public class MappingABHRow{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MappingABHRow other = (MappingABHRow) obj;
         if (accMetadataSet == null) {
-            if (other.accMetadataSet != null)
+            if (other.accMetadataSet != null) {
                 return false;
-        } else if (!accMetadataSet.equals(other.accMetadataSet))
+            }
+        } else if (!accMetadataSet.equals(other.accMetadataSet)) {
             return false;
+        }
         if (mappingPopValues == null) {
-            if (other.mappingPopValues != null)
+            if (other.mappingPopValues != null) {
                 return false;
-        } else if (!mappingPopValues.equals(other.mappingPopValues))
+            }
+        } else if (!mappingPopValues.equals(other.mappingPopValues)) {
             return false;
+        }
         return true;
     }
 

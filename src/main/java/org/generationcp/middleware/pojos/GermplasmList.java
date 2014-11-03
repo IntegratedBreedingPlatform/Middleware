@@ -11,25 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * POJO for listnms table.
@@ -138,28 +127,6 @@ public class GermplasmList implements Serializable{
             "      OR desig = :qNoSpaces " +
             "      OR desig = :qStandardized " +
             ")";
-    
-    //public static String SEARCH_FOR_GERMPLASM_LIST_EQUAL_GID_LIKE =
-    //		"SELECT DISTINCT listnms.* " +
-    //        "FROM listnms " +
-    //        "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
-    //        "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-    //        "WHERE liststatus!=9 AND (listdata.gid LIKE :gid OR desig = :q OR listname = :q) ";
-    
-    
-    //Full Text version
-//    		"SELECT DISTINCT listid, listname, listdate, listtype, listuid, listdesc, lhierarchy, liststatus, sdate, edate, listlocn, listref, projectid " +
-//            "FROM ( " +
-//    		"    SELECT listnms.* " +
-//            "       , count(*) AS matches " +
-//            "       , (MATCH(listname) AGAINST(:q)) AS searchScore " +
-//            "    FROM listdata " +
-//            "       LEFT JOIN listnms ON (listdata.listid=listnms.listid) " +
-//            "    WHERE lrstatus!=gid AND ((gid=:gid AND 0!=:gid) OR desig LIKE :q) " +
-//            "    GROUP BY listdata.listid " +
-//            "    HAVING searchScore>0 OR matches>0 " +
-//            ") AS listnms " +
-//            "ORDER BY matches DESC, searchScore DESC";
     
     public GermplasmList() {
 

@@ -11,20 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -37,11 +25,10 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -110,16 +97,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 		List<FolderReference> folderList = new ArrayList<FolderReference>();
 		
-		/* SELECT DISTINCT p.projectId, p.name, p.description
-		 * 	FROM DmsProject p 
-		 * 		JOIN p.relatedTos pr 
-		 * WHERE pr.typeId = CVTermId.HAS_PARENT_FOLDER.getId() 
-		 * 		 AND pr.objectProject.projectId = " + DmsProject.SYSTEM_FOLDER_ID  
-		 * 		 AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
-		 *    	 AND pp.project_id = p.project_id AND pp.value = " 
-	     *         "+TermId.DELETED_STUDY.getId()+") "	
-		 * ORDER BY p.project_id 
-		 */
+
 		
 		try {
 			
@@ -177,13 +155,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		List<DatasetReference> datasetReferences = new ArrayList<DatasetReference>();
 		
 		try {
-			/*
-			SELECT DISTINCT p.projectId, p.name, p.description, pr.objectProject.projectId 
-			FROM DmsProject p JOIN p.relatedTos pr 
-			WHERE pr.typeId = CVTermId.BELONGS_TO_STUDY.getId()
-			      AND pr.objectProject.projectId = :studyId 
-			ORDER BY name
-			*/ 
+
 
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
@@ -811,28 +783,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException {
 	    List<StudyNode> studyNodes = new ArrayList<StudyNode>();
         try {
-            /*
-                SELECT DISTINCT p.project_id AS id
-                        , p.name AS name
-                        , p.description AS description
-                        , ppStartDate.value AS startDate
-                        , ppStudyType.value AS studyType
-                        , gpSeason.value AS season
-                FROM project p 
-                INNER JOIN projectprop ppStudyType ON p.project_id = ppStudyType.project_id 
-                               AND ppStudyType.type_id = 8070 -- TermId.STUDY_TYPE.getIdc 
-                               AND (ppStudyType.value = 10000 -- TermId.NURSERY.getId()  --  10000 for Nursery
-                               OR ppStudyType.value = 10010) -- TermId.TRIAL.getId()  --  10010 for Trial
-                LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id 
-                               AND ppStartDate.type_id =  8050 -- TermId.START_DATE.getId()  --  8050 
-                LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id 
-                INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id 
-                LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id 
-                       AND gpSeason.type_id =  8371  --  2452 
-                WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id = 8006 --  TermId.STUDY_STATUS.getId(  --  8006
-                           AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  12990 ) -- TermId.DELETED_STUDY.getId(  --  12990     
 
-             */
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT DISTINCT p.project_id AS id ")
             .append("        , p.name AS name ")

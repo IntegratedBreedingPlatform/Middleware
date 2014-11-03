@@ -11,11 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -23,6 +18,11 @@ import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class TraitGroupBuilder extends Builder {
 
@@ -53,11 +53,6 @@ public class TraitGroupBuilder extends Builder {
             setStandardVariablesOfProperties(Database.CENTRAL, traitClass.getProperties());
             setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
         }
-
-        // Step 4: Build and sort tree
-//        traitClasses = buildTree(traitClasses, classType.getId());
-//        sortTree(traitClasses);
-        
 
 	    return traitClasses;
 	}

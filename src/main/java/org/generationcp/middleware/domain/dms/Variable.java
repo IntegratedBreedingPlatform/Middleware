@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /** 
  * Contains the details of a Variable - type and value.
@@ -35,13 +35,17 @@ public class Variable  implements Serializable, Comparable<Variable> {
 		this.phenotypeId = phenotypeId;
 		this.variableType = variableType;
 		this.value = value;
-		if (variableType == null) throw new RuntimeException();
+		if (variableType == null) {
+            throw new RuntimeException();
+        }
 	}
 	
 	public Variable(VariableType variableType, String value) {
 		this.variableType = variableType;
 		this.value = value;
-		if (variableType == null) throw new RuntimeException();
+		if (variableType == null) {
+            throw new RuntimeException();
+        }
 	}
 	
 	public Variable(Integer phenotypeId, VariableType variableType, Double value) {
@@ -50,7 +54,9 @@ public class Variable  implements Serializable, Comparable<Variable> {
 		if (value != null) {
 			this.value = Double.toString(value);
 		}
-		if (variableType == null) throw new RuntimeException();
+		if (variableType == null) {
+            throw new RuntimeException();
+        }
 	}
 
 	public Variable(VariableType variableType, Double value) {
@@ -58,7 +64,9 @@ public class Variable  implements Serializable, Comparable<Variable> {
 		if (value != null) {
 			this.value = Double.toString(value);
 		}
-		if (variableType == null) throw new RuntimeException();
+		if (variableType == null) {
+            throw new RuntimeException();
+        }
 	}
 
 	public Variable(Integer phenotypeId, VariableType variableType, Integer value) {
@@ -67,7 +75,9 @@ public class Variable  implements Serializable, Comparable<Variable> {
 		if (value != null) {
 			this.value = Integer.toString(value);
 		}
-		if (variableType == null) throw new RuntimeException();
+		if (variableType == null) {
+            throw new RuntimeException();
+        }
 	}
 
 	public Variable(VariableType variableType, Integer value) {
@@ -75,7 +85,9 @@ public class Variable  implements Serializable, Comparable<Variable> {
 		if (value != null) {
 			this.value = Integer.toString(value);
 		}
-		if (variableType == null) throw new RuntimeException();
+		if (variableType == null) {
+            throw new RuntimeException();
+        }
 	}
 
 	public VariableType getVariableType() {
@@ -84,14 +96,17 @@ public class Variable  implements Serializable, Comparable<Variable> {
 
 	public void setVariableType(VariableType variableType) {
 		this.variableType = variableType;
-		if (variableType == null) throw new RuntimeException();
+		if (variableType == null) {
+            throw new RuntimeException();
+        }
 	}
 	
 	public void setVariableType(VariableType variableType, boolean hasVariableType) {
 		this.variableType = variableType;
 		if(hasVariableType){
-			if (variableType == null) 
-				throw new RuntimeException();
+			if (variableType == null) {
+                throw new RuntimeException();
+            }
 		}
 	}
 
@@ -174,18 +189,29 @@ public class Variable  implements Serializable, Comparable<Variable> {
 		return variableType.hashCode();
 	}
 	
+	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof Variable)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof Variable)) {
+            return false;
+        }
 		Variable other = (Variable) obj;
 		return other.getVariableType().equals(getVariableType()) &&
-			   equals(other.getValue(), getValue());
+			   stringEquals(other.getValue(), getValue());
 	}
 	
-	private boolean equals(String s1, String s2) {
-		if (s1 == null && s2 == null) return true;
-		if (s1 == null) return false;
-		if (s2 == null) return false;
+	private boolean stringEquals(String s1, String s2) {
+		if (s1 == null && s2 == null) {
+            return true;
+        }
+		if (s1 == null) {
+            return false;
+        }
+		if (s2 == null) {
+            return false;
+        }
 		return s1.equals(s2);
 	}
 

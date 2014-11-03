@@ -31,8 +31,12 @@ public class Stocks {
 		Stock found = null;
 		for (Stock stock : stocks) {
 			if (stock.containsValueByLocalName(localName, value)) {
-				if (found == null) found = stock;
-				else { found = null; break; }
+				if (found == null) {
+                    found = stock;
+                } else {
+                    found = null;
+                    break;
+                }
 			}
 		}
 		return found;

@@ -11,19 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.dms;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_project
@@ -151,18 +142,23 @@ public class DmsProject implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		DmsProject other = (DmsProject) obj;
 		if (projectId == null) {
-			if (other.projectId != null)
-				return false;
-		} else if (!projectId.equals(other.projectId))
-			return false;
+			if (other.projectId != null) {
+                return false;
+            }
+		} else if (!projectId.equals(other.projectId)) {
+            return false;
+        }
 		return true;
 	}
 
@@ -176,12 +172,6 @@ public class DmsProject implements Serializable {
 		builder.append(name);
 		builder.append(", description=");
 		builder.append(description);
-		builder.append(", properties=");
-		builder.append(properties);
-		builder.append(", relatedTos=");
-		builder.append(relatedTos);
-		builder.append(", relatedBys=");
-		builder.append(relatedBys);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -11,16 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 /**
  * POJO for the template_setting table in the workbench database.
@@ -153,43 +145,58 @@ public class TemplateSetting implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         TemplateSetting other = (TemplateSetting) obj;
         if (configuration == null) {
-            if (other.configuration != null)
+            if (other.configuration != null) {
                 return false;
-        } else if (!configuration.equals(other.configuration))
+            }
+        } else if (!configuration.equals(other.configuration)) {
             return false;
+        }
         if (isDefault == null) {
-            if (other.isDefault != null)
+            if (other.isDefault != null) {
                 return false;
-        } else if (!isDefault.equals(other.isDefault))
+            }
+        } else if (!isDefault.equals(other.isDefault)) {
             return false;
+        }
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
+        }
         if (projectId == null) {
-            if (other.projectId != null)
+            if (other.projectId != null) {
                 return false;
-        } else if (!projectId.equals(other.projectId))
+            }
+        } else if (!projectId.equals(other.projectId)) {
             return false;
+        }
         if (templateSettingId == null) {
-            if (other.templateSettingId != null)
+            if (other.templateSettingId != null) {
                 return false;
-        } else if (!templateSettingId.equals(other.templateSettingId))
+            }
+        } else if (!templateSettingId.equals(other.templateSettingId)) {
             return false;
+        }
         if (tool == null) {
-            if (other.tool != null)
+            if (other.tool != null) {
                 return false;
-        } else if (!tool.equals(other.tool))
+            }
+        } else if (!tool.equals(other.tool)) {
             return false;
+        }
         return true;
     }
 

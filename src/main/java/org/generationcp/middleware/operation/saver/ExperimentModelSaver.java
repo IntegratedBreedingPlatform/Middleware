@@ -11,33 +11,19 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.Values;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.ExperimentStock;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.util.DatabaseBroker;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExperimentModelSaver extends Saver {
 	
-//	private static final String DUMMY_DESCRIPTION = "DUMMY LOCATION - for null constraint";
-
 	public ExperimentModelSaver(
 			HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
@@ -67,7 +53,9 @@ public class ExperimentModelSaver extends Saver {
 					variable.getVariableType().getId(), 
 					variable.getValue());
 
-			if (val > 0) isUpdated = true;
+			if (val > 0) {
+                isUpdated = true;
+            }
 			
 			if (experimentId != 0 && val == 0){
 				getPhenotypeSaver().save(experimentId, variable);
@@ -153,7 +141,6 @@ public class ExperimentModelSaver extends Saver {
 		}
 		ExperimentProperty property = new ExperimentProperty();
 		
-		//property.setNdExperimentpropId(getExperimentPropertyDao().getNegativeId("ndExperimentpropId"));
 		property.setNdExperimentpropId(id);
 		property.setExperiment(experimentModel);
 		property.setTypeId(variable.getVariableType().getId());

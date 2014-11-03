@@ -267,63 +267,86 @@ public class AllelicValueElement implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		AllelicValueElement other = (AllelicValueElement) obj;
 		if (accSampleId == null) {
-			if (other.accSampleId != null)
-				return false;
-		} else if (!accSampleId.equals(other.accSampleId))
-			return false;
+			if (other.accSampleId != null) {
+                return false;
+            }
+		} else if (!accSampleId.equals(other.accSampleId)) {
+            return false;
+        }
 		if (alleleBinValue == null) {
-			if (other.alleleBinValue != null)
-				return false;
-		} else if (!alleleBinValue.equals(other.alleleBinValue))
-			return false;
+			if (other.alleleBinValue != null) {
+                return false;
+            }
+		} else if (!alleleBinValue.equals(other.alleleBinValue)) {
+            return false;
+        }
 		if (data == null) {
-			if (other.data != null)
-				return false;
-		} else if (!data.equals(other.data))
-			return false;
+			if (other.data != null) {
+                return false;
+            }
+		} else if (!data.equals(other.data)) {
+            return false;
+        }
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (gid == null) {
-			if (other.gid != null)
-				return false;
-		} else if (!gid.equals(other.gid))
-			return false;
+			if (other.gid != null) {
+                return false;
+            }
+		} else if (!gid.equals(other.gid)) {
+            return false;
+        }
 		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
+			if (other.id != null) {
+                return false;
+            }
+		} else if (!id.equals(other.id)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (markerName == null) {
-			if (other.markerName != null)
-				return false;
-		} else if (!markerName.equals(other.markerName))
-			return false;
+			if (other.markerName != null) {
+                return false;
+            }
+		} else if (!markerName.equals(other.markerName)) {
+            return false;
+        }
 		if (markerSampleId == null) {
-			if (other.markerSampleId != null)
-				return false;
-		} else if (!markerSampleId.equals(other.markerSampleId))
-			return false;
+			if (other.markerSampleId != null) {
+                return false;
+            }
+		} else if (!markerSampleId.equals(other.markerSampleId)) {
+            return false;
+        }
 		if (peakHeight == null) {
-			if (other.peakHeight != null)
-				return false;
-		} else if (!peakHeight.equals(other.peakHeight))
-			return false;
+			if (other.peakHeight != null) {
+                return false;
+            }
+		} else if (!peakHeight.equals(other.peakHeight)) {
+            return false;
+        }
 		return true;
 	}
 

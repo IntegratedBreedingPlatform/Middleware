@@ -11,14 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.io.Serializable;
+import java.util.*;
 
 /** 
  * List of variable types.
@@ -35,19 +31,20 @@ public class VariableTypeList implements Serializable{
 		variableTypes.add(variableType);
 		
 			idVarTypeMap.put(Integer.toString(variableType.getId()), variableType);
-		if(variableType.getLocalName() != null)
-			nameVarTypeMap.put(variableType.getLocalName(), variableType);
+		if(variableType.getLocalName() != null) {
+            nameVarTypeMap.put(variableType.getLocalName(), variableType);
+        }
 	}
 	
 	public void addAll(VariableTypeList variableTypes) {
 		for (VariableType variableType : variableTypes.getVariableTypes()) {
 			if (findByLocalName(variableType.getLocalName()) == null) {
-//			if (findById(variableType.getId()) == null) { //causing an error bec some templates have multiple variables with same id (erroneous template, but..
 		        this.variableTypes.add(variableType);
 		        
 		        	idVarTypeMap.put(Integer.toString(variableType.getId()), variableType);
-				if(variableType.getLocalName() != null)
-					nameVarTypeMap.put(variableType.getLocalName(), variableType);
+				if(variableType.getLocalName() != null) {
+                    nameVarTypeMap.put(variableType.getLocalName(), variableType);
+                }
 				
 			}
 		}

@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /** 
  * Used to contain sortable list of values.
@@ -91,8 +91,12 @@ public class Enumeration implements Serializable, Comparable<Enumeration> {
 
 	@Override
 	public int compareTo(Enumeration other) {
-		if (rank < other.rank) return -1;
-		if (rank > other.rank) return 1;
+		if (rank < other.rank) {
+            return -1;
+        }
+		if (rank > other.rank) {
+            return 1;
+        }
 		return name.compareTo(other.name);
 	}
 }

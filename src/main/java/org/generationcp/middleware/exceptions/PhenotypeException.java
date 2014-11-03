@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.exceptions;
 
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+
+import java.util.Map;
 
 /**
  * Exceptions for Phenotype data issues.

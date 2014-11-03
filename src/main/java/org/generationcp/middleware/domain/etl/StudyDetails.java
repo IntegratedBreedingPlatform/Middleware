@@ -12,12 +12,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 public class StudyDetails implements Serializable{
     
@@ -28,8 +28,6 @@ public class StudyDetails implements Serializable{
 	private String studyName;
 	
 	private String title;
-	
-	/*private String pmKey;*/
 	
 	private String objective;
 	
@@ -69,7 +67,6 @@ public class StudyDetails implements Serializable{
             long parentFolderId, String trialDatasetName, String measurementDatasetName) {
         this.studyName = studyName;
         this.title = title;
-        /*this.pmKey = pmKey;*/
         this.objective = objective;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -136,14 +133,6 @@ public class StudyDetails implements Serializable{
 		this.title = title;
 	}
 
-	/*public String getPmKey() {
-		return pmKey;
-	}
-
-	public void setPmKey(String pmKey) {
-		this.pmKey = pmKey;
-	}*/
-
 	public String getObjective() {
 		return objective;
 	}
@@ -196,10 +185,7 @@ public class StudyDetails implements Serializable{
 	}
 	
 	public boolean isNursery() {
-		if (this.studyType != null && this.studyType==StudyType.N) {
-			return true;
-		}
-		return false;
+		return this.studyType != null && this.studyType == StudyType.N;
 	}
 	
 	public String getTrialDatasetName() {
@@ -312,7 +298,6 @@ public class StudyDetails implements Serializable{
         result = prime * result + ((objective == null) ? 0 : objective.hashCode());
         result = prime * result + (int) (parentFolderId ^ (parentFolderId >>> 32));
         result = prime * result + ((piName == null) ? 0 : piName.hashCode());
-        /*result = prime * result + ((pmKey == null) ? 0 : pmKey.hashCode());*/
         result = prime * result + ((season == null) ? 0 : season.hashCode());
         result = prime * result + ((siteName == null) ? 0 : siteName.hashCode());
         result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
@@ -325,74 +310,95 @@ public class StudyDetails implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         StudyDetails other = (StudyDetails) obj;
         if (endDate == null) {
-            if (other.endDate != null)
+            if (other.endDate != null) {
                 return false;
-        } else if (!endDate.equals(other.endDate))
+            }
+        } else if (!endDate.equals(other.endDate)) {
             return false;
+        }
         if (id == null) {
-            if (other.id != null)
+            if (other.id != null) {
                 return false;
-        } else if (!id.equals(other.id))
+            }
+        } else if (!id.equals(other.id)) {
             return false;
+        }
         if (measurementDatasetName == null) {
-            if (other.measurementDatasetName != null)
+            if (other.measurementDatasetName != null) {
                 return false;
-        } else if (!measurementDatasetName.equals(other.measurementDatasetName))
+            }
+        } else if (!measurementDatasetName.equals(other.measurementDatasetName)) {
             return false;
+        }
         if (objective == null) {
-            if (other.objective != null)
+            if (other.objective != null) {
                 return false;
-        } else if (!objective.equals(other.objective))
+            }
+        } else if (!objective.equals(other.objective)) {
             return false;
-        if (parentFolderId != other.parentFolderId)
+        }
+        if (parentFolderId != other.parentFolderId) {
             return false;
+        }
         if (piName == null) {
-            if (other.piName != null)
+            if (other.piName != null) {
                 return false;
-        } else if (!piName.equals(other.piName))
+            }
+        } else if (!piName.equals(other.piName)) {
             return false;
-        /*if (pmKey == null) {
-            if (other.pmKey != null)
-                return false;
-        } else if (!pmKey.equals(other.pmKey))
-            return false;*/
-        if (season != other.season)
+        }
+        if (season != other.season) {
             return false;
+        }
         if (siteName == null) {
-            if (other.siteName != null)
+            if (other.siteName != null) {
                 return false;
-        } else if (!siteName.equals(other.siteName))
+            }
+        } else if (!siteName.equals(other.siteName)) {
             return false;
+        }
         if (startDate == null) {
-            if (other.startDate != null)
+            if (other.startDate != null) {
                 return false;
-        } else if (!startDate.equals(other.startDate))
+            }
+        } else if (!startDate.equals(other.startDate)) {
             return false;
+        }
         if (studyName == null) {
-            if (other.studyName != null)
+            if (other.studyName != null) {
                 return false;
-        } else if (!studyName.equals(other.studyName))
+            }
+        } else if (!studyName.equals(other.studyName)) {
             return false;
-        if (studyType != other.studyType)
+        }
+        if (studyType != other.studyType) {
             return false;
+        }
         if (title == null) {
-            if (other.title != null)
+            if (other.title != null) {
                 return false;
-        } else if (!title.equals(other.title))
+            }
+        } else if (!title.equals(other.title)) {
             return false;
+        }
         if (trialDatasetName == null) {
-            if (other.trialDatasetName != null)
+            if (other.trialDatasetName != null) {
                 return false;
-        } else if (!trialDatasetName.equals(other.trialDatasetName))
+            }
+        } else if (!trialDatasetName.equals(other.trialDatasetName)) {
             return false;
+        }
         return true;
     }
     
@@ -406,8 +412,6 @@ public class StudyDetails implements Serializable{
         builder.append(studyName);
         builder.append(", title=");
         builder.append(title);
-        /*builder.append(", pmKey=");
-        builder.append(pmKey);*/
         builder.append(", objective=");
         builder.append(objective);
         builder.append(", startDate=");
@@ -443,7 +447,6 @@ public class StudyDetails implements Serializable{
         Debug.println(indent + 3, "Id: " + id);
 		Debug.println(indent + 3, "Name: " + studyName);
 	    Debug.println(indent + 3, "Title: " + title);
-	    /*Debug.println(indent + 3, "PM Key: " + pmKey);*/
 	    Debug.println(indent + 3, "Objective: " + objective);
 	    Debug.println(indent + 3, "Start Date: " + startDate);
 	    Debug.println(indent + 3, "End Date: " + endDate);

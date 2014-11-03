@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.generationcp.middleware.util.Debug;
 
 /** 
  * Contains the details of an experiment - id, factors, variates.
@@ -72,8 +72,9 @@ public class Experiment {
 			if(variates != null){
 				
 				for(Variable var : variates.getVariables()){
-					if(var != null && var.getVariableType() != null)
-						variatesMap.put(Integer.toString(var.getVariableType().getId()), var);
+					if(var != null && var.getVariableType() != null) {
+                        variatesMap.put(Integer.toString(var.getVariableType().getId()), var);
+                    }
 				}
 			}
 		}		

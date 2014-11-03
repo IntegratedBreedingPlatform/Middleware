@@ -1,8 +1,8 @@
 package org.generationcp.middleware.domain.gms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 public class ListDataColumnValues implements Serializable {
 
@@ -57,28 +57,37 @@ public class ListDataColumnValues implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ListDataColumnValues other = (ListDataColumnValues) obj;
 		if (column == null) {
-			if (other.column != null)
-				return false;
-		} else if (!column.equals(other.column))
-			return false;
+			if (other.column != null) {
+                return false;
+            }
+		} else if (!column.equals(other.column)) {
+            return false;
+        }
 		if (listDataId == null) {
-			if (other.listDataId != null)
-				return false;
-		} else if (!listDataId.equals(other.listDataId))
-			return false;
+			if (other.listDataId != null) {
+                return false;
+            }
+		} else if (!listDataId.equals(other.listDataId)) {
+            return false;
+        }
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
+			if (other.value != null) {
+                return false;
+            }
+		} else if (!value.equals(other.value)) {
+            return false;
+        }
 		return true;
 	}
 

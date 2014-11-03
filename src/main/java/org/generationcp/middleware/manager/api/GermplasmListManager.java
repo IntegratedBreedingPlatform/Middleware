@@ -11,8 +11,6 @@ o * Copyright (c) 2012, All Rights Reserved.
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -21,6 +19,8 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
+
+import java.util.List;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.

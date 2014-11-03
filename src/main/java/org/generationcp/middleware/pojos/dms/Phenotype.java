@@ -11,14 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.dms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_phenotype
@@ -172,53 +166,72 @@ public class Phenotype implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		Phenotype other = (Phenotype) obj;
 		if (assayId == null) {
-			if (other.assayId != null)
-				return false;
-		} else if (!assayId.equals(other.assayId))
-			return false;
+			if (other.assayId != null) {
+                return false;
+            }
+		} else if (!assayId.equals(other.assayId)) {
+            return false;
+        }
 		if (attributeId == null) {
-			if (other.attributeId != null)
-				return false;
-		} else if (!attributeId.equals(other.attributeId))
-			return false;
+			if (other.attributeId != null) {
+                return false;
+            }
+		} else if (!attributeId.equals(other.attributeId)) {
+            return false;
+        }
 		if (cValueId == null) {
-			if (other.cValueId != null)
-				return false;
-		} else if (!cValueId.equals(other.cValueId))
-			return false;
+			if (other.cValueId != null) {
+                return false;
+            }
+		} else if (!cValueId.equals(other.cValueId)) {
+            return false;
+        }
 		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
+			if (other.name != null) {
+                return false;
+            }
+		} else if (!name.equals(other.name)) {
+            return false;
+        }
 		if (observableId == null) {
-			if (other.observableId != null)
-				return false;
-		} else if (!observableId.equals(other.observableId))
-			return false;
+			if (other.observableId != null) {
+                return false;
+            }
+		} else if (!observableId.equals(other.observableId)) {
+            return false;
+        }
 		if (phenotypeId == null) {
-			if (other.phenotypeId != null)
-				return false;
-		} else if (!phenotypeId.equals(other.phenotypeId))
-			return false;
+			if (other.phenotypeId != null) {
+                return false;
+            }
+		} else if (!phenotypeId.equals(other.phenotypeId)) {
+            return false;
+        }
 		if (uniqueName == null) {
-			if (other.uniqueName != null)
-				return false;
-		} else if (!uniqueName.equals(other.uniqueName))
-			return false;
+			if (other.uniqueName != null) {
+                return false;
+            }
+		} else if (!uniqueName.equals(other.uniqueName)) {
+            return false;
+        }
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
+			if (other.value != null) {
+                return false;
+            }
+		} else if (!value.equals(other.value)) {
+            return false;
+        }
 		return true;
 	}
 

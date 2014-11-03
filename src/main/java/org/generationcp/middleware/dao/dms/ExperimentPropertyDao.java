@@ -11,13 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
@@ -33,6 +26,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * DAO class for {@link ExperimentProperty}.
@@ -61,51 +57,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
     @SuppressWarnings("unchecked")
     public List<FieldMapDatasetInfo> getFieldMapLabels(int projectId) throws MiddlewareQueryException{
         List<FieldMapDatasetInfo> datasets = null;
-        /*  
-            SET @projectId = -139;
-            
-            SELECT  eproj.project_id AS datasetId  
-            , proj.name AS datasetName  
-            , geo.nd_geolocation_id AS geolocationId  
-            , site.value AS siteName  
-            , eproj.nd_experiment_id AS experimentId  
-            , s.uniqueName AS entryNumber  
-            , s.name AS germplasmName  
-            , epropRep.value AS rep  
-            , epropPlot.value AS plotNo  
-            , row.value AS row  
-            , col.value AS col  
-            , blk.value AS block_id  
-            , inst.description AS trialInstance  
-            , st.name AS studyName  
-            , s.dbxref_id AS gid  
-            , ppStartDate.value as startDate  
-            , gpSeason.value as season  
-            FROM  nd_experiment_project eproj  
-            INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = 1150 
-            INNER JOIN project st ON st.project_id = pr.object_project_id 
-            LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id AND ppStartDate.type_id =  8050  
-            INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id AND eproj.project_id = pr.subject_project_id  
-            INNER JOIN stock s ON es.stock_id = s.stock_id  
-            LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id
-            AND epropRep.type_id =  8210  AND eproj.project_id = pr.subject_project_id 
-            AND epropRep.value IS NOT NULL  AND epropRep.value <> ''
-            LEFT JOIN nd_experimentprop epropBlock ON eproj.nd_experiment_id = epropBlock.nd_experiment_id
-            AND epropBlock.type_id =  8220  AND eproj.project_id = pr.subject_project_id 
-            AND epropBlock.value IS NOT NULL  AND epropBlock.value <> ''    
-            INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id        
-            AND epropPlot.type_id IN (8200, 8380) AND eproj.project_id = pr.subject_project_id        
-            AND epropPlot.value IS NOT NULL  AND epropPlot.value <> ''  
-            INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id AND geo.type_id = 1155 
-            INNER JOIN nd_geolocation inst ON geo.nd_geolocation_id = inst.nd_geolocation_id  
-            LEFT JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id AND site.type_id = 8190 
-            LEFT JOIN nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id AND blk.type_id = 77783 
-            INNER JOIN project proj on proj.project_id = eproj.project_id  
-            LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = eproj.nd_experiment_id AND row.type_id = 32769 
-            LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = eproj.nd_experiment_id AND col.type_id = 32770 
-            LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id AND gpSeason.type_id =  8371  
-            ORDER BY eproj.nd_experiment_id DESC
-        */
+
         try {
             String order = projectId > 0 ? "ASC" : "DESC";
             StringBuilder sql = new StringBuilder()
@@ -122,9 +74,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , row.value AS row ")
                 .append(" , col.value AS col ") 
                 .append(" , blk.value AS block_id ")
-                //.append("rowsInBlock, cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder, ")
-                //.append("rpp.value AS rowsPerPlot, blkName.value AS blockName, ")
-                //.append("locName.value AS locationName, fldName.value AS fieldName, ")
                 .append(" , inst.description AS trialInstance ")
                 .append(" , st.name AS studyName ")
                 .append(" , s.dbxref_id AS gid ")
@@ -355,13 +304,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         String trialInstanceNo = null;
         Integer blockId = null;
         Integer siteId = null;
-        //String blockName = null;
-        //String locationName = null;
-        //String fieldName = null;
-        //Integer rowsInBlock = null;
-        //Integer columnsInBlock = null;
-        //Integer plantingOrder = null;
-        //Integer rowsPerPlot = null;
         for (Object[] row : list) {
             if (geolocationId == null){
                 trialInstance = new FieldMapTrialInstanceInfo();
@@ -375,21 +317,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     trialInstance.setLocationId(siteId);
                     trialInstance.setTrialInstanceNo(trialInstanceNo);
                     trialInstance.setBlockId(blockId);
-                    //trialInstance.setBlockName(blockName);
-                    //trialInstance.setLocationName(locationName);
-                    //trialInstance.setFieldName(fieldName);
                     trialInstance.setFieldMapLabels(labels);
-                    //trialInstance.setColumnsInBlock(rowsInBlock);
-                    //trialInstance.setRangesInBlock(columnsInBlock);
-                    //trialInstance.setRowsPerPlot(rowsPerPlot);
                     if (blockId != null) {
                         trialInstance.setHasFieldMap(true);
-                        //if (plantingOrder.equals(TermId.ROW_COLUMN.getId())) {
-                        //    trialInstance.setPlantingOrder(1);
-                        //}
-                        //else {
-                        //    trialInstance.setPlantingOrder(2);
-                        //}
                     }
                     trialInstances.add(trialInstance);
                     trialInstance = new FieldMapTrialInstanceInfo();
@@ -457,44 +387,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             }
             trialInstanceNo = (String) row[12];
             blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
-            /*
-            blockName = (String) row[15];
-            locationName = (String) row[16];
-            fieldName = (String) row[17];
-            
-            String rBlock = (String) row[11];
-            String cBlock = (String) row[12];
-            String pOrder = (String) row[13];
-            String rpp = (String) row[14];
-            
-            if (NumberUtils.isNumber(rBlock)) {
-                rowsInBlock = Integer.parseInt(rBlock);
-            }
-            if (NumberUtils.isNumber(cBlock)) {
-                columnsInBlock = Integer.parseInt(cBlock);
-            }
-            if (NumberUtils.isNumber(pOrder)) {
-                plantingOrder = Integer.parseInt(pOrder);
-            }
-            if (NumberUtils.isNumber(rpp)) {
-                rowsPerPlot = Integer.parseInt(rpp);
-            }
-            */
         }
         //add last trial instance and dataset
         trialInstance.setGeolocationId(geolocationId);
         trialInstance.setSiteName(siteName);
         trialInstance.setLocationName(siteName);
         trialInstance.setLocationId(siteId);
+        trialInstance.setBlockId(blockId);
         trialInstance.setTrialInstanceNo(trialInstanceNo);
-        /*
-        trialInstance.setBlockName(blockName);
-        trialInstance.setLocationName(locationName);
-        trialInstance.setFieldName(fieldName);
-        trialInstance.setColumnsInBlock(rowsInBlock);
-        trialInstance.setRangesInBlock(columnsInBlock);
-        trialInstance.setRowsPerPlot(rowsPerPlot);
-        */
         trialInstance.setFieldMapLabels(labels);
         
         if (blockId != null) {
@@ -512,7 +412,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
     
     
     private List<FieldMapInfo> createFieldMapLabels(List<Object[]> rows) {
-        //List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
+
         List<FieldMapInfo> infos = new ArrayList<FieldMapInfo>();
         
         Map<Integer, FieldMapInfo> infoMap = new HashMap<Integer, FieldMapInfo>();

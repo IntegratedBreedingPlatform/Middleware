@@ -11,9 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
-import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.List;
 
 /**
  * The Class GermplasmMarkerName. Contains the germplasm name and marker names associated with it. 

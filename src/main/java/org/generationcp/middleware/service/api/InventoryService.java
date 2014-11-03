@@ -12,11 +12,11 @@
 
 package org.generationcp.middleware.service.api;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.LotsResult;
+
+import java.util.List;
 
 /**
  * This is the API for inventory management system.

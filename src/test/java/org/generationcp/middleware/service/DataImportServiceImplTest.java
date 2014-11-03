@@ -1,282 +1,162 @@
-/*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
- *
- * Generation Challenge Programme (GCP)
- *
- *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
- *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
-import org.generationcp.middleware.domain.etl.WorkbookTest2;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
-import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.util.Message;
-import org.generationcp.middleware.utils.test.Debug;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(JUnit4.class)
-public class DataImportServiceImplTest extends ServiceIntegraionTest {
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    private static DataImportService dataImportService;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        dataImportService = serviceFactory.getDataImportService();
-    }
+@RunWith(MockitoJUnitRunner.class)
+public class DataImportServiceImplTest {
 
-    @Test
-    public void testSaveMultiLocationDataset() throws MiddlewareQueryException {
-        List<Workbook> workbooks = WorkbookTest2.getTestWorkbooks(5);
-        int id = 0;
-        for (Workbook workbook : workbooks) {
-            //comment these out if you want to let the system generate the dataset names.
+    public static final int INVALID_VARIABLES_COUNT = 5;
+    public static final int VALID_VARIABLES_COUNT = 5;
+    @Mock
+    private WorkbookParser parser;
 
-            workbook.getStudyDetails().setTrialDatasetName("MyTrial_" + workbook.getStudyDetails().getStudyName());
-            workbook.getStudyDetails().setMeasurementDatasetName("MyMeasurement_" + workbook.getStudyDetails().getStudyName());
+    @Mock
+    private Workbook workbook;
 
-            id = dataImportService.saveDataset(workbook);
-        }
-        String name = workbooks.get(0).getStudyDetails() != null ? workbooks.get(0).getStudyDetails().getStudyName() : null;
-        Debug.println(INDENT, "Created study: " + id + ", name = " + name);
-    }
+    @Mock
+    private OntologyDataManager ontology;
 
-    @Test
-    public void testSaveDataset() throws MiddlewareQueryException {
-        Workbook workbook = WorkbookTest2.getTestWorkbook();
-        workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook);
-        Debug.println(INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
-    }
+    @Mock
+    private File file;
 
-    @Test
-    public void testSaveNurseryDataset() throws MiddlewareQueryException {
-        Workbook workbook = WorkbookTest.getTestWorkbook();
-        workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook);
-        String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
-        Debug.println(INDENT, "Created study:" + id + ", name = " + name);
-    }
+    @InjectMocks
+    private DataImportServiceImpl dataImportService;
+
+    public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[]{"1234", "word@", "_+world=", "!!world!!", "&&&"};
+    public static final String[] STRINGS_WITH_VALID_CHARACTERS = new String[]{"i_am_groot", "hello123world", "%%bangbang", "something_something", "zawaruldoisbig"};
 
     @Test
-    public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException {
-        // Dan V : changed implem so that template path is located in src/test/resources. no need to change per user to reflect file location
+    public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
+        DataImportServiceImpl moleDataImportService = spy(dataImportService);
 
-        String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
-        File file = new File(fileLocation);
-        Workbook workbook = dataImportService.parseWorkbook(file);
-        workbook.print(INDENT);
+        // we just need to test if isTrialInstanceNumberExists works, so lets mock out other dataImportService calls for the moment
+        when(workbook.isNursery()).thenReturn(true);
 
+        // tip! do note that spy-ed object still calls the real method, may cause changing internal state as side effect
+        when(moleDataImportService.isEntryExists(ontology, workbook.getFactors())).thenReturn(true);
+        when(moleDataImportService.isPlotExists(ontology, workbook.getFactors())).thenReturn(true);
+        when(moleDataImportService.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())).thenReturn(true);
 
-        int id = dataImportService.saveDataset(workbook);
-        Debug.println(INDENT, "Created study:" + id);
-    }
+        when(workbook.getAllVariables()).thenReturn(initializeTestMeasurementVariables());
 
-    // Daniel V
-    // added new tests to cover validation scenarios for strict parsing of workbook
-
-    @Test
-    public void testParseWorkbookWrongDescriptionSheet() {
-        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5808WrongDescriptionSheetName.xls", "error.missing.sheet.description", "Unable to detect wrong description sheet");
-    }
-
-    @Test
-    public void testParseWorkbookWrongObservationSheet() {
-        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5808WrongObservationSheetName.xls", "error.missing.sheet.observation", "Unable to detect wrong observation sheet");
-    }
-
-    @Test
-    public void testParseWorkbookWithEntryWrongPMS() {
-        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5800ScenarioWithEntryWrongPSM.xls", "error.entry.doesnt.exist", "Unable to detect invalid entry");
-    }
-
-    @Test
-    public void testParseWorkbookNoEntry() {
-        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5800ScenarioNoEntry.xls", "error.entry.doesnt.exist", "Unable to detect invalid entry");
-    }
-
-    @Test
-    public void testParseWorkbookWithEntryWrongCategory() {
-        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5800ScenarioWithEntryWrongCategory.xls", "error.entry.doesnt.exist", "Unable to detect invalid entry");
-    }
-
-    @Test
-    public void testParseWorkbookWithNoTrialNonNursery() {
-        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5799NonNurseryWorkbookNoTrialEnvironment.xls", "error.missing.trial.condition", "Unable to detect missing trial condition");
-    }
-
-    @Test
-    public void testParseWorkbookWithNoTrialNursery() {
-        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoTrialEnvironment.xls").getFile();
-        File file = new File(fileLocation);
         try {
-            dataImportService.strictParseWorkbook(file);
-        } catch (WorkbookParserException e) {
-            fail("Unable to correctly parse Nursery workbook with no trial condition");
-        } catch (MiddlewareQueryException e) {
-            fail("Unexpected exception : " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testParseWorkbookWithEmptyFields() {
-        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5802SevenFieldsMissing.xls").getFile();
-        File file = new File(fileLocation);
-        try {
-            dataImportService.strictParseWorkbook(file);
+            moleDataImportService.strictParseWorkbook(file, parser, workbook, ontology);
+            fail("We expects workbookParserException to be thrown");
         } catch (WorkbookParserException e) {
 
-            List<Message> messages = e.getErrorMessages();
+            verify(moleDataImportService).validateMeasurementVariableName(workbook.getAllVariables());
 
-            assertNotNull(messages);
-            // There should be 7 error messages to correspond with the 7 missing fields in the file
-            assertSame(messages.size(), 7);
-
-            return;
-        } catch (MiddlewareQueryException e) {
-            fail("Unexpected exception : " + e.getMessage());
-        }
-
-        fail("Unable to detect empty fields");
-    }
-
-    protected void testFileAgainstExpectedErrorCondition(String qualifiedFilename, String expectedErrorKey, String errorMessage) {
-        String fileLocation = this.getClass().getClassLoader().getResource(qualifiedFilename).getFile();
-        try {
-            File file = new File(fileLocation);
-            dataImportService.strictParseWorkbook(file);
-        } catch (WorkbookParserException e) {
-            List<Message> messages = e.getErrorMessages();
-
-            assertNotNull(messages);
-            assertTrue(messages.size() == 1);
-            assertEquals(expectedErrorKey, messages.get(0).getMessageKey());
-            return;
-        } catch (MiddlewareQueryException e) {
-            fail("Unexpected exception : " + e.getMessage());
-        }
-
-        fail(errorMessage);
-    }
-
-    @Test
-	public void testCheckIfProjectNameIsExisting() throws Exception {
-    	//try to save first then use the name of the saved study
-    	Workbook workbook = WorkbookTest2.getTestWorkbook();
-        workbook.print(INDENT);
-        dataImportService.saveDataset(workbook);
-        String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
-        Debug.println(INDENT, "Name: " + name);
-		boolean isExisting = dataImportService.checkIfProjectNameIsExisting(name);
-		assertTrue(isExisting);
-		
-		name = "SHOULDNOTEXISTSTUDY";
-		Debug.println(INDENT, "Name: " + name);
-		isExisting = dataImportService.checkIfProjectNameIsExisting(name);
-		assertFalse(isExisting);
-	}
-    
-    @Test
-    public void getLocationIdByProjectNameAndDescription() throws MiddlewareQueryException {
-    	//try to save first then use the name of the saved study
-    	Workbook workbook = WorkbookTest2.getTestWorkbook();
-        workbook.print(INDENT);
-        dataImportService.saveDataset(workbook);
-        String name = workbook.getStudyDetails().getStudyName();
-        Debug.println(INDENT, "Name: " + name);
-		Integer locationId = dataImportService.getLocationIdByProjectNameAndDescription(name,"1");
-		assertEquals(locationId.longValue(),1L);        
-    }
-    
-    @Test
-    public void testSaveProjectOntology() throws MiddlewareQueryException {
-        Workbook workbook = WorkbookTest2.getTestWorkbook();
-        workbook.print(INDENT);
-        int id = dataImportService.saveProjectOntology(workbook);
-        Debug.println(INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
-
-    }
-    
-    @Test
-    public void testSaveProjectData() throws MiddlewareQueryException {
-        Workbook workbook = WorkbookTest2.getTestWorkbook();
-        workbook.print(INDENT);
-        int studyId = dataImportService.saveProjectOntology(workbook);
-        workbook.setStudyId(studyId);
-        workbook.setTrialDatasetId(studyId-1);
-        workbook.setMeasurementDatesetId(studyId-2); 
-        dataImportService.saveProjectData(workbook);
-        Debug.println(INDENT, "Saved project data:" + studyId + ", name = " + workbook.getStudyDetails().getStudyName());
-
-    }
-    
-    @Test
-	public void testValidateProjectOntology() throws MiddlewareQueryException {
-        Workbook workbook = WorkbookTest2.getTestWorkbookWithErrors();
-        workbook.print(INDENT);
-        Map<String,List<Message>> errors = dataImportService.validateProjectOntology(workbook);
-        assertNotNull(errors);
-        if(errors!=null) {
-        	Debug.println(INDENT, "Errors Identified: ");
-        	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
-        		Debug.println(INDENT+2, e.getKey());
-        		for(Message m: e.getValue()) {
-        			if(m.getMessageParams()!=null) {
-        				Debug.println(INDENT+4, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
-        			} else {
-        				Debug.println(INDENT+4, "Key: " + m.getMessageKey());
-        			}
-        		}
-        	}
+            final String[] errorTypes = {DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH,DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
+            for (Message error : e.getErrorMessages()) {
+                assertTrue("All errors should contain either ERROR_INVALID_VARIABLE_NAME_CHARACTERS or ERROR_INVALID_VARIABLE_NAME_LENGTH", Arrays.asList(errorTypes).contains(error.getMessageKey()));
+            }
         }
     }
-    
+
     @Test
-	public void testValidateProjectData() throws MiddlewareQueryException {
-    	String studyName = "validateProjectData_" + new Random().nextInt(10000);
-    	int trialNo = 1;
-    	Workbook workbook = WorkbookTest2.getTestWorkbookForWizard(studyName,trialNo);
-        workbook.print(INDENT);
-        dataImportService.saveDataset(workbook,true,false);
-        Map<String,List<Message>> errors = dataImportService.validateProjectData(workbook);
-        assertNotNull(errors);
-        if(errors!=null) {
-        	Debug.println(INDENT, "Errors Identified: ");
-        	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
-        		Debug.println(INDENT+2, e.getKey());
-        		for(Message m: e.getValue()) {
-        			if(m.getMessageParams()!=null) {
-        				Debug.println(INDENT+4, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
-        			} else {
-        				Debug.println(INDENT+4, "Key: " + m.getMessageKey());
-        			}
-        		}
-        	}
+    public void testValidateMeasurementVariableNameLengths() throws Exception {
+        List<MeasurementVariable> measurementVariables = initializeTestMeasurementVariables();
+
+        List<Message> messages = dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
+
+        assertEquals("we should only have 5 variables with > 32 char length", INVALID_VARIABLES_COUNT,messages.size());
+
+        for (Message message : messages) {
+            assertTrue("returned messages should only contain the variables with names > 32",message.getMessageParams()[0].length() > 32);
         }
     }
+
+    @Test
+    public void testValidateMeasurementVariableNameLengthsAllShortNames() throws Exception {
+        List<MeasurementVariable> measurementVariables = getShortNamedMeasurementVariables();
+
+        List<Message> messages = dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
+
+        assertEquals("messages should be empty",0,messages.size());
+    }
+
+    @Test
+    public void testValidateMeasurmentVariableNameCharacters() throws Exception {
+        List<MeasurementVariable> measurementVariables = getValidNamedMeasurementVariables();
+        measurementVariables.addAll(getInvalidNamedMeasurementVariables());
+
+        List<Message> messages = dataImportService.validateMeasurmentVariableNameCharacters(measurementVariables);
+
+        assertEquals("we should only have messages same size with the STRINGS_WITH_INVALID_CHARACTERS count", STRINGS_WITH_INVALID_CHARACTERS.length,messages.size());
+
+        for (Message message : messages) {
+            assertTrue("returned messages should contain the names from the set of invalid strings list", Arrays.asList(STRINGS_WITH_INVALID_CHARACTERS).contains(message.getMessageParams()[0]));
+        }
+    }
+
+    protected List<MeasurementVariable> initializeTestMeasurementVariables() {
+        List<MeasurementVariable> measurementVariables = getShortNamedMeasurementVariables();
+
+        // 5 long names
+        for (int i = 0; i < INVALID_VARIABLES_COUNT; i++) {
+            MeasurementVariable mv = new MeasurementVariable();
+
+            mv.setName("NUM_" + i + "_MEASUREMENT_VARIABLE_WITH_NAME_UP_TO_THIRTY_TWO_CHARACTERS");
+            measurementVariables.add(mv);
+        }
+
+        // also add those invalid variables to add to the main test
+        measurementVariables.addAll(getInvalidNamedMeasurementVariables());
+
+        return measurementVariables;
+    }
+
+    private List<MeasurementVariable> getShortNamedMeasurementVariables() {
+        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+
+        // 5 short names
+        for (int i = 0; i < VALID_VARIABLES_COUNT; i++) {
+            MeasurementVariable mv = new MeasurementVariable();
+            mv.setName("NUM_"+ i +"_SHORT");
+            measurementVariables.add(mv);
+        }
+        return measurementVariables;
+    }
+
+    private List<MeasurementVariable> getInvalidNamedMeasurementVariables() {
+        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+
+        for (int i = 0; i < STRINGS_WITH_INVALID_CHARACTERS.length; i++) {
+            MeasurementVariable mv = new MeasurementVariable();
+            mv.setName(STRINGS_WITH_INVALID_CHARACTERS[i]);
+            measurementVariables.add(mv);
+        }
+        return measurementVariables;
+    }
+
+    private List<MeasurementVariable> getValidNamedMeasurementVariables() {
+        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+
+        for (int i = 0; i < STRINGS_WITH_VALID_CHARACTERS.length; i++) {
+            MeasurementVariable mv = new MeasurementVariable();
+            mv.setName(STRINGS_WITH_VALID_CHARACTERS[i]);
+            measurementVariables.add(mv);
+        }
+        return measurementVariables;
+    }
+
 
 }

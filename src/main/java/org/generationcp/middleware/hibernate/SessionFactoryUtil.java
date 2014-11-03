@@ -11,15 +11,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.hibernate;
 
-import java.io.FileNotFoundException;
-import java.net.URL;
-
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileNotFoundException;
+import java.net.URL;
 
 /**
  * <p>

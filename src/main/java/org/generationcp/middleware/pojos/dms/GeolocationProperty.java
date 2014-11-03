@@ -11,16 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.dms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * 
@@ -132,38 +124,51 @@ public class GeolocationProperty implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		GeolocationProperty other = (GeolocationProperty) obj;
 		if (geolocation == null) {
-			if (other.geolocation != null)
-				return false;
-		} else if (!geolocation.equals(other.geolocation))
-			return false;
+			if (other.geolocation != null) {
+                return false;
+            }
+		} else if (!geolocation.equals(other.geolocation)) {
+            return false;
+        }
 		if (geolocationPropertyId == null) {
-			if (other.geolocationPropertyId != null)
-				return false;
-		} else if (!geolocationPropertyId.equals(other.geolocationPropertyId))
-			return false;
+			if (other.geolocationPropertyId != null) {
+                return false;
+            }
+		} else if (!geolocationPropertyId.equals(other.geolocationPropertyId)) {
+            return false;
+        }
 		if (rank == null) {
-			if (other.rank != null)
-				return false;
-		} else if (!rank.equals(other.rank))
-			return false;
+			if (other.rank != null) {
+                return false;
+            }
+		} else if (!rank.equals(other.rank)) {
+            return false;
+        }
 		if (typeId == null) {
-			if (other.typeId != null)
-				return false;
-		} else if (!typeId.equals(other.typeId))
-			return false;
+			if (other.typeId != null) {
+                return false;
+            }
+		} else if (!typeId.equals(other.typeId)) {
+            return false;
+        }
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
+			if (other.value != null) {
+                return false;
+            }
+		} else if (!value.equals(other.value)) {
+            return false;
+        }
 		return true;
 	}
 

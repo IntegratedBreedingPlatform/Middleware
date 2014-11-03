@@ -12,11 +12,11 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+
+import java.util.List;
 
 
 public interface PedigreeDataManager{

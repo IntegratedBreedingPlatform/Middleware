@@ -11,19 +11,18 @@
  *******************************************************************************/
 package org.generationcp.middleware.support.servlet;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.hibernate.SessionFactoryUtil;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.hibernate.SessionFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestEvent;
-
-import org.generationcp.middleware.exceptions.ConfigException;
-import org.generationcp.middleware.hibernate.SessionFactoryUtil;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.hibernate.SessionFactory;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * <p>

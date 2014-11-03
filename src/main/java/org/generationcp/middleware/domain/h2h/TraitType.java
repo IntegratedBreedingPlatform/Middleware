@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.h2h;
 
+import org.generationcp.middleware.domain.oms.TermId;
+
 import java.util.Arrays;
 import java.util.List;
-
-import org.generationcp.middleware.domain.oms.TermId;
 
 /**
  * The different trait info types used - NUMERIC, CHARACTER, CATEGORICAL

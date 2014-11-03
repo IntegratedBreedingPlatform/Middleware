@@ -11,13 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
-import java.io.Serializable;
-import java.math.BigInteger;
-
-import javax.persistence.*;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  * POJO for gdms_marker_retrieval_info table.

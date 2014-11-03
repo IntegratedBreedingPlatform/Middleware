@@ -11,13 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * POJO for gdms_marker_metadataset table.
@@ -107,33 +102,44 @@ public class MarkerMetadataSet implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		MarkerMetadataSet other = (MarkerMetadataSet) obj;
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (markerMetadataSetId == null) {
-			if (other.markerMetadataSetId != null)
-				return false;
-		} else if (!markerMetadataSetId.equals(other.markerMetadataSetId))
-			return false;
+			if (other.markerMetadataSetId != null) {
+                return false;
+            }
+		} else if (!markerMetadataSetId.equals(other.markerMetadataSetId)) {
+            return false;
+        }
 		if (markerSampleId == null) {
-			if (other.markerSampleId != null)
-				return false;
-		} else if (!markerSampleId.equals(other.markerSampleId))
-			return false;
+			if (other.markerSampleId != null) {
+                return false;
+            }
+		} else if (!markerSampleId.equals(other.markerSampleId)) {
+            return false;
+        }
 		return true;
 	}
 

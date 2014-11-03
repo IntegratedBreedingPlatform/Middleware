@@ -11,11 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** 
  * Contains the details of a trial environment - id and variables.
@@ -103,15 +103,19 @@ public class TrialEnvironment {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         TrialEnvironment other = (TrialEnvironment) obj;
-        if (id != other.id)
+        if (id != other.id) {
             return false;
+        }
         return true;
     }
     

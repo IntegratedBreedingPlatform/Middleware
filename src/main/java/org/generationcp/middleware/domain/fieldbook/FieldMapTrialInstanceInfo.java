@@ -12,14 +12,10 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * The Class FieldMapTrialInstanceInfo.

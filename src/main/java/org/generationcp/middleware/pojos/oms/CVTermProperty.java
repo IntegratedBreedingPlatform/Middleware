@@ -11,14 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.oms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvtermsynonym
@@ -56,10 +50,6 @@ public class CVTermProperty implements Serializable {
 	@Column(name = "rank")
 	private Integer rank;
 	
-/*	@ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "cvterm_id", nullable = false)
-	private CVTerm cvTerm;
-*/
 	@Column(name="cvterm_id")
 	private Integer cvTermId;
 	
@@ -94,15 +84,7 @@ public class CVTermProperty implements Serializable {
 	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
-/*
-	public CVTerm getCvTerm() {
-		return cvTerm;
-	}
 
-	public void setCvTerm(CVTerm cvTerm) {
-		this.cvTerm = cvTerm;
-	}
-*/
     public Integer getCvTermId() {
         return cvTermId;
     }
@@ -123,18 +105,23 @@ public class CVTermProperty implements Serializable {
 
     @Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		CVTermProperty other = (CVTermProperty) obj;
 		if (cvTermPropertyId == null) {
-			if (other.cvTermPropertyId != null)
-				return false;
-		} else if (!cvTermPropertyId.equals(other.cvTermPropertyId))
-			return false;
+			if (other.cvTermPropertyId != null) {
+                return false;
+            }
+		} else if (!cvTermPropertyId.equals(other.cvTermPropertyId)) {
+            return false;
+        }
 		return true;
 	}
 

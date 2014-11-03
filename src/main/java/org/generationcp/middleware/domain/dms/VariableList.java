@@ -11,14 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.io.Serializable;
+import java.util.*;
 
 /** 
  * List of variables and types.
@@ -108,9 +104,15 @@ public class VariableList implements Serializable{
 	}
 	
 	private boolean strEquals(String s1, String s2) {
-		if (s1 == null && s2 == null) return true;
-		if (s1 == s2) return true;
-		if (s1 != null && s1.equals(s2)) return true;
+		if (s1 == null && s2 == null) {
+            return true;
+        }
+		if (s1 == s2) {
+            return true;
+        }
+		if (s1 != null && s1.equals(s2)) {
+            return true;
+        }
 		return false;
 	}
 

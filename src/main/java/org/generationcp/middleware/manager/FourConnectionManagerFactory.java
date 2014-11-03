@@ -11,25 +11,19 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.net.URL;
-
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.net.URL;
 
 /**
  * The {@link FourConnectionManagerFactory} gives access to the different Manager implementation

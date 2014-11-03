@@ -11,11 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.helper;
 
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class ProjectValues {
 

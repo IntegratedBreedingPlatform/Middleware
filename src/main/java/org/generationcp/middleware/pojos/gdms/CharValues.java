@@ -11,13 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * POJO for allele_values table.
@@ -146,48 +141,65 @@ public class CharValues implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		CharValues other = (CharValues) obj;
 		if (acId == null) {
-			if (other.acId != null)
-				return false;
-		} else if (!acId.equals(other.acId))
-			return false;
+			if (other.acId != null) {
+                return false;
+            }
+		} else if (!acId.equals(other.acId)) {
+            return false;
+        }
 		if (accSampleId == null) {
-			if (other.accSampleId != null)
-				return false;
-		} else if (!accSampleId.equals(other.accSampleId))
-			return false;
+			if (other.accSampleId != null) {
+                return false;
+            }
+		} else if (!accSampleId.equals(other.accSampleId)) {
+            return false;
+        }
 		if (charValue == null) {
-			if (other.charValue != null)
-				return false;
-		} else if (!charValue.equals(other.charValue))
-			return false;
+			if (other.charValue != null) {
+                return false;
+            }
+		} else if (!charValue.equals(other.charValue)) {
+            return false;
+        }
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (gId == null) {
-			if (other.gId != null)
-				return false;
-		} else if (!gId.equals(other.gId))
-			return false;
+			if (other.gId != null) {
+                return false;
+            }
+		} else if (!gId.equals(other.gId)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (markerSampleId == null) {
-			if (other.markerSampleId != null)
-				return false;
-		} else if (!markerSampleId.equals(other.markerSampleId))
-			return false;
+			if (other.markerSampleId != null) {
+                return false;
+            }
+		} else if (!markerSampleId.equals(other.markerSampleId)) {
+            return false;
+        }
 		return true;
 	}
 

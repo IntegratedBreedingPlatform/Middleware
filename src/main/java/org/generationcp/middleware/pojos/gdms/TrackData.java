@@ -11,12 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for the gdms_track_data table.
@@ -86,28 +85,37 @@ public class TrackData implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		TrackData other = (TrackData) obj;
 		if (trackId == null) {
-			if (other.trackId != null)
-				return false;
-		} else if (!trackId.equals(other.trackId))
-			return false;
+			if (other.trackId != null) {
+                return false;
+            }
+		} else if (!trackId.equals(other.trackId)) {
+            return false;
+        }
 		if (trackName == null) {
-			if (other.trackName != null)
-				return false;
-		} else if (!trackName.equals(other.trackName))
-			return false;
+			if (other.trackName != null) {
+                return false;
+            }
+		} else if (!trackName.equals(other.trackName)) {
+            return false;
+        }
 		if (userId == null) {
-			if (other.userId != null)
-				return false;
-		} else if (!userId.equals(other.userId))
-			return false;
+			if (other.userId != null) {
+                return false;
+            }
+		} else if (!userId.equals(other.userId)) {
+            return false;
+        }
 		return true;
 	}
 

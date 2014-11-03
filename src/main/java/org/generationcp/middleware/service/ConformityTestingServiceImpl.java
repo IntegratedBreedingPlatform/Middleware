@@ -1,9 +1,9 @@
 package org.generationcp.middleware.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.conformity.ConformityGermplasmInput;
 import org.generationcp.middleware.domain.conformity.UploadInput;
 import org.generationcp.middleware.exceptions.ConformityException;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -21,8 +21,6 @@ import java.util.*;
 public class ConformityTestingServiceImpl implements ConformityTestingService {
 
 
-    // data structure to use for both cases in conformity : for storing ancestor allele values, or for storing possible cross results
-    /*private Map<String, List<String>> genotypeInfo;*/
     private ThreadLocal<Map<String, List<String>>> genotypeInfo;
     private ThreadLocal<UploadInput> inputThreadLocal;
 

@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.hibernate;
 
-import java.io.Serializable;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
+import java.io.Serializable;
 
 /**
  * <p>

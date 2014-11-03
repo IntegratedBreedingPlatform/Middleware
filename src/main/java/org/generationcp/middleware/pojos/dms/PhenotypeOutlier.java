@@ -11,14 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.dms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * 
@@ -83,32 +77,41 @@ public class PhenotypeOutlier implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		PhenotypeOutlier other = (PhenotypeOutlier) obj;
 		
 		if (phenotypeOutlierId == null) {
-			if (other.phenotypeOutlierId != null)
-				return false;
-		} else if (!phenotypeOutlierId.equals(other.phenotypeOutlierId))
-			return false;
+			if (other.phenotypeOutlierId != null) {
+                return false;
+            }
+		} else if (!phenotypeOutlierId.equals(other.phenotypeOutlierId)) {
+            return false;
+        }
 		
 		if (phenotypeId == null) {
-			if (other.phenotypeId != null)
-				return false;
-		} else if (!phenotypeId.equals(other.phenotypeId))
-			return false;
+			if (other.phenotypeId != null) {
+                return false;
+            }
+		} else if (!phenotypeId.equals(other.phenotypeId)) {
+            return false;
+        }
 	
 		
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
+			if (other.value != null) {
+                return false;
+            }
+		} else if (!value.equals(other.value)) {
+            return false;
+        }
 		
 
 		return true;

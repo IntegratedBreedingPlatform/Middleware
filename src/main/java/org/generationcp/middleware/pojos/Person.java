@@ -11,19 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 
 /**
  * POJO for persons table.

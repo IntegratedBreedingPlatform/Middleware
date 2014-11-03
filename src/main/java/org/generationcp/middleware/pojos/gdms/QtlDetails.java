@@ -11,13 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * POJO for gdms_qtl_details table
@@ -314,113 +309,156 @@ public class QtlDetails implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         QtlDetails other = (QtlDetails) obj;
         if (clen == null) {
-            if (other.clen != null)
+            if (other.clen != null) {
                 return false;
-        } else if (!clen.equals(other.clen))
+            }
+        } else if (!clen.equals(other.clen)) {
             return false;
+        }
         if (effect == null) {
-            if (other.effect != null)
+            if (other.effect != null) {
                 return false;
-        } else if (!effect.equals(other.effect))
+            }
+        } else if (!effect.equals(other.effect)) {
             return false;
+        }
         if (experiment == null) {
-            if (other.experiment != null)
+            if (other.experiment != null) {
                 return false;
-        } else if (!experiment.equals(other.experiment))
+            }
+        } else if (!experiment.equals(other.experiment)) {
             return false;
+        }
         if (hvAllele == null) {
-            if (other.hvAllele != null)
+            if (other.hvAllele != null) {
                 return false;
-        } else if (!hvAllele.equals(other.hvAllele))
+            }
+        } else if (!hvAllele.equals(other.hvAllele)) {
             return false;
+        }
         if (hvParent == null) {
-            if (other.hvParent != null)
+            if (other.hvParent != null) {
                 return false;
-        } else if (!hvParent.equals(other.hvParent))
+            }
+        } else if (!hvParent.equals(other.hvParent)) {
             return false;
+        }
         if (qtlId == null) {
-            if (other.qtlId != null)
+            if (other.qtlId != null) {
                 return false;
-        } else if (!qtlId.equals(other.qtlId))
+            }
+        } else if (!qtlId.equals(other.qtlId)) {
             return false;
+        }
         if (mapId == null) {
-            if (other.mapId != null)
+            if (other.mapId != null) {
                 return false;
-        } else if (!mapId.equals(other.mapId))
+            }
+        } else if (!mapId.equals(other.mapId)) {
             return false;
+        }
         if (interactions == null) {
-            if (other.interactions != null)
+            if (other.interactions != null) {
                 return false;
-        } else if (!interactions.equals(other.interactions))
+            }
+        } else if (!interactions.equals(other.interactions)) {
             return false;
+        }
         if (leftFlankingMarker == null) {
-            if (other.leftFlankingMarker != null)
+            if (other.leftFlankingMarker != null) {
                 return false;
-        } else if (!leftFlankingMarker.equals(other.leftFlankingMarker))
+            }
+        } else if (!leftFlankingMarker.equals(other.leftFlankingMarker)) {
             return false;
+        }
         if (linkageGroup == null) {
-            if (other.linkageGroup != null)
+            if (other.linkageGroup != null) {
                 return false;
-        } else if (!linkageGroup.equals(other.linkageGroup))
+            }
+        } else if (!linkageGroup.equals(other.linkageGroup)) {
             return false;
+        }
         if (lvAllele == null) {
-            if (other.lvAllele != null)
+            if (other.lvAllele != null) {
                 return false;
-        } else if (!lvAllele.equals(other.lvAllele))
+            }
+        } else if (!lvAllele.equals(other.lvAllele)) {
             return false;
+        }
         if (lvParent == null) {
-            if (other.lvParent != null)
+            if (other.lvParent != null) {
                 return false;
-        } else if (!lvParent.equals(other.lvParent))
+            }
+        } else if (!lvParent.equals(other.lvParent)) {
             return false;
+        }
         if (maxPosition == null) {
-            if (other.maxPosition != null)
+            if (other.maxPosition != null) {
                 return false;
-        } else if (!maxPosition.equals(other.maxPosition))
+            }
+        } else if (!maxPosition.equals(other.maxPosition)) {
             return false;
+        }
         if (minPosition == null) {
-            if (other.minPosition != null)
+            if (other.minPosition != null) {
                 return false;
-        } else if (!minPosition.equals(other.minPosition))
+            }
+        } else if (!minPosition.equals(other.minPosition)) {
             return false;
+        }
         if (position == null) {
-            if (other.position != null)
+            if (other.position != null) {
                 return false;
-        } else if (!position.equals(other.position))
+            }
+        } else if (!position.equals(other.position)) {
             return false;
+        }
         if (rSquare == null) {
-            if (other.rSquare != null)
+            if (other.rSquare != null) {
                 return false;
-        } else if (!rSquare.equals(other.rSquare))
+            }
+        } else if (!rSquare.equals(other.rSquare)) {
             return false;
+        }
         if (rightFlankingMarker == null) {
-            if (other.rightFlankingMarker != null)
+            if (other.rightFlankingMarker != null) {
                 return false;
-        } else if (!rightFlankingMarker.equals(other.rightFlankingMarker))
+            }
+        } else if (!rightFlankingMarker.equals(other.rightFlankingMarker)) {
             return false;
+        }
         if (scoreValue == null) {
-            if (other.scoreValue != null)
+            if (other.scoreValue != null) {
                 return false;
-        } else if (!scoreValue.equals(other.scoreValue))
+            }
+        } else if (!scoreValue.equals(other.scoreValue)) {
             return false;
+        }
         if (seAdditive == null) {
-            if (other.seAdditive != null)
+            if (other.seAdditive != null) {
                 return false;
-        } else if (!seAdditive.equals(other.seAdditive))
+            }
+        } else if (!seAdditive.equals(other.seAdditive)) {
             return false;
+        }
         if (traitId == null) {
-            if (other.traitId != null)
+            if (other.traitId != null) {
                 return false;
-        } else if (!traitId.equals(other.traitId))
+            }
+        } else if (!traitId.equals(other.traitId)) {
             return false;
+        }
         return true;
     }
 

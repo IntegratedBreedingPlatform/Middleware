@@ -12,21 +12,9 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.JoinColumn;
 
 /**
  * 
@@ -169,28 +157,37 @@ public class ExperimentModel implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ExperimentModel other = (ExperimentModel) obj;
 		if (geoLocation == null) {
-			if (other.geoLocation != null)
-				return false;
-		} else if (!geoLocation.equals(other.geoLocation))
-			return false;
+			if (other.geoLocation != null) {
+                return false;
+            }
+		} else if (!geoLocation.equals(other.geoLocation)) {
+            return false;
+        }
 		if (ndExperimentId == null) {
-			if (other.ndExperimentId != null)
-				return false;
-		} else if (!ndExperimentId.equals(other.ndExperimentId))
-			return false;
+			if (other.ndExperimentId != null) {
+                return false;
+            }
+		} else if (!ndExperimentId.equals(other.ndExperimentId)) {
+            return false;
+        }
 		if (typeId == null) {
-			if (other.typeId != null)
-				return false;
-		} else if (!typeId.equals(other.typeId))
-			return false;
+			if (other.typeId != null) {
+                return false;
+            }
+		} else if (!typeId.equals(other.typeId)) {
+            return false;
+        }
 		return true;
 	}
 

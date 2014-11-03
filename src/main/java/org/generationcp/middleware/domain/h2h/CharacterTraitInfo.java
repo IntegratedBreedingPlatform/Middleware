@@ -12,10 +12,10 @@
 
 package org.generationcp.middleware.domain.h2h;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.generationcp.middleware.util.Debug;
 
 
 /**

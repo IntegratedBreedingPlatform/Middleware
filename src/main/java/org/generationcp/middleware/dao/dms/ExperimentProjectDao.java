@@ -11,10 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -23,9 +19,12 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * DAO class for {@link ExperimentProject}.
@@ -83,15 +82,7 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 	@SuppressWarnings("unchecked")
 	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows) throws MiddlewareQueryException {
 		try {
-			/*
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.eq("projectId", projectId));
-			criteria.createAlias("experiment", "experiment").add(Restrictions.in("experiment.typeId", getIds(types)));
-			criteria.setMaxResults(numOfRows);
-			criteria.setFirstResult(start);
-			return criteria.list();
-			*/
-			
+
 			List <Integer> lists = new ArrayList<Integer>();
 			for (TermId termId : types) {
 				lists.add(termId.getId());

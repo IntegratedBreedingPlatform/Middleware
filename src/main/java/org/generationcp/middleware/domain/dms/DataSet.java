@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import org.generationcp.middleware.util.Debug;
 
 /** 
  * Contains the details of a dataset.
@@ -89,12 +89,16 @@ public class DataSet {
 
 	public void setLocationIds(Set<Integer> locationIds) {
 		this.locationIds = locationIds;
-		if (this.locationIds == null) this.locationIds = new HashSet<Integer>();
+		if (this.locationIds == null) {
+            this.locationIds = new HashSet<Integer>();
+        }
 	}
 	
 	public boolean containsLocationId(int locationId) {
 		for (Integer locId : locationIds) {
-			if (locId == locationId) return true;
+			if (locId == locationId) {
+                return true;
+            }
 		}
 		return false;
 	}
@@ -158,8 +162,12 @@ public class DataSet {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof DataSet)) return false;
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof DataSet)) {
+            return false;
+        }
         DataSet other = (DataSet) obj;
         return getId() == other.getId();
     }

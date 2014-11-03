@@ -1,11 +1,11 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.domain.oms.TermId;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.generationcp.middleware.domain.oms.TermId;
 
 /**
  * The different phenotypic types used in standard variable. 

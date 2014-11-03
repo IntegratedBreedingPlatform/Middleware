@@ -11,14 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.searcher;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudySearcherByParentFolder extends Searcher {
 

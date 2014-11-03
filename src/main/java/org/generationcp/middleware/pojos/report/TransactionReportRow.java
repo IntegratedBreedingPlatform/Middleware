@@ -11,11 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.report;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
+
+import java.io.Serializable;
 
 /**
  * This POJO represents a row in reports about Transaction records. Note that

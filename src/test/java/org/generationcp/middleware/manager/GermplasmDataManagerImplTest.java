@@ -63,8 +63,9 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
             ids.add(ls.getMid());
 
             // only get subset of locations
-            if (ids.size() < 5)
+            if (ids.size() < 5) {
                 break;
+            }
         }
 
         List<Method> results = manager.getMethodsByIDs(ids);
@@ -809,9 +810,11 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
       Debug.println(INDENT, "searchForGermplasm(" + q + "): ");
       for(Germplasm g : results){
           String name = "";
-          if(g.getPreferredName()!= null)
-              if(g.getPreferredName().getNval() != null)
+          if(g.getPreferredName()!= null) {
+              if (g.getPreferredName().getNval() != null) {
                   name = g.getPreferredName().getNval().toString();
+              }
+          }
           Debug.println(INDENT, g.getGid() + " : " + name);
       }
   }         

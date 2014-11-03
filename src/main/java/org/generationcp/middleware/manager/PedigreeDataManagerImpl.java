@@ -12,12 +12,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -25,8 +19,12 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Session;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -85,10 +83,11 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
             rootNode.setGermplasm(root);
             if (level > 1) {
-                if(includeDerivativeLines == true)
+                if(includeDerivativeLines == true) {
                     rootNode = addParents(rootNode, level);
-                else
+                } else {
                     rootNode = addParentsExcludeDerivativeLines(rootNode, level);
+                }
             }
             tree.setRoot(rootNode);
             return tree;
@@ -297,7 +296,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             //for MAN neighborhood, move the step count only if the ancestor is a MAN.
             //otherwise, skip through the ancestor without changing the step count
             if (methodType == 'M') {
-                Method method = germplasmDataManager.getMethodByID(germplasm.getMethodId());//getMethodDao().getById(germplasm.getMethodId(), false); 
+                Method method = germplasmDataManager.getMethodByID(germplasm.getMethodId());
                 if (method != null && "MAN".equals(method.getMtype())) {
                     nextStep--;
                 }

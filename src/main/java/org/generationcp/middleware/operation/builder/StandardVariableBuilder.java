@@ -11,28 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.NameSynonym;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StandardVariableSummary;
-import org.generationcp.middleware.domain.dms.VariableConstraints;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermProperty;
-import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -43,6 +25,8 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
+
+import java.util.*;
 
 public class StandardVariableBuilder extends Builder {
 
@@ -267,7 +251,7 @@ public class StandardVariableBuilder extends Builder {
 					Enumeration newValue = createEnumeration(getCvTerm(id));
 					
 					Enumeration existingMatch = getExistingEnumeration(enumerations, newValue);
-					//if (!isEnumerationValueExists(enumerations, newValue)){
+
 					if (existingMatch == null) {
 					    enumerations.add(newValue);
 					}
@@ -282,15 +266,6 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 	
-//    private boolean isEnumerationValueExists(List<Enumeration> enumerations, Enumeration value) {
-//        for (Enumeration enumeration : enumerations) {
-//            if (enumeration.getName().equals(value.getName())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
     private Enumeration getExistingEnumeration(List<Enumeration> enumerations, Enumeration value) {
         for (Enumeration enumeration : enumerations) {
             if (enumeration.getName().equals(value.getName())) {
@@ -335,17 +310,6 @@ public class StandardVariableBuilder extends Builder {
 	    return cropOntologyId;
 	}
 
-/*	private CVTermProperty findProperty(List<CVTermProperty> properties, int typeId) {
-		if (properties != null) {
-			for (CVTermProperty property : properties) {
-				if (property.getTypeId() == typeId) {
-					return property;
-				}
-			}
-		}
-		return null;
-	}
-*/
 	private boolean hasEnumerations(List<CVTermRelationship> cvTermRelationships) {
 		return findTermId(cvTermRelationships, TermId.HAS_VALUE) != null;
 	}

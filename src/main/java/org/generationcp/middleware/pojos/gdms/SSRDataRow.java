@@ -59,23 +59,30 @@ public class SSRDataRow{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         SSRDataRow other = (SSRDataRow) obj;
         if (accMetadataSet == null) {
-            if (other.accMetadataSet != null)
+            if (other.accMetadataSet != null) {
                 return false;
-        } else if (!accMetadataSet.equals(other.accMetadataSet))
+            }
+        } else if (!accMetadataSet.equals(other.accMetadataSet)) {
             return false;
+        }
         if (alleleValues == null) {
-            if (other.alleleValues != null)
+            if (other.alleleValues != null) {
                 return false;
-        } else if (!alleleValues.equals(other.alleleValues))
+            }
+        } else if (!alleleValues.equals(other.alleleValues)) {
             return false;
+        }
         return true;
     }
 

@@ -11,25 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos;
 
+import javax.persistence.*;
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.Comparator;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * POJO for location table.
@@ -119,8 +104,6 @@ public class Location implements Serializable, Comparable<Location>{
             + "ON g.glocn = l.locid "
             + "WHERE gid IN (:gids)";
     
-/*    @OneToMany(mappedBy = "location")
-    private Set<Locdes> descriptions = new HashSet<Locdes>();*/
 
     public Location() {
     }
@@ -223,14 +206,6 @@ public class Location implements Serializable, Comparable<Location>{
     public void setLrplce(Integer lrplce) {
         this.lrplce = lrplce;
     }
-
-/*    public Set<Locdes> getDescriptions() {
-        return descriptions;
-    }
-
-    public void setDescriptions(Set<Locdes> descriptions) {
-        this.descriptions = descriptions;
-    }*/
 
     public Georef getGeoref() {
 		return georef;
@@ -379,9 +354,6 @@ public class Location implements Serializable, Comparable<Location>{
         //ascending order
         return this.lname.compareTo(compareName);
  
-        //descending order
-        //return compareName.compareTo(this.lname);
- 
     }
  
     public static Comparator<Location> LocationNameComparator  
@@ -395,7 +367,7 @@ public class Location implements Serializable, Comparable<Location>{
             return locationName1.compareTo(locationName2);
    
             //descending order
-            //return locationName2.compareTo(locationName1);
+
         }
  
     };

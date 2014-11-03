@@ -1,15 +1,7 @@
 package org.generationcp.middleware.pojos.dms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * http://wiki.cimmyt.org/confluence/display/MBP/Business+Rules+for+Mapping+to+Chado
@@ -125,18 +117,23 @@ public class ProjectProperty implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ProjectProperty other = (ProjectProperty) obj;
 		if (projectPropertyId == null) {
-			if (other.projectPropertyId != null)
-				return false;
-		} else if (!projectPropertyId.equals(other.projectPropertyId))
-			return false;
+			if (other.projectPropertyId != null) {
+                return false;
+            }
+		} else if (!projectPropertyId.equals(other.projectPropertyId)) {
+            return false;
+        }
 		return true;
 	}
 
@@ -146,7 +143,7 @@ public class ProjectProperty implements Serializable {
         builder.append("ProjectProperty [projectPropertyId=");
         builder.append(projectPropertyId);
         builder.append(", project=");
-        builder.append(project);
+        builder.append(project.getName());
         builder.append(", typeId=");
         builder.append(typeId);
         builder.append(", value=");

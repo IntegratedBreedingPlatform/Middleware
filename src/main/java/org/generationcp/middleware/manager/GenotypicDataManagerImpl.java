@@ -11,47 +11,23 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
-import org.generationcp.middleware.dao.gdms.CharValuesDAO;
-import org.generationcp.middleware.dao.gdms.DartValuesDAO;
-import org.generationcp.middleware.dao.gdms.DatasetDAO;
-import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
-import org.generationcp.middleware.dao.gdms.MapDAO;
-import org.generationcp.middleware.dao.gdms.MappingPopDAO;
-import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
-import org.generationcp.middleware.dao.gdms.MarkerDAO;
-import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
-import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
-import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
-import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
-import org.generationcp.middleware.dao.gdms.MtaDAO;
-import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
-import org.generationcp.middleware.dao.gdms.QtlDAO;
-import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.dao.gdms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.*;
+import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Implementation of the GenotypicDataManager interface.  To instantiate this
@@ -510,7 +486,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<ExtendedMarkerInfo> getMarkerInfoDataByMarkerType(String markerType) throws MiddlewareQueryException {
-        /*List<String> methods = Arrays.asList("countByMarkerType", "getByMarkerType");*/
         return (List<ExtendedMarkerInfo>) super.getAllFromCentralAndLocalByMethod(getExtendedMarkerInfoDao(), "getByMarkerType",
                 new Object[]{markerType}, new Class[]{String.class});
     }
@@ -1787,10 +1762,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-//    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,            
-//    List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
-//            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException {
-    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, 
+    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
             List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets, 
             List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList, 
             List<AlleleValues> alleleValueList, List<DartValues> dartValueList) 
@@ -2677,10 +2649,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
         
-        /*if (mtaList.size() != mtaMetadataList.size()){
-        	logAndThrowException("Error in GenotypicDataManager.addMTAs: mtaList and mtaMetadataList must have the same size");
-        }*/
-
         try {
             trans = session.beginTransaction();
 
@@ -3253,10 +3221,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         MappingPopDAO mappingPopDao = getMappingPopDao();
         mappingPop.setDatasetId(datasetId);
-
-        // Mapping Pop has DatasetID as PK in Hibernate, but not in SQL
-        // Integer mappingPopGeneratedId = mappingPopDao.getNegativeId("datasetId");
-        // mappingPop.setDatasetIdId(mappingPopGeneratedId);
 
         MappingPop mappingPopRecordSaved = mappingPopDao.save(mappingPop);
         Integer mappingPopSavedId = mappingPopRecordSaved.getDatasetId();

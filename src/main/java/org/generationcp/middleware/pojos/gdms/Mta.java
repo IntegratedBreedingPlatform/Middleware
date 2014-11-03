@@ -11,13 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * POJO for the gdms_mta table.
@@ -426,143 +421,198 @@ public class Mta implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		Mta other = (Mta) obj;
 		if (alleleA == null) {
-			if (other.alleleA != null)
-				return false;
-		} else if (!alleleA.equals(other.alleleA))
-			return false;
+			if (other.alleleA != null) {
+                return false;
+            }
+		} else if (!alleleA.equals(other.alleleA)) {
+            return false;
+        }
 		if (alleleAPhenotype == null) {
-			if (other.alleleAPhenotype != null)
-				return false;
-		} else if (!alleleAPhenotype.equals(other.alleleAPhenotype))
-			return false;
+			if (other.alleleAPhenotype != null) {
+                return false;
+            }
+		} else if (!alleleAPhenotype.equals(other.alleleAPhenotype)) {
+            return false;
+        }
 		if (alleleB == null) {
-			if (other.alleleB != null)
-				return false;
-		} else if (!alleleB.equals(other.alleleB))
-			return false;
+			if (other.alleleB != null) {
+                return false;
+            }
+		} else if (!alleleB.equals(other.alleleB)) {
+            return false;
+        }
 		if (alleleBPhenotype == null) {
-			if (other.alleleBPhenotype != null)
-				return false;
-		} else if (!alleleBPhenotype.equals(other.alleleBPhenotype))
-			return false;
+			if (other.alleleBPhenotype != null) {
+                return false;
+            }
+		} else if (!alleleBPhenotype.equals(other.alleleBPhenotype)) {
+            return false;
+        }
 		if (chromosome == null) {
-			if (other.chromosome != null)
-				return false;
-		} else if (!chromosome.equals(other.chromosome))
-			return false;
+			if (other.chromosome != null) {
+                return false;
+            }
+		} else if (!chromosome.equals(other.chromosome)) {
+            return false;
+        }
 		if (correctionMethod == null) {
-			if (other.correctionMethod != null)
-				return false;
-		} else if (!correctionMethod.equals(other.correctionMethod))
-			return false;
+			if (other.correctionMethod != null) {
+                return false;
+            }
+		} else if (!correctionMethod.equals(other.correctionMethod)) {
+            return false;
+        }
 		if (datasetId == null) {
-			if (other.datasetId != null)
-				return false;
-		} else if (!datasetId.equals(other.datasetId))
-			return false;
+			if (other.datasetId != null) {
+                return false;
+            }
+		} else if (!datasetId.equals(other.datasetId)) {
+            return false;
+        }
 		if (dominance == null) {
-			if (other.dominance != null)
-				return false;
-		} else if (!dominance.equals(other.dominance))
-			return false;
+			if (other.dominance != null) {
+                return false;
+            }
+		} else if (!dominance.equals(other.dominance)) {
+            return false;
+        }
 		if (effect == null) {
-			if (other.effect != null)
-				return false;
-		} else if (!effect.equals(other.effect))
-			return false;
+			if (other.effect != null) {
+                return false;
+            }
+		} else if (!effect.equals(other.effect)) {
+            return false;
+        }
 		if (evidence == null) {
-			if (other.evidence != null)
-				return false;
-		} else if (!evidence.equals(other.evidence))
-			return false;
+			if (other.evidence != null) {
+                return false;
+            }
+		} else if (!evidence.equals(other.evidence)) {
+            return false;
+        }
 		if (freqAlleleA == null) {
-			if (other.freqAlleleA != null)
-				return false;
-		} else if (!freqAlleleA.equals(other.freqAlleleA))
-			return false;
+			if (other.freqAlleleA != null) {
+                return false;
+            }
+		} else if (!freqAlleleA.equals(other.freqAlleleA)) {
+            return false;
+        }
 		if (freqAlleleB == null) {
-			if (other.freqAlleleB != null)
-				return false;
-		} else if (!freqAlleleB.equals(other.freqAlleleB))
-			return false;
+			if (other.freqAlleleB != null) {
+                return false;
+            }
+		} else if (!freqAlleleB.equals(other.freqAlleleB)) {
+            return false;
+        }
 		if (gene == null) {
-			if (other.gene != null)
-				return false;
-		} else if (!gene.equals(other.gene))
-			return false;
+			if (other.gene != null) {
+                return false;
+            }
+		} else if (!gene.equals(other.gene)) {
+            return false;
+        }
 		if (mapId == null) {
-			if (other.mapId != null)
-				return false;
-		} else if (!mapId.equals(other.mapId))
-			return false;
+			if (other.mapId != null) {
+                return false;
+            }
+		} else if (!mapId.equals(other.mapId)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (mtaId == null) {
-			if (other.mtaId != null)
-				return false;
-		} else if (!mtaId.equals(other.mtaId))
-			return false;
+			if (other.mtaId != null) {
+                return false;
+            }
+		} else if (!mtaId.equals(other.mtaId)) {
+            return false;
+        }
 		if (notes == null) {
-			if (other.notes != null)
-				return false;
-		} else if (!notes.equals(other.notes))
-			return false;
+			if (other.notes != null) {
+                return false;
+            }
+		} else if (!notes.equals(other.notes)) {
+            return false;
+        }
 		if (pValueCorrected == null) {
-			if (other.pValueCorrected != null)
-				return false;
-		} else if (!pValueCorrected.equals(other.pValueCorrected))
-			return false;
+			if (other.pValueCorrected != null) {
+                return false;
+            }
+		} else if (!pValueCorrected.equals(other.pValueCorrected)) {
+            return false;
+        }
 		if (pValueUncorrected == null) {
-			if (other.pValueUncorrected != null)
-				return false;
-		} else if (!pValueUncorrected.equals(other.pValueUncorrected))
-			return false;
+			if (other.pValueUncorrected != null) {
+                return false;
+            }
+		} else if (!pValueUncorrected.equals(other.pValueUncorrected)) {
+            return false;
+        }
 		if (position == null) {
-			if (other.position != null)
-				return false;
-		} else if (!position.equals(other.position))
-			return false;
+			if (other.position != null) {
+                return false;
+            }
+		} else if (!position.equals(other.position)) {
+            return false;
+        }
 		if (rSquare == null) {
-			if (other.rSquare != null)
-				return false;
-		} else if (!rSquare.equals(other.rSquare))
-			return false;
+			if (other.rSquare != null) {
+                return false;
+            }
+		} else if (!rSquare.equals(other.rSquare)) {
+            return false;
+        }
 		if (reference == null) {
-			if (other.reference != null)
-				return false;
-		} else if (!reference.equals(other.reference))
-			return false;
+			if (other.reference != null) {
+                return false;
+            }
+		} else if (!reference.equals(other.reference)) {
+            return false;
+        }
 		if (scoreValue == null) {
-			if (other.scoreValue != null)
-				return false;
-		} else if (!scoreValue.equals(other.scoreValue))
-			return false;
+			if (other.scoreValue != null) {
+                return false;
+            }
+		} else if (!scoreValue.equals(other.scoreValue)) {
+            return false;
+        }
 		if (tId == null) {
-			if (other.tId != null)
-				return false;
-		} else if (!tId.equals(other.tId))
-			return false;
+			if (other.tId != null) {
+                return false;
+            }
+		} else if (!tId.equals(other.tId)) {
+            return false;
+        }
 		if (traitAvgAlleleA == null) {
-			if (other.traitAvgAlleleA != null)
-				return false;
-		} else if (!traitAvgAlleleA.equals(other.traitAvgAlleleA))
-			return false;
+			if (other.traitAvgAlleleA != null) {
+                return false;
+            }
+		} else if (!traitAvgAlleleA.equals(other.traitAvgAlleleA)) {
+            return false;
+        }
 		if (traitAvgAlleleB == null) {
-			if (other.traitAvgAlleleB != null)
-				return false;
-		} else if (!traitAvgAlleleB.equals(other.traitAvgAlleleB))
-			return false;
+			if (other.traitAvgAlleleB != null) {
+                return false;
+            }
+		} else if (!traitAvgAlleleB.equals(other.traitAvgAlleleB)) {
+            return false;
+        }
 		return true;
 	}
 

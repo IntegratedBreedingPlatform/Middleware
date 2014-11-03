@@ -11,27 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -53,6 +33,8 @@ import org.generationcp.middleware.util.TimerWatch;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 //ASsumptions - can be added to validations
 //Mandatory fields:  workbook.studyDetails.studyName
@@ -159,18 +141,8 @@ public class WorkbookSaver extends Saver {
 		List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
 		List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
 		
-		// TODO : Review code and see whether variable validation and possible dataset creation abort
-		// is a good idea (rebecca)
-//		boolean error = false;
-//		for (VariableType ev : effectVariables.getVariableTypes()) {
-//			if(ev.getStandardVariable().getStoredIn() == null) {
-//				LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
-//				error = true;
-//			}
-//			else LOG.info("Role for : " + ev.getStandardVariable().getName() + " : " + ev.getStandardVariable().getStoredIn().getId());
-//		}
-//		if(error) return -1;				
-		
+		// TODO : Review code and see whether variable validation and possible dataset creation abort is a good idea (rebecca)
+
         //GCP-6091 start
         int studyLocationId;
         List<Integer> locationIds = new ArrayList<Integer>();
@@ -498,15 +470,6 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String getStockFactor(VariableList stockVariables) {
-		/*
-		for (Variable variable : stockVariables.getVariables()) {
-			if (TermId.ENTRY_NUMBER_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-				return variable.getValue();
-			}
-		}
-		return null;
-		*/
-		
 		Map<String, Variable> variableMap = stockVariables.getVariableMap();
 		if(variableMap != null){
 			Variable var = variableMap.get(Integer.toString(TermId.ENTRY_NUMBER_STORAGE.getId()));
@@ -518,14 +481,6 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String getTrialInstanceNumber(VariableList trialVariables) {
-		/*
-		for (Variable variable : trialVariables.getVariables()) {
-			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-				return variable.getValue();
-			}
-		}
-		return null;
-		*/
 		Map<String, Variable> variableMap = trialVariables.getVariableMap();
 		if(variableMap != null){
 			Variable var = variableMap.get(Integer.toString(TermId.TRIAL_INSTANCE_STORAGE.getId()));
@@ -687,9 +642,6 @@ public class WorkbookSaver extends Saver {
 	public void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = getStockModelBuilder().getStockMapForDataset(datasetId);
 
-		//TimerWatch watch = new TimerWatch("fetch stocks", LOG);
-		//TimerWatch rowWatch = new TimerWatch("for each row", LOG);
-		
 		Session session = getCurrentSessionForLocal();
 		int i = 0;
 		List<Integer> variableIndexesList = new ArrayList<Integer>();
@@ -706,7 +658,6 @@ public class WorkbookSaver extends Saver {
         		Integer stockId = stockMap.get(stockFactor);
         		
         		if (stockId == null) {
-        		      //rowWatch.restart("--save 1 stock");
         			stockId = getStockSaver().saveStock(stock);
         			stockMap.put(stockFactor, stockId);
         		} else {
@@ -721,8 +672,6 @@ public class WorkbookSaver extends Saver {
         	    }
 		}
 		
-		//rowWatch.stop();
-		//watch.stop();
 	}
 	
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, 

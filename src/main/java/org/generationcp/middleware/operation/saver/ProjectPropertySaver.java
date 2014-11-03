@@ -11,19 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -35,6 +24,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.hibernate.Session;
+
+import java.util.*;
 
 public class ProjectPropertySaver extends Saver {
 
@@ -299,12 +290,12 @@ public class ProjectPropertySaver extends Saver {
 			if (variable.getStoredIn() == TermId.STUDY_NAME_STORAGE.getId()) {
 				project.setName(variable.getValue());
 				getDmsProjectDao().merge(project);
-				//getDmsProjectDao().saveOrUpdate(project);
+
 			}
 			else if (variable.getStoredIn() == TermId.STUDY_TITLE_STORAGE.getId()) {
 				project.setDescription(variable.getValue());
 				getDmsProjectDao().merge(project);
-				//getDmsProjectDao().saveOrUpdate(project);
+
 			}
 		}
 	}

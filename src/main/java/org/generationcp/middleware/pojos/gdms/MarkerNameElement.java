@@ -82,28 +82,37 @@ public class MarkerNameElement implements Serializable{
 
     @Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		MarkerNameElement other = (MarkerNameElement) obj;
 		if (gId == null) {
-			if (other.gId != null)
-				return false;
-		} else if (!gId.equals(other.gId))
-			return false;
+			if (other.gId != null) {
+                return false;
+            }
+		} else if (!gId.equals(other.gId)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (markerName == null) {
-			if (other.markerName != null)
-				return false;
-		} else if (!markerName.equals(other.markerName))
-			return false;
+			if (other.markerName != null) {
+                return false;
+            }
+		} else if (!markerName.equals(other.markerName)) {
+            return false;
+        }
 		return true;
 	}
 

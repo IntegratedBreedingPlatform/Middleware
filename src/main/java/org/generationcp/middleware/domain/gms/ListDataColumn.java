@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.gms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Data Transfer Object for ListDataProperty POJO
@@ -82,28 +82,37 @@ public class ListDataColumn implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ListDataColumn other = (ListDataColumn) obj;
 		if (columnName == null) {
-			if (other.columnName != null)
-				return false;
-		} else if (!columnName.equals(other.columnName))
-			return false;
+			if (other.columnName != null) {
+                return false;
+            }
+		} else if (!columnName.equals(other.columnName)) {
+            return false;
+        }
 		if (listDataColumnId == null) {
-			if (other.listDataColumnId != null)
-				return false;
-		} else if (!listDataColumnId.equals(other.listDataColumnId))
-			return false;
+			if (other.listDataColumnId != null) {
+                return false;
+            }
+		} else if (!listDataColumnId.equals(other.listDataColumnId)) {
+            return false;
+        }
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
+			if (other.value != null) {
+                return false;
+            }
+		} else if (!value.equals(other.value)) {
+            return false;
+        }
 		return true;
 	}
 

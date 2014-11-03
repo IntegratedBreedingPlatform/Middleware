@@ -1,8 +1,8 @@
 package org.generationcp.middleware.pojos.workbench.settings;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.manager.Operation;
+
+import java.io.Serializable;
 
 public class Condition  implements Serializable {
 

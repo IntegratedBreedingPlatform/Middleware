@@ -11,12 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Germplasm;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Germplasm;
 
 /**
  * Utility methods for the GermplasmDataManager class
@@ -74,10 +74,11 @@ public class GermplasmDataManagerUtil{
     	
         String toreturn;
         
-        if(name!=null)
-        	toreturn = name.trim();
-        else
-        	toreturn = "";
+        if(name!=null) {
+            toreturn = name.trim();
+        } else {
+            toreturn = "";
+        }
 
         // a) Capitalize all letters
         toreturn = toreturn.toUpperCase();

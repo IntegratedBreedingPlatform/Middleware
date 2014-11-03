@@ -11,17 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -30,6 +20,11 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.hibernate.Hibernate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DatasetProjectSaver extends Saver {
 
@@ -66,12 +61,16 @@ public class DatasetProjectSaver extends Saver {
 	}
 	
 	private String getName(DatasetValues datasetValues) {
-		if (datasetValues.getName() != null) return datasetValues.getName();
+		if (datasetValues.getName() != null) {
+            return datasetValues.getName();
+        }
 		return getStringValue(datasetValues, TermId.DATASET_NAME.getId());
 	}
 
 	private String getDescription(DatasetValues datasetValues) {
-		if (datasetValues.getDescription() != null) return datasetValues.getDescription();
+		if (datasetValues.getDescription() != null) {
+            return datasetValues.getDescription();
+        }
 		return getStringValue(datasetValues, TermId.DATASET_TITLE.getId());
 	}
 

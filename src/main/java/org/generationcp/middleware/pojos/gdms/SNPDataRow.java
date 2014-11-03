@@ -57,23 +57,30 @@ public class SNPDataRow{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         SNPDataRow other = (SNPDataRow) obj;
         if (accMetadataSet == null) {
-            if (other.accMetadataSet != null)
+            if (other.accMetadataSet != null) {
                 return false;
-        } else if (!accMetadataSet.equals(other.accMetadataSet))
+            }
+        } else if (!accMetadataSet.equals(other.accMetadataSet)) {
             return false;
+        }
         if (charValues == null) {
-            if (other.charValues != null)
+            if (other.charValues != null) {
                 return false;
-        } else if (!charValues.equals(other.charValues))
+            }
+        } else if (!charValues.equals(other.charValues)) {
             return false;
+        }
         return true;
     }
 

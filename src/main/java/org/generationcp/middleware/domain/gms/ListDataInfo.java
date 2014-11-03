@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.gms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
 import java.util.List;
-
-import org.generationcp.middleware.util.Debug;
 
 /**
  * Data Transfer Object for specifying properties (columns) for
@@ -64,23 +64,30 @@ public class ListDataInfo implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ListDataInfo other = (ListDataInfo) obj;
 		if (columns == null) {
-			if (other.columns != null)
-				return false;
-		} else if (!columns.equals(other.columns))
-			return false;
+			if (other.columns != null) {
+                return false;
+            }
+		} else if (!columns.equals(other.columns)) {
+            return false;
+        }
 		if (listDataId == null) {
-			if (other.listDataId != null)
-				return false;
-		} else if (!listDataId.equals(other.listDataId))
-			return false;
+			if (other.listDataId != null) {
+                return false;
+            }
+		} else if (!listDataId.equals(other.listDataId)) {
+            return false;
+        }
 		return true;
 	}
 

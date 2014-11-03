@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /** 
  * Contains the details of a Term - id, vocabularyId, name, definition, nameSynonyms, obsolete.
@@ -86,8 +86,12 @@ public class Term implements Serializable{
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof Term)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof Term)) {
+            return false;
+        }
 		Term other = (Term) obj;
 		return getId() == other.getId();
 	}

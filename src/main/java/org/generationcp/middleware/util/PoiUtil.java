@@ -506,7 +506,6 @@ public class PoiUtil {
         if (row == null) {
             return true;
         }
-        //Boolean isEmpty = true;
 
         for (int cn = start; cn <= end; cn++) {
             Cell c;
@@ -519,15 +518,12 @@ public class PoiUtil {
 
                 Object cellValue = getCellValue(c);
                 if (cellValue != null && !String.valueOf(cellValue).equals("")) {
-                    //isEmpty = false;
-                    // since there is a cell with value in this row, we should return it now
                     return false;
 
                 }
             }
         }
 
-        //return isEmpty;
         return true;
     }
 
@@ -670,7 +666,9 @@ public class PoiUtil {
 
     public static String rowAsString(Sheet sheet, int rowIndex, String delimiter) {
         Row row = sheet.getRow(rowIndex);
-        if (row == null) return "";
+        if (row == null) {
+            return "";
+        }
         int startCell = row.getFirstCellNum();
         int endCell = row.getLastCellNum() - 1;
 

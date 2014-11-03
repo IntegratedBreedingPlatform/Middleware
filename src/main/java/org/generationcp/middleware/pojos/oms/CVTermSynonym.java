@@ -12,13 +12,8 @@
 
 package org.generationcp.middleware.pojos.oms;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvtermsynonym
@@ -109,19 +104,24 @@ public class CVTermSynonym implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof CVTermSynonym))
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof CVTermSynonym)) {
+            return false;
+        }
 		
 		CVTermSynonym other = (CVTermSynonym) obj;
 		if (cvTermSynonymId == null) {
-			if (other.cvTermSynonymId != null)
-				return false;
-		} else if (!cvTermSynonymId.equals(other.cvTermSynonymId))
-			return false;
+			if (other.cvTermSynonymId != null) {
+                return false;
+            }
+		} else if (!cvTermSynonymId.equals(other.cvTermSynonymId)) {
+            return false;
+        }
 		
 		return true;
 	}

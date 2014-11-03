@@ -11,37 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.TreatmentVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
@@ -55,20 +31,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationType;
-import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.LocdesType;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -78,11 +41,14 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
-//	private static final String DATA_TYPE_NUMERIC = "N";
+
 	
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -96,8 +62,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
     	List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
-    		if(detail.hasRows())
-    			newList.add(detail);
+    		if(detail.hasRows()) {
+                newList.add(detail);
+            }
     	}
     	return newList;
     }
@@ -107,8 +74,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
         List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
-    		if(detail.hasRows())
-    			newList.add(detail);
+    		if(detail.hasRows()) {
+                newList.add(detail);
+            }
     	}
     	return newList;
     }
@@ -135,8 +103,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	
     	for(Location loc : locList){
     		if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue())
-    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()))
-    			continue;
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue())) {
+                continue;
+            }
     		newLocation.add(loc);
     	}
     	
@@ -181,8 +150,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             Location location = getLocationDataManager().getLocationByID(locationId);
             
             if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == location.getLtype().intValue())
-    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue()))
-    			continue;
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue())) {
+                continue;
+            }
             
             locationList.add(location);
         }
@@ -629,30 +599,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     public int countPlotsWithRecordedVariatesInDataset(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
-//        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
-        
-//        int dataSetId = 0;
-//        
-//        //get observation dataset
-//        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
-//        if (datasetRefList != null) {
-//            for (DatasetReference datasetRef : datasetRefList) {
-//                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
-//                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
-//                    dataSetId = datasetRef.getId();
-//                }
-//            }
-//        }
-//        
-//        //if not found in the list using the name, get dataset with Plot Data type
-//        if (dataSetId == 0) {
-//            DataSet dataset = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA);
-//            if (dataset != null){
-//                dataSetId = dataset.getId();
-//            }
-//        }
-        
-//        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId, variateIds);
+
         return getStudyDataManager().countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
     }
     
