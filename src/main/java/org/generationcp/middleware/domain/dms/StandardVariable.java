@@ -44,7 +44,7 @@ public class StandardVariable implements Serializable{
     
     private PhenotypicType phenotypicType;
     
-    private VariableConstraints constraints;  // may be null
+    private VariableConstraints constraints;
     
     private List<Enumeration> enumerations;
     
@@ -56,9 +56,7 @@ public class StandardVariable implements Serializable{
     }
     
 	public StandardVariable(Term property, Term scale, Term method,
-			Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType,
-			VariableConstraints constraints,
-			List<Enumeration> enumerations) {
+			Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType) {
 		this.property = property;
 		this.scale = scale;
 		this.method = method;
@@ -66,20 +64,19 @@ public class StandardVariable implements Serializable{
 		this.storedIn = storedIn;
 		this.isA = isA;
 		this.phenotypicType = phenotypicType;
-		this.constraints = constraints;
-		this.enumerations = enumerations;
 	}
 
     /* Copy constructor. Used by the copy method */
     private StandardVariable(StandardVariable stdVar) {
     	this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(),
 			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getIsA(), 
-			stdVar.getPhenotypicType(), stdVar.getConstraints(),
-			stdVar.getEnumerations());
+			stdVar.getPhenotypicType());
     	this.setId(0);  
     	this.setName(stdVar.getName());
     	this.setDescription(stdVar.getDescription());
     	this.setCropOntologyId(stdVar.getCropOntologyId());
+    	this.setConstraints(stdVar.getConstraints());
+		this.setEnumerations(stdVar.getEnumerations());
 	}
     
 	public int getId() {
@@ -250,16 +247,16 @@ public class StandardVariable implements Serializable{
 	}
 	
 	public boolean hasEnumerations() {
-		return (enumerations != null && enumerations.size() > 0);
+		return enumerations != null && !enumerations.isEmpty();
 	}
 	
 	public StandardVariable copy() {
 		return new StandardVariable(this);
 	}
 	
-	public void print(int indent) {
-		Debug.println(indent, "Standard Variable: ");
-		indent += 3;
+	public void print(int previousIndent) {
+		Debug.println(previousIndent, "Standard Variable: ");
+		int indent = previousIndent + 3;
 		Debug.println(indent, "term: " + term);
 		Debug.println(indent, "property: " + property);
 		Debug.println(indent, "method " + method);
@@ -285,7 +282,7 @@ public class StandardVariable implements Serializable{
 		if (obj == null) {
             return false;
         }
-		if (!(obj instanceof StandardVariable)) {
+		if (obj instanceof StandardVariable == false) {
             return false;
         }
 		StandardVariable other = (StandardVariable) obj;
