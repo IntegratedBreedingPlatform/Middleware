@@ -25,7 +25,7 @@ public interface OntologyDataManagerImplTestConstants {
 
     // PSMT ID's
     public static int NONEXISTING_TERM_PROPERTY_ID = 20109;
-    public static int EXPECTED_TERM_PROPERTY_ID = 20002;
+    public static int EXPECTED_TERM_PROPERTY_ID = 2000;
 
     public static int NONEXISTING_TERM_SCALE_ID = 20392;
     public static int EXPECTED_TERM_SCALE_ID = 6015;
@@ -34,7 +34,7 @@ public interface OntologyDataManagerImplTestConstants {
     public static int EXPECTED_TERM_METHOD_ID = 4020;
 
     public static int NONEXISTING_TERM_TRAIT_CLASS_ID = 21744;
-    public static int EXPECTED_TERM_TRAIT_CLASS_ID = 1410;
+    public static int EXPECTED_TERM_TRAIT_CLASS_ID = 1100;
 
     /* OLD constants used by the tests */
     public static final Integer CV_TERM_ID = 1010;

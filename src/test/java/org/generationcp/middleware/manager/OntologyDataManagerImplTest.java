@@ -26,8 +26,10 @@ import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.utils.database.DatabaseSetupUtil;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,6 +41,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 	@BeforeClass
 	public static void setUp() throws Exception {
+		DatabaseSetupUtil.startSqlScripts();
 		OntologyDataManagerImplTest.manager = DataManagerIntegrationTest.managerFactory
 				.getNewOntologyDataManager();
 	}
@@ -1032,9 +1035,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 		Assert.assertTrue(vars.isEmpty());
 
-		vars = OntologyDataManagerImplTest.manager.getStandardVariables(null, 20002, null, null);
-		Assert.assertFalse(vars.isEmpty());
-
 		vars = OntologyDataManagerImplTest.manager.getStandardVariables(null,
 				OntologyDataManagerImplTestConstants.EXPECTED_TERM_PROPERTY_ID, null, null);
 		Assert.assertFalse(vars.isEmpty());
@@ -1414,5 +1414,10 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Term term = OntologyDataManagerImplTest.manager.getTermById(standardVariable.getId());
 
 		Assert.assertNull(term);
+	}
+	
+	@AfterClass
+	public static void cleanUp() throws Exception{
+		DatabaseSetupUtil.endSqlScripts();
 	}
 }
