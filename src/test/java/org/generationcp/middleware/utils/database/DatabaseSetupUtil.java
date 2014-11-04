@@ -26,7 +26,6 @@ public class DatabaseSetupUtil{
 	private static DatabaseConnectionParameters centralConnectionParams, localConnectionParameters, workbenchConnectionParameters;
 	
 	private static String SQL_SCRIPTS_FOLDER = "sql";
-	private static String START_SQL_SCRIPTS = "/start";
 		
 	private static String LOCAL_SCRIPT = "/local";
 	private static String CENTRAL_SCRIPT = "/central";
@@ -34,14 +33,6 @@ public class DatabaseSetupUtil{
 	private static String MYSQL_PATH = "";
 	private static String TEST_DB_REQUIRED_PREFIX = "test_";
 		
-	@Test
-	public void testCreateDb() throws Exception{
-		Assert.assertTrue("Database should return true if the DB for local, central and workbench has a prefix 'test_'", DatabaseSetupUtil.startSqlScripts());
-	}
-	@Test
-	public void testDestroyDb() throws Exception{
-		Assert.assertTrue("Database should return true if the DB for local, central and workbench has a prefix 'test_'", DatabaseSetupUtil.endSqlScripts());
-	}
 	
     private static void setUp() throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
@@ -56,11 +47,11 @@ public class DatabaseSetupUtil{
 		MYSQL_PATH = prop.getProperty("mysql.path", "");
     }
 	
-	private static Map<String, List<File>> setupScripts(String sqlFolderPrefix) throws FileNotFoundException, URISyntaxException{
+	private static Map<String, List<File>> setupScripts() throws FileNotFoundException, URISyntaxException{
 		Map<String, List<File>> scriptsMap = new HashMap<String, List<File>>();		
 		
 		try{
-			File centralFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+sqlFolderPrefix+CENTRAL_SCRIPT).toURI());
+			File centralFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+CENTRAL_SCRIPT).toURI());
 			if(centralFile != null && centralFile.isDirectory()){
 				scriptsMap.put(CENTRAL_SCRIPT, Arrays.asList(centralFile.listFiles()));	
 			}
@@ -68,7 +59,7 @@ public class DatabaseSetupUtil{
 			scriptsMap.put(CENTRAL_SCRIPT, new ArrayList<File>());
 		}
 		try{
-			File localFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+sqlFolderPrefix+LOCAL_SCRIPT).toURI());
+			File localFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+LOCAL_SCRIPT).toURI());
 			if(localFile != null && localFile.isDirectory()){
 				scriptsMap.put(LOCAL_SCRIPT,  Arrays.asList(localFile.listFiles()));	
 			}
@@ -76,7 +67,7 @@ public class DatabaseSetupUtil{
 			scriptsMap.put(LOCAL_SCRIPT, new ArrayList<File>());
 		}
 		try{
-			File wbFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+sqlFolderPrefix+WORKBENCH_SCRIPT).toURI());
+			File wbFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+WORKBENCH_SCRIPT).toURI());
 			if(wbFile != null && wbFile.isDirectory()){
 				scriptsMap.put(WORKBENCH_SCRIPT,  Arrays.asList(wbFile.listFiles()));	
 			}
@@ -96,7 +87,7 @@ public class DatabaseSetupUtil{
 	public static boolean startSqlScripts() throws Exception{
 		try {						
 			setUp();
-			Map<String, List<File>> scriptsMap = setupScripts(START_SQL_SCRIPTS);
+			Map<String, List<File>> scriptsMap = setupScripts();
 			if(isTestDatabase(centralConnectionParams.getDbName())){
 				runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+centralConnectionParams.getDbName()+"`; USE `"+centralConnectionParams.getDbName()+"`;", centralConnectionParams);
 				runAllSetupScripts(scriptsMap.get(CENTRAL_SCRIPT), centralConnectionParams);
