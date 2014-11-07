@@ -186,13 +186,15 @@ public class ProjectPropertySaver extends Saver {
 			
 			insertVariable(trialDataset, variable, datasetRank);
 			
+			//GCP-9959
+			if (variable.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+				insertVariable(measurementDataset, variable, measurementRank);
+			}
+			
 			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 			}
-			else {
-			    //GCP-9659
-			    insertVariable(measurementDataset, variable, measurementRank);
-			    
+			else {    
 				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
 				setWorkingDatabase(Database.LOCAL);
 				getGeolocationDao().saveOrUpdate(geolocation);
@@ -204,9 +206,7 @@ public class ProjectPropertySaver extends Saver {
 			if (isConstant) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { //a trial constant
 					int datasetRank = getNextRank(trialDataset);
-					int measurementRank = getNextRank(measurementDataset);
 					insertVariable(trialDataset, variable, datasetRank);
-					insertVariable(measurementDataset, variable, measurementRank);
 					getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
 				}
 				else { // a study constant

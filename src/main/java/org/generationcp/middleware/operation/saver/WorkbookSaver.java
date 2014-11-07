@@ -745,22 +745,23 @@ public class WorkbookSaver extends Saver {
 		return getVariableTypeBuilder().create(info);
 	}
 	
-	private VariableTypeList propagateTrialFactorsIfNecessary(VariableTypeList effectVariables, VariableTypeList trialVariables) throws MiddlewareQueryException, MiddlewareException {
+	protected VariableTypeList propagateTrialFactorsIfNecessary(VariableTypeList effectVariables, VariableTypeList trialVariables) {
 		
 		VariableTypeList newList = new VariableTypeList();
 		
 		
 		
-        if (!isTrialFactorInDataset(effectVariables)) {
-            if (trialVariables != null) {
-                int index = 1;
-                for (VariableType var : trialVariables.getVariableTypes()) {
-                    if (var.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() 
-                            || TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() != var.getStandardVariable().getStoredIn().getId()) {
-                        var.setRank(index);
-                        newList.add(var);
-                        index++;
-                    }
+        if (!isTrialFactorInDataset(effectVariables) && trialVariables != null) {
+            int index = 1;
+            for (VariableType var : trialVariables.getVariableTypes()) {
+                if (var.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() ||
+                		(!PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(
+                				Integer.valueOf(var.getStandardVariable().getStoredIn().getId()))
+        				&& !PhenotypicType.VARIATE.getTypeStorages().contains(
+                				Integer.valueOf(var.getStandardVariable().getStoredIn().getId())))) {
+                    var.setRank(index);
+                    newList.add(var);
+                    index++;
                 }
             }
             
