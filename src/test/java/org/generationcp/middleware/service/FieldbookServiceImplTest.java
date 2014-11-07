@@ -34,6 +34,7 @@ import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -147,57 +148,85 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     }
     
     @Test
-    public void testSaveMeasurementRows() throws MiddlewareQueryException {
-
-        // Assumption: there is at least 1 local nursery stored in the database
-        int id = fieldbookService.getAllLocalNurseryDetails().get(0).getId();
-//    	int id = -167;
-        Workbook workbook = fieldbookService.getNurseryDataSet(id);
+    public void testSaveTrialMeasurementRows() throws MiddlewareQueryException {
+    	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
         workbook.print(INDENT);
+                
+        int id = dataImportService.saveDataset(workbook);
+        Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
         
-        List<MeasurementRow> observations = workbook.getObservations();
+        createdWorkbook = WorkbookTest.addEnvironmentAndConstantVariables(createdWorkbook);
+        
+        List<MeasurementRow> observations = createdWorkbook.getObservations();
         for (MeasurementRow observation : observations){
             List<MeasurementData> fields = observation.getDataList();
             for (MeasurementData field : fields){
                 try {
-                    //Debug.println(INDENT, "Original: " + field.toString());
                     if (field.getValue() != null){
                         field.setValue(Double.valueOf(Double.valueOf(field.getValue()) + 1).toString());
                         field.setValue(Integer.valueOf(Integer.valueOf(field.getValue()) + 1).toString());
-                        //Debug.println(INDENT, "Updated: " + field.toString());
                     }
                 } catch (NumberFormatException e){
                     // Ignore. Update only numeric values
                 }
             }
-        }
+        }        
         
-//        MeasurementVariable bhtrait = new MeasurementVariable(22448, "BH-LOCAL", "BH-LOCAL DESC", null, null, null, null, null, null);
-//        bhtrait.setOperation(Operation.ADD);
-//        bhtrait.setStoredIn(TermId.OBSERVATION_VARIATE.getId());
-//        workbook.getVariates().add(bhtrait);
-//        for (MeasurementVariable var : workbook.getVariates()) {
-//        	if (var.getTermId() == 8390) { //NOTES trait
-//        		var.setName("LOCAL " + var.getName());
-//        		var.setDescription("LOCAL " + var.getDescription());
-//        		var.setOperation(Operation.UPDATE);
-//        	}
-//        }
-//        for (MeasurementVariable var : workbook.getConditions()) {
-//        	if (var.getTermId() == -160) {
-//        		var.setOperation(Operation.DELETE);
-//        	}
-//        	else if (var.getTermId() == 8100) {
-//        		var.setOperation(Operation.UPDATE);
-//        		var.setName("INVESTIGATOR_NAME");
-//        		var.setDescription("INVESTIGATOR_DESCRIPTION");
-//        	}
-//        }
+        fieldbookService.saveMeasurementRows(createdWorkbook);
+        workbook = fieldbookService.getTrialDataSet(id);
+        assertFalse(workbook.equals(createdWorkbook));
         
-        fieldbookService.saveMeasurementRows(workbook);
-        Workbook workbook2 = fieldbookService.getNurseryDataSet(id);
-        workbook2.print(INDENT);
-        assertFalse(workbook.equals(workbook2));
+        assertEquals("Expected " + createdWorkbook.getTrialConditions().size() + " of records for trial conditions but got " 
+        		+ workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions().size(), 
+        		workbook.getTrialConditions().size());
+        assertTrue("Expected the same trial conditions retrieved but found a different condition.", 
+        		WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConditions(), workbook.getTrialConditions()));
+        assertEquals("Expected " + createdWorkbook.getTrialConstants().size() + " of records for trial constants but got " 
+        		+ workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants().size(), 
+        		workbook.getTrialConstants().size());
+        assertTrue("Expected the same trial constants retrieved but found a different constant.", 
+        		WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConstants(), workbook.getTrialConstants()));
+    }
+    
+    @Test
+    public void testSaveNurseryMeasurementRows() throws MiddlewareQueryException {
+    	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+        workbook.print(INDENT);
+                
+        int id = dataImportService.saveDataset(workbook);
+        Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
+        
+        createdWorkbook = WorkbookTest.addEnvironmentAndConstantVariables(createdWorkbook);
+        
+        List<MeasurementRow> observations = createdWorkbook.getObservations();
+        for (MeasurementRow observation : observations){
+            List<MeasurementData> fields = observation.getDataList();
+            for (MeasurementData field : fields){
+                try {
+                    if (field.getValue() != null){
+                        field.setValue(Double.valueOf(Double.valueOf(field.getValue()) + 1).toString());
+                        field.setValue(Integer.valueOf(Integer.valueOf(field.getValue()) + 1).toString());
+                    }
+                } catch (NumberFormatException e){
+                    // Ignore. Update only numeric values
+                }
+            }
+        }        
+        
+        fieldbookService.saveMeasurementRows(createdWorkbook);
+        workbook = fieldbookService.getNurseryDataSet(id);
+        assertFalse(workbook.equals(createdWorkbook));
+        
+        assertEquals("Expected " + createdWorkbook.getTrialConditions().size() + " of records for trial conditions but got " 
+        		+ workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions().size(), 
+        		workbook.getTrialConditions().size());
+        assertTrue("Expected the same trial conditions retrieved but found a different condition.", 
+        		WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConditions(), workbook.getTrialConditions()));
+        assertEquals("Expected " + createdWorkbook.getTrialConstants().size() + " of records for trial constants but got " 
+        		+ workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants().size(), 
+        		workbook.getTrialConstants().size());
+        assertTrue("Expected the same trial constants retrieved but found a different constant.", 
+        		WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConstants(), workbook.getTrialConstants()));
     }
     
     @Test
