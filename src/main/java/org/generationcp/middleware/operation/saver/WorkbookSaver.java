@@ -63,9 +63,9 @@ public class WorkbookSaver extends Saver {
      */
     
     @SuppressWarnings("rawtypes")
-	public Map saveVariables(Workbook workbook) throws Exception 
-    {
-    	workbook.reset();//make sure to reset all derived variables
+	public Map saveVariables(Workbook workbook) throws Exception {
+    	//make sure to reset all derived variables
+    	workbook.reset();
     	
     	// Create Maps, which we will fill with transformed Workbook Variable Data
     	Map<String, Map<String, ?>> variableMap = new HashMap<String, Map<String,?>>();
@@ -176,9 +176,11 @@ public class WorkbookSaver extends Saver {
             resetTrialObservations(workbook.getTrialObservations());
         }
         
-        if(trialVariableTypeList!=null && !isDeleteObservations) {//multi-location for data loader
+        if(trialVariableTypeList!=null && !isDeleteObservations) {
+        	//multi-location for data loader
    			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap, false);
-        } else if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { //also a multi-location
+        } else if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { 
+        	//also a multi-location
         	studyLocationId = createLocationsAndSetToObservations(locationIds,  workbook,  trialVariables, trialHeaders, trialVariatesMap, isDeleteTrialObservations);
         } else {
         	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations);
@@ -200,8 +202,7 @@ public class WorkbookSaver extends Saver {
 		int studyId = 0;
 		if (!(workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null)) {
 			studyId = createStudyIfNecessary(workbook, studyLocationId, true); 
-		}
-		else {
+		} else {
 			studyId = workbook.getStudyDetails().getId();
 		}
    		trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
@@ -269,8 +270,7 @@ public class WorkbookSaver extends Saver {
                     }
                     if (found) {
                     	row.getDataList().remove(varIndex);
-                    }
-                    else {
+                    } else {
                     	break;
                     }
                     index++;
@@ -390,18 +390,17 @@ public class WorkbookSaver extends Saver {
 			if (workbook.isNursery()) {
 				geolocationId = observations.get(0).getLocationId();
 			}
-		}
-		else {
+		} else {
 			observations = workbook.getObservations();
 		}
 		Map<String, Integer> locationMap = new HashMap<String, Integer>();
 		if (observations != null) {
 			for (MeasurementRow row : observations) {
 			    geolocationId = row.getLocationId();
-				if (geolocationId != null && geolocationId != 0) { //if geolocationId already exists, no need to create the geolocation
+				if (geolocationId != null && geolocationId != 0) { 
+					//if geolocationId already exists, no need to create the geolocation
 					row.setLocationId(geolocationId);
-				}
-				else {
+				} else {
 					TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
 					VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
 					if (geolocation != null && geolocation.size() > 0) {
@@ -409,7 +408,8 @@ public class WorkbookSaver extends Saver {
 		                if (LOG.isDebugEnabled()){
 		                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
 		                }
-		                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
+		                if(trialInstanceNumbers.add(trialInstanceNumber)) {
+		                	//if new location (unique by trial instance number)
 				            watch.restart("save geolocation");
 				            Geolocation g = getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
 				            		workbook.getStudyDetails().getStudyName(), geolocation, row, workbook.isNursery(), isDeleteTrialObservations);
@@ -433,17 +433,15 @@ public class WorkbookSaver extends Saver {
 					if (trialInstance != null) {
 						Integer locId = locationMap.get(trialInstance);
 						row.setLocationId(locId);
-					}
-					else if (geolocationId != null) {
+					} else if (geolocationId != null) {
 						row.setLocationId(geolocationId);
 					}
 				}
 			}
 	        //return studyLocationId
-			if (workbook.getObservations() != null && workbook.getObservations().size() > 0) {
+			if (workbook.getObservations() != null && !workbook.getObservations().isEmpty()) {
 			    return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
-			} 
-			else {
+			} else {
 			    return Long.valueOf(workbook.getTrialObservations().get(0).getLocationId()).intValue(); 
 			}
 		}
@@ -547,7 +545,7 @@ public class WorkbookSaver extends Saver {
 		TimerWatch watch = new TimerWatch("find trial dataset", LOG);
 		String trialName = workbook.getStudyDetails().getTrialDatasetName();
 		Integer trialDatasetId = null;
- 		if(trialName == null || trialName.equals("") ){
+ 		if(trialName == null || ("").equals(trialName)){
  		    List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
  	        if (datasetRefList != null) {
  	            for (DatasetReference datasetRef : datasetRefList) {
@@ -569,7 +567,7 @@ public class WorkbookSaver extends Saver {
 			DatasetValues trialValues = getDatasetValuesTransformer().transform(trialName, trialName, 
 					DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 			
-			if (workbook.isNursery() && (trialMV == null || trialMV.size() == 0 || getMainFactor(trialMV) == null)) {
+			if (workbook.isNursery() && (trialMV == null || trialMV.isEmpty() || getMainFactor(trialMV) == null)) {
 				trialVariables.add(createOccVariableType(trialVariables.size()+1));
 			}
 		
@@ -577,7 +575,7 @@ public class WorkbookSaver extends Saver {
 			DmsProject trial = getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues);
 			trialDatasetId = trial.getProjectId();
 		} else {
-			if (workbook.isNursery() && (trialMV == null || trialMV.size() == 0 || getMainFactor(trialMV) == null)) {
+			if (workbook.isNursery() && (trialMV == null || trialMV.isEmpty() || getMainFactor(trialMV) == null)) {
 				trialVariables.add(createOccVariableType(trialVariables.size()+1));
 			}
 		}
@@ -602,7 +600,7 @@ public class WorkbookSaver extends Saver {
         String datasetName = workbook.getStudyDetails().getMeasurementDatasetName();
         Integer datasetId = null;
 		
-		if(datasetName == null || datasetName.equals("") ){
+		if(datasetName == null || ("").equals(datasetName) ){
 		    List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(studyId);
             if (datasetRefList != null) {
                 for (DatasetReference datasetRef : datasetRefList) {
@@ -646,7 +644,7 @@ public class WorkbookSaver extends Saver {
 		int i = 0;
 		List<Integer> variableIndexesList = new ArrayList<Integer>();
 		//we get the indexes so that in the next rows we dont need to compare anymore per row
-		if(workbook.getObservations() != null && workbook.getObservations().size() != 0){
+		if(workbook.getObservations() != null && !workbook.getObservations().isEmpty()){
 			MeasurementRow row = workbook.getObservations().get(0);
 			variableIndexesList  = getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
 		}
@@ -664,7 +662,8 @@ public class WorkbookSaver extends Saver {
         			getStockSaver().saveOrUpdateStock(stock, stockId);
         		}
         		row.setStockId(stockId);
-        		if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        		if ( i % 50 == 0 ) { 
+        			  //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
         		      session.flush();
         		      session.clear();
         		}
@@ -680,7 +679,8 @@ public class WorkbookSaver extends Saver {
 		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		
-		int i = 2;//observation values start at row 2
+		//observation values start at row 2
+		int i = 2;
 		Session session = getCurrentSessionForLocal();
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
@@ -702,8 +702,10 @@ public class WorkbookSaver extends Saver {
         					for (Integer standardVariableId : e.getExceptions().keySet()) {
         						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
         						if(exceptions.get(standardVariableId)==null) {
-        							exceptions.put(standardVariableId, exception);//add exception
-        						} else {//add invalid values to the existing map of exceptions for each phenotype
+        							//add exception
+        							exceptions.put(standardVariableId, exception);
+        						} else {
+        							//add invalid values to the existing map of exceptions for each phenotype
         							for(String invalidValue : exception.getInvalidValues()) {
         								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
         							}
@@ -711,7 +713,8 @@ public class WorkbookSaver extends Saver {
         					}
         				}
         			}
-        			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        			if ( i % 50 == 0 ) { 
+        				//to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
         				session.flush();
         				session.clear();
         			}
@@ -828,13 +831,16 @@ public class WorkbookSaver extends Saver {
 
 		// unpack maps
 		VariableTypeList trialVariables = new VariableTypeList();
-		trialVariables.addAll(variableTypeMap.get("trialVariables"));//addAll instead of assigning directly to avoid changing the state of the object
+		//addAll instead of assigning directly to avoid changing the state of the object
+		trialVariables.addAll(variableTypeMap.get("trialVariables"));
 		VariableTypeList effectVariables = new VariableTypeList();
-		effectVariables.addAll(variableTypeMap.get("effectVariables"));//addAll instead of assigning directly to avoid changing the state of the object
+		//addAll instead of assigning directly to avoid changing the state of the object
+		effectVariables.addAll(variableTypeMap.get("effectVariables"));
 		List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
 		List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
 		
-		int studyId = createStudyIfNecessary(workbook, 0, false);//locationId and experiment are not yet needed here
+		//locationId and experiment are not yet needed here
+		int studyId = createStudyIfNecessary(workbook, 0, false);
 		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
 		int measurementDatasetId = 0;
 		int meansDatasetId = 0;
@@ -1038,7 +1044,8 @@ public class WorkbookSaver extends Saver {
 		TimerWatch watch = new TimerWatch("saving means data (total)", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		
-		int i = 2;//observation values start at row 2
+		//observation values start at row 2
+		int i = 2;
 		Session session = getCurrentSessionForLocal();
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
@@ -1060,8 +1067,10 @@ public class WorkbookSaver extends Saver {
         					for (Integer standardVariableId : e.getExceptions().keySet()) {
         						PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
         						if(exceptions.get(standardVariableId)==null) {
-        							exceptions.put(standardVariableId, exception);//add exception
-        						} else {//add invalid values to the existing map of exceptions for each phenotype
+        							//add exception
+        							exceptions.put(standardVariableId, exception);
+        						} else {
+        							//add invalid values to the existing map of exceptions for each phenotype
         							for(String invalidValue : exception.getInvalidValues()) {
         								exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
         							}
@@ -1069,7 +1078,8 @@ public class WorkbookSaver extends Saver {
         					}
         				}
         			}
-        			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+        			if ( i % 50 == 0 ) { 
+        				//to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
         				session.flush();
         				session.clear();
         			}
