@@ -84,7 +84,7 @@ public class User implements Serializable, BeanFormState {
     @Column(name = "cdate")
     private Integer cdate;
     
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @NotFound(action = NotFoundAction.IGNORE)
     private List<UserRole> roles;
     
