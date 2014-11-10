@@ -44,6 +44,7 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
@@ -111,6 +112,11 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
     @Test
     public void testAddUser() throws MiddlewareQueryException {
         User user = createTestUserData();
+        
+        List<UserRole> roles = new ArrayList<UserRole>();
+        roles.add(new UserRole(1, "ADMIN", "Admin"));
+        roles.add(new UserRole(2, "BREEDER", "Breeder"));
+        user.setRoles(roles);
         Integer result = manager.addUser(user);
         Assert.assertNotNull("Expected id of a newly saved record in workbench_user.", result);
         
