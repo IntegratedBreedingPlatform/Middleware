@@ -84,8 +84,7 @@ public class User implements Serializable, BeanFormState {
     @Column(name = "cdate")
     private Integer cdate;
     
-    @OneToMany
-    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "userid") }, inverseJoinColumns = { @JoinColumn(name = "roleid") })
+    @OneToMany(mappedBy = "user")
     @NotFound(action = NotFoundAction.IGNORE)
     private List<UserRole> roles;
     

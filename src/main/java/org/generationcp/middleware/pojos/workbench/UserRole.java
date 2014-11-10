@@ -5,38 +5,50 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.generationcp.middleware.pojos.User;
+
 @Entity
-@Table(name = "roles")
+@Table(name = "users_roles")
 public class UserRole {
 
 	@Id
 	@Basic(optional = false)
-	@Column(name = "roleid")
-	private Integer roleid;
+	@Column(name = "id")
+	private Integer id;
+
+	@ManyToOne
+	@JoinColumn(name = "userid", nullable = false)
+	private User user;
 
 	@Column(name = "role")
 	private String role;
 
-	@Column(name = "description")
-	private String description;
-
 	public UserRole() {
 	}
 
-	public UserRole(Integer roleid, String role, String description) {
-		this.roleid = roleid;
+	public UserRole(User user, String role) {
+		this.user = user;
 		this.role = role;
-		this.description = description;
 	}
 
-	public Integer getRoleid() {
-		return roleid;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setRoleid(Integer roleid) {
-		this.roleid = roleid;
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public String getRole() {
@@ -47,17 +59,9 @@ public class UserRole {
 		this.role = role;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	@Override
 	public String toString() {
-		return "UserRole [roleid=" + roleid + ", role=" + role + ", description=" + description + "]";
+		return "UserRole [User=" + user + ", role=" + role + "]";
 	}
-	
+
 }
