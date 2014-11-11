@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,15 +18,14 @@ public class UserRole {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Basic(optional = false)
-	@Column(name = "id")
+	@Column(name = "id", nullable = false)
 	private Integer id;
 
 	@ManyToOne
 	@JoinColumn(name = "userid", nullable = false)
 	private User user;
 
-	@Column(name = "role")
+	@Column(name = "role", nullable = false)
 	private String role;
 
 	public UserRole() {

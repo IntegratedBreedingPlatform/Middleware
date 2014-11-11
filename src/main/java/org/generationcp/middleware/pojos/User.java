@@ -143,8 +143,6 @@ public class User implements Serializable, BeanFormState {
         user.setIsNew(isnew);
         user.setActive(active);
         user.setEnabled(enabled);
-        user.setRoles(roles);
-        
         return user;
     }
 
