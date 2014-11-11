@@ -58,13 +58,13 @@ public class WorkbookParser {
 
     //GCP-5815
     private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
-    private final static String[] DEFAULT_EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
-    private final static String[] EXPECTED_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
-    private final static String[] EXPECTED_VARIATE_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
-    private final static String[] EXPECTED_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
-    private final static String[] EXPECTED_CONSTANT_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", ""};
-    private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
-    private final static String[] EXPECTED_FACTOR_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "LABEL"};
+    public final static String[] DEFAULT_EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
+    public final static String[] EXPECTED_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
+    public final static String[] EXPECTED_VARIATE_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
+    public final static String[] EXPECTED_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
+    public final static String[] EXPECTED_CONSTANT_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", ""};
+    public final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
+    public final static String[] EXPECTED_FACTOR_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "LABEL"};
 
     private final static String[] SECTION_NAMES = new String[]{"CONDITION", "FACTOR", "CONSTANT", "VARIATE"};
 
@@ -75,7 +75,7 @@ public class WorkbookParser {
      * @return
      * @throws IOException
      */
-    private Workbook getCorrectWorkbook(File file) throws IOException, WorkbookParserException {
+    protected Workbook getCorrectWorkbook(File file) throws IOException, WorkbookParserException {
         InputStream inp = new FileInputStream(file);
         InputStream inp2 = new FileInputStream(file);
         Workbook wb;
@@ -122,30 +122,8 @@ public class WorkbookParser {
 
             wb = getCorrectWorkbook(file);
 
-            //validations
-            try {
-                Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
-
-                if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
-                    errorMessages.add(new Message("error.missing.sheet.description"));
-                }
-            } catch (IllegalArgumentException e) {
-                errorMessages.add(new Message("error.missing.sheet.description"));
-            } catch (Exception e) {
-                throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
-            }
-
-            try {
-                Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
-
-                if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
-                    errorMessages.add(new Message("error.missing.sheet.observation"));
-                }
-            } catch (IllegalArgumentException e) {
-                errorMessages.add(new Message("error.missing.sheet.observation"));
-            } catch (Exception e) {
-                throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
-            }
+            //validation Descriptin and Observation Sheets
+            validateExistenceOfSheets(wb);
 
             // throw an exception here if
             if (errorMessages.size() > 0 && performValidation) {
@@ -172,6 +150,31 @@ public class WorkbookParser {
 
         return currentWorkbook;
     }
+	protected void validateExistenceOfSheets(Workbook wb) throws WorkbookParserException {
+		try {
+		    Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
+
+		    if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
+		        errorMessages.add(new Message("error.missing.sheet.description"));
+		    }
+		} catch (IllegalArgumentException e) {
+		    errorMessages.add(new Message("error.missing.sheet.description"));
+		} catch (Exception e) {
+		    throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
+		}
+
+		try {
+		    Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
+
+		    if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
+		        errorMessages.add(new Message("error.missing.sheet.observation"));
+		    }
+		} catch (IllegalArgumentException e) {
+		    errorMessages.add(new Message("error.missing.sheet.observation"));
+		} catch (Exception e) {
+		    throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
+		}
+	}
 
     public void parseAndSetObservationRows(File file, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
         try {
@@ -184,7 +187,7 @@ public class WorkbookParser {
         }
     }
 
-    private StudyDetails readStudyDetails(Workbook wb) throws WorkbookParserException {
+    protected StudyDetails readStudyDetails(Workbook wb) throws WorkbookParserException {
 
         //get study details
         String study = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_NAME_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
@@ -267,7 +270,7 @@ public class WorkbookParser {
         return studyDetails;
     }
 
-    private List<MeasurementVariable> readMeasurementVariables(Workbook wb, String name) throws WorkbookParserException {
+    protected List<MeasurementVariable> readMeasurementVariables(Workbook wb, String name) throws WorkbookParserException {
         List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
         try {
@@ -308,73 +311,78 @@ public class WorkbookParser {
             }
 
             //If file is still valid (after checking headers), proceed
-            do {
-                currentRow++;
-            } while (rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8));
-
-            // capture empty sections, and return to avoid spillover
-            String value = getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0);
-
-            for (String sectionName : SECTION_NAMES) {
-                if (value.equalsIgnoreCase(sectionName)) {
-                    return measurementVariables;
-                }
-            }
-
-            while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
-
-                // GCP-5802
-                MeasurementVariable var = new MeasurementVariable(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 1)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 3)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 4)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 2)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7));
-
-                if (StringUtils.isEmpty(var.getName())) {
-                    errorMessages.add(new Message("error.missing.field.name", Integer.toString(currentRow + 1)));
-                }
-
-                if (StringUtils.isEmpty(var.getDescription())) {
-                    errorMessages.add(new Message("error.missing.field.description", Integer.toString(currentRow + 1)));
-                }
-
-                if (StringUtils.isEmpty(var.getProperty())) {
-                    errorMessages.add(new Message("error.missing.field.property", Integer.toString(currentRow + 1)));
-                }
-
-                if (StringUtils.isEmpty(var.getScale())) {
-                    errorMessages.add(new Message("error.missing.field.scale", Integer.toString(currentRow + 1)));
-                }
-
-                if (StringUtils.isEmpty(var.getMethod())) {
-                    errorMessages.add(new Message("error.missing.field.method", Integer.toString(currentRow + 1)));
-                }
-
-                if (StringUtils.isEmpty(var.getDataType())) {
-                    errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(currentRow + 1)));
-                }
-
-                if (!name.equals("VARIATE") && StringUtils.isEmpty(var.getLabel())) {
-                    errorMessages.add(new Message("error.missing.field.label", Integer.toString(currentRow + 1)));
-                }
-
-                if ((name.equals("FACTOR") || name.equals("CONDITION")) && PhenotypicType.getPhenotypicTypeForLabel(var.getLabel()) == null) {
-                    errorMessages.add(new Message("error.invalid.field.label", Integer.toString(currentRow + 1)));
-                }
-
-                measurementVariables.add(var);
-
-                currentRow++;
-            }
+            extractMeasurementVariablesForSection(wb, name, measurementVariables);
 
             return measurementVariables;
         } catch (Exception e) {
             throw new WorkbookParserException(e.getMessage(), e);
         }
     }
+	protected void extractMeasurementVariablesForSection(Workbook wb, String name,
+			List<MeasurementVariable> measurementVariables) {
+		do {
+			System.out.println(currentRow);
+		    currentRow++;
+		} while (rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8));
+
+		// capture empty sections, and return to avoid spillover
+		String value = getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0);
+
+		for (String sectionName : SECTION_NAMES) {
+		    if (value.equalsIgnoreCase(sectionName)) {
+		        return;
+		    }
+		}
+
+		while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
+
+		    // GCP-5802
+		    MeasurementVariable var = new MeasurementVariable(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0)
+		            , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 1)
+		            , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 3)
+		            , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 4)
+		            , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 2)
+		            , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5)
+		            , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6)
+		            , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7));
+
+		    if (StringUtils.isEmpty(var.getName())) {
+		        errorMessages.add(new Message("error.missing.field.name", Integer.toString(currentRow + 1)));
+		    }
+
+		    if (StringUtils.isEmpty(var.getDescription())) {
+		        errorMessages.add(new Message("error.missing.field.description", Integer.toString(currentRow + 1)));
+		    }
+
+		    if (StringUtils.isEmpty(var.getProperty())) {
+		        errorMessages.add(new Message("error.missing.field.property", Integer.toString(currentRow + 1)));
+		    }
+
+		    if (StringUtils.isEmpty(var.getScale())) {
+		        errorMessages.add(new Message("error.missing.field.scale", Integer.toString(currentRow + 1)));
+		    }
+
+		    if (StringUtils.isEmpty(var.getMethod())) {
+		        errorMessages.add(new Message("error.missing.field.method", Integer.toString(currentRow + 1)));
+		    }
+
+		    if (StringUtils.isEmpty(var.getDataType())) {
+		        errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(currentRow + 1)));
+		    }
+
+		    if (!name.equals("VARIATE") && StringUtils.isEmpty(var.getLabel())) {
+		        errorMessages.add(new Message("error.missing.field.label", Integer.toString(currentRow + 1)));
+		    }
+
+		    if ((name.equals("FACTOR") || name.equals("CONDITION")) && PhenotypicType.getPhenotypicTypeForLabel(var.getLabel()) == null) {
+		        errorMessages.add(new Message("error.invalid.field.label", Integer.toString(currentRow + 1)));
+		    }
+
+		    measurementVariables.add(var);
+
+		    currentRow++;
+		}
+	}
 
     private List<MeasurementRow> readObservations(Workbook wb, org.generationcp.middleware.domain.etl.Workbook
             workbook) throws WorkbookParserException {
@@ -468,7 +476,7 @@ public class WorkbookParser {
     }
 
 
-    private static String getCellStringValue(Workbook wb, Integer sheetNumber, Integer rowNumber, Integer columnNumber) {
+    protected static String getCellStringValue(Workbook wb, Integer sheetNumber, Integer rowNumber, Integer columnNumber) {
         try {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
@@ -485,7 +493,7 @@ public class WorkbookParser {
     }
 
     // GCP-5815
-    private boolean checkHeadersValid(Workbook workbook, int sheetNumber, int row, String[] expectedHeaders) {
+    protected boolean checkHeadersValid(Workbook workbook, int sheetNumber, int row, String[] expectedHeaders) {
 
         for (int i = 0; i < expectedHeaders.length; i++) {
             // a plus is added to the column count, since the first column is the name of the group; e.g., FACTOR, CONDITION, ETC
