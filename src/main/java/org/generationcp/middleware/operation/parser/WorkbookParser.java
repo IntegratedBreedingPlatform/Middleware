@@ -60,7 +60,7 @@ public class WorkbookParser {
     private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
     private final static String[] DEFAULT_EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
     private final static String[] EXPECTED_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
-    private final static String[] EXPECTED_VARIATE_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
+    private final static String[] EXPECTED_VARIATE_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
     private final static String[] EXPECTED_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
     private final static String[] EXPECTED_CONSTANT_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", ""};
     private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
