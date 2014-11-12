@@ -28,9 +28,11 @@ import org.generationcp.middleware.ServiceIntegraionTest;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.etl.WorkbookTest2;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
@@ -42,10 +44,13 @@ import org.junit.runners.JUnit4;
 public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
 
     private static DataImportService dataImportService;
+    
+    private static FieldbookService fieldbookService;
 
     @BeforeClass
     public static void setUp() throws Exception {
         dataImportService = serviceFactory.getDataImportService();
+        fieldbookService = serviceFactory.getFieldbookService();
     }
 
     @Test
@@ -65,20 +70,49 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     }
 
     @Test
-    public void testSaveDataset() throws MiddlewareQueryException {
-        Workbook workbook = WorkbookTest2.getTestWorkbook();
-        workbook.print(INDENT);
+    public void testSaveTrialDataset() throws MiddlewareQueryException {
+        Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+                
         int id = dataImportService.saveDataset(workbook);
-        Debug.println(INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+                
+        Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
+        
+        WorkbookTest.setTestWorkbook(null);
+        workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+        
+        assertEquals("Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got " 
+        		+ createdWorkbook.getTrialConditions().size(), workbook.getTrialConditions().size(), 
+        		createdWorkbook.getTrialConditions().size());
+        assertTrue("Expected the same trial conditions retrieved but found a different condition.", 
+        		WorkbookTest.areTrialVariablesSame(workbook.getTrialConditions(), createdWorkbook.getTrialConditions()));
+        assertEquals("Expected " + workbook.getTrialConstants().size() + " of records for trial constants but got " 
+        		+ createdWorkbook.getTrialConstants().size(), workbook.getTrialConstants().size(), 
+        		createdWorkbook.getTrialConstants().size());
+        assertTrue("Expected the same trial constants retrieved but found a different constant.", 
+        		WorkbookTest.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
     }
 
-    @Test
+	@Test
     public void testSaveNurseryDataset() throws MiddlewareQueryException {
-        Workbook workbook = WorkbookTest.getTestWorkbook();
-        workbook.print(INDENT);
+		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+                
         int id = dataImportService.saveDataset(workbook);
-        String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
-        Debug.println(INDENT, "Created study:" + id + ", name = " + name);
+                
+        Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
+        
+        WorkbookTest.setTestWorkbook(null);
+        workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+                
+        assertEquals("Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got " 
+        		+ createdWorkbook.getTrialConditions().size(), workbook.getTrialConditions().size(), 
+        		createdWorkbook.getTrialConditions().size());
+        assertTrue("Expected the same trial conditions retrieved but found a different condition.", 
+        		WorkbookTest.areTrialVariablesSame(workbook.getTrialConditions(), createdWorkbook.getTrialConditions()));
+        assertEquals("Expected " + workbook.getTrialConstants().size() + " of records for trial constants but got " 
+        		+ createdWorkbook.getTrialConstants().size(), workbook.getTrialConstants().size(), 
+        		createdWorkbook.getTrialConstants().size());
+        assertTrue("Expected the same trial constants retrieved but found a different constant.", 
+        		WorkbookTest.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
     }
 
     @Test

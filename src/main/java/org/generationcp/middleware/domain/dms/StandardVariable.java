@@ -282,11 +282,11 @@ public class StandardVariable implements Serializable{
 		if (obj == null) {
             return false;
         }
-		if (obj instanceof StandardVariable == false) {
-            return false;
+		if (obj instanceof StandardVariable) {
+			StandardVariable other = (StandardVariable) obj;
+			return other.getId() == getId();
         }
-		StandardVariable other = (StandardVariable) obj;
-		return other.getId() == getId();
+		return false;
 	}
 	
 	@Override
