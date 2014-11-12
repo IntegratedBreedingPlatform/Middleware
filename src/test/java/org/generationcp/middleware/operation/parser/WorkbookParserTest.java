@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
+
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -28,9 +30,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.generationcp.middleware.operation.parser.WorkbookParser.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class WorkbookParserTest {
 	
+	public final static String[] INCORRECT_CONDITION_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "PLOT"};
+	public final static String[] INCORRECT_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE123", "VALUE", "LABEL"};
+	public final static String[] INCORRECT_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE123", "SAMPLE LEVEL"};
 	public final static String[] INCORRECT_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL123"};
 	
 	protected final Logger LOG = LoggerFactory.getLogger(getClass());
@@ -59,28 +66,82 @@ public class WorkbookParserTest {
 	}
 
 	@Test
+	public void testDefaultHeadersForConditionHeaders() throws Exception {
+		testCorrectSectionHeaders(Section.CONDITION, DEFAULT_EXPECTED_VARIABLE_HEADERS);
+	}
+	
+	@Test
+	public void testOldFieldbookExportForFactorHeaders_Format1() throws Exception {
+		testCorrectSectionHeaders(Section.FACTOR, EXPECTED_FACTOR_HEADERS);
+	}
+	
+	@Test
+	public void testOldFieldbookExportForFactorHeaders_Format2() throws Exception {
+		testCorrectSectionHeaders(Section.FACTOR, EXPECTED_FACTOR_HEADERS_2);
+	}
+	
+	@Test
+	public void testNewFieldbookExportFactorHeaders() throws Exception {
+		testCorrectSectionHeaders(Section.FACTOR, DEFAULT_EXPECTED_VARIABLE_HEADERS);
+	}
+	
+	@Test
+	public void testNewFieldbookExportConstantHeaders() throws Exception {
+		testCorrectSectionHeaders(Section.CONSTANT, EXPECTED_CONSTANT_HEADERS);
+	}
+	
+	@Test
+	public void testOldFieldbookExportConstantHeaders() throws Exception {
+		testCorrectSectionHeaders(Section.CONSTANT, EXPECTED_CONSTANT_HEADERS_2);
+	}
+	
+	@Test
+	public void testDefaultHeadersForConstantHeaders() throws Exception {
+		testCorrectSectionHeaders(Section.CONSTANT, DEFAULT_EXPECTED_VARIABLE_HEADERS);
+	}
+	
+	@Test
 	public void testNewFieldbookExportVariateHeaders() throws Exception {
-		testCorrectVariateHeaders(WorkbookParser.EXPECTED_VARIATE_HEADERS_2);
+		testCorrectSectionHeaders(Section.VARIATE, EXPECTED_VARIATE_HEADERS_2);
 	}
 	
 	@Test
 	public void testOldFieldbookExportVariateHeaders() throws Exception {
-		testCorrectVariateHeaders(WorkbookParser.EXPECTED_VARIATE_HEADERS);
+		testCorrectSectionHeaders(Section.VARIATE, EXPECTED_VARIATE_HEADERS);
 	}
 	
 	@Test
 	public void testDefaultHeadersForVariateHeaders() throws Exception {
-		testCorrectVariateHeaders(WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS);
+		testCorrectSectionHeaders(Section.VARIATE, DEFAULT_EXPECTED_VARIABLE_HEADERS);
+	}
+	
+	@Test
+	public void testInCorrectConditionHeadersValidated() throws Exception {
+		testIncorrectSectionHeadersValidated(Section.CONDITION, INCORRECT_CONDITION_HEADERS);
+	}
+	
+	@Test
+	public void testInCorrectFactorHeadersValidated() throws Exception {
+		testIncorrectSectionHeadersValidated(Section.FACTOR, INCORRECT_FACTOR_HEADERS);
+	}
+	
+	@Test
+	public void testInCorrectConstantHeadersValidated() throws Exception {
+		testIncorrectSectionHeadersValidated(Section.CONSTANT, INCORRECT_CONSTANT_HEADERS);
+	}
+	
+	@Test
+	public void testInCorrectVariateHeadersValidated() throws Exception {
+		testIncorrectSectionHeadersValidated(Section.VARIATE, INCORRECT_VARIATE_HEADERS);
 	}
 
 
-
-	private void testCorrectVariateHeaders(String[] headerArray) throws IOException, WorkbookParserException {
+	private void testCorrectSectionHeaders(Section section, String[] headerArray) throws IOException, WorkbookParserException {
 		WorkbookParser moleWorkbookParser = spy(workbookParser);
 		
-		Workbook sampleWorkbook = createWorkbookWithSectionHeaders("VARIATE", headerArray);
+		Workbook sampleWorkbook = createWorkbookWithSectionHeaders(section.toString(), headerArray);
 		
-		setupVariateHeaderValidationMocks(moleWorkbookParser, sampleWorkbook);
+		setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 		
 		moleWorkbookParser.parseFile(file, true);
 		verify(moleWorkbookParser).checkHeadersValid(sampleWorkbook, 0, 0, headerArray);
@@ -89,35 +150,36 @@ public class WorkbookParserTest {
 	
 	
 	
-	
-	@Test
-	public void testInCorrectVariateHeadersValidated() throws Exception {
+	private void testIncorrectSectionHeadersValidated(Section section, String[] headerArray) throws IOException, WorkbookParserException {
 		WorkbookParser moleWorkbookParser = spy(workbookParser);
 		
-		Workbook sampleWorkbook = createWorkbookWithSectionHeaders("VARIATE", INCORRECT_VARIATE_HEADERS);
+		String sectionName = section.toString();
+		Workbook sampleWorkbook = createWorkbookWithSectionHeaders(sectionName, headerArray);
 		
-		setupVariateHeaderValidationMocks(moleWorkbookParser, sampleWorkbook);
+		setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 		
 		try {
 			moleWorkbookParser.parseFile(file, true);
 			fail("Validation exception should have been thrown");
 		} catch (WorkbookParserException e) {
-			assertTrue("Should have thrown validation exception but did not", "Incorrect headers for VARIATE".equals(e.getMessage()));
+			String errorMessage = "Incorrect headers for " + sectionName;
+			assertTrue("Should have thrown validation exception but did not", errorMessage.equals(e.getMessage()));
 		}
-			
 	}
 
-	private void setupVariateHeaderValidationMocks(WorkbookParser moleWorkbookParser,
-			Workbook sampleWorkbook) throws IOException, WorkbookParserException {
+	private void setupHeaderValidationMocks(WorkbookParser moleWorkbookParser,
+			Workbook sampleWorkbook, Section section) throws IOException, WorkbookParserException {
 		// mock / skip other parsing logic and validations
 		doReturn(sampleWorkbook).when(moleWorkbookParser).getCorrectWorkbook(file);
 		doNothing().when(moleWorkbookParser).validateExistenceOfSheets(sampleWorkbook);
 		doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook);
 		
-		// only interested in VARIATE section
-		doReturn(new ArrayList<MeasurementVariable>()).when(moleWorkbookParser).readMeasurementVariables(sampleWorkbook, "CONDITION");
-		doReturn(new ArrayList<MeasurementVariable>()).when(moleWorkbookParser).readMeasurementVariables(sampleWorkbook, "FACTOR");
-		doReturn(new ArrayList<MeasurementVariable>()).when(moleWorkbookParser).readMeasurementVariables(sampleWorkbook, "CONSTANT");
+		// only interested in specific section
+		for (Section aSection : Section.values()){
+			if (!aSection.equals(section)){
+				doReturn(new ArrayList<MeasurementVariable>()).when(moleWorkbookParser).readMeasurementVariables(sampleWorkbook, aSection.toString());
+			}
+		}
 		
 		// when processing variate section, do not read actual measurement vars after validating headers
 		doNothing().when(moleWorkbookParser).extractMeasurementVariablesForSection(any(Workbook.class), 
