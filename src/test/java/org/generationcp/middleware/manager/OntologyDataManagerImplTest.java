@@ -21,15 +21,23 @@ import java.util.Set;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.utils.database.DatabaseSetupUtil;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +49,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		DatabaseSetupUtil.startSqlScripts();
 		OntologyDataManagerImplTest.manager = DataManagerIntegrationTest.managerFactory
 				.getNewOntologyDataManager();
 	}
@@ -1416,8 +1423,4 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Assert.assertNull(term);
 	}
 	
-	@AfterClass
-	public static void cleanUp() throws Exception{
-		DatabaseSetupUtil.endSqlScripts();
-	}
 }
