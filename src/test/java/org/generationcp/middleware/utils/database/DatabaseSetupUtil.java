@@ -27,7 +27,7 @@ import org.tmatesoft.svn.core.wc2.SvnTarget;
 public class DatabaseSetupUtil{
 	
 	private static final String TEST_DATABASE_CONFIG_PROPERTIES = "testDatabaseConfig.properties";
-	private static final String prefixDirectory = "/updatedIbdbScripts";
+	private static final String prefixDirectory = "./updatedIbdbScripts";
 	private static final String DEFAULT_IBDB_GIT_URL = "https://github.com/digitalabs/IBDBScripts";
 
 
