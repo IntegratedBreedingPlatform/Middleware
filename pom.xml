@@ -137,6 +137,12 @@
             <artifactId>poi-ooxml-schemas</artifactId>
             <version>3.8</version>
         </dependency>
+         <!-- Used in tests, we would dynamically do a git (svn) checkout -->
+        <dependency>
+			<groupId>org.tmatesoft.svnkit</groupId>
+			<artifactId>svnkit</artifactId>
+			<version>1.8.5</version>
+		</dependency>
 
     </dependencies>
 

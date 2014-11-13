@@ -18,11 +18,19 @@ import java.util.Properties;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
-import org.junit.Assert;
-import org.junit.Test;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.wc2.SvnCheckout;
+import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
+import org.tmatesoft.svn.core.wc2.SvnTarget;
 
 public class DatabaseSetupUtil{
 	
+	private static final String TEST_DATABASE_CONFIG_PROPERTIES = "testDatabaseConfig.properties";
+	private static final String prefixDirectory = "/updatedIbdbScripts";
+	private static final String DEFAULT_IBDB_GIT_URL = "https://github.com/digitalabs/IBDBScripts";
+
+
 	private static DatabaseConnectionParameters centralConnectionParams, localConnectionParameters, workbenchConnectionParameters;
 	
 	private static String SQL_SCRIPTS_FOLDER = "sql";
@@ -32,21 +40,24 @@ public class DatabaseSetupUtil{
 	private static String WORKBENCH_SCRIPT = "/workbench";	
 	private static String MYSQL_PATH = "";
 	private static String TEST_DB_REQUIRED_PREFIX = "test_";
-		
 	
-    private static void setUp() throws Exception{
+	private static String gitUrl;
+	
+	
+    private static void setUpMysqlConfig() throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
-		localConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-		centralConnectionParams = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-		workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
+		localConnectionParameters = new DatabaseConnectionParameters(TEST_DATABASE_CONFIG_PROPERTIES, "local");
+		centralConnectionParams = new DatabaseConnectionParameters(TEST_DATABASE_CONFIG_PROPERTIES, "central");
+		workbenchConnectionParameters = new DatabaseConnectionParameters(TEST_DATABASE_CONFIG_PROPERTIES, "workbench");
 		
-		InputStream in = new FileInputStream(new File(ResourceFinder.locateFile("testDatabaseConfig.properties").toURI()));
+		InputStream in = new FileInputStream(new File(ResourceFinder.locateFile(TEST_DATABASE_CONFIG_PROPERTIES).toURI()));
 		Properties prop = new Properties();
 		prop.load(in);
 
 		MYSQL_PATH = prop.getProperty("mysql.path", "");
     }
-	
+
+    
 	private static Map<String, List<File>> setupScripts() throws FileNotFoundException, URISyntaxException{
 		Map<String, List<File>> scriptsMap = new HashMap<String, List<File>>();		
 		
@@ -84,28 +95,87 @@ public class DatabaseSetupUtil{
 		return false;
 	}
 	
-	public static boolean startSqlScripts() throws Exception{
+	
+	private static void initializeCentralDatabase() throws Exception {
+		// copy and execute central/common scripts
+		String checkoutURL = prefixDirectory+"/database/central/common";    	
+		String centralCommonGitURL = gitUrl + "/trunk/central/common";
+		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, centralConnectionParams);
+		
+		//copy and execute central/common-update scripts
+		checkoutURL = prefixDirectory+"/database/central/common-update";    	
+		centralCommonGitURL = gitUrl + "/trunk/central/common-update";
+		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, centralConnectionParams);
+	}
+	
+	private static void initializeLocalDatabase() throws Exception {
+		// copy and execute central/common scripts
+		String checkoutURL = prefixDirectory+"/database/local/common";    	
+		String centralCommonGitURL = gitUrl + "/trunk/local/common";
+		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, localConnectionParameters);
+		
+		//copy and execute central/common-update scripts
+		checkoutURL = prefixDirectory+"/database/local/common-update";    	
+		centralCommonGitURL = gitUrl + "/trunk/local/common-update";
+		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, localConnectionParameters);
+	}
+
+	private static void setupIBDBScriptsConfig() throws FileNotFoundException, URISyntaxException,
+			IOException {
+		InputStream in = new FileInputStream(new File(ResourceFinder.locateFile(TEST_DATABASE_CONFIG_PROPERTIES).toURI()));
+	    Properties prop = new Properties();
+	    prop.load(in);
+		         
+		String ibdbScriptsGitUrl = prop.getProperty("test.ibdb.scripts.git.url", null);
+		if(ibdbScriptsGitUrl == null) {
+			 //we use the default url
+			gitUrl = DEFAULT_IBDB_GIT_URL;
+		} else {
+			gitUrl = ibdbScriptsGitUrl;
+		}
+	}
+
+	private static void checkoutAndRunIBDBScripts(String checkoutURL, String gitUrl, DatabaseConnectionParameters connection) throws SVNException, Exception {
+		File scriptsDir = new File(checkoutURL);    	
+		scriptsDir.mkdir(); 
+		
+		SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
+    	try {
+    	    SvnCheckout checkout = svnOperationFactory.createCheckout();
+    	    checkout.setSingleTarget(SvnTarget.fromFile(scriptsDir));
+    	    SVNURL url = SVNURL.parseURIEncoded(gitUrl);
+    	    checkout.setSource(SvnTarget.fromURL(url));
+    	    checkout.run();
+    	} catch (SVNException e) {
+			throw e;
+    	} finally {
+    	    svnOperationFactory.dispose();
+    	}
+    	
+    	runAllSetupScripts(Arrays.asList(scriptsDir.listFiles()), connection);
+	}
+	
+	/**
+	 * Creates test central, local and workbench databases with creation scripts coming from IBDBScripts
+	 * along with init data files in src\test\resources\sql
+	 * 
+	 * @return true if all test databases created successfully
+	 * @throws Exception
+	 */
+	public static boolean setupTestDatabases() throws Exception{
 		try {						
-			setUp();
+			setUpMysqlConfig();
+			setupIBDBScriptsConfig();
+			
+			// drop database to ensure fresh DB
+			dropTestDatabases();
+			
 			Map<String, List<File>> scriptsMap = setupScripts();
-			if(isTestDatabase(centralConnectionParams.getDbName())){
-				runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+centralConnectionParams.getDbName()+"`; USE `"+centralConnectionParams.getDbName()+"`;", centralConnectionParams);
-				runAllSetupScripts(scriptsMap.get(CENTRAL_SCRIPT), centralConnectionParams);
-			}else{
-				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
-			}
-			if(isTestDatabase(localConnectionParameters.getDbName())){
-				runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+localConnectionParameters.getDbName()+"`; USE `"+localConnectionParameters.getDbName()+"`;", localConnectionParameters);
-				runAllSetupScripts(scriptsMap.get(LOCAL_SCRIPT), localConnectionParameters);
-			}else{
-				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
-			}
-			if(isTestDatabase(workbenchConnectionParameters.getDbName())){
-				runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+workbenchConnectionParameters.getDbName()+"`; USE `"+workbenchConnectionParameters.getDbName()+"`;", workbenchConnectionParameters);
-				runAllSetupScripts(scriptsMap.get(WORKBENCH_SCRIPT), workbenchConnectionParameters);
-			}else{
-				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
-			}
+			
+			createTestDatabase(centralConnectionParams, scriptsMap.get(CENTRAL_SCRIPT));
+			createTestDatabase(localConnectionParameters, scriptsMap.get(LOCAL_SCRIPT));
+			createTestDatabase(workbenchConnectionParameters, scriptsMap.get(WORKBENCH_SCRIPT));
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return false;
@@ -124,25 +194,40 @@ public class DatabaseSetupUtil{
 		}
 		return true;
 	}
+
+	
+	private static void createTestDatabase(DatabaseConnectionParameters connectionParams, List<File> initDataFiles) throws IOException,
+			InterruptedException, Exception {
 		
-	public static boolean endSqlScripts() throws Exception{
+		if(isTestDatabase(connectionParams.getDbName())) {
+			runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+connectionParams.getDbName()+"`; USE `"+connectionParams.getDbName()+"`;", connectionParams);
+			if (connectionParams.equals(centralConnectionParams)) {
+				initializeCentralDatabase();
+			} else if (connectionParams.equals(localConnectionParameters)) {
+				initializeLocalDatabase();
+			}
+			runAllSetupScripts(initDataFiles, connectionParams);
+			
+		} else {
+			throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+		}
+	}
+	
+	/**
+	 * Drops all test databases (central, local, workbench)
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean dropTestDatabases() throws Exception{
 		try {
-			setUp();
-			if(isTestDatabase(localConnectionParameters.getDbName())){
-				runSQLCommand("DROP DATABASE IF EXISTS `"+localConnectionParameters.getDbName()+"`; ", localConnectionParameters);
-			}else{
-				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
-			}
-			if(isTestDatabase(centralConnectionParams.getDbName())){
-				runSQLCommand("DROP DATABASE IF EXISTS `"+centralConnectionParams.getDbName()+"`; ", centralConnectionParams);
-			}else{
-				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
-			}
-			if(isTestDatabase(workbenchConnectionParameters.getDbName())){
-				runSQLCommand("DROP DATABASE IF EXISTS `"+workbenchConnectionParameters.getDbName()+"`; ", workbenchConnectionParameters);
-			}else{
-				throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
-			}
+			setUpMysqlConfig();
+			
+			dropTestDatabase(localConnectionParameters);
+			dropTestDatabase(centralConnectionParams);
+			dropTestDatabase(workbenchConnectionParameters);
+			
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return false;
@@ -157,14 +242,26 @@ public class DatabaseSetupUtil{
 			return false;
 		}
 		return true;
+	}
+
+	private static void dropTestDatabase(DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException, Exception {
+		if(isTestDatabase(localConnectionParameters.getDbName())){
+			runSQLCommand("DROP DATABASE IF EXISTS `"+connectionParams.getDbName()+"`; ", connectionParams);
+		}else{
+			throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
+		}
 	} 
 	
 		
 	private static void runAllSetupScripts(List<File> fileList, DatabaseConnectionParameters connectionParams) throws Exception{		          
     	if(fileList != null && !fileList.isEmpty()){        	        		
-    		for(int index = 0 ; index < fileList.size() ; index++){
+    		for(int index = 0 ; index < fileList.size() ; index++) {
     			File sqlFile = fileList.get(index);
-    			runScriptFromFile(sqlFile, connectionParams);
+    			if (sqlFile.getName().endsWith(".sql")) {
+    				if (!runScriptFromFile(sqlFile, connectionParams)) {
+    					throw new Exception("Error in executing " + sqlFile.getAbsolutePath());
+    				}
+    			}
     		}        		
     	}       
 	}
@@ -262,7 +359,6 @@ public class DatabaseSetupUtil{
         StringBuilder errorOut = new StringBuilder();
         while ((line = errorReader.readLine()) != null) {
             errorOut.append(line);
-            //    System.err.println(line);
         }
 
         errorReader.close();
