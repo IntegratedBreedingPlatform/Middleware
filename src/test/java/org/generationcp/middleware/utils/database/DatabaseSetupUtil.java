@@ -18,6 +18,10 @@ import java.util.Properties;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.wc2.SvnCheckout;
@@ -25,6 +29,8 @@ import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
 import org.tmatesoft.svn.core.wc2.SvnTarget;
 
 public class DatabaseSetupUtil{
+	
+	protected static final Logger LOG = LoggerFactory.getLogger(DatabaseSetupUtil.class);
 	
 	private static final String TEST_DATABASE_CONFIG_PROPERTIES = "testDatabaseConfig.properties";
 	private static final String prefixDirectory = "./updatedIbdbScripts";
@@ -44,6 +50,11 @@ public class DatabaseSetupUtil{
 	private static String gitUrl;
 	
 	
+	@Test
+	public void testSetupDatabase() throws Exception{
+		setupTestDatabases();
+	}
+	 
     private static void setUpMysqlConfig() throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
 		localConnectionParameters = new DatabaseConnectionParameters(TEST_DATABASE_CONFIG_PROPERTIES, "local");
@@ -106,6 +117,8 @@ public class DatabaseSetupUtil{
 		checkoutURL = prefixDirectory+"/database/central/common-update";    	
 		centralCommonGitURL = gitUrl + "/trunk/central/common-update";
 		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, centralConnectionParams);
+		
+		LOG.debug("  >>>Central DB initialized - all scripts from IBDBScripts ran successfully.");
 	}
 	
 	private static void initializeLocalDatabase() throws Exception {
@@ -118,6 +131,8 @@ public class DatabaseSetupUtil{
 		checkoutURL = prefixDirectory+"/database/local/common-update";    	
 		centralCommonGitURL = gitUrl + "/trunk/local/common-update";
 		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, localConnectionParameters);
+		
+		LOG.debug("  >>>Local DB initialized - all scripts from IBDBScripts ran successfully.");
 	}
 
 	private static void setupIBDBScriptsConfig() throws FileNotFoundException, URISyntaxException,
@@ -151,6 +166,7 @@ public class DatabaseSetupUtil{
     	} finally {
     	    svnOperationFactory.dispose();
     	}
+    	LOG.debug("  >>>Checkout from " + gitUrl + " successful.");
     	
     	runAllSetupScripts(Arrays.asList(scriptsDir.listFiles()), connection);
 	}
@@ -201,12 +217,23 @@ public class DatabaseSetupUtil{
 		
 		if(isTestDatabase(connectionParams.getDbName())) {
 			runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+connectionParams.getDbName()+"`; USE `"+connectionParams.getDbName()+"`;", connectionParams);
+			
 			if (connectionParams.equals(centralConnectionParams)) {
+				LOG.debug("Test CENTRAL db created.");
 				initializeCentralDatabase();
+			
 			} else if (connectionParams.equals(localConnectionParameters)) {
+				LOG.debug("Test LOCAL db created.");
 				initializeLocalDatabase();
+			
+			} else {
+				LOG.debug("Test WORKBENCH db created.");
 			}
-			runAllSetupScripts(initDataFiles, connectionParams);
+			
+			if (!initDataFiles.isEmpty()){
+				runAllSetupScripts(initDataFiles, connectionParams);
+				LOG.debug("  >>>Ran init data scripts successfully");
+			}
 			
 		} else {
 			throw new Exception("Test Database is not setup, please use a prefix 'test_' ");
@@ -365,4 +392,6 @@ public class DatabaseSetupUtil{
 
         return errorOut.toString();
     }	 
+
+
 }
