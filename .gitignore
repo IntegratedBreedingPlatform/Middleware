@@ -79,3 +79,7 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Test DB scripts downloaded from git #
+#######################################
+updatedIbdbScripts/
