@@ -239,6 +239,11 @@ public enum TermId {
     , MUTATION_METHODS_CLASS (1570)
     , GENETIC_MODIFICATION_CLASS (1590)
     , CYTOGENETIC_MANIPULATION (1580)
+    
+    //Check Variables
+    , CHECK_START (8411)
+    , CHECK_INTERVAL (8412)
+    , CHECK_PLAN (8413)
 ;
 	
 	private final int id;
