@@ -68,7 +68,6 @@ local.properties
 # Logs and databases #
 ######################
 *.log
-*.sql
 *.sqlite
 
 # OS generated files #
@@ -80,3 +79,7 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Test DB scripts downloaded from git #
+#######################################
+updatedIbdbScripts/
