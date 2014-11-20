@@ -56,11 +56,17 @@ public enum Season {
      */
     public static Season getSeason(String seasonStr){
         Season season = Season.GENERAL;
+
+        if (seasonStr == null || seasonStr.isEmpty()) {
+            return season;
+        }
+
         if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()){
             season = Season.DRY;
         } else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()){
             season = Season.WET;
         }
+
         return season;
     }
 }

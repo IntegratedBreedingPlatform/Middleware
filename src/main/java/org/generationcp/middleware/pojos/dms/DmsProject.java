@@ -142,18 +142,23 @@ public class DmsProject implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		DmsProject other = (DmsProject) obj;
 		if (projectId == null) {
-			if (other.projectId != null)
-				return false;
-		} else if (!projectId.equals(other.projectId))
-			return false;
+			if (other.projectId != null) {
+                return false;
+            }
+		} else if (!projectId.equals(other.projectId)) {
+            return false;
+        }
 		return true;
 	}
 

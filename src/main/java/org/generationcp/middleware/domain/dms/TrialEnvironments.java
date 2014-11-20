@@ -50,7 +50,9 @@ public class TrialEnvironments {
 		List<Variable> vars = new ArrayList<Variable>();
 		for (TrialEnvironment trialEnvironment : trialEnvironments) {
 			Variable var = trialEnvironment.getVariables().findByLocalName(localName);
-			if (var != null) vars.add(var);
+			if (var != null) {
+                vars.add(var);
+            }
 			
 		}
 		Collections.sort(vars, new  Comparator<Variable>() {
@@ -81,8 +83,12 @@ public class TrialEnvironments {
 		TrialEnvironment found = null;
 		for (TrialEnvironment trialEnvironment : trialEnvironments) {
 			if (trialEnvironment.containsValueByLocalName(localName, value)) {
-				if (found == null) found = trialEnvironment;
-				else { found = null; break; }
+				if (found == null) {
+                    found = trialEnvironment;
+                } else {
+                    found = null;
+                    break;
+                }
 			}
 		}
 		return found;

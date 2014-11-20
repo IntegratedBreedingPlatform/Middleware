@@ -44,8 +44,12 @@ public class NameSynonym implements Serializable{
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof NameSynonym)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof NameSynonym)) {
+            return false;
+        }
 		NameSynonym other = (NameSynonym) obj;
 		return name.equals(other.name) && type == other.type; 
 	}

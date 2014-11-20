@@ -137,19 +137,24 @@ public class Geolocation implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Geolocation))
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof Geolocation)) {
+            return false;
+        }
 		
 		Geolocation other = (Geolocation) obj;
 		if (locationId == null) {
-			if (other.locationId != null)
-				return false;
-		} else if (!locationId.equals(other.locationId))
-			return false;
+			if (other.locationId != null) {
+                return false;
+            }
+		} else if (!locationId.equals(other.locationId)) {
+            return false;
+        }
 		return true;
 	}
 

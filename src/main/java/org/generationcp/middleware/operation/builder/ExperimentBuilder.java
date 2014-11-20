@@ -61,8 +61,9 @@ public class ExperimentBuilder extends Builder {
 		List<Integer> stockIds = new ArrayList<Integer>();
 		for (ExperimentProject experimentProject  : experimentProjects) {
 			List<ExperimentStock> experimentStocks = experimentProject.getExperiment().getExperimentStocks();
-			if (experimentStocks != null && experimentStocks.size() == 1) 
-				stockIds.add(experimentStocks.get(0).getStock().getStockId());
+			if (experimentStocks != null && experimentStocks.size() == 1) {
+                stockIds.add(experimentStocks.get(0).getStock().getStockId());
+            }
 		}
 		stockModelMap = getStockBuilder().get(stockIds);
 
@@ -253,10 +254,11 @@ public class ExperimentBuilder extends Builder {
 		List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
 		if (experimentStocks != null && experimentStocks.size() == 1) {
 			StockModel stockModel = null;
-			if(stockModelMap != null && stockModelMap.get(experimentStocks.get(0).getStock().getStockId()) != null)
-				stockModel = stockModelMap.get(experimentStocks.get(0).getStock().getStockId());
-			else	
-				stockModel = getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
+			if(stockModelMap != null && stockModelMap.get(experimentStocks.get(0).getStock().getStockId()) != null) {
+                stockModel = stockModelMap.get(experimentStocks.get(0).getStock().getStockId());
+            } else {
+                stockModel = getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
+            }
 			
 			
 			for (VariableType variableType : variableTypes.getVariableTypes()) {
@@ -330,8 +332,9 @@ public class ExperimentBuilder extends Builder {
 		if (experimentModel.getProperties() != null) {
 			for (ExperimentProperty property : experimentModel.getProperties()) {
 				Variable var = createVariable(property, variableTypes, hasVariableType);
-				if(var.getVariableType() != null)
-					variables.add(var);
+				if(var.getVariableType() != null) {
+                    variables.add(var);
+                }
 			}
 		}
 	}

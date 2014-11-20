@@ -83,33 +83,44 @@ public class TermProperty implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         TermProperty other = (TermProperty) obj;
         if (rank == null) {
-            if (other.rank != null)
+            if (other.rank != null) {
                 return false;
-        } else if (!rank.equals(other.rank))
+            }
+        } else if (!rank.equals(other.rank)) {
             return false;
+        }
         if (termPropertyId == null) {
-            if (other.termPropertyId != null)
+            if (other.termPropertyId != null) {
                 return false;
-        } else if (!termPropertyId.equals(other.termPropertyId))
+            }
+        } else if (!termPropertyId.equals(other.termPropertyId)) {
             return false;
+        }
         if (typeId == null) {
-            if (other.typeId != null)
+            if (other.typeId != null) {
                 return false;
-        } else if (!typeId.equals(other.typeId))
+            }
+        } else if (!typeId.equals(other.typeId)) {
             return false;
+        }
         if (value == null) {
-            if (other.value != null)
+            if (other.value != null) {
                 return false;
-        } else if (!value.equals(other.value))
+            }
+        } else if (!value.equals(other.value)) {
             return false;
+        }
         return true;
     }
 

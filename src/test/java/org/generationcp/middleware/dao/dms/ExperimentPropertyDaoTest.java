@@ -34,10 +34,17 @@ public class ExperimentPropertyDaoTest extends MiddlewareIntegrationTest {
         dao.setSession(centralSessionUtil.getCurrentSession());
     }
 
+    // FIXME: hardcoded project id
     @Test
     public void testGetFieldMapLabels() throws Exception {
         int projectId = 5734; //5790;
         List<FieldMapDatasetInfo> datasets = dao.getFieldMapLabels(projectId);
+
+        if (datasets == null) {
+            Debug.println(0, "testGetFieldMapLabels(projectId=" + projectId + ") RESULTS: NULL/Empty");
+            return;
+        }
+
         Debug.println(0, "testGetFieldMapLabels(projectId=" + projectId + ") RESULTS:");
         for (FieldMapDatasetInfo dataset: datasets) {
         	Debug.println(3, dataset.toString());

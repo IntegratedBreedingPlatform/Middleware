@@ -131,8 +131,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && variableIds.size()>0)
+            if(environmentIds.size()>0 && variableIds.size()>0) {
                 list = query.list();
+            }
               
             for (Object[] row : list){
                 Integer id = (Integer) row[0]; 
@@ -211,8 +212,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0)
+            if(environmentIds.size()>0) {
                 list = query.list();
+            }
 
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0];
@@ -256,8 +258,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0)
+            if(environmentIds.size()>0) {
                 list = query.list();
+            }
 
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0];
@@ -309,8 +312,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && environmentIds.size()>0)
+            if(environmentIds.size()>0 && environmentIds.size()>0) {
                 list = query.list();
+            }
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0];
@@ -364,8 +368,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(traitIds.size()>0)
+            if(traitIds.size()>0) {
                 list = query.list();
+            }
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -434,8 +439,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && traitIds.size()>0)
+            if(environmentIds.size()>0 && traitIds.size()>0) {
                 list = query.list();
+            }
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -473,8 +479,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && traitIds.size()>0)
+            if(environmentIds.size()>0 && traitIds.size()>0) {
                 list = query.list();
+            }
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -760,7 +767,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			this.flush();
 			
-			if (cvTermIds.size() == 0) return new ArrayList<Object[]>();
+			if (cvTermIds.size() == 0) {
+                return new ArrayList<Object[]>();
+            }
 			
 			// get the phenotype_id
 			String sql = "SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM nd_experiment_project ep " +
@@ -995,7 +1004,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ")
 		.append(" where a.project_id = ").append(projectId)
 		.append(" and nd_exp.nd_geolocation_id = ").append(locationId)
-		.append(" and (phenotype.value <> '' and phenotype.value is not null) ")
+		.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
+		.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
 		.append(" group by nd_exp.nd_geolocation_id, nd_exp_stock.stock_id, phenotype.observable_id ")
 		.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
 		

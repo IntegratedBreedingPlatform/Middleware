@@ -219,7 +219,9 @@ public class StandardVariableSaver extends Saver {
 				}
 			}
 			// save to DB if this relationship does not already exist
-			if(!exists) saveCvTermRelationship(subjectId, typeId, object.getId());
+			if(!exists) {
+                saveCvTermRelationship(subjectId, typeId, object.getId());
+            }
 		} else {
 			throw new MiddlewareQueryException("The CvTermRelationship field is required for " + subjectId + " with relationship type of " + typeId);
 		}

@@ -53,7 +53,9 @@ public class ExperimentModelSaver extends Saver {
 					variable.getVariableType().getId(), 
 					variable.getValue());
 
-			if (val > 0) isUpdated = true;
+			if (val > 0) {
+                isUpdated = true;
+            }
 			
 			if (experimentId != 0 && val == 0){
 				getPhenotypeSaver().save(experimentId, variable);

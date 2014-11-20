@@ -140,7 +140,9 @@ public class PoiEventUserModel {
 				throws SAXException {
 			
 			if(name.equals("row")){
-				if (rowCounter == (maxLimit+1)) throw new SAXException("You have exceeded the limit!!!!");
+				if (rowCounter == (maxLimit+1)) {
+                    throw new SAXException("You have exceeded the limit!!!!");
+                }
 				rowCounter ++;
 			}
 		}

@@ -246,38 +246,51 @@ public class QtlDetailElement implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         QtlDetailElement other = (QtlDetailElement) obj;
         if (mapName == null) {
-            if (other.mapName != null)
+            if (other.mapName != null) {
                 return false;
-        } else if (!mapName.equals(other.mapName))
+            }
+        } else if (!mapName.equals(other.mapName)) {
             return false;
+        }
         if (ontology == null) {
-            if (other.ontology != null)
+            if (other.ontology != null) {
                 return false;
-        } else if (!ontology.equals(other.ontology))
+            }
+        } else if (!ontology.equals(other.ontology)) {
             return false;
+        }
         if (qtlDetails == null) {
-            if (other.qtlDetails != null)
+            if (other.qtlDetails != null) {
                 return false;
-        } else if (!qtlDetails.equals(other.qtlDetails))
+            }
+        } else if (!qtlDetails.equals(other.qtlDetails)) {
             return false;
+        }
         if (qtlName == null) {
-            if (other.qtlName != null)
+            if (other.qtlName != null) {
                 return false;
-        } else if (!qtlName.equals(other.qtlName))
+            }
+        } else if (!qtlName.equals(other.qtlName)) {
             return false;
+        }
         if (tRName == null) {
-            if (other.tRName != null)
+            if (other.tRName != null) {
                 return false;
-        } else if (!tRName.equals(other.tRName))
+            }
+        } else if (!tRName.equals(other.tRName)) {
             return false;
+        }
         return true;
     }
 

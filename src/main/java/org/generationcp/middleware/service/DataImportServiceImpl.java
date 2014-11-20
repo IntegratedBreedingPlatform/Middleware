@@ -11,25 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.etl.Constants;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
@@ -46,9 +32,19 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DataImportServiceImpl extends Service implements DataImportService {
+import java.io.File;
+import java.util.*;
 
+public class DataImportServiceImpl extends Service implements DataImportService {
     private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
+    public static final int MAX_VARIABLE_NAME_LENGTH = 32;
+    public static final String ERROR_MISSING_TRIAL_CONDITION = "error.missing.trial.condition";
+    public static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
+    public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
+    public static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
+    public static final String ERROR_DUPLICATE_PSMR = "error.duplicate.psmr";
+    public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
+    public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 
     public DataImportServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -72,7 +68,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	/**
 	 * Transaction 1 : Transform Variables and save new Ontology Terms
 	 *  Send : xls workbook
-	 *   Return : Map of 3 sub maps with transformed variables (ontology fully loaded) - here is how it was loaded :
+	 *   Return : Map of 3 sub maps with transformed allVariables (ontology fully loaded) - here is how it was loaded :
 	 *    -- headers : Strings
 	 *        //         headerMap.put("trialHeaders", trialHeaders);
 	 *        // -- variableTypeLists (VariableTypeList)
@@ -162,27 +158,33 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException {
         WorkbookParser parser = new WorkbookParser();
 
-        // partially parse the file to parse the description sheet only at first
-        Workbook workbook = parser.parseFile(file, true);
-        // perform validations on the parsed data that require db access
-        List<Message> messages = new LinkedList<Message>();
-
         OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
                 getSessionProviderForLocal(), getSessionProviderForCentral());
 
+        // partially parse the file to parse the description sheet only at first
+        return strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology);
+    }
+
+    protected Workbook strictParseWorkbook(File file, WorkbookParser parser, Workbook workbook,OntologyDataManager ontology) throws MiddlewareQueryException, WorkbookParserException {
+        // perform validations on the parsed data that require db access
+        List<Message> messages = new LinkedList<Message>();
+
+
         if (!isEntryExists(ontology, workbook.getFactors())) {
-            messages.add(new Message("error.entry.doesnt.exist"));
+            messages.add(new Message(ERROR_ENTRY_DOESNT_EXIST));
         }
 
         if (!isPlotExists(ontology, workbook.getFactors())) {
-            messages.add(new Message("error.plot.doesnt.exist"));
+            messages.add(new Message(ERROR_PLOT_DOESNT_EXIST));
         }
 
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
-            messages.add(new Message("error.missing.trial.condition"));
+            messages.add(new Message(ERROR_MISSING_TRIAL_CONDITION));
         }
 
-        if (messages.size() > 0) {
+        messages.addAll(validateMeasurementVariableName(workbook.getAllVariables()));
+
+        if (!messages.isEmpty()) {
             throw new WorkbookParserException(messages);
         }
 
@@ -203,6 +205,39 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         checkForInvalidLabel(workbook, messages);
 
         return workbook;
+    }
+
+    protected List<Message> validateMeasurementVariableName(List<MeasurementVariable> allVariables) {
+        List<Message> messages = new ArrayList<Message>();
+
+        messages.addAll(validateMeasurmentVariableNameLengths(allVariables));
+        messages.addAll(validateMeasurmentVariableNameCharacters(allVariables));
+
+        return messages;
+    }
+
+    protected List<Message> validateMeasurmentVariableNameLengths(List<MeasurementVariable> variableList) {
+        List<Message> messages = new ArrayList<Message>();
+
+        for (MeasurementVariable mv : variableList) {
+            if (mv.getName().length() > MAX_VARIABLE_NAME_LENGTH) {
+                messages.add(new Message(ERROR_INVALID_VARIABLE_NAME_LENGTH,mv.getName()));
+            }
+        }
+
+        return messages;
+    }
+
+    protected List<Message> validateMeasurmentVariableNameCharacters(List<MeasurementVariable> variableList) {
+        List<Message> messages = new ArrayList<Message>();
+
+        for (MeasurementVariable mv : variableList) {
+            if (!mv.getName().matches("^[^0-9][\\w\\d%]*$")) {
+                messages.add(new Message(ERROR_INVALID_VARIABLE_NAME_CHARACTERS,mv.getName()));
+            }
+        }
+
+        return messages;
     }
 
     private List<Message> checkForEmptyRequiredVariables(Workbook workbook) {
@@ -246,17 +281,20 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         String studyName = workbook.getStudyDetails().getStudyName();
         String locationDescription = getLocationDescription(ontology, workbook);
         Integer locationId = getLocationIdByProjectNameAndDescription(studyName, locationDescription);
-        if (locationId != null) {//same location and study
-            messages.add(new Message("error.duplicate.study.name"));
+
+        //same location and study
+        if (locationId != null) {
+            messages.add(new Message(ERROR_DUPLICATE_STUDY_NAME));
         } else {
             boolean isExisting = checkIfProjectNameIsExisting(studyName);
             //existing and is not a valid study
             if (isExisting && getStudyId(studyName) == null) {
-                messages.add(new Message("error.duplicate.study.name"));
-            }//else we will create a new study or append the data sets to the existing study
+                messages.add(new Message(ERROR_DUPLICATE_STUDY_NAME));
+            }
+            //else we will create a new study or append the data sets to the existing study
         }
 
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             throw new WorkbookParserException(messages);
         }
     }
@@ -278,8 +316,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                     variableNameMap.put(measurementVariable.getName(), measurementVariable);
                 }
 
-                PhenotypicType type = ((variableList == workbook.getVariates() || variableList == workbook.getConstants()) ?
-                        PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
+                PhenotypicType type = variableList == workbook.getVariates() || variableList == workbook.getConstants() ?
+                        PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
                 Integer varId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(),
                         measurementVariable.getScale(), measurementVariable.getMethod(), type);
 
@@ -294,14 +332,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                         }
                     }
 
-                } else {
-                    continue;
                 }
-
             }
         }
 
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             throw new WorkbookParserException(messages);
         }
     }
@@ -312,7 +347,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     	addErrorForDuplicates(messages,stdVarMap);
     	stdVarMap = checkForDuplicates(workbook.getVariateVariables(),true);
     	addErrorForDuplicates(messages,stdVarMap);
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             throw new WorkbookParserException(messages);
         }
     }
@@ -332,7 +367,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             //need to retrieve standard variable because of synonyms
             Integer standardVariableId = getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(
             		measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod(), type);
-            String key = null;
+            String key;
             if (standardVariableId != null) {
                 key = Integer.toString(standardVariableId);
             } else {
@@ -354,7 +389,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private void addErrorForDuplicates(Map<String, List<Message>> errors, Map<String, List<MeasurementVariable>> map) {
     	for (String key : map.keySet()) {
 			List<MeasurementVariable> vars = map.get(key);
-			if(vars.size()>1) {//has duplicate
+			if(vars.size()>1) {
+			    //has duplicate
 				StringBuilder duplicates = new StringBuilder();
 				String delimiter = "";
 				for (MeasurementVariable measurementVariable : vars) {
@@ -365,7 +401,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				for (MeasurementVariable measurementVariable : vars) {
 					initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
 					errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).
-						add(new Message("error.duplicate.psmr", duplicates.toString()));
+						add(new Message(ERROR_DUPLICATE_PSMR, duplicates.toString()));
 				}
 			}
 		}
@@ -374,7 +410,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private void addErrorForDuplicates(List<Message> errors, Map<String, List<MeasurementVariable>> map) {
     	for (String key : map.keySet()) {
 			List<MeasurementVariable> vars = map.get(key);
-			if(vars.size()>1) {//has duplicate
+			if(vars.size()>1) {
+			    //has duplicate
 				StringBuilder duplicates = new StringBuilder();
 				String delimiter = "";
 				for (MeasurementVariable measurementVariable : vars) {
@@ -399,11 +436,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             }
         }
 
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             throw new WorkbookParserException(messages);
         }
     }
 
+    /**
+     * @deprecated
+     * @param workbook
+     * @return
+     * @throws WorkbookParserException
+     * @throws MiddlewareQueryException
+     */
     @Override
     @Deprecated
     // Deprecated in favor of validateProjectOntology
@@ -420,10 +464,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
 
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
-            messages.add(new Message("error.missing.trial.condition"));
+            messages.add(new Message(ERROR_MISSING_TRIAL_CONDITION));
         }
 
-        if (messages.size() > 0) {
+        if (!messages.isEmpty()) {
             throw new WorkbookParserException(messages);
         }
 
@@ -458,15 +502,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
             if (varId != null) {
                 StandardVariable svar = ontology.getStandardVariable(varId);
-                if (svar.getStoredIn() != null) {
-                    if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
-                        return row.getMeasurementDataValue(mvar.getName());
-                    }
+                if (svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+                    return row.getMeasurementDataValue(mvar.getName());
                 }
             }
         }
+        //GCP-7340, GCP-7346
         if (workbook.isNursery()) {
-            return "1";//GCP-7340, GCP-7346
+            return "1";
         }
         return null;
     }
@@ -476,9 +519,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     private Integer getProjectId(String name, TermId relationship) throws MiddlewareQueryException {
-        Integer id = null;
         setWorkingDatabase(Database.CENTRAL);
-        id = getDmsProjectDao().getProjectIdByName(name, relationship);
+        Integer id = getDmsProjectDao().getProjectIdByName(name, relationship);
         if (id == null) {
             setWorkingDatabase(Database.LOCAL);
             id = getDmsProjectDao().getProjectIdByName(name, relationship);
@@ -486,18 +528,16 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return id;
     }
 
-    private Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    protected Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
             PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
             Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
 
             if (varId != null) {
                 StandardVariable svar = ontology.getStandardVariable(varId);
-                if (svar.getStoredIn() != null) {
-                    if (svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
-                        mvar.setRequired(true);
-                        return true;
-                    }
+                if (svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
+                    mvar.setRequired(true);
+                    return true;
                 }
             }
         }
@@ -505,7 +545,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return false;
     }
 
-    private Boolean isPlotExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    protected Boolean isPlotExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
             PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
             Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
@@ -524,27 +564,24 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return false;
     }
 
-    private Boolean isTrialInstanceNumberExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    protected Boolean isTrialInstanceNumberExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
 
             StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-            if (svar != null) {
-                if (svar.getStoredIn() != null) {
-                    if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
-                        mvar.setRequired(true);
-                        return true;
-                    }
-                }
+
+            if (svar != null && svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+                mvar.setRequired(true);
+                return true;
             }
+
         }
         return false;
     }
 
     @Override
     public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
-        boolean isExisting = false;
         setWorkingDatabase(Database.CENTRAL);
-        isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
         if (!isExisting) {
             setWorkingDatabase(Database.LOCAL);
             isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
@@ -554,9 +591,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     @Override
     public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
-        Integer locationId = null;
         setWorkingDatabase(Database.CENTRAL);
-        locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
+
+        Integer locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
         if (locationId == null) {
             setWorkingDatabase(Database.LOCAL);
             locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
@@ -577,17 +614,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
         }
 
-        if(workbook.getImportType()==null || workbook.getImportType().intValue()==DataSetType.PLOT_DATA.getId()) {
-	        if (!isPlotExists(ontology, workbook.getFactors())) {
-	            initializeIfNull(errors, Constants.MISSING_PLOT);
-	            // DMV : TODO change implem so that backend is agnostic to UI when determining messages
-	            errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
-	        }
+        if( (workbook.getImportType() ==null || workbook.getImportType()==DataSetType.PLOT_DATA.getId()) && !isPlotExists(ontology, workbook.getFactors()) ) {
+            initializeIfNull(errors, Constants.MISSING_PLOT);
+            // DMV : TODO change implem so that backend is agnostic to UI when determining messages
+            errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
         }
 
         if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
             initializeIfNull(errors, Constants.MISSING_TRIAL);
-            errors.get(Constants.MISSING_TRIAL).add(new Message("error.missing.trial.condition"));
+            errors.get(Constants.MISSING_TRIAL).add(new Message(ERROR_MISSING_TRIAL_CONDITION));
         }
 
         checkForDuplicatePSMCombo(workbook, errors);
@@ -669,7 +704,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         List<Message> requiredVariableValueErrors = checkForEmptyRequiredVariables(workbook);
 
-        if (requiredVariableValueErrors.size() > 0) {
+        if (!requiredVariableValueErrors.isEmpty()) {
             errors.put(Constants.OBSERVATION_DATA_ERRORS, requiredVariableValueErrors);
         }
 
@@ -681,11 +716,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             throws MiddlewareQueryException {
 
         String studyName = workbook.getStudyDetails().getStudyName();
-        String trialInstanceNumber = null;
+        String trialInstanceNumber;
         if (workbook.isNursery()) {
             trialInstanceNumber = "1";
             Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
-            if (locationId != null) {//same location and study
+            //same location and study
+            if (locationId != null) {
                 initializeIfNull(errors, Constants.GLOBAL);
                 errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance", trialInstanceNumber));
             }
@@ -698,31 +734,32 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
                 if (varId != null) {
                     StandardVariable svar = ontology.getStandardVariable(varId);
-                    if (svar.getStoredIn() != null) {
-                        if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
-                            trialInstanceHeader = mvar.getName();
-                            break;
-                        }
+                    if (svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+                        trialInstanceHeader = mvar.getName();
+                        break;
                     }
                 }
             }
             //get and check if trialInstanceNumber already exists
             Set<String> locationIds = new LinkedHashSet<String>();
-            int maxNumOfIterations = 100000;//TODO MODIFY THIS IF NECESSARY
+
+            //TODO MODIFY THIS IF NECESSARY
+            int maxNumOfIterations = 100000;
             int observationCount = workbook.getObservations().size();
             if (observationCount < maxNumOfIterations) {
                 maxNumOfIterations = observationCount;
             }
             List<String> duplicateTrialInstances = new ArrayList<String>();
             boolean isMeansDataImport = 
-            		workbook.getImportType()!=null && 
-            		workbook.getImportType().intValue()==DataSetType.MEANS_DATA.getId();
+            		workbook.getImportType() != null &&
+            		workbook.getImportType() == DataSetType.MEANS_DATA.getId();
             for (int i = 0; i < maxNumOfIterations; i++) {
                 MeasurementRow row = workbook.getObservations().get(i);
                 trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
                 if (locationIds.add(trialInstanceNumber)) {
                     Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
-                    if (locationId != null) {//same location and study
+                    //same location and study
+                    if (locationId != null) {
                     	duplicateTrialInstances.add(trialInstanceNumber);
                     }
                 }

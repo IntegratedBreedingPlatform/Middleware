@@ -135,28 +135,37 @@ public class MarkerUserInfo implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		MarkerUserInfo other = (MarkerUserInfo) obj;
 		if (markerUserInfoDetails == null) {
-			if (other.markerUserInfoDetails != null)
-				return false;
-		} else if (!markerUserInfoDetails.equals(other.markerUserInfoDetails))
-			return false;
+			if (other.markerUserInfoDetails != null) {
+                return false;
+            }
+		} else if (!markerUserInfoDetails.equals(other.markerUserInfoDetails)) {
+            return false;
+        }
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (userInfoId == null) {
-			if (other.userInfoId != null)
-				return false;
-		} else if (!userInfoId.equals(other.userInfoId))
-			return false;
+			if (other.userInfoId != null) {
+                return false;
+            }
+		} else if (!userInfoId.equals(other.userInfoId)) {
+            return false;
+        }
 		return true;
 	}
 

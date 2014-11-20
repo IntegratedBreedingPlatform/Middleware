@@ -118,8 +118,12 @@ public class StandardVariableSummary {
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof StandardVariableSummary)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof StandardVariableSummary)) {
+            return false;
+        }
 		StandardVariableSummary other = (StandardVariableSummary) obj;
 		return getId().equals(other.getId());
 	}

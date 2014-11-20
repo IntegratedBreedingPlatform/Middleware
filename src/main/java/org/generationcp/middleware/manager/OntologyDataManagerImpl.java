@@ -34,6 +34,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     private static final Logger LOG = LoggerFactory.getLogger(OntologyDataManagerImpl.class);
 
+	public static final String DELETE_TERM_ERROR_MESSAGE = "The term you selected cannot be deleted";
+
     public OntologyDataManagerImpl() {
     }
 
@@ -547,17 +549,20 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+		Term updatedTerm = null;
 
         if (term == null){
         	return null;
         }
 
+
+
         try {
             trans = session.beginTransaction();
             
-            term = getTermSaver().update(term);
+            updatedTerm = getTermSaver().update(term);
             
-            saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
+            saveOrUpdateCvTermRelationship(updatedTerm.getId(), objectId, typeId);
             
             trans.commit();
         } catch (Exception e) {
@@ -565,15 +570,18 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
         }
         
-        return term;
+        return updatedTerm;
         
     }
 
 	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
         Term term = findTermByName(name, cvId);
-        if (term == null){   // If term is not existing, add
+
+		// If term is not existing, add
+        if (term == null){
             term = getTermSaver().save(name, definition, cvId);
-        } else { // If term is existing, update
+		// If term is existing, update
+        } else {
             term = getTermSaver().saveOrUpdate(name, definition, cvId);
         }
         return term;
@@ -583,9 +591,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Term typeTerm = getTermById(typeId);
         if (typeTerm != null) {
             CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
-            if(cvRelationship == null){ // add the relationship
+			// add the relationship
+            if(cvRelationship == null){
                 getTermRelationshipSaver().save(subjectId, typeId, objectId);
-            }else{ // update the existing relationship
+			// update the existing relationship
+            }else{
                 if (cvRelationship.getCvTermRelationshipId() >= 0) { 
                     throw new MiddlewareException("Error in saveOrUpdateCvTermRelationship: Relationship found in central - cannot be updated.");
                 }
@@ -770,8 +780,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
             if (operation == Operation.ADD) {
                 getStandardVariableSaver().save(standardVariable);
-            }
-            else {
+            } else {
                 getStandardVariableSaver().update(standardVariable);
             }
 
@@ -869,12 +878,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         try {
             trans = session.beginTransaction();
-            if (enumeration.getId() == null){ // Operation is ADD
+			// Operation is ADD
+            if (enumeration.getId() == null){
                 getStandardVariableSaver().saveEnumeration(variable, enumeration, cvId);
-            } else { // Operation is UPDATE
-                if (enumeration.getId() >= 0){ // Original value is in central. Create the "updated" value in local.
+
+			// Operation is UPDATE
+            } else {
+				// Original value is in central. Create the "updated" value in local.
+                if (enumeration.getId() >= 0){
                     getStandardVariableSaver().saveEnumeration(variable, enumeration, cvId);
-                } else { // Original value is in local. Update the value.
+				// Original value is in local. Update the value.
+                } else {
                     getTermSaver().update(new Term(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
                 }
             }
@@ -935,7 +949,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         try {
             
             if (cvTermId >= 0) {
-                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), "The term you selected cannot be deleted");
+                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), DELETE_TERM_ERROR_MESSAGE);
             }
             
             if (CvId.VARIABLES.getId() != cvId.getId()) {
@@ -959,17 +973,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         try {
             if (cvTermId >= 0) {
-                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), "The term you selected cannot be deleted");
+                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), DELETE_TERM_ERROR_MESSAGE);
             }
             if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
                 if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
                     if (getCvTermDao().getById(getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv().equals(CvId.PROPERTIES.getId())) {
-                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(), "The term you selected cannot be deleted");
+                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(), DELETE_TERM_ERROR_MESSAGE);
                     } else {
-                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(), "The term you selected cannot be deleted");
+                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(), DELETE_TERM_ERROR_MESSAGE);
                     }
                 } else {
-                    throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), "The term you selected cannot be deleted");
+                    throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), DELETE_TERM_ERROR_MESSAGE);
                 }
             }
             
@@ -1078,14 +1092,3 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 
 }
-
-
-
-
-
-
-
-
-
-
-

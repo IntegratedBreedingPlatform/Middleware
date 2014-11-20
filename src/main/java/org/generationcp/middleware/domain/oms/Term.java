@@ -86,8 +86,12 @@ public class Term implements Serializable{
 	}
 	
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof Term)) return false;
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof Term)) {
+            return false;
+        }
 		Term other = (Term) obj;
 		return getId() == other.getId();
 	}

@@ -105,18 +105,23 @@ public class CVTermProperty implements Serializable {
 
     @Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		CVTermProperty other = (CVTermProperty) obj;
 		if (cvTermPropertyId == null) {
-			if (other.cvTermPropertyId != null)
-				return false;
-		} else if (!cvTermPropertyId.equals(other.cvTermPropertyId))
-			return false;
+			if (other.cvTermPropertyId != null) {
+                return false;
+            }
+		} else if (!cvTermPropertyId.equals(other.cvTermPropertyId)) {
+            return false;
+        }
 		return true;
 	}
 

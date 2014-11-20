@@ -44,10 +44,9 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -56,13 +55,17 @@ import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.utils.test.Debug;
+import org.generationcp.middleware.utils.test.FieldMapDataUtil;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
@@ -175,7 +178,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
             Debug.println(INDENT, "\t" + resultSet.next());
             System.out.flush();
         }
-        // long before = resultSet.size();
         /*
          * to test deleted study, uncomment line above, then run in mysql:
          * update projectprop set value = 12990 where type_id = 8006 and
@@ -380,7 +382,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
                 variables.addAll(variates.getVariables());
             }
 
-            for (Variable variable : variables)
+            for (Variable variable : variables) {
                 if (!("GID".equals(variable.getVariableType().getLocalName().trim()))) {
                     String value = variable.getDisplayValue();
                     Debug.println(INDENT, "Data Type is "
@@ -388,6 +390,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
                     Debug.println(INDENT, "\t" + experiment.getId() + "  :  "
                             + variable.getVariableType().getStandardVariable().getName() + "  :  " + value);
                 }
+            }
         }
     }
 
@@ -1034,19 +1037,17 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetParentFolder() throws MiddlewareQueryException{
     	DmsProject proj = manager.getParentFolder(10010);
-    	if(proj==null)
-    		Debug.println(INDENT, "Parent is null");
-    	else
-    		Debug.println(INDENT, "Parent is NOT null");
+    	if(proj==null) {
+            Debug.println(INDENT, "Parent is null");
+        } else {
+            Debug.println(INDENT, "Parent is NOT null");
+        }
     }
     
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException {
         List<Integer> nurseryIdList = new ArrayList<Integer>();
         
-        //ORIGINAL CODE
-        //nurseryIdList.addAll(Arrays.asList(Integer.valueOf(-1)));
-
         //REPLACED BY THIS TO MAKE THE JUNIT WORK - Get the first nursery from the db
         List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails();
         if (studyDetailsList != null && studyDetailsList.size() > 0) {
@@ -1080,47 +1081,20 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     @Test
     public void testSaveFieldMapProperties() throws MiddlewareQueryException {
         List<Integer> trialIdList = new ArrayList<Integer>();
-        
-        //ORIGINAL CODE
-        //trialIdList.add(new Integer(-186));
-        //int geolocationId = -123; //please specify the geolocation id used by the trial 
 
         //REPLACED BY THIS TO MAKE THE JUNIT WORK
-        int geolocationId = 0;
         List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails();
         if (studyDetailsList != null && studyDetailsList.size() > 0){
             for (StudyDetails study : studyDetailsList){
                 if (study.getStudyType() == StudyType.T){
                     trialIdList.add(study.getId());
-                    geolocationId = study.getSiteId();
                     break;
                 }
             }
         }
          
         List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
-        //info.setBlockName("Block Name 1");
-//        if (info != null) {
-//            info.get(0).setFieldbookId(-186);
-//        }
-        //info.setColumnsInBlock(7);
-        //info.setRangesInBlock(8);
-        //info.setPlantingOrder(1);
-//        int columnCount = 1, rangeCount = 1;
-        /*
-        for (FieldMapLabel label : info.getFieldMapLabels()) {
-            label.setColumn(columnCount);
-            label.setRange(rangeCount++);
-            if (rangeCount > 8) {
-                columnCount++;
-                rangeCount = 1;
-            }
-            if (columnCount > 7) {
-                break;
-            }
-        }*/
-        //TODO
-//    	List<FieldMapInfo> info = createFieldmapData();
+
         manager.saveOrUpdateFieldmapProperties(info, -1, false);
     }
     
@@ -1186,7 +1160,9 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     	
     	DataSet dataSet = manager.getDataSet(-9999);
     	
-    	if (dataSet==null) return;
+    	if (dataSet==null) {
+            return;
+        }
     	
 		for (VariableType vType: dataSet.getVariableTypes().getVariates().getVariableTypes()){
 			cvTermIds.add(vType.getStandardVariable().getId());
@@ -1210,7 +1186,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     	
     	List<PhenotypeOutlier> outliers = new ArrayList<PhenotypeOutlier>();
     	PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
-    	//phenotypeOutlier.setPhenotypeOutlierId(-1);
     	phenotypeOutlier.setPhenotypeId(1);
     	phenotypeOutlier.setValue("hello");
     	
@@ -1238,45 +1213,71 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
             }
         }
     }
-    
-    private List<FieldMapInfo> createFieldmapData() {
-    	List<FieldMapInfo> list = new ArrayList<FieldMapInfo>();
+        
+    @Test
+    public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
+    	LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
     	
-    	FieldMapInfo info = new FieldMapInfo();
-    	info.setFieldbookId(-8);
-    	info.setTrial(true);
-    	info.setFieldbookName("TrialTest");
-    	info.setDatasets(new ArrayList<FieldMapDatasetInfo>());
-    	list.add(info);
+    	FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, 
+    			FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK, 
+    			FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, 
+    			FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
     	
-    	FieldMapDatasetInfo dataset = new FieldMapDatasetInfo();
-    	dataset.setDatasetId(-9);
-    	dataset.setDatasetName("Trial Dataset");
-    	dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
-    	info.getDatasets().add(dataset);
+    	StudyDataManagerImpl localManager = ((StudyDataManagerImpl) manager);
     	
-    	FieldMapTrialInstanceInfo trial = new FieldMapTrialInstanceInfo();
-    	trial.setBlockId(26190);
-    	trial.setBlockName("TEST BLOCK 1");
-    	trial.setRowsInBlock(20);
-    	trial.setDeletedPlots(Arrays.asList("3,1"));
-    	trial.setFieldId(26189);
-    	trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
-    	trial.setMachineRowCapacity(2);
-    	trial.setRangesInBlock(20);
-    	trial.setRowsPerPlot(2);
-    	trial.setGeolocationId(-3);
-    	dataset.getTrialInstances().add(trial);
+    	List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
     	
-    	FieldMapLabel label = new FieldMapLabel();
-    	label.setExperimentId(-1915);
-    	label.setGeolocationId(-3);
-    	label.setColumn(1);
-    	label.setRange(1);
-    	label.setSiteName("site name");
-    	trial.getFieldMapLabels().add(label);
-    	
-    	return list;
+    	localManager.setLocationDataManager(locationDataManager);
+    		
+    	try {
+    		Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+    		localManager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
+    		
+    		FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+    		
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + trialInstance.getRowsInBlock() + " instead.", 
+    				FieldMapDataUtil.ROWS_IN_BLOCK, trialInstance.getRowsInBlock().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + trialInstance.getRangesInBlock() + " instead.", 
+    				FieldMapDataUtil.RANGES_IN_BLOCK, trialInstance.getRangesInBlock().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got " + trialInstance.getRowsPerPlot() + " instead.", 
+    				FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, trialInstance.getRowsPerPlot().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + trialInstance.getPlantingOrder() + " instead.", 
+    				FieldMapDataUtil.PLANTING_ORDER, trialInstance.getPlantingOrder().intValue());
+    		Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + trialInstance.getMachineRowCapacity() + " instead.", 
+    				FieldMapDataUtil.MACHINE_ROW_CAPACITY, trialInstance.getMachineRowCapacity().intValue());
+    	} catch (MiddlewareQueryException e) {
+    		Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
+    	}
     }
     
+    @Test
+    public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
+    	LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+    	
+    	FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, 
+    			FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK, 
+    			FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, 
+    			FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+    	
+    	StudyDataManagerImpl localManager = ((StudyDataManagerImpl) manager);
+    	
+    	List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+    	FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+    	trialInstance.setBlockId(null);
+    	
+    	localManager.setLocationDataManager(locationDataManager);
+    		
+    	try {
+    		Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+    		localManager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
+    		
+    		Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
+    		Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+    		Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot() + " instead.", trialInstance.getRowsPerPlot());
+    		Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder() + " instead.", trialInstance.getPlantingOrder());
+    		Assert.assertNull("Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.", trialInstance.getMachineRowCapacity());
+    	} catch (MiddlewareQueryException e) {
+    		Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
+    	}
+    }
 }

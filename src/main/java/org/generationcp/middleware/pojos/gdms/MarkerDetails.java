@@ -290,93 +290,128 @@ public class MarkerDetails implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MarkerDetails other = (MarkerDetails) obj;
         if (elongationTemp == null) {
-            if (other.elongationTemp != null)
+            if (other.elongationTemp != null) {
                 return false;
-        } else if (!elongationTemp.equals(other.elongationTemp))
+            }
+        } else if (!elongationTemp.equals(other.elongationTemp)) {
             return false;
+        }
         if (expectedProductSize == null) {
-            if (other.expectedProductSize != null)
+            if (other.expectedProductSize != null) {
                 return false;
-        } else if (!expectedProductSize.equals(other.expectedProductSize))
+            }
+        } else if (!expectedProductSize.equals(other.expectedProductSize)) {
             return false;
+        }
         if (forwardPrimerTemp == null) {
-            if (other.forwardPrimerTemp != null)
+            if (other.forwardPrimerTemp != null) {
                 return false;
-        } else if (!forwardPrimerTemp.equals(other.forwardPrimerTemp))
+            }
+        } else if (!forwardPrimerTemp.equals(other.forwardPrimerTemp)) {
             return false;
+        }
         if (fragmentSizeExpected == null) {
-            if (other.fragmentSizeExpected != null)
+            if (other.fragmentSizeExpected != null) {
                 return false;
-        } else if (!fragmentSizeExpected.equals(other.fragmentSizeExpected))
+            }
+        } else if (!fragmentSizeExpected.equals(other.fragmentSizeExpected)) {
             return false;
+        }
         if (fragmentSizeObserved == null) {
-            if (other.fragmentSizeObserved != null)
+            if (other.fragmentSizeObserved != null) {
                 return false;
-        } else if (!fragmentSizeObserved.equals(other.fragmentSizeObserved))
+            }
+        } else if (!fragmentSizeObserved.equals(other.fragmentSizeObserved)) {
             return false;
+        }
         if (markerId == null) {
-            if (other.markerId != null)
+            if (other.markerId != null) {
                 return false;
-        } else if (!markerId.equals(other.markerId))
+            }
+        } else if (!markerId.equals(other.markerId)) {
             return false;
+        }
         if (maxAllele == null) {
-            if (other.maxAllele != null)
+            if (other.maxAllele != null) {
                 return false;
-        } else if (!maxAllele.equals(other.maxAllele))
+            }
+        } else if (!maxAllele.equals(other.maxAllele)) {
             return false;
+        }
         if (minAllele == null) {
-            if (other.minAllele != null)
+            if (other.minAllele != null) {
                 return false;
-        } else if (!minAllele.equals(other.minAllele))
+            }
+        } else if (!minAllele.equals(other.minAllele)) {
             return false;
+        }
         if (motifType == null) {
-            if (other.motifType != null)
+            if (other.motifType != null) {
                 return false;
-        } else if (!motifType.equals(other.motifType))
+            }
+        } else if (!motifType.equals(other.motifType)) {
             return false;
+        }
         if (noOfRepeats == null) {
-            if (other.noOfRepeats != null)
+            if (other.noOfRepeats != null) {
                 return false;
-        } else if (!noOfRepeats.equals(other.noOfRepeats))
+            }
+        } else if (!noOfRepeats.equals(other.noOfRepeats)) {
             return false;
+        }
         if (positionOnReferenceSequence == null) {
-            if (other.positionOnReferenceSequence != null)
+            if (other.positionOnReferenceSequence != null) {
                 return false;
-        } else if (!positionOnReferenceSequence.equals(other.positionOnReferenceSequence))
+            }
+        } else if (!positionOnReferenceSequence.equals(other.positionOnReferenceSequence)) {
             return false;
+        }
         if (restrictionEnzymeForAssay == null) {
-            if (other.restrictionEnzymeForAssay != null)
+            if (other.restrictionEnzymeForAssay != null) {
                 return false;
-        } else if (!restrictionEnzymeForAssay.equals(other.restrictionEnzymeForAssay))
+            }
+        } else if (!restrictionEnzymeForAssay.equals(other.restrictionEnzymeForAssay)) {
             return false;
+        }
         if (reversePrimerTemp == null) {
-            if (other.reversePrimerTemp != null)
+            if (other.reversePrimerTemp != null) {
                 return false;
-        } else if (!reversePrimerTemp.equals(other.reversePrimerTemp))
+            }
+        } else if (!reversePrimerTemp.equals(other.reversePrimerTemp)) {
             return false;
+        }
         if (sequence == null) {
-            if (other.sequence != null)
+            if (other.sequence != null) {
                 return false;
-        } else if (!sequence.equals(other.sequence))
+            }
+        } else if (!sequence.equals(other.sequence)) {
             return false;
+        }
         if (sequenceLength == null) {
-            if (other.sequenceLength != null)
+            if (other.sequenceLength != null) {
                 return false;
-        } else if (!sequenceLength.equals(other.sequenceLength))
+            }
+        } else if (!sequenceLength.equals(other.sequenceLength)) {
             return false;
+        }
         if (ssrNr == null) {
-            if (other.ssrNr != null)
+            if (other.ssrNr != null) {
                 return false;
-        } else if (!ssrNr.equals(other.ssrNr))
+            }
+        } else if (!ssrNr.equals(other.ssrNr)) {
             return false;
+        }
         return true;
     }
 

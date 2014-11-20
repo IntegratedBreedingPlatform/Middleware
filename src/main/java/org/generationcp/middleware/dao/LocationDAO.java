@@ -128,19 +128,23 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         try {
 
             Integer countryId = null;
-            if (country != null)
+            if (country != null) {
                 countryId = country.getCntryid();
+            }
 
             Criteria criteria = getSession().createCriteria(Location.class);
 
-            if (countryId != null)
+            if (countryId != null) {
                 criteria.add(Restrictions.eq("cntryid", countryId));
+            }
 
-            if (type != null)
+            if (type != null) {
                 criteria.add(Restrictions.eq("ltype", type));
+            }
 
-            if (name != null && !name.isEmpty())
+            if (name != null && !name.isEmpty()) {
                 criteria.add(Restrictions.like("lname", "%" + name.trim() + "%"));
+            }
 
             criteria.addOrder(Order.asc("lname"));
 

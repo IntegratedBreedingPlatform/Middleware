@@ -74,10 +74,11 @@ public class GermplasmDataManagerUtil{
     	
         String toreturn;
         
-        if(name!=null)
-        	toreturn = name.trim();
-        else
-        	toreturn = "";
+        if(name!=null) {
+            toreturn = name.trim();
+        } else {
+            toreturn = "";
+        }
 
         // a) Capitalize all letters
         toreturn = toreturn.toUpperCase();

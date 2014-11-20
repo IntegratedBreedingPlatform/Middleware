@@ -99,19 +99,24 @@ public class ExperimentProject implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof ExperimentProject))
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof ExperimentProject)) {
+            return false;
+        }
 		
 		ExperimentProject other = (ExperimentProject) obj;
 		if (experimentProjectId == null) {
-			if (other.experimentProjectId != null)
-				return false;
-		} else if (!experimentProjectId.equals(other.experimentProjectId))
-			return false;
+			if (other.experimentProjectId != null) {
+                return false;
+            }
+		} else if (!experimentProjectId.equals(other.experimentProjectId)) {
+            return false;
+        }
 		
 		return true;
 	}

@@ -42,8 +42,9 @@ public class StudyVariableBuilder extends Builder {
 		
 		for (VariableType variableType : variableTypes.getVariableTypes()) {
 			Variable var = createVariable(variableType, project, experiment, hasVariabletype);
-			if(var.getVariableType() != null)
-				variables.add(var);
+			if(var.getVariableType() != null) {
+                variables.add(var);
+            }
 		}
 		
 		return variables.sort();

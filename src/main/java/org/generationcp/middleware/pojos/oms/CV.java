@@ -108,19 +108,24 @@ public class CV implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof CV))
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof CV)) {
+            return false;
+        }
 		
 		CV other = (CV) obj;
 		if (cvId == null) {
-			if (other.cvId != null)
-				return false;
-		} else if (!cvId.equals(other.cvId))
-			return false;
+			if (other.cvId != null) {
+                return false;
+            }
+		} else if (!cvId.equals(other.cvId)) {
+            return false;
+        }
 		
 		return true;
 	}

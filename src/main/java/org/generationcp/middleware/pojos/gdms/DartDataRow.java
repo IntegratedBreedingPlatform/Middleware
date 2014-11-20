@@ -69,28 +69,37 @@ public class DartDataRow{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         DartDataRow other = (DartDataRow) obj;
         if (accMetadataSet == null) {
-            if (other.accMetadataSet != null)
+            if (other.accMetadataSet != null) {
                 return false;
-        } else if (!accMetadataSet.equals(other.accMetadataSet))
+            }
+        } else if (!accMetadataSet.equals(other.accMetadataSet)) {
             return false;
+        }
         if (alleleValues == null) {
-            if (other.alleleValues != null)
+            if (other.alleleValues != null) {
                 return false;
-        } else if (!alleleValues.equals(other.alleleValues))
+            }
+        } else if (!alleleValues.equals(other.alleleValues)) {
             return false;
+        }
         if (dartValues == null) {
-            if (other.dartValues != null)
+            if (other.dartValues != null) {
                 return false;
-        } else if (!dartValues.equals(other.dartValues))
+            }
+        } else if (!dartValues.equals(other.dartValues)) {
             return false;
+        }
         return true;
     }
 

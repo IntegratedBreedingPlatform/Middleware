@@ -41,7 +41,7 @@ public class ProjectPropertySaver extends Saver {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		List<VariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 		
-		if (variableTypes != null && variableTypes.size() > 0) {
+		if (variableTypes != null && !variableTypes.isEmpty()) {
 			int index = getProjectPropertyDao().getNegativeId("projectPropertyId");
 			for (VariableType variableType : variableTypes) {
 				List<ProjectProperty> list = createVariableProperties(index, project, variableType);
@@ -85,7 +85,7 @@ public class ProjectPropertySaver extends Saver {
 	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
-		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
 				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId
@@ -150,13 +150,11 @@ public class ProjectPropertySaver extends Saver {
 				if (variable.getOperation() == Operation.ADD) {
 					insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, geolocation);
 					rank++;
-				}
-				else if (variable.getOperation() == Operation.UPDATE) {
+				} else if (variable.getOperation() == Operation.UPDATE) {
 					if (variable.getTermId() != TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 						updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
 					}
-				}
-				else if (variable.getOperation() == Operation.DELETE) {
+				} else if (variable.getOperation() == Operation.DELETE) {
 					deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId(), geolocation);
 				}
 			}
@@ -183,40 +181,38 @@ public class ProjectPropertySaver extends Saver {
 			
 			insertVariable(trialDataset, variable, datasetRank);
 			
+			//GCP-9959
+			if (variable.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+				insertVariable(measurementDataset, variable, measurementRank);
+			}
+			
 			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-			}
-			else {
-			    //GCP-9659
-			    insertVariable(measurementDataset, variable, measurementRank);
-			    
+			} else {    
 				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
 				setWorkingDatabase(Database.LOCAL);
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
-		}
-		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
+		} else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
 			if (isConstant) {
-				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { //a trial constant
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { 
+					//a trial constant
 					int datasetRank = getNextRank(trialDataset);
-					int measurementRank = getNextRank(measurementDataset);
 					insertVariable(trialDataset, variable, datasetRank);
-					insertVariable(measurementDataset, variable, measurementRank);
 					getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
-				}
-				else { // a study constant
+				} else { 
+					// a study constant
 					insertVariable(project, variable, rank);
 					getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
 				}
-			}
-			else {
+			} else {
 				int measurementRank = getNextRank(measurementDataset);
 				insertVariable(measurementDataset, variable, measurementRank);
 			}
-		}
-		else { //study
+		} else { 
+			//study
 			insertVariable(project, variable, rank);
 			VariableList variableList = new VariableList();
 			variableList.add(new Variable(createVariableType(variable, rank), variable.getValue()));
@@ -257,39 +253,36 @@ public class ProjectPropertySaver extends Saver {
 			updateVariable(measurementDataset, variable);
 			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-			}
-			else {
+			} else {
 				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
 				setWorkingDatabase(Database.LOCAL);
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
-		}
-		else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
+		} else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
 				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
 			
 			if (isConstant) {
-				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { //a trial constant
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) { 
+					//a trial constant
 					updateVariable(trialDataset, variable);
 					updateVariable(measurementDataset, variable);
 					getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
-				}
-				else { //a study constant
+				} else { 
+					//a study constant
 					updateVariable(project, variable);
 					getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(), variable.getStoredIn(), variable.getValue());
 				}
-			}
-			else {
+			} else {
 				updateVariable(measurementDataset, variable);
 			}
-		}
-		else { //study
+		} else { 
+			//study
 			updateVariable(project, variable);
 			if (variable.getStoredIn() == TermId.STUDY_NAME_STORAGE.getId()) {
 				project.setName(variable.getValue());
 				getDmsProjectDao().merge(project);
 
-			}
-			else if (variable.getStoredIn() == TermId.STUDY_TITLE_STORAGE.getId()) {
+			} else if (variable.getStoredIn() == TermId.STUDY_TITLE_STORAGE.getId()) {
 				project.setDescription(variable.getValue());
 				getDmsProjectDao().merge(project);
 
@@ -304,11 +297,9 @@ public class ProjectPropertySaver extends Saver {
 				if (rank == property.getRank()) {
 					if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId()) {
 						property.setValue(variable.getDescription());
-					}
-					else if (property.getTypeId().intValue() == variable.getTermId()) {
+					} else if (property.getTypeId().intValue() == variable.getTermId()) {
 						property.setValue(variable.getValue());
-					}
-					else if (allTypeStorages.contains(property.getTypeId().intValue())) {
+					} else if (allTypeStorages.contains(property.getTypeId().intValue())) {
 						property.setValue(variable.getName());
 					}
 					getProjectPropertyDao().update(property);
@@ -344,17 +335,18 @@ public class ProjectPropertySaver extends Saver {
             session.clear();
 			if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
-			}
-			else {
+			} else {
 				getGeolocationSaver().setGeolocation(geolocation, termId, storedInId, null);
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
-		}
-		else if (storedInId == TermId.OBSERVATION_VARIATE.getId()
+		} else if (storedInId == TermId.OBSERVATION_VARIATE.getId()
 				|| storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
-			deleteVariable(project, termId); //for constants
-			deleteVariable(trialDataset, termId); //for constants
-			deleteVariable(measurementDataset, termId); //for variates
+			//for constants
+			deleteVariable(project, termId); 
+			deleteVariable(trialDataset, termId);
+			
+			//for variates
+			deleteVariable(measurementDataset, termId); 
 			//remove phoenotype value
 			List<Integer> ids = Arrays.asList(project.getProjectId(), trialDataset.getProjectId(), measurementDataset.getProjectId());
 			setWorkingDatabase(Database.LOCAL);
@@ -382,10 +374,10 @@ public class ProjectPropertySaver extends Saver {
 				if (variable.getOperation() == Operation.ADD) {
 					int measurementRank = getNextRank(measurementDataset);
 					insertVariable(measurementDataset, variable, measurementRank);
-				}
-				else if (variable.getOperation() == Operation.DELETE) {
+				} else if (variable.getOperation() == Operation.DELETE) {
 					deleteVariable(measurementDataset, variable.getTermId());
-				} // update operation is not allowed with factors
+				} 
+				// update operation is not allowed with factors
 			}
 		}
 	}

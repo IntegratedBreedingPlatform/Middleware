@@ -70,8 +70,9 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
             ids.add(ls.getLocid());
 
             // only get subset of locations
-            if (ids.size() < 5)
+            if (ids.size() < 5) {
                 break;
+            }
         }
 
         List<Location> results = manager.getLocationsByIDs(ids);
@@ -96,8 +97,9 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
             ids.add(ls.getLocid());
 
             // only get subset of locations
-            if (ids.size() < 5)
+            if (ids.size() < 5) {
                 break;
+            }
         }
 
         List<LocationDetails> results = manager.getLocationDetailsByLocationIDs(ids);

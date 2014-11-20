@@ -75,19 +75,24 @@ public class ExperimentProperty implements Serializable {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof ExperimentProperty))
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof ExperimentProperty)) {
+            return false;
+        }
 		
 		ExperimentProperty other = (ExperimentProperty) obj;
 		if (ndExperimentpropId == null) {
-			if (other.ndExperimentpropId != null)
-				return false;
-		} else if (!ndExperimentpropId.equals(other.ndExperimentpropId))
-			return false;
+			if (other.ndExperimentpropId != null) {
+                return false;
+            }
+		} else if (!ndExperimentpropId.equals(other.ndExperimentpropId)) {
+            return false;
+        }
 		
 		return true;
 	}

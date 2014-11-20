@@ -97,19 +97,24 @@ public class ExperimentPhenotype implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof ExperimentPhenotype))
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (!(obj instanceof ExperimentPhenotype)) {
+            return false;
+        }
 		
 		ExperimentPhenotype other = (ExperimentPhenotype) obj;
 		if (experimentPhenotypeId == null) {
-			if (other.experimentPhenotypeId != null)
-				return false;
-		} else if (!experimentPhenotypeId.equals(other.experimentPhenotypeId))
-			return false;
+			if (other.experimentPhenotypeId != null) {
+                return false;
+            }
+		} else if (!experimentPhenotypeId.equals(other.experimentPhenotypeId)) {
+            return false;
+        }
 		
 		return true;
 	}

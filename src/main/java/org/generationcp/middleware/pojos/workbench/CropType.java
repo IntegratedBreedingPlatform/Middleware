@@ -113,18 +113,23 @@ public class CropType implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         CropType other = (CropType) obj;
         if (cropName == null) {
-            if (other.cropName != null)
+            if (other.cropName != null) {
                 return false;
-        } else if (!cropName.equals(other.cropName))
+            }
+        } else if (!cropName.equals(other.cropName)) {
             return false;
+        }
         return true;
     }
 

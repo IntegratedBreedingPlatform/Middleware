@@ -236,9 +236,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			int numOfRows, VariableTypeList varTypeList)
 			throws MiddlewareQueryException {
     	clearSessions();
-		if(varTypeList == null)
+		if(varTypeList == null) {
 			return getExperiments(dataSetId, start, numOfRows);
-		else{
+		} else {
 			return getExperimentBuilder().build(
 	                dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, varTypeList);
 		}
@@ -448,7 +448,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) 
             throws MiddlewareQueryException {
         List<DataSet> datasets = getDataSetsByType(studyId, dataSetType);
-        if (datasets != null && datasets.size() >= 1) {
+        if (datasets != null && !datasets.isEmpty()) {
             return datasets.get(0);
         }
         return null;
@@ -586,7 +586,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
                     List<FieldMapTrialInstanceInfo> trialInstances =
                             fieldMapDatasetInfo.getTrialInstances();
-                    if (trialInstances != null && trialInstances.size() > 0) {
+                    if (trialInstances != null && !trialInstances.isEmpty()) {
                         for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
                             List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
                             for (FieldMapLabel label : labels) {
@@ -705,7 +705,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 for (FieldMapDatasetInfo fieldMapDatasetInfo : datasetInfoList) {
                     List<FieldMapTrialInstanceInfo> trialInstances =
                             fieldMapDatasetInfo.getTrialInstances();
-                    if (trialInstances != null && trialInstances.size() > 0) {
+                    if (trialInstances != null && !trialInstances.isEmpty()) {
                         for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
                             List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
                             for (FieldMapLabel label : labels) {
@@ -876,10 +876,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
-        if (id > 0)
+        if (id > 0) {
             requireCentralDatabaseInstance();
-        else
+        } else {
             requireLocalDatabaseInstance();
+        }
         DmsProject folderParentFolder = getProjectRelationshipDao()
                 .getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
         DmsProject studyParentFolder = getProjectRelationshipDao()
@@ -1182,7 +1183,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	updateFieldMapWithBlockInformation(infos, blockInfo, false);
     }
     
-    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
+    protected void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
     	Map<Integer, String> locationMap = new HashMap<Integer, String>();
     	if (infos != null) {
     		for (FieldMapInfo info : infos) {
@@ -1298,7 +1299,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId);
 	}
 
-
-
-	
+	public void setLocationDataManager(LocationDataManager locationDataManager) {
+		this.locationDataManager = locationDataManager;
+	}
 }

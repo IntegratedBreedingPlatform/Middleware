@@ -99,18 +99,23 @@ public class ExperimentStock implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ExperimentStock other = (ExperimentStock) obj;
 		if (experimentStockId == null) {
-			if (other.experimentStockId != null)
-				return false;
-		} else if (!experimentStockId.equals(other.experimentStockId))
-			return false;
+			if (other.experimentStockId != null) {
+                return false;
+            }
+		} else if (!experimentStockId.equals(other.experimentStockId)) {
+            return false;
+        }
 		return true;
 	}
 

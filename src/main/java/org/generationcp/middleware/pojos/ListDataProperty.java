@@ -124,33 +124,44 @@ public class ListDataProperty implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		ListDataProperty other = (ListDataProperty) obj;
 		if (column == null) {
-			if (other.column != null)
-				return false;
-		} else if (!column.equals(other.column))
-			return false;
+			if (other.column != null) {
+                return false;
+            }
+		} else if (!column.equals(other.column)) {
+            return false;
+        }
 		if (listData == null) {
-			if (other.listData != null)
-				return false;
-		} else if (!listData.equals(other.listData))
-			return false;
+			if (other.listData != null) {
+                return false;
+            }
+		} else if (!listData.equals(other.listData)) {
+            return false;
+        }
 		if (listDataPropertyId == null) {
-			if (other.listDataPropertyId != null)
-				return false;
-		} else if (!listDataPropertyId.equals(other.listDataPropertyId))
-			return false;
+			if (other.listDataPropertyId != null) {
+                return false;
+            }
+		} else if (!listDataPropertyId.equals(other.listDataPropertyId)) {
+            return false;
+        }
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
+			if (other.value != null) {
+                return false;
+            }
+		} else if (!value.equals(other.value)) {
+            return false;
+        }
 		return true;
 	}
 

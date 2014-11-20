@@ -257,10 +257,12 @@ public class Workbook {
 				studyConditions = getStudyConditions();
 				studyConstants = getStudyConstants();
 			}
-			if(studyConditions != null)
-				list.addAll(studyConditions);
-			if(studyConstants != null)
-				list.addAll(studyConstants);
+			if(studyConditions != null) {
+                list.addAll(studyConditions);
+            }
+			if(studyConstants != null) {
+                list.addAll(studyConstants);
+            }
 		} else {
 			if(trialConditions == null) {
 				trialConditions = getTrialConditions();
@@ -268,10 +270,12 @@ public class Workbook {
 			if (trialConstants == null) {
 				trialConstants = getTrialConstants();
 			}
-			if(trialConditions != null)
-				list.addAll(trialConditions);
-			if(trialConstants != null)
-				list.addAll(trialConstants);
+			if(trialConditions != null) {
+                list.addAll(trialConditions);
+            }
+			if(trialConstants != null) {
+                list.addAll(trialConstants);
+            }
 		}
 		return list;
 	}
@@ -370,26 +374,42 @@ public class Workbook {
 
     public List<MeasurementVariable> getAllVariables() {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
-        if (conditions != null) variableList.addAll(conditions);
-        if (constants != null) variableList.addAll(constants);
-        if (factors != null) variableList.addAll(factors);
-        if (variates != null) variableList.addAll(variates);
+        if (conditions != null) {
+            variableList.addAll(conditions);
+        }
+        if (constants != null) {
+            variableList.addAll(constants);
+        }
+        if (factors != null) {
+            variableList.addAll(factors);
+        }
+        if (variates != null) {
+            variableList.addAll(variates);
+        }
 
         return variableList;
     }
     
     public List<MeasurementVariable> getNonVariateVariables() {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
-        if (conditions != null) variableList.addAll(conditions);
-        if (factors != null) variableList.addAll(factors);
+        if (conditions != null) {
+            variableList.addAll(conditions);
+        }
+        if (factors != null) {
+            variableList.addAll(factors);
+        }
 
         return variableList;
     }
     
     public List<MeasurementVariable> getVariateVariables() {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
-        if (constants != null) variableList.addAll(constants);
-        if (variates != null) variableList.addAll(variates);
+        if (constants != null) {
+            variableList.addAll(constants);
+        }
+        if (variates != null) {
+            variableList.addAll(variates);
+        }
 
         return variableList;
     }
@@ -472,95 +492,131 @@ public class Workbook {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Workbook other = (Workbook) obj;
         if (conditions == null) {
-            if (other.conditions != null)
+            if (other.conditions != null) {
                 return false;
-        } else if (!conditions.equals(other.conditions))
+            }
+        } else if (!conditions.equals(other.conditions)) {
             return false;
+        }
         if (constants == null) {
-            if (other.constants != null)
+            if (other.constants != null) {
                 return false;
-        } else if (!constants.equals(other.constants))
+            }
+        } else if (!constants.equals(other.constants)) {
             return false;
+        }
         if (factors == null) {
-            if (other.factors != null)
+            if (other.factors != null) {
                 return false;
-        } else if (!factors.equals(other.factors))
+            }
+        } else if (!factors.equals(other.factors)) {
             return false;
-        if (isCheckFactorAddedOnly != other.isCheckFactorAddedOnly)
+        }
+        if (isCheckFactorAddedOnly != other.isCheckFactorAddedOnly) {
             return false;
+        }
         if (measurementDatasetVariables == null) {
-            if (other.measurementDatasetVariables != null)
+            if (other.measurementDatasetVariables != null) {
                 return false;
-        } else if (!measurementDatasetVariables.equals(other.measurementDatasetVariables))
+            }
+        } else if (!measurementDatasetVariables.equals(other.measurementDatasetVariables)) {
             return false;
+        }
         if (nonTrialFactors == null) {
-            if (other.nonTrialFactors != null)
+            if (other.nonTrialFactors != null) {
                 return false;
-        } else if (!nonTrialFactors.equals(other.nonTrialFactors))
+            }
+        } else if (!nonTrialFactors.equals(other.nonTrialFactors)) {
             return false;
+        }
         if (observations == null) {
-            if (other.observations != null)
+            if (other.observations != null) {
                 return false;
-        } else if (!observations.equals(other.observations))
+            }
+        } else if (!observations.equals(other.observations)) {
             return false;
+        }
         if (studyConditions == null) {
-            if (other.studyConditions != null)
+            if (other.studyConditions != null) {
                 return false;
-        } else if (!studyConditions.equals(other.studyConditions))
+            }
+        } else if (!studyConditions.equals(other.studyConditions)) {
             return false;
+        }
         if (studyConstants == null) {
-            if (other.studyConstants != null)
+            if (other.studyConstants != null) {
                 return false;
-        } else if (!studyConstants.equals(other.studyConstants))
+            }
+        } else if (!studyConstants.equals(other.studyConstants)) {
             return false;
+        }
         if (studyDetails == null) {
-            if (other.studyDetails != null)
+            if (other.studyDetails != null) {
                 return false;
-        } else if (!studyDetails.equals(other.studyDetails))
+            }
+        } else if (!studyDetails.equals(other.studyDetails)) {
             return false;
+        }
         if (studyVariables == null) {
-            if (other.studyVariables != null)
+            if (other.studyVariables != null) {
                 return false;
-        } else if (!studyVariables.equals(other.studyVariables))
+            }
+        } else if (!studyVariables.equals(other.studyVariables)) {
             return false;
+        }
         if (trialConditions == null) {
-            if (other.trialConditions != null)
+            if (other.trialConditions != null) {
                 return false;
-        } else if (!trialConditions.equals(other.trialConditions))
+            }
+        } else if (!trialConditions.equals(other.trialConditions)) {
             return false;
+        }
         if (trialConstants == null) {
-            if (other.trialConstants != null)
+            if (other.trialConstants != null) {
                 return false;
-        } else if (!trialConstants.equals(other.trialConstants))
+            }
+        } else if (!trialConstants.equals(other.trialConstants)) {
             return false;
+        }
         if (trialFactors == null) {
-            if (other.trialFactors != null)
+            if (other.trialFactors != null) {
                 return false;
-        } else if (!trialFactors.equals(other.trialFactors))
+            }
+        } else if (!trialFactors.equals(other.trialFactors)) {
             return false;
+        }
         if (trialHeaders == null) {
-            if (other.trialHeaders != null)
+            if (other.trialHeaders != null) {
                 return false;
-        } else if (!trialHeaders.equals(other.trialHeaders))
+            }
+        } else if (!trialHeaders.equals(other.trialHeaders)) {
             return false;
+        }
         if (trialVariables == null) {
-            if (other.trialVariables != null)
+            if (other.trialVariables != null) {
                 return false;
-        } else if (!trialVariables.equals(other.trialVariables))
+            }
+        } else if (!trialVariables.equals(other.trialVariables)) {
             return false;
+        }
         if (variates == null) {
-            if (other.variates != null)
+            if (other.variates != null) {
                 return false;
-        } else if (!variates.equals(other.variates))
+            }
+        } else if (!variates.equals(other.variates)) {
             return false;
+        }
         return true;
     }
 

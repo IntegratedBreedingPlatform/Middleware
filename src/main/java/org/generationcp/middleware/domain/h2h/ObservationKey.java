@@ -74,19 +74,25 @@ public class ObservationKey{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ObservationKey other = (ObservationKey) obj;
-        if (environmentId != other.environmentId)
+        if (environmentId != other.environmentId) {
             return false;
-        if (germplasmId != other.germplasmId)
+        }
+        if (germplasmId != other.germplasmId) {
             return false;
-        if (traitId != other.traitId)
+        }
+        if (traitId != other.traitId) {
             return false;
+        }
         return true;
     }
 

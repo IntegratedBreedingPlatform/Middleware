@@ -62,8 +62,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
     	List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
-    		if(detail.hasRows())
-    			newList.add(detail);
+    		if(detail.hasRows()) {
+                newList.add(detail);
+            }
     	}
     	return newList;
     }
@@ -73,8 +74,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
         List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
-    		if(detail.hasRows())
-    			newList.add(detail);
+    		if(detail.hasRows()) {
+                newList.add(detail);
+            }
     	}
     	return newList;
     }
@@ -101,8 +103,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	
     	for(Location loc : locList){
     		if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue())
-    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()))
-    			continue;
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue())) {
+                continue;
+            }
     		newLocation.add(loc);
     	}
     	
@@ -147,8 +150,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             Location location = getLocationDataManager().getLocationByID(locationId);
             
             if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == location.getLtype().intValue())
-    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue()))
-    			continue;
+    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue())) {
+                continue;
+            }
             
             locationList.add(location);
         }

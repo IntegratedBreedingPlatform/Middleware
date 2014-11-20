@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -40,6 +39,44 @@ public class DataSetupTest extends ServiceIntegraionTest {
 	
 	private static final int NUMBER_OF_GERMPLASM = 20;
 	private static final String GERMPLSM_PREFIX = "GP-VARIETY-";
+	
+	private static final String PROP_BREEDING_METHOD = "Breeding Method";
+	private static final String PROP_INSTITUTE = "Institute";
+	private static final String PROP_STUDY = "Study";
+	private static final String PROP_STUDY_TITLE = "Study Title";
+	private static final String PROP_START_DATE = "Start Date";
+	private static final String PROP_END_DATE = "End Date";
+	private static final String PROP_OBJECTIVE = "Study Objective";
+
+	private static final String CHAR = "C";
+	private static final String NUMERIC = "N";
+	
+	private static final String ASSIGNED = "ASSIGNED";
+	private static final String APPLIED = "APPLIED";
+	
+	private static final String STUDY = "STUDY";
+	private static final String ENTRY = "ENTRY";
+	private static final String PLOT = "PLOT";
+
+	private static final String CONDUCTED = "CONDUCTED";
+	private static final String DBCV = "DBCV";
+	private static final String DBID = "DBID";
+	
+	private static final String SCALE_TEXT = "Text";
+	private static final String ENUMERATED = "ENUMERATED";
+	private static final String DESCRIBED = "Described";
+	private static final String DATE = "Date (yyyymmdd)";
+	
+	private static final String GID = "GID";
+	private static final String DESIG = "DESIG";
+	private static final String CROSS = "CROSS";
+	private static final String NUMBER = "NUMBER";
+	private static final String PEDIGREE_STRING = "PEDIGREE STRING";
+	
+	private static final String KG_HA = "kg/ha";
+	private static final String GRAIN_YIELD = "Grain Yield";
+	private static final String DRY_AND_WEIGH = "Dry and weigh";
+	
 	
 	@BeforeClass
 	public static void setUp() {
@@ -90,32 +127,32 @@ public class DataSetupTest extends ServiceIntegraionTest {
     	List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
     	
     	conditions.add(createMeasurementVariable(TermId.BREEDING_METHOD_CODE.getId(), "STUDY_BM_CODE", "Breeding method applied to all plots in a study (CODE)", 
-    			WorkbookTest.PROP_BREEDING_METHOD, WorkbookTest.APPLIED, "BMETH_CODE", WorkbookTest.CHAR, 
-    			null, WorkbookTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+    			PROP_BREEDING_METHOD, APPLIED, "BMETH_CODE", CHAR, 
+    			null, STUDY, TermId.STUDY_INFORMATION.getId(), true));
     	
     	conditions.add(createMeasurementVariable(8080, "STUDY_INSTITUTE", "Study institute - conducted (DBCV)", 
-    			WorkbookTest.PROP_INSTITUTE, WorkbookTest.CONDUCTED, WorkbookTest.DBCV, WorkbookTest.CHAR, 
-    			"CIMMYT", WorkbookTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+    			PROP_INSTITUTE, CONDUCTED, DBCV, CHAR, 
+    			"CIMMYT", STUDY, TermId.STUDY_INFORMATION.getId(), true));
     	
     	conditions.add(createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)", 
-    			WorkbookTest.PROP_STUDY, WorkbookTest.ASSIGNED, WorkbookTest.DBCV, WorkbookTest.CHAR, 
-    			studyDetails.getStudyName(), WorkbookTest.STUDY, TermId.STUDY_NAME_STORAGE.getId(), true));
+    			PROP_STUDY, ASSIGNED, DBCV, CHAR, 
+    			studyDetails.getStudyName(), STUDY, TermId.STUDY_NAME_STORAGE.getId(), true));
 
     	conditions.add(createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE", "Study title - assigned (text)", 
-    			WorkbookTest.PROP_STUDY_TITLE, WorkbookTest.ASSIGNED, WorkbookTest.SCALE_TEXT, WorkbookTest.CHAR, 
-    			studyDetails.getTitle(), WorkbookTest.STUDY, TermId.STUDY_TITLE_STORAGE.getId(), true));
+    			PROP_STUDY_TITLE, ASSIGNED, SCALE_TEXT, CHAR, 
+    			studyDetails.getTitle(), STUDY, TermId.STUDY_TITLE_STORAGE.getId(), true));
 
     	conditions.add(createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)", 
-    			WorkbookTest.PROP_START_DATE, WorkbookTest.ASSIGNED, WorkbookTest.DATE, WorkbookTest.CHAR, 
-    			studyDetails.getStartDate(), WorkbookTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+    			PROP_START_DATE, ASSIGNED, DATE, CHAR, 
+    			studyDetails.getStartDate(), STUDY, TermId.STUDY_INFORMATION.getId(), true));
     	
     	conditions.add(createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE", "Objective - described (text)", 
-    			WorkbookTest.PROP_OBJECTIVE, WorkbookTest.DESCRIBED, WorkbookTest.SCALE_TEXT, WorkbookTest.CHAR, 
-    			studyDetails.getObjective(), WorkbookTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+    			PROP_OBJECTIVE, DESCRIBED, SCALE_TEXT, CHAR, 
+    			studyDetails.getObjective(), STUDY, TermId.STUDY_INFORMATION.getId(), true));
     	
     	conditions.add(createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)", 
-    			WorkbookTest.PROP_END_DATE, WorkbookTest.ASSIGNED, WorkbookTest.DATE, WorkbookTest.CHAR, 
-    			studyDetails.getEndDate(), WorkbookTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+    			PROP_END_DATE, ASSIGNED, DATE, CHAR, 
+    			studyDetails.getEndDate(), STUDY, TermId.STUDY_INFORMATION.getId(), true));
     	
     	workbook.setConditions(conditions);
     	
@@ -123,35 +160,35 @@ public class DataSetupTest extends ServiceIntegraionTest {
     	List<MeasurementVariable> constants = new ArrayList<MeasurementVariable>();
     	constants.add(createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)",  
     			"Soil acidity", "Ph meter", "pH", 
-    			WorkbookTest.NUMERIC, "7", WorkbookTest.STUDY, TermId.OBSERVATION_VARIATE.getId(), false));
+    			NUMERIC, "7", STUDY, TermId.OBSERVATION_VARIATE.getId(), false));
     	workbook.setConstants(constants);
     	
     	
     	//Factors
     	List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
     	MeasurementVariable entryFactor = createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO", "Germplasm entry - enumerated (number)", 
-    			"Germplasm entry", WorkbookTest.ENUMERATED, WorkbookTest.NUMBER, 
-    			WorkbookTest.NUMERIC, null, WorkbookTest.ENTRY, TermId.ENTRY_NUMBER_STORAGE.getId(), true);
+    			"Germplasm entry", ENUMERATED, NUMBER, 
+    			NUMERIC, null, ENTRY, TermId.ENTRY_NUMBER_STORAGE.getId(), true);
 		factors.add(entryFactor);
     	
     	MeasurementVariable designationFactor = createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION", "Germplasm designation - assigned (DBCV)", 
-    			"Germplasm Designation", WorkbookTest.ASSIGNED, WorkbookTest.DBCV, 
-    			WorkbookTest.CHAR, null, WorkbookTest.DESIG, TermId.ENTRY_DESIGNATION_STORAGE.getId(), true);
+    			"Germplasm Designation", ASSIGNED, DBCV, 
+    			CHAR, null, DESIG, TermId.ENTRY_DESIGNATION_STORAGE.getId(), true);
 		factors.add(designationFactor);
     	
     	MeasurementVariable crossFactor = createMeasurementVariable(TermId.CROSS.getId(), "CROSS", "The pedigree string of the germplasm", 
-    			"Cross history", WorkbookTest.ASSIGNED, WorkbookTest.PEDIGREE_STRING, 
-    			WorkbookTest.CHAR, null, WorkbookTest.CROSS, TermId.GERMPLASM_ENTRY_STORAGE.getId(), true);
+    			"Cross history", ASSIGNED, PEDIGREE_STRING, 
+    			CHAR, null, CROSS, TermId.GERMPLASM_ENTRY_STORAGE.getId(), true);
 		factors.add(crossFactor);
     	
     	MeasurementVariable gidFactor = createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)", 
-    			"Germplasm id", WorkbookTest.ASSIGNED, WorkbookTest.DBID, 
-    			WorkbookTest.NUMERIC, null, WorkbookTest.GID, TermId.ENTRY_GID_STORAGE.getId(), true);
+    			"Germplasm id", ASSIGNED, DBID, 
+    			NUMERIC, null, GID, TermId.ENTRY_GID_STORAGE.getId(), true);
 		factors.add(gidFactor);
     	
     	MeasurementVariable plotFactor = createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO", "Field plot - enumerated (number)", 
-    			"Field plot", WorkbookTest.ENUMERATED, WorkbookTest.NUMBER, 
-    			WorkbookTest.NUMERIC, null, WorkbookTest.PLOT, TermId.TRIAL_DESIGN_INFO_STORAGE.getId(), true);
+    			"Field plot", ENUMERATED, NUMBER, 
+    			NUMERIC, null, PLOT, TermId.TRIAL_DESIGN_INFO_STORAGE.getId(), true);
 		factors.add(plotFactor);
 		
     	workbook.setFactors(factors);
@@ -159,8 +196,8 @@ public class DataSetupTest extends ServiceIntegraionTest {
     	//Variates
     	List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
     	MeasurementVariable variate = createMeasurementVariable(18000, "Grain_yield", "Grain yield -dry and weigh (kg/ha)", 
-    			WorkbookTest.GRAIN_YIELD, WorkbookTest.DRY_AND_WEIGH, WorkbookTest.KG_HA, WorkbookTest.NUMERIC, 
-                null, WorkbookTest.PLOT, TermId.OBSERVATION_VARIATE.getId(), false);
+    			GRAIN_YIELD, DRY_AND_WEIGH, KG_HA, NUMERIC, 
+                null, PLOT, TermId.OBSERVATION_VARIATE.getId(), false);
 		variates.add(variate);
     	
     	workbook.setVariates(variates);

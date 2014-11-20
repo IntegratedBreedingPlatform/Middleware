@@ -61,12 +61,16 @@ public class DatasetProjectSaver extends Saver {
 	}
 	
 	private String getName(DatasetValues datasetValues) {
-		if (datasetValues.getName() != null) return datasetValues.getName();
+		if (datasetValues.getName() != null) {
+            return datasetValues.getName();
+        }
 		return getStringValue(datasetValues, TermId.DATASET_NAME.getId());
 	}
 
 	private String getDescription(DatasetValues datasetValues) {
-		if (datasetValues.getDescription() != null) return datasetValues.getDescription();
+		if (datasetValues.getDescription() != null) {
+            return datasetValues.getDescription();
+        }
 		return getStringValue(datasetValues, TermId.DATASET_TITLE.getId());
 	}
 

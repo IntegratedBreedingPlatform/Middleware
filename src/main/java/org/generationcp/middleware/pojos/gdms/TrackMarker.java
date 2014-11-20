@@ -101,33 +101,44 @@ public class TrackMarker implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) {
+            return true;
+        }
+		if (obj == null) {
+            return false;
+        }
+		if (getClass() != obj.getClass()) {
+            return false;
+        }
 		TrackMarker other = (TrackMarker) obj;
 		if (markerId == null) {
-			if (other.markerId != null)
-				return false;
-		} else if (!markerId.equals(other.markerId))
-			return false;
+			if (other.markerId != null) {
+                return false;
+            }
+		} else if (!markerId.equals(other.markerId)) {
+            return false;
+        }
 		if (markerSampleId == null) {
-			if (other.markerSampleId != null)
-				return false;
-		} else if (!markerSampleId.equals(other.markerSampleId))
-			return false;
+			if (other.markerSampleId != null) {
+                return false;
+            }
+		} else if (!markerSampleId.equals(other.markerSampleId)) {
+            return false;
+        }
 		if (trackId == null) {
-			if (other.trackId != null)
-				return false;
-		} else if (!trackId.equals(other.trackId))
-			return false;
+			if (other.trackId != null) {
+                return false;
+            }
+		} else if (!trackId.equals(other.trackId)) {
+            return false;
+        }
 		if (trackMarkerId == null) {
-			if (other.trackMarkerId != null)
-				return false;
-		} else if (!trackMarkerId.equals(other.trackMarkerId))
-			return false;
+			if (other.trackMarkerId != null) {
+                return false;
+            }
+		} else if (!trackMarkerId.equals(other.trackMarkerId)) {
+            return false;
+        }
 		return true;
 	}
 
