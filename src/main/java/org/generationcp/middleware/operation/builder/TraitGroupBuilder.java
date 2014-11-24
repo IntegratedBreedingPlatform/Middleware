@@ -58,25 +58,22 @@ public class TraitGroupBuilder extends Builder {
 	}
 	
     /** 
-     * Gets all the Trait Classes with properties and standard variables in a hierarchical structure 
-     * from both Central and Local databases
+     * Gets all the Trait Classes with properties and standard variables in a hierarchical structure.
      * 
      * @return list of all trait class references in a hierarchy
      * @throws MiddlewareQueryException
      */
     public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException {
 
-        // Step 1: Get all Trait Classes from Central and Local
+        // Step 1: Get all Trait Classes
         List<TraitClassReference> traitClasses = getAllTraitClasses();
         
         if(includePropertiesAndVariables){
-            // Step 2: Get all Trait Class Properties from Central and Local
-            setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
+            // Step 2: Get all Trait Class Properties
             setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
     
-            // Step 3: Get all StandardVariables of Properties from Central and Local
+            // Step 3: Get all StandardVariables of Properties
             for (TraitClassReference traitClass : traitClasses){
-                setStandardVariablesOfProperties(Database.CENTRAL, traitClass.getProperties());
                 setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
             }
         }
@@ -104,15 +101,13 @@ public class TraitGroupBuilder extends Builder {
     }
 	
     /** 
-     * Gets all Trait Classes in a flat table form from Central and Local
+     * Gets all Trait Classes in a flat table form.
      * 
      * @return
      * @throws MiddlewareQueryException
      */
 	private List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
-	    List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
-        setWorkingDatabase(Database.CENTRAL);
-        traitClasses.addAll(getCvTermDao().getAllTraitClasses());  
+	    List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();  
         setWorkingDatabase(Database.LOCAL);
         traitClasses.addAll(getCvTermDao().getAllTraitClasses());  
         Collections.sort(traitClasses);

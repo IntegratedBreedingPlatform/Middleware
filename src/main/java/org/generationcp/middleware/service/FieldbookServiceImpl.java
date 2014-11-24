@@ -607,39 +607,29 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds, List<Integer> propertyIds, boolean isRemoveProperties) 
             throws MiddlewareQueryException {
     	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
-    	
     	List<CVTerm> variables = new ArrayList<CVTerm>();
-    	
     	Set<Integer> variableIds = new HashSet<Integer>();
     	
-    	addAllVariableIdsInMode(variableIds, storedInIds, Database.CENTRAL);
     	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
-    	
     	if (propertyIds != null && propertyIds.size() > 0) {
     	        Set<Integer> propertyVariableList = new HashSet<Integer>(); 
-    	        createPropertyList(propertyVariableList, propertyIds, Database.CENTRAL);
     	        createPropertyList(propertyVariableList, propertyIds, Database.LOCAL);
     	        filterByProperty(variableIds, propertyVariableList, isRemoveProperties);
     	}
     	
     	List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
-    	setWorkingDatabase(Database.CENTRAL);
-    	variables.addAll(getCvTermDao().getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(), TermId.CATEGORICAL_VARIABLE.getId()));
     	setWorkingDatabase(Database.LOCAL);
     	variables.addAll(getCvTermDao().getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(), TermId.CATEGORICAL_VARIABLE.getId()));
-    	
     	for (CVTerm variable : variables) {
     		list.add(new StandardVariableReference(variable.getCvTermId()
     		        , variable.getName(), variable.getDefinition()));
     	}
-    	
     	return list;
     }
     
 
     private void addAllVariableIdsInMode(Set<Integer> variableIds
-            , List<Integer> storedInIds, Database database) 
-                    throws MiddlewareQueryException {
+            , List<Integer> storedInIds, Database database) throws MiddlewareQueryException {
     	setWorkingDatabase(database);
     	for (Integer storedInId : storedInIds) {
     		variableIds.addAll(getCvTermRelationshipDao()
@@ -1100,7 +1090,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<Long> getFavoriteProjectLocationIds()
             throws MiddlewareQueryException {
         List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE);
-        List<Long> longVals = new ArrayList();
+        List<Long> longVals = new ArrayList<Long>();
         if(favList != null && !favList.isEmpty()){
             for(ProgramFavorite fav : favList){
                 longVals.add(Long.valueOf(Integer.toString(fav.getEntityId())));
@@ -1113,7 +1103,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<Integer> getFavoriteProjectMethods()
             throws MiddlewareQueryException {
         List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE);
-        List<Integer> ids = new ArrayList();
+        List<Integer> ids = new ArrayList<Integer>();
         if(favList != null && !favList.isEmpty()){
             for(ProgramFavorite fav : favList){
                 ids.add(fav.getEntityId());
