@@ -26,35 +26,8 @@ import java.util.Map;
 
 public class TraitGroupBuilder extends Builder {
 
-	public TraitGroupBuilder(HibernateSessionProvider sessionProviderForLocal,
-			               HibernateSessionProvider sessionProviderForCentral) {
+	public TraitGroupBuilder(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
-	}
-
-    /** 
-     * Gets the Trait Classes with properties and standard variables in a hierarchy 
-     * from both Central and Local databases based on the given class type.
-     * 
-     * @return list of trait class references
-     * @throws MiddlewareQueryException
-     */
-	@Deprecated
-	public List<TraitClassReference> buildTraitGroupHierarchy(TermId classType) throws MiddlewareQueryException {
-
-        // Step 1: Get all Trait Classes from Central and Local
-	    List<TraitClassReference> traitClasses = getTraitClasses(classType);
-	    	    
-        // Step 2: Get all Trait Class Properties from Central and Local
-        setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
-        setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
-
-        // Step 3: Get all StandardVariables of Properties from Central and Local
-        for (TraitClassReference traitClass : traitClasses){
-            setStandardVariablesOfProperties(Database.CENTRAL, traitClass.getProperties());
-            setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
-        }
-
-	    return traitClasses;
 	}
 	
     /** 
@@ -82,21 +55,6 @@ public class TraitGroupBuilder extends Builder {
         traitClasses = buildTree(traitClasses, TermId.IBDB_CLASS.getId());
         sortTree(traitClasses);
         
-        return traitClasses;
-    }        
-    
-    
-    /** 
-     * Gets all the Trait Classes in a hierarchical structure from both Central and Local databases
-     * 
-     * @return list of all trait classes
-     * @throws MiddlewareQueryException
-     */
-    @Deprecated
-    public List<TraitClassReference> getAllTraitClassesHierarchy() throws MiddlewareQueryException {
-        List<TraitClassReference> traitClasses = getAllTraitClasses();
-        traitClasses = buildTree(traitClasses, TermId.IBDB_CLASS.getId());
-        sortTree(traitClasses);
         return traitClasses;
     }
 	
@@ -137,24 +95,6 @@ public class TraitGroupBuilder extends Builder {
         for (TraitClassReference child : traitClass.getTraitClassChildren()){
             sortChildren(child);
         }
-    }
-    
-	/**
-	 * Gets trait classes from central and local of the given class type
-	 * 
-	 * @param classType
-	 * @return list of all trait classes
-	 * @throws MiddlewareQueryException
-	 */
-    @Deprecated
-	public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException {
-        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
-        setWorkingDatabase(Database.CENTRAL);
-        traitClasses.addAll(getCvTermDao().getTraitClasses(classType));  
-        setWorkingDatabase(Database.LOCAL);
-        traitClasses.addAll(getCvTermDao().getTraitClasses(classType));  
-        Collections.sort(traitClasses);
-        return traitClasses;
     }
 
     private void setPropertiesOfTraitClasses(Database instance, List<TraitClassReference> traitClasses) throws MiddlewareQueryException{
@@ -203,8 +143,5 @@ public class TraitGroupBuilder extends Builder {
                 Collections.sort(property.getStandardVariables());
             }
         }
-
     }
-
-    
 }
