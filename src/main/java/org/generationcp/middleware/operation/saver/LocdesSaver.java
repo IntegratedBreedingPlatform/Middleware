@@ -43,7 +43,7 @@ public class LocdesSaver extends Saver {
 	}
 	
 	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
-		setWorkingDatabase(Database.CENTRAL);
+		setWorkingDatabase(Database.LOCAL);
 		Map<String, Integer> udfldMap = getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE", 
 				Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode()
 						, LocdesType.RANGES_IN_BLOCK.getCode()

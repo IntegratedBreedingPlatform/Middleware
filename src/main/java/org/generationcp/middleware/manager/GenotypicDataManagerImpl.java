@@ -144,78 +144,35 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException {
-        List<MapInfo> mapInfoList = getMapInfoByMapName(mapName, Database.CENTRAL);
-        mapInfoList.addAll(getMapInfoByMapName(mapName, Database.LOCAL));
+        List<MapInfo> mapInfoList = getMapInfoByMapName(mapName, Database.LOCAL);
         Collections.sort(mapInfoList);
         return mapInfoList;
     }
-
-
     
-    private void getMarkerNamesOfMapInfoFromCentral(List<MapInfo> mapInfoList) throws MiddlewareQueryException{
-
-    	List<Integer> markerIdsToGetFromCentral = new ArrayList<Integer>();
-        for (MapInfo mapInfo : mapInfoList){
-    		if (mapInfo.getMarkerName() == null && mapInfo.getMarkerId() >= 0){
-    			markerIdsToGetFromCentral.add(mapInfo.getMarkerId());
-    		}
-    	}
-    	
-    	if (markerIdsToGetFromCentral.size() > 0){
-    		// Get markers from central
-    		setWorkingDatabase(Database.CENTRAL);
-    		List<Marker> markersFromCentral = getMarkerDao().
-    						getMarkersByIds(markerIdsToGetFromCentral, 0, markerIdsToGetFromCentral.size());
-    		
-    		// Assign marker names to mapInfo
-        	for (MapInfo mapInfo : mapInfoList){
-        		for (Marker marker : markersFromCentral){
-        			if (mapInfo.getMarkerId().equals(marker.getMarkerId())){
-        				mapInfo.setMarkerName(marker.getMarkerName());
-        				break;
-        			}
-        		}
-        	}
-    	}
-    }
-
     @Override
     public List<MapInfo> getMapInfoByMapAndChromosome(int mapId, String chromosome) throws MiddlewareQueryException {
-        setWorkingDatabase(mapId);
+        setWorkingDatabase(Database.LOCAL);
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapAndChromosome(mapId, chromosome);
-        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
-        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
-        }
         return mapInfoList;
     }
     
-    
     @Override
-    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) 
-    		throws MiddlewareQueryException {
-        setWorkingDatabase(mapId);
+    public List<MapInfo> getMapInfoByMapChromosomeAndPosition(int mapId, String chromosome, float startPosition) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMapChromosomeAndPosition(mapId, chromosome, startPosition);
-        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
-        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
-        }
         return mapInfoList;
     }
 
     @Override
     public List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
-        setWorkingDatabase(mapId);
+        setWorkingDatabase(Database.LOCAL);
         List<MapInfo> mapInfoList = getMapDao().getMapInfoByMarkersAndMap(markers, mapId);
-        if (mapId < 0) { // Map is in local, it's possible that the markers referenced are in central
-        	getMarkerNamesOfMapInfoFromCentral(mapInfoList);
-        }
         return mapInfoList;
     }
     
-    
     //GCP-8572
     @Override
-    public List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, double startPos, double endPos)  
-    		throws MiddlewareQueryException{
+    public List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException {
     	return super.getAllFromCentralAndLocalByMethod(getMarkerOnMapDao(), "getMarkersOnMap", 
     			new Object[]{mapIds, linkageGroup, startPos, endPos}, 
     			new Class[]{List.class, String.class, Double.TYPE, Double.TYPE});
@@ -239,12 +196,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public String getMapNameById(Integer mapID) throws MiddlewareQueryException {
-        if (mapID < 0) {
-            setWorkingDatabase(Database.LOCAL);
-        } else {
-            setWorkingDatabase(Database.CENTRAL);
-        }
-
+        setWorkingDatabase(Database.LOCAL);
         return getMapDao().getMapNameById(mapID);
     }
 
@@ -334,30 +286,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
 
-    	// Get from local and central (with marker names available in local)
     	List<MarkerNameElement> dataValues = (List<MarkerNameElement>) super.getAllFromCentralAndLocalByMethod(getMarkerDao(), 
         		"getMarkerNamesByGIds", new Object[]{gIds}, new Class[]{List.class});
         
-        // Get marker names from central
-        List<Integer> markerIds = new ArrayList<Integer>();
-        for (MarkerNameElement element : dataValues){
-        	if (element.getMarkerName() == null){
-        		markerIds.add(element.getMarkerId());
-        	}
-        }
-        if (markerIds.size() > 0){
-        	setWorkingDatabase(Database.CENTRAL);
-        	List<Marker> markers = getMarkerDao().getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
-            for (MarkerNameElement element : dataValues){
-            	for (Marker marker : markers){
-	            	if (element.getMarkerName() == null && element.getMarkerId().equals(marker.getMarkerId())){
-	            		element.setMarkerName(marker.getMarkerName());
-	            		break;
-	            	}
-            	}
-            }
-        }
-
         // Remove duplicates
         Set<MarkerNameElement> set = new HashSet<MarkerNameElement>();
         set.addAll(dataValues);
@@ -413,17 +344,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
 
         //Get marker_ids by marker_names
-        setWorkingDatabase(Database.CENTRAL);
-        java.util.Map<Integer, String> markerIdName = getMarkerDao().getFirstMarkerIdByMarkerName(markerNames, Database.CENTRAL);
         setWorkingDatabase(Database.LOCAL);
-        markerIdName.putAll(getMarkerDao().getFirstMarkerIdByMarkerName(markerNames, Database.LOCAL));
+        java.util.Map<Integer, String> markerIdName = getMarkerDao().getFirstMarkerIdByMarkerName(markerNames, Database.LOCAL);
         List<Integer> markerIds = new ArrayList<Integer>(markerIdName.keySet());
 
-        // Get from CENTRAL
-        allelicValues.addAll(super.getFromInstanceByMethod(getMarkerDao(), Database.CENTRAL,
-                "getAllelicValuesByGidsAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class}));
-
-        // Get from LOCAL
         allelicValues.addAll(super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL,
                 "getAllelicValuesByGidsAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class}));
 
@@ -553,10 +477,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        List<MarkerIdMarkerNameElement> markers = super.getFromInstanceByMethod(getMarkerDao(), Database.CENTRAL, "getNamesByIds",
+        List<MarkerIdMarkerNameElement> markers = super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, "getNamesByIds",
                 new Object[]{markerIds}, new Class[]{List.class});
-        markers.addAll(super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, "getNamesByIds",
-                new Object[]{markerIds}, new Class[]{List.class}));
 
         // Sort based on the given input order
         List<MarkerIdMarkerNameElement> markersToReturn = new ArrayList<MarkerIdMarkerNameElement>();
@@ -652,9 +574,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueElement> getAllAllelicValuesByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList) 
             throws MiddlewareQueryException {
-        List<AllelicValueElement> elements =  getAllelicValuesByMarkersAndAlleleValues(Database.LOCAL, markerIdList, alleleValueList);
-        elements.addAll(getAllelicValuesByMarkersAndAlleleValues(Database.CENTRAL, markerIdList, alleleValueList));
-        return elements;
+        return getAllelicValuesByMarkersAndAlleleValues(Database.LOCAL, markerIdList, alleleValueList);
     }
     
     @Override
@@ -696,10 +616,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     			throws MiddlewareQueryException {
         Set<Integer> nidSet = new TreeSet<Integer>();
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(
-            		datasetIds, markerIds, gIds, start, numOfRows));
-        }
         if (setWorkingDatabase(Database.LOCAL)) {
             nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(
             		datasetIds, markerIds, gIds, start, numOfRows));
@@ -724,15 +640,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     private List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds) 
     		throws MiddlewareQueryException {
         Set<Integer> nidSet = new TreeSet<Integer>();
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
-        }
-
         if (setWorkingDatabase(Database.LOCAL)) {
             nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         }
-
         return new ArrayList<Integer>(((TreeSet<Integer>) nidSet).descendingSet());
     }
 
@@ -872,32 +782,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 getAlleleValuesDao(), getMethodName, new Object[]{gids, start, numOfRows}, 
                 new Class[]{List.class, Integer.TYPE, Integer.TYPE});
 
-        
-        // Get marker names from central
-        List<Integer> markerIds = new ArrayList<Integer>();
-        for (AllelicValueElement element : allelicValueElements){
-        	if (element.getMarkerName() == null){
-        		markerIds.add(element.getMarkerId());
-        	}
-        }
-        if (markerIds.size() > 0){
-        	setWorkingDatabase(Database.CENTRAL);
-        	List<Marker> markers = getMarkerDao().getMarkersByIds(markerIds, 0, Integer.MAX_VALUE);
-            for (AllelicValueElement element : allelicValueElements){
-            	for (Marker marker : markers){
-	            	if (element.getMarkerName() == null && element.getMarkerId().equals(marker.getMarkerId())){
-	            		element.setMarkerName(marker.getMarkerName());
-	            		break;
-	            	}
-            	}
-            }
-        }
-
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
-
         return allelicValueElements;
-
     }
 
     @Override
@@ -973,9 +860,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public java.util.Map<Integer, String> getQtlNamesByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
         java.util.Map<Integer, String> qtlNames = new HashMap<Integer, String>();
-
-        setWorkingDatabase(Database.CENTRAL);
-        qtlNames.putAll(getQtlDao().getQtlNameByQtlIds(qtlIds));
 
         setWorkingDatabase(Database.LOCAL);
         qtlNames.putAll(getQtlDao().getQtlNameByQtlIds(qtlIds));
@@ -1148,10 +1032,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return markerMaps;
         }
 
-        // Get from Central
-        setWorkingDatabase(Database.CENTRAL);
-        markerMaps.putAll(getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
-
         setWorkingDatabase(Database.LOCAL);
         markerMaps.putAll(getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
 
@@ -1201,14 +1081,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
         List<Marker> markers = new ArrayList<Marker>();
-        List<Integer> positiveGids = getPositiveIds(markerIds);
-        List<Integer> negativeGids = getNegativeIds(markerIds);
-
-        if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            markers.addAll(getMarkerDao().getMarkersByIds(negativeGids, start, numOfRows));
-        }
-        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            markers.addAll(getMarkerDao().getMarkersByIds(positiveGids, start, numOfRows));
+        if ((setWorkingDatabase(Database.LOCAL)) && (markerIds != null) && (!markerIds.isEmpty())) {
+            markers.addAll(getMarkerDao().getMarkersByIds(markerIds, start, numOfRows));
         }
         return markers;
     }
@@ -1216,17 +1090,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public java.util.Map<Integer, String> getMarkerTypeMapByIds(List<Integer> markerIds) throws MiddlewareQueryException{
     	java.util.Map<Integer, String> markerTypes = new HashMap<Integer, String>();
-        List<Integer> positiveIds = getPositiveIds(markerIds);
-        List<Integer> negativeIds = getNegativeIds(markerIds);
-
-        if ((setWorkingDatabase(Database.LOCAL)) && (negativeIds != null) && (!negativeIds.isEmpty())) {
-        	markerTypes.putAll(getMarkerDao().getMarkerTypeMapByIds(negativeIds));
-        }
-        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveIds != null) && (!positiveIds.isEmpty())) {
-        	markerTypes.putAll(getMarkerDao().getMarkerTypeMapByIds(positiveIds));
+        if ((setWorkingDatabase(Database.LOCAL)) && (markerIds != null) && (!markerIds.isEmpty())) {
+        	markerTypes.putAll(getMarkerDao().getMarkerTypeMapByIds(markerIds));
         }
         return markerTypes;
-    	
     }
 
     @Override
@@ -2234,27 +2101,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     private Integer getMarkerIdByMarkerName(String markerName) throws MiddlewareQueryException, MiddlewareException {
-
-        setWorkingDatabase(Database.CENTRAL);
-        Integer markerId = getMarkerDao().getIdByName(markerName);
-
-        if (markerId == null) {
-            setWorkingDatabase(Database.LOCAL);
-            markerId = getMarkerDao().getIdByName(markerName);
-        }
-
-        return markerId;
+        setWorkingDatabase(Database.LOCAL);
+        return getMarkerDao().getIdByName(markerName);
     }
 
     private Integer getMapIdByMapName(String mapName) throws MiddlewareQueryException {
-        Integer mapId = null;
-        setWorkingDatabase(Database.CENTRAL);
-        mapId = getMapDao().getMapIdByName(mapName);
-        if (mapId == null) {
-            setWorkingDatabase(Database.LOCAL);
-            mapId = getMapDao().getMapIdByName(mapName);
-        }
-        return mapId;
+        setWorkingDatabase(Database.LOCAL);
+        return getMapDao().getMapIdByName(mapName);
     }
 
     @Override
@@ -2299,13 +2152,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Integer getMapIdByName(String mapName) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        Integer mapId = getMapDao().getMapIdByName(mapName);
-        if (mapId == null) {
-            setWorkingDatabase(Database.LOCAL);
-            mapId = getMapDao().getMapIdByName(mapName);
-        }
-        return mapId;
+        setWorkingDatabase(Database.LOCAL);
+        return getMapDao().getMapIdByName(mapName);
     }
 
     @Override
@@ -2330,15 +2178,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Dataset getDatasetById(Integer datasetId) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        Dataset dataset = getDatasetDao().getById(datasetId);
-
-        if (dataset == null) {
-            setWorkingDatabase(Database.LOCAL);
-            dataset = getDatasetDao().getById(datasetId);
-        }
-
-        return dataset;
+        setWorkingDatabase(Database.LOCAL);
+        return getDatasetDao().getById(datasetId);
     }
     
     @Override
@@ -2360,15 +2201,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     private Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException {
-
-        setWorkingDatabase(Database.CENTRAL);
-        Dataset dataset = getDatasetDao().getByName(datasetName);
-        if (dataset == null) {
-            setWorkingDatabase(Database.LOCAL);
-            dataset = getDatasetDao().getByName(datasetName);
-        }
-
-        return dataset;
+        setWorkingDatabase(Database.LOCAL);
+        return getDatasetDao().getByName(datasetName);
     }
 
     @Override
@@ -3322,16 +3156,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     // GCP-7873
     @Override
     public List<Marker> getAllSNPMarkers() throws MiddlewareQueryException {
-        List<Marker> returnVal = null;
-
-        setWorkingDatabase(Database.CENTRAL, getMarkerDao());
-
-        returnVal = getMarkerDao().getByType(TYPE_SNP);
-
         setWorkingDatabase(Database.LOCAL, getMarkerDao());
-        returnVal.addAll(getMarkerDao().getByType(TYPE_SNP));
-
-        return returnVal;
+        return getMarkerDao().getByType(TYPE_SNP);
     }
     
     //GCP-8568
@@ -3383,9 +3209,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<MarkerInfo> getMarkerInfoByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
         List<MarkerInfo> returnVal = new ArrayList<MarkerInfo>();
 
-        setWorkingDatabase(Database.CENTRAL, getMarkerInfoDao());
-        returnVal = getMarkerInfoDao().getByMarkerIds(markerIds);
-
         setWorkingDatabase(Database.LOCAL, getMarkerInfoDao());
         returnVal.addAll(getMarkerInfoDao().getByMarkerIds(markerIds));
 
@@ -3397,10 +3220,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueElement> getAlleleValuesByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
         List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
-
-        setWorkingDatabase(Database.CENTRAL);
-        returnVal = getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds);
-        returnVal.addAll(getCharValuesDao().getAlleleValuesByMarkerId(markerIds));
 
         setWorkingDatabase(Database.LOCAL);
         returnVal.addAll(getAlleleValuesDao().getAlleleValuesByMarkerId(markerIds));

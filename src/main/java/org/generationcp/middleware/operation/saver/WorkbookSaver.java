@@ -788,16 +788,9 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private Integer getProjectId(String name, TermId relationship) throws MiddlewareQueryException {
-		Integer id = null;
-		setWorkingDatabase(Database.CENTRAL);
-		id = getDmsProjectDao().getProjectIdByName(name, relationship);
-		if (id == null) {
-			setWorkingDatabase(Database.LOCAL);
-			id = getDmsProjectDao().getProjectIdByName(name, relationship);
-		}
-		return id;
+		setWorkingDatabase(Database.LOCAL);
+		return getDmsProjectDao().getProjectIdByName(name, relationship);
 	}
-	
 	
 	private Integer getMeansDataset(Integer studyId) throws MiddlewareQueryException {
 		Integer id = null;
@@ -809,8 +802,6 @@ public class WorkbookSaver extends Saver {
 		}
 		return id;
 	}
-	
-	
 	
 	/**
      * Saves project ontology creating entries in the following tables:

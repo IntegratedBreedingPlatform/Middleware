@@ -546,8 +546,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) throws MiddlewareQueryException {
 
-    	Database instance = parentId >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	return getFromInstanceByMethod(getGermplasmListDAO(), instance, "getByParentFolderId", 
+    	return getFromInstanceByMethod(getGermplasmListDAO(), Database.LOCAL, "getByParentFolderId", 
     				new Object[] {parentId, start, numOfRows},
     				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
     }
@@ -569,9 +568,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException {
-    	
-    	Database instance = parentId >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	return countFromInstanceByMethod(getGermplasmListDAO(), instance, "countByParentFolderId", 
+    	return countFromInstanceByMethod(getGermplasmListDAO(), Database.LOCAL, "countByParentFolderId", 
     				new Object[] {parentId}, new Class[] {Integer.class});
     }
 
@@ -580,8 +577,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException {
     	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
     	
-    	Database instance = Database.CENTRAL;    	
-    	List results = getFromInstanceByMethod(getGermplasmListDAO(), instance, "getGermplasmListTypes", 
+    	List results = getFromInstanceByMethod(getGermplasmListDAO(), Database.LOCAL, "getGermplasmListTypes", 
 				new Object[] {}, new Class[] {});
     	
         for (Object o : results) {
@@ -611,8 +607,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
     	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
     	
-    	Database instance = Database.CENTRAL;    	
-		List results = getFromInstanceByMethod(getGermplasmListDAO(), instance, "getGermplasmNameTypes", 
+		List results = getFromInstanceByMethod(getGermplasmListDAO(), Database.LOCAL, "getGermplasmNameTypes", 
 				new Object[] {}, new Class[] {});
     	
         for (Object o : results) {
@@ -639,23 +634,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     
     @Override
     public List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException{
-        List<GermplasmList> resultsFromCentral;
-        List<GermplasmList> resultsFromLocal;
-        List<GermplasmList> combinedResults = new ArrayList<GermplasmList>();
-
-        if(searchPublicData) {
-	        if (setWorkingDatabase(Database.CENTRAL)) {
-	            resultsFromCentral = getGermplasmListDAO().searchForGermplasmLists(q, o);
-	            combinedResults.addAll(resultsFromCentral);
-	        }
-        }
+        List<GermplasmList> results = new ArrayList<GermplasmList>();
         
         if (setWorkingDatabase(Database.LOCAL)) {
-            resultsFromLocal = getGermplasmListDAO().searchForGermplasmLists(q, o);
-            combinedResults.addAll(resultsFromLocal);
+        	results.addAll(getGermplasmListDAO().searchForGermplasmLists(q, o));
         }
 
-        return combinedResults;
+        return results;
     }
 
 	@Override
@@ -665,10 +650,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public GermplasmListNewColumnsInfo  getAdditionalColumnsForList(Integer listId)
-			throws MiddlewareQueryException {
-		Database instance = listId >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	if (setWorkingDatabase(instance)){
+	public GermplasmListNewColumnsInfo  getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException {
+    	if (setWorkingDatabase(Database.LOCAL)){
     		return getListDataPropertyDAO().getPropertiesForList(listId);
     	}
     	return null;

@@ -12,13 +12,35 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.dms.NameSynonym;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -27,8 +49,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 public class OntologyDataManagerImpl extends DataManager implements OntologyDataManager{
 
@@ -163,9 +183,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         if (setWorkingDatabase(Database.LOCAL)) {
             standardVariables.addAll(getStandardVariablesByNameOrSynonym(nameOrSynonym));
         }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            standardVariables.addAll(getStandardVariablesByNameOrSynonym(nameOrSynonym));
-        }
         return standardVariables;
     }
 
@@ -237,7 +254,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         if (cvTerms != null && !cvTerms.isEmpty()) {
             terms = new ArrayList<Term>();
             for (CVTerm cvTerm : cvTerms) {
-                terms.add(getTermBuilder().mapCVTermToTerm(cvTerm));
+                terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
             }
         }
         return terms;
@@ -245,23 +262,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        long centralCount = getCvTermDao().countTermsByCvId(cvId);
-        setWorkingDatabase(Database.LOCAL);
-        long localCount = getCvTermDao().countTermsByCvId(cvId);
-        return centralCount + localCount;
+        return getCvTermDao().countTermsByCvId(cvId);
     }
 
     @Override
     public List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException {
         List<Term> methodTerms = new ArrayList<Term>();
         Set<Integer> methodIds = new HashSet<Integer>();
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            List<Integer> centralMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
-            if (centralMethodIds != null) {
-                methodIds.addAll(centralMethodIds);
-            }
-        }
         if (setWorkingDatabase(Database.LOCAL)) {
             List<Integer> localMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
             if (localMethodIds != null) {
@@ -279,12 +286,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException {
         List<Term> scaleTerms = new ArrayList<Term>();
         Set<Integer> scaleIds = new HashSet<Integer>();
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            List<Integer> centralMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
-            if (centralMethodIds != null) {
-                scaleIds.addAll(centralMethodIds);
-            }
-        }
         if (setWorkingDatabase(Database.LOCAL)) {
             List<Integer> localMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
             if (localMethodIds != null) {
@@ -369,17 +370,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             int numOfRows) throws MiddlewareQueryException {
 
         TreeMap<String, StandardVariable> standardVariables = new TreeMap<String, StandardVariable>();
-        List<Integer> centralStdVariableIds = new ArrayList<Integer>();
         List<Integer> localStdVariableIds = new ArrayList<Integer>();
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            centralStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
-
-            for (Integer stdVarId : centralStdVariableIds) {
-                StandardVariable sd = getStandardVariableBuilder().create(stdVarId);
-                standardVariables.put(sd.getName(), sd);
-            }
-        }
 
         if (setWorkingDatabase(Database.LOCAL)) {
             localStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
@@ -419,15 +410,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 cvTerms.add(getCvTermDao().getById(id));
             }
         }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
-            for (Integer id : termIds) {
-                cvTerms.add(getCvTermDao().getById(id));
-            }
-        }
 
         for (CVTerm cvTerm : cvTerms) {
-            terms.add(getTermBuilder().mapCVTermToTerm(cvTerm));
+            terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
         }
 
         return terms;
@@ -446,7 +431,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         if (cvTerms != null && !cvTerms.isEmpty()) {
             terms = new ArrayList<Term>();
             for (CVTerm cvTerm : cvTerms) {
-                terms.add(getTermBuilder().mapCVTermToTerm(cvTerm));
+                terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
             }
         }
         return terms;
@@ -636,9 +621,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public long countIsAOfProperties() throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
-        }
         if (setWorkingDatabase(Database.LOCAL)) {
             count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
         }
@@ -700,23 +682,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 
         if (traitClassId != null){
-            standardVariables.addAll(getStandardVariablesOfTraitClass(Database.CENTRAL, traitClassId));
             standardVariables.addAll(getStandardVariablesOfTraitClass(Database.LOCAL, traitClassId));
             return standardVariables;
         }
         
         // For property, scale, method
-        setWorkingDatabase(Database.CENTRAL);
+        setWorkingDatabase(Database.LOCAL);
         List<Integer> standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
         for (Integer id : standardVariableIds) {
             standardVariables.add(getStandardVariable(id));
         }
-        setWorkingDatabase(Database.LOCAL);
-        standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
-        for (Integer id : standardVariableIds) {
-            standardVariables.add(getStandardVariable(id));
-        }
-        
         
         return standardVariables;
     }
@@ -726,11 +701,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         setWorkingDatabase(instance);
 
         List<PropertyReference> properties = getCvTermDao().getPropertiesOfTraitClass(traitClassId);
-        if (instance == Database.LOCAL) {
-            setWorkingDatabase(Database.CENTRAL);
-            properties.addAll(getCvTermDao().getPropertiesOfTraitClass(traitClassId));
-            setWorkingDatabase(Database.LOCAL);
-        }
 
         List<Integer> propertyIds = new ArrayList<Integer>();
         for (PropertyReference property : properties){
@@ -904,14 +874,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         // Check if cv entry of enumeration already exists
         // Add cv entry of the standard variable if none found
-        setWorkingDatabase(Database.CENTRAL);
+        setWorkingDatabase(Database.LOCAL);
         Integer cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
-        
-        if (cvId == null) {
-            setWorkingDatabase(Database.LOCAL);
-            cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
-        }
-        
+                
         if (cvId == null){
             cvId = getStandardVariableSaver().createCv(variable).getCvId();
         }

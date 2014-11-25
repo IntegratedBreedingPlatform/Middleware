@@ -69,13 +69,12 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException {
 		StandardVariableSummary summary = null;
 		if(standardVariableId != null) {
-			if(setWorkingDatabase(standardVariableId)) {
+			if(setWorkingDatabase(Database.LOCAL)) {
 				summary =  getStandardVariableDao().getStandardVariableSummary(standardVariableId);
 			}
 			
-			//Special handling for standard variables loaded from local databases.
 			if(summary != null && summary.getId() < 0) {
-				populateCentralDatabaseReferences(Arrays.asList(summary));
+				specialProcessing(Arrays.asList(summary));
 			}
 		}
 		return summary;
@@ -87,31 +86,12 @@ public class StandardVariableBuilder extends Builder {
 	 * @see StandardVariableDao#getStarndardVariableSummaries(List)
 	 */
 	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
-
 		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
 		if(standardVariableIds != null && !standardVariableIds.isEmpty()) {
-			List<Integer> positiveIds = new ArrayList<Integer>();
-			for(Integer id : standardVariableIds) {
-				if(id > 0) {
-					positiveIds.add(id);
-				}
-			}
-			if(!positiveIds.isEmpty()) {
-				if(setWorkingDatabase(Database.CENTRAL)) {		
-					result.addAll(getStandardVariableDao().getStarndardVariableSummaries(positiveIds));
-				}
-			}
-			
-			List<Integer> negativeIds = new ArrayList<Integer>();
-			for(Integer id : standardVariableIds) {
-				if(id < 0) {
-					negativeIds.add(id);
-				}
-			}	
-			if(!negativeIds.isEmpty()) {
+			if(!standardVariableIds.isEmpty()) {
 				if(setWorkingDatabase(Database.LOCAL)) {		
-					List<StandardVariableSummary> localVariables = getStandardVariableDao().getStarndardVariableSummaries(negativeIds);
-					populateCentralDatabaseReferences(localVariables);
+					List<StandardVariableSummary> localVariables = getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
+					specialProcessing(localVariables);
 					result.addAll(localVariables);
 				}
 			}
@@ -119,87 +99,16 @@ public class StandardVariableBuilder extends Builder {
 		return result;
 	}
 	
-	/**
-	 * Standard variables in local databases can have some CV Terms local and
-	 * some referring to the CV Terms in central database. This method populates
-	 * those standard variable summary fields by loading full CVTerm's for them
-	 * from central database as the DB view 'standarad_variable_summary' view
-	 * can not do that automatically.
-	 * 
-	 */
-	private void populateCentralDatabaseReferences(List<StandardVariableSummary> summaries) throws MiddlewareQueryException {
+	private void specialProcessing(List<StandardVariableSummary> summaries) throws MiddlewareQueryException {
 		if(summaries == null || summaries.isEmpty()) {
 			return;
 		}
 		
-		// Collect IDs of all cental database references (+ve IDs) in ontology star components of the local standard variables.
-		Set<Integer> cvTermsToLoad = new HashSet<Integer>();		
 		for(StandardVariableSummary summary : summaries) {
-			if(summary.getProperty() != null && summary.getProperty().getId() > 0) {
-				cvTermsToLoad.add(summary.getProperty().getId());
-			}
-			if(summary.getMethod() != null && summary.getMethod().getId() > 0) {
-				cvTermsToLoad.add(summary.getMethod().getId());
-			}
-			if(summary.getScale() != null && summary.getScale().getId() > 0) {
-				cvTermsToLoad.add(summary.getScale().getId());
-			}
-			if(summary.getDataType() != null && summary.getDataType().getId() > 0) {
-				cvTermsToLoad.add(summary.getDataType().getId());
-			}
-			if(summary.getStoredIn() != null && summary.getStoredIn().getId() > 0) {
-				cvTermsToLoad.add(summary.getStoredIn().getId());
-			}
-			//isA (class) relationship is always going to be NULL for all standard variables in local DB 
-			//because we never save it linked to the standard variable. It is derived from the Property.
-			//See further hackery for it further below.
-		}
-		
-		setWorkingDatabase(Database.CENTRAL);
-		
-		List<CVTerm> cvTerms = getCvTermDao().getByIds(new ArrayList<Integer>(cvTermsToLoad));
-		Map<Integer, CVTerm> cvTermMap = new HashMap<Integer, CVTerm>();
-		for(CVTerm term : cvTerms) {
-			cvTermMap.put(term.getCvTermId(), term);
-		}
-		
-		for(StandardVariableSummary summary : summaries) {
-			if(summary.getProperty() != null && summary.getProperty().getId() > 0) {
-				CVTerm prop = cvTermMap.get(summary.getProperty().getId());
-				if(prop != null) {
-					summary.setProperty(new TermSummary(prop.getCvTermId(), prop.getName(), prop.getDefinition()));
-				}
-			}
-			if(summary.getMethod() != null && summary.getMethod().getId() > 0) {
-				CVTerm method = cvTermMap.get(summary.getMethod().getId());
-				if(method != null) {
-					summary.setMethod(new TermSummary(method.getCvTermId(), method.getName(), method.getDefinition()));
-				}
-			}
-			if(summary.getScale() != null && summary.getScale().getId() > 0) {
-				CVTerm scale = cvTermMap.get(summary.getScale().getId());
-				if(scale != null) {
-					summary.setScale(new TermSummary(scale.getCvTermId(), scale.getName(), scale.getDefinition()));
-				}
-			}
-			if(summary.getDataType() != null && summary.getDataType().getId() > 0) {
-				CVTerm dataType = cvTermMap.get(summary.getDataType().getId());
-				if(dataType != null) {
-					summary.setDataType(new TermSummary(dataType.getCvTermId(), dataType.getName(), dataType.getDefinition()));
-				}
-			}
-			if(summary.getStoredIn() != null && summary.getStoredIn().getId() > 0) {
-				CVTerm storedIn = cvTermMap.get(summary.getStoredIn().getId());
-				if(storedIn != null) {  
-					summary.setStoredIn(new TermSummary(storedIn.getCvTermId(), storedIn.getName(), storedIn.getDefinition()));
-				}
-			}
-			
 			//Special hackery for the isA (class) part of the relationship!
 			//Earlier isA (class) part of the standard variables ontology star used to be linked to standard variables directly.
-			//Now in local databases, this relationship is linked to the Property of the standard variable. (facepalm).
+			//Now this relationship is linked to the "Property" of the standard variable. (facepalm).
 			if (summary.getProperty() != null){
-		        setWorkingDatabase(summary.getProperty().getId());
 				List<CVTermRelationship> propertyCvTermRelationships = getCvTermRelationshipDao().getBySubject(summary.getProperty().getId());
 				Term isAOfProperty = createTerm(propertyCvTermRelationships, TermId.IS_A);
 				if(isAOfProperty != null) {
@@ -212,11 +121,8 @@ public class StandardVariableBuilder extends Builder {
 
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
 	    
-		// Why are we looking at relationships in both DBs? Can one standard variable's relationships be spread across two DBs?
         setWorkingDatabase(Database.LOCAL);
         List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
-        setWorkingDatabase(Database.CENTRAL);
-        cvTermRelationships.addAll(getCvTermRelationshipDao().getBySubject(standardVariable.getId()));
 	        
 		if (setWorkingDatabase(standardVariable.getId())) {
 			standardVariable.setProperty(createTerm(cvTermRelationships, TermId.HAS_PROPERTY));	
@@ -225,7 +131,6 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
 			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
-			//get isA of property - why is this logic needed?
 		    if (standardVariable.getProperty() != null){
 		        setWorkingDatabase(standardVariable.getProperty().getId());
 				List<CVTermRelationship> propertyCvTermRelationships = 
@@ -477,15 +382,7 @@ public class StandardVariableBuilder extends Builder {
 	public Integer getIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
 		Integer stdVariableId = null;
 	    if (setWorkingDatabase(Database.LOCAL)) {
-			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
-					propertyId, scaleId, methodId, "DESC");
-			
-			if (stdVariableId == null) {
-				if (setWorkingDatabase(Database.CENTRAL)) {
-					stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
-							propertyId, scaleId, methodId, "ASC");
-				}
-			}
+			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "DESC");
 		}
 	    return stdVariableId;
 	}
@@ -620,37 +517,22 @@ public class StandardVariableBuilder extends Builder {
 	}
 	
 	public Integer getIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
-            Integer stdVariableId = null;
-            if (setWorkingDatabase(Database.LOCAL)) {
-                stdVariableId = getCvTermDao().getStandardVariableIdByTermId(cvTermId, termId);
-            }
-            return stdVariableId;
-        }
-
-    public CVTerm getCvTerm(String name, int cvId) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        CVTerm term = getCvTermDao().getByNameAndCvId(name, cvId);
-        if (term == null) {
-            setWorkingDatabase(Database.LOCAL);
-            term = getCvTermDao().getByNameAndCvId(name, cvId);
-        }
-        return term;
-    }
-
-    public Integer getIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role) 
-    throws MiddlewareQueryException {
-    
         Integer stdVariableId = null;
         if (setWorkingDatabase(Database.LOCAL)) {
-            stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(
-                    propertyId, scaleId, methodId, role);
-            
-            if (stdVariableId == null) {
-                if (setWorkingDatabase(Database.CENTRAL)) {
-                    stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(
-                            propertyId, scaleId, methodId, role);
-                }
-            }
+            stdVariableId = getCvTermDao().getStandardVariableIdByTermId(cvTermId, termId);
+        }
+        return stdVariableId;
+    }
+
+    public CVTerm getCvTerm(String name, int cvId) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
+        return getCvTermDao().getByNameAndCvId(name, cvId);
+    }
+
+    public Integer getIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role) throws MiddlewareQueryException {
+        Integer stdVariableId = null;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
         }
         return stdVariableId;
     }
@@ -681,8 +563,6 @@ public class StandardVariableBuilder extends Builder {
     
     private boolean isExistsGeolocationByTypeAndValue(int factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> geolocationIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.CENTRAL);
-		geolocationIds.addAll(getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
 		setWorkingDatabase(Database.LOCAL);
 		geolocationIds.addAll(getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
 		return !geolocationIds.isEmpty();
@@ -690,8 +570,6 @@ public class StandardVariableBuilder extends Builder {
 
 	private boolean isExistsStocksByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> stockIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.CENTRAL);
-		stockIds.addAll(getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 		setWorkingDatabase(Database.LOCAL);
 		stockIds.addAll(getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 		return !stockIds.isEmpty();
@@ -699,8 +577,6 @@ public class StandardVariableBuilder extends Builder {
 	
 	private boolean isExistsExperimentsByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> experimentIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.CENTRAL);
-		experimentIds.addAll(getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
 		setWorkingDatabase(Database.LOCAL);
 		experimentIds.addAll(getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
 		return !experimentIds.isEmpty();
@@ -708,8 +584,6 @@ public class StandardVariableBuilder extends Builder {
 	
 	private boolean isExistsPropertyByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		setWorkingDatabase(Database.CENTRAL);
-		properties.addAll(getProjectPropertyDao().getByTypeAndValue(factorId, value));
 		setWorkingDatabase(Database.LOCAL);
 		properties.addAll(getProjectPropertyDao().getByTypeAndValue(factorId, value));
 		return !properties.isEmpty();
@@ -717,8 +591,6 @@ public class StandardVariableBuilder extends Builder {
 	
 	private boolean isExistsPhenotypeByTypeAndValue(Integer variateId, String value, boolean isEnum) throws MiddlewareQueryException {
 		List<Phenotype> phenotypes = new ArrayList<Phenotype>();
-		setWorkingDatabase(Database.CENTRAL);
-		phenotypes.addAll(getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
 		setWorkingDatabase(Database.LOCAL);
 		phenotypes.addAll(getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
 		return !phenotypes.isEmpty();
@@ -726,15 +598,8 @@ public class StandardVariableBuilder extends Builder {
 	
 	public List<StandardVariableReference> findAllByProperty(int propertyId) throws MiddlewareQueryException {
 		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
-		
 		setWorkingDatabase(Database.LOCAL);
 		list.addAll(getCvTermDao().getStandardVariablesOfProperty(propertyId));
-		
-		if (propertyId > 0) {
-			setWorkingDatabase(Database.CENTRAL);
-			list.addAll(getCvTermDao().getStandardVariablesOfProperty(propertyId));
-		}
-		
 		return list;
 	}
 }

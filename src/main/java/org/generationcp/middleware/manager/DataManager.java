@@ -751,9 +751,6 @@ public abstract class DataManager extends DatabaseBroker{
             if (setWorkingDatabase(Database.LOCAL, dao)) {
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
-            if (setWorkingDatabase(Database.CENTRAL, dao)) {
-                count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-            }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
             logAndThrowException("Error in counting: " + e.getMessage(), e);
         }
@@ -786,19 +783,13 @@ public abstract class DataManager extends DatabaseBroker{
             Class[] parameterTypes) throws MiddlewareQueryException {
 
         List<Integer> ids = (List<Integer>) parameters[0];
-        List<Integer> positiveIds = getPositiveIds(ids);
-        List<Integer> negativeIds = getNegativeIds(ids);
 
         long count = 0;
         try {
             java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
 
-            if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
-                parameters[0] = negativeIds;
-                count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-            }
-            if (setWorkingDatabase(Database.CENTRAL, dao) && (positiveIds != null) && (!positiveIds.isEmpty())) {
-                parameters[0] = positiveIds;
+            if (setWorkingDatabase(Database.LOCAL, dao) && (ids != null) && (!ids.isEmpty())) {
+                parameters[0] = ids;
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException

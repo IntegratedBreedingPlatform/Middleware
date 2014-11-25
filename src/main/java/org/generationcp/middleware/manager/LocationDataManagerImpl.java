@@ -80,9 +80,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         if (setWorkingDatabase(Database.LOCAL)) {
             locations.addAll(getLocationDao().getByName(name, op));
         }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            locations.addAll(getLocationDao().getByName(name, op));
-        }
         return locations;
     }
 
@@ -201,24 +198,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException {
         List<Location> results = new ArrayList<Location>();
 
-        List<Integer> pos = new ArrayList<Integer>();
-        List<Integer> negs = new ArrayList<Integer>();
-
-        //separate ids from local and central
-        for (Integer id : ids) {
-            if (id > 0) {
-                pos.add(id);
-            } else {
-                negs.add(id);
-            }
-        }
-
-        if (pos != null && setWorkingDatabase(Database.CENTRAL) && pos.size() > 0) {
-            results.addAll(getLocationDao().getLocationByIds(pos));
-        }
-
-        if (negs != null && setWorkingDatabase(Database.LOCAL) && negs.size() > 0) {
-            results.addAll(getLocationDao().getLocationByIds(negs));
+        if (ids != null && setWorkingDatabase(Database.LOCAL) && ids.size() > 0) {
+            results.addAll(getLocationDao().getLocationByIds(ids));
         }
 
         Collections.sort(results, new Comparator() {
@@ -237,24 +218,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException {
         List<LocationDetails> results = new ArrayList<LocationDetails>();
 
-        List<Integer> pos = new ArrayList<Integer>();
-        List<Integer> negs = new ArrayList<Integer>();
-
-        //separate ids from local and central
-        for (Integer id : ids) {
-            if (id > 0) {
-                pos.add(id);
-            } else {
-                negs.add(id);
-            }
-        }
-
-        if (pos != null && pos.size() > 0 && setWorkingDatabase(Database.CENTRAL)) {
-            results.addAll(getLocationDao().getLocationDetails(pos, 0, pos.size()));
-        }
-
-        if (negs != null && negs.size() > 0 && setWorkingDatabase(Database.LOCAL)) {
-            List<Location> locations = getLocationDao().getLocationByIds(negs);
+        if (ids != null && ids.size() > 0 && setWorkingDatabase(Database.LOCAL)) {
+            List<Location> locations = getLocationDao().getLocationByIds(ids);
 
             for (Location l : locations) {
                 Country c = this.getCountryById(l.getCntryid());
@@ -424,13 +389,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
-        Database centralInstance = Database.CENTRAL;
-        Database localInstance = Database.LOCAL;
 
         List<Location> allLocations = getFromInstanceByMethod(getLocationDAO()
-                , centralInstance, "getAllBreedingLocations", new Object[]{}, new Class[]{});
-        allLocations.addAll(getFromInstanceByMethod(getLocationDAO()
-                , localInstance, "getAllBreedingLocations", new Object[]{}, new Class[]{}));
+                , Database.LOCAL, "getAllBreedingLocations", new Object[]{}, new Class[]{});
 
         return allLocations;
     }
@@ -531,8 +492,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         Map<Integer, String> namesMap = new HashMap<Integer, String>();
         if (!parentIds.isEmpty()) {
             setWorkingDatabase(Database.LOCAL);
-            namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
-            setWorkingDatabase(Database.CENTRAL);
             namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
         }
 

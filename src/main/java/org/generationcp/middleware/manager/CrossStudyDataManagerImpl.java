@@ -132,9 +132,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds) throws MiddlewareQueryException {
     	List<GermplasmLocationInfo> result = new ArrayList<GermplasmLocationInfo>();
     	if(environmentIds != null && !environmentIds.isEmpty()) {
-	    	if(setWorkingDatabase(Database.CENTRAL)) {
-	    		result.addAll(getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
-	    	}
 	    	if(setWorkingDatabase(Database.LOCAL)) {
 	    		result.addAll(getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
 	    	}
@@ -146,9 +143,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
     	List<Integer> result = new ArrayList<Integer>();
     	if(gids != null && !gids.isEmpty()) {
-	    	if(setWorkingDatabase(Database.CENTRAL)) {
-	    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
-	    	}
 	    	if(setWorkingDatabase(Database.LOCAL)) {
 	    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
 	    	}

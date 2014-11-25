@@ -172,14 +172,6 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
     }
 
     @Test
-    public void testGetLatestInstallationRecord() throws Exception {
-        Installation result = manager.getLatestInstallationRecord(Database.CENTRAL);
-        Installation result2 = manager.getLatestInstallationRecord(Database.LOCAL);
-        Debug.println(INDENT, "Central Database: " + result);
-        Debug.println(INDENT, "Local Database: " + result2);
-    }
-
-    @Test
 	public void testGetPersonById() throws Exception {
 
     	//central database

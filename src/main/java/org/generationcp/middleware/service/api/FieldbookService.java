@@ -177,14 +177,6 @@ public interface FieldbookService {
     throws MiddlewareQueryException;
     
     /**
-     * Gets the next germplasm id.
-     *
-     * @return the next germplasm id
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    int getNextGermplasmId() throws MiddlewareQueryException;
-    
-    /**
      * Gets the germplasm id by name.
      *
      * @param name the name

@@ -36,25 +36,9 @@ public class StockModelBuilder extends Builder {
 	public Map<Integer, StockModel> get(List<Integer> stockIds) throws MiddlewareQueryException {
 		 Map<Integer, StockModel> stockModels = new HashMap<Integer, StockModel>();
 		 
-		 List<Integer> positiveIds = new ArrayList<Integer>();
-		 List<Integer> negativeIds = new ArrayList<Integer>();
-		 
-		 for (Integer stockId : stockIds){
-			 if (stockId >= 0) {
-				 positiveIds.add(stockId);
-			 } else {
-				 negativeIds.add(stockId);
-			 }
-		 }
-		 
-		 if (!positiveIds.isEmpty()){
-			 setWorkingDatabase(Database.CENTRAL);
-			 stockModels.putAll(getStockDao().getStocksByIds(positiveIds));
-		 }
-		 
-		 if (!negativeIds.isEmpty()){
-			 setWorkingDatabase(-1);
-			 stockModels.putAll(getStockDao().getStocksByIds(negativeIds));
+		 if (stockIds != null && !stockIds.isEmpty()){
+			 setWorkingDatabase(Database.LOCAL);
+			 stockModels.putAll(getStockDao().getStocksByIds(stockIds));
 		 }
 
 		return stockModels;

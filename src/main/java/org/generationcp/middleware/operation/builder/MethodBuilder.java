@@ -19,17 +19,16 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class MethodBuilder extends Builder {
 
-	private static final int METHOD_ID = 1020;
+	private static final int METHOD_CV_ID = 1020;
 
-	public MethodBuilder(HibernateSessionProvider sessionProviderForLocal,
-			             HibernateSessionProvider sessionProviderForCentral) {
+	public MethodBuilder(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
 	public Term findMethodById(int id) throws MiddlewareQueryException {
 		Term term = getTermBuilder().get(id);
 		if (term != null) {
-			if (term.getVocabularyId() != METHOD_ID) {
+			if (term.getVocabularyId() != METHOD_CV_ID) {
 				term = null;
 			}
 		}
@@ -38,19 +37,14 @@ public class MethodBuilder extends Builder {
 	
 	public Term findMethodByName(String name) throws MiddlewareQueryException {
 		Term term = null;
-		if (this.setWorkingDatabase(Database.LOCAL)) {
-			term = mapToTerm(this.getCvTermDao().getByNameAndCvId(name, METHOD_ID));
-		}
-		
-		if (term == null && this.setWorkingDatabase(Database.CENTRAL)) {
-			term = mapToTerm(this.getCvTermDao().getByNameAndCvId(name, METHOD_ID));
+		if (term == null && this.setWorkingDatabase(Database.LOCAL)) {
+			term = mapToTerm(this.getCvTermDao().getByNameAndCvId(name, METHOD_CV_ID));
 		}
 		return term;
 	}
 	
 	private Term mapToTerm(CVTerm cvTerm) {
 		Term term = null;
-		
 		if (cvTerm != null){
 			term = new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
 			term.setObsolete(cvTerm.isObsolete());
@@ -58,5 +52,4 @@ public class MethodBuilder extends Builder {
 		}
 		return term;
 	}
-
 }

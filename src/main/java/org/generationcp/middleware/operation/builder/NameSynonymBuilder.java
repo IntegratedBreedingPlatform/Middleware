@@ -32,16 +32,8 @@ public class NameSynonymBuilder extends Builder {
     
     public List<CVTermSynonym> findSynonyms(int cvTermId) throws MiddlewareQueryException {
         List<CVTermSynonym> synonyms = new ArrayList<CVTermSynonym>();
-        
-        Database database = getActiveDatabase();
         setWorkingDatabase(Database.LOCAL);
         synonyms.addAll(getCvTermSynonymDao().getByCvTermId(cvTermId));
-        if (cvTermId > 0) {
-            setWorkingDatabase(Database.CENTRAL);
-            synonyms.addAll(getCvTermSynonymDao().getByCvTermId(cvTermId));
-        }
-        setWorkingDatabase(database);
-        
         return synonyms;
     }
 

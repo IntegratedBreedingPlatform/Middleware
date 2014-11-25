@@ -519,13 +519,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     private Integer getProjectId(String name, TermId relationship) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        Integer id = getDmsProjectDao().getProjectIdByName(name, relationship);
-        if (id == null) {
-            setWorkingDatabase(Database.LOCAL);
-            id = getDmsProjectDao().getProjectIdByName(name, relationship);
-        }
-        return id;
+    	setWorkingDatabase(Database.LOCAL);
+    	return getDmsProjectDao().getProjectIdByName(name, relationship);
     }
 
     protected Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
@@ -580,25 +575,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     @Override
     public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
-        if (!isExisting) {
-            setWorkingDatabase(Database.LOCAL);
-            isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
-        }
-        return isExisting;
+        setWorkingDatabase(Database.LOCAL);
+        return getDmsProjectDao().checkIfProjectNameIsExisting(name);
     }
 
     @Override
     public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-
-        Integer locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
-        if (locationId == null) {
-            setWorkingDatabase(Database.LOCAL);
-            locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
-        }
-        return locationId;
+        setWorkingDatabase(Database.LOCAL);
+        return getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
     }
 
     @Override

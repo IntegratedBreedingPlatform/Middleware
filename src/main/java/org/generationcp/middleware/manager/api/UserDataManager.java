@@ -193,15 +193,6 @@ public interface UserDataManager {
     List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException;
     
     /**
-     * Returns the installation record which have been added last to the database.
-     * 
-     * @param instance
-     * @return The latest Installation record from the given database instance.
-     * @throws MiddlewareQueryException
-     */
-    Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException;
-
-    /**
      * Adds the user to Central database.
      *
      * @param user the user

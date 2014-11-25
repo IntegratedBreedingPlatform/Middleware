@@ -21,18 +21,12 @@ import java.util.List;
 
 public class PropertyBuilder extends Builder{
 
-    public PropertyBuilder(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
+    public PropertyBuilder(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        List<Property> properties = getCvTermDao().getAllPropertiesWithTraitClass();
-        
         setWorkingDatabase(Database.LOCAL);
-        properties.addAll(getCvTermDao().getAllPropertiesWithTraitClass());
-        
-        return properties;
+        return getCvTermDao().getAllPropertiesWithTraitClass();
     }
 }

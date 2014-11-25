@@ -359,12 +359,4 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         }
         return null;
     }
-
-    @Override
-    public Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getInstallationDao().getLatest(instance);
-        }
-        return null;
-    }
 }

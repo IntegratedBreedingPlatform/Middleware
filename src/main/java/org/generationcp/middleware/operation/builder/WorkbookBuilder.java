@@ -64,12 +64,7 @@ public class WorkbookBuilder extends Builder {
          *  iseditable (true for variates, else, false)
          */
 		
-		StudyDetails studyDetails = null;
-		if (id < 0) {
-		    studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
-		} else {
-		    studyDetails = getStudyDataManager().getStudyDetails(Database.CENTRAL, studyType, id);
-		}
+		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
 		
 		Study study = getStudyBuilder().createStudy(id);
 		
@@ -260,8 +255,7 @@ public class WorkbookBuilder extends Builder {
                 	if(!isNursery) {
                 		studyType = StudyType.T;
                 	}
-                	Database database = id > 0 ? Database.CENTRAL : Database.LOCAL;
-                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(database, studyType, id);
+                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
                     workbook.setStudyDetails(studyDetails);
                     for (DatasetReference datasetRef : datasetRefList) {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 

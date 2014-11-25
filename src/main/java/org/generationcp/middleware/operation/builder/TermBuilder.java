@@ -52,13 +52,7 @@ public class TermBuilder extends Builder {
 	}
 
 	public List<Term> getTermsByCvId(CvId cvId) throws MiddlewareQueryException {
-		List<Term> terms = new ArrayList<Term>();		
-		if (setWorkingDatabase(Database.CENTRAL)) {
-			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId,0,0);
-			for (CVTerm cvTerm : cvTerms){
-				terms.add(mapCVTermToTerm(cvTerm));
-			}
-		}
+		List<Term> terms = new ArrayList<Term>();
 		if (setWorkingDatabase(Database.LOCAL)) {
 			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId,0,0);
 			for (CVTerm cvTerm : cvTerms){
@@ -83,22 +77,14 @@ public class TermBuilder extends Builder {
 	
 	public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
 		Term term = null;
-		
-		if (setWorkingDatabase(Database.CENTRAL)) {
+		if (setWorkingDatabase(Database.LOCAL)) {
 			term = mapToTerm(getCvTermDao().getByNameAndCvId(name, cvId.getId()));
-			if (term == null) {
-				if (setWorkingDatabase(Database.LOCAL)) {
-					term =  mapToTerm(getCvTermDao().getByNameAndCvId(name, cvId.getId()));
-				}
-			}
 		}
-		
 		return term;
 	}
 	
 	private Term mapToTerm(CVTerm cvTerm) {
 		Term term = null;
-		
 		if (cvTerm != null){
 			term = new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
 			term.setObsolete(cvTerm.isObsolete());
@@ -109,7 +95,7 @@ public class TermBuilder extends Builder {
 	
 	public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException {
 		List<Term> terms = null;
-		if (setWorkingDatabase(Database.CENTRAL)) {
+		if (setWorkingDatabase(Database.LOCAL)) {
 			List<CVTerm> cvTerms = getCvTermDao().getByIds(ids);
 			if(cvTerms!=null) {
 				terms = new ArrayList<Term>();
@@ -127,7 +113,7 @@ public class TermBuilder extends Builder {
         if (term == null) {
         	term = getTermSaver().save(name, name, cv);
         	//assign unclassified trait class
-        	setWorkingDatabase(Database.CENTRAL);
+        	setWorkingDatabase(Database.LOCAL);
         	CVTerm cvTerm = getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
         	Integer typeClass = null;
         	if(cvTerm != null) {
@@ -166,8 +152,6 @@ public class TermBuilder extends Builder {
 	
 	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
 		List<Scale> list = new ArrayList<Scale>();
-		setWorkingDatabase(Database.CENTRAL);
-		list.addAll(getCvTermDao().getAllInventoryScales());
 		setWorkingDatabase(Database.LOCAL);
 		list.addAll(getCvTermDao().getAllInventoryScales());
 		return list;

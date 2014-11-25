@@ -98,26 +98,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
     public int getStudyIdByName(String studyName) throws MiddlewareQueryException {
-        Integer id = null;
-        setWorkingDatabase(Database.CENTRAL);
-        id = getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
-        if (id == null) {
-            setWorkingDatabase(Database.LOCAL);
-            id = getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
-        }
-        return id;
+        setWorkingDatabase(Database.LOCAL);
+        return getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
     }
 
     @Override
     public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
-        boolean isExisting = false;
-        setWorkingDatabase(Database.CENTRAL);
-        isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
-        if (!isExisting) {
-            setWorkingDatabase(Database.LOCAL);
-            isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
-        }
-        return isExisting;
+        setWorkingDatabase(Database.LOCAL);
+        return getDmsProjectDao().checkIfProjectNameIsExisting(name);
     }
 
     @Override
@@ -527,7 +515,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException {
         List<StudyNode> studyNodes = new ArrayList<StudyNode>();
         studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.LOCAL));
-        studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.CENTRAL));
         return studyNodes;
     }
 
@@ -540,23 +527,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
-        long count = getDmsProjectDao().countByVariable(variableId);
-        if (variableId > 0) {
-            setWorkingDatabase(Database.CENTRAL);
-            count += getDmsProjectDao().countByVariable(variableId);
-        }
-        return count;
+        return getDmsProjectDao().countByVariable(variableId);
     }
 
     @Override
     public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
-        long count = getExperimentDao().countByObservedVariable(variableId, storedInId);
-        if (variableId > 0) {
-            setWorkingDatabase(Database.CENTRAL);
-            count += getExperimentDao().countByObservedVariable(variableId, storedInId);
-        }
-        return count;
+        return getExperimentDao().countByObservedVariable(variableId, storedInId);
     }
 
     @Override
@@ -954,26 +931,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 list.addAll(localList);
             }
         }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            List centralList = getDmsProjectDao().getAllStudyDetails(studyType);
-            if (centralList != null) {
-                list.addAll(centralList);
-            }
-        }
-        
         populateSiteAndPersonIfNecessary(list);
-        
         return list;
     }
 
     @Override
-    public long countAllStudyDetails(StudyType studyType)
-            throws MiddlewareQueryException {
+    public long countAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
         long count = 0;
         if (setWorkingDatabase(Database.LOCAL)) {
-            count += getDmsProjectDao().countAllStudyDetails(studyType);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
             count += getDmsProjectDao().countAllStudyDetails(studyType);
         }
         return count;
@@ -1000,26 +965,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 list.addAll(localList);
             }
         }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            List centralList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
-            if (centralList != null) {
-                list.addAll(centralList);
-            }
-        }
-        
         populateSiteAndPersonIfNecessary(list);
-        
         return list;
     }
 
     @Override
-    public long countAllNurseryAndTrialStudyDetails()
-            throws MiddlewareQueryException {
+    public long countAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
         long count = 0;
         if (setWorkingDatabase(Database.LOCAL)) {
-            count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
             count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
         }
         return count;
@@ -1107,48 +1060,28 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
     private void populateSiteAndPersonIfNecessary(List<StudyDetails> studyDetails) throws MiddlewareQueryException {
     	if (studyDetails != null && !studyDetails.isEmpty()) {
-	    	List<Integer> centralSite = new ArrayList<Integer>();
-	    	List<Integer> localSite = new ArrayList<Integer>();
-	    	List<Integer> centralPerson = new ArrayList<Integer>();
-	    	List<Integer> localPerson = new ArrayList<Integer>();
+	    	List<Integer> siteIds = new ArrayList<Integer>();
+	    	List<Integer> personIds = new ArrayList<Integer>();
 	    	
 	    	for (StudyDetails detail : studyDetails) {
 	    		if (detail.getSiteId() != null) {
-	    			if (detail.getSiteId() > 0) {
-	    				centralSite.add(detail.getSiteId());
-	    			}
-	    			else {
-	    				localSite.add(detail.getSiteId());
-	    			}
+	    			siteIds.add(detail.getSiteId());
 	    		}
 	    		if (detail.getPiId() != null) {
-	    			if (detail.getPiId() > 0) {
-	    				centralPerson.add(detail.getPiId());
-	    			}
-	    			else {
-	    				localPerson.add(detail.getPiId());
-	    			}
+	    			personIds.add(detail.getPiId());
 	    		}
 	    	}
 	    	
 	    	Map<Integer, String> siteMap = new HashMap<Integer, String>();
 	    	Map<Integer, String> personMap = new HashMap<Integer, String>();
 	    	
-	    	if (!centralSite.isEmpty()) {
-	    		setWorkingDatabase(Database.CENTRAL);
-	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(centralSite));
-	    	}
-	    	if (!localSite.isEmpty()) {
+	    	if (!siteIds.isEmpty()) {
 	    		setWorkingDatabase(Database.LOCAL);
-	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(localSite));
+	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(siteIds));
 	    	}
-	    	if (!centralPerson.isEmpty()) {
-	    		setWorkingDatabase(Database.CENTRAL);
-	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(centralPerson));
-	    	}
-	    	if (!localPerson.isEmpty()) {
+	    	if (!personIds.isEmpty()) {
 	    		setWorkingDatabase(Database.LOCAL);
-	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(localPerson));
+	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(personIds));
 	    	}
 	    	
 	    	for (StudyDetails detail : studyDetails) {

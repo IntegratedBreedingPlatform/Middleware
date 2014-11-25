@@ -889,48 +889,6 @@ public interface GermplasmDataManager {
     Location getLocationByID(Integer id) throws MiddlewareQueryException;
 
     /**
-     * Please use LocationDataManager.addLocation().
-     * 
-     * Inserts a single {@code Location} object into the database.
-     *
-     * @param location - The {@code Location} object to be persisted to the database.
-     * Must be a valid {@code Location} object.
-     * @return Returns the id of the {@code Location} record inserted in the
-     * database.
-     * Returns the id of the newly-added Germplasm {@code Name}s.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    Integer addLocation(Location location) throws MiddlewareQueryException;
-    
-    /**
-     * Please use LocationDataManager.addLocation().
-     * 
-     * Inserts a single {@code Location} object into the database.
-     *
-     * @param locations - The {@code Location} object to be persisted to the database.
-     * Must be a valid {@code Location} object.
-     * @return Returns the ids of the {@code Location} records inserted in the
-     * database.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
-    
-    /**
-     * Please use LocationDataManager.deleteLocation().
-     * 
-     * Deletes a single {@code Location} object into the database.
-     *
-     * @param location - The {@code Location} object to be deleted from the database.
-     * Must be a valid {@code Location} object.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    void deleteLocation(Location location) throws MiddlewareQueryException;
-
-
-    /**
      * Updates the {@code Method} object into the database.
      *
      * @param method - The {@code Method} object to be persisted to the database.
@@ -1184,19 +1142,6 @@ public interface GermplasmDataManager {
     List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
     
     /**
-     * Please use LocationDataManager.countAllBreedingLocations().
-     * 
-     * Count all breeding locations
-     * 
-     * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB.
-     *
-     * @return the long
-     * @throws MiddlewareQueryException the middleware query exception
-     */    
-    @Deprecated
-    Long countAllBreedingLocations() throws MiddlewareQueryException;
-    
-    /**
      * Returns the String representation of next available sequence number for
      * Germplasm Names with given prefix on specified database instance.
      *
@@ -1313,18 +1258,6 @@ public interface GermplasmDataManager {
     List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
     /**
-     * Please use LocationDataManager.getLocationDetailsByLocationIDs().
-     * 
-     * Gets the location details by location IDs.
-     *
-     * @param ids the Location IDs
-     * @return the location details corresponding to the given IDs
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
-
-    /**
      * Gets the methods by IDs.
      *
      * @param ids the Method Ids
@@ -1350,14 +1283,6 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException;
-
-    /**
-     * Gets the next negative id.
-     *
-     * @return the next negative id
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Integer getNextNegativeId() throws MiddlewareQueryException;
     
     /**
      * Gets the method by code.

@@ -23,9 +23,7 @@ import java.util.List;
 
 public class StudyReferenceBuilder extends Builder {
 
-	public StudyReferenceBuilder(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
+	public StudyReferenceBuilder(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
@@ -40,11 +38,7 @@ public class StudyReferenceBuilder extends Builder {
 	}
 
 	public List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
-		List<StudyReference> studies = new ArrayList<StudyReference>();
-		setWorkingDatabase(Database.CENTRAL);
-		studies.addAll(getDmsProjectDao().getStudiesByTrialEnvironments(environmentIds));
 		setWorkingDatabase(Database.LOCAL);
-		studies.addAll(getDmsProjectDao().getStudiesByTrialEnvironments(environmentIds));
-		return studies;
+		return getDmsProjectDao().getStudiesByTrialEnvironments(environmentIds);
 	}
 }
