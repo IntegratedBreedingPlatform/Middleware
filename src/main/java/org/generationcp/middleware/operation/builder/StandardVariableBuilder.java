@@ -387,6 +387,7 @@ public class StandardVariableBuilder extends Builder {
 	    return stdVariableId;
 	}
 
+	//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) 
 			throws MiddlewareQueryException {
 		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();

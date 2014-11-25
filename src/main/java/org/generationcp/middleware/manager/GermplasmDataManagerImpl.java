@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -165,11 +164,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         return (List<Germplasm>) super.getFromInstanceByMethod(getGermplasmDao(), instance, "getAll", 
                 new Object[]{start, numOfRows}, new Class[]{Integer.TYPE, Integer.TYPE});
-    }
-
-    @Override
-    public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
-        return super.countFromInstance(getGermplasmDao(), instance);
     }
 
     @Override
@@ -1295,7 +1289,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             // Auto-assign negative IDs for new local DB records
             Integer negativeId = dao.getNegativeId("fldno");
             field.setFldno(negativeId);
-            UserDefinedField udflds = dao.save(field);
+            dao.save(field);
             isUdfldSaved++;
 
             // end transaction, commit to database
@@ -1364,7 +1358,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             // Auto-assign negative IDs for new local DB records
             Integer negativeId = dao.getNegativeId("aid");
             attr.setAid(negativeId);
-            Attribute newAttr = dao.save(attr);
+            dao.save(attr);
             isAttrSaved++;
 
             // end transaction, commit to database
@@ -1903,35 +1897,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Deprecated
     public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
         return getFromInstanceByMethod(getLocationDAO(), Database.LOCAL, "getAllBreedingLocations", new Object[] {}, new Class[] {});
-    }
+    } 
     
     @Override
-    public String getNextSequenceNumberForCrossName(String prefix, Database instance)
-            throws MiddlewareQueryException {
+    public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException {
         String nextSequenceStr = "1";
         
-        if (setWorkingDatabase(instance, getGermplasmDao())){
+        if (setWorkingDatabase(Database.LOCAL, getGermplasmDao())){
             nextSequenceStr =  getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
-            
         }
         
         return nextSequenceStr;
-    }    
-    
-    @Override
-    public String getNextSequenceNumberForCrossName(String prefix)
-            throws MiddlewareQueryException {
-        String localNextSequenceStr = "1";
-        String centralNextSequenceStr = "1";
-        
-        centralNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.CENTRAL);
-        localNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.LOCAL);
-        
-        Integer centralNextSequenceInt = Integer.parseInt(centralNextSequenceStr);
-        Integer localNextSequenceInt = Integer.parseInt(localNextSequenceStr);
-        
-        return (centralNextSequenceInt > localNextSequenceInt) ? 
-                centralNextSequenceStr : localNextSequenceStr;
     }
 
     @Override

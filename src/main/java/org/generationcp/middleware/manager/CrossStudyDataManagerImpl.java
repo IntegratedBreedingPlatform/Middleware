@@ -13,7 +13,6 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.*;
@@ -50,16 +49,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     @Override
     public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
         return getTrialEnvironmentBuilder().getAllTrialEnvironments(includePublicData);
-    }
-    
-    @SuppressWarnings("unchecked")
-	@Override
-    public TrialEnvironments getTrialEnvironments(int start, int numOfRows) throws MiddlewareQueryException {
-    	List<String> methodNames = Arrays.asList("countAllTrialEnvironments", "getTrialEnvironments");
-    	List<TrialEnvironment> environmentList =  getFromCentralAndLocalByMethod(getGeolocationDao(), methodNames, 
-    			start, numOfRows, new Object[]{}, new Class[]{});
-    	
-    	return getTrialEnvironmentBuilder().buildTrialEnvironments(environmentList);
     }
     
     @Override

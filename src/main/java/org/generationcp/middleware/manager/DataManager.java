@@ -151,6 +151,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return List of all records
      * @throws MiddlewareQueryException
      */
+    //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List getFromCentralAndLocal(GenericDAO dao, int start, int numOfRows) throws MiddlewareQueryException {
         
@@ -212,6 +213,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return List of all records satisfying the given parameters
      * @throws MiddlewareQueryException
      */
+    //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters,
             Class[] parameterTypes) throws MiddlewareQueryException {
@@ -284,91 +286,6 @@ public abstract class DataManager extends DatabaseBroker{
         return toReturn;
 
     }
-
-    /**
-     * Same behavior as getFromCentralAndLocalByMethod but retrieves first in local database then in central database     <br/>
-     * 
-     * @param dao   The DAO to call the methods from
-     * @param methods   The methods to call (countXXX and its corresponding getXXX)
-     * @param start     The start row
-     * @param numOfRows     The number of rows to retrieve
-     * @param parameters    The parameters to be passed to the methods
-     * @param parameterTypes    The types of the parameters to be passed to the method
-     * @return List of all records satisfying the given parameters
-     * @throws MiddlewareQueryException
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getFromLocalAndCentralByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters,
-            Class[] parameterTypes) throws MiddlewareQueryException {
-        
-        List toReturn = new ArrayList();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        // Get count method parameter types and parameters
-        Class[] countMethodParameterTypes = parameterTypes;
-        Object[] countMethodParameters = parameters;
-
-        // Get get method parameter types and parameters
-        Class[] getMethodParameterTypes = new Class[parameters.length + 2];
-        Object[] getMethodParameters = new Object[parameters.length + 2];
-
-        int i = 0;
-        for (i = 0; i < parameters.length; i++) {
-            getMethodParameterTypes[i] = parameterTypes[i];
-            getMethodParameters[i] = parameters[i];
-        }
-        getMethodParameterTypes[i] = Integer.TYPE;
-        getMethodParameterTypes[i + 1] = Integer.TYPE;
-        getMethodParameters[i] = start;
-        getMethodParameters[i + 1] = numOfRows;
-
-        String countMethodName = methods.get(0);
-        String getMethodName = methods.get(1);
-        try {
-            // Get the methods from the dao
-            java.lang.reflect.Method countMethod = dao.getClass().getMethod(countMethodName, countMethodParameterTypes);
-            java.lang.reflect.Method getMethod = dao.getClass().getMethod(getMethodName, getMethodParameterTypes);
-
-            if (setWorkingDatabase(Database.LOCAL, dao)) {
-                localCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                if (localCount > start) {
-                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // start, numRows
-                    relativeLimit = numOfRows - (localCount - start);
-                    if (relativeLimit > 0) {
-                        if (setWorkingDatabase(Database.CENTRAL, dao)) {
-                            centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                            if (centralCount > 0) {
-                                getMethodParameters[getMethodParameters.length - 2] = 0;
-                                getMethodParameters[getMethodParameters.length - 1] = (int) relativeLimit;
-                                toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //0, (int) relativeLimit
-                            }
-                        }
-                    }
-                } else {
-                    relativeLimit = start - localCount;
-                    if (setWorkingDatabase(Database.CENTRAL, dao)) {
-                        centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                        if (centralCount > relativeLimit) {
-                            getMethodParameters[getMethodParameters.length - 2] = (int) relativeLimit;
-                            getMethodParameters[getMethodParameters.length - 1] = numOfRows;
-                            toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // (int) relativeLimit, numOfRows
-                        }
-                    }
-                }
-            } else if (setWorkingDatabase(Database.CENTRAL, dao)) {
-                centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                if (centralCount > start) {
-                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //start, numOfRows
-                }
-            }
-        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            logAndThrowException("Error in gettting all from local and central using " + getMethodName + ": " + e.getMessage(), e);
-        }
-        return toReturn;
-
-    }
     
     /**
      * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).      <br/>
@@ -399,6 +316,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return List of all records satisfying the given parameters
      * @throws MiddlewareQueryException
      */
+    //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, 
     		Object[] centralParameters, Object[] localParameters, Class[] parameterTypes) throws MiddlewareQueryException {
@@ -479,115 +397,6 @@ public abstract class DataManager extends DatabaseBroker{
     }
 
     /**
-     * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).      <br/>
-     * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.      <br/>
-     * Separates the positive from negative ids and retrieves from central and local databases respectively.       <br/>
-     * The ids are stored in the first index of the "parameters" parameter.       <br/>
-     *      <br/>
-     * Sample usage:     <br/>    
-     * <pre><code>
-     *      public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
-     *          List<String> methods = Arrays.asList("countAccMetadataSetByGids", "getAccMetadasetByGids");
-     *          return (List<AccMetadataSetPK>) super.getFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), methods, start, numOfRows,
-     *                    new Object[] { gids }, new Class[] { List.class });
-     *      }
-     * </code></pre>
-     * @param dao   The DAO to call the methods from
-     * @param methods   The methods to call (countXXX and its corresponding getXXX)
-     * @param start     The start row
-     * @param numOfRows The number of rows to retrieve
-     * @param parameters    The parameters to be passed to the methods
-     * @param parameterTypes    The types of the parameters to be passed to the method
-     * @return List of all records satisfying the given parameters
-     * @throws MiddlewareQueryException
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getFromCentralAndLocalBySignedIdAndMethod(GenericDAO dao, List<String> methods, int start, int numOfRows,
-            Object[] parameters, Class[] parameterTypes) throws MiddlewareQueryException {
-        List toReturn = new ArrayList();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        //Separate the positive ids from the negative ids
-
-        List<Integer> ids = (List<Integer>) parameters[0];
-        List<Integer> positiveIds = getPositiveIds(ids);
-        List<Integer> negativeIds = getNegativeIds(ids);
-
-        // Get count method parameter types and parameters
-        Class[] countMethodParameterTypes = parameterTypes;
-        Object[] countMethodParameters = parameters;
-
-        // Get get method parameter types and parameters
-        Class[] getMethodParameterTypes = new Class[parameters.length + 2];
-        Object[] getMethodParameters = new Object[parameters.length + 2];
-
-        int i = 0;
-        for (i = 0; i < parameters.length; i++) {
-            getMethodParameterTypes[i] = parameterTypes[i];
-            getMethodParameters[i] = parameters[i];
-        }
-        getMethodParameterTypes[i] = Integer.TYPE;
-        getMethodParameterTypes[i + 1] = Integer.TYPE;
-        getMethodParameters[i] = start;
-        getMethodParameters[i + 1] = numOfRows;
-
-        String countMethodName = methods.get(0);
-        String getMethodName = methods.get(1);
-        try {
-            // Get the methods from the dao
-            java.lang.reflect.Method countMethod = dao.getClass().getMethod(countMethodName, countMethodParameterTypes);
-            java.lang.reflect.Method getMethod = dao.getClass().getMethod(getMethodName, getMethodParameterTypes);
-
-            if (setWorkingDatabase(Database.CENTRAL, dao) && (positiveIds != null) && (!positiveIds.isEmpty())) {
-                countMethodParameters[0] = positiveIds;
-                getMethodParameters[0] = positiveIds;
-                centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                if (centralCount > start) {
-                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // start, numRows
-                    relativeLimit = numOfRows - (centralCount - start);
-                    if (relativeLimit > 0) {
-                        if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
-                            countMethodParameters[0] = negativeIds;
-                            getMethodParameters[0] = negativeIds;
-                            localCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                            if (localCount > 0) {
-                                getMethodParameters[getMethodParameters.length - 2] = 0;
-                                getMethodParameters[getMethodParameters.length - 1] = (int) relativeLimit;
-                                toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //0, (int) relativeLimit
-                            }
-                        }
-                    }
-                } else {
-                    relativeLimit = start - centralCount;
-                    if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
-                        countMethodParameters[0] = negativeIds;
-                        getMethodParameters[0] = negativeIds;
-                        localCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                        if (localCount > relativeLimit) {
-                            getMethodParameters[getMethodParameters.length - 2] = (int) relativeLimit;
-                            getMethodParameters[getMethodParameters.length - 1] = numOfRows;
-                            toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // (int) relativeLimit, numOfRows
-                        }
-                    }
-                }
-            } else if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
-                countMethodParameters[0] = negativeIds;
-                getMethodParameters[0] = negativeIds;
-                localCount = (Long) countMethod.invoke(dao, countMethodParameters);
-                if (localCount > start) {
-                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //start, numOfRows
-                }
-            }
-        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            logAndThrowException("Error in gettting all from central and local using " + getMethodName + ": " + e.getMessage(), e);
-        }
-        return toReturn;
-
-    }
-
-    /**
      * A generic implementation of the getXXXByXXXX() method that calls a specific get method from a DAO.     <br/> 
      * Calls the corresponding method that returns list type as specified in the parameter methodName.         <br/>
      *      <br/>
@@ -606,6 +415,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return the List result
      * @throws MiddlewareQueryException
      */
+    //TODO BMS-148 : No longer reads from two DBs, rename.
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List getAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
@@ -615,9 +425,6 @@ public abstract class DataManager extends DatabaseBroker{
             java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
 
             if (setWorkingDatabase(Database.LOCAL, dao)) {
-                toReturn.addAll((List) method.invoke(dao, parameters));
-            }
-            if (setWorkingDatabase(Database.CENTRAL, dao)) {
                 toReturn.addAll((List) method.invoke(dao, parameters));
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
@@ -711,13 +518,11 @@ public abstract class DataManager extends DatabaseBroker{
      * @return The number of entities from both central and local instances
      * @throws MiddlewareQueryException
      */
+    //TODO BMS-148 : No longer reads from two DBs, rename.
     @SuppressWarnings("rawtypes")
     public long countAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
         long count = 0;
         if (setDaoSession(dao, getCurrentSessionForLocal())) {
-            count = count + dao.countAll();
-        }
-        if (setDaoSession(dao, getCurrentSessionForCentral())) {
             count = count + dao.countAll();
         }
         return count;
@@ -741,6 +546,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return the count
      * @throws MiddlewareQueryException
      */
+    //TODO BMS-148 : No longer reads from two DBs, rename.
     @SuppressWarnings("rawtypes")
     public long countAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {

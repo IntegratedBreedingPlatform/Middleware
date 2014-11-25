@@ -284,6 +284,7 @@ public class ListInventoryBuilder extends Builder {
 		
 	}
 
+	//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 	private void queryLocationsAndScalesFromDatabase(
 			List<Integer> negativeLocationIds,
 			List<Integer> positiveLocationIds, List<Integer> negativeScaleIds,

@@ -665,6 +665,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 						params,GermplasmListData.class);
     }
     
+    //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
 			Integer listId) throws MiddlewareQueryException {
@@ -823,6 +824,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		return inventoryDetails;
     }
     
+	//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     @SuppressWarnings("unchecked")
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)

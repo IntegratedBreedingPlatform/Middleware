@@ -874,18 +874,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getDmsProjectDao().getById(id);
     }
 
-    @SuppressWarnings({"unchecked"})
-    @Override
-    public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) 
-            throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAllStudyDetails", "getAllStudyDetails");
-        Object[] parameters = new Object[]{studyType};
-        List<StudyDetails> details = getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
-                parameters, new Class[]{StudyType.class});
-        populateSiteAndPersonIfNecessary(details);
-        return details;
-    }
-
     @Override
     public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
@@ -900,17 +888,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         StudyDetails studyDetails = getDmsProjectDao().getStudyDetails(studyType, studyId);
         populateSiteAnPersonIfNecessary(studyDetails);
         return studyDetails;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAllNurseryAndTrialStudyDetails", "getAllNurseryAndTrialStudyDetails");
-        Object[] parameters = new Object[]{};
-        List<StudyDetails> list = getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
-                parameters, new Class[]{});
-        populateSiteAndPersonIfNecessary(list);
-        return list;
     }
 
     @Override

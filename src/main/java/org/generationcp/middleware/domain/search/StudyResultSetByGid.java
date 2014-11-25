@@ -20,6 +20,7 @@ import org.generationcp.middleware.operation.searcher.Searcher;
 
 import java.util.List;
 
+//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 
 	private int gid;

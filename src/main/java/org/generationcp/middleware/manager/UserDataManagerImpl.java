@@ -89,6 +89,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         return idUserSaved;
     }
     
+    //TODO BMS-148 : Review usage in org.generationcp.ibpworkbench.ui.project.create.AddProgramPresenter.doAddNewProgram() and cleanup.
     @Override
     public Integer addUserToCentral(User user) throws MiddlewareQueryException {
         requireCentralDatabaseInstance();
@@ -229,6 +230,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         return idPersonSaved;
     }
     
+    //TODO BMS-148 : Review usage in org.generationcp.ibpworkbench.ui.project.create.AddProgramPresenter.doAddNewProgram() and cleanup.
     @Override
     public Integer addPersonToCentral(Person person) throws MiddlewareQueryException {
         requireCentralDatabaseInstance();
@@ -289,12 +291,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     @Override
     public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-        if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
-            return true;
-        }
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
+        if (setWorkingDatabase(Database.LOCAL)) {
             if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
                 return true;
             }
@@ -304,11 +301,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     @Override
     public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-        if (getPersonDao().isPersonExists(firstName, lastName)) {
-            return true;
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
+        if (setWorkingDatabase(Database.LOCAL)) {
             if (getPersonDao().isPersonExists(firstName, lastName)) {
                 return true;
             }
@@ -318,11 +311,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     @Override
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-        if (getUserDao().isUsernameExists(userName)) {
-            return true;
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
+        if (setWorkingDatabase(Database.LOCAL)) {
             if (getUserDao().isUsernameExists(userName)) {
                 return true;
             }

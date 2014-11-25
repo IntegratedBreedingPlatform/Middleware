@@ -816,6 +816,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlIdByName", new Object[]{name}, new Class[]{String.class});
     }
 
+    //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     @Override
     public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
         List<QtlDetailElement> qtlDetailElements = new ArrayList<QtlDetailElement>();
@@ -867,6 +868,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return qtlNames;
     }
 
+    //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     @Override
     public List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtlIds, int start, int numOfRows) throws MiddlewareQueryException {
         List<QtlDetailElement> qtlDetailElements = new ArrayList<QtlDetailElement>();

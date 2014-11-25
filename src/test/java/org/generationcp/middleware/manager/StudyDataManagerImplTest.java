@@ -1101,21 +1101,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetStudyDetailsWithPaging() throws MiddlewareQueryException {
     	Debug.println(INDENT, "testGetStudyDetailsWithPaging");
-    	Debug.println(INDENT, "List of Nurseries");
-    	List<StudyDetails> nlist = manager.getStudyDetails(StudyType.N, 0,Integer.MAX_VALUE);
-        for (StudyDetails s : nlist) {
-            Debug.println(INDENT, s.toString());
-        }
-        Debug.println(INDENT, "List of Trials");
-        List<StudyDetails> tlist = manager.getStudyDetails(StudyType.T, 0,Integer.MAX_VALUE);
-        for (StudyDetails s : tlist) {
-            Debug.println(INDENT, s.toString());
-        }
-        Debug.println(INDENT, "List of Trials and Nurseries");
-        List<StudyDetails> slist = manager.getNurseryAndTrialStudyDetails(0,Integer.MAX_VALUE);
-        for (StudyDetails s : slist) {
-            Debug.println(INDENT, s.toString());
-        }
         Debug.println(INDENT, "List ALL Trials and Nurseries");
         List<StudyDetails> list = manager.getAllNurseryAndTrialStudyDetails();
         for (StudyDetails s : list) {

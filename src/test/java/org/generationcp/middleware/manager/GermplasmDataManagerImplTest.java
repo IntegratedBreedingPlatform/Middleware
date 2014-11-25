@@ -635,21 +635,10 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     }
     
     @Test
-    public void testGetNextSequenceNumberForCrossNameInDatabase() throws MiddlewareQueryException{
-        String prefix = "IR";
-        Database db = Database.CENTRAL;
-        Debug.println("Next number in sequence for prefix (" + prefix + ") in " + db + " database: " + 
-                manager.getNextSequenceNumberForCrossName(prefix, db));
-    }
-    
-    @Test
     public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException{
-        String prefix = "PARA7A2";
-//      Debug.println("Next number in sequence for prefix (" + prefix + "): " + 
-//              manager.getNextSequenceNumberForCrossName(prefix));
-        Debug.println(prefix.substring(prefix.length()-1) + " " 
-                    + prefix.substring(prefix.length()-1).matches("\\d"));
-            
+        String prefix = "IR";
+        Debug.println("Next number in sequence for prefix (" + prefix + ") is : " + 
+                manager.getNextSequenceNumberForCrossName(prefix));
     }
    
     @Test
@@ -660,13 +649,6 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
             Debug.println(INDENT, gid + " : " + results.get(gid));
         }
     }
-    
-    @Test
-    public void testCountAllGermplasm() throws MiddlewareQueryException {
-        long count = manager.countAllGermplasm((Database.CENTRAL));
-        assertNotNull(count);
-        Debug.println(INDENT, "testCountAllGermplasm() : " + count);
-    } 
     
     @Test
     public void testGetAllMethods() throws Exception {

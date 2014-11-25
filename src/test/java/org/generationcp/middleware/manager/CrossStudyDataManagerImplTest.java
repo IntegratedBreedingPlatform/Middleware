@@ -49,20 +49,6 @@ public class CrossStudyDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 	
 	@Test
-	public void testGetTrialEnvironments() throws Exception {
-		long count = manager.countAllTrialEnvironments();
-		Integer batchSizeInt = 1000;
-		int iterations = ((Double) Math.ceil(count / batchSizeInt.doubleValue())).intValue();
-		
-		for (int i = 0; i < iterations; i++){
-			int start = i * batchSizeInt;
-			TrialEnvironments environments = manager.getTrialEnvironments(start, batchSizeInt);
-			environments.print(INDENT);
-			Debug.println(INDENT, "start=" + start + ", size=" + environments.size());
-		}
-	}
-	
-	@Test
 	public void testCountAllTrialEnvironments() throws Exception {
 		long count = manager.countAllTrialEnvironments();
 		Debug.println(INDENT, "#RECORDS: " + count);

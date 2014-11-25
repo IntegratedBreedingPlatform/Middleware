@@ -421,16 +421,6 @@ public interface GermplasmDataManager {
 
     
     /**
-     * Counts all the Germplasm entries from the given database instance.
-     *
-     * @param instance - can be Database.CENTRAL or Database.LOCAL
-     * @return The number of germplasms from the given database instance
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    long countAllGermplasm(Database instance) throws MiddlewareQueryException;
-
-    
-    /**
      * Retrieves all the Germplasm entries from the given database instance matching the given preferred name.
      *
      * @param name - the preferred name to match
@@ -1140,18 +1130,7 @@ public interface GermplasmDataManager {
      */
     @Deprecated
     List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
-    
-    /**
-     * Returns the String representation of next available sequence number for
-     * Germplasm Names with given prefix on specified database instance.
-     *
-     * @param prefix - String used as prefix for Germplasm Names querying
-     * @param instance - can be Database.LOCAL or Database.CENTRAL
-     * @return next available sequence number for a germplasm with given prefix.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    String getNextSequenceNumberForCrossName(String prefix, Database instance) throws MiddlewareQueryException;
-    
+        
     /**
      * Returns the String representation of next available sequence number for
      * Germplasm Names with given prefix. Queries both Database.LOCAL and Database.CENTRAL
