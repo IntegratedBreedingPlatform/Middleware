@@ -114,6 +114,26 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
         assertTrue("Expected the same trial constants retrieved but found a different constant.", 
         		WorkbookTest.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
     }
+	
+	@Test
+    public void testAddTrialEnvironmentToTrial() throws MiddlewareQueryException {
+        Workbook workbook = WorkbookTest.getTestWorkbook(4, StudyType.T);
+                
+        int id = dataImportService.saveDataset(workbook);
+        
+        Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
+        
+        int noOfOrigTrialInstances = createdWorkbook.getTrialObservations().size();
+        
+        WorkbookTest.addNewEnvironment(createdWorkbook);
+                
+        dataImportService.saveDataset(createdWorkbook);
+        
+        createdWorkbook = fieldbookService.getTrialDataSet(id);
+        
+        assertTrue("Expected " + (noOfOrigTrialInstances + 1) + " instances but got " + createdWorkbook.getTrialObservations().size() + " instead." , 
+        		(noOfOrigTrialInstances + 1) == createdWorkbook.getTrialObservations().size());
+    }
 
     @Test
     public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException {

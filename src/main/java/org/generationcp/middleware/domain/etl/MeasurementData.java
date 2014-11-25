@@ -36,6 +36,16 @@ public class MeasurementData {
 	public MeasurementData() {
 	}
 	
+	public MeasurementData(MeasurementData data) {
+		this.label = data.label;
+		this.value = data.value;
+		this.isEditable = data.isEditable;
+		this.dataType = data.dataType;
+		this.phenotypeId = data.phenotypeId;
+		this.cValueId = data.cValueId;
+		this.measurementVariable = data.measurementVariable;
+	}
+	
 	public MeasurementData(String label, String value) {
 		super();
 		this.label = label;

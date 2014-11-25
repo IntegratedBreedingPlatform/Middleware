@@ -31,6 +31,16 @@ public class MeasurementRow {
 	
 	public MeasurementRow() {
 	}
+	
+	public MeasurementRow(MeasurementRow row) {
+		this.stockId = row.stockId;
+		this.locationId = row.locationId;
+		this.experimentId = row.experimentId;
+		this.dataList = new ArrayList<MeasurementData>();
+		for (MeasurementData data : row.dataList) {
+			this.dataList.add(new MeasurementData(data));
+		}
+	}
 
     public MeasurementRow(List<MeasurementData> dataList) {
         this.dataList = dataList;

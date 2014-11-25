@@ -28,6 +28,8 @@ import org.generationcp.middleware.pojos.Location;
 
 public class WorkbookTest {
 	
+	private static final int ASPERGILLUS_FLAVUSPPB = 20369;
+	private static final int ASPERGILLUS_FLAVUS1_5 = 20368;
 	private static final String NURSERY_NAME = "Nursery_";
 	private static final String TRIAL_NAME = "Trial_";
 
@@ -426,4 +428,65 @@ public class WorkbookTest {
 		}
 		return true;
 	}
+
+	public static void addNewEnvironment(Workbook createdWorkbook) {
+		addObservations(1, createdWorkbook.getTrialObservations());
+		addObservations(1, createdWorkbook.getObservations());			
+	}
+	
+	
+
+	private static void addObservations(int newEnvironmentCount, List<MeasurementRow> observations) {		
+		List<MeasurementRow> originalObservations = new ArrayList<MeasurementRow>(getFirstTrialInstance(observations));
+		int currentObsCount = observations.size()/originalObservations.size();
+		
+		for (int i = 0; i < newEnvironmentCount; i++) {
+			List<MeasurementRow> newInstance = new ArrayList<MeasurementRow>();
+			for (MeasurementRow row : originalObservations) {
+				newInstance.add(new MeasurementRow(row));
+			}
+			currentObsCount++;
+			observations.addAll(setValuesPerInstance(newInstance, currentObsCount));
+		}
+		
+		for (MeasurementRow row : observations) {
+			for (MeasurementData data : row.getDataList()) {
+				if (data.getMeasurementVariable().getTermId() == ASPERGILLUS_FLAVUS1_5 ||
+						data.getMeasurementVariable().getTermId() == ASPERGILLUS_FLAVUSPPB) {
+					data.setValue(String.valueOf(new Random().nextInt(10000)));
+				}
+			}
+		}
+	}
+
+	private static List<MeasurementRow> getFirstTrialInstance(
+			List<MeasurementRow> observations) {
+		List<MeasurementRow> firstTrialInstance = new ArrayList<MeasurementRow>();
+		long oldLocationId = 0;
+		for (MeasurementRow row : observations) {
+			long locationId = row.getLocationId();
+			if (oldLocationId != locationId && oldLocationId != 0) {
+				break;
+			}
+			firstTrialInstance.add(row);
+			oldLocationId = locationId;
+		}
+		return firstTrialInstance;
+	}
+
+	private static List<MeasurementRow> setValuesPerInstance(List<MeasurementRow> newInstance, int currentObsCount) {
+		for (MeasurementRow row : newInstance) {
+			for (MeasurementData data : row.getDataList()) {
+				if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+					data.setValue(String.valueOf(currentObsCount));
+				}
+				data.setPhenotypeId(null);
+			}
+			row.setExperimentId(0);
+			row.setLocationId(0);
+			row.setStockId(0);
+		}
+		return newInstance;
+	}
+
 }
