@@ -225,7 +225,8 @@ public class WorkbookBuilder extends Builder {
 		workbook.setTreatmentFactors(treatmentFactors);
 		workbook.setExperimentalDesignVariables(expDesignVariables);
 		
-		List<MeasurementRow> trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
+		List<MeasurementRow> trialObservations = getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId(), isTrial).getObservations(); 
+				
 		workbook.setTrialObservations(trialObservations);
 		return workbook;
 	}
