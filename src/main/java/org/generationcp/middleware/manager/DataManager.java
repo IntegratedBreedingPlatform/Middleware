@@ -128,9 +128,6 @@ public abstract class DataManager extends DatabaseBroker{
         if (setDaoSession(dao, getCurrentSessionForLocal())) {
             toReturn.addAll(dao.getAll());
         }
-        if (setDaoSession(dao, getCurrentSessionForCentral())) {
-            toReturn.addAll(dao.getAll());
-        }
         return toReturn;
     }
 

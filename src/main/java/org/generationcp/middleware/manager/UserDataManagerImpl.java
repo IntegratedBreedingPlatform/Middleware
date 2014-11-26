@@ -174,25 +174,15 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         return (List<Person>) getAllFromCentralAndLocal(getPersonDao());
     }
 
+    //TODO BMS-148 Rename method. No loger reads from two DBs.
     @Override
     public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
         List<Person> toReturn = new ArrayList<Person>();
         PersonDAO dao = getPersonDao();
         if (setDaoSession(dao, getCurrentSessionForLocal())) {
-            List<Person> localPersons = dao.getAll();
-            Collections.sort(localPersons);
-            toReturn.addAll(localPersons);
-        }
-        if (setDaoSession(dao, getCurrentSessionForCentral())) {
-            List<Person> centralPersons = dao.getAll();
-            List<Person> centralPersonsNew = new ArrayList<Person>();
-            for(Person person : centralPersons){
-            	if(person != null && !"".equalsIgnoreCase(person.getDisplayName())){
-            		centralPersonsNew.add(person);
-            	}
-            }
-            Collections.sort(centralPersonsNew);
-            toReturn.addAll(centralPersonsNew);
+            List<Person> persons = dao.getAll();
+            Collections.sort(persons);
+            toReturn.addAll(persons);
         }
         return toReturn;
     }
