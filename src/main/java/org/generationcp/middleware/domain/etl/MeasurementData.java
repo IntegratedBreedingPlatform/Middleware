@@ -180,11 +180,11 @@ public class MeasurementData {
 					return possibleValue.getDescription();
 				}
 			}
-			return this.value; //this would return the value from the db
-		}
-		else {
-			if(this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null && this.getMeasurementVariable().getDataTypeDisplay().equalsIgnoreCase("N")){
-				if(this.value != null && !this.value.equalsIgnoreCase("") && !this.value.equalsIgnoreCase("null")) {
+			//this would return the value from the db
+			return this.value; 
+		} else {
+			if(this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null && "N".equalsIgnoreCase(this.getMeasurementVariable().getDataTypeDisplay())){
+				if(this.value != null && !"".equalsIgnoreCase(this.value) && !"null".equalsIgnoreCase(this.value)) {
 					int intVal = Double.valueOf(this.value).intValue();
 					double doubleVal = Double.valueOf(this.value);
 					if(intVal == doubleVal){

@@ -109,8 +109,7 @@ public class MeasurementRow {
 				if(label!=null && data.getLabel()!=null && label.equals(data.getLabel())) {
 					if (data.getcValueId() != null) {
 						return data.getcValueId().toString();
-					}
-					else {
+					} else {
 						return data.getValue();
 					}
 				}
@@ -167,8 +166,7 @@ public class MeasurementRow {
                 if(data.getMeasurementVariable().getTermId() == id.intValue()) {
                     if (data.getcValueId() != null) {
                         return data.getcValueId().toString();
-                    }
-                    else {
+                    } else {
                         return data.getValue();
                     }
                 }
