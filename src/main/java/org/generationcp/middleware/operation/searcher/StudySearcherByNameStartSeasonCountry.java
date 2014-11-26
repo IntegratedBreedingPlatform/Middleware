@@ -15,10 +15,8 @@ import java.util.*;
 
 public class StudySearcherByNameStartSeasonCountry extends Searcher {
 
-	public StudySearcherByNameStartSeasonCountry(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) { 
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudySearcherByNameStartSeasonCountry(HibernateSessionProvider sessionProviderForLocal) { 
+		super(sessionProviderForLocal);
 	}
 
 	public List<DmsProject> searchByFilter(BrowseStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {

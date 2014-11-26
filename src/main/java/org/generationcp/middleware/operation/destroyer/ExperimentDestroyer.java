@@ -7,10 +7,8 @@ import java.util.List;
 
 public class ExperimentDestroyer extends Destroyer {
 
-	public ExperimentDestroyer(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ExperimentDestroyer(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	

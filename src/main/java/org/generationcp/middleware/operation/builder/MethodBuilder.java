@@ -21,8 +21,8 @@ public class MethodBuilder extends Builder {
 
 	private static final int METHOD_CV_ID = 1020;
 
-	public MethodBuilder(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public MethodBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public Term findMethodById(int id) throws MiddlewareQueryException {

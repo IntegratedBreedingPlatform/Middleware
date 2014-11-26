@@ -37,12 +37,12 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     public CrossStudyDataManagerImpl() {
     }
 
-    public CrossStudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public CrossStudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
-    public CrossStudyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
+    public CrossStudyDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
     }
 
 

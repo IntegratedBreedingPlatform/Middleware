@@ -31,9 +31,8 @@ import java.util.*;
 public class StandardVariableBuilder extends Builder {
 
 	
-	public StandardVariableBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                   HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StandardVariableBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {

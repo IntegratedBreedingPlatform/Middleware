@@ -15,9 +15,8 @@ import java.util.*;
 
 public class LocdesSaver extends Saver {
 
-	public LocdesSaver(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public LocdesSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void saveLocationDescriptions(List<FieldMapInfo> infoList, int userId) throws MiddlewareQueryException {

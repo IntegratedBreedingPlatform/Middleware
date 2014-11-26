@@ -258,19 +258,19 @@ public class ServiceFactory implements Serializable {
     }
     
     public DataImportService getDataImportService(){
-        return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new DataImportServiceImpl(sessionProviderForLocal);
     }
 
     public FieldbookService getFieldbookService(){
-        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+        return new FieldbookServiceImpl(sessionProviderForLocal, localDatabaseName);
     }
 
     public OntologyService getOntologyService(){
-        return new OntologyServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new OntologyServiceImpl(sessionProviderForLocal);
     }
     
     public InventoryService getInventoryService() {
-    	return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    	return new InventoryServiceImpl(sessionProviderForLocal, localDatabaseName);
     }
 
 

@@ -9,9 +9,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import java.util.List;
 
 public class ExperimentValuesTransformer extends Transformer {
-	public ExperimentValuesTransformer(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-				super(sessionProviderForLocal, sessionProviderForCentral);
+	public ExperimentValuesTransformer(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 

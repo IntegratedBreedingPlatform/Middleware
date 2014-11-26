@@ -26,8 +26,8 @@ import java.util.Map;
 
 public class TraitGroupBuilder extends Builder {
 
-	public TraitGroupBuilder(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public TraitGroupBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
     /** 

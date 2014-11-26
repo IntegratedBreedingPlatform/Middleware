@@ -32,8 +32,8 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     private SelectedMarkerDAO selectedMarkerDAO;
     private SelectedGenotypeDAO selectedGenotypeDAO;
 
-    public MBDTDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public MBDTDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     @Override

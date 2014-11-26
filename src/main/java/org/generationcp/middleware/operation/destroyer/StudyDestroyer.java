@@ -15,9 +15,8 @@ import java.util.List;
 
 public class StudyDestroyer extends Destroyer {
 
-	public StudyDestroyer(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudyDestroyer(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void deleteStudy(int studyId) throws MiddlewareQueryException {

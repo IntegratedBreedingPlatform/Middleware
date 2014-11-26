@@ -9,9 +9,8 @@ import java.util.List;
 
 public class MeasurementVariableTransformer extends Transformer {
 	
-    public MeasurementVariableTransformer(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-				super(sessionProviderForLocal, sessionProviderForCentral);
+    public MeasurementVariableTransformer(HibernateSessionProvider sessionProviderForLocal) {
+    	super(sessionProviderForLocal);
 	}
 	
 	public List<MeasurementVariable> transform(VariableTypeList variableTypeList, boolean isFactor) {

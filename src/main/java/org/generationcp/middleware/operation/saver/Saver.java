@@ -31,107 +31,107 @@ public abstract class Saver extends DatabaseBroker{
     /**
      * Instantiates a new data manager given session providers for local and central.
      */
-    protected Saver(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-       super(sessionProviderForLocal, sessionProviderForCentral);
+    protected Saver(HibernateSessionProvider sessionProviderForLocal) {
+       super(sessionProviderForLocal);
     }
     
     protected final StudySaver getStudySaver() {
-    	return new StudySaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new StudySaver(sessionProviderForLocal);
     }
 
     protected final ProjectSaver getProjectSaver() {
-    	return new ProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new ProjectSaver(sessionProviderForLocal);
     }
 
     protected final ProjectPropertySaver getProjectPropertySaver() {
-    	return new ProjectPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new ProjectPropertySaver(sessionProviderForLocal);
     }
 
     protected final ProjectRelationshipSaver getProjectRelationshipSaver() {
-    	return new ProjectRelationshipSaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new ProjectRelationshipSaver(sessionProviderForLocal);
     }
 
     protected final GeolocationSaver getGeolocationSaver() {
-    	return new GeolocationSaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new GeolocationSaver(sessionProviderForLocal);
     }
     
     protected final StockSaver getStockSaver() {
-    	return new StockSaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new StockSaver(sessionProviderForLocal);
     }
     
     protected final PhenotypeSaver getPhenotypeSaver() {
-    	return new PhenotypeSaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new PhenotypeSaver(sessionProviderForLocal);
     }
     
     protected final ExperimentModelSaver getExperimentModelSaver() {
-    	return new ExperimentModelSaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new ExperimentModelSaver(sessionProviderForLocal);
     }
     
     protected final StandardVariableBuilder getStandardVariableBuilder() {
-    	return new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    	return new StandardVariableBuilder(sessionProviderForLocal);
     }
 
 	protected final VariableTypeListTransformer getVariableTypeListTransformer() {
-		return new VariableTypeListTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new VariableTypeListTransformer(sessionProviderForLocal);
 	}
 	
 	protected final VariableListTransformer getVariableListTransformer() {
-		return new VariableListTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new VariableListTransformer(sessionProviderForLocal);
 	}
 
 	protected final StudyValuesTransformer getStudyValuesTransformer() {
-		return new StudyValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new StudyValuesTransformer(sessionProviderForLocal);
 	}
 	
 	protected final DatasetValuesTransformer getDatasetValuesTransformer() {
-		return new DatasetValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new DatasetValuesTransformer(sessionProviderForLocal);
 	}
 	
 	protected final ExperimentValuesTransformer getExperimentValuesTransformer() {
-		return new ExperimentValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new ExperimentValuesTransformer(sessionProviderForLocal);
 	}
 	
 	protected final DatasetProjectSaver getDatasetProjectSaver() {
-		return new DatasetProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
+		return new DatasetProjectSaver(sessionProviderForLocal);
 	}
 	
 	protected final VariableTypeBuilder getVariableTypeBuilder() {
-		return new VariableTypeBuilder(sessionProviderForLocal, sessionProviderForCentral);
+		return new VariableTypeBuilder(sessionProviderForLocal);
 	}
 	
 	protected final StockModelBuilder getStockModelBuilder() {
-		return new StockModelBuilder(sessionProviderForLocal, sessionProviderForCentral);
+		return new StockModelBuilder(sessionProviderForLocal);
 	}
 	
 	protected final TermBuilder getTermBuilder() {
-	    return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
+	    return new TermBuilder(sessionProviderForLocal);
 	}
 	
     protected final ExperimentBuilder getExperimentBuilder() {
-        return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+        return new ExperimentBuilder(sessionProviderForLocal);
     }
 
     protected final ExperimentPropertySaver getExperimentPropertySaver() {
-        return new ExperimentPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+        return new ExperimentPropertySaver(sessionProviderForLocal);
     }
     
     protected final ListDataPropertySaver getListDataPropertySaver() {
-        return new ListDataPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+        return new ListDataPropertySaver(sessionProviderForLocal);
     }
 
     protected final WorkbookBuilder getWorkbookBuilder() {
-        return new WorkbookBuilder(sessionProviderForLocal, sessionProviderForCentral);
+        return new WorkbookBuilder(sessionProviderForLocal);
     }
 
     protected final GeolocationPropertySaver getGeolocationPropertySaver() {
-    	return new GeolocationPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new GeolocationPropertySaver(sessionProviderForLocal);
     }
  
     protected final StudyDataManager getStudyDataManager() {
-        return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new StudyDataManagerImpl(sessionProviderForLocal);
     }
     
     protected final ExperimentDestroyer getExperimentDestroyer() {
-        return new ExperimentDestroyer(sessionProviderForLocal, sessionProviderForCentral);
+        return new ExperimentDestroyer(sessionProviderForLocal);
     }
 }

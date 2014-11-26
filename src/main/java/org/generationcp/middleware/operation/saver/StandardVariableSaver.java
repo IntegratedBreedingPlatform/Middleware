@@ -35,9 +35,8 @@ public class StandardVariableSaver extends Saver {
 
 	private static final int CV_VARIABLES = 1040;
 	
-	public StandardVariableSaver(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StandardVariableSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void delete(StandardVariable stdVar) throws MiddlewareQueryException, MiddlewareException {

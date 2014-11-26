@@ -21,10 +21,8 @@ import java.util.List;
 
 public class StudyVariateBuilder extends Builder {
 
-	public StudyVariateBuilder(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudyVariateBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public VariableTypeList build(int studyId) throws MiddlewareQueryException {

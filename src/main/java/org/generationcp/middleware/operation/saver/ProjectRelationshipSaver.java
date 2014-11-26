@@ -25,10 +25,8 @@ import java.util.List;
 
 public class ProjectRelationshipSaver extends Saver {
 
-	public ProjectRelationshipSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ProjectRelationshipSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void saveProjectParentRelationship(DmsProject project, int parentId, boolean isAStudy) throws MiddlewareQueryException, MiddlewareException{

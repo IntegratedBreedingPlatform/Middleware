@@ -60,27 +60,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyDataManagerImpl() {
     }
     
-    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral,
-            String localDatabaseName, String centralDatabaseName) {
-		super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
-		germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, 
-				sessionProviderForCentral, localDatabaseName, centralDatabaseName);
-		locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
+		super(sessionProviderForLocal, localDatabaseName);
+		germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, localDatabaseName);
+		locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal);
 	}
 
-    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
-                                HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, 
-                sessionProviderForCentral);
-        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal);
+        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal);
     }
 
-    public StudyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForLocal);
-        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    public StudyDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal);
+        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal);
     }
 
     @Override
@@ -151,15 +146,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) 
             throws MiddlewareQueryException {
         if (filter instanceof ParentFolderStudyQueryFilter) {
-            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, 
-                    this.sessionProviderForLocal, this.sessionProviderForCentral);
+            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal);
         } else if (filter instanceof GidStudyQueryFilter) {
-            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, 
-                    this.sessionProviderForLocal, this.sessionProviderForCentral);
+            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal);
         } else if (filter instanceof BrowseStudyQueryFilter) {
-            return new StudyResultSetByNameStartDateSeasonCountry(
-                    (BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, 
-                    this.sessionProviderForCentral);
+            return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal);
         }
         return null;
     }

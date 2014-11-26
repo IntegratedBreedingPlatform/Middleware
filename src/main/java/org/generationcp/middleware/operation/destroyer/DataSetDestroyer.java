@@ -20,9 +20,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
  */
 public class DataSetDestroyer extends Destroyer {
 
-	public DataSetDestroyer(HibernateSessionProvider sessionProviderForLocal,
-			                HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public DataSetDestroyer(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void deleteDataSet(int datasetId) throws MiddlewareQueryException {

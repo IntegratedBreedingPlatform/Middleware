@@ -37,46 +37,14 @@ public class DatabaseBroker {
     public final static String NO_LOCAL_INSTANCE_MSG = "There is no connection to a local instance.";
     public final static String NO_CENTRAL_INSTANCE_MSG = "There is no connection to a central instance.";
 
-    /**
-     * The {@link HibernateSessionProvider} for local database.
-     */
     protected HibernateSessionProvider sessionProviderForLocal;
-
-    /**
-     * The {@link HibernateSessionProvider} for central database.
-     */
-    protected HibernateSessionProvider sessionProviderForCentral;
-
-    /**
-     * Hibernate {@link Session} for local.
-     */
     private Session sessionForLocal;
-
-    /**
-     * Hibernate {@link Session} for central.
-     */
-    private Session sessionForCentral;
-    
-    /**
-     * The local database name
-     */
     protected String localDatabaseName;
 
-    /**
-     * The central database name
-     */
-    protected String centralDatabaseName;
-
-    /** The Constant JDBC_BATCH_SIZE. */
     protected static final int JDBC_BATCH_SIZE = 50;
 
-    /**
-     * Contains the current active session - either local or central.
-     */
     private Session activeSession;
-    
     private Database activeDatabase;
-    
     
     // GDMS DAOs
     private NameDAO nameDao;
@@ -132,31 +100,20 @@ public class DatabaseBroker {
     // UserDataManager DAOs
     private InstallationDAO installationDao;
 
-
-    protected DatabaseBroker(){
-    	
-    }
-    /**
-     * Instantiates a new data manager given session providers for local and central.
-     */
-    protected DatabaseBroker(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        this.sessionProviderForLocal = sessionProviderForLocal;
-        this.sessionProviderForCentral = sessionProviderForCentral;
+    protected DatabaseBroker() {
     }
 
-    /**
-     * Instantiates a new data manager given session providers for local and central.
-     */
-    protected DatabaseBroker(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, String localDatabaseName, String centralDatabaseName) {
+    protected DatabaseBroker(HibernateSessionProvider sessionProviderForLocal) {
         this.sessionProviderForLocal = sessionProviderForLocal;
-        this.sessionProviderForCentral = sessionProviderForCentral;
+    }
+
+    protected DatabaseBroker(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
+        this.sessionProviderForLocal = sessionProviderForLocal;
         this.localDatabaseName = localDatabaseName;
-        this.centralDatabaseName = centralDatabaseName;
     }
     
-    public DatabaseBroker(Session sessionForLocal, Session sessionForCentral) {
+    public DatabaseBroker(Session sessionForLocal) {
         this.sessionForLocal = sessionForLocal;
-        this.sessionForCentral = sessionForCentral;
     }
 
     public HibernateSessionProvider getSessionProviderForLocal() {
@@ -167,14 +124,6 @@ public class DatabaseBroker {
     	this.sessionProviderForLocal = sessionProviderForLocal;
     }
     
-    public HibernateSessionProvider getSessionProviderForCentral() {
-        return sessionProviderForCentral;
-    }
-
-    public void setSessionProviderForCentral(HibernateSessionProvider sessionProviderForCentral){
-    	this.sessionProviderForCentral = sessionProviderForCentral;
-    }
-
     /**
      * Returns the current session for local if not null, otherwise returns null
      * 
@@ -854,25 +803,16 @@ public class DatabaseBroker {
     	if (sessionForLocal != null) {
     		this.sessionForLocal.clear();
     	}
-    	
-    	if (sessionForCentral != null) {
-    		this.sessionForCentral.clear();
-    	}
     }
     
     protected final void flushSessions() {
     	if (sessionForLocal != null) {
     		this.sessionForLocal.flush();
     	}
-    	
-    	if (sessionForCentral != null) {
-    		this.sessionForCentral.flush();
-    	}
     }
     
     protected final TermPropertyBuilder getTermPropertyBuilder() {
-        return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
+        return new TermPropertyBuilder(sessionProviderForLocal);
     }
-	
 	
 }

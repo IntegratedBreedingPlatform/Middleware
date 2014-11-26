@@ -30,8 +30,7 @@ public class WorkbookBuilderTest extends TestOutputFormatter {
     
     @BeforeClass
 	public static void setUp() throws Exception {
-    	workbookBuilder = new WorkbookBuilder(Mockito.mock(HibernateSessionProvider.class), 
-    			Mockito.mock(HibernateSessionProvider.class));
+    	workbookBuilder = new WorkbookBuilder(Mockito.mock(HibernateSessionProvider.class));
     }
  
     @Test

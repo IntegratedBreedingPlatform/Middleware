@@ -15,8 +15,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public abstract class ProjectSearcher extends Searcher {
 
-	protected ProjectSearcher(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	protected ProjectSearcher(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 }

@@ -39,9 +39,8 @@ public class WorkbookBuilder extends Builder {
 			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(), 
 			TermId.NO_OF_CBLKS_LATINIZE.getId());
 	
-	public WorkbookBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                   HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public WorkbookBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	} 
 	
 	public Workbook create(int id) throws MiddlewareQueryException {

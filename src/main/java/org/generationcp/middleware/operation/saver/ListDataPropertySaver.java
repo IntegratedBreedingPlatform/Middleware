@@ -13,12 +13,9 @@ import java.util.List;
 
 public class ListDataPropertySaver extends Saver {
 
-	public ListDataPropertySaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ListDataPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
-	
 	
 	public List<ListDataInfo> saveProperties(List<ListDataInfo> listDataCollection) throws MiddlewareQueryException {
 		

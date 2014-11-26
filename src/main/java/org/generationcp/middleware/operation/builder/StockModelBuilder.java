@@ -20,9 +20,8 @@ import java.util.*;
 
 public class StockModelBuilder extends Builder {
 
-	public StockModelBuilder(HibernateSessionProvider sessionProviderForLocal,
-			               HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StockModelBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public StockModel get(int stockId) throws MiddlewareQueryException {

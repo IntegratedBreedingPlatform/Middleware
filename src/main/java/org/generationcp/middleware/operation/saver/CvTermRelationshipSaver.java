@@ -20,10 +20,8 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 
 public class CvTermRelationshipSaver extends Saver {
 
-	public CvTermRelationshipSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public CvTermRelationshipSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	// Returns the id

@@ -23,9 +23,8 @@ import java.util.*;
 
 public class TraitBuilder extends Builder{
 
-    public TraitBuilder(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public TraitBuilder(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     public List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException {

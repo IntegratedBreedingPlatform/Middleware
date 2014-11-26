@@ -49,12 +49,10 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private int bufIndex;
 	
 
-	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows,
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral)
+	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProviderForLocal)
 			throws MiddlewareQueryException {
 
-		super(sessionProviderForLocal, sessionProviderForCentral);
+		super(sessionProviderForLocal);
 		
 		this.name = filter.getName();
 		this.startDate = filter.getStartDate();

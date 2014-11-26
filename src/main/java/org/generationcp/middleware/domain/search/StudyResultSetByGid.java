@@ -34,12 +34,10 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	private List<StudyReference> buffer;
 	private int bufIndex;
 
-	public StudyResultSetByGid(GidStudyQueryFilter filter, int numOfRows,
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral)
+	public StudyResultSetByGid(GidStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProviderForLocal)
 			throws MiddlewareQueryException {
 
-		super(sessionProviderForLocal, sessionProviderForCentral);
+		super(sessionProviderForLocal);
 		
 		this.gid = filter.getGid();
 		this.numOfRows = numOfRows;

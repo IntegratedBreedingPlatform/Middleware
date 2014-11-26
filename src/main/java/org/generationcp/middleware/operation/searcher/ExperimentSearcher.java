@@ -20,8 +20,8 @@ import java.util.*;
 
 public class ExperimentSearcher extends Searcher {
 
-	public ExperimentSearcher(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ExperimentSearcher(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	//TODO: Not all factors were considered in this method. to be added as needed

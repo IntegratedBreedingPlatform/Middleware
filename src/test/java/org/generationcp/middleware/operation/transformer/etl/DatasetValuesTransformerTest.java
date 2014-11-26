@@ -35,7 +35,7 @@ public class DatasetValuesTransformerTest extends TestOutputFormatter {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		transformer = new DatasetValuesTransformer(Mockito.mock(HibernateSessionProvider.class), Mockito.mock(HibernateSessionProvider.class));
+		transformer = new DatasetValuesTransformer(Mockito.mock(HibernateSessionProvider.class));
 	}
 	
 	@Test

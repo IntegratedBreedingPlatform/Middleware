@@ -26,9 +26,8 @@ import java.util.List;
 
 public class TermBuilder extends Builder {
 
-	public TermBuilder(HibernateSessionProvider sessionProviderForLocal,
-			               HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public TermBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public Term get(int termId) throws MiddlewareQueryException {

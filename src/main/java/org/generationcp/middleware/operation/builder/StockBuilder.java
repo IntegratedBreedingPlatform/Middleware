@@ -22,10 +22,8 @@ import java.util.Set;
 
 public class StockBuilder extends Builder {
 
-	public StockBuilder(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StockBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {

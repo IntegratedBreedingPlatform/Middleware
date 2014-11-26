@@ -47,14 +47,9 @@ import java.util.*;
 public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
-
-
 	
-    public FieldbookServiceImpl(
-            HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral,
-            String localDatabaseName, String centralDatabaseName) {
-        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    public FieldbookServiceImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
+        super(sessionProviderForLocal, localDatabaseName);
     }
 
     @Override

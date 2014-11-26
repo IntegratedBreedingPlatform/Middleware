@@ -24,10 +24,8 @@ import java.util.List;
 
 public class ExperimentModelSaver extends Saver {
 	
-	public ExperimentModelSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ExperimentModelSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {

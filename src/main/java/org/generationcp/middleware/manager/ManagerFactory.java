@@ -68,10 +68,8 @@ public class ManagerFactory implements Serializable {
         LOG.trace("Created ManagerFactory instance");
         
         Properties prop = new Properties();
-    
+        InputStream in = null;
         try {
-            InputStream in = null;
-    
             try {
                 in = new FileInputStream(new File(ResourceFinder.locateFile(propertyFile).toURI()));
             } catch (IllegalArgumentException ex) {
@@ -112,8 +110,15 @@ public class ManagerFactory implements Serializable {
             LOG.error(e.getMessage(), e);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
+        } finally {
+        	if(in != null) {
+        		try {
+					in.close();
+				} catch (IOException e) {
+					// ignore..
+				}
+        	}
         }
-
     }
     
     public ManagerFactory(DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
@@ -265,75 +270,75 @@ public class ManagerFactory implements Serializable {
     }
 
     public GermplasmDataManager getGermplasmDataManager() {
-        return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+        return new GermplasmDataManagerImpl(sessionProviderForLocal, localDatabaseName);
     }
 
     public PedigreeDataManager getPedigreeDataManager() {
-        return new PedigreeDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+        return new PedigreeDataManagerImpl(sessionProviderForLocal, localDatabaseName);
     }
 
     public CrossStudyDataManager getCrossStudyDataManager() {
-        return new CrossStudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new CrossStudyDataManagerImpl(sessionProviderForLocal);
     }
 
     public GermplasmListManager getGermplasmListManager() {
-        return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+        return new GermplasmListManagerImpl(sessionProviderForLocal, localDatabaseName);
     }
 
     public LocationDataManager getLocationDataManager() {
-        return new LocationDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new LocationDataManagerImpl(sessionProviderForLocal);
     }
 
     public OntologyDataManager getOntologyDataManager() {
-        return new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new OntologyDataManagerImpl(sessionProviderForLocal);
     }
 
     public StudyDataManager getStudyDataManager() throws ConfigException {
-        return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new StudyDataManagerImpl(sessionProviderForLocal);
     }
     
     public StudyDataManager getNewStudyDataManager() throws ConfigException {
-    	return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    	return new StudyDataManagerImpl(sessionProviderForLocal, localDatabaseName);
     }
 
     public OntologyDataManager getNewOntologyDataManager() throws ConfigException {
-    	return new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    	return new OntologyDataManagerImpl(sessionProviderForLocal);
     }
 
     public InventoryDataManager getInventoryDataManager() throws ConfigException {
         if (sessionProviderForLocal == null) {
             throw new ConfigException("The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");
         } else {
-            return new InventoryDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+            return new InventoryDataManagerImpl(sessionProviderForLocal, localDatabaseName);
         }
     }
     
     public GenotypicDataManager getGenotypicDataManager() throws ConfigException {
-        return new GenotypicDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new GenotypicDataManagerImpl(sessionProviderForLocal);
     }
     
     public UserDataManager getUserDataManager() {
-        return new UserDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new UserDataManagerImpl(sessionProviderForLocal);
     }
     
     public FieldbookService getFieldbookMiddlewareService() throws ConfigException {
-        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+        return new FieldbookServiceImpl(sessionProviderForLocal, localDatabaseName);
     }
     
     public InventoryService getInventoryMiddlewareService() throws ConfigException {
-        return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+        return new InventoryServiceImpl(sessionProviderForLocal, localDatabaseName);
     }
     
     public DataImportService getDataImportService() throws ConfigException {
-        return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new DataImportServiceImpl(sessionProviderForLocal);
     }
     
     public OntologyService getOntologyService() throws ConfigException {
-        return new OntologyServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new OntologyServiceImpl(sessionProviderForLocal);
     }
 
     public MBDTDataManager getMbdtDataManager() {
-        return new MBDTDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new MBDTDataManagerImpl(sessionProviderForLocal);
     }
 
     /**

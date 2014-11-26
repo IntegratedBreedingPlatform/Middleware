@@ -40,12 +40,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public LocationDataManagerImpl() {
     }
 
-    public LocationDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public LocationDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
-    public LocationDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
+    public LocationDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
     }
 
     @Override

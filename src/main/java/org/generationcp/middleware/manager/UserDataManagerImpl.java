@@ -33,7 +33,7 @@ import java.util.List;
  * Implementation of the UserDataManager interface. To instantiate this
  * class, a Hibernate Session must be passed to its constructor.
  */ 
-public class UserDataManagerImpl extends DataManager implements UserDataManager{
+public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);
 
@@ -41,12 +41,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         super();
     }
 
-    public UserDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public UserDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
-    public UserDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
+    public UserDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
     }
 
     @SuppressWarnings("unchecked")

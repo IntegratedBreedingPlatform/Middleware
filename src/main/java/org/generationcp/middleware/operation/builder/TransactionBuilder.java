@@ -29,9 +29,8 @@ public class TransactionBuilder  extends Builder {
 
 	private static final int COMMITMENT_DATE_INDEFINITE = 0;
 
-	public TransactionBuilder(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public TransactionBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public List<Transaction> buildForSave(List<Lot> lots, Double amount, Integer userId, String comment, Integer sourceId)

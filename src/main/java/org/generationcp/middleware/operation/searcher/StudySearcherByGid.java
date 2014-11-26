@@ -17,10 +17,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class StudySearcherByGid extends Searcher {
 
-	public StudySearcherByGid(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) { 
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudySearcherByGid(HibernateSessionProvider sessionProviderForLocal) { 
+		super(sessionProviderForLocal);
 	}
 	
 

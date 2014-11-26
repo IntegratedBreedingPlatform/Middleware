@@ -27,9 +27,8 @@ import java.util.List;
 
 public class ExperimentPropertySaver extends Saver {
 
-    public ExperimentPropertySaver(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public ExperimentPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     public void saveOrUpdateProperty(ExperimentModel experiment, TermId propertyType, String value) throws MiddlewareQueryException {

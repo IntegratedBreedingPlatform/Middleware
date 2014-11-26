@@ -32,9 +32,8 @@ import java.util.TreeSet;
 
 public class PhenotypeSaver extends Saver{
 
-    public PhenotypeSaver(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public PhenotypeSaver(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     public void savePhenotypes(ExperimentModel experimentModel, VariableList variates) throws MiddlewareQueryException {

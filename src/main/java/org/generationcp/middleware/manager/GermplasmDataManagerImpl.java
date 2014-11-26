@@ -48,17 +48,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public GermplasmDataManagerImpl() {
     }
     
-    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
-    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral,
-    		String localDatabaseName, String centralDatabaseName) {
-        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
+        super(sessionProviderForLocal, localDatabaseName);
     }
 
-    public GermplasmDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
+    public GermplasmDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
     }
     
     @Override
@@ -185,7 +184,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("name",nameToUse);
 		params.put("altname",null);
 		params.put("altname2",null);
@@ -229,7 +228,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		
 		String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -270,7 +269,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("name",nameToUse);
 		params.put("altname",null);
 		params.put("altname2",null);
@@ -305,7 +304,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		
 		String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -408,7 +407,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
         
         return getGermplasmDao().
@@ -448,7 +447,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
 		if (status != null && status != 0) {
 			params.put("status",status);
@@ -469,7 +468,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public Name getPreferredNameByGID(Integer gid) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredNamesRecordByGid",
@@ -481,7 +480,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException{
         setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredNameByGid",
@@ -503,7 +502,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredIDNamesRecordByGid",
@@ -667,7 +666,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
 		return getAttributeDao().
 				callStoredProcedureForList("getAttributesByGID",
@@ -2021,7 +2020,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         //search by gid
         if(q.matches("\\d+") || q.matches("-\\d+")) {
         	params = new LinkedHashMap<String,Object>();
-			params.put("central_db_name", centralDatabaseName);
+			params.put("central_db_name", localDatabaseName);
 			params.put("gid",q);
 			params.put("searchType", searchType);
 			params.put("searchPublicData",searchPublicData?1:0);
@@ -2034,7 +2033,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
 		//search by name
 		params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		List<String> names = GermplasmDataManagerUtil.createNamePermutations(q);
         String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -2145,7 +2144,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		params.put("v_pro_no",null);
 		List<Germplasm> germplasms = getGermplasmListDataDAO().

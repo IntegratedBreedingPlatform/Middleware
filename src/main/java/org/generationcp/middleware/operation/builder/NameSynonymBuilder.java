@@ -13,9 +13,8 @@ import java.util.List;
 
 public class NameSynonymBuilder extends Builder {
 
-    public NameSynonymBuilder(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public NameSynonymBuilder(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
     
     public List<NameSynonym> create(List<CVTermSynonym> cvTermSynonyms) {

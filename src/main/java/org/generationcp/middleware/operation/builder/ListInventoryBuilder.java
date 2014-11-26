@@ -19,10 +19,8 @@ import java.util.*;
 
 public class ListInventoryBuilder extends Builder {
 	
-	public ListInventoryBuilder(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ListInventoryBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	/**

@@ -25,11 +25,10 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
  * @author Joyce Avestro
  * 
  */
-public class StudySaver extends Saver{
+public class StudySaver extends Saver {
 	
-	public StudySaver(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-				super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudySaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	/**

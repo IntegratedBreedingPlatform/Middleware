@@ -22,9 +22,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 
 public class StudyBuilder extends Builder {
 
-	public StudyBuilder(HibernateSessionProvider sessionProviderForLocal,
-			               HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudyBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public Study createStudy(int studyId) throws MiddlewareQueryException {

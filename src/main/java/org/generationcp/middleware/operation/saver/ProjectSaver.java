@@ -21,10 +21,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 
 public class ProjectSaver extends Saver {
 
-	public ProjectSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public DmsProject save(DmsProject project) throws MiddlewareQueryException{

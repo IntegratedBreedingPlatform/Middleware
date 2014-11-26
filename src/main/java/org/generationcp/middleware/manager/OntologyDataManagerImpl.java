@@ -59,13 +59,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public OntologyDataManagerImpl() {
     }
 
-    public OntologyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public OntologyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
-    public OntologyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);        
+    public OntologyDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);        
     }
 
     @Override

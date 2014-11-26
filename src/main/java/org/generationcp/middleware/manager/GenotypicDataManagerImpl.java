@@ -56,12 +56,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public GenotypicDataManagerImpl() {
     }
 
-    public GenotypicDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public GenotypicDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
-    public GenotypicDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
+    public GenotypicDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
     }
 
     @Override

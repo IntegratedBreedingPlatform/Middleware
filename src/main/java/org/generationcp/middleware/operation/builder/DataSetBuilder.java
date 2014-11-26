@@ -32,9 +32,8 @@ public class DataSetBuilder extends Builder {
 	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(),
 			TermId.DATASET_TYPE.getId());
 
-	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                 HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public DataSet build(int dataSetId) throws MiddlewareQueryException {

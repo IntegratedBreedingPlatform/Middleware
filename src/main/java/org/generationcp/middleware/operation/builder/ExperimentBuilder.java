@@ -21,9 +21,8 @@ import java.util.*;
 
 public class ExperimentBuilder extends Builder {
 
-	public ExperimentBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                 HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ExperimentBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public long count(int dataSetId) throws MiddlewareQueryException {

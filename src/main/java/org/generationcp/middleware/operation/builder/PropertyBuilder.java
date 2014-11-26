@@ -21,8 +21,8 @@ import java.util.List;
 
 public class PropertyBuilder extends Builder{
 
-    public PropertyBuilder(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public PropertyBuilder(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {

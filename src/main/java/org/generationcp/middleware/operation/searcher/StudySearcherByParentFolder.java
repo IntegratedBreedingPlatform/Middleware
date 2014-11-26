@@ -22,10 +22,8 @@ import java.util.List;
 
 public class StudySearcherByParentFolder extends Searcher {
 
-	public StudySearcherByParentFolder(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) { 
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudySearcherByParentFolder(HibernateSessionProvider sessionProviderForLocal) { 
+		super(sessionProviderForLocal);
 	}
 	
 	public List<StudyReference> searchStudies(ParentFolderStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {

@@ -31,11 +31,9 @@ public class StudyResultSetByParentFolder extends Searcher implements StudyResul
 	private int startIndex;
 	private int index;
 
-	public StudyResultSetByParentFolder(ParentFolderStudyQueryFilter filter, int numOfRows,
-			                            HibernateSessionProvider sessionProviderForLocal,
-			                            HibernateSessionProvider sessionProviderForCentral) throws MiddlewareQueryException {
+	public StudyResultSetByParentFolder(ParentFolderStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProviderForLocal) throws MiddlewareQueryException {
 		
-		super(sessionProviderForLocal, sessionProviderForCentral);
+		super(sessionProviderForLocal);
 		this.filter = filter;
 		this.numOfRows = numOfRows;
 		this.size = countStudies();

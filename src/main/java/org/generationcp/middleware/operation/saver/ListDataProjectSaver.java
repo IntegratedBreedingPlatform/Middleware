@@ -13,10 +13,8 @@ import java.util.List;
 
 public class ListDataProjectSaver extends Saver {
 
-	public ListDataProjectSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ListDataProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public int saveOrUpdateListDataProject(int projectId,

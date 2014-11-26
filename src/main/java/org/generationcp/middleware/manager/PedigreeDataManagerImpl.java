@@ -40,19 +40,18 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public PedigreeDataManagerImpl() {
     }
 
-    public PedigreeDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, 
-    		String localDatabaseName, String centralDatabaseName) {
-        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    public PedigreeDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
+        super(sessionProviderForLocal, localDatabaseName);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, localDatabaseName);
     }
 
-    public PedigreeDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
+    public PedigreeDataManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal);
     }
     
-    public PedigreeDataManagerImpl(Session sessionForLocal, Session sessionForCentral,GermplasmDataManagerImpl germplasmDataManager) {
-        super(sessionForLocal, sessionForCentral);
+    public PedigreeDataManagerImpl(Session sessionForLocal,GermplasmDataManagerImpl germplasmDataManager) {
+        super(sessionForLocal);
         this.germplasmDataManager =germplasmDataManager;
     }
         
@@ -65,7 +64,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
         Map<String, Object> params = new LinkedHashMap<String, Object>();
-        params.put("central_db_name", centralDatabaseName);
+        params.put("central_db_name", localDatabaseName);
         params.put("v_gid", gid);
         params.put("include_derivative", includeDerivativeLine);
         return getGermplasmDao().
@@ -345,7 +344,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     private List<Germplasm> getChildren(Integer gid, char methodType) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		params.put("v_method_type",methodType);
 		List<Germplasm> germplasms = getGermplasmDao().
@@ -364,7 +363,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		params.put("v_pro_no",progenitorNumber);
 		List<Germplasm> germplasms = getGermplasmDao().
@@ -405,7 +404,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 			int numOfRows) {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		params.put("v_start",start);
 		params.put("v_num_of_rows",numOfRows);
@@ -419,7 +418,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public long countDescendants(Integer gid) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		return getGermplasmDao().
 				callStoredProcedureForObject("countGermplasmDescendants",
@@ -430,7 +429,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		params.put("v_start",start);
 		params.put("v_num_of_rows",numOfRows);
@@ -449,7 +448,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		return getGermplasmDao().
 				callStoredProcedureForObject("countManagementNeighbors",
@@ -460,7 +459,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		return getGermplasmDao().
 				callStoredProcedureForObject("countGroupRelatives",
@@ -472,7 +471,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
 		params.put("v_start",start);
 		params.put("v_num_of_rows",numRows);

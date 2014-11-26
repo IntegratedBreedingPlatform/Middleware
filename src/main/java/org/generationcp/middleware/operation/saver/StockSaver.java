@@ -25,10 +25,8 @@ import java.util.HashSet;
 
 public class StockSaver extends Saver {
 
-	public StockSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StockSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public Integer saveStock(VariableList variableList) throws MiddlewareQueryException {

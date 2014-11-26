@@ -14,10 +14,8 @@ import java.util.List;
 
 public class GeolocationPropertySaver extends Saver {
 
-	public GeolocationPropertySaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public GeolocationPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public void saveFieldmapProperties(List<FieldMapInfo> infos) throws MiddlewareQueryException {

@@ -22,9 +22,8 @@ import java.util.List;
 
 public class TermPropertyBuilder extends Builder {
 
-	public TermPropertyBuilder(HibernateSessionProvider sessionProviderForLocal,
-			               HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public TermPropertyBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public TermProperty get(int termPropertyId) throws MiddlewareQueryException {

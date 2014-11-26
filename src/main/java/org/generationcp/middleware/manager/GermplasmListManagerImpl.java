@@ -40,16 +40,16 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public GermplasmListManagerImpl() {
     }
     
-    public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
-    public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, String localDatabaseName, String centralDatabaseName) {
-        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
+        super(sessionProviderForLocal, localDatabaseName);
     }
 
-    public GermplasmListManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
+    public GermplasmListManagerImpl(Session sessionForLocal) {
+        super(sessionForLocal);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("listid",id);
 		params.put("start",start);
 		params.put("numOfRows",numOfRows);
@@ -138,7 +138,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("id",id);
 		return getGermplasmListDataDAO().
 				callStoredProcedureForObject("countGermplasmListDataByListId",
@@ -164,7 +164,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("listId",listId);
 		params.put("entryId",entryId);
 		return getGermplasmListDataDAO().
@@ -176,7 +176,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
     	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
+		params.put("central_db_name", localDatabaseName);
 		params.put("listId",listId);
 		params.put("lrecId",lrecId);
 		return getGermplasmListDataDAO().

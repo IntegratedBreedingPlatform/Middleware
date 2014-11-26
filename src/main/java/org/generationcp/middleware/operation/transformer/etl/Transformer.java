@@ -19,37 +19,37 @@ public abstract class Transformer extends DatabaseBroker {
 	
 	private StandardVariableBuilder standardVariableBuilder;
 	
-	protected Transformer(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-       super(sessionProviderForLocal, sessionProviderForCentral);
+	protected Transformer(HibernateSessionProvider sessionProviderForLocal) {
+       super(sessionProviderForLocal);
     }
 	
 	protected final VariableTypeListTransformer getVariableTypeListTransformer(){
-		return new VariableTypeListTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new VariableTypeListTransformer(sessionProviderForLocal);
 	}
 	
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer(){
-	        return new MeasurementVariableTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	        return new MeasurementVariableTransformer(sessionProviderForLocal);
 	}
 	
 	protected final StudyValuesTransformer getStudyValuesTransformer(){
-		return new StudyValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new StudyValuesTransformer(sessionProviderForLocal);
 	}
 	
 	protected final DatasetValuesTransformer getDatasetValuesTransformer(){
-		return new DatasetValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new DatasetValuesTransformer(sessionProviderForLocal);
 	}
 	
 	protected final VariableListTransformer getVariableListTransformer(){
-		return new VariableListTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new VariableListTransformer(sessionProviderForLocal);
 	}
 	
 	protected final ExperimentValuesTransformer getExperimentValuesTransformer(){
-		return new ExperimentValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new ExperimentValuesTransformer(sessionProviderForLocal);
 	}
 	
     protected final StandardVariableBuilder getStandardVariableBuilder() {
     	if (standardVariableBuilder == null) {
-    		standardVariableBuilder = new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    		standardVariableBuilder = new StandardVariableBuilder(sessionProviderForLocal);
     	} 
     	return standardVariableBuilder;
     }

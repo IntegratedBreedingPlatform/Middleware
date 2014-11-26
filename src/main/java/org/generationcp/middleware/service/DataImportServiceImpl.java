@@ -46,10 +46,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
     public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 
-    public DataImportServiceImpl(
-            HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public DataImportServiceImpl(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     /**
@@ -158,8 +156,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException {
         WorkbookParser parser = new WorkbookParser();
 
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
-                getSessionProviderForLocal(), getSessionProviderForCentral());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
 
         // partially parse the file to parse the description sheet only at first
         return strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology);
@@ -456,8 +453,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         // perform validations on the parsed data that require db access
         List<Message> messages = new LinkedList<Message>();
 
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
-                getSessionProviderForLocal(), getSessionProviderForCentral());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
 
         if (!isEntryExists(ontology, workbook.getFactors()) && !isEntryExists(ontology, workbook.getConditions())) {
             messages.add(new Message("error.entry.doesnt.exist.wizard"));
@@ -589,8 +585,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public Map<String, List<Message>> validateProjectOntology(Workbook workbook) throws MiddlewareQueryException {
         Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
 
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
-                getSessionProviderForLocal(), getSessionProviderForCentral());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
 
         if (!isEntryExists(ontology, workbook.getFactors())) {
             initializeIfNull(errors, Constants.MISSING_ENTRY);
@@ -673,8 +668,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     @Override
     public Map<String, List<Message>> validateProjectData(Workbook workbook) throws MiddlewareQueryException {
         Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
-                getSessionProviderForLocal(), getSessionProviderForCentral());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
         checkForExistingTrialInstance(ontology, workbook, errors);
 
         // the following code is a workaround versus the current state management in the ETL Wizard

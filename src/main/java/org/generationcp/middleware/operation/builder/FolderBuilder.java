@@ -23,10 +23,8 @@ import java.util.List;
 
 public class FolderBuilder extends Builder{
 
-    public FolderBuilder(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
-        // TODO Auto-generated constructor stub
+    public FolderBuilder(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     public List<FolderReference> buildFolderTree() throws MiddlewareQueryException {
