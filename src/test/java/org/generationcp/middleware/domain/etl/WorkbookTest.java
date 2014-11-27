@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Location;
 
 public class WorkbookTest {
 	
+	private static final int DAY_OBS = 8284;
 	private static final int ASPERGILLUS_FLAVUSPPB = 20369;
 	private static final int ASPERGILLUS_FLAVUS1_5 = 20368;
 	private static final String NURSERY_NAME = "Nursery_";
@@ -256,6 +257,11 @@ public class WorkbookTest {
 				REPLICATION, NUMBER, ENUMERATED,
 				REPLICATION_FACTOR, NUMERIC,
 				NUMERIC_VALUE, PLOT, TermId.NUMERIC_VARIABLE.getId()));
+		
+		factors.add(createMeasurementVariable(DAY_OBS, "DAY_OBS",
+				REPLICATION, NUMBER, ENUMERATED,
+				REPLICATION_FACTOR, NUMERIC,
+				NUMERIC_VALUE, PLOT, TermId.NUMERIC_VARIABLE.getId()));
 
 		workbook.setFactors(factors);
 	}
@@ -307,6 +313,7 @@ public class WorkbookTest {
 			dataList.add(createMeasurementData(PLOT, String.valueOf(i), TermId.PLOT_NO.getId(), workbook.getFactors()));
 			dataList.add(createMeasurementData(BLOCK, "", TermId.BLOCK_NO.getId(), workbook.getFactors()));
 			dataList.add(createMeasurementData(REP, "", TermId.REP_NO.getId(), workbook.getFactors()));
+			dataList.add(createMeasurementData("DAY_OBS", randomizeValue(random, fmt, 5000), DAY_OBS, workbook.getFactors()));
 			dataList.add(createMeasurementData(GYLD, randomizeValue(random, fmt, 5000), GYLD_ID, workbook.getVariates()));
 
 			row.setDataList(dataList);
@@ -487,6 +494,16 @@ public class WorkbookTest {
 			row.setStockId(0);
 		}
 		return newInstance;
+	}
+
+	public static void deleteExperimentPropVar(Workbook createdWorkbook) {
+		if (createdWorkbook.getFactors() != null) {
+			for (MeasurementVariable var : createdWorkbook.getFactors()) {
+				if (var.getTermId() == DAY_OBS) {
+					var.setOperation(Operation.DELETE);
+				}
+			}
+		}
 	}
 
 }

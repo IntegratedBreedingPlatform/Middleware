@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import junit.framework.Assert;
+
 import org.generationcp.middleware.ServiceIntegraionTest;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
@@ -135,6 +137,24 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
         		(noOfOrigTrialInstances + 1) == createdWorkbook.getTrialObservations().size());
     }
 
+	@Test
+	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareQueryException {
+		WorkbookTest.setTestWorkbook(null);
+		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+		
+		int id = dataImportService.saveDataset(workbook);
+		
+		Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
+		
+		WorkbookTest.deleteExperimentPropVar(createdWorkbook);
+		
+		dataImportService.saveDataset(createdWorkbook);
+		
+		createdWorkbook = fieldbookService.getNurseryDataSet(id);
+		
+		assertNotNull("Expected successful retrieval of workbook.", createdWorkbook);
+	}
+	
     @Test
     public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException {
         // Dan V : changed implem so that template path is located in src/test/resources. no need to change per user to reflect file location
