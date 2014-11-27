@@ -62,8 +62,19 @@ public class StudyDestroyer extends Destroyer {
 				getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
 			}
 		}
+		
+		deleteRelationshipsIfNotAStudy(study);
 	}
 	
+	protected void deleteRelationshipsIfNotAStudy(DmsProject study) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		boolean isAStudy = getProjectRelationshipDao().isSubjectTypeExisting(
+				study.getProjectId(), TermId.IS_STUDY.getId());
+		if(!isAStudy) {
+			getProjectRelationshipDao().deleteByProjectId(study.getProjectId());
+		}
+	}
+
 	private void renameStudyAndDatasets(DmsProject study) throws MiddlewareQueryException {
 		DateFormat format = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 		String tstamp = format.format(new Date());

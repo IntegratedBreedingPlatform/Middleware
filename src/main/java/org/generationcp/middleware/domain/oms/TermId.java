@@ -177,6 +177,7 @@ public enum TermId {
 	, TRIAL_INSTANCE_FACTOR(8170)
 	
 	, DELETED_STUDY(12990)
+	, ACTIVE_STUDY(12960)
 	
 	//Planting Order
 	, ROW_COLUMN (32778)
