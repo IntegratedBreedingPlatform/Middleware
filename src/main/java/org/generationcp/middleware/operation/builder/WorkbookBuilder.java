@@ -225,12 +225,22 @@ public class WorkbookBuilder extends Builder {
 		workbook.setTreatmentFactors(treatmentFactors);
 		workbook.setExperimentalDesignVariables(expDesignVariables);
 		
-		List<MeasurementRow> trialObservations = getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId(), isTrial).getObservations(); 
-				
+		List<MeasurementRow> trialObservations = getTrialObservations(workbook, isTrial); 
+		
 		workbook.setTrialObservations(trialObservations);
 		return workbook;
 	}
 	
+	private List<MeasurementRow> getTrialObservations(Workbook workbook, boolean isTrial) throws MiddlewareQueryException {
+		List<MeasurementRow> trialObservations = null;
+		if (!isTrial) {
+	        trialObservations = buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
+		} else {
+			trialObservations = getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId(), isTrial).getObservations();
+		}
+		return trialObservations;
+	}
+
 	protected void checkMeasurementDataset(Integer dataSetId) throws MiddlewareQueryException{
 		//if study has no measurementDataset, throw an error as it is an invalid template
 		if (dataSetId == null || dataSetId.equals(0)) {
