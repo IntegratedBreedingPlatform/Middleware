@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.utils.database.DatabaseSetupUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +34,7 @@ public class MiddlewareIntegrationTest {
 	 */
 	static {
 		try {
+			DatabaseSetupUtil.setupTestDatabases();
 			localConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
 			centralConnectionParams = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
 			workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
@@ -48,6 +50,8 @@ public class MiddlewareIntegrationTest {
 		} catch (URISyntaxException e) {
 			Assert.fail(e.getMessage());
 		} catch (IOException e) {
+			Assert.fail(e.getMessage());
+		} catch (Exception e){
 			Assert.fail(e.getMessage());
 		}
 	}

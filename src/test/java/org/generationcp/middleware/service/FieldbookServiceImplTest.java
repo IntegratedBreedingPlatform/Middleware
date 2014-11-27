@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.StudyTestDataUtil;
+import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -46,6 +48,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.utils.test.Debug;
@@ -581,6 +584,36 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     	int projectId = -422;
     	
     	fieldbookService.deleteListDataProjects(projectId, GermplasmListType.ADVANCED);
+    }
+    
+    @Test
+    public void testDeleteStudy() throws Exception {
+    	StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
+    	DmsProject testFolder = studyTestDataUtil.createFolderTestData();
+    	DmsProject testStudy1 = studyTestDataUtil.createStudyTestData();
+    	DmsProject testStudy2 = studyTestDataUtil.createStudyTestDataWithActiveStatus();
+    	fieldbookService.deleteStudy(testFolder.getProjectId());
+    	fieldbookService.deleteStudy(testStudy1.getProjectId());
+    	fieldbookService.deleteStudy(testStudy2.getProjectId());
+    	
+    	boolean folderExists = false;
+    	boolean study1Exists = false;
+    	boolean study2Exists = false;
+    	List<FolderReference> rootFolders = studyTestDataUtil.getLocalRootFolders();
+    	for (FolderReference folderReference : rootFolders) {
+			if(folderReference.getId().equals(testFolder.getProjectId())) {
+				folderExists = true;
+			}
+			if(folderReference.getId().equals(testStudy1.getProjectId())) {
+				study1Exists = true;
+			}
+			if(folderReference.getId().equals(testStudy2.getProjectId())) {
+				study2Exists = true;
+			}
+		}
+    	assertFalse("Folder should no longer be found",folderExists);
+    	assertFalse("Study should no longer be found",study1Exists);
+    	assertFalse("Study should no longer be found",study2Exists);
     }
     
 }

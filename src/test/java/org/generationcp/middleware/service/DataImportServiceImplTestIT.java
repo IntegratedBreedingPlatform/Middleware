@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import junit.framework.Assert;
+
 import org.generationcp.middleware.ServiceIntegraionTest;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
@@ -114,7 +116,45 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
         assertTrue("Expected the same trial constants retrieved but found a different constant.", 
         		WorkbookTest.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
     }
+	
+	@Test
+    public void testAddTrialEnvironmentToTrial() throws MiddlewareQueryException {
+        Workbook workbook = WorkbookTest.getTestWorkbook(4, StudyType.T);
+                
+        int id = dataImportService.saveDataset(workbook);
+        
+        Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
+        
+        int noOfOrigTrialInstances = createdWorkbook.getTrialObservations().size();
+        
+        WorkbookTest.addNewEnvironment(createdWorkbook);
+                
+        dataImportService.saveDataset(createdWorkbook);
+        
+        createdWorkbook = fieldbookService.getTrialDataSet(id);
+        
+        assertTrue("Expected " + (noOfOrigTrialInstances + 1) + " instances but got " + createdWorkbook.getTrialObservations().size() + " instead." , 
+        		(noOfOrigTrialInstances + 1) == createdWorkbook.getTrialObservations().size());
+    }
 
+	@Test
+	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareQueryException {
+		WorkbookTest.setTestWorkbook(null);
+		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+		
+		int id = dataImportService.saveDataset(workbook);
+		
+		Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
+		
+		WorkbookTest.deleteExperimentPropVar(createdWorkbook);
+		
+		dataImportService.saveDataset(createdWorkbook);
+		
+		createdWorkbook = fieldbookService.getNurseryDataSet(id);
+		
+		assertNotNull("Expected successful retrieval of workbook.", createdWorkbook);
+	}
+	
     @Test
     public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException {
         // Dan V : changed implem so that template path is located in src/test/resources. no need to change per user to reflect file location
