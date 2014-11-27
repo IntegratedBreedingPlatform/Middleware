@@ -66,7 +66,6 @@ public class TraitGroupBuilder extends Builder {
      */
 	private List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
 	    List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();  
-        setWorkingDatabase(Database.LOCAL);
         traitClasses.addAll(getCvTermDao().getAllTraitClasses());  
         Collections.sort(traitClasses);
         return traitClasses;
@@ -99,8 +98,6 @@ public class TraitGroupBuilder extends Builder {
 
     private void setPropertiesOfTraitClasses(Database instance, List<TraitClassReference> traitClasses) throws MiddlewareQueryException{
         
-        setWorkingDatabase(instance);
-        
         List<Integer> traitClassIds = new ArrayList<Integer>();
         for (TraitClassReference traitClass : traitClasses){
             traitClassIds.add(traitClass.getId());
@@ -123,8 +120,6 @@ public class TraitGroupBuilder extends Builder {
     }
 
     private void setStandardVariablesOfProperties(Database instance, List<PropertyReference> traitClassProperties) throws MiddlewareQueryException{
-        setWorkingDatabase(instance);
-        
         List<Integer> propertyIds = new ArrayList<Integer>();
         for (PropertyReference property : traitClassProperties){
             propertyIds.add(property.getId());

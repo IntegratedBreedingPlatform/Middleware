@@ -11,12 +11,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.searcher;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
-
-import java.util.*;
 
 public class ExperimentSearcher extends Searcher {
 
@@ -55,18 +58,15 @@ public class ExperimentSearcher extends Searcher {
 
 
 	private Integer getStoredInId(Integer factorId) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		List<Integer> termIds = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
 		return (termIds != null && termIds.size() > 0 ? termIds.get(0) : null);
 	}
 
 	private List<Integer> findExperimentsByGeolocationFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> geolocationIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.LOCAL);
 		geolocationIds.addAll(getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
 		
 		Set<Integer> experimentIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.LOCAL);
 		experimentIds.addAll(getExperimentDao().getExperimentIdsByGeolocationIds(geolocationIds));
 		
 		return new ArrayList<Integer>(experimentIds);
@@ -74,25 +74,21 @@ public class ExperimentSearcher extends Searcher {
 	
 	private List<Integer> findExperimentsByStockFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> stockIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.LOCAL);
 		stockIds.addAll(getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 		
 		return getExperimentIdsByStockIds(stockIds);
 	}
 	
 	private List<Integer> findExperimentsByExperimentFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value);
 	}
 	
 	private List<Integer> getExperimentIdsByStockIds(Collection<Integer> stockIds) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getExperimentStockDao().getExperimentIdsByStockIds(stockIds);
 	}
 	
 	private List<Integer> findExperimentsByStock(String columnName, String value) throws MiddlewareQueryException {
 		Set<Integer> stockIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.LOCAL);
 		stockIds.addAll(getStockDao().getStockIdsByProperty(columnName, value));
 		return getExperimentIdsByStockIds(stockIds);
 	}

@@ -41,7 +41,6 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	private List<DmsProject> searchByStartDate(Integer startDate) throws MiddlewareQueryException {
 		List<DmsProject> studies = new ArrayList<DmsProject>();
 		if (startDate != null) {
-			setWorkingDatabase(Database.LOCAL);
 			studies.addAll(getDmsProjectDao().getStudiesByStartDate(startDate));
 		}
 		return studies;
@@ -50,7 +49,6 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	private List<DmsProject> searchByStudyName(String name) throws MiddlewareQueryException {
 		List<DmsProject> studies = new ArrayList<DmsProject>();
 		if (!StringUtil.isEmpty(name)) {
-			setWorkingDatabase(Database.LOCAL);
 			studies.addAll(getDmsProjectDao().getStudiesByName(name));
 		}
 		return studies;
@@ -59,7 +57,6 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	private List<DmsProject> searchByCountry(String countryName) throws MiddlewareQueryException {
 		List<DmsProject> studies = new ArrayList<DmsProject>();
 		if (!StringUtil.isEmpty(countryName)) {
-			setWorkingDatabase(Database.LOCAL);
 			List<Country> countries = getCountryDao().getByIsoFull(countryName);
 			if (countries != null && countries.size() > 0) {
 				List<Integer> countryIds = new ArrayList<Integer>(); 
@@ -135,31 +132,25 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	}
 	
 	private List<Integer> getSeasonalFactors() throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), TermId.SEASON.getId());
 	}
 
 	private CVTerm getDiscreteValueTerm(String name, String definition) throws MiddlewareQueryException {
 		CVTerm term = null;
 		Integer cvId = null;
-		if (setWorkingDatabase(Database.LOCAL)) {
-			cvId = getCvDao().getIdByName(name);
-			term = getCvTermDao().getByCvIdAndDefinition(cvId, definition);
-		}		
+		cvId = getCvDao().getIdByName(name);
+		term = getCvTermDao().getByCvIdAndDefinition(cvId, definition);
 		return term;
 	}
 	
 	private List<Integer> getProjectIdsByExperiment(Collection<Integer> experimentIds) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getExperimentProjectDao().getProjectIdsByExperimentIds(experimentIds);
 	}
 	
 	private Set<DmsProject> getProjectsByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		Set<DmsProject> projects = new HashSet<DmsProject>();
 		if (ids != null && ids.size() > 0) {
-			if (setWorkingDatabase(Database.LOCAL)) {
-				projects.addAll(getDmsProjectDao().getByIds(ids));
-			}
+			projects.addAll(getDmsProjectDao().getByIds(ids));
 		}
 		return projects;
 	}

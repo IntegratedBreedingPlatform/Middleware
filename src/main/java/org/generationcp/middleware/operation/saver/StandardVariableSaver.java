@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.*;
@@ -40,8 +39,6 @@ public class StandardVariableSaver extends Saver {
 	}
 
 	public void delete(StandardVariable stdVar) throws MiddlewareQueryException, MiddlewareException {
-	    setWorkingDatabase(Database.LOCAL);
-	    
 	    deleteEnumerations(stdVar.getId(), stdVar.getEnumerations());
 	    
 	    if (stdVar.getCropOntologyId() != null) {
@@ -66,16 +63,13 @@ public class StandardVariableSaver extends Saver {
 	}
 
 	public void deleteConstraints(StandardVariable stdVar) throws MiddlewareQueryException{
-        setWorkingDatabase(Database.LOCAL);
         if (stdVar.getConstraints() != null) {
-               deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
-               deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
-           }
-
+        	deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
+        	deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+        }
 	}
 	
 	public Integer save(StandardVariable stdVar) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		CVTerm varTerm = createCvTerm(stdVar);
 		int varId = varTerm.getCvTermId();
 		stdVar.setId(varId);
@@ -99,8 +93,6 @@ public class StandardVariableSaver extends Saver {
 	}
 	
 	public void saveConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareQueryException{
-	    requireLocalDatabaseInstance();
-	     
 	    if (constraints.getMinValueId() == null){ // add
 	        Integer minId = saveConstraint(standardVariableId, TermId.MIN_VALUE.getId(), constraints.getMinValue());
 	        constraints.setMinValueId(minId);
@@ -120,8 +112,6 @@ public class StandardVariableSaver extends Saver {
     public void saveEnumeration(StandardVariable variable, Enumeration enumeration, Integer cvId) 
             throws MiddlewareException, MiddlewareQueryException{
 
-        requireLocalDatabaseInstance();
-        
         validateInputEnumeration(variable, enumeration);
         
         //Save cvterm entry of the new valid value
@@ -130,7 +120,6 @@ public class StandardVariableSaver extends Saver {
         
         // save cvterm relationship
         saveCvTermRelationship(variable.getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
-        
     }
     
     private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException{
@@ -196,7 +185,6 @@ public class StandardVariableSaver extends Saver {
     }
 
     public CV createCv(StandardVariable variable) throws MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         CV cv = new CV();
         cv.setCvId(getCvDao().getNegativeId("cvId"));
         cv.setName(String.valueOf(variable.getId()));
@@ -292,7 +280,6 @@ public class StandardVariableSaver extends Saver {
 	}
 
     public void update(StandardVariable standardVariable) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         CVTerm varTerm = getStandardVariableBuilder().getCvTerm(standardVariable.getName(), CvId.VARIABLES.getId());
         varTerm.setName(standardVariable.getName());
         varTerm.setDefinition(standardVariable.getDescription());
@@ -369,27 +356,19 @@ public class StandardVariableSaver extends Saver {
     }
 
     public void saveOrUpdateCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-        
+       
         CVTermProperty cropOntologyProperty = getCvTermPropertyDao().getOneByCvTermAndType(traitId, TermId.CROP_ONTOLOGY_ID.getId());
-        if (cropOntologyProperty == null) {
-            if (traitId > 0) {
-                setWorkingDatabase(traitId);
-                cropOntologyProperty = getCvTermPropertyDao().getOneByCvTermAndType(traitId, TermId.CROP_ONTOLOGY_ID.getId());
-                if (cropOntologyProperty != null && cropOntologyProperty.getValue() != null 
-                        && cropOntologyProperty.getValue().equalsIgnoreCase(cropOntologyId)) {
-                    //do nothing, no change
-                    return;
-                }
-            }
+        if (cropOntologyProperty != null && cropOntologyProperty.getValue() != null 
+                && cropOntologyProperty.getValue().equalsIgnoreCase(cropOntologyId)) {
+            //do nothing, no change
+            return;
         }
-        else {
-            if (cropOntologyId == null || "".equals(cropOntologyId)) {
-                getCvTermPropertyDao().makeTransient(cropOntologyProperty);
-                return;
-            }
+        
+        if (cropOntologyId == null || "".equals(cropOntologyId)) {
+            getCvTermPropertyDao().makeTransient(cropOntologyProperty);
+            return;
         }
-        setWorkingDatabase(Database.LOCAL);
+
         boolean isForCreate = true;
         if (cropOntologyProperty == null) {
             if (cropOntologyId == null || "".equals(cropOntologyId.trim())) {
@@ -411,7 +390,6 @@ public class StandardVariableSaver extends Saver {
     }
     
     public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException {
-        requireLocalDatabaseInstance();
         deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
         deleteCvTerm(getCvTermDao().getById(enumeration.getId()));
     }
@@ -492,7 +470,6 @@ public class StandardVariableSaver extends Saver {
     }
     
     public void deleteCvTerm(CVTerm cvTerm) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         CVTermDao dao = getCvTermDao();
         try {
             dao.makeTransient(cvTerm);

@@ -175,20 +175,6 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */    
     long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Please use LocationDataManager.getAllLocations().
-     * 
-     * Returns all Locations.
-     *
-     * @param start - the starting index of the sublist of results to be returned
-     * @param numOfRows - the number of rows to be included in the sublist of results
-     * to be returned
-     * @return All Locations based on the given start and numOfRows
-     * @throws MiddlewareQueryException the middleware query exception
-     */   
-    @Deprecated
-    List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Please use LocationDataManager.getAllLocations().

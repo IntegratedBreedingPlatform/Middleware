@@ -12,14 +12,24 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.h2h.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
+import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.ObservationKey;
+import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-
-import java.util.*;
 
 public class TraitBuilder extends Builder{
 
@@ -30,7 +40,6 @@ public class TraitBuilder extends Builder{
     public List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
         List<NumericTraitInfo> numericTraitInfoList = new ArrayList<NumericTraitInfo>();
 
-        setWorkingDatabase(Database.LOCAL);
         List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId()), null);
         List<Integer> variableIds = getVariableIds(variableTerms);
         // Get locationCount, germplasmCount, observationCount, minValue, maxValue
@@ -63,7 +72,6 @@ public class TraitBuilder extends Builder{
         List<CharacterTraitInfo> characterTraitInfoList = new ArrayList<CharacterTraitInfo>();
 
         // Get character variable terms
-        setWorkingDatabase(Database.LOCAL);
         List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId()), null);
        
         // Get location, germplasm and observation counts 
@@ -108,7 +116,6 @@ public class TraitBuilder extends Builder{
         // Get locationCount, germplasmCount, observationCount
         List<TraitInfo> traitInfoList = new ArrayList<TraitInfo>();
 
-        setWorkingDatabase(Database.LOCAL);
         traitInfoList.addAll(getPhenotypeDao().getTraitInfoCounts(environmentIds));
         
         Collections.sort(traitInfoList);        
@@ -133,7 +140,6 @@ public class TraitBuilder extends Builder{
         List<TraitInfo> traitInfoList = new ArrayList<TraitInfo>();
 
          // Get locationCount, germplasmCount, observationCount
-        setWorkingDatabase(Database.LOCAL);
         traitInfoList.addAll(getPhenotypeDao().getTraitInfoCounts(environmentIds, variableIds));
 
         return traitInfoList;        
@@ -153,7 +159,6 @@ public class TraitBuilder extends Builder{
 
         Map<Integer, List<Double>> traitValues = new HashMap<Integer, List<Double>>();
 
-        setWorkingDatabase(Database.LOCAL);
         //for large crop, break up DB calls per trait to avoid out of memory error for large DBs
         if (environmentIds.size() > 1000){
         	for (NumericTraitInfo traitInfo : numericTraitInfoList){
@@ -186,7 +191,6 @@ public class TraitBuilder extends Builder{
     	
         List<Observation> observations = new ArrayList<Observation>();
         if (environmentIds != null && !environmentIds.isEmpty()){
-            setWorkingDatabase(Database.LOCAL);
             observations = getPhenotypeDao().getObservationForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
         }
         return observations;
@@ -199,7 +203,6 @@ public class TraitBuilder extends Builder{
 
         List<Observation> observations = new ArrayList<Observation>();
         if (environmentIds.size() > 0){
-            setWorkingDatabase(Database.LOCAL);
             observations = getPhenotypeDao().getObservationForTraits(traitIds, environmentIds,0,0);
         }
         return observations;
@@ -223,7 +226,6 @@ public class TraitBuilder extends Builder{
 	public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException{
     	List<TraitObservation> traitObservations = new ArrayList<TraitObservation>();
     	if(!environmentIds.isEmpty()){
-    		setWorkingDatabase(Database.LOCAL);
         	traitObservations = getPhenotypeDao().getObservationsForTrait(traitId, environmentIds);
     	}
     	return traitObservations;

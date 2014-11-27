@@ -38,24 +38,20 @@ public class DataSetBuilder extends Builder {
 
 	public DataSet build(int dataSetId) throws MiddlewareQueryException {
 		DataSet dataSet = null;
-		if (setWorkingDatabase(dataSetId)) {
-			DmsProject project = getDmsProjectDao().getById(dataSetId);
-			if (project != null) {
-				dataSet = createDataSet(project);
-			}
+		DmsProject project = getDmsProjectDao().getById(dataSetId);
+		if (project != null) {
+			dataSet = createDataSet(project);
 		}
 		return dataSet;
 	}
 	
 	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareQueryException {
 		VariableTypeList variableTypeList = new VariableTypeList();
-		if (setWorkingDatabase(dataSetId)) {
-			DmsProject project = getDmsProjectDao().getById(dataSetId);
-			if (project != null) {
-				Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(project.getProperties());
-				for (VariableInfo variableInfo : variableInfoList) {
-					variableTypeList.add(getVariableTypeBuilder().create(variableInfo));
-				}
+		DmsProject project = getDmsProjectDao().getById(dataSetId);
+		if (project != null) {
+			Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(project.getProperties());
+			for (VariableInfo variableInfo : variableInfoList) {
+				variableTypeList.add(getVariableTypeBuilder().create(variableInfo));
 			}
 		}
 		return variableTypeList.sort();
@@ -102,7 +98,6 @@ public class DataSetBuilder extends Builder {
 	}
 
 	public DmsProject getTrialDataset(int studyId, int measurementDatasetId) throws MiddlewareQueryException {
-	    setWorkingDatabase(studyId);
 	    DmsProject trialDataset = null;
 	    DmsProject study = getDmsProjectDao().getById(studyId);
 	    List<ProjectRelationship> datasets = study.getRelatedBys();
@@ -187,7 +182,6 @@ public class DataSetBuilder extends Builder {
 	}
 	
 	private List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
-		setWorkingDatabase(datasetId);
 		return getProjectPropertyDao().getVariablesOfSiblingDatasets(datasetId);
 	}
 	

@@ -19,7 +19,6 @@ public class ListDataPropertySaver extends Saver {
 	
 	public List<ListDataInfo> saveProperties(List<ListDataInfo> listDataCollection) throws MiddlewareQueryException {
 		
-    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
         sessionForLocal.flush();
 

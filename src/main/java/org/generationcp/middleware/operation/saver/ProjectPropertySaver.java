@@ -18,7 +18,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -34,8 +33,6 @@ public class ProjectPropertySaver extends Saver {
 	}
 
 	public List<ProjectProperty> create(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		List<VariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 		
@@ -47,12 +44,10 @@ public class ProjectPropertySaver extends Saver {
 				index = index + list.size();
 			}
 		}
-		
 		return properties;
 	}
 	
 	public void saveProjectProperties(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		List<ProjectProperty> properties = create(project, variableTypeList);
 		
 		Integer generatedId;
@@ -81,8 +76,6 @@ public class ProjectPropertySaver extends Saver {
 	}
 	
 	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
 				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
@@ -101,7 +94,6 @@ public class ProjectPropertySaver extends Saver {
 	}
 	
 	public void saveVariableType(DmsProject project, VariableType variableType) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		saveProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank());
 		saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank());
 		saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(variableType.getStandardVariable().getId()), variableType.getRank());
@@ -122,10 +114,8 @@ public class ProjectPropertySaver extends Saver {
 	}
 	
 	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, int storedIn) throws MiddlewareQueryException {
-	    setWorkingDatabase(project.getProjectId());
         ProjectProperty property = getProjectPropertyDao().getByStandardVariableId(project, termId.getId());
         if (property == null) {
-            setWorkingDatabase(project.getProjectId());
             int rank = getProjectPropertyDao().getNextRank(project.getProjectId());
             StandardVariable stdvar = new StandardVariable();
             stdvar.setId(termId.getId());
@@ -138,9 +128,7 @@ public class ProjectPropertySaver extends Saver {
 	public void saveProjectProperties(DmsProject study, DmsProject trialDataset, DmsProject measurementDataset, 
 			List<MeasurementVariable> variables, boolean isConstant) throws MiddlewareQueryException {
 		
-		setWorkingDatabase(Database.LOCAL);
 		if (variables != null) {
-			
 			int rank = getNextRank(study);
 			Set<Integer> geoIds = getGeolocationDao().getLocationIds(study.getProjectId());
 			Geolocation geolocation = getGeolocationDao().getById(geoIds.iterator().next()); 
@@ -188,7 +176,6 @@ public class ProjectPropertySaver extends Saver {
 				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 			} else {    
 				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
-				setWorkingDatabase(Database.LOCAL);
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
 		} else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
@@ -253,7 +240,6 @@ public class ProjectPropertySaver extends Saver {
 				getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 			} else {
 				getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
-				setWorkingDatabase(Database.LOCAL);
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
 		} else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
@@ -323,7 +309,6 @@ public class ProjectPropertySaver extends Saver {
 	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
 			int storedInId, int termId, Geolocation geolocation) throws MiddlewareQueryException {
 		
-		setWorkingDatabase(Database.LOCAL);
 		Session session = getCurrentSessionForLocal();
 		deleteVariable(project, termId);
 		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(storedInId)) {
@@ -347,12 +332,10 @@ public class ProjectPropertySaver extends Saver {
 			deleteVariable(measurementDataset, termId); 
 			//remove phoenotype value
 			List<Integer> ids = Arrays.asList(project.getProjectId(), trialDataset.getProjectId(), measurementDataset.getProjectId());
-			setWorkingDatabase(Database.LOCAL);
 			getPhenotypeDao().deletePhenotypesInProjectByTerm(ids, termId);
 		}
 	}
 	private void deleteVariable(DmsProject project, int termId) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		int rank = getRank(project, termId);
 		if (project.getProperties() != null && !project.getProperties().isEmpty()) {
 			for (Iterator<ProjectProperty> iterator = project.getProperties().iterator(); iterator.hasNext();) {
@@ -366,7 +349,6 @@ public class ProjectPropertySaver extends Saver {
 	}
 	
 	public void saveFactors(DmsProject measurementDataset, List<MeasurementVariable> variables) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		if (variables != null && !variables.isEmpty()) {
 			for (MeasurementVariable variable : variables) {
 				if (variable.getOperation() == Operation.ADD) {

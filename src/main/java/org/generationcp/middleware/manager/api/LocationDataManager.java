@@ -40,17 +40,6 @@ public interface LocationDataManager {
      */
     List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException;
-
-    /**
-     * Returns all Locations.
-     *
-     * @param start - the starting index of the sublist of results to be returned
-     * @param numOfRows - the number of rows to be included in the sublist of results
-     * to be returned
-     * @return All Locations based on the given start and numOfRows
-     * @throws MiddlewareQueryException the middleware query exception
-     */   
-    List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns all Location information from central and local databases.

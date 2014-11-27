@@ -87,38 +87,27 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
     public int getStudyIdByName(String studyName) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
     }
 
     @Override
     public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getDmsProjectDao().checkIfProjectNameIsExisting(name);
     }
 
     @Override
     public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getDmsProjectDao().getRootFolders();
-        }
-        return new ArrayList<FolderReference>();
+        return getDmsProjectDao().getRootFolders();
     }
 
     @Override
     public List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(folderId)) {
-            return getDmsProjectDao().getChildrenOfFolder(folderId);
-        }
-        return new ArrayList<Reference>();
+        return getDmsProjectDao().getChildrenOfFolder(folderId);
     }
 
     @Override
     public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(studyId)) {
-            return getDmsProjectDao().getDatasetNodesByStudyId(studyId);
-        }
-        return new ArrayList<DatasetReference>();
+        return getDmsProjectDao().getDatasetNodesByStudyId(studyId);
     }
 
     @Override
@@ -152,7 +141,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, 
             StudyValues studyValues) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -177,7 +165,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, 
             DatasetValues datasetValues) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -225,7 +212,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public void addExperiment(int dataSetId, ExperimentType experimentType, 
             ExperimentValues experimentValues) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -243,7 +229,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, 
             ExperimentValues experimentValues) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -263,7 +248,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			ExperimentType experimentType,
 			List<ExperimentValues> experimentValuesList)
 			throws MiddlewareQueryException {
-    	  requireLocalDatabaseInstance();
           Session session = getCurrentSessionForLocal();
           Transaction trans = null;
 
@@ -285,7 +269,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -304,7 +287,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public int addStock(VariableList variableList) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -323,7 +305,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) 
             throws MiddlewareQueryException {
-        setWorkingDatabase(studyId);
 
         List<DmsProject> datasetProjects = getDmsProjectDao().getDataSetsByStudyAndProjectProperty(
                 studyId, TermId.DATASET_TYPE.getId(), String.valueOf(dataSetType.getId()));
@@ -340,17 +321,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public long countExperimentsByTrialEnvironmentAndVariate(
             int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException {
         long count = 0;
-        if (this.setWorkingDatabase(trialEnvironmentId)) {
-            count = getExperimentDao().countByTrialEnvironmentAndVariate(
-                    trialEnvironmentId, variateVariableId);
-        }
+        count = getExperimentDao().countByTrialEnvironmentAndVariate(
+                trialEnvironmentId, variateVariableId);
         return count;
     }
 
     @Override
     public void addDataSetVariableType(int datasetId, VariableType variableType) 
             throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -368,7 +346,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public void setExperimentValue(int experimentId, int variableId, String value) 
             throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -386,12 +363,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) 
             throws MiddlewareQueryException {
-    	if (this.setWorkingDatabase(datasetId)) {
-	    	DmsProject study = getProjectRelationshipDao().
-	    			getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
-	        return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(),datasetId);
-    	}
-    	return null;
+    	DmsProject study = getProjectRelationshipDao().
+    			getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
+        return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(),datasetId);
     }
 
     @Override
@@ -402,19 +376,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) 
             throws MiddlewareQueryException {
-        if (this.setWorkingDatabase(datasetId)) {
-            return getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
-        }
-        return 0;
+        return getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
     }
 
     @Override
     public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) 
             throws MiddlewareQueryException {
-        if (this.setWorkingDatabase(datasetId)) {
-            return getStockDao().countObservations(datasetId, trialEnvironmentId, variateStdVarId);
-        }
-        return 0;
+        return getStockDao().countObservations(datasetId, trialEnvironmentId, variateStdVarId);
     }
 
     @Override
@@ -429,7 +397,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -445,7 +412,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -462,7 +428,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) 
             throws MiddlewareQueryException {
-        setWorkingDatabase(projectId);
         Session session = getActiveSession();
 
         try {
@@ -490,7 +455,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) 
             throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
         List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType);
         populateSiteAndPersonIfNecessary(details);
         return details;
@@ -505,19 +469,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public List<StudyNode> getNurseryAndTrialStudyNodes(Database instance) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
         return getDmsProjectDao().getAllNurseryAndTrialStudyNodes();
     }
 
     @Override
     public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getDmsProjectDao().countByVariable(variableId);
     }
 
     @Override
     public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getExperimentDao().countByObservedVariable(variableId, storedInId);
     }
 
@@ -528,7 +489,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         for (Integer studyId : studyIdList) {
             FieldMapInfo fieldMapInfo = new FieldMapInfo();
-            setWorkingDatabase(studyId);
 
             fieldMapInfo.setFieldbookId(studyId);
             fieldMapInfo.setFieldbookName(getDmsProjectDao().getById(studyId).getName());
@@ -580,7 +540,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         if (info != null && !info.isEmpty()) {
 
-            requireLocalDatabaseInstance();
             Session session = getCurrentSessionForLocal();
             Transaction trans = null;
 
@@ -612,7 +571,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             DmsProject project, VariableTypeList variableTypeList, 
             List<ExperimentValues> experimentValues, List<Integer> locationIds) 
                     throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -651,7 +609,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId)
             throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
-        setWorkingDatabase(datasetId);
         
         fieldMapInfos = getExperimentPropertyDao()
                 .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
@@ -694,7 +651,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throws MiddlewareQueryException {
 
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
-        setWorkingDatabase(Database.LOCAL);
         
         fieldMapInfos = getExperimentPropertyDao()
                 .getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
@@ -708,15 +664,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
     @Override
     public boolean isStudy(int id) throws MiddlewareQueryException {
-        setWorkingDatabase(id);
         return getProjectRelationshipDao().isSubjectTypeExisting(id, TermId.STUDY_HAS_FOLDER.getId());
     }
 
     public boolean renameSubFolder(String newFolderName, int folderId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
 
         // check for existing folder name
-
         boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(newFolderName);
         if (isExisting) {
             throw new MiddlewareQueryException("Folder name is not unique");
@@ -745,7 +698,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public int addSubFolder(int parentFolderId, String name, String description)
             throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         DmsProject parentProject = getDmsProjectDao().getById(parentFolderId);
         if (parentProject == null) {
             throw new MiddlewareQueryException("DMS Project is not existing");
@@ -773,8 +725,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     public boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) 
             throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-        DmsProject source = getDmsProjectDao().getById(sourceId);
+
+    	DmsProject source = getDmsProjectDao().getById(sourceId);
         DmsProject target = getDmsProjectDao().getById(targetId);
         if (source == null) {
             throw new MiddlewareQueryException("Source Project is not existing");
@@ -806,7 +758,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public void deleteEmptyFolder(int id) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         DmsProjectDao dmsProjectDao = getDmsProjectDao();
         //check if folder is existing
         DmsProject project = dmsProjectDao.getById(id);
@@ -838,12 +789,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
-        if (id > 0) {
-            requireCentralDatabaseInstance();
-        } else {
-            requireLocalDatabaseInstance();
-        }
-        DmsProject folderParentFolder = getProjectRelationshipDao()
+
+    	DmsProject folderParentFolder = getProjectRelationshipDao()
                 .getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
         DmsProject studyParentFolder = getProjectRelationshipDao()
                 .getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
@@ -855,13 +802,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public DmsProject getProject(int id) throws MiddlewareQueryException {
-        setWorkingDatabase(id);
         return getDmsProjectDao().getById(id);
     }
 
     @Override
     public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
         List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType, start, numOfRows);
         populateSiteAndPersonIfNecessary(details);
         return details;
@@ -869,7 +814,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
     @Override
     public StudyDetails getStudyDetails(Database instance, StudyType studyType, int studyId) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
         StudyDetails studyDetails = getDmsProjectDao().getStudyDetails(studyType, studyId);
         populateSiteAnPersonIfNecessary(studyDetails);
         return studyDetails;
@@ -877,7 +821,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
         List<StudyDetails> list = getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start, numOfRows);
         populateSiteAndPersonIfNecessary(list);
         return list;
@@ -887,11 +830,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
         List<StudyDetails> list = new ArrayList<StudyDetails>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            List localList = getDmsProjectDao().getAllStudyDetails(studyType);
-            if (localList != null) {
-                list.addAll(localList);
-            }
+        List localList = getDmsProjectDao().getAllStudyDetails(studyType);
+        if (localList != null) {
+            list.addAll(localList);
         }
         populateSiteAndPersonIfNecessary(list);
         return list;
@@ -900,9 +841,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public long countAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getDmsProjectDao().countAllStudyDetails(studyType);
-        }
+        count += getDmsProjectDao().countAllStudyDetails(studyType);
         return count;
     }
 
@@ -910,9 +849,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public long countStudyDetails(Database instance, StudyType studyType)
             throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getDmsProjectDao().countAllStudyDetails(studyType);
-        }
+        count += getDmsProjectDao().countAllStudyDetails(studyType);
         return count;
     }
 
@@ -921,11 +858,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<StudyDetails> getAllNurseryAndTrialStudyDetails()
             throws MiddlewareQueryException {
         List<StudyDetails> list = new ArrayList<StudyDetails>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            List localList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
-            if (localList != null) {
-                list.addAll(localList);
-            }
+        List localList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+        if (localList != null) {
+            list.addAll(localList);
         }
         populateSiteAndPersonIfNecessary(list);
         return list;
@@ -934,9 +869,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public long countAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
-        }
+        count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
         return count;
     }
 
@@ -944,9 +877,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public long countNurseryAndTrialStudyDetails(Database instance)
             throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
-        }
+        count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
         return count;
     }
 
@@ -957,28 +888,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
     @Override
     public int countPlotsWithRecordedVariatesInDataset(int dataSetId, List<Integer> variateIds) throws MiddlewareQueryException {
-        if (setWorkingDatabase(Database.LOCAL)) {
-            return getPhenotypeDao().countRecordedVariatesOfStudy(dataSetId, variateIds);
-        }
-        return 0;
+        return getPhenotypeDao().countRecordedVariatesOfStudy(dataSetId, variateIds);
     }
     
     @Override
     public String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException {
-        setWorkingDatabase(instance);
         return getGeolocationPropertyDao().getGeolocationPropValue(stdVarId, studyId);
     }
     
     @Override
     public String getFolderNameById(Integer folderId) throws MiddlewareQueryException {
-        setWorkingDatabase(folderId);
         DmsProject currentFolder = getDmsProjectDao().getById(folderId);
         return currentFolder.getName();
     }
     
     @Override
     public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
-        setWorkingDatabase(datasetId);
         if (getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0) {
             return true;
         } 
@@ -989,7 +914,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
     	int variatesWithDataCount = 0;
     	if (variateIds != null && !variateIds.isEmpty()) {
-	        setWorkingDatabase(datasetId);
 	        Map<Integer, Integer> map = getPhenotypeDao().countVariatesDataOfStudy(datasetId);
 	        for (Integer variateId : variateIds) {
 	        	Integer count = map.get(variateId);
@@ -1004,14 +928,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     private void populateSiteAnPersonIfNecessary(StudyDetails detail) throws MiddlewareQueryException {
     	if (detail != null) {
 			if (detail.getSiteName() != null && !"".equals(detail.getSiteName().trim()) && detail.getSiteId() != null) {
-				setWorkingDatabase(detail.getSiteId());
 				Location loc = getLocationDao().getById(detail.getSiteId());
 				if (loc != null) {
 					detail.setSiteName(loc.getLname());
 				}
 			}    	
 			if (detail.getPiName() != null && !"".equals(detail.getPiName().trim()) && detail.getPiId() != null) {
-				setWorkingDatabase(detail.getPiId());
 				Person person = getPersonDao().getById(detail.getPiId());
 				if (person != null) {
 					detail.setPiName(person.getDisplayName());
@@ -1038,11 +960,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	Map<Integer, String> personMap = new HashMap<Integer, String>();
 	    	
 	    	if (!siteIds.isEmpty()) {
-	    		setWorkingDatabase(Database.LOCAL);
 	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(siteIds));
 	    	}
 	    	if (!personIds.isEmpty()) {
-	    		setWorkingDatabase(Database.LOCAL);
 	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(personIds));
 	    	}
 	    	
@@ -1114,7 +1034,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	if (name != null) {
 	    		return name;
 	    	}
-	    	setWorkingDatabase(id);
 	    	Location location = getLocationDAO().getById(id);
 	    	if (location != null) {
 	    		locationMap.put(id, location.getLname());
@@ -1126,23 +1045,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
    @Override 
    public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, List<Integer> plotNos, List<Integer> cvTermIds) throws MiddlewareQueryException{
-	   setWorkingDatabase(projectId);
 	   return getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNos, cvTermIds);
-	  
    }
    
    @Override 
    public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(int projectId, int locationId, Integer plotNo, List<Integer> cvTermIds) throws MiddlewareQueryException{
-	   setWorkingDatabase(projectId);
 	   return getPhenotypeDao().getPhenotypeIdsByLocationAndPlotNo(projectId, locationId, plotNo, cvTermIds);
-	  
    }
    
    @Override
    public void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers)
 			throws MiddlewareQueryException {
 	   
-   	  	 requireLocalDatabaseInstance();
          Session session = getCurrentSessionForLocal();
          Transaction trans = null;
          PhenotypeOutlierDao phenotypeOutlierDao = getPhenotypeOutlierDao();
@@ -1190,7 +1104,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId)
 			throws MiddlewareQueryException {
 		
-		this.setWorkingDatabase(projectId);
 		return getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId);
 	}
 

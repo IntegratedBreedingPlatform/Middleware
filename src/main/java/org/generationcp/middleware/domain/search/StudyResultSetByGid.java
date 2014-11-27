@@ -50,10 +50,7 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	}
 	
 	private long countStudies(Database database, int gid) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database)) {
-			return this.getStockDao().countStudiesByGid(gid);
-		}
-		return 0;
+		return this.getStockDao().countStudiesByGid(gid);
 	}
 
 	@Override
@@ -84,19 +81,15 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	}
 
 	private void fillBufferFromLocalStudies() throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(Database.LOCAL)) {
-			int start = currentRow - (int) countOfLocalStudies;
-			buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
-			bufIndex = 0;
-		}
+		int start = currentRow - (int) countOfLocalStudies;
+		buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
+		bufIndex = 0;
 	}
 
 	private void fillBufferFromCentralStudies() throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(Database.CENTRAL)) {
-			int start = currentRow - (int) countOfLocalStudies;
-			buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
-			bufIndex = 0;
-		}
+		int start = currentRow - (int) countOfLocalStudies;
+		buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
+		bufIndex = 0;
 	}
 
 	@Override

@@ -11,15 +11,75 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
-import org.generationcp.middleware.dao.*;
-import org.generationcp.middleware.dao.dms.*;
-import org.generationcp.middleware.dao.gdms.*;
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.BreedersQueryDao;
+import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.InstallationDAO;
+import org.generationcp.middleware.dao.ListDataProjectDAO;
+import org.generationcp.middleware.dao.ListDataPropertyDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.LocdesDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
+import org.generationcp.middleware.dao.dms.ExperimentProjectDao;
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
+import org.generationcp.middleware.dao.dms.ExperimentStockDao;
+import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
+import org.generationcp.middleware.dao.dms.LocationSearchDao;
+import org.generationcp.middleware.dao.dms.PhenotypeDao;
+import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
+import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
+import org.generationcp.middleware.dao.dms.StockDao;
+import org.generationcp.middleware.dao.dms.StockPropertyDao;
+import org.generationcp.middleware.dao.dms.StudySearchDao;
+import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
+import org.generationcp.middleware.dao.gdms.CharValuesDAO;
+import org.generationcp.middleware.dao.gdms.DartValuesDAO;
+import org.generationcp.middleware.dao.gdms.DatasetDAO;
+import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
+import org.generationcp.middleware.dao.gdms.ExtendedMarkerInfoDAO;
+import org.generationcp.middleware.dao.gdms.MapDAO;
+import org.generationcp.middleware.dao.gdms.MappingDataDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
+import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
+import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDetailsDAO;
+import org.generationcp.middleware.dao.gdms.MtaDAO;
+import org.generationcp.middleware.dao.gdms.MtaMetadataDAO;
+import org.generationcp.middleware.dao.gdms.QtlDAO;
+import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.dao.gdms.TrackDataDAO;
+import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.dao.oms.*;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.dao.oms.CVDao;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
+import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
+import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -41,10 +101,7 @@ public class DatabaseBroker {
     protected String localDatabaseName;
 
     protected static final int JDBC_BATCH_SIZE = 50;
-
-    private Session activeSession;
-    private Database activeDatabase;
-    
+  
     // GDMS DAOs
     private NameDAO nameDao;
     private AccMetadataSetDAO accMetadataSetDao;
@@ -115,142 +172,21 @@ public class DatabaseBroker {
         return sessionProviderForLocal;
     }
     
-    public void setSessionProviderForLocal(HibernateSessionProvider sessionProviderForLocal){
+    public void setSessionProviderForLocal(HibernateSessionProvider sessionProviderForLocal) {
     	this.sessionProviderForLocal = sessionProviderForLocal;
     }
     
-    /**
-     * Returns the current session if not null, otherwise returns null
-     * 
-     */
     public Session getCurrentSessionForLocal() {
-        if (sessionProviderForLocal != null) {
+        return getActiveSession();
+    }
+    
+    protected Session getActiveSession() {
+    	if (sessionProviderForLocal != null) {
             return sessionProviderForLocal.getSession();
         }
         return null;
     }
-
-    /**
-     * Returns the current session for central if not null, otherwise returns null
-     * 
-     */
-    public Session getCurrentSessionForCentral() {
-    	//HACK : Diverting all calls to get central session to only ever return the local session.
-        return getCurrentSessionForLocal();
-    }
-
-    protected Database getActiveDatabase() {
-    	return activeDatabase;
-    }
-
-    /**
-     * Checks for the existence of a local database session. Throws an exception if not found.
-     * 
-     */
-    protected Session requireLocalDatabaseInstance() throws MiddlewareQueryException {
-        if (!setWorkingDatabase(Database.LOCAL)) {
-            throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
-        }
-        return getCurrentSessionForLocal();
-    }
-
-    /**
-     * Checks for the existence of a central database session. Throws an exception if not found.
-     * 
-     */
-    protected void requireCentralDatabaseInstance() throws MiddlewareQueryException {
-        if (!setWorkingDatabase(Database.CENTRAL)) {
-            throw new MiddlewareQueryException(NO_CENTRAL_INSTANCE_MSG);
-        }
-    }
-
-    /**
-     * Sets the session of a given DAO. Returns true if successful. 
-     * 
-     */
-    @SuppressWarnings("rawtypes")
-	protected boolean setDaoSession(GenericDAO dao, Session session) {
-        if (session != null) {
-            dao.setSession(session);
-            return true;
-        }
-        return false;
-    }
-    
-	@SuppressWarnings("rawtypes")
-	protected boolean setDaoSession(GenericDAO dao, Integer id) {
-		if (setWorkingDatabase(id)) {
-			dao.setSession(activeSession);
-			return true;
-		}
-		return false;
-	}
-
-    /** 
-     * Retrieves the current active session - either local or central database connection.
-     * 
-     * @return The current active session
-     */
-    protected Session getActiveSession() {
-        return activeSession;
-    }
-
-    protected boolean setWorkingDatabase(Database instance) {
-        //HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
-    	activeSession = getCurrentSessionForLocal();
-        activeDatabase = Database.LOCAL;
-        
-        if (activeSession != null) {
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean setWorkingDatabase(Integer id) {
-    	if (id != null) {
-    		//HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
-	        activeSession = getCurrentSessionForLocal();
-	        activeDatabase = Database.LOCAL;
-	        if (activeSession != null) {
-	            return true;
-	        }
-    	}
-        return false;
-    }
-
-    @SuppressWarnings("rawtypes")
-    protected boolean setWorkingDatabase(Database instance, GenericDAO dao) {
-        
-    	//HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
-    	activeSession = getCurrentSessionForLocal();
-        activeDatabase = Database.LOCAL;
-        
-        if (activeSession != null) {
-            return setDaoSession(dao, activeSession);
-        }
-        return false;
-    }
-
-    /**
-     * Sets the active session based on the given instance.         <br/>
-     * Returns true if the active session is not null.              <br/>
-     * @param id
-     *          If the given id is positive, the session is set to Central.
-     *          If the given id is negative, the session is set to Local.
-     * @param dao 
-     *          The DAO to set the active session into
-     */
-    @SuppressWarnings("rawtypes")
-    protected boolean setWorkingDatabase(Integer id, GenericDAO dao) {
-    	//HACK: Hard codding to only ever return the same (local) db session for all operations for the single (merged) DB scheme.
-    	activeSession = getCurrentSessionForLocal();
-        activeDatabase = Database.LOCAL;
-        if (activeSession != null) {
-            return setDaoSession(dao, activeSession);
-        }
-        return false;
-    }
-    
+ 
     /**
      * Rolls back a given transaction
      * 

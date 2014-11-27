@@ -11,7 +11,27 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -23,7 +43,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -33,8 +52,6 @@ import org.generationcp.middleware.util.TimerWatch;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 //ASsumptions - can be added to validations
 //Mandatory fields:  workbook.studyDetails.studyName
@@ -189,7 +206,6 @@ public class WorkbookSaver extends Saver {
         if (isDeleteTrialObservations) {
             session.flush();
             session.clear();
-            requireLocalDatabaseInstance();
             ExperimentModel studyExperiment = getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
             studyExperiment.setGeoLocation(getGeolocationDao().getById(studyLocationId));
             getExperimentDao().saveOrUpdate(studyExperiment);
@@ -319,7 +335,6 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	public void saveTrialObservations(Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
-        setWorkingDatabase(Database.LOCAL);
         if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
             for (MeasurementRow trialObservation : workbook.getTrialObservations()) {
                 getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery());
@@ -787,13 +802,11 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private Integer getProjectId(String name, TermId relationship) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getDmsProjectDao().getProjectIdByName(name, relationship);
 	}
 	
 	private Integer getMeansDataset(Integer studyId) throws MiddlewareQueryException {
 		Integer id = null;
-		setWorkingDatabase(Database.LOCAL);
 		List<DmsProject> datasets = getDmsProjectDao().getDataSetsByStudyAndProjectProperty(
                 studyId, TermId.DATASET_TYPE.getId(), String.valueOf(DataSetType.MEANS_DATA.getId()));
 		if(datasets!=null && !datasets.isEmpty()) {
@@ -933,7 +946,6 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private boolean checkIfHasExistingStudyExperiment(int studyId) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
         Integer experimentId = getExperimentProjectDao().getExperimentIdByProjectId(studyId);
         if(experimentId!=null) {
         	return true;
@@ -942,7 +954,6 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private boolean checkIfHasExistingExperiments(List<Integer> locationIds) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
         List<Integer> experimentIds = getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
         if(experimentIds!=null && !experimentIds.isEmpty()) {
         	return true;
@@ -964,10 +975,8 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	public void saveWorkbookVariables(Workbook workbook) throws MiddlewareQueryException {		
-		setWorkingDatabase(Database.LOCAL);
 		getProjectRelationshipSaver().saveOrUpdateStudyToFolder(workbook.getStudyDetails().getId(), 
 				Long.valueOf(workbook.getStudyDetails().getParentFolderId()).intValue());
-		setWorkingDatabase(Database.LOCAL);
 		DmsProject study = getDmsProjectDao().getById(workbook.getStudyDetails().getId());
 		Integer trialDatasetId = workbook.getTrialDatasetId(), measurementDatasetId = workbook.getMeasurementDatesetId();
 		if (workbook.getTrialDatasetId() == null || workbook.getMeasurementDatesetId() == null) {

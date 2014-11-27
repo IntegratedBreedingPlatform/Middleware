@@ -11,17 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
+import java.util.HashSet;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-
-import java.util.HashSet;
 
 public class StockSaver extends Saver {
 
@@ -30,8 +29,6 @@ public class StockSaver extends Saver {
 	}
 
 	public Integer saveStock(VariableList variableList) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
 		StockModel stockModel = createStock(variableList, null);
 		if (stockModel != null) {
 			getStockDao().save(stockModel);
@@ -42,8 +39,6 @@ public class StockSaver extends Saver {
 	}
 	
 	public void saveOrUpdateStock(VariableList variableList, int stockId) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
 		StockModel stockModel = getStockModelBuilder().get(stockId);
 		createStock(variableList, stockModel);
 		if (stockModel != null) {

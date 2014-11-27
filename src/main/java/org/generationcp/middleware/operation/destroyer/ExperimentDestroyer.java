@@ -13,17 +13,14 @@ public class ExperimentDestroyer extends Destroyer {
 
 	
 	public void deleteExperimentsByIds(List<Integer> experimentIds) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		getExperimentDao().deleteExperimentsByIds(experimentIds);
 	}
 	
 	public void deleteExperimentsByStudy(int datasetId) throws MiddlewareQueryException {
-	    requireLocalDatabaseInstance();
 	    getExperimentDao().deleteExperimentsByStudy(datasetId);
 	} 
 	
 	public void deleteTrialExperimentsOfStudy(int trialDatasetId) throws MiddlewareQueryException {
-	    requireLocalDatabaseInstance();
         getExperimentDao().deleteTrialExperimentsOfStudy(trialDatasetId);
 	}
 }

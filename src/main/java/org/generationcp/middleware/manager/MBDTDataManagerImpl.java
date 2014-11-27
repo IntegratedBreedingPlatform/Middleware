@@ -38,10 +38,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public Integer setProjectData(MBDTProjectData projectData) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         projectDAO = prepareProjectDAO();
-
-
 
         if (projectData.getProjectID() == null || projectData.getProjectID() == 0) {
             MBDTProjectData existingData = projectDAO.getByName(projectData.getProjectName());
@@ -62,12 +59,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     @Override
     public MBDTProjectData getProjectData(Integer projectID) throws MiddlewareQueryException {
 
-        if (projectID < 0) {
-            requireLocalDatabaseInstance();
-        } else {
-            requireCentralDatabaseInstance();
-        }
-
         projectDAO = prepareProjectDAO();
         MBDTProjectData data = projectDAO.getById(projectID);
         return data;
@@ -75,17 +66,12 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<MBDTProjectData> getAllProjects() throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-
         projectDAO = prepareProjectDAO();
-
         return projectDAO.getAll();
     }
 
     @Override
     public Integer getProjectIDByProjectName(String projectName) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-
         projectDAO = prepareProjectDAO();
 
         MBDTProjectData projectData = projectDAO.getByName(projectName);
@@ -100,7 +86,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     @Override
     public MBDTGeneration setGeneration(Integer projectID, MBDTGeneration generation) throws MiddlewareQueryException {
 
-        requireLocalDatabaseInstance();
         if (generation.getProject() == null) {
             MBDTProjectData project = getProjectData(projectID);
 
@@ -133,32 +118,18 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
     @Override
     public MBDTGeneration getGeneration(Integer generationID) throws MiddlewareQueryException {
 
-        if (generationID < 0) {
-            requireLocalDatabaseInstance();
-        } else {
-            requireCentralDatabaseInstance();
-        }
-
         prepareGenerationDAO();
         return generationDAO.getById(generationID);
     }
 
     @Override
     public List<MBDTGeneration> getAllGenerations(Integer projectID) throws MiddlewareQueryException {
-        if (projectID < 0) {
-            requireLocalDatabaseInstance();
-        } else {
-            requireCentralDatabaseInstance();
-        }
-
         prepareGenerationDAO();
         return generationDAO.getByProjectID(projectID);
     }
 
     @Override
     public Integer getGenerationIDByGenerationName(String name, Integer projectID) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-
         prepareGenerationDAO();
 
         MBDTGeneration generation = generationDAO.getByNameAndProjectID(name, projectID);
@@ -176,8 +147,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         if (markerIDs == null || markerIDs.size() == 0 ) {
             return;
         }
-
-        requireLocalDatabaseInstance();
 
         prepareGenerationDAO();
         prepareSelectedMarkerDAO();
@@ -207,12 +176,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<Integer> getMarkerStatus(Integer generationID) throws MiddlewareQueryException {
-        if (generationID < 0) {
-            requireLocalDatabaseInstance();
-        } else {
-            requireCentralDatabaseInstance();
-        }
-
         prepareGenerationDAO();
 
         MBDTGeneration generation = generationDAO.getById(generationID);
@@ -234,11 +197,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<SelectedGenotype> getSelectedAccession(Integer generationID) throws MiddlewareQueryException {
-        if (generationID < 0) {
-            requireLocalDatabaseInstance();
-        } else {
-            requireCentralDatabaseInstance();
-        }
 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
@@ -258,11 +216,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException {
-        if (generationID < 0) {
-            requireLocalDatabaseInstance();
-        } else {
-            requireCentralDatabaseInstance();
-        }
 
         prepareSelectedGenotypeDAO();
         prepareGenerationDAO();
@@ -286,8 +239,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         if (gids == null || gids.size() == 0) {
             return;
         }
-
-        requireLocalDatabaseInstance();
 
         Set<Integer> gidSet = new HashSet<Integer>(gids);
 
@@ -366,9 +317,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
         if (genotypeEnum.equals(SelectedGenotypeEnum.SD) || genotypeEnum.equals(SelectedGenotypeEnum.SR)) {
             throw new MiddlewareQueryException("Set Parent Data only takes in Recurrent or Donor as possible types. Use setSelectedAccession to mark / create entries as Selected Recurrent / Selected Donor");
         }
-
-
-        requireLocalDatabaseInstance();
 
         prepareGenerationDAO();
         prepareSelectedGenotypeDAO();
@@ -486,10 +434,8 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
     @Override
     public void clear() {
-        if (getActiveSession() == null) {
-            setWorkingDatabase(Database.LOCAL);
+        if (getActiveSession() != null) {
+            getActiveSession().clear();
         }
-
-        getActiveSession().clear();
     }
 }

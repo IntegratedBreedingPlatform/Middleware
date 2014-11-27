@@ -14,7 +14,6 @@ package org.generationcp.middleware.operation.builder;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class MethodBuilder extends Builder {
@@ -36,11 +35,7 @@ public class MethodBuilder extends Builder {
 	}
 	
 	public Term findMethodByName(String name) throws MiddlewareQueryException {
-		Term term = null;
-		if (term == null && this.setWorkingDatabase(Database.LOCAL)) {
-			term = mapToTerm(this.getCvTermDao().getByNameAndCvId(name, METHOD_CV_ID));
-		}
-		return term;
+		return mapToTerm(this.getCvTermDao().getByNameAndCvId(name, METHOD_CV_ID));
 	}
 	
 	private Term mapToTerm(CVTerm cvTerm) {

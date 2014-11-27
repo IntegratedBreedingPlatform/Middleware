@@ -68,11 +68,9 @@ public class StudyResultSetByParentFolder extends Searcher implements StudyResul
 		index = 0;
 		int folderId = filter.getFolderId();
 		studyReferences.clear();
-		if (setWorkingDatabase(folderId)) {
-			List<DmsProject> projects = (List<DmsProject>) getDmsProjectDao().getProjectsByFolder(folderId, startIndex, numOfRows);
-			for (DmsProject project : projects) {
-				studyReferences.add(new StudyReference(project.getProjectId(), project.getName(), project.getDescription()));
-			}
+		List<DmsProject> projects = (List<DmsProject>) getDmsProjectDao().getProjectsByFolder(folderId, startIndex, numOfRows);
+		for (DmsProject project : projects) {
+			studyReferences.add(new StudyReference(project.getProjectId(), project.getName(), project.getDescription()));
 		}
 		startIndex += numOfRows;
 	}
@@ -80,9 +78,7 @@ public class StudyResultSetByParentFolder extends Searcher implements StudyResul
 	private long countStudies() throws MiddlewareQueryException {
 		int folderId = filter.getFolderId();
 		long count = 0;
-		if (setWorkingDatabase(folderId)) {
-			count = getDmsProjectDao().countProjectsByFolder(folderId);
-		}
+		count = getDmsProjectDao().countProjectsByFolder(folderId);
 		return count;
 	}
 }

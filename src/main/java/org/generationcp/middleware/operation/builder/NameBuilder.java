@@ -20,7 +20,6 @@ public class NameBuilder extends Builder {
 	public int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count) throws MiddlewareQueryException {
 		Set<String> names = new HashSet<String>();
 		TimerWatch timer = new TimerWatch("Retrieve all matched names");
-		setWorkingDatabase(Database.LOCAL);
 		names.addAll(getNameDao().getAllMatchingNames(prefix, suffix));
 		timer.restart("get maximum sequence");
 		int max = getMaximumSequenceInNames(isBulk, names, prefix, suffix, count);

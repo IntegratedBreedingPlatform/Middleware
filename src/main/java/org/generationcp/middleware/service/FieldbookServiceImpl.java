@@ -204,7 +204,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@SuppressWarnings("unchecked")
 	@Override
     public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
@@ -386,7 +385,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                             , GermplasmList germplasmList)
             throws MiddlewareQueryException {
         
-        Session session = requireLocalDatabaseInstance();
+        Session session = getActiveSession();
         Transaction trans = null;
 
         Integer listId = null;
@@ -493,7 +492,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     private List<Name> getByGidAndNtype(int gid, GermplasmNameType nType) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getNameDao().getByGIDWithFilters(gid, null, nType);
     }
     
@@ -549,8 +547,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override
     public List<ValueReference> getAllNurseryTypes() throws MiddlewareQueryException{
         
-        setWorkingDatabase(Database.LOCAL);
-
         List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
 
         StandardVariable stdVar = getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId());
@@ -595,7 +591,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	}
     	
     	List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
-    	setWorkingDatabase(Database.LOCAL);
     	variables.addAll(getCvTermDao().getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(), TermId.CATEGORICAL_VARIABLE.getId()));
     	for (CVTerm variable : variables) {
     		list.add(new StandardVariableReference(variable.getCvTermId()
@@ -607,7 +602,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     private void addAllVariableIdsInMode(Set<Integer> variableIds
             , List<Integer> storedInIds, Database database) throws MiddlewareQueryException {
-    	setWorkingDatabase(database);
     	for (Integer storedInId : storedInIds) {
     		variableIds.addAll(getCvTermRelationshipDao()
     		        .getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
@@ -616,7 +610,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private void createPropertyList(Set<Integer> propertyVariableList
             , List<Integer> propertyIds, Database database) throws MiddlewareQueryException{
-        setWorkingDatabase(database);
         for (Integer propertyId : propertyIds) {
             propertyVariableList.addAll(getCvTermRelationshipDao()
                         .getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
@@ -728,10 +721,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StandardVariableReference> getAllTreatmentLevels(List<Integer> hiddenFields) throws MiddlewareQueryException {
 		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
-		setWorkingDatabase(Database.LOCAL);
 		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, true));
 		list.addAll(getCvTermDao().getAllTreatmentFactors(hiddenFields, false));
-		
 		Collections.sort(list);
 		return list;
 	}
@@ -739,8 +730,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException {
 		List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
-		
-		setWorkingDatabase(Database.LOCAL);
 		treatmentPairs.addAll(getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 		
 		List<Integer> termIds = new ArrayList<Integer>();
@@ -753,7 +742,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		
 		List<CVTerm> terms = new ArrayList<CVTerm>();
-		setWorkingDatabase(Database.LOCAL);
 		terms.addAll(getCvTermDao().getByIds(termIds));
 		
 		for (CVTerm term : terms) {
@@ -774,7 +762,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public TermId getStudyType(int studyId) throws MiddlewareQueryException {
-		setWorkingDatabase(studyId);
 		String value = getProjectPropertyDao().getValueByProjectIdAndTypeId(studyId, TermId.STUDY_TYPE.getId());
 		if (value != null && NumberUtils.isNumber(value)) {
 			return TermId.getById(Integer.valueOf(value));
@@ -860,7 +847,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public String getBlockId(int datasetId, String trialInstance) throws MiddlewareQueryException {
-		setWorkingDatabase(datasetId);
 		return getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
 	}
 	
@@ -898,10 +884,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException {
-	    requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-
         try {
             trans = session.beginTransaction(); 
 
@@ -921,7 +905,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getNameDao().getGidsByName(name);
 	}
 	
@@ -946,7 +929,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getDmsProjectDao().getProjectIdByName(name);
 	}
 	
@@ -980,7 +962,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getNameDao().getNamesByGidsInMap(gids);
 	}
 
@@ -1015,7 +996,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public void deleteStudy(int studyId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
@@ -1059,20 +1039,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
     public List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type) throws MiddlewareQueryException {
-        setWorkingDatabase(projectId);
         return getGermplasmListDAO().getByProjectIdAndType(projectId, type);
     }
 	
 	@Override
     public List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException {
-        setWorkingDatabase(listId);
         return getListDataProjectDAO().getByListId(listId);
     }
 	
 	@Override
     public void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException {
         //when used in advanced, it will delete all the advance lists (list data projects)
-        requireLocalDatabaseInstance();
         List<GermplasmList> lists = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
         if (lists != null && !lists.isEmpty()) {
             for (GermplasmList list : lists) {
@@ -1086,7 +1063,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             GermplasmListType type, Integer originalListId,
             List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
         
-        requireLocalDatabaseInstance();
         int listId = 0;
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;

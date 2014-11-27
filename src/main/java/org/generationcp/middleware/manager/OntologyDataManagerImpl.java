@@ -90,7 +90,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
@@ -143,7 +142,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
@@ -175,9 +173,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym)
             throws MiddlewareQueryException {
         Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            standardVariables.addAll(getStandardVariablesByNameOrSynonym(nameOrSynonym));
-        }
+        standardVariables.addAll(getStandardVariablesByNameOrSynonym(nameOrSynonym));
         return standardVariables;
     }
 
@@ -237,24 +233,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return getTermBuilder().getTermsByCvId(cvId);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Term> getAllTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countTermsByCvId", "getTermsByCvId");
-        Object[] centralParameters = new Object[] { cvId };
-        Object[] localParameters = new Object[] { cvId };
-        List<CVTerm> cvTerms = getFromCentralAndLocalByMethod(getCvTermDao(), methods, start, numOfRows,
-                centralParameters, localParameters, new Class[] { CvId.class });
-        List<Term> terms = null;
-        if (cvTerms != null && !cvTerms.isEmpty()) {
-            terms = new ArrayList<Term>();
-            for (CVTerm cvTerm : cvTerms) {
-                terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
-            }
-        }
-        return terms;
-    }
-
     @Override
     public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException {
         return getCvTermDao().countTermsByCvId(cvId);
@@ -264,13 +242,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException {
         List<Term> methodTerms = new ArrayList<Term>();
         Set<Integer> methodIds = new HashSet<Integer>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            List<Integer> localMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
-            if (localMethodIds != null) {
-                methodIds.addAll(localMethodIds);
-            }
+        List<Integer> localMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
+        if (localMethodIds != null) {
+            methodIds.addAll(localMethodIds);
         }
-        // iterate list
         for (Integer termId : methodIds) {
             methodTerms.add(getTermBuilder().get(termId));
         }
@@ -281,13 +256,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException {
         List<Term> scaleTerms = new ArrayList<Term>();
         Set<Integer> scaleIds = new HashSet<Integer>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            List<Integer> localMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
-            if (localMethodIds != null) {
-                scaleIds.addAll(localMethodIds);
-            }
+        List<Integer> localMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
+        if (localMethodIds != null) {
+            scaleIds.addAll(localMethodIds);
         }
-        // iterate list
         for (Integer termId : scaleIds) {
             scaleTerms.add(getTermBuilder().get(termId));
         }
@@ -307,7 +279,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             return term;
         }
 
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -333,7 +304,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareException("Error in updateTerm: Cannot update terms in central.");
         }
         
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -367,13 +337,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         TreeMap<String, StandardVariable> standardVariables = new TreeMap<String, StandardVariable>();
         List<Integer> localStdVariableIds = new ArrayList<Integer>();
 
-        if (setWorkingDatabase(Database.LOCAL)) {
-            localStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
+        localStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
 
-            for (Integer stdVarId : localStdVariableIds) {
-                StandardVariable sd = getStandardVariableBuilder().create(stdVarId);
-                standardVariables.put(sd.getName(), sd);
-            }
+        for (Integer stdVarId : localStdVariableIds) {
+            StandardVariable sd = getStandardVariableBuilder().create(stdVarId);
+            standardVariables.put(sd.getName(), sd);
         }
 
         Set<String> standardVariablesSet = standardVariables.keySet();
@@ -399,35 +367,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         List<CVTerm> cvTerms = new ArrayList<CVTerm>();
         List<Integer> termIds = new ArrayList<Integer>();
 
-        if (setWorkingDatabase(Database.LOCAL)) {
-            termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
-            for (Integer id : termIds) {
-                cvTerms.add(getCvTermDao().getById(id));
-            }
+        termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
+        for (Integer id : termIds) {
+            cvTerms.add(getCvTermDao().getById(id));
         }
-
         for (CVTerm cvTerm : cvTerms) {
             terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
-        }
-
-        return terms;
-
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Term> getIsAOfProperties(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countIsAOfTermsByCvId", "getIsAOfTermsByCvId");
-        Object[] centralParameters = new Object[] { CvId.PROPERTIES };
-        Object[] localParameters = new Object[] { CvId.PROPERTIES };
-        List<CVTerm> cvTerms = getFromCentralAndLocalByMethod(getCvTermDao(), methods, start, numOfRows,
-                centralParameters, localParameters, new Class[] { CvId.class });
-        List<Term> terms = null;
-        if (cvTerms != null && !cvTerms.isEmpty()) {
-            terms = new ArrayList<Term>();
-            for (CVTerm cvTerm : cvTerms) {
-                terms.add(TermBuilder.mapCVTermToTerm(cvTerm));
-            }
         }
         return terms;
     }
@@ -441,7 +386,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             return term;
         }
 
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -467,7 +411,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         
     @Override
     public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
@@ -492,7 +435,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId, String cropOntologyId) 
             throws MiddlewareQueryException, MiddlewareException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -526,7 +468,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareException("Error in updateTerm: Cannot update terms in central.");
         }
         
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 		Term updatedTerm = null;
@@ -534,8 +475,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         if (term == null){
         	return null;
         }
-
-
 
         try {
             trans = session.beginTransaction();
@@ -551,7 +490,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
         
         return updatedTerm;
-        
     }
 
 	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
@@ -616,9 +554,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public long countIsAOfProperties() throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
-        }
+        count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
         return count;
     }
 
@@ -640,7 +576,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             return new TraitClass(term, getTermById(parentTraitClassId));
         }
 
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -682,7 +617,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
         
         // For property, scale, method
-        setWorkingDatabase(Database.LOCAL);
         List<Integer> standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
         for (Integer id : standardVariableIds) {
             standardVariables.add(getStandardVariable(id));
@@ -693,8 +627,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     private List<StandardVariable> getStandardVariablesOfTraitClass(Database instance, Integer traitClassId) throws MiddlewareQueryException{
         List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
-        setWorkingDatabase(instance);
-
         List<PropertyReference> properties = getCvTermDao().getPropertiesOfTraitClass(traitClassId);
 
         List<Integer> propertyIds = new ArrayList<Integer>();
@@ -736,7 +668,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException(errorCodes, "The variable you entered is invalid");
         }
         
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -760,8 +691,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
             throws MiddlewareException, MiddlewareQueryException{
-        requireLocalDatabaseInstance();
-        Session session = getCurrentSessionForLocal();
+        
+    	Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         try {
@@ -778,7 +709,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public void deleteStandardVariableLocalConstraints(int standardVariableId) 
             throws MiddlewareQueryException{
         
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -807,7 +737,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         Integer cvId = getEnumerationCvId(variable);
 
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -837,7 +766,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         Integer cvId = getEnumerationCvId(variable);
         
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -869,7 +797,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         // Check if cv entry of enumeration already exists
         // Add cv entry of the standard variable if none found
-        setWorkingDatabase(Database.LOCAL);
         Integer cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
                 
         if (cvId == null){
@@ -882,7 +809,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -902,7 +828,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         
     @Override
     public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
@@ -927,7 +852,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -993,16 +917,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         try {
             trans = session.beginTransaction();
             StandardVariable stdVar = getStandardVariable(stdVariableId);
-            
             getStandardVariableSaver().delete(stdVar);
-
             trans.commit();
             
         } catch (Exception e) {
@@ -1049,6 +970,4 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(termId);
 		return getNameSynonymBuilder().create(synonyms);
 	}
-
-
 }

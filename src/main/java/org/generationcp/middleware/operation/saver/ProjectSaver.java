@@ -26,7 +26,6 @@ public class ProjectSaver extends Saver {
 	}
 
 	public DmsProject save(DmsProject project) throws MiddlewareQueryException{
-		requireLocalDatabaseInstance();
         DmsProjectDao projectDao = getDmsProjectDao();
         Integer generatedId = projectDao.getNegativeId("projectId");
         project.setProjectId(generatedId);
@@ -78,7 +77,6 @@ public class ProjectSaver extends Saver {
 	 * Saves a folder. Creates an entry in project and project_relationship
 	 */
 	public DmsProject saveFolder(int parentId, String name, String description) throws Exception{
-        requireLocalDatabaseInstance();
         DmsProject project = new DmsProject();
         mapStudytoProject(null, name, description, project);
         

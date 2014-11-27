@@ -28,7 +28,6 @@ public class CvTermSaver extends Saver {
 	}
 
 	public Term save(String name, String definition, CvId cvId)  throws MiddlewareException, MiddlewareQueryException{ 
-		requireLocalDatabaseInstance();
 		validateInputFields(name, definition);
         CVTermDao dao = getCvTermDao();
 
@@ -46,7 +45,6 @@ public class CvTermSaver extends Saver {
 	
 
     public Term saveOrUpdate(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         validateInputFields(name, definition);
         CVTermDao dao = getCvTermDao();
         
@@ -66,7 +64,6 @@ public class CvTermSaver extends Saver {
     }
     
     public Term update(Term term) throws MiddlewareException, MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         validateInputFields(term.getName(), term.getDefinition());
         CVTermDao dao = getCvTermDao();
 
@@ -107,13 +104,11 @@ public class CvTermSaver extends Saver {
 	}
 	
 	public void delete(CVTerm cvTerm, CvId cvId) throws MiddlewareQueryException {
-	    requireLocalDatabaseInstance();
-            CVTermDao dao = getCvTermDao();
-
-            try {
-                dao.makeTransient(cvTerm);
-            } catch (MiddlewareQueryException e) {
-                throw new MiddlewareQueryException(e.getMessage(), e);
-            }
+        CVTermDao dao = getCvTermDao();
+        try {
+            dao.makeTransient(cvTerm);
+        } catch (MiddlewareQueryException e) {
+            throw new MiddlewareQueryException(e.getMessage(), e);
+        }
 	} 
 }

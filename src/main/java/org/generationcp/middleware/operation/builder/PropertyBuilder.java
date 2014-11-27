@@ -11,12 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
-
-import java.util.List;
 
 
 public class PropertyBuilder extends Builder{
@@ -26,7 +25,6 @@ public class PropertyBuilder extends Builder{
     }
 
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getCvTermDao().getAllPropertiesWithTraitClass();
     }
 }

@@ -60,8 +60,6 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 	public LotsResult addAdvanceLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
 			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
 		
-		requireLocalDatabaseInstance();
-		
 		LotsResult result  = getLotBuilder().getGidsForUpdateAndAdd(gids);
 		List<Integer> newGids = result.getGidsAdded();
 		List<Integer> existingGids = result.getGidsUpdated();

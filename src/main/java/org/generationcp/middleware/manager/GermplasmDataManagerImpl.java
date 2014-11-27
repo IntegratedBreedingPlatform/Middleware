@@ -58,12 +58,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     @Deprecated
-    public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
-    }
-    
-    @Override
-    @Deprecated
     public List<Location> getAllLocations() throws MiddlewareQueryException{
         List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
         Collections.sort(locations);
@@ -73,10 +67,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {
-        if (setWorkingDatabase(Database.LOCAL)) {
-            return this.getLocationDao().getAll(start, numOfRows);
-        }
-        return new ArrayList<Location>();
+        return this.getLocationDao().getAll(start, numOfRows);
     }
 
     @Override
@@ -89,9 +80,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Deprecated
     public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         List<Location> locations = new ArrayList<Location>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            locations.addAll(getLocationDao().getByName(name, op));
-        }
+        locations.addAll(getLocationDao().getByName(name, op));
         return locations;
     }
 
@@ -102,8 +91,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { name, op },
                 new Class[] { String.class, Operation.class });
     }
-
-
 
     @Override
     @Deprecated
@@ -177,7 +164,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, GetGermplasmByNameModes mode, Operation op,
             Integer status, GermplasmNameType type, Database instance) throws MiddlewareQueryException {
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-        setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
@@ -221,7 +207,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-        setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
@@ -262,7 +247,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
             Database instance) throws MiddlewareQueryException {
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-        setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
@@ -297,7 +281,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public long countGermplasmByName(String name, Operation operation) throws MiddlewareQueryException {
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-        setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
@@ -333,7 +316,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	List<Germplasm> germplasms = new ArrayList<Germplasm>();
     	//get first all the IDs
     	List<Integer> germplasmIds = new ArrayList<Integer>();
-    	setWorkingDatabase(Database.LOCAL);
     	germplasmIds.addAll(getGermplasmDao().getIdsByName(name, start, numOfRows));    	
 		germplasms.addAll(getGermplasmDao().getGermplasmByIds(germplasmIds, start, numOfRows));
     	return germplasms;
@@ -343,13 +325,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
         List<Germplasm> germplasms = new ArrayList<Germplasm>();
-        if (setWorkingDatabase(instance)) {
-            GermplasmDAO dao = getGermplasmDao();
-            if (op == Operation.EQUAL) {
-                germplasms = dao.getByLocationNameUsingEqual(name, start, numOfRows);
-            } else if (op == Operation.LIKE) {
-                germplasms = dao.getByLocationNameUsingLike(name, start, numOfRows);
-            }
+        GermplasmDAO dao = getGermplasmDao();
+        if (op == Operation.EQUAL) {
+            germplasms = dao.getByLocationNameUsingEqual(name, start, numOfRows);
+        } else if (op == Operation.LIKE) {
+            germplasms = dao.getByLocationNameUsingLike(name, start, numOfRows);
         }
         return germplasms;
     }
@@ -357,13 +337,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(instance)) {
-            GermplasmDAO dao = getGermplasmDao();
-            if (op == Operation.EQUAL) {
-                count = dao.countByLocationNameUsingEqual(name);
-            } else if (op == Operation.LIKE) {
-                count = dao.countByLocationNameUsingLike(name);
-            }
+        GermplasmDAO dao = getGermplasmDao();
+        if (op == Operation.EQUAL) {
+            count = dao.countByLocationNameUsingEqual(name);
+        } else if (op == Operation.LIKE) {
+            count = dao.countByLocationNameUsingLike(name);
         }
         return count;
     }
@@ -372,14 +350,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
         List<Germplasm> germplasms = new ArrayList<Germplasm>();
-
-        if (setWorkingDatabase(instance)) {
-            GermplasmDAO dao = getGermplasmDao();
-            if (op == Operation.EQUAL) {
-                germplasms = dao.getByMethodNameUsingEqual(name, start, numOfRows);
-            } else if (op == Operation.LIKE) {
-                germplasms = dao.getByMethodNameUsingLike(name, start, numOfRows);
-            }
+        GermplasmDAO dao = getGermplasmDao();
+        if (op == Operation.EQUAL) {
+            germplasms = dao.getByMethodNameUsingEqual(name, start, numOfRows);
+        } else if (op == Operation.LIKE) {
+            germplasms = dao.getByMethodNameUsingLike(name, start, numOfRows);
         }
         return germplasms;
     }
@@ -387,21 +362,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public long countGermplasmByMethodName(String name, Operation op, Database instance) throws MiddlewareQueryException {
         long count = 0;
-        if (setWorkingDatabase(instance)) {
-            GermplasmDAO dao = getGermplasmDao();
-            if (op == Operation.EQUAL) {
-                count = dao.countByMethodNameUsingEqual(name);
-            } else if (op == Operation.LIKE) {
-                count = dao.countByMethodNameUsingLike(name);
-            }
+        GermplasmDAO dao = getGermplasmDao();
+        if (op == Operation.EQUAL) {
+            count = dao.countByMethodNameUsingEqual(name);
+        } else if (op == Operation.LIKE) {
+            count = dao.countByMethodNameUsingLike(name);
         }
         return count;
     }
 
     @Override
     public Germplasm getGermplasmByGID(Integer gid) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
-		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
@@ -409,7 +380,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return getGermplasmDao().
 				callStoredProcedureForObject("getUpdatedGermplasmByID",
 						params,Germplasm.class);
-
     }
 
     @Override
@@ -424,23 +394,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Germplasm getGermplasmWithPrefAbbrev(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return (Germplasm) getGermplasmDao().getByGIDWithPrefAbbrev(gid);
-        }
-        return null;
+        return (Germplasm) getGermplasmDao().getByGIDWithPrefAbbrev(gid);
     }
 
     @Override
     public Name getGermplasmNameByID(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return (Name) getNameDao().getById(id, false);
-        }
-        return null;
+        return (Name) getNameDao().getById(id, false);
     }
 
     @Override
     public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {      
-        setWorkingDatabase(Database.LOCAL);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
@@ -462,7 +425,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Name getPreferredNameByGID(Integer gid) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
@@ -474,7 +436,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException{
-        setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
@@ -485,18 +446,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Name getPreferredAbbrevByGID(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            List<Name> names = getNameDao().getByGIDWithFilters(gid, 2, null);
-            if (!names.isEmpty()) {
-                return names.get(0);
-            }
+        List<Name> names = getNameDao().getByGIDWithFilters(gid, 2, null);
+        if (!names.isEmpty()) {
+            return names.get(0);
         }
         return null;
     }
     
     @Override
     public Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
@@ -507,18 +465,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public List<Name> getPreferredIdsByListId(Integer listId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(listId)) {
-            return getNameDao().getPreferredIdsByListId(listId);
-        }
-        return null;
+        return getNameDao().getPreferredIdsByListId(listId);
     }
 
     @Override
     public Name getNameByGIDAndNval(Integer gid, String nval, GetGermplasmByNameModes mode) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
-        }
-        return null;
+        return getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
     }
 
     @Override
@@ -534,7 +486,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private void updateGermplasmPrefNameAbbrev(Integer gid, String newPrefValue, String nameOrAbbrev) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -614,7 +565,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private List<Integer> addOrUpdateGermplasmName(List<Name> names, Operation operation) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -659,15 +609,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
-		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("gid",gid);
 		return getAttributeDao().
 				callStoredProcedureForList("getAttributesByGID",
 						params,Attribute.class);
-    	
     }
     
     @Override
@@ -696,17 +643,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Method getMethodByID(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return (Method) getMethodDao().getById(id, false);
-        }
-        return null;
+        return (Method) getMethodDao().getById(id, false);
     }
 
     @Override
     public List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException {
         List<Method> results = new ArrayList<Method>();
 
-        if (!ids.isEmpty() && setWorkingDatabase(Database.LOCAL)) {
+        if (!ids.isEmpty()) {
             results.addAll(getMethodDao().getMethodsByIds(ids));
         }
 
@@ -780,7 +724,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Integer addMethod(Method method) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -811,7 +754,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Method editMethod(Method method) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -843,7 +785,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -874,7 +815,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public void deleteMethod(Method method) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -894,28 +834,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return (UserDefinedField) getUserDefinedFieldDao().getById(id, false);
-        }
-        return null;
+        return (UserDefinedField) getUserDefinedFieldDao().getById(id, false);
     }
 
     @Override
     @Deprecated
     public Country getCountryById(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getCountryDao().getById(id, false);
-        }
-        return null;
+        return getCountryDao().getById(id, false);
     }
 
     @Override
     @Deprecated
     public Location getLocationByID(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getLocationDao().getById(id, false);
-        }
-        return null;
+        return getLocationDao().getById(id, false);
     }
 
     @Override
@@ -923,7 +854,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException {
         List<Location> results = new ArrayList<Location>();
 
-        if (ids != null && setWorkingDatabase(Database.LOCAL) && ids.size()>0) {
+        if (ids != null && ids.size()>0) {
            results.addAll(getLocationDao().getLocationByIds(ids));
         }
         
@@ -941,16 +872,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public Bibref getBibliographicReferenceByID(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getBibrefDao().getById(id, false);
-        }
-        return null;
+        return getBibrefDao().getById(id, false);
     }
 
     @Override
     public Integer addBibliographicReference(Bibref bibref) throws MiddlewareQueryException {
         Session session = getCurrentSessionForLocal();
-        requireLocalDatabaseInstance();
         Transaction trans = null;
 
         Integer idBibrefSaved = null;
@@ -1004,7 +931,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private List<Integer> addOrUpdateAttributes(List<Attribute> attributes, Operation operation) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1040,15 +966,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Attribute getAttributeById(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getAttributeDao().getById(id, false);
-        }
-        return null;
+        return getAttributeDao().getById(id, false);
     }
 
     @Override
     public Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
 
         // check if the germplasm record identified by gid exists
         Germplasm child = getGermplasmByGID(gid);
@@ -1121,7 +1043,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private List<Integer> addOrUpdateGermplasms(List<Germplasm> germplasms, Operation operation) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1164,7 +1085,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private int addOrUpdateProgenitors(List<Progenitor> progenitors) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1206,7 +1126,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     			}
 			}
     		if(gids!=null && !gids.isEmpty()) {
-    			setWorkingDatabase(Database.LOCAL);
     			getTransactionDao().cancelUnconfirmedTransactionsForGermplasms(gids);
     		}
     	}
@@ -1224,7 +1143,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1272,7 +1190,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public Integer addUserDefinedField(UserDefinedField field) throws MiddlewareQueryException{
-    	requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1301,7 +1218,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public List<Integer> addUserDefinedFields(List<UserDefinedField> fields) throws MiddlewareQueryException{
-    	requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1341,7 +1257,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public Integer addAttribute(Attribute attr) throws MiddlewareQueryException{
-    	requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1370,7 +1285,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public List<Integer> addAttributes(List<Attribute> attrs) throws MiddlewareQueryException{
-    	requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -1897,11 +1811,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException {
         String nextSequenceStr = "1";
-        
-        if (setWorkingDatabase(Database.LOCAL, getGermplasmDao())){
-            nextSequenceStr =  getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
-        }
-        
+        nextSequenceStr =  getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
         return nextSequenceStr;
     }
 
@@ -1910,23 +1820,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         Map<Integer, String> toreturn = new HashMap<Integer, String>();
         
         if(!gids.isEmpty()){
-        	setWorkingDatabase(Database.LOCAL);
             Map<Integer, String> results = getNameDao().getPrefferedIdsByGIDs(gids);
-            
             for(Integer gid : results.keySet()){
                 toreturn.put(gid, results.get(gid));
             }
         }
-        
         return toreturn;
     }       
     
     @Override
     public List<Germplasm> getGermplasmByLocationId(String name, int locationID) throws MiddlewareQueryException {
         List<Germplasm> germplasmList = new ArrayList<Germplasm>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
-        }
+        germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
         return germplasmList;
     }
     
@@ -1950,22 +1855,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             startGID = temp;
         }
         
-        if (setWorkingDatabase(startGID)) {
-            germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
-            return germplasmList;
-        }
-        
-        return null;
+        germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
+        return germplasmList;
     }
     
     @Override 
     public List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException{
         List<Germplasm> germplasmList = new ArrayList<Germplasm>();
-        
-        if (setWorkingDatabase(Database.LOCAL)) {
-            germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
-        }
-        
+        germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
         return germplasmList;
     }
     
@@ -1974,7 +1871,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
          Map<Integer, String> toreturn = new HashMap<Integer, String>();
                  
          if(!gids.isEmpty()){
-         	 setWorkingDatabase(Database.LOCAL);
              Map<Integer, String> results = getNameDao().getPrefferedNamesByGIDs(gids);
              for(Integer gid : results.keySet()){
                  toreturn.put(gid, results.get(gid));
@@ -1986,7 +1882,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException{
-    	setWorkingDatabase(Database.LOCAL);
     	return getLocationDao().getLocationNamesMapByGIDs(gids);
     }
 
@@ -2000,8 +1895,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return new ArrayList<Germplasm>();
         }
         
-        setWorkingDatabase(Database.LOCAL);
-    	
         Set<Germplasm> result = new LinkedHashSet<Germplasm>();
     	
         String searchType;
@@ -2075,7 +1968,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
    
     
     public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
         return getGermplasmDao().getGermplasmDatesByGids(gids);
     }
     
@@ -2084,12 +1976,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         Map<Integer, Object> results = new HashMap<Integer, Object>();
         Map<Integer, Integer> methodIds = new HashMap<Integer, Integer>();
         
-        if (setWorkingDatabase(Database.LOCAL)) {
-            methodIds = getGermplasmDao().getMethodIdsByGids(gids);
-            for(Map.Entry<Integer,Integer> entry: methodIds.entrySet()) {
-            	Method method = getMethodDao().getById(entry.getValue(), false);
-            	results.put(entry.getKey(), method);
-            }
+        methodIds = getGermplasmDao().getMethodIdsByGids(gids);
+        for(Map.Entry<Integer,Integer> entry: methodIds.entrySet()) {
+        	Method method = getMethodDao().getById(entry.getValue(), false);
+        	results.put(entry.getKey(), method);
         }
 
         return results;
@@ -2115,18 +2005,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Method getMethodByCode(String code) throws MiddlewareQueryException {
 	    Method method = new Method();
-	    if (setWorkingDatabase(Database.LOCAL)) {
-	        method = getMethodDao().getByCode(code);
-	    }
+        method = getMethodDao().getByCode(code);
 	    return method;
 	}
 	
 	@Override
 	public Method getMethodByName(String name) throws MiddlewareQueryException {
 	    List<Method> methods = new ArrayList<Method>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            methods = getMethodDao().getByName(name);
-        }
+        methods = getMethodDao().getByName(name);
         if (methods != null && methods.size() > 0) {
             Method method = methods.get(0); 
             return method;
@@ -2138,7 +2024,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid)
 			throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("v_gid",gid);
@@ -2156,28 +2041,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
 	public List<ProgramFavorite> getProgramFavorites(FavoriteType type)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		return this.getProgramFavoriteDao().getProgramFavorites(type);
 	}
 
 	@Override
 	public int countProgramFavorites(FavoriteType type)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		return this.getProgramFavoriteDao().countProgramFavorites(type);
 	}
 	
 	@Override
 	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		return this.getProgramFavoriteDao().getProgramFavorites(type, max);
 	}
 
 	@Override
 	public void saveProgramFavorites(List<ProgramFavorite> list)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
 		Transaction trans = null;
 
@@ -2209,13 +2090,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} finally {
 			session.flush();
 		}
-
 	}
 
 	@Override
 	public void saveProgramFavorite(ProgramFavorite favorite)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
 		Transaction trans = null;
 
@@ -2239,7 +2118,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void deleteProgramFavorites(List<ProgramFavorite> list)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
 		Transaction trans = null;
 
@@ -2274,7 +2152,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void deleteProgramFavorite(ProgramFavorite favorite)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
 		Transaction trans = null;
 
@@ -2300,7 +2177,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	
 	@Override
 	public boolean checkIfMatches(String name) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getNameDao().checkIfMatches(name);
 	}
 	

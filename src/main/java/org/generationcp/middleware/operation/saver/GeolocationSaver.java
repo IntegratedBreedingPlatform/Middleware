@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
+import java.util.ArrayList;
+
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -19,12 +21,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.util.StringUtil;
-
-import java.util.ArrayList;
 
 public class GeolocationSaver extends Saver {
 
@@ -37,8 +36,6 @@ public class GeolocationSaver extends Saver {
 	}
 	
 	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row, boolean isNursery, boolean isCreate) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
 		Integer locationId = null;
 		if (row != null && !isCreate && row.getLocationId() != 0) {
 			locationId = (int) row.getLocationId();
@@ -175,7 +172,6 @@ public class GeolocationSaver extends Saver {
 	}
 	
 	public Geolocation createMinimumGeolocation() throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		Geolocation geolocation = getGeolocationObject(null, null);
 		geolocation.setDescription("1");
 		getGeolocationDao().save(geolocation);
@@ -184,7 +180,6 @@ public class GeolocationSaver extends Saver {
 	}
 	
 	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery) throws MiddlewareQueryException, MiddlewareException {
-		setWorkingDatabase(Database.LOCAL);
 		VariableTypeList variableTypes = getVariableTypeListTransformer().transform(row.getMeasurementVariables(), false);
 		VariableList variableList = getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
 		
@@ -211,7 +206,6 @@ public class GeolocationSaver extends Saver {
 	
 	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, 
 			VariableList variableList, MeasurementRow row, boolean isNursery, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		Geolocation geolocation = null;
 		
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {

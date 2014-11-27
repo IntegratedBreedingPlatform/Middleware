@@ -28,22 +28,18 @@ public class StudyBuilder extends Builder {
 
 	public Study createStudy(int studyId) throws MiddlewareQueryException {
 		Study study = null;
-		if (setWorkingDatabase(studyId)) {
-			DmsProject project = getDmsProjectDao().getById(studyId);
-			if (project != null) {
-				study = createStudy(project);
-			}
+		DmsProject project = getDmsProjectDao().getById(studyId);
+		if (project != null) {
+			study = createStudy(project);
 		}
 		return study;
 	}
 	
 	public Study createStudy(int studyId, boolean hasVariabletype) throws MiddlewareQueryException {
 		Study study = null;
-		if (setWorkingDatabase(studyId)) {
-			DmsProject project = getDmsProjectDao().getById(studyId);
-			if (project != null) {
-				study = createStudy(project, hasVariabletype);
-			}
+		DmsProject project = getDmsProjectDao().getById(studyId);
+		if (project != null) {
+			study = createStudy(project, hasVariabletype);
 		}
 		return study;
 	}

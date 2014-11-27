@@ -38,7 +38,6 @@ public class StudyReferenceBuilder extends Builder {
 	}
 
 	public List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return getDmsProjectDao().getStudiesByTrialEnvironments(environmentIds);
 	}
 }

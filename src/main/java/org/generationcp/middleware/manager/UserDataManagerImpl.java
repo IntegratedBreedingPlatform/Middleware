@@ -58,7 +58,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
     @Override
     public Integer addUser(User user) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -88,7 +87,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     //TODO BMS-148 : Review usage in org.generationcp.ibpworkbench.ui.project.create.AddProgramPresenter.doAddNewProgram() and cleanup.
     @Override
     public Integer addUserToCentral(User user) throws MiddlewareQueryException {
-        requireCentralDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -118,7 +116,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
     @Override
     public Integer updateUser(User user) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -139,15 +136,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
     @Override
     public User getUserById(int id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getUserDao().getById(id, false);
-        }
-        return null;
+        return getUserDao().getById(id, false);
     }
 
     @Override
     public void deleteUser(User user) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -175,14 +168,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
         List<Person> toReturn = new ArrayList<Person>();
         PersonDAO dao = getPersonDao();
-        if (setDaoSession(dao, getCurrentSessionForLocal())) {
-            List<Person> persons = dao.getAll();
-            Collections.sort(persons);
-            toReturn.addAll(persons);
-        }
+        List<Person> persons = dao.getAll();
+        Collections.sort(persons);
+        toReturn.addAll(persons);
         return toReturn;
     }
-
 
     public long countAllPersons() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getPersonDao());
@@ -190,7 +180,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
     @Override
     public Integer addPerson(Person person) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -219,7 +208,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     //TODO BMS-148 : Review usage in org.generationcp.ibpworkbench.ui.project.create.AddProgramPresenter.doAddNewProgram() and cleanup.
     @Override
     public Integer addPersonToCentral(Person person) throws MiddlewareQueryException {
-        requireCentralDatabaseInstance();
         
         Session session = getActiveSession();
         Transaction trans = null;
@@ -249,15 +237,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
     @Override
     public Person getPersonById(int id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getPersonDao().getById(id, false);
-        }
-        return null;
+        return getPersonDao().getById(id, false);
     }
 
     @Override
     public void deletePerson(Person person) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -277,61 +261,45 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
     @Override
     public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-        if (setWorkingDatabase(Database.LOCAL)) {
-            if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
-                return true;
-            }
+        if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
+            return true;
         }
         return false;
     }
 
     @Override
     public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
-        if (setWorkingDatabase(Database.LOCAL)) {
-            if (getPersonDao().isPersonExists(firstName, lastName)) {
-                return true;
-            }
+        if (getPersonDao().isPersonExists(firstName, lastName)) {
+            return true;
         }
         return false;
     }
 
     @Override
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
-        if (setWorkingDatabase(Database.LOCAL)) {
-            if (getUserDao().isUsernameExists(userName)) {
-                return true;
-            }
+        if (getUserDao().isUsernameExists(userName)) {
+            return true;
         }
         return false;
     }
     
     @Override
     public User getUserByUserName(String userName) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         return getUserDao().getUserByUserName(userName);
     }
 
     @Override
     public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getInstallationDao().getAll(start, numOfRows);
-        }
-        return new ArrayList<Installation>();
+        return getInstallationDao().getAll(start, numOfRows);
     }
 
     @Override
     public Installation getInstallationRecordById(Long id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id.intValue())) {
-            return getInstallationDao().getById(id, false);
-        }
-        return null;
+        return getInstallationDao().getById(id, false);
     }
 
     @Override
     public List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id.intValue())) {
-            return getInstallationDao().getByAdminId(id);
-        }
-        return null;
+        return getInstallationDao().getByAdminId(id);
     }
 }

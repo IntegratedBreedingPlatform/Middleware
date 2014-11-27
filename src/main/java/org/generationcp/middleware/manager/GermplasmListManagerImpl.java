@@ -50,16 +50,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public GermplasmList getGermplasmListById(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getGermplasmListDAO().getById(id, false);
-        }
-        
-        return null;
+        return getGermplasmListDAO().getById(id, false);
     }
 
     @Override
     public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-    	
     	return getFromInstanceByMethod(getGermplasmListDAO(), instance, "getAllExceptDeleted", 
     				new Object[] {start,  numOfRows}, new Class[] {Integer.TYPE, Integer.TYPE});
     }
@@ -81,9 +76,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListByName(String name, Operation operation, Database instance) throws MiddlewareQueryException {
-
-        return countFromInstanceByMethod(getGermplasmListDAO(), instance, "countByName", new Object[] { name, operation },
-                new Class[] { String.class, Operation.class });
+        return getGermplasmListDAO().countByName(name, operation);
     }
 
     @Override
@@ -97,9 +90,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListByStatus(Integer status, Database instance) throws MiddlewareQueryException {
-    	
-    	return countFromInstanceByMethod(getGermplasmListDAO(), instance, "countByStatus", new Object[] {status},
-    	        new Class[]{Integer.class});
+    	return getGermplasmListDAO().countByStatus(status);
     }
     
     @Override
@@ -119,7 +110,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("listid",id);
@@ -132,7 +122,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("id",id);
@@ -158,7 +147,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("listId",listId);
@@ -170,7 +158,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
 		params.put("central_db_name", localDatabaseName);
 		params.put("listId",listId);
@@ -207,13 +194,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException {
         List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
 
-        if (setWorkingDatabase(instance)) {
-        	long topLevelCount = getGermplasmListDAO().countAllTopLevelLists();
-        	int start = 0;
-            while (start < topLevelCount) {
-                topLevelFolders.addAll(getGermplasmListDAO().getAllTopLevelLists(start, batchSize));
-                start += batchSize;
-            }
+    	long topLevelCount = getGermplasmListDAO().countAllTopLevelLists();
+    	int start = 0;
+        while (start < topLevelCount) {
+            topLevelFolders.addAll(getGermplasmListDAO().getAllTopLevelLists(start, batchSize));
+            start += batchSize;
         }
         
         return topLevelFolders;
@@ -221,7 +206,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countAllTopLevelLists(Database instance) throws MiddlewareQueryException {
-    	return countFromInstanceByMethod(getGermplasmListDAO(), instance, "countAllTopLevelLists", null, null);
+    	return getGermplasmListDAO().countAllTopLevelLists();
     }
 
     @Override
@@ -251,7 +236,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     private List<Integer> addOrUpdateGermplasmList(List<GermplasmList> germplasmLists, Operation operation) throws MiddlewareQueryException {
-    	requireLocalDatabaseInstance();
     	Session sessionForLocal = getCurrentSessionForLocal();
 
         // initialize session & transaction
@@ -315,9 +299,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException {
-    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
-
         // initialize session & transaction
         Session session = sessionForLocal;
         Transaction trans = null;
@@ -390,7 +372,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     private List<Integer> addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation)
             throws MiddlewareQueryException {
         
-    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         // initialize session & transaction
@@ -450,7 +431,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException {
-    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         // initialize session & transaction
@@ -500,9 +480,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
-    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
-
         // initialize session & transaction
         Session session = sessionForLocal;
         Transaction trans = null;
@@ -550,22 +528,18 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) throws MiddlewareQueryException {
     	List<GermplasmList> childLists = new ArrayList<GermplasmList>();
-    	if (setWorkingDatabase(parentId)) {
-            int start = 0;
-            long childListCount = getGermplasmListDAO().countByParentFolderId(parentId);
-            while (start < childListCount) {
-                childLists.addAll(getGermplasmListDAO().getByParentFolderId(parentId, start, batchSize));
-                start += batchSize;
-            }
+        int start = 0;
+        long childListCount = getGermplasmListDAO().countByParentFolderId(parentId);
+        while (start < childListCount) {
+            childLists.addAll(getGermplasmListDAO().getByParentFolderId(parentId, start, batchSize));
+            start += batchSize;
         }
-
         return childLists;
     }
 
     @Override
     public long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException {
-    	return countFromInstanceByMethod(getGermplasmListDAO(), Database.LOCAL, "countByParentFolderId", 
-    				new Object[] {parentId}, new Class[] {Integer.class});
+    	return getGermplasmListDAO().countByParentFolderId(parentId);
     }
 
     @SuppressWarnings("rawtypes")
@@ -573,8 +547,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException {
     	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
     	
-    	List results = getFromInstanceByMethod(getGermplasmListDAO(), Database.LOCAL, "getGermplasmListTypes", 
-				new Object[] {}, new Class[] {});
+    	List results = getGermplasmListDAO().getGermplasmListTypes();
     	
         for (Object o : results) {
             Object[] result = (Object[]) o;
@@ -631,11 +604,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException{
         List<GermplasmList> results = new ArrayList<GermplasmList>();
-        
-        if (setWorkingDatabase(Database.LOCAL)) {
-        	results.addAll(getGermplasmListDAO().searchForGermplasmLists(q, o));
-        }
-
+    	results.addAll(getGermplasmListDAO().searchForGermplasmLists(q, o));
         return results;
     }
 
@@ -647,9 +616,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public GermplasmListNewColumnsInfo  getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException {
-    	if (setWorkingDatabase(Database.LOCAL)){
-    		return getListDataPropertyDAO().getPropertiesForList(listId);
-    	}
-    	return null;
+		return getListDataPropertyDAO().getPropertiesForList(listId);
 	}
 }

@@ -48,8 +48,6 @@ public class TransactionBuilder  extends Builder {
 	
 	public List<Transaction> buildForUpdate(List<Lot> lots, Double amount, String comment) throws MiddlewareQueryException {
 		
-		requireLocalDatabaseInstance();
-		
 		List<Integer> lotIds = new ArrayList<Integer>();
 		List<Integer> gids = new ArrayList<Integer>();
 		for (Lot lot : lots){
@@ -83,10 +81,7 @@ public class TransactionBuilder  extends Builder {
 	}
 	
 	private Integer getPersonId(Integer userId) throws MiddlewareQueryException{
-        // Get personId
-        setWorkingDatabase(userId);
         User user = getUserDao().getById(userId);
         return user.getPersonid();
-
 	}
 }

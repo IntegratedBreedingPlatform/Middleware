@@ -44,11 +44,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         super(sessionProviderForLocal);
     }
 
-    @Override
-    public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
-    }
-
     public List<Location> getAllLocations() throws MiddlewareQueryException {
         List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
         Collections.sort(locations);
@@ -58,11 +53,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {
-        if (setWorkingDatabase(Database.LOCAL)) {
-            return this.getLocationDao().getAll(start, numOfRows);
-        }
-
-        return new ArrayList<Location>();
+        return this.getLocationDao().getAll(start, numOfRows);
     }
 
     @Override
@@ -73,9 +64,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     @Override
     public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         List<Location> locations = new ArrayList<Location>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            locations.addAll(getLocationDao().getByName(name, op));
-        }
+        locations.addAll(getLocationDao().getByName(name, op));
         return locations;
     }
 
@@ -132,10 +121,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return (UserDefinedField) getUserDefinedFieldDao().getById(id, false);
-        }
-        return null;
+        return (UserDefinedField) getUserDefinedFieldDao().getById(id, false);
     }
 
     @Override
@@ -175,18 +161,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public Country getCountryById(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getCountryDao().getById(id, false);
-        }
-        return null;
+        return getCountryDao().getById(id, false);
     }
 
     @Override
     public Location getLocationByID(Integer id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getLocationDao().getById(id, false);
-        }
-        return null;
+        return getLocationDao().getById(id, false);
     }
 
     @SuppressWarnings("rawtypes")
@@ -194,7 +174,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException {
         List<Location> results = new ArrayList<Location>();
 
-        if (ids != null && setWorkingDatabase(Database.LOCAL) && ids.size() > 0) {
+        if (ids != null && ids.size() > 0) {
             results.addAll(getLocationDao().getLocationByIds(ids));
         }
 
@@ -214,7 +194,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException {
         List<LocationDetails> results = new ArrayList<LocationDetails>();
 
-        if (ids != null && ids.size() > 0 && setWorkingDatabase(Database.LOCAL)) {
+        if (ids != null && ids.size() > 0) {
             List<Location> locations = getLocationDao().getLocationByIds(ids);
 
             for (Location l : locations) {
@@ -240,7 +220,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public Integer addLocation(Location location) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -270,7 +249,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -303,7 +281,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -339,7 +316,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     @Override
     public void deleteLocation(Location location) throws MiddlewareQueryException {
         Session session = getCurrentSessionForLocal();
-        requireLocalDatabaseInstance();
         Transaction trans = null;
 
         try {
@@ -401,7 +377,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public Integer getNextNegativeId() throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getLocationDao().getNegativeId("locid");
 
     }
@@ -440,7 +415,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
         Map<String, UserDefinedField> dTypes = getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 
-        setWorkingDatabase(blockId);
         List<Locdes> locdesOfLocation = getLocdesDao().getByLocation(blockId);
         List<String> deletedPlots = new ArrayList<String>();
 
@@ -487,7 +461,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
         Map<Integer, String> namesMap = new HashMap<Integer, String>();
         if (!parentIds.isEmpty()) {
-            setWorkingDatabase(Database.LOCAL);
             namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
         }
 

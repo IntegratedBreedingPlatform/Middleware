@@ -11,16 +11,29 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.etl.*;
+import org.generationcp.middleware.domain.etl.Constants;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
@@ -31,9 +44,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.*;
 
 public class DataImportServiceImpl extends Service implements DataImportService {
     private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
@@ -85,24 +95,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     @SuppressWarnings("unchecked")
     @Override
     public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         Map<String, ?> variableMap = null;
         TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", LOG);
-
         try {
-
             trans = session.beginTransaction();
-            
             boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
             if (isUpdate) {
                 getWorkbookSaver().saveWorkbookVariables(workbook);
                 getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
             }
-
             variableMap = getWorkbookSaver().saveVariables(workbook);
-
             trans.commit();
 
         } catch (Exception e) {
@@ -515,7 +519,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     private Integer getProjectId(String name, TermId relationship) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
     	return getDmsProjectDao().getProjectIdByName(name, relationship);
     }
 
@@ -571,13 +574,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     @Override
     public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getDmsProjectDao().checkIfProjectNameIsExisting(name);
     }
 
     @Override
     public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         return getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
     }
 
@@ -618,7 +619,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     @Override
     public int saveProjectOntology(Workbook workbook)
             throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)", LOG);
@@ -643,7 +643,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     @Override
     public int saveProjectData(Workbook workbook) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)", LOG);

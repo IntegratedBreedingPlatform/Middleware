@@ -12,23 +12,26 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.DatabaseBroker;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
 
 public class PhenotypeSaver extends Saver{
 
@@ -37,7 +40,6 @@ public class PhenotypeSaver extends Saver{
     }
 
     public void savePhenotypes(ExperimentModel experimentModel, VariableList variates) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         int i=0;
         Map<Integer,PhenotypeExceptionDto> exceptions = null;
         if (variates != null && variates.getVariables() != null && variates.getVariables().size() > 0) {
@@ -69,7 +71,6 @@ public class PhenotypeSaver extends Saver{
     }
     
     public void save(int experimentId, Variable variable) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         Phenotype phenotype = createPhenotype(variable);
         if (phenotype != null) {
             getPhenotypeDao().save(phenotype);
@@ -79,7 +80,6 @@ public class PhenotypeSaver extends Saver{
     
     public void saveOrUpdate(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype)
             throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         phenotype = createPhenotype(variableId, storedIn, value, phenotype);
         saveOrUpdate(experimentId, phenotype);
     }
@@ -165,7 +165,6 @@ public class PhenotypeSaver extends Saver{
     }
     
     private void saveOrUpdate(int experimentId, Phenotype phenotype) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         if (phenotype != null) {
             getPhenotypeDao().merge(phenotype);
             saveOrUpdateExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
@@ -232,7 +231,6 @@ public class PhenotypeSaver extends Saver{
     public void saveOrUpdatePhenotypeValue(int projectId, int variableId, int storedIn, String value) throws MiddlewareQueryException {
     	if (value != null) {
     		boolean isInsert = false;
-			setWorkingDatabase(Database.LOCAL);
 			Integer phenotypeId = getPhenotypeDao().getPhenotypeIdByProjectAndType(projectId, variableId);
 			Phenotype phenotype = null;
 			if (phenotypeId == null) {

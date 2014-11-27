@@ -11,14 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class FolderBuilder extends Builder{
@@ -29,12 +28,8 @@ public class FolderBuilder extends Builder{
 
     public List<FolderReference> buildFolderTree() throws MiddlewareQueryException {
         List<FolderReference> folderTree = new ArrayList<FolderReference>();
-        
-        setWorkingDatabase(Database.LOCAL);
         List<FolderReference> allFolders = getDmsProjectDao().getAllFolders();
-        
         folderTree = buildTree(allFolders, DmsProject.SYSTEM_FOLDER_ID);
-        
         return folderTree;
     }
     

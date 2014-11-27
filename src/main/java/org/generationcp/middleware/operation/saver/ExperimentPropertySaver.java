@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
@@ -18,11 +20,8 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-
-import java.util.List;
 
 
 public class ExperimentPropertySaver extends Saver {
@@ -36,16 +35,12 @@ public class ExperimentPropertySaver extends Saver {
         ExperimentProperty experimentProperty = getExperimentProperty(experiment, propertyType.getId());
         if (experimentProperty == null) {
             getProjectPropertySaver().createProjectPropertyIfNecessary(experiment.getProject(), propertyType, storedIn);
-            
-            setWorkingDatabase(Database.LOCAL);
             experimentProperty = new ExperimentProperty();
             experimentProperty.setNdExperimentpropId(getExperimentPropertyDao().getNegativeId("ndExperimentpropId"));
             experimentProperty.setTypeId(propertyType.getId());
             experimentProperty.setRank(0);
             experimentProperty.setExperiment(experiment);
         }
-        
-        setWorkingDatabase(Database.LOCAL);
         experimentProperty.setValue(value);
         getExperimentPropertyDao().saveOrUpdate(experimentProperty);
     }
@@ -53,16 +48,12 @@ public class ExperimentPropertySaver extends Saver {
     public void saveOrUpdateProperty(ExperimentModel experiment, int propertyType, String value) throws MiddlewareQueryException {
         ExperimentProperty experimentProperty = getExperimentProperty(experiment, propertyType);
         if (experimentProperty == null) {
-            
-            setWorkingDatabase(Database.LOCAL);
             experimentProperty = new ExperimentProperty();
             experimentProperty.setNdExperimentpropId(getExperimentPropertyDao().getNegativeId("ndExperimentpropId"));
             experimentProperty.setTypeId(propertyType);
             experimentProperty.setRank(0);
             experimentProperty.setExperiment(experiment);
         }
-        
-        setWorkingDatabase(Database.LOCAL);
         experimentProperty.setValue(value);
         getExperimentPropertyDao().saveOrUpdate(experimentProperty);
     }

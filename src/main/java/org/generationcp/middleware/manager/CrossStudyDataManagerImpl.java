@@ -12,19 +12,23 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.h2h.*;
+import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
+import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
+import org.generationcp.middleware.domain.h2h.GermplasmPair;
+import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
-import org.hibernate.Session;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -92,16 +96,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
         return getTraitBuilder().getObservationsForTraits(traitIds, environmentIds);
     }
     
-    @SuppressWarnings("unchecked")
-	@Override
-    public List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds, int start, int numOfRows) throws MiddlewareQueryException{
-        List<String> methods = Arrays.asList("countObservationForTraits", "getObservationForTraits");
-        Object[] parameters = new Object[] { traitIds, environmentIds};
-    	return (List<Observation>) getFromCentralAndLocalByMethod(
-    			getPhenotypeDao(), methods, start, numOfRows, 
-    			parameters, parameters, new Class[] { List.class, List.class});
-    }
-    
     @Override
     public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException{
     	return getTraitBuilder().getObservationsForTrait(traitId, environmentIds);
@@ -116,9 +110,7 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds) throws MiddlewareQueryException {
     	List<GermplasmLocationInfo> result = new ArrayList<GermplasmLocationInfo>();
     	if(environmentIds != null && !environmentIds.isEmpty()) {
-	    	if(setWorkingDatabase(Database.LOCAL)) {
-	    		result.addAll(getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
-	    	}
+    		result.addAll(getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
     	}
     	return result;
     }
@@ -127,9 +119,7 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
     	List<Integer> result = new ArrayList<Integer>();
     	if(gids != null && !gids.isEmpty()) {
-	    	if(setWorkingDatabase(Database.LOCAL)) {
-	    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
-	    	}
+    		result.addAll(getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
     	}
     	return result;
 	}

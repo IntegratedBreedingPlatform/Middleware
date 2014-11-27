@@ -1,16 +1,15 @@
 package org.generationcp.middleware.operation.saver;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-
-import java.util.List;
 
 public class GeolocationPropertySaver extends Saver {
 
@@ -19,7 +18,6 @@ public class GeolocationPropertySaver extends Saver {
 	}
 	
 	public void saveFieldmapProperties(List<FieldMapInfo> infos) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
         for (FieldMapInfo info : infos) {
             for (FieldMapDatasetInfo dataset : info.getDatasets()) {
                 for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
@@ -78,7 +76,6 @@ public class GeolocationPropertySaver extends Saver {
 	}
 
 	public void saveOrUpdate(Geolocation geolocation, int typeId, String value) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		GeolocationProperty property = null;
 		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
 			property = findProperty(geolocation.getProperties(), typeId);

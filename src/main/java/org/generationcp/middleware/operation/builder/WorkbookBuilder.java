@@ -137,7 +137,6 @@ public class WorkbookBuilder extends Builder {
                         	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
                         } else if (!isTrial) { 
                         	//set trial env for nursery studies
-                        	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
                         		Integer locId = locIds.get(0);
@@ -348,7 +347,6 @@ public class WorkbookBuilder extends Builder {
                         	}
                         } else { 
                         	//set trial env for nursery studies
-                        	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
                         		Integer locId = locIds.get(0);
@@ -919,7 +917,6 @@ public class WorkbookBuilder extends Builder {
 	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentVariables, int measurementDatasetId)
 			throws MiddlewareQueryException {
 		
-		setWorkingDatabase(measurementDatasetId);
 		for (TreatmentVariable treatmentVariable : treatmentVariables) {
 			List<String> values = getExperimentPropertyDao().getTreatmentFactorValues(
 					treatmentVariable.getLevelVariable().getTermId(), 

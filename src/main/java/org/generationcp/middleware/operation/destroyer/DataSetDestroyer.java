@@ -25,23 +25,17 @@ public class DataSetDestroyer extends Destroyer {
 	}
 
 	public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(datasetId)) {
-			this.getDataSetDao().delete(datasetId);
-			this.getDmsProjectDao().clear();
-		}
+		this.getDataSetDao().delete(datasetId);
+		this.getDmsProjectDao().clear();
 	}
 
 	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(datasetId)) {
-			this.getDataSetDao().deleteExperimentsByLocation(datasetId, locationId);
-			this.getDmsProjectDao().clear();
-		}
+		this.getDataSetDao().deleteExperimentsByLocation(datasetId, locationId);
+		this.getDmsProjectDao().clear();
 	}
 	
 	public void deleteExperimentsByLocationAndExperimentType(int datasetId, int locationId, int typeId) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(datasetId)) {
-			this.getDataSetDao().deleteExperimentsByLocationAndType(datasetId, locationId, typeId);
-			this.getDmsProjectDao().clear();
-		}
+		this.getDataSetDao().deleteExperimentsByLocationAndType(datasetId, locationId, typeId);
+		this.getDmsProjectDao().clear();
 	}
 }

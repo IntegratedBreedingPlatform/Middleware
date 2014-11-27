@@ -24,9 +24,7 @@ public class StudyDestroyer extends Destroyer {
 			throw new MiddlewareQueryException("Can not delete central study");
 		}
 		
-		requireLocalDatabaseInstance();
 		DmsProject study = getDmsProjectDao().getById(studyId);
-		
 		renameStudyAndDatasets(study);
 
 		if (study.getProperties() != null && !study.getProperties().isEmpty()) {

@@ -27,13 +27,11 @@ public class StudyVariateBuilder extends Builder {
 
 	public VariableTypeList build(int studyId) throws MiddlewareQueryException {
 		VariableTypeList variates = new VariableTypeList();
-		if (setWorkingDatabase(studyId)) {
-			addVariates(studyId, variates);
-		
-			List<DatasetReference> dataSetReferences = getDmsProjectDao().getDatasetNodesByStudyId(studyId);
-			for (DatasetReference dataSetReference : dataSetReferences) {
-				addVariates(dataSetReference.getId(), variates);
-			}
+		addVariates(studyId, variates);
+	
+		List<DatasetReference> dataSetReferences = getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		for (DatasetReference dataSetReference : dataSetReferences) {
+			addVariates(dataSetReference.getId(), variates);
 		}
 		return variates.sort();
 	}

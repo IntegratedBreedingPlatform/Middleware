@@ -1,14 +1,13 @@
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class NameSynonymBuilder extends Builder {
@@ -31,7 +30,6 @@ public class NameSynonymBuilder extends Builder {
     
     public List<CVTermSynonym> findSynonyms(int cvTermId) throws MiddlewareQueryException {
         List<CVTermSynonym> synonyms = new ArrayList<CVTermSynonym>();
-        setWorkingDatabase(Database.LOCAL);
         synonyms.addAll(getCvTermSynonymDao().getByCvTermId(cvTermId));
         return synonyms;
     }

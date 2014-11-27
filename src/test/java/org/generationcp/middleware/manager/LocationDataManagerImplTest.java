@@ -39,14 +39,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
     public static void setUp() throws Exception {
         manager = managerFactory.getLocationDataManager();
     }
-
-    @Test
-    public void testGetAllLocationsWithStartNumRows() throws Exception {
-        List<Location> locationList = manager.getAllLocations(5, 10);
-        assertTrue(locationList != null);
-        Debug.println(INDENT, "testGetAllLocations(5,10): ");
-        Debug.printObjects(INDENT, locationList);
-    }
     
     @Test
     public void testGetAllLocations() throws Exception {

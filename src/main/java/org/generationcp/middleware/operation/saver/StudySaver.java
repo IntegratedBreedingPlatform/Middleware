@@ -36,7 +36,6 @@ public class StudySaver extends Saver {
 	 * Creates an entry in nd_experiment and nd_experiment_project tables if saveStudyExperiment is true.
 	 */
 	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, boolean saveStudyExperiment) throws Exception{
-        requireLocalDatabaseInstance();
         DmsProject project = getProjectSaver().create(studyValues);
         
         try {

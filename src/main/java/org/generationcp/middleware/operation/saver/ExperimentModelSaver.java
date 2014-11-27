@@ -11,16 +11,27 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Values;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
+import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentStock;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.DatabaseBroker;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExperimentModelSaver extends Saver {
 	
@@ -29,7 +40,6 @@ public class ExperimentModelSaver extends Saver {
 	}
 	
 	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		TermId myExperimentType = mapExperimentType(experimentType);
 		ExperimentModel experimentModel = create(projectId, values, myExperimentType);
 		getExperimentDao().save(experimentModel);
@@ -38,8 +48,6 @@ public class ExperimentModelSaver extends Saver {
 	}
 	
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
 		int experimentId = getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(), values.getGermplasmId());
 		
 		//update if existing
@@ -168,22 +176,20 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	public void setExperimentValue(int experimentId, int variableId, Object value) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(experimentId)) {
-		    ExperimentModel experiment = getExperimentDao().getById(experimentId);
-		    StandardVariable stdVariable = getStandardVariableBuilder().create(variableId);
-		    if (experiment != null && stdVariable != null) {
-	
-		    	if (stdVariable.getStoredIn().getId() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
-		    		setExperimentValue(experiment, stdVariable, value);
-		    	}
-		    	else if (stdVariable.getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()) {
-		    		setObservationVariateValue(experiment, stdVariable, value);
-		    	}
-		    	else if (stdVariable.getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()) {
-		    		setCategoricalVariateValue(experiment, stdVariable, value);
-		    	}
-		    }
-		}
+	    ExperimentModel experiment = getExperimentDao().getById(experimentId);
+	    StandardVariable stdVariable = getStandardVariableBuilder().create(variableId);
+	    if (experiment != null && stdVariable != null) {
+
+	    	if (stdVariable.getStoredIn().getId() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+	    		setExperimentValue(experiment, stdVariable, value);
+	    	}
+	    	else if (stdVariable.getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()) {
+	    		setObservationVariateValue(experiment, stdVariable, value);
+	    	}
+	    	else if (stdVariable.getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()) {
+	    		setCategoricalVariateValue(experiment, stdVariable, value);
+	    	}
+	    }
 	}
 
 	private void setObservationVariateValue(ExperimentModel experiment, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
@@ -307,7 +313,6 @@ public class ExperimentModelSaver extends Saver {
 		if (studyId > 0) {
 			throw new MiddlewareQueryException("Can not update central studies");
 		}
-		setWorkingDatabase(Database.LOCAL);
 		List<DatasetReference> datasets = getDmsProjectDao().getDatasetNodesByStudyId(studyId);
 		List<Integer> ids = new ArrayList<Integer>();
 		ids.add(studyId);
@@ -318,7 +323,6 @@ public class ExperimentModelSaver extends Saver {
 		}
 		
 		Geolocation location = getGeolocationSaver().createMinimumGeolocation();
-		
 		List<ExperimentModel> experiments = getExperimentDao().getExperimentsByProjectIds(ids);
 		if (experiments != null && !experiments.isEmpty()) {
 			int i = 0;

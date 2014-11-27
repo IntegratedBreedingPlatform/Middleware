@@ -45,17 +45,14 @@ public class TrialEnvironmentBuilder extends Builder {
 	}
 
 	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(datasetId)) {
-			DmsProject project = getDataSetBuilder().getTrialDataset(studyId, datasetId);
-			DataSet dataSet = getDataSetBuilder().build(project.getProjectId());
-		    Study study = getStudyBuilder().createStudy(dataSet.getStudyId());
-		
-		    VariableTypeList trialEnvironmentVariableTypes = getTrialEnvironmentVariableTypes(study, dataSet);
-		    Set<Geolocation> locations = getGeoLocations(datasetId);
-		
-		    return buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
-		}
-		return new TrialEnvironments();
+		DmsProject project = getDataSetBuilder().getTrialDataset(studyId, datasetId);
+		DataSet dataSet = getDataSetBuilder().build(project.getProjectId());
+	    Study study = getStudyBuilder().createStudy(dataSet.getStudyId());
+	
+	    VariableTypeList trialEnvironmentVariableTypes = getTrialEnvironmentVariableTypes(study, dataSet);
+	    Set<Geolocation> locations = getGeoLocations(datasetId);
+	
+	    return buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
 	}
 
 	private VariableTypeList getTrialEnvironmentVariableTypes(Study study, DataSet dataSet) {
@@ -123,104 +120,37 @@ public class TrialEnvironmentBuilder extends Builder {
 	
 	public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
 		TrialEnvironments environments = new TrialEnvironments();
-		setWorkingDatabase(Database.LOCAL);
 		environments.addAll(getGeolocationDao().getAllTrialEnvironments());		
 		return environments;
 	}
 	
 	public long countAllTrialEnvironments() throws MiddlewareQueryException{
-		setWorkingDatabase(Database.LOCAL);
 		return getGeolocationDao().countAllTrialEnvironments();
 	}
 	
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		return  getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
 	}
 
-	//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     public List<GermplasmPair> getEnvironmentForGermplasmPairs(List<GermplasmPair> germplasmPairs) throws MiddlewareQueryException {
         List<TrialEnvironment> trialEnvironments = new ArrayList<TrialEnvironment>();
-        
-        // Get gids for local and gids for central. Local may contain (+) and (-) gids
-        Set<Integer> centralGids = new HashSet<Integer>();
-        Set<Integer> localGids = new HashSet<Integer>();
+
+        Set<Integer> allGids = new HashSet<Integer>();
         for (GermplasmPair pair : germplasmPairs){
-            int gid = pair.getGid1();
-            for (int i = 0; i < 2; i++){
-                if (gid < 0){
-                    localGids.add(gid);                    
-                } else {
-                    centralGids.add(gid);
-                    localGids.add(gid);
-                }
-                gid = pair.getGid2();
-            }
+            allGids.add(pair.getGid1());
+            allGids.add(pair.getGid2());
         }
-        
-        
-        // GET DETAILS FROM CENTRAL
-        setWorkingDatabase(Database.CENTRAL);
-        
-        // Step 1: Get Trial Environments for each GID (Map<GID, EnvironmentIds>)
-        Map<Integer, Set<Integer>> centralGermplasmEnvironments = getExperimentStockDao().getEnvironmentsOfGermplasms(centralGids);
-
-        // Step 2: Get the trial environment details
-        Set<Integer> centralEnvironmentIds = getEnvironmentIdsFromMap(centralGermplasmEnvironments);
-        Set<TrialEnvironment> centralTrialEnvironmentDetails = new HashSet<TrialEnvironment>();
-        centralTrialEnvironmentDetails.addAll(getGeolocationDao().getTrialEnvironmentDetails(centralEnvironmentIds));
-
-        // Step 3: Get environment traits
-        trialEnvironments = getPhenotypeDao().getEnvironmentTraits(centralTrialEnvironmentDetails);
-
-        // GET DETAILS FROM LOCAL
-        setWorkingDatabase(Database.LOCAL);
         
         // Step 1: Get Trial Environments for each GID
-        Map<Integer, Set<Integer>> localGermplasmEnvironments = getExperimentStockDao().getEnvironmentsOfGermplasms(localGids);
+        Map<Integer, Set<Integer>> germplasmEnvironments = getExperimentStockDao().getEnvironmentsOfGermplasms(allGids);
 
         // Step 2: Get the trial environment details
-        Set<Integer> localEnvironmentIds = getEnvironmentIdsFromMap(localGermplasmEnvironments);
-        Set<TrialEnvironment> localTrialEnvironmentDetails = new HashSet<TrialEnvironment>();
-        localTrialEnvironmentDetails.addAll(getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
+        Set<Integer> localEnvironmentIds = getEnvironmentIdsFromMap(germplasmEnvironments);
+        Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<TrialEnvironment>();
+        trialEnvironmentDetails.addAll(getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
         
         // Step 3: Get environment traits
-        List<TrialEnvironment> localTrialEnvironments = getPhenotypeDao().getEnvironmentTraits(localTrialEnvironmentDetails);
-
-        // STEP 3B: Get the trait id and name from central (ONLY FOR LOCAL)
-        List<Integer> traitIds = new ArrayList<Integer>();
-        
-        for (TrialEnvironment env : localTrialEnvironments){
-            List<TraitInfo> localTraits = env.getTraits();
-            if (localTraits != null){
-                for (TraitInfo trait : localTraits){
-                    traitIds.add(trait.getId());
-                }
-            }
-        }
-        
-        if (traitIds.size() > 0){
-            setWorkingDatabase(Database.CENTRAL);
-            List<TraitInfo> localTraitDetails = getCvTermDao().getTraitInfo(traitIds);
-    
-            for (TrialEnvironment env : localTrialEnvironments){
-                List<TraitInfo> localTraits = env.getTraits();
-                List<TraitInfo> newLocalTraits = new ArrayList<TraitInfo>();
-                if (localTraits != null){
-                    for (TraitInfo trait : localTraits){
-                        for (TraitInfo traitDetails : localTraitDetails){
-                            if (trait.equals(traitDetails)){
-                                newLocalTraits.add(traitDetails);
-                                break;
-                            }
-                        }
-                    }
-                    env.setTraits(newLocalTraits);
-                }
-            }
-        }
-        
-        // Consolidate local and central trial environments with trait details
+        List<TrialEnvironment> localTrialEnvironments = getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails);
         trialEnvironments.addAll(localTrialEnvironments);
         
         // Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
@@ -228,21 +158,10 @@ public class TrialEnvironmentBuilder extends Builder {
             int gid1 = pair.getGid1();
             int gid2 = pair.getGid2();
             
-            Set<Integer> g1Environments = centralGermplasmEnvironments.get(gid1);
-            if (g1Environments != null) {
-            	g1Environments.addAll(localGermplasmEnvironments.get(gid1));
-            } else {
-            	g1Environments = localGermplasmEnvironments.get(gid1);
-            }
-            Set<Integer> g2Environments = centralGermplasmEnvironments.get(gid2);
-            if (g2Environments != null) {
-            	g2Environments.addAll(localGermplasmEnvironments.get(gid2));
-            } else {
-            	g2Environments = localGermplasmEnvironments.get(gid2);
-            }
+            Set<Integer> g1Environments = germplasmEnvironments.get(gid1);
+            Set<Integer> g2Environments = germplasmEnvironments.get(gid2);
 
             TrialEnvironments environments = new TrialEnvironments();
-            
             if (g1Environments != null && g2Environments != null){
 	            for (Integer env1 : g1Environments){
 	                for (Integer env2 : g2Environments){
@@ -260,10 +179,8 @@ public class TrialEnvironmentBuilder extends Builder {
 	                }
 	            }
             }
-            
             pair.setTrialEnvironments(environments);
         }
-        
         return germplasmPairs;
     }
     
@@ -282,11 +199,8 @@ public class TrialEnvironmentBuilder extends Builder {
     }
     
     public TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException {
-    	
 		TrialEnvironments environments = new TrialEnvironments();
-		setWorkingDatabase(Database.LOCAL);
 		environments.addAll(getGeolocationDao().getEnvironmentsForTraits(traitIds));
-		
 		return environments;
 	}
 
