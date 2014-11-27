@@ -41,11 +41,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
         super(sessionProviderForLocal);
     }
 
-    public CrossStudyDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-    }
-
-
     @Override
     public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
         return getTrialEnvironmentBuilder().getAllTrialEnvironments(includePublicData);

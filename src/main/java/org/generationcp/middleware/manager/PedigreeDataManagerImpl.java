@@ -12,6 +12,11 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -19,12 +24,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
-import org.hibernate.Session;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -32,7 +31,6 @@ import java.util.Map;
  * class, a Hibernate Session must be passed to its constructor.
  * 
  */
-@SuppressWarnings("unchecked")
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
     private GermplasmDataManagerImpl germplasmDataManager;
@@ -43,16 +41,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public PedigreeDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
         super(sessionProviderForLocal, localDatabaseName);
         germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, localDatabaseName);
-    }
-
-    public PedigreeDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal);
-    }
-    
-    public PedigreeDataManagerImpl(Session sessionForLocal,GermplasmDataManagerImpl germplasmDataManager) {
-        super(sessionForLocal);
-        this.germplasmDataManager =germplasmDataManager;
     }
         
     @Override

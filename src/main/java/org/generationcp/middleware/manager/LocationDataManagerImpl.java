@@ -44,10 +44,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         super(sessionProviderForLocal);
     }
 
-    public LocationDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-    }
-
     @Override
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);

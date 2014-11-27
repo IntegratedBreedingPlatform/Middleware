@@ -45,10 +45,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         super(sessionProviderForLocal);
     }
 
-    public UserDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public List<User> getAllUsers() throws MiddlewareQueryException {

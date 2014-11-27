@@ -60,10 +60,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         super(sessionProviderForLocal);
     }
 
-    public GenotypicDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-    }
-
     @Override
     public List<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException {
         if ((qtlName == null) || (qtlName.isEmpty())) {

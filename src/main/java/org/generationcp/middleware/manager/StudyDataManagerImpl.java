@@ -72,12 +72,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal);
     }
 
-    public StudyDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal);
-        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal);
-    }
-
     @Override
     public Study getStudy(int studyId) throws MiddlewareQueryException {
         return getStudyBuilder().createStudy(studyId);

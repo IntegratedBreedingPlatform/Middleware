@@ -55,10 +55,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
         super(sessionProviderForLocal, localDatabaseName);
     }
-
-    public GermplasmDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-    }
     
     @Override
     @Deprecated

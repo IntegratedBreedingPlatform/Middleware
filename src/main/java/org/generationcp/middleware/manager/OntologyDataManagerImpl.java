@@ -63,10 +63,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         super(sessionProviderForLocal);
     }
 
-    public OntologyDataManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);        
-    }
-
     @Override
     public Term getTermById(int termId) throws MiddlewareQueryException {
         return getTermBuilder().get(termId);

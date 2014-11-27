@@ -38,7 +38,6 @@ public class DatabaseBroker {
     public final static String NO_CENTRAL_INSTANCE_MSG = "There is no connection to a central instance.";
 
     protected HibernateSessionProvider sessionProviderForLocal;
-    private Session sessionForLocal;
     protected String localDatabaseName;
 
     protected static final int JDBC_BATCH_SIZE = 50;
@@ -111,10 +110,6 @@ public class DatabaseBroker {
         this.sessionProviderForLocal = sessionProviderForLocal;
         this.localDatabaseName = localDatabaseName;
     }
-    
-    public DatabaseBroker(Session sessionForLocal) {
-        this.sessionForLocal = sessionForLocal;
-    }
 
     public HibernateSessionProvider getSessionProviderForLocal() {
         return sessionProviderForLocal;
@@ -125,16 +120,13 @@ public class DatabaseBroker {
     }
     
     /**
-     * Returns the current session for local if not null, otherwise returns null
+     * Returns the current session if not null, otherwise returns null
      * 
      */
     public Session getCurrentSessionForLocal() {
-        if (sessionForLocal != null) {
-            return sessionForLocal;
-        } else if (sessionProviderForLocal != null) {
+        if (sessionProviderForLocal != null) {
             return sessionProviderForLocal.getSession();
         }
-
         return null;
     }
 
@@ -800,14 +792,14 @@ public class DatabaseBroker {
     //===========================================================================================
     
     protected final void clearSessions() {
-    	if (sessionForLocal != null) {
-    		this.sessionForLocal.clear();
+    	if (sessionProviderForLocal != null) {
+    		this.sessionProviderForLocal.getSession().clear();;
     	}
     }
     
     protected final void flushSessions() {
-    	if (sessionForLocal != null) {
-    		this.sessionForLocal.flush();
+    	if (sessionProviderForLocal != null) {
+    		this.sessionProviderForLocal.getSession().flush();
     	}
     }
     

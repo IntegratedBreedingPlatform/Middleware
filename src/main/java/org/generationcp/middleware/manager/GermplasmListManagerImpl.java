@@ -48,10 +48,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         super(sessionProviderForLocal, localDatabaseName);
     }
 
-    public GermplasmListManagerImpl(Session sessionForLocal) {
-        super(sessionForLocal);
-    }
-
     @Override
     public GermplasmList getGermplasmListById(Integer id) throws MiddlewareQueryException {
         if (setWorkingDatabase(id)) {

@@ -53,11 +53,6 @@ public abstract class DataManager extends DatabaseBroker{
     	super(sessionProviderForLocal, localDatabaseName);
     }
 
-    
-    public DataManager(Session sessionForLocal) {
-        super(sessionForLocal);
-    }
-
     /**
      * Gets the parameter types of given parameters.        <br/>
      * 
