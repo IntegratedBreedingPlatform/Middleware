@@ -20,6 +20,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.hibernate.Session;
@@ -335,6 +337,7 @@ public class ProjectPropertySaver extends Saver {
 			getPhenotypeDao().deletePhenotypesInProjectByTerm(ids, termId);
 		}
 	}
+	
 	private void deleteVariable(DmsProject project, int termId) throws MiddlewareQueryException {
 		int rank = getRank(project, termId);
 		if (project.getProperties() != null && !project.getProperties().isEmpty()) {
@@ -348,6 +351,16 @@ public class ProjectPropertySaver extends Saver {
 		}
 	}
 	
+	private void deleteVariableForFactors(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
+		deleteVariable(project, variable.getTermId());
+		
+		if (variable.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+			getExperimentPropertyDao().deleteExperimentPropInProjectByTermId(project.getProjectId(), variable.getTermId());
+		} else if (variable.getStoredIn() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+			getStockPropertyDao().deleteStockPropInProjectByTermId(project.getProjectId(), variable.getTermId());
+		}
+	}
+	
 	public void saveFactors(DmsProject measurementDataset, List<MeasurementVariable> variables) throws MiddlewareQueryException {
 		if (variables != null && !variables.isEmpty()) {
 			for (MeasurementVariable variable : variables) {
@@ -355,7 +368,7 @@ public class ProjectPropertySaver extends Saver {
 					int measurementRank = getNextRank(measurementDataset);
 					insertVariable(measurementDataset, variable, measurementRank);
 				} else if (variable.getOperation() == Operation.DELETE) {
-					deleteVariable(measurementDataset, variable.getTermId());
+					deleteVariableForFactors(measurementDataset, variable);
 				} 
 				// update operation is not allowed with factors
 			}

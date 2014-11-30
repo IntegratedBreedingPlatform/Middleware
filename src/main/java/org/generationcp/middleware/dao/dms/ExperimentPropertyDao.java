@@ -21,9 +21,11 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -545,5 +547,24 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         }
         return new ArrayList<String>();
     }
-    
+
+    public void deleteExperimentPropInProjectByTermId(int projectId, int termId) throws MiddlewareQueryException {
+    	try {
+			StringBuilder sql = new StringBuilder()
+				.append("DELETE FROM nd_experimentprop ")
+				.append(" WHERE nd_experiment_id IN ( ")
+				.append(" SELECT e.nd_experiment_id ")
+				.append(" FROM nd_experiment e ")
+				.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
+				.append(" AND ep.project_id = ").append(projectId);			
+			sql.append(") ").append(" AND type_id =").append(termId);
+
+  			SQLQuery query = getSession().createSQLQuery(sql.toString());
+  			Debug.println("DELETE ND_EXPERIMENTPROP ROWS FOR " + termId + " : " + query.executeUpdate());
+				
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in deleteExperimentPropInProjectByTermId(" + projectId + ", " + termId + ") in ExperimentPropertyDao: " + e.getMessage(), e);
+		}
+    }
 }
