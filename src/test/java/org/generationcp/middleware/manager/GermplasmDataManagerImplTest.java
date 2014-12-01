@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -42,11 +43,30 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 
     private static GermplasmDataManager manager;
     private static LocationDataManager locationManager;
-
+    private static UserDataManager userDataManager;
+    
+    // make sure a seed User(-1) is present in the db
+    // otherwise add one
     @BeforeClass
     public static void setUp() throws Exception {
         manager = managerFactory.getGermplasmDataManager();
         locationManager = managerFactory.getLocationDataManager();
+        userDataManager = managerFactory.getUserDataManager();
+        
+        User user = userDataManager.getUserById(-1);
+        if(user == null) {
+        	user = new User(-1);
+        	user.setAccess(1);
+        	user.setAdate(1);
+        	user.setCdate(1);
+        	user.setInstalid(1);
+        	user.setName("uname");
+        	user.setPassword("upwd");
+        	user.setPersonid(1);
+        	user.setStatus(1);
+        	user.setType(1);
+        	userDataManager.addUser(user);
+        }
     }
 
     @Test
@@ -721,7 +741,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetMethodByID() throws Exception {
-        Integer id = Integer.valueOf(2);
+        Integer id = Integer.valueOf(4);
         Method methodid = manager.getMethodByID(id);
         assertNotNull(methodid);
         Debug.println(INDENT, "testGetMethodByID("+id+"): ");
@@ -859,24 +879,6 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     	List<Term> terms = manager.getMethodClasses();
     	System.out.println(terms);
     }
-      
-    @Test
-    public void testUpdateGermplasm() throws Exception {
-    	//use wheat local database
-    	Integer gid = -35457;
-    	List<Germplasm> gList = new ArrayList<Germplasm>();
-    	Germplasm oldG = manager.getGermplasmByGID(gid);
-    	oldG.setGrplce(gid);
-		gList.add(oldG);
-        manager.updateGermplasm(gList);
-        Germplasm newG = manager.getGermplasmByGID(gid);
-        assertNull(newG);
-        //revert changes to Germplasm
-        oldG.setGrplce(0);
-		gList.add(oldG);
-        manager.updateGermplasm(gList);
-        Debug.println(INDENT, "testUpdateGermplasm(" + gid + ")");
-    }
     
     @Test
     public void testGetMethodByName() throws Exception {
@@ -906,6 +908,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         field.setFfmt("MCLASS,ASSIGNED,C");
         field.setFdesc("-");
         field.setLfldno(0);
+        // requires a seed User in the localDB
         field.setUser(new User(-1));
         field.setFdate(20041116);
         field.setScaleid(0);
