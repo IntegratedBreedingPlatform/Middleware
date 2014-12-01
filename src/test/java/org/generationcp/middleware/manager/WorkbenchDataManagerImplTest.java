@@ -100,7 +100,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
     	manager.deleteProjectActivity(testProjectActivity2);
     	
     	manager.deletePerson(testPerson1);
-    	manager.deletePerson(testPerson1);
+    	manager.deletePerson(testPerson2);
     	
     	manager.deleteUser(testUser1);
     	manager.deleteUser(testUser2);

@@ -14,9 +14,14 @@ package org.generationcp.middleware.pojos;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.workbench.UserRole;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * POJO for users table.
@@ -79,6 +84,10 @@ public class User implements Serializable, BeanFormState {
     @Column(name = "cdate")
     private Integer cdate;
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private List<UserRole> roles;
+    
     @Transient
     private Boolean isnew = false;
 
@@ -134,7 +143,6 @@ public class User implements Serializable, BeanFormState {
         user.setIsNew(isnew);
         user.setActive(active);
         user.setEnabled(enabled);
-        
         return user;
     }
 
@@ -233,8 +241,17 @@ public class User implements Serializable, BeanFormState {
     public void setIsNew(Boolean val) {
         this.isnew = val;
     }
-    
-    @Override
+
+	public List<UserRole> getRoles() {
+		return roles;
+	}
+
+	
+	public void setRoles(List<UserRole> roles) {
+		this.roles = roles;
+	}
+
+	@Override
     public int hashCode() {
         return new HashCodeBuilder().append(userid).hashCode();
     }

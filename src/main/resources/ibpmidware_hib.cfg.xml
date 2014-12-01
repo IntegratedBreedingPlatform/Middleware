@@ -81,6 +81,7 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Role"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.UserRole"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowStep"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
