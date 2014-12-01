@@ -64,6 +64,9 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     
     @SuppressWarnings("unchecked")
     public T getById(ID id, boolean lock) throws MiddlewareQueryException {
+    	if (id == null) {
+    		return null;
+    	}
         try {
             T entity;
             if (lock) {
