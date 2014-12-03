@@ -932,7 +932,7 @@ public class Workbook {
 		this.trialConditions = null;
 	}
 
-	public boolean isHasExistingDataOverwrite() {
+	public boolean hasExistingDataOverwrite() {
 		return hasExistingDataOverwrite;
 	}
 
