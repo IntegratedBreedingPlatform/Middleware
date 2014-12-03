@@ -845,11 +845,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
         return idsSaved;
     }
-
-    @Override
-    public ProjectUserRole getProjectUserRoleById(Integer id) throws MiddlewareQueryException {
-        return getProjectUserRoleDao().getById(id);
-    }
     
     @Override
     public List<ProjectUserRole> getProjectUserRolesByProject(Project project) throws MiddlewareQueryException{
