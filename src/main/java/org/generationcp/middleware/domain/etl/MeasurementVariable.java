@@ -46,6 +46,8 @@ public class MeasurementVariable {
 	
 	private List<ValueReference> possibleValues;
 	
+	private String possibleValuesString;
+	
 	private Double minRange;
 	
 	private Double maxRange;
@@ -250,7 +252,18 @@ public class MeasurementVariable {
 	 * @param possibleValues the possibleValues to set
 	 */
 	public void setPossibleValues(List<ValueReference> possibleValues) {
+		
 		this.possibleValues = possibleValues;
+		
+		StringBuilder sb = new StringBuilder();
+		
+		if (possibleValues != null) {
+			for (ValueReference ref : possibleValues){
+				sb.append(ref.getDescription() + "|");
+			}
+		}
+		
+		this.setPossibleValuesString(sb.toString());
 	}
 
 	/**
@@ -346,4 +359,13 @@ public class MeasurementVariable {
 	    var.setOperation(operation);		
 		return var;
 	}
+
+	public String getPossibleValuesString() {
+		return possibleValuesString;
+	}
+
+	public void setPossibleValuesString(String possibleValuesString) {
+		this.possibleValuesString = possibleValuesString;
+	}
+
 }
