@@ -17,7 +17,6 @@ import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Session;
@@ -334,37 +333,5 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     public User getUserByUserName(String userName) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         return getUserDao().getUserByUserName(userName);
-    }
-
-    @Override
-    public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getInstallationDao().getAll(start, numOfRows);
-        }
-        return new ArrayList<Installation>();
-    }
-
-    @Override
-    public Installation getInstallationRecordById(Long id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id.intValue())) {
-            return getInstallationDao().getById(id, false);
-        }
-        return null;
-    }
-
-    @Override
-    public List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id.intValue())) {
-            return getInstallationDao().getByAdminId(id);
-        }
-        return null;
-    }
-
-    @Override
-    public Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getInstallationDao().getLatest(instance);
-        }
-        return null;
     }
 }

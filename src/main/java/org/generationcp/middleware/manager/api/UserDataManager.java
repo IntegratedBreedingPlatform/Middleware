@@ -11,13 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-
-import java.util.List;
 
 /**
  * The Interface UserDataManager.
@@ -157,49 +155,6 @@ public interface UserDataManager {
      * @throws MiddlewareQueryException
      */
     User getUserByUserName(String userName) throws MiddlewareQueryException;
-    
-    /**
-     * Returns all the installation records
-     * 
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param instance - to specify the instace from where the records will be retrieved
-     *          either from the central or local
-     * @return The list of all Installation records from the given database instance.
-     * @throws MiddlewareQueryException
-     */
-    List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) 
-        throws MiddlewareQueryException; 
-    
-    /**
-     * Return the installation record identified by the given id.
-     * 
-     * @param id 
-     * @return The Installation record corresponding to the given ID.
-     * @throws MiddlewareQueryException
-     */
-    Installation getInstallationRecordById(Long id) throws MiddlewareQueryException;
-    
-    /**
-     * Get the installation records with the admin id equal to the given id.
-     * 
-     * @param id
-     * @return The List of Installation records based on the given Admin ID.
-     * @throws MiddlewareQueryException
-     */
-    List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException;
-    
-    /**
-     * Returns the installation record which have been added last to the database.
-     * 
-     * @param instance
-     * @return The latest Installation record from the given database instance.
-     * @throws MiddlewareQueryException
-     */
-    Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException;
 
     /**
      * Adds the user to Central database.

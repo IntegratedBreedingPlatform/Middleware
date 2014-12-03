@@ -233,20 +233,6 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
             Debug.println(INDENT, holder);
         }
     }
-
-    @Test
-    public void testInstallation() {
-        Query query = session.createQuery("FROM Installation");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof Installation);
-            Assert.assertTrue(obj != null);
-            Installation holder = (Installation) obj;
-            Debug.println(INDENT, holder);
-        }
-    }
     
     @Test
     public void testListDataProperty() {
