@@ -144,7 +144,12 @@ public class ExperimentBuilder extends Builder {
 				if (variableType != null) {
 					if (variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId() &&
 							variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId()));
+						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
+						if(phenotype.getcValueId() == null && phenotype.getValue() != null){
+							var.setValue(phenotype.getValue());
+							var.setCustomValue(true);
+						}
+						variates.add(var);
 					}
 					else {
 						variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));

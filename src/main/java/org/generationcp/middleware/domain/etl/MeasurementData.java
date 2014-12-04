@@ -33,6 +33,8 @@ public class MeasurementData {
 	
 	private MeasurementVariable measurementVariable;
 	
+	private boolean isCustomCategoricalValue;
+	
 	public MeasurementData() {
 	}
 	
@@ -171,15 +173,17 @@ public class MeasurementData {
 	
 	public String getDisplayValue() {
 		if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getPossibleValues() != null
-				&& !this.getMeasurementVariable().getPossibleValues().isEmpty() 
-				&& NumberUtils.isNumber(this.value)) {
+				&& !this.getMeasurementVariable().getPossibleValues().isEmpty()){
 			
-			List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
-			for (ValueReference possibleValue : possibleValues) {
-				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
-					return possibleValue.getDescription();
+		
+				if(NumberUtils.isNumber(this.value)) {			
+					List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
+					for (ValueReference possibleValue : possibleValues) {
+						if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
+							return possibleValue.getDescription();
+						}
+					}
 				}
-			}
 			//this would return the value from the db
 			return this.value; 
 		} else {
@@ -205,6 +209,7 @@ public class MeasurementData {
 		MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
+		data.setCustomCategoricalValue(this.isCustomCategoricalValue);
 		return data;
 	}
 	public MeasurementData copy(MeasurementVariable oldVar) {
@@ -213,4 +218,13 @@ public class MeasurementData {
 		data.setcValueId(this.cValueId);
 		return data;
 	}
+
+	public boolean isCustomCategoricalValue() {
+		return isCustomCategoricalValue;
+	}
+
+	public void setCustomCategoricalValue(boolean isCustomCategoricalValue) {
+		this.isCustomCategoricalValue = isCustomCategoricalValue;
+	}
+	
 }
