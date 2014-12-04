@@ -134,6 +134,15 @@ public class DatabaseSetupUtil{
 		LOG.debug("  >>>Local DB initialized - all scripts from IBDBScripts ran successfully.");
 	}
 
+	private static void initializeWorkbenchDatabase() throws Exception {
+		// copy and execute central/common scripts
+		String checkoutURL = prefixDirectory+"/database/workbench";    	
+		String centralCommonGitURL = gitUrl + "/trunk/workbench";
+		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, workbenchConnectionParameters);
+		
+		LOG.debug("  >>>Workbench DB initialized - all scripts from IBDBScripts ran successfully.");
+	}
+
 	private static void setupIBDBScriptsConfig() throws FileNotFoundException, URISyntaxException,
 			IOException {
 		InputStream in = new FileInputStream(new File(ResourceFinder.locateFile(TEST_DATABASE_CONFIG_PROPERTIES).toURI()));
@@ -218,15 +227,16 @@ public class DatabaseSetupUtil{
 			runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+connectionParams.getDbName()+"`; USE `"+connectionParams.getDbName()+"`;", connectionParams);
 			
 			if (connectionParams.equals(centralConnectionParams)) {
-				LOG.debug("Test CENTRAL db created.");
+				LOG.debug("Creating CENTRAL db ......");
 				initializeCentralDatabase();
 			
 			} else if (connectionParams.equals(localConnectionParameters)) {
-				LOG.debug("Test LOCAL db created.");
+				LOG.debug("Creating LOCAL db .......");
 				initializeLocalDatabase();
 			
 			} else {
-				LOG.debug("Test WORKBENCH db created.");
+				LOG.debug("Creating WORKBENCH db .......");
+				initializeWorkbenchDatabase();
 			}
 			
 			if (!initDataFiles.isEmpty()){
@@ -239,6 +249,7 @@ public class DatabaseSetupUtil{
 		}
 	}
 	
+
 	/**
 	 * Drops all test databases (central, local, workbench)
 	 * 
