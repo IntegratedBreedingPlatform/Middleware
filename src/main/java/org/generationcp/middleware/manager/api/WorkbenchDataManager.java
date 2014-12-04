@@ -491,15 +491,6 @@ public interface WorkbenchDataManager {
     List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException;
     
     /**
-     * Retrieves a workbench_project_user_role record by id.
-     *
-     * @param id - the ProjectUserRole id
-     * @return the associated ProjectUser
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    ProjectUserRole getProjectUserRoleById(Integer id) throws MiddlewareQueryException;
-    
-    /**
      * Retrieves the workbench_project_user_role records based on the given project.
      *
      * @param project - the Project to match

@@ -12,7 +12,6 @@
 
 package org.generationcp.middleware.manager;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -382,7 +381,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 
         assertTrue(breedingLocations.size() > 0);   // must have a data
 
-        Location aculcoLoc = manager.getLocationByID(10548);    // this location exists on maize central
+        Location aculcoLoc = manager.getLocationByID(25340);    // this location exists on rice central
 
         // aculco is in wheat
         if (aculcoLoc != null) {
@@ -391,9 +390,9 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
             assertNotNull(aculcoLoc.getGeoref());
 
             // check equivalency
-            assertTrue(aculcoLoc.getGeoref().getLat() == 20.51707);
-            assertTrue(aculcoLoc.getGeoref().getLon() == -100.21179);
-            assertTrue(aculcoLoc.getGeoref().getAlt() == 1920);
+            assertTrue(aculcoLoc.getGeoref().getLat() == 27.5);
+            assertTrue(aculcoLoc.getGeoref().getLon() == 90.5);
+            assertTrue(aculcoLoc.getGeoref().getAlt() == 2080);
 
             // test LocationDAO.getLocationDetails()
             List<LocationDetails> locationDetails = manager.getLocationDetailsByLocId(aculcoLoc.getLocid(),0,Integer.MAX_VALUE);

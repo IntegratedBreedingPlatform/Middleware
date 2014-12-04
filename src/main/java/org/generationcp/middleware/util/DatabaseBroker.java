@@ -18,7 +18,6 @@ import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.InstallationDAO;
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocationDAO;
@@ -152,9 +151,6 @@ public class DatabaseBroker {
     private LotDAO lotDao;
     private PersonDAO personDao;
     private TransactionDAO transactionDao;
-
-    // UserDataManager DAOs
-    private InstallationDAO installationDao;
 
     protected DatabaseBroker() {
     }
@@ -711,18 +707,6 @@ public class DatabaseBroker {
         }
         transactionDao.setSession(getActiveSession());
         return transactionDao;
-    }    
-
-    
-    //================================  UserDataManager DAO Methods =============================
-
-
-    protected final InstallationDAO getInstallationDao() {
-        if (installationDao == null) {
-            installationDao = new InstallationDAO();
-        }
-        installationDao.setSession(getActiveSession());
-        return installationDao;
     }
 
     //===========================================================================================

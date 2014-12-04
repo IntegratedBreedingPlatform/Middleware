@@ -18,7 +18,6 @@ import java.util.List;
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.utils.test.Debug;
@@ -144,31 +143,6 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
         Debug.println(INDENT, "Existing Username (" + userName + "): " + manager.isUsernameExists(userName));
         String userName2 = "CLAREN";
         Debug.println(INDENT, "Non-existing Username (" + userName2 + "): " + manager.isUsernameExists(userName2));
-    }
-
-    @Test
-    public void testGetAllInstallationRecords() throws Exception {
-        List<Installation> results = manager.getAllInstallationRecords(0, 150, Database.CENTRAL);
-        List<Installation> results2 = manager.getAllInstallationRecords(0, 150, Database.LOCAL);
-        Debug.println(INDENT, "Central Database: " + results.size());
-        Debug.printObjects(INDENT*2, results);
-
-        Debug.println(INDENT, "Local Database: " + results2.size());
-        Debug.printObjects(INDENT*2, results2);
-    }
-
-    @Test
-    public void testGetInstallationRecordById() throws Exception {
-        Long id = Long.valueOf(1);
-        Debug.println(INDENT, "testGetInstallationRecordById(" + id + ")" + manager.getInstallationRecordById(id));
-    }
-
-    @Test
-    public void testGetInstallationRecordsByAdminId() throws Exception {
-        Long id = Long.valueOf(1);
-        List<Installation> results = manager.getInstallationRecordsByAdminId(id);
-        Debug.println(INDENT, "testGetInstallationRecordsByAdminId(" + id + "): ");
-        Debug.printObjects(INDENT, results);
     }
 
     @Test

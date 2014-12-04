@@ -74,6 +74,7 @@ public class Workbook {
 
 	private Integer importType;
 	private List<StandardVariable> expDesignVariables;
+	private boolean hasExistingDataOverwrite;
 	
 	public void reset() {
 		trialHeaders = null;
@@ -88,6 +89,7 @@ public class Workbook {
 		trialConditions = null;
 		trialConstants = null;
 		treatmentFactors = null;
+		hasExistingDataOverwrite = false;
 	}
 	
 	public Workbook(){
@@ -929,4 +931,13 @@ public class Workbook {
 	public void resetTrialConditions() {
 		this.trialConditions = null;
 	}
+
+	public boolean hasExistingDataOverwrite() {
+		return hasExistingDataOverwrite;
+	}
+
+	public void setHasExistingDataOverwrite(boolean hasExistingDataOverwrite) {
+		this.hasExistingDataOverwrite = hasExistingDataOverwrite;
+	}
+	
 }

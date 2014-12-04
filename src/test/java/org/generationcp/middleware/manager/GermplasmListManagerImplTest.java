@@ -352,8 +352,6 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testDeleteGermplasmListData() throws Exception {
-    	testAddGermplasmLists();
-        testAddGermplasmListDatas();
         List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
         Debug.println(INDENT, "Test Case #1: test deleteGermplasmListDataByListId");
         GermplasmList germplasmList = manager.getGermplasmListByName("Test List #1", 0, 1, 

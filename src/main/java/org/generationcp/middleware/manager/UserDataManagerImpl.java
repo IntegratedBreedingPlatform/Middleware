@@ -17,7 +17,6 @@ import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Session;
@@ -286,20 +285,5 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     @Override
     public User getUserByUserName(String userName) throws MiddlewareQueryException {
         return getUserDao().getUserByUserName(userName);
-    }
-
-    @Override
-    public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        return getInstallationDao().getAll(start, numOfRows);
-    }
-
-    @Override
-    public Installation getInstallationRecordById(Long id) throws MiddlewareQueryException {
-        return getInstallationDao().getById(id, false);
-    }
-
-    @Override
-    public List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException {
-        return getInstallationDao().getByAdminId(id);
     }
 }

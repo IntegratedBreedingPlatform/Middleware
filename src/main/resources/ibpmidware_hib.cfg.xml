@@ -41,7 +41,6 @@
         <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
         <mapping class="org.generationcp.middleware.pojos.ListDataProject"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/>
-        <mapping class="org.generationcp.middleware.pojos.Installation"/>
         <mapping class="org.generationcp.middleware.pojos.ListDataProperty"/>
         
         <mapping class="org.generationcp.middleware.pojos.ims.Lot"/>
@@ -81,6 +80,7 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Role"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.UserRole"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowStep"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
