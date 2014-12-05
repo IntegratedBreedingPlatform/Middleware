@@ -30,6 +30,19 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
     public static void setUp() throws Exception {
     	session = managerFactory.getSessionProviderForCentral().getSession();
     }
+    
+    @Test
+    public void testGetProgram() {
+		Query query = session.createQuery("FROM Program");
+		query.setMaxResults(5);
+		List results = query.list();
+        for (Object obj : results) {
+        	Assert.assertTrue(obj != null);
+        	Assert.assertTrue(obj instanceof Program);
+            Program program = (Program) obj;
+            Debug.println(INDENT, program);
+        }
+    }
 
     @Test
     public void testAtributs() {
