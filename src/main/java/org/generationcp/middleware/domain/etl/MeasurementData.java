@@ -33,8 +33,10 @@ public class MeasurementData {
 	
 	private MeasurementVariable measurementVariable;
 	
-	private boolean isCustomCategoricalValue;
+	public boolean isCustomCategoricalValue;
 	
+	private boolean isAccepted;
+
 	public MeasurementData() {
 	}
 	
@@ -210,6 +212,7 @@ public class MeasurementData {
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
 		data.setCustomCategoricalValue(this.isCustomCategoricalValue);
+		data.setAccepted(this.isAccepted);
 		return data;
 	}
 	public MeasurementData copy(MeasurementVariable oldVar) {
@@ -225,6 +228,14 @@ public class MeasurementData {
 
 	public void setCustomCategoricalValue(boolean isCustomCategoricalValue) {
 		this.isCustomCategoricalValue = isCustomCategoricalValue;
+	}
+	
+	public boolean isAccepted() {
+		return isAccepted;
+	}
+
+	public void setAccepted(boolean isAccepted) {
+		this.isAccepted = isAccepted;
 	}
 	
 }
