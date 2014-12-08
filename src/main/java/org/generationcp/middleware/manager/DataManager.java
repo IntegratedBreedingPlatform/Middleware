@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -485,6 +486,22 @@ public abstract class DataManager extends DatabaseBroker{
             }
         }
         return negativeIds;
+    }
+    
+    
+    void doInTransaction(Work work) throws MiddlewareQueryException {    	
+        Session session = getActiveSession();
+        Transaction trans = null;
+        try {
+            trans = session.beginTransaction();
+            work.doWork();
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with " + work.getName() + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
     }
 
     protected final TermBuilder getTermBuilder() {
