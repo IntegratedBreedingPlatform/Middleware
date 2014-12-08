@@ -520,7 +520,6 @@ public class WorkbookBuilder extends Builder {
 		                    variate);
 		            measurementData.setPhenotypeId(variable.getPhenotypeId());
 		            measurementData.setAccepted(true);
-		            measurementData.setCustomCategoricalValue(variable.isCustomValue());
 		            if(!variable.isCustomValue() && NumberUtils.isNumber(variable.getValue())){
 		            	//we set the cValue id if the isCustomValue flag is false, since this is an id of the valid value
 		            	//we check if its a number to be sure
