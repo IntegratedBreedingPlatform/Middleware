@@ -748,12 +748,13 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
     	Debug.println(INDENT, result.toString());
     }
 
-    @Test
-    public void testGetWorkbenchSetting() throws MiddlewareQueryException  {
-    	WorkbenchSetting result = manager.getWorkbenchSetting();
-    	Assert.assertNotNull(result);
-    	Debug.println(INDENT, result.toString());
-    }
+//     FIXME : Seed directly to DB
+//    @Test
+//    public void testGetWorkbenchSetting() throws MiddlewareQueryException  {
+//    	WorkbenchSetting result = manager.getWorkbenchSetting();
+//    	Assert.assertNotNull(result);
+//    	Debug.println(INDENT, result.toString());
+//    }
 
     @Test
     public void testGetWorkflowTemplateByName() throws MiddlewareQueryException  {
