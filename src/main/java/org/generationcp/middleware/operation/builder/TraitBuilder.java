@@ -23,6 +23,8 @@ import java.util.*;
 
 public class TraitBuilder extends Builder{
 
+	private static final List<Integer> NUMERIC_VARIABLE_TYPE = Arrays.asList(TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId());
+
 	public TraitBuilder(HibernateSessionProvider sessionProviderForLocal,
             HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
@@ -31,20 +33,22 @@ public class TraitBuilder extends Builder{
     public List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
         List<NumericTraitInfo> numericTraitInfoList = new ArrayList<NumericTraitInfo>();
         List<NumericTraitInfo> localNumericTraitInfoList = new ArrayList<NumericTraitInfo>();
+        List<CVTerm> variableTerms = new ArrayList<CVTerm>();
+        List<Integer> variableIds = new ArrayList<Integer>();
 
         // Get numeric variables from central
-        setWorkingDatabase(Database.CENTRAL);
-        List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId()), null);
-        List<Integer> variableIds = getVariableIds(variableTerms);
+        variableTerms.addAll(getVariablesForVariableTypes(Database.CENTRAL, NUMERIC_VARIABLE_TYPE));
+        variableIds.addAll(getVariableIds(variableTerms));
 
         // Get locationCount, germplasmCount, observationCount, minValue, maxValue
-        setWorkingDatabase(Database.CENTRAL);
         numericTraitInfoList.addAll(getPhenotypeDao().getNumericTraitInfoList(environmentIds, variableIds));
 
-        setWorkingDatabase(Database.LOCAL);
+        //retrieve traits in local environments
+        variableTerms.addAll(getVariablesForVariableTypes(Database.LOCAL, NUMERIC_VARIABLE_TYPE));
+        variableIds.addAll(getVariableIds(variableTerms));
         localNumericTraitInfoList.addAll(getPhenotypeDao().getNumericTraitInfoList(environmentIds, variableIds));
         
-        // Merge local and central results
+        // Merge local and central results, if they have common traits
         Collections.sort(numericTraitInfoList);
         Collections.sort(localNumericTraitInfoList);
         
@@ -63,15 +67,23 @@ public class TraitBuilder extends Builder{
             }
         }
         
-        if (numericTraitInfoList.size() == 0){
-            return numericTraitInfoList;
+        // add traits observed only in local environments
+        List<NumericTraitInfo> finalNumericTraitList = new ArrayList<NumericTraitInfo>();
+        finalNumericTraitList.addAll(numericTraitInfoList);
+        for (NumericTraitInfo localObservedTrait : localNumericTraitInfoList){
+        	if (!numericTraitInfoList.contains(localObservedTrait)){
+        		finalNumericTraitList.add(localObservedTrait);
+        	}
+        }
+        if (finalNumericTraitList.size() == 0){
+            return finalNumericTraitList;
         }
         
         // Get median value
-        getMedianValues(numericTraitInfoList, environmentIds);
+        getMedianValues(finalNumericTraitList, environmentIds);
 
         // Set name and description
-        for (NumericTraitInfo traitInfo : numericTraitInfoList) {
+        for (NumericTraitInfo traitInfo : finalNumericTraitList) {
             for (CVTerm variable : variableTerms) {
                 if (traitInfo.getId() == variable.getCvTermId()) {
                     traitInfo.setName(variable.getName());
@@ -81,7 +93,7 @@ public class TraitBuilder extends Builder{
             }
         }
 
-        return numericTraitInfoList;
+        return finalNumericTraitList;
     }
     
     public List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
@@ -269,7 +281,10 @@ public class TraitBuilder extends Builder{
 	private void getMedianValue(Map<Integer, List<Double>> centralTraitValues,
 			Map<Integer, List<Double>> localTraitValues,
 			NumericTraitInfo traitInfo) {
-		List<Double> values = centralTraitValues.get(traitInfo.getId());
+		List<Double> values = new ArrayList<Double>();
+		if (centralTraitValues.get(traitInfo.getId()) != null){
+			values.addAll(centralTraitValues.get(traitInfo.getId()));
+		}
 		if (localTraitValues.get(traitInfo.getId()) != null){
 		    values.addAll(localTraitValues.get(traitInfo.getId()));
 		}
