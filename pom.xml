@@ -263,6 +263,7 @@
 					<includes>
 						<include>**/UserRoleSetupTest.java</include>
 						<include>**/UserDataManagerImplTest.java</include>
+						<include>**/CrossStudyDataManagerImplTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>
