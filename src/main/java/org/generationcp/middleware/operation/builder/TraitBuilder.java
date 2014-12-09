@@ -23,7 +23,7 @@ import java.util.*;
 
 public class TraitBuilder extends Builder{
 
-    public TraitBuilder(HibernateSessionProvider sessionProviderForLocal,
+	public TraitBuilder(HibernateSessionProvider sessionProviderForLocal,
             HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
     }
@@ -86,14 +86,14 @@ public class TraitBuilder extends Builder{
     
     public List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
         List<CharacterTraitInfo> characterTraitInfoList = new ArrayList<CharacterTraitInfo>();
+        List<CVTerm> variableTerms = new ArrayList<CVTerm>();
 
         // Get character variable terms
-        setWorkingDatabase(Database.CENTRAL);
-        List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId()), null);
+        variableTerms.addAll(getVariablesForVariableTypes(Database.CENTRAL, Arrays.asList(TermId.CHARACTER_VARIABLE.getId())));
+        variableTerms.addAll(getVariablesForVariableTypes(Database.LOCAL, Arrays.asList(TermId.CHARACTER_VARIABLE.getId())));
        
         // Get location, germplasm and observation counts 
         List<TraitInfo> traitInfoList = getTraitCounts(getVariableIds(variableTerms), environmentIds);
-        
         // Set name and description
         for (TraitInfo traitInfo : traitInfoList) {
             for (CVTerm variable : variableTerms) {
@@ -122,9 +122,13 @@ public class TraitBuilder extends Builder{
         Map<Integer, List<String>> localTraitValues = getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, characterTraitInfoList);
         
         for (CharacterTraitInfo traitInfo : characterTraitInfoList){
-                List<String> values = centralTraitValues.get(traitInfo.getId());
-                if (localTraitValues.get(traitInfo.getId()) != null){
-                    values.addAll(localTraitValues.get(traitInfo.getId()));
+                List<String> values = new ArrayList<String>();
+                int traitId = traitInfo.getId();
+				if (centralTraitValues != null && centralTraitValues.containsKey(traitId)){
+                	values.addAll(centralTraitValues.get(traitId));
+                }
+                if (localTraitValues != null && localTraitValues.containsKey(traitId)){
+                    values.addAll(localTraitValues.get(traitId));
                 }
                 Collections.sort(values);
                 traitInfo.setValues(values);
@@ -190,7 +194,7 @@ public class TraitBuilder extends Builder{
         setWorkingDatabase(Database.LOCAL);
         localTraitInfoList.addAll(getPhenotypeDao().getTraitInfoCounts(environmentIds, variableIds));
         
-        // Merge local and central results
+        // Merge local and central results, if they have common traits
         Collections.sort(traitInfoList);
         Collections.sort(localTraitInfoList);        
         for (TraitInfo centralTrait : traitInfoList){
@@ -203,11 +207,25 @@ public class TraitBuilder extends Builder{
                 }                
             }
         }
+        // add traits only observed in local environments
+        List<TraitInfo> finalTraitInfoList = new ArrayList<TraitInfo>();
+        finalTraitInfoList.addAll(traitInfoList);
+        for (TraitInfo localObservedTrait : localTraitInfoList){
+        	if (!traitInfoList.contains(localObservedTrait)){
+        		finalTraitInfoList.add(localObservedTrait);
+        	}
+        }
+        
 
-        return traitInfoList;        
+        return finalTraitInfoList;        
     }
 
 
+    private List<CVTerm> getVariablesForVariableTypes(Database database, List<Integer> types) throws MiddlewareQueryException{
+    	setWorkingDatabase(database);
+    	return getCvTermDao().getVariablesByType(types, null);
+    }
+    
     private List<Integer> getVariableIds(List<CVTerm> variableTerms) {
         List<Integer> variableIds = new ArrayList<Integer>();
         for (CVTerm term : variableTerms) {
