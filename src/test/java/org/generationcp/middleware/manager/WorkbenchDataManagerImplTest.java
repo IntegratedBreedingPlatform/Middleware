@@ -561,7 +561,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(
                 commonTestProject.getProjectId().intValue(), testUser1.getUserid());
         Assert.assertNotNull(record);
-        Assert.assertEquals(Long.valueOf(commonTestProject.getProjectId()), new Long(record.getUser().getUserid()));
+        Assert.assertEquals(Long.valueOf(commonTestProject.getProjectId()), new Long(record.getProject().getProjectId()));
         Assert.assertEquals(testUser1.getUserid(), record.getUser().getUserid());
         Debug.println(INDENT, record.toString());
     }
