@@ -42,6 +42,11 @@ public class Program {
     @NotFound(action = NotFoundAction.IGNORE)
 	private List<DmsProject> projects = new ArrayList<DmsProject>();
 	
+	@OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "program_user", joinColumns = { @JoinColumn(name = "program_id") }, inverseJoinColumns = { @JoinColumn(name = "user_id") })
+    @NotFound(action = NotFoundAction.IGNORE)
+	private List<User> users = new ArrayList<User>();
+	
 	public Program() {
 	
 	}
@@ -84,6 +89,16 @@ public class Program {
 	public void addProject(DmsProject project) {
 		if(project != null) {
 			projects.add(project);
+		}
+	}
+	
+	public List<User> getUsers() {
+		return users;
+	}
+	
+	public void addUser(User user) {
+		if(user != null) {
+			users.add(user);
 		}
 	}
 
