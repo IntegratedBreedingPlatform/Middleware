@@ -150,7 +150,9 @@ public class TraitBuilder extends Builder{
     }
     
     public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
-        List<CategoricalTraitInfo> categoricalTraitInfoList = new ArrayList<CategoricalTraitInfo>();
+    	List<CategoricalTraitInfo> centralCategTraitList = new ArrayList<CategoricalTraitInfo>();
+    	List<CategoricalTraitInfo> localCategTraitList = new ArrayList<CategoricalTraitInfo>();
+    	List<CategoricalTraitInfo> finalTraitInfoList = new ArrayList<CategoricalTraitInfo>();
 
         // Get locationCount, germplasmCount, observationCount
         List<TraitInfo> centraltraitInfoList = new ArrayList<TraitInfo>();
@@ -173,25 +175,32 @@ public class TraitBuilder extends Builder{
                     break;
                 }                
             }
-            categoricalTraitInfoList.add(new CategoricalTraitInfo(centralTrait));
+            centralCategTraitList.add(new CategoricalTraitInfo(centralTrait));
         }
         
-        if (categoricalTraitInfoList.size() == 0){
-            return categoricalTraitInfoList;
+        // get traits only observed in local environments
+        for (TraitInfo localObservedTrait : localTraitInfoList){
+        	CategoricalTraitInfo categoricalTrait = new CategoricalTraitInfo(localObservedTrait);
+        	if (!centralCategTraitList.contains(categoricalTrait)){
+        		localCategTraitList.add(categoricalTrait);
+        	}
         }
         
-        // Set name, description and get categorical domain values from central
-        setWorkingDatabase(Database.CENTRAL);
-        categoricalTraitInfoList = getCvTermDao().setCategoricalVariables(categoricalTraitInfoList);
+        // Set name, description and get categorical domain values and count per value from central
+        if (!centralCategTraitList.isEmpty()){
+        	setWorkingDatabase(Database.CENTRAL);
+        	finalTraitInfoList.addAll(getCvTermDao().setCategoricalVariables(centralCategTraitList));
+        	getPhenotypeDao().setCategoricalTraitInfoValues(centralCategTraitList, environmentIds);
+        }
         
-        // Get categorical values count from phenotype
-        setWorkingDatabase(Database.CENTRAL);
-        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList, environmentIds);
-        setWorkingDatabase(Database.LOCAL);
-        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList, environmentIds);
-        
+        // Set name, description and get categorical domain values and count per value from local
+        if (!localCategTraitList.isEmpty()){
+        	setWorkingDatabase(Database.LOCAL);
+        	finalTraitInfoList.addAll(getCvTermDao().setCategoricalVariables(localCategTraitList));
+        	getPhenotypeDao().setCategoricalTraitInfoValues(localCategTraitList, environmentIds);
+        }
 
-        return categoricalTraitInfoList;
+        return finalTraitInfoList;
         
     }
     
