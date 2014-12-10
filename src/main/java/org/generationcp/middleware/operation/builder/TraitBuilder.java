@@ -75,7 +75,7 @@ public class TraitBuilder extends Builder{
         		finalNumericTraitList.add(localObservedTrait);
         	}
         }
-        if (finalNumericTraitList.size() == 0){
+        if (finalNumericTraitList.isEmpty()){
             return finalNumericTraitList;
         }
         
@@ -117,7 +117,7 @@ public class TraitBuilder extends Builder{
             }
         }
         
-        if (traitInfoList.size() == 0){
+        if (traitInfoList.isEmpty()){
             return characterTraitInfoList;
         }
 
@@ -327,11 +327,11 @@ public class TraitBuilder extends Builder{
         List<Observation> localObservations = new ArrayList<Observation>();
         List<Observation> centralObservations = new ArrayList<Observation>();
 
-        if (centralEnvironments.size() > 0){
+        if (!centralEnvironments.isEmpty()){
             setWorkingDatabase(Database.CENTRAL);
             centralObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(traitIds, germplasmIds, centralEnvironments);
         }
-        if (localEnvironments.size() > 0){
+        if (!localEnvironments.isEmpty()){
             setWorkingDatabase(Database.LOCAL);
             localObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(traitIds, germplasmIds, localEnvironments);
         }
@@ -361,11 +361,11 @@ public class TraitBuilder extends Builder{
         List<Observation> localObservations = new ArrayList<Observation>();
         List<Observation> centralObservations = new ArrayList<Observation>();
 
-        if (centralEnvironments.size() > 0){
+        if (!centralEnvironments.isEmpty()){
             setWorkingDatabase(Database.CENTRAL);
             centralObservations = getPhenotypeDao().getObservationForTraits(traitIds, centralEnvironments,0,0);
         }
-        if (localEnvironments.size() > 0){
+        if (!localEnvironments.isEmpty()){
             setWorkingDatabase(Database.LOCAL);
             localObservations = getPhenotypeDao().getObservationForTraits(traitIds, localEnvironments,0,0);
         }
@@ -407,13 +407,13 @@ public class TraitBuilder extends Builder{
             }
         }
     	
-        if( centralEnvironmentIds.size() > 0 ){
+        if(!centralEnvironmentIds.isEmpty()){
         	setWorkingDatabase(Database.CENTRAL);
         	centralTraitObservations = getPhenotypeDao().getObservationsForTrait(traitId, centralEnvironmentIds);
         }
     	
     	
-    	if( localEnvironmentIds.size() > 0 ){
+    	if (!localEnvironmentIds.isEmpty()){
     		setWorkingDatabase(Database.LOCAL);
         	localTraitObservations = getPhenotypeDao().getObservationsForTrait(traitId, localEnvironmentIds);
     	}
