@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +118,7 @@ public class DatabaseSetupUtil{
 		centralCommonGitURL = gitUrl + "/trunk/central/common-update";
 		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, centralConnectionParams);
 		
-		LOG.debug("  >>>Central DB initialized - all scripts from IBDBScripts ran successfully.");
+		LOG.debug("  >>> Central DB initialized - all scripts from IBDBScripts ran successfully.");
 	}
 	
 	private static void initializeLocalDatabase() throws Exception {
@@ -131,7 +132,7 @@ public class DatabaseSetupUtil{
 		centralCommonGitURL = gitUrl + "/trunk/local/common-update";
 		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, localConnectionParameters);
 		
-		LOG.debug("  >>>Local DB initialized - all scripts from IBDBScripts ran successfully.");
+		LOG.debug("  >>> Local DB initialized - all scripts from IBDBScripts ran successfully.");
 	}
 
 	private static void initializeWorkbenchDatabase() throws Exception {
@@ -140,7 +141,7 @@ public class DatabaseSetupUtil{
 		String centralCommonGitURL = gitUrl + "/trunk/workbench";
 		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, workbenchConnectionParameters);
 		
-		LOG.debug("  >>>Workbench DB initialized - all scripts from IBDBScripts ran successfully.");
+		LOG.debug("  >>> Workbench DB initialized - all scripts from IBDBScripts ran successfully.");
 	}
 
 	private static void setupIBDBScriptsConfig() throws FileNotFoundException, URISyntaxException,
@@ -174,9 +175,18 @@ public class DatabaseSetupUtil{
     	} finally {
     	    svnOperationFactory.dispose();
     	}
-    	LOG.debug("  >>>Checkout from " + gitUrl + " successful.");
+    	LOG.debug("  >>> Checkout from " + gitUrl + " successful.");
     	
-    	runAllSetupScripts(Arrays.asList(scriptsDir.listFiles()), connection);
+    	File[] files = scriptsDir.listFiles();
+    	Arrays.sort(files, new Comparator<File>() {
+    			     public int compare(File a, File b) {
+    			       return a.getName().compareTo(b.getName());
+    			     }
+    			   });
+    	
+    	LOG.info("Running files : " + Arrays.asList(files));
+    	
+    	runAllSetupScripts(Arrays.asList(files), connection);
 	}
 	
 	/**
@@ -241,7 +251,7 @@ public class DatabaseSetupUtil{
 			
 			if (!initDataFiles.isEmpty()){
 				runAllSetupScripts(initDataFiles, connectionParams);
-				LOG.debug("  >>>Ran init data scripts successfully");
+				LOG.debug("  >>> Ran init data scripts successfully");
 			}
 			
 		} else {
