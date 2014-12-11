@@ -696,7 +696,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public int addSubFolder(int parentFolderId, String name, String description)
+    public int addSubFolder(int parentFolderId, String name, String description, String programUUID)
             throws MiddlewareQueryException {
         DmsProject parentProject = getDmsProjectDao().getById(parentFolderId);
         if (parentProject == null) {
@@ -710,7 +710,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         Transaction trans = null;
         try {
             trans = session.beginTransaction();
-            DmsProject project = getProjectSaver().saveFolder(parentFolderId, name, description);
+            DmsProject project = getProjectSaver().saveFolder(parentFolderId, name, description, programUUID);
             trans.commit();
             return project.getProjectId();
         } catch (Exception e) {

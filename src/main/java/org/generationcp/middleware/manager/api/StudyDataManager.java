@@ -516,7 +516,7 @@ public interface StudyDataManager{
 	 * @return ID of the folder created
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-    int addSubFolder(int parentFolderId, String name, String description) throws MiddlewareQueryException;
+    int addSubFolder(int parentFolderId, String name, String description, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Rename sub folder.

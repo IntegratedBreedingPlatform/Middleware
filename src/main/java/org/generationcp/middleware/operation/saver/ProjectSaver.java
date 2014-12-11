@@ -76,8 +76,9 @@ public class ProjectSaver extends Saver {
 	/**
 	 * Saves a folder. Creates an entry in project and project_relationship
 	 */
-	public DmsProject saveFolder(int parentId, String name, String description) throws Exception{
+	public DmsProject saveFolder(int parentId, String name, String description, String programUUID) throws Exception{
         DmsProject project = new DmsProject();
+        project.setProgramUUID(programUUID);
         mapStudytoProject(null, name, description, project);
         
         try {

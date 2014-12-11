@@ -42,8 +42,9 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 	
 	public DmsProject createFolderTestData() throws MiddlewareQueryException {
 		int randomInt = new Random().nextInt(10000);
+		//TODO set test data for programUUID
 		int folderId = studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, 
-				TEST_FOLDER_NAME+randomInt, TEST_FOLDER_DESC+randomInt);
+				TEST_FOLDER_NAME+randomInt, TEST_FOLDER_DESC+randomInt, null);
 		DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(folderId);
 		return dmsProject;
