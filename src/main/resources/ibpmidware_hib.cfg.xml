@@ -126,7 +126,5 @@
         <mapping class="org.generationcp.middleware.pojos.mbdt.MBDTGeneration"/>
         <mapping class="org.generationcp.middleware.pojos.mbdt.SelectedGenotype"/>
         <mapping class="org.generationcp.middleware.pojos.mbdt.SelectedMarker"/>
-        
-        <mapping class="org.generationcp.middleware.pojos.Program"/>
     </session-factory>
 </hibernate-configuration>
