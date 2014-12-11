@@ -341,10 +341,6 @@ public class ManagerFactory implements Serializable {
         return new MBDTDataManagerImpl(sessionProviderForLocal);
     }
     
-    public ProgramDataManager getProgramDataManager() {
-    	return new ProgramDataManagerImpl(sessionProviderForLocal);
-    }
-
     /**
      * Closes the db connection by shutting down the HibernateUtil object
      */

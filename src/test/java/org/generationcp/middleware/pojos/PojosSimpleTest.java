@@ -32,19 +32,6 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
     }
     
     @Test
-    public void testGetProgram() {
-		Query query = session.createQuery("FROM Program");
-		query.setMaxResults(5);
-		List results = query.list();
-        for (Object obj : results) {
-        	Assert.assertTrue(obj != null);
-        	Assert.assertTrue(obj instanceof Program);
-            Program program = (Program) obj;
-            Debug.println(INDENT, program);
-        }
-    }
-
-    @Test
     public void testAtributs() {
         Query query = session.createQuery("FROM Attribute");
         query.setMaxResults(5);
