@@ -1302,4 +1302,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public void setLocationDataManager(LocationDataManager locationDataManager) {
 		this.locationDataManager = locationDataManager;
 	}
+
+	@Override
+	public StudyType getStudyType(int studyId) throws MiddlewareQueryException {
+		setWorkingDatabase(studyId);
+		return getDmsProjectDao().getStudyType(studyId);
+	}
 }

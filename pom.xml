@@ -1,236 +1,241 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.generationcp</groupId>
-    <artifactId>middleware</artifactId>
-    <packaging>jar</packaging>
-    <version>3.1.0.SNAPSHOT</version>
-    <name>ibp middleware</name>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.generationcp</groupId>
+	<artifactId>middleware</artifactId>
+	<packaging>jar</packaging>
+	<version>3.1.0.SNAPSHOT</version>
+	<name>ibp middleware</name>
 
-    <distributionManagement>
-        <repository>
-            <id>efficio-nexus</id>
-            <name>Releases</name>
-            <url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>efficio-nexus</id>
-            <name>Snapshots</name>
-            <url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>efficio-nexus</id>
+			<name>Releases</name>
+			<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>efficio-nexus</id>
+			<name>Snapshots</name>
+			<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>jboss-repository</id>
-            <name>Jboss Repository for Maven</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>jboss-repository</id>
+			<name>Jboss Repository for Maven</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
+	</repositories>
 
-    <profiles>
-        <profile>
-            <id>default</id>
-            <properties>
-                <envConfig>ci</envConfig>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-    </profiles>
+	<profiles>
+		<profile>
+			<id>default</id>
+			<properties>
+				<envConfig>ci</envConfig>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+	</profiles>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>3.5.6-Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-annotations</artifactId>
-            <version>3.5.6-Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-c3p0</artifactId>
-            <version>3.5.6-Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-cglib-repack</artifactId>
-            <version>2.1_3</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>c3p0</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-       
-        <!-- Logging dependencies -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.1.2</version>
-        </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>3.5.6-Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.6-Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>3.5.6-Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-cglib-repack</artifactId>
+			<version>2.1_3</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>c3p0</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.12.1.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
 
-        <!-- Servlet API Dependency -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
+		<!-- Logging dependencies -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.1.2</version>
+		</dependency>
 
-        <!-- Mockito -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
-        </dependency>
+		<!-- Servlet API Dependency -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
 
-        <!-- Used for Workbook Parser -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml-schemas</artifactId>
-            <version>3.8</version>
-        </dependency>
-         <!-- Used in tests, we would dynamically do a git (svn) checkout -->
-        <dependency>
+		<!-- Mockito -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Used for Workbook Parser -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml-schemas</artifactId>
+			<version>3.8</version>
+		</dependency>
+		<!-- Used in tests, we would dynamically do a git (svn) checkout -->
+		<dependency>
 			<groupId>org.tmatesoft.svnkit</groupId>
 			<artifactId>svnkit</artifactId>
 			<version>1.8.5</version>
 		</dependency>
 
-    </dependencies>
+	</dependencies>
 
-    <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**</include>
-                </includes>
-            </testResource>
-        </testResources>
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**</include>
+				</includes>
+			</testResource>
+		</testResources>
 
-        <plugins>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <copy todir="src/main/resources" overwrite="true">
-                                    <fileset dir="pipeline/config/${envConfig}" id="fromDir">
-                                        <include name="workbench.properties"/>
-                                    </fileset>
-                                </copy>
-                                <copy todir="src/test/resources" overwrite="true">
-                                    <fileset dir="pipeline/config/${envConfig}" id="fromDir">
-                                        <include name="testDatabaseConfig.properties"/>
-                                    </fileset>
-                                </copy>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-            <!--jar-with-dependencies is built for external middleware teams
-            such as the one at ICRISAT India where Maven is not used.-->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>jar-with-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <windowtitle>BMS Java API ${project.version}</windowtitle>
-                    <doctitle>BMS Java API ${project.version}</doctitle>
-                    <charset>UTF-8</charset>
-                    <docencoding>UTF-8</docencoding>
-                    <docfilessubdirs>true</docfilessubdirs>
-                    <sourcepath>
-                        ${basedir}/src/main/java/org/generationcp/middleware/service/api;
-                        ${basedir}/src/main/java/org/generationcp/middleware/manager/api;
-                        ${basedir}/src/main/java/org/generationcp/middleware/domain;
-                        ${basedir}/src/main/java/org/generationcp/middleware/pojos;
-                    </sourcepath>
-                </configuration>
-            </plugin>
-            <plugin>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<configuration>
+							<tasks>
+								<copy todir="src/main/resources" overwrite="true">
+									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
+										<include name="workbench.properties" />
+									</fileset>
+								</copy>
+								<copy todir="src/test/resources" overwrite="true">
+									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
+										<include name="testDatabaseConfig.properties" />
+									</fileset>
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<!--jar-with-dependencies is built for external middleware teams such 
+				as the one at ICRISAT India where Maven is not used. -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jar-with-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<windowtitle>BMS Java API ${project.version}</windowtitle>
+					<doctitle>BMS Java API ${project.version}</doctitle>
+					<charset>UTF-8</charset>
+					<docencoding>UTF-8</docencoding>
+					<docfilessubdirs>true</docfilessubdirs>
+					<sourcepath>
+						${basedir}/src/main/java/org/generationcp/middleware/service/api;
+						${basedir}/src/main/java/org/generationcp/middleware/manager/api;
+						${basedir}/src/main/java/org/generationcp/middleware/domain;
+						${basedir}/src/main/java/org/generationcp/middleware/pojos;
+					</sourcepath>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.7.1.201405082137</version>
@@ -250,7 +255,21 @@
 					</execution>
 				</executions>
 			</plugin>
-
-        </plugins>
-    </build>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18</version>
+				<configuration>
+					<includes>
+						<include>**/UserRoleSetupTest.java</include>
+						<include>**/UserDataManagerImplTest.java</include>
+						<include>**/CrossStudyDataManagerImplTest.java</include>
+						<include>**/GermplasmDataManagerUtilTest.java</include>
+						<include>**/OntologyDataManagerTest.java</include>
+						<include>**/WorkbenchDataManagerImplTest.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -547,6 +547,25 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         return studyDetails;
 	    
 	}
+    
+    public StudyType getStudyType(int studyId) throws MiddlewareQueryException {
+		try {
+	    	SQLQuery query = getSession().createSQLQuery("SELECT pp.value FROM project p "
+	    			+ " INNER JOIN projectprop pp ON p.project_id = pp.project_id "
+	    			+ " WHERE p.project_id = :projectId AND pp.type_id = :typeId");
+	    	query.setParameter("projectId", studyId);
+	    	query.setParameter("typeId", TermId.STUDY_TYPE.getId());
+	    	Object queryResult = query.uniqueResult();
+	    	if(queryResult != null) {
+	    		return StudyType.getStudyTypeById(Integer.valueOf((String) queryResult));
+	    	}
+	    	return null;
+		} catch(HibernateException he) {
+			throw new MiddlewareQueryException(String.format(
+					"Hibernate error in getting study type for a studyId %s. Cause: %s",
+					studyId, he.getCause().getMessage()), he);
+		}
+    }
 	
 	
 	public StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException {

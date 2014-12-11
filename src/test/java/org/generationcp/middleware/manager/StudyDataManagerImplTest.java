@@ -1280,4 +1280,21 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     		Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
     	}
     }
+    public void testGetStudyType() {
+    	try {
+			Assert.assertEquals("Study type returned did not match.", StudyType.BON, manager.getStudyType(STUDY_ID));
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+    }
+    
+    @Test
+    public void testGetStudyTypeNullEdgeCase() {
+    	try {
+    		final int PRESUMABLY_NON_EXISTENT_STUDY_ID = -1000000;
+    		Assert.assertNull("Expected null return value but was non null.", manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_ID));
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+    }
 }
