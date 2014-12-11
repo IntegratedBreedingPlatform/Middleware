@@ -770,15 +770,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<FolderReference> getRootFolders(Database instance)
+	public List<FolderReference> getRootFolders(Database instance, String programUUID)
 			throws MiddlewareQueryException {
-		return getStudyDataManager().getRootFolders(instance);
+		return getStudyDataManager().getRootFolders(instance, programUUID);
 	}
 
 	@Override
-	public List<Reference> getChildrenOfFolder(int folderId)
+	public List<Reference> getChildrenOfFolder(int folderId, String programUUID)
 			throws MiddlewareQueryException {
-		return getStudyDataManager().getChildrenOfFolder(folderId);
+		return getStudyDataManager().getChildrenOfFolder(folderId, programUUID);
 	}
 
 	@Override

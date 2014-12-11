@@ -492,7 +492,7 @@ public interface FieldbookService {
      * @return List of Folder POJOs or empty list if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
+    List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns list of children of a folder given its ID. Retrieves from central
@@ -503,7 +503,7 @@ public interface FieldbookService {
      * if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
+    List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException;
     /**
      * Check if the given id is an existing study.
      *

@@ -49,7 +49,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = subject.project_id AND pp.value = " 
 			+ "         "+TermId.DELETED_STUDY.getId()+") "
-			+ "ORDER BY name "
+			+ " AND subject.program_uuid = :program_uuid "
+			+ " ORDER BY name "
 			;
 
 	
@@ -73,6 +74,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		    + " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
 			+ "         "+TermId.DELETED_STUDY.getId()+") "
+			+ " AND p.program_uuid = :program_uuid "
 		    + " ORDER BY p.project_id ";
 	
 	private static final String COUNT_PROJECTS_WITH_VARIABLE =
@@ -93,15 +95,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	        + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() 
 	        ;
 	
-	public List<FolderReference> getRootFolders() throws MiddlewareQueryException{
+	public List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException{
 		
 		List<FolderReference> folderList = new ArrayList<FolderReference>();
-		
-
-		
 		try {
-			
 			Query query = getSession().createSQLQuery(GET_ROOT_FOLDERS);
+			query.setParameter("program_uuid", programUUID);
 			List<Object[]> list =  query.list();
 			
 			if (list != null && list.size() > 0) {
@@ -120,13 +119,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 	}
 	
-	public List<Reference> getChildrenOfFolder(Integer folderId) throws MiddlewareQueryException{
+	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID) throws MiddlewareQueryException{
 		
 		List<Reference> childrenNodes = new ArrayList<Reference>();
 		
 		try {
 			Query query = getSession().createSQLQuery(GET_CHILDREN_OF_FOLDER);
 			query.setParameter("folderId", folderId);
+			query.setParameter("program_uuid", programUUID);
 			List<Object[]> list =  query.list();
 			
 			for (Object[] row : list){

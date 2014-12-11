@@ -113,11 +113,11 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
     }
 	
 	public void deleteTestData(int projectId) throws MiddlewareQueryException {
-		studyDataManager.deleteEmptyFolder(projectId);
+		studyDataManager.deleteEmptyFolder(projectId, null);
 	}
 	
 	public List<FolderReference> getLocalRootFolders() throws MiddlewareQueryException {
-		return studyDataManager.getRootFolders(Database.LOCAL);
+		return studyDataManager.getRootFolders(Database.LOCAL, null);
     }
 	
 }

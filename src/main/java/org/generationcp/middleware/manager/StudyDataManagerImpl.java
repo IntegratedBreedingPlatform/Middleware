@@ -96,13 +96,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException {
-        return getDmsProjectDao().getRootFolders();
+    public List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException {
+        return getDmsProjectDao().getRootFolders(programUUID);
     }
 
     @Override
-    public List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException {
-        return getDmsProjectDao().getChildrenOfFolder(folderId);
+    public List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException {
+        return getDmsProjectDao().getChildrenOfFolder(folderId, programUUID);
     }
 
     @Override
@@ -757,7 +757,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 
     @Override
-    public void deleteEmptyFolder(int id) throws MiddlewareQueryException {
+    public void deleteEmptyFolder(int id, String programUUID) throws MiddlewareQueryException {
         DmsProjectDao dmsProjectDao = getDmsProjectDao();
         //check if folder is existing
         DmsProject project = dmsProjectDao.getById(id);
@@ -765,7 +765,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("Folder is not existing");
         }
         //check if folder has no children
-        List<Reference> children = dmsProjectDao.getChildrenOfFolder(id);
+        List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID);
         if (children != null && !children.isEmpty()) {
             throw new MiddlewareQueryException("Folder is not empty");
         }

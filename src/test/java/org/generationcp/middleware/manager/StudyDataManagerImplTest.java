@@ -237,7 +237,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetRootFolders() throws Exception {
-        List<FolderReference> rootFolders = manager.getRootFolders(Database.CENTRAL);
+    	//TODO setup data with programUUID and pass through..
+        List<FolderReference> rootFolders = manager.getRootFolders(Database.CENTRAL, null);
         assertNotNull(rootFolders);
         assertTrue(rootFolders.size() > 0);
         Debug.println(INDENT, "testGetRootFolders(): " + rootFolders.size());
@@ -250,7 +251,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     public void testGetChildrenOfFolder() throws Exception {
         List<Integer> folderIds = Arrays.asList(1000, 2000);
         for (Integer folderId : folderIds) {
-            List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
+        	//TODO setup data with programUUID and pass through..
+            List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId, null);
             assertNotNull(childrenNodes);
             assertTrue(childrenNodes.size() > 0);
             Debug.println(INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());

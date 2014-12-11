@@ -70,7 +70,7 @@ public interface StudyDataManager{
      * @return List of Folder POJOs or empty list if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
+    List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns list of children of a folder given its ID. Retrieves from central
@@ -81,7 +81,7 @@ public interface StudyDataManager{
      * if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
+    List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns the list of DataSet references for a specific study. Retrieves
@@ -535,7 +535,7 @@ public interface StudyDataManager{
      * @param id the id
      * @throws MiddlewareQueryException the middleware query exception
      */
-	void deleteEmptyFolder(int id) throws MiddlewareQueryException;
+	void deleteEmptyFolder(int id, String programUUID) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the parent folder of the project. Accepts a project id.
