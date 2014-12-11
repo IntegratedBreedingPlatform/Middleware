@@ -59,7 +59,15 @@ public enum StudyType {
                 return studyType;
             }
         }
-
         return null;
     }
+    
+	public static StudyType getStudyTypeById(int id) {
+		for (StudyType studyType : StudyType.values()) {
+			if (studyType.getId() == id) {
+				return studyType;
+			}
+		}
+		return null;
+	}
 }

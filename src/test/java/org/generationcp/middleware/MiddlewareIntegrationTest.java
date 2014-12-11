@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConversionException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateUtil;
@@ -19,8 +20,6 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.mysql.jdbc.log.Log;
 
 /**
  * Base class with common functionality - mainly session factory creation - required for Middleware integration tests (i.e. tests that
@@ -40,13 +39,10 @@ public class MiddlewareIntegrationTest {
 	 */
 	static {
 		try {
-
 			Configuration config = new PropertiesConfiguration("testDatabaseConfig.properties");
-
 			if (config.getBoolean("drop.create.dbs")) {
 				DatabaseSetupUtil.setupTestDatabases();
 			}
-
 			localConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
 			centralConnectionParams = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
 			workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
@@ -65,8 +61,10 @@ public class MiddlewareIntegrationTest {
 			Assert.fail(e.getMessage());
 		} catch (ConfigurationException e) {
 			Assert.fail(e.getMessage());
+		} catch (ConversionException e) {
+			Assert.fail("Boolean config for drop.create.dbs in testDatabaseConfig.properties was not formed properly - needs to be true,t,false or f" + e.getMessage());		
 		} catch (Exception e) {
-			Assert.fail("Boolean config for drop.create.dbs in testDatabaseConfig.properties was not formed properly..." + e.getMessage());		
+			Assert.fail(e.getMessage());
 		} 
 	}
 

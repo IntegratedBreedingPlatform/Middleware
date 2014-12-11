@@ -510,6 +510,13 @@ public class WorkbookBuilder extends Builder {
 		                    getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
 		                    variate);
 		            measurementData.setPhenotypeId(variable.getPhenotypeId());
+		            measurementData.setAccepted(true);
+		            if(!variable.isCustomValue() && NumberUtils.isNumber(variable.getValue())){
+		            	//we set the cValue id if the isCustomValue flag is false, since this is an id of the valid value
+		            	//we check if its a number to be sure
+		            	measurementData.setcValueId(variable.getValue());
+		            	//measurementData.setValue(null);
+		            }
 		            measurementDataList.add(measurementData);
 		            break;
 				}

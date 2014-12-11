@@ -28,6 +28,8 @@ public class Variable  implements Serializable, Comparable<Variable> {
 	private String value;
 	
 	private Integer phenotypeId;
+	
+	private boolean isCustomValue;
 
 	public Variable() { }
 	
@@ -239,6 +241,14 @@ public class Variable  implements Serializable, Comparable<Variable> {
 
 	public void setPhenotypeId(Integer phenotypeId) {
 		this.phenotypeId = phenotypeId;
+	}
+
+	public boolean isCustomValue() {
+		return isCustomValue;
+	}
+
+	public void setCustomValue(boolean isCustomValue) {
+		this.isCustomValue = isCustomValue;
 	}
 	
 }

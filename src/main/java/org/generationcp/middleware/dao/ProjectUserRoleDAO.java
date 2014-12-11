@@ -47,24 +47,6 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer>{
         return super.saveOrUpdate(projectUser);
     }
 
-    public ProjectUserRole getById(Integer id) throws MiddlewareQueryException {
-        return super.getById(id, false);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public ProjectUserRole getByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
-        try {
-            List<Criterion> criteria = new ArrayList<Criterion>();
-            criteria.add(Restrictions.eq("project", project));
-            criteria.add(Restrictions.eq("userId", user.getUserid()));
-            List results = super.getByCriteria(criteria);
-            return (ProjectUserRole) results.get(0);
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getByProjectAndUser(project=" + project + ", user=" + user
-                    + ") query from ProjectUser: " + e.getMessage(), e);
-        }
-    }
-
     public List<ProjectUserRole> getByProject(Project project) throws MiddlewareQueryException {
         try {
             List<Criterion> criteria = new ArrayList<Criterion>();

@@ -148,12 +148,6 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
     @Test
 	public void testGetPersonById() throws Exception {
 
-    	//central database
-		int id = 1;
-		Person personid = manager.getPersonById(id);
-		assertNotNull(personid);
-		Debug.println(INDENT, "Central database: " + personid);
-
 		//local database
         Person person = new Person();
         person.setId(-1);
@@ -182,11 +176,6 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
 
     @Test
 	public void testGetUserById() throws Exception {
-    	//central database
-		int id = 1;
-		User userid = manager.getUserById(id);
-		assertNotNull(userid);
-		Debug.println(INDENT, "Central Database: " + userid);
 
     	//local database
         User user = new User();

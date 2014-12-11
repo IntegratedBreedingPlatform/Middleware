@@ -110,7 +110,6 @@ public class CrossStudyDataManagerImplTest extends DataManagerIntegrationTest {
 
         // Case 1: Central - Central
         pairs.add(new GermplasmPair(2434138, 1356114));
-        //pairs.add(new GermplasmPair(1317670, 383601));
         
         // Case 2: Local - Local
         pairs.add(new GermplasmPair(-1, -2));
@@ -126,11 +125,6 @@ public class CrossStudyDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetObservationsForTraitOnGermplasms() throws Exception {
-        /*
-        List<Integer> traitIds = Arrays.asList(22564, 22073, 21735, 20848, 18000);
-        List<Integer> germplasmIds = Arrays.asList(39, 1709, 1000);
-        List<Integer> environmentIds = Arrays.asList(5770, 10085, 5748, -1, -6);
-        */
     	
         List<Integer> traitIds = Arrays.asList(18020,18180,18190,18200);
         List<Integer> germplasmIds = Arrays.asList(1709);

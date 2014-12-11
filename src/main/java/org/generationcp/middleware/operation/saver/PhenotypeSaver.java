@@ -80,7 +80,12 @@ public class PhenotypeSaver extends Saver{
     
     public void saveOrUpdate(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype)
             throws MiddlewareQueryException {
-        phenotype = createPhenotype(variableId, storedIn, value, phenotype);
+        saveOrUpdate(experimentId, variableId, storedIn, value, phenotype, false);
+    }
+
+    public void saveOrUpdate(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype, boolean isCustomCategoricalValue)
+            throws MiddlewareQueryException {
+        phenotype = createPhenotype(variableId, storedIn, value, phenotype, isCustomCategoricalValue);
         saveOrUpdate(experimentId, phenotype);
     }
 
@@ -170,8 +175,8 @@ public class PhenotypeSaver extends Saver{
             saveOrUpdateExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
         }
     }
-
-    private Phenotype createPhenotype(Integer variableId, int storedIn, String value, Phenotype phenotype)
+    
+    private Phenotype createPhenotype(Integer variableId, int storedIn, String value, Phenotype phenotype, boolean isCustomCategoricalValue)
             throws MiddlewareQueryException {
     	
     	if ((value == null || "".equals(value.trim())) && (phenotype == null || phenotype.getPhenotypeId() == null) ){
@@ -183,12 +188,23 @@ public class PhenotypeSaver extends Saver{
         if (TermId.OBSERVATION_VARIATE.getId() == storedIn) {
             phenotype.setValue(value);
         } else if (TermId.CATEGORICAL_VARIATE.getId() == storedIn) {
-            if (value != null && !value.equals("")) {
-                phenotype.setcValue(Double.valueOf(value).intValue());
-            }
-            else {
-            	phenotype.setcValue(null);
-            }
+        	if(isCustomCategoricalValue){
+        		phenotype.setcValue(null);
+        		phenotype.setValue(value);
+        	}else{
+        		phenotype.setValue(null);
+	            if (value != null && !value.equals("")) {
+	            	if(NumberUtils.isNumber(value)){
+	            		phenotype.setcValue(Double.valueOf(value).intValue());
+	            	}else{
+	            		phenotype.setValue(value);
+	            		phenotype.setcValue(null);
+	            	}
+	            } else {
+	            	phenotype.setcValue(null);
+	            }
+	            
+        	}
         }
         phenotype.setObservableId(variableId);
         phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
