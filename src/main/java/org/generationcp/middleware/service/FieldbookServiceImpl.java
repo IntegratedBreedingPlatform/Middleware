@@ -305,7 +305,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	                                if (phenotype != null) {
 		                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
 		                                        , variate.getTermId(), variate.getStoredIn()
-		                                        , field.getValue(), phenotype);
+		                                        , field.getValue(), phenotype, field.isCustomCategoricalValue());
 		
 		                                i++;
 		                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
