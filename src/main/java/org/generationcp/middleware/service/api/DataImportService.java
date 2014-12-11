@@ -35,7 +35,7 @@ public interface DataImportService {
 	 * @param workbook
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(Workbook workbook) throws MiddlewareQueryException;
+	int saveDataset(Workbook workbook, String programUUID) throws MiddlewareQueryException;
 	
     /**
      * Saves a workbook as a local trial or nursery on the new CHADO schema
@@ -44,7 +44,7 @@ public interface DataImportService {
      * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
      * @return id of created trial or nursery
      */
-    int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException;
+    int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations, String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Given a file, parse the file to create a workbook object
@@ -107,7 +107,7 @@ public interface DataImportService {
 	 * @param workbook
 	 * @return id of created the study (Table.column = Project.project_id)
 	 */
-    int saveProjectOntology(Workbook workbook) throws MiddlewareQueryException;
+    int saveProjectOntology(Workbook workbook, String programUUID) throws MiddlewareQueryException;
     
     /**
 	 * Saves the project ontology from the Workbook

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Implementation of the WorkbenchDataManager interface. To instantiate this
@@ -363,6 +364,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
         try {
             trans = session.beginTransaction();
+            project.setUniqueID(UUID.randomUUID().toString());
             getProjectDao().save(project);
             trans.commit();
         } catch (Exception e) {

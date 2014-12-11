@@ -55,6 +55,9 @@ public class DmsProject implements Serializable {
 	@Column(name = "description")
 	private String description;
 	
+	@Column(name = "program_uuid")
+	private String programUUID;
+	
 	/**
 	 * List of Project Properties
 	 */
@@ -105,6 +108,14 @@ public class DmsProject implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	public List<ProjectProperty> getProperties() {

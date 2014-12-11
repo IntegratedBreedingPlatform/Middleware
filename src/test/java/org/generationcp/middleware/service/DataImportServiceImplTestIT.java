@@ -65,7 +65,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
             workbook.getStudyDetails().setTrialDatasetName("MyTrial_" + workbook.getStudyDetails().getStudyName());
             workbook.getStudyDetails().setMeasurementDatasetName("MyMeasurement_" + workbook.getStudyDetails().getStudyName());
 
-            id = dataImportService.saveDataset(workbook);
+            id = dataImportService.saveDataset(workbook, null);
         }
         String name = workbooks.get(0).getStudyDetails() != null ? workbooks.get(0).getStudyDetails().getStudyName() : null;
         Debug.println(INDENT, "Created study: " + id + ", name = " + name);
@@ -75,7 +75,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     public void testSaveTrialDataset() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
                 
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
                 
         Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
         
@@ -98,7 +98,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     public void testSaveNurseryDataset() throws MiddlewareQueryException {
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
                 
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
                 
         Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
         
@@ -121,7 +121,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     public void testAddTrialEnvironmentToTrial() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook(4, StudyType.T);
                 
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         
         Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
         
@@ -129,7 +129,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
         
         WorkbookTest.addNewEnvironment(createdWorkbook);
                 
-        dataImportService.saveDataset(createdWorkbook);
+        dataImportService.saveDataset(createdWorkbook, null);
         
         createdWorkbook = fieldbookService.getTrialDataSet(id);
         
@@ -142,13 +142,13 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
 		WorkbookTest.setTestWorkbook(null);
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
 		
-		int id = dataImportService.saveDataset(workbook);
+		int id = dataImportService.saveDataset(workbook, null);
 		
 		Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
 		
 		WorkbookTest.deleteExperimentPropVar(createdWorkbook);
 		
-		dataImportService.saveDataset(createdWorkbook);
+		dataImportService.saveDataset(createdWorkbook, null);
 		
 		createdWorkbook = fieldbookService.getNurseryDataSet(id);
 		
@@ -165,7 +165,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
         workbook.print(INDENT);
 
 
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         Debug.println(INDENT, "Created study:" + id);
     }
 
@@ -261,7 +261,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     	//try to save first then use the name of the saved study
     	Workbook workbook = WorkbookTest2.getTestWorkbook();
         workbook.print(INDENT);
-        dataImportService.saveDataset(workbook);
+        dataImportService.saveDataset(workbook, null);
         String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
         Debug.println(INDENT, "Name: " + name);
 		boolean isExisting = dataImportService.checkIfProjectNameIsExisting(name);
@@ -278,7 +278,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     	//try to save first then use the name of the saved study
     	Workbook workbook = WorkbookTest2.getTestWorkbook();
         workbook.print(INDENT);
-        dataImportService.saveDataset(workbook);
+        dataImportService.saveDataset(workbook, null);
         String name = workbook.getStudyDetails().getStudyName();
         Debug.println(INDENT, "Name: " + name);
 		Integer locationId = dataImportService.getLocationIdByProjectNameAndDescription(name,"1");
@@ -289,7 +289,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     public void testSaveProjectOntology() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest2.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveProjectOntology(workbook);
+        int id = dataImportService.saveProjectOntology(workbook, null);
         Debug.println(INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
 
     }
@@ -298,7 +298,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     public void testSaveProjectData() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest2.getTestWorkbook();
         workbook.print(INDENT);
-        int studyId = dataImportService.saveProjectOntology(workbook);
+        int studyId = dataImportService.saveProjectOntology(workbook, null);
         workbook.setStudyId(studyId);
         workbook.setTrialDatasetId(studyId-1);
         workbook.setMeasurementDatesetId(studyId-2); 
@@ -334,7 +334,7 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
     	int trialNo = 1;
     	Workbook workbook = WorkbookTest2.getTestWorkbookForWizard(studyName,trialNo);
         workbook.print(INDENT);
-        dataImportService.saveDataset(workbook,true,false);
+        dataImportService.saveDataset(workbook,true,false, null);
         Map<String,List<Message>> errors = dataImportService.validateProjectData(workbook);
         assertNotNull(errors);
         if(errors!=null) {

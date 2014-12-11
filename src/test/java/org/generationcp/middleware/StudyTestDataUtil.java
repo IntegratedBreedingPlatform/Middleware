@@ -66,7 +66,7 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
         studyValues.setVariableList(variableList);
 
         StudyReference studyReference = studyDataManager.addStudy(
-        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues);
+        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues, null);
         DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(studyReference.getId());
 		return dmsProject;
@@ -94,7 +94,7 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
         studyValues.setVariableList(variableList);
 
         StudyReference studyReference = studyDataManager.addStudy(
-        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues);
+        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues, null);
         DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(studyReference.getId());
 		return dmsProject;

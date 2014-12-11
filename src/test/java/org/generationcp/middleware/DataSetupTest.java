@@ -3,6 +3,7 @@ package org.generationcp.middleware;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -239,7 +240,7 @@ public class DataSetupTest extends ServiceIntegraionTest {
 		workbook.setObservations(observations);
     	    	
 		// Save the workbook
-        int nurseryStudyId = dataImportService.saveDataset(workbook, true, false);
+        int nurseryStudyId = dataImportService.saveDataset(workbook, true, false, null);
         LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + nurseryStudyId);
         
 

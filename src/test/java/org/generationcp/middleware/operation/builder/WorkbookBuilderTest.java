@@ -77,7 +77,7 @@ public class WorkbookBuilderTest extends ServiceIntegraionTest {
     	WorkbookTest.setTestWorkbook(null);
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
     	
-    	int id = dataImportService.saveDataset(workbook);
+    	int id = dataImportService.saveDataset(workbook, null);
     	
     	Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
     	
@@ -115,7 +115,7 @@ public class WorkbookBuilderTest extends ServiceIntegraionTest {
 		WorkbookTest.setTestWorkbook(null);
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
     	
-    	int id = dataImportService.saveDataset(workbook);
+    	int id = dataImportService.saveDataset(workbook, null);
     	
     	Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
     	

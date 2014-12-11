@@ -11,17 +11,26 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.User;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 /**
  * POJO for workbench_project table.
@@ -38,6 +47,10 @@ public class Project implements Serializable{
     @GeneratedValue
     @Column(name = "project_id")
     private Long projectId;
+    
+    @Basic(optional = false)
+    @Column(name = "project_uuid")
+    private String uniqueID;
 
     @Basic(optional = false)
     @Column(name = "project_name")
@@ -104,8 +117,16 @@ public class Project implements Serializable{
     public int getUserId() {
         return userId;
     }
+    
+	public String getUniqueID() {
+		return uniqueID;
+	}
 
-    public void setUserId(int userId) {
+	public void setUniqueID(String uniqueID) {
+		this.uniqueID = uniqueID;
+	}
+
+	public void setUserId(int userId) {
         this.userId = userId;
     }
 

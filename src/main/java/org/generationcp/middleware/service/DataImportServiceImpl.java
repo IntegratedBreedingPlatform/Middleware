@@ -69,8 +69,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
      * Session Flush, and thereby persist all required terms to the Ontology Tables
      */
     @Override
-    public int saveDataset(Workbook workbook) throws MiddlewareQueryException {
-        return saveDataset(workbook, false, false);
+    public int saveDataset(Workbook workbook, String programUUID) throws MiddlewareQueryException {
+        return saveDataset(workbook, false, false, programUUID);
     }
 
 	/**
@@ -94,7 +94,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 */
     @SuppressWarnings("unchecked")
     @Override
-    public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException {
+    public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations, String programUUID) throws MiddlewareQueryException {
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         Map<String, ?> variableMap = null;
@@ -126,7 +126,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
             trans2 = session.beginTransaction();
 
-            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations);
+            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID);
 
             trans2.commit();
 
@@ -617,7 +617,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     @Override
-    public int saveProjectOntology(Workbook workbook)
+    public int saveProjectOntology(Workbook workbook, String programUUID)
             throws MiddlewareQueryException {
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -627,7 +627,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         try {
 
             trans = session.beginTransaction();
-            studyId = getWorkbookSaver().saveProjectOntology(workbook);
+            studyId = getWorkbookSaver().saveProjectOntology(workbook, programUUID);
             trans.commit();
 
         } catch (Exception e) {

@@ -181,7 +181,7 @@ public interface StudyDataManager{
      * @return StudyReference corresponding to the newly-created Study
      * @throws MiddlewareQueryException the middleware query exception
      */
-    StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues)
+    StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID)
             throws MiddlewareQueryException;
 
     /**
@@ -194,7 +194,7 @@ public interface StudyDataManager{
      * @return DatasetReference corresponding to the newly-created DataSet
      * @throws MiddlewareQueryException the middleware query exception
      */
-    DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues)
+    DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID)
             throws MiddlewareQueryException;
 
     /**

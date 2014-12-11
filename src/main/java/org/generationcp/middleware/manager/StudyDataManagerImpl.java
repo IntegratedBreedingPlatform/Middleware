@@ -140,13 +140,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, 
-            StudyValues studyValues) throws MiddlewareQueryException {
+            StudyValues studyValues, String programUUID) throws MiddlewareQueryException {
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         try {
             trans = session.beginTransaction();
-            DmsProject project = getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true);
+            DmsProject project = getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID);
             trans.commit();
             return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 
@@ -164,14 +164,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, 
-            DatasetValues datasetValues) throws MiddlewareQueryException {
+    		DatasetValues datasetValues, String programUUID) throws MiddlewareQueryException {
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         try {
             trans = session.beginTransaction();
             DmsProject datasetProject = getDatasetProjectSaver()
-                    .addDataSet(studyId, variableTypeList, datasetValues);
+                    .addDataSet(studyId, variableTypeList, datasetValues, programUUID);
             trans.commit();
             return new DatasetReference(datasetProject.getProjectId(), 
                     datasetProject.getName(), datasetProject.getDescription());

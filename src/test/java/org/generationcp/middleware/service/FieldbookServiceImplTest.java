@@ -145,7 +145,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     public void testGetNurseryDataSet() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         workbook = fieldbookService.getNurseryDataSet(id);
         workbook.print(INDENT);
     }
@@ -155,7 +155,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
         workbook.print(INDENT);
                 
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
         
         createdWorkbook = WorkbookTest.addEnvironmentAndConstantVariables(createdWorkbook);
@@ -196,7 +196,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
         workbook.print(INDENT);
                 
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
         
         createdWorkbook = WorkbookTest.addEnvironmentAndConstantVariables(createdWorkbook);
@@ -423,7 +423,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     public void testCountPlotsWithPlantsSelectedofNursery() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         //Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
     }
     
@@ -431,7 +431,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     public void testGetNurseryVariableSettings() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         workbook = fieldbookService.getStudyVariableSettings(id, true);
         workbook.print(INDENT);
     }
@@ -484,7 +484,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     public void testCheckIfStudyHasMeasurementData() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         workbook = fieldbookService.getNurseryDataSet(id);
         List<Integer> variateIds =  new ArrayList<Integer>();
         variateIds.add(new Integer(21980));
@@ -498,7 +498,7 @@ public class FieldbookServiceImplTest extends ServiceIntegraionTest {
     public void testDeleteObservationsOfStudy() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook);
+        int id = dataImportService.saveDataset(workbook, null);
         workbook = fieldbookService.getNurseryDataSet(id);
         
         fieldbookService.deleteObservationsOfStudy(workbook.getMeasurementDatesetId());

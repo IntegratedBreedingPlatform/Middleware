@@ -74,7 +74,7 @@ public class PhenotypeDaoTest extends ServiceIntegraionTest {
         Workbook workbook = dataImportService.parseWorkbook(file);
         workbook.print(INDENT);
         
-    	int studyId = dataImportService.saveDataset(workbook);
+    	int studyId = dataImportService.saveDataset(workbook, null);
     	
     	List<DatasetReference> datasetRefences = studyDataManager.getDatasetReferences(studyId);
     	

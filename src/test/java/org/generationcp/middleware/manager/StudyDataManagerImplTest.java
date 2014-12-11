@@ -312,7 +312,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
         studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-        StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
+        StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues, null);
 
         assertTrue(studyRef.getId() < 0);
         Debug.println(INDENT, "testAddStudy(): " + studyRef);
@@ -345,7 +345,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
         studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-        StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
+        StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues, null);
 
         assertTrue(studyRef.getId() < 0);
         Study study = manager.getStudy(studyRef.getId());
@@ -449,7 +449,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         DatasetValues datasetValues = new DatasetValues();
         datasetValues.setVariables(variableList);
 
-        DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
+        DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues, null);
         Debug.println(INDENT, "Dataset added : " + datasetReference);
 
     }
@@ -473,7 +473,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         variableType = createVariableType(8200, "Plot No", "whatever", 6);
         typeList.add(variableType);
 
-        DatasetReference dataSetRef = manager.addDataSet(studyRef.getId(), typeList, datasetValues);
+        DatasetReference dataSetRef = manager.addDataSet(studyRef.getId(), typeList, datasetValues, null);
 
         DataSet dataSet = manager.getDataSet(dataSetRef.getId());
         dataSet.print(INDENT);
@@ -511,7 +511,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         DatasetValues datasetValues = new DatasetValues();
         datasetValues.setVariables(variableList);
 
-        DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
+        DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues, null);
         Debug.println(INDENT, "Dataset added : " + datasetReference);
 
         DataSet dataSet = manager.getDataSet(datasetReference.getId());
@@ -889,7 +889,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
         studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-        return manager.addStudy(parentStudyId, typeList, studyValues);
+        return manager.addStudy(parentStudyId, typeList, studyValues, null);
     }
 
     private StudyReference addTestStudyWithNoLocation() throws Exception {
@@ -913,7 +913,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
         studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-        return manager.addStudy(parentStudyId, typeList, studyValues);
+        return manager.addStudy(parentStudyId, typeList, studyValues, null);
     }
 
     private DatasetReference addTestDataset(int studyId) throws Exception {
@@ -935,7 +935,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         variableType = createVariableType(8200, "Plot No", "whatever", 6);
         typeList.add(variableType);
 
-        return manager.addDataSet(studyId, typeList, datasetValues);
+        return manager.addDataSet(studyId, typeList, datasetValues, null);
     }
 
     private DatasetReference addTestDatasetWithLocation(int studyId) throws Exception {
@@ -960,7 +960,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         variableType = createVariableType(8195, "Site Code", "whatever", 7);
         typeList.add(variableType);
 
-        return manager.addDataSet(studyId, typeList, datasetValues);
+        return manager.addDataSet(studyId, typeList, datasetValues, null);
     }
 
     public void addTestExperiments(int datasetId, int numExperiments) throws Exception {
