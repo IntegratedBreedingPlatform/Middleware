@@ -445,11 +445,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         try {
             trans = session.beginTransaction();
-            if (term == null || term.getId() < 0) {
+            if (term == null) {
                 term = saveOrUpdateCvTerm(name, definition, cvId);
                 saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
             }
-            if (cropOntologyId != null/* && !"".equals(cropOntologyId.trim())*/) {
+            if (cropOntologyId != null) {
                 getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
             }
             

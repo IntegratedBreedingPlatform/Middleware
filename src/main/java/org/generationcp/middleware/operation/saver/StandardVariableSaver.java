@@ -422,18 +422,16 @@ public class StandardVariableSaver extends Saver {
     }
     
     public void deleteCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
-        if (traitId < 0) {
-            CVTerm trait = getCvTermDao().getById(traitId);
-            if (trait != null) { 
-                List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
-                if (traitProperties != null) {
-                    for (CVTermProperty traitProperty : traitProperties) {
-                        if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
-                            if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
-                                getCvTermPropertyDao().makeTransient(traitProperty);
-                            }
-                            break;
+        CVTerm trait = getCvTermDao().getById(traitId);
+        if (trait != null) { 
+            List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
+            if (traitProperties != null) {
+                for (CVTermProperty traitProperty : traitProperties) {
+                    if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
+                        if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
+                            getCvTermPropertyDao().makeTransient(traitProperty);
                         }
+                        break;
                     }
                 }
             }

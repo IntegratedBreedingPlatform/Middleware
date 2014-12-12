@@ -100,13 +100,7 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");
 			queryString.append("(st.uniqueName * 1) ASC, ");
-			
-			if(projectId < 0){
-				queryString.append("ep.experiment.ndExperimentId DESC");
-			}
-			else{
-				queryString.append("ep.experiment.ndExperimentId ASC");
-			}
+			queryString.append("ep.experiment.ndExperimentId ASC");
 
 			//Query q = getSession().createQuery("from ExperimentProject as ep where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids)")
 			Query q = getSession().createQuery(queryString.toString())
@@ -122,15 +116,6 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + types + " query at ExperimentProjectDao: " + e.getMessage(), e);
 			return null;
 		}
-	}
-
-	private Integer[] getIds(List<TermId> types) {
-		Integer ids[] = new Integer[types.size()];
-		int i = 0;
-		for (TermId type : types) {
-			ids[i++] = type.getId();
-		}
-		return ids;
 	}
 
 	public long count(int dataSetId) throws MiddlewareQueryException {

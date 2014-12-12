@@ -422,6 +422,12 @@ public class GermplasmList implements Serializable{
     	return getParent()!=null?true:false;
     }
     
+    // TODO BMS-148 & BMS-150 check references and remove logic based on -ve/+ve ID.
+    /**
+     * No local/central lists or -ve vs. +ve IDs in merged DB world.
+     * @return
+     */
+    @Deprecated
     public boolean isLocalList() {
         return this.getId() < 0;
     }

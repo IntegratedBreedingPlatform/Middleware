@@ -216,21 +216,6 @@ public class TraitBuilder extends Builder{
         return observations;
 	}
     
-	public void buildObservations(List<Observation> centralObservations, List<Observation> localObservations, List<Integer> traitIds, List<Integer> environmentIds) 
-								throws MiddlewareQueryException{
-        
-        // Separate local and central observations - environmentIds determine where to get the data from
-        for (int i = 0; i < environmentIds.size(); i++){
-            Observation observation = new Observation(
-                    new ObservationKey(traitIds.get(i), environmentIds.get(i)));
-            if (environmentIds.get(i) < 0){
-                localObservations.add(observation);
-            } else {
-                centralObservations.add(observation);
-            }
-        }
-	}
-	
 	public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException{
     	List<TraitObservation> traitObservations = new ArrayList<TraitObservation>();
     	if(!environmentIds.isEmpty()){

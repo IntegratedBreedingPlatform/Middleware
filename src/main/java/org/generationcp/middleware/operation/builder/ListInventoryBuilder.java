@@ -186,20 +186,19 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	private void setLocationsAndScales(List<? extends LotDetails> lots) throws MiddlewareQueryException{
 		
-		List<Integer> negativeLocationIds = new ArrayList<Integer>();
-		List<Integer> positiveLocationIds = new ArrayList<Integer>();
-		List<Integer> negativeScaleIds = new ArrayList<Integer>();
-		List<Integer> positiveScaleIds = new ArrayList<Integer>();
+		List<Integer> locationIds = new ArrayList<Integer>();
+		List<Integer> scaleIds = new ArrayList<Integer>();
 		Map<Integer, List<LotDetails>> scaleLotMap = new HashMap<Integer, List<LotDetails>>();
 		Map<Integer, List<LotDetails>> locationLotMap = new HashMap<Integer, List<LotDetails>>();
 		
-		createScaleAndLocationMaps(lots, negativeLocationIds,	positiveLocationIds, negativeScaleIds, positiveScaleIds,
-				scaleLotMap, locationLotMap);
+		createScaleAndLocationMaps(lots, locationIds, scaleIds,	scaleLotMap, locationLotMap);
 		
-		List<Location> allLocations = new ArrayList<Location>();
+		List<Location> allLocations = getLocationDao().getByIds(locationIds);
 		List<Term> allScales = new ArrayList<Term>();
-		queryLocationsAndScalesFromDatabase(negativeLocationIds, positiveLocationIds, negativeScaleIds, positiveScaleIds, 
-				allLocations, allScales);
+		List<CVTerm> cvTerms = getCvTermDao().getByIds(scaleIds);
+		for (CVTerm cvTerm : cvTerms){
+			allScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
+		}
 		
 		for (Location location : allLocations){
 			List<LotDetails> lotList = locationLotMap.get(location.getLocid());
@@ -218,9 +217,8 @@ public class ListInventoryBuilder extends Builder {
 
 	// create maps of scale/location IDs to lots for easier setting of Terms and Locations
 	private void createScaleAndLocationMaps(List<? extends LotDetails> lots,
-			List<Integer> negativeLocationIds,
-			List<Integer> positiveLocationIds, List<Integer> negativeScaleIds,
-			List<Integer> positiveScaleIds,
+			List<Integer> locationIds,
+			List<Integer> scaleIds,
 			Map<Integer, List<LotDetails>> scaleLotMap,
 			Map<Integer, List<LotDetails>> locationLotMap) {
 		
@@ -234,11 +232,7 @@ public class ListInventoryBuilder extends Builder {
 				listLot.add(lot);
 				locationLotMap.put(locationId, listLot); 
 			}
-			if (locationId < 0){
-				negativeLocationIds.add(locationId);
-			} else {
-				positiveLocationIds.add(locationId);
-			}
+			locationIds.add(locationId);
 			
 			Integer scaleId = lot.getScaleId();
 			if (scaleLotMap.get(scaleId) != null){
@@ -248,56 +242,7 @@ public class ListInventoryBuilder extends Builder {
 				listLot.add(lot);
 				scaleLotMap.put(scaleId, listLot); 
 			}
-			if (scaleId < 0){
-				negativeScaleIds.add(scaleId);
-			} else {
-				positiveScaleIds.add(scaleId);
-			}
+			scaleIds.add(scaleId);
 		}
-		
 	}
-
-	//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
-	private void queryLocationsAndScalesFromDatabase(
-			List<Integer> negativeLocationIds,
-			List<Integer> positiveLocationIds, List<Integer> negativeScaleIds,
-			List<Integer> positiveScaleIds, List<Location> allLocations,
-			List<Term> allScales) throws MiddlewareQueryException {
-		
-		List<Location> localLocations = new ArrayList<Location>();
-		List<Location> centralLocations = new ArrayList<Location>();
-		List<Term> localScales = new ArrayList<Term>();
-		List<Term> centralScales = new ArrayList<Term>();
-		
-		if (!negativeLocationIds.isEmpty() || !negativeScaleIds.isEmpty()){
-			if (!negativeLocationIds.isEmpty()){
-				localLocations = getLocationDao().getByIds(negativeLocationIds);
-			}
-			
-			if (!negativeScaleIds.isEmpty()){
-				List<CVTerm> cvTerms = getCvTermDao().getByIds(negativeScaleIds);
-				for (CVTerm cvTerm : cvTerms){
-					localScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
-				}
-			}
-		}
-		
-		if (!positiveLocationIds.isEmpty() || !positiveScaleIds.isEmpty()){
-			if (!positiveLocationIds.isEmpty()){
-				centralLocations = getLocationDao().getByIds(positiveLocationIds);
-			}
-			
-			if (!positiveScaleIds.isEmpty()){
-				List<CVTerm> cvTerms = getCvTermDao().getByIds(positiveScaleIds);
-				for (CVTerm cvTerm : cvTerms){
-					centralScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
-				}
-			}
-		}
-		allLocations.addAll(localLocations);
-		allLocations.addAll(centralLocations);
-		allScales.addAll(localScales);
-		allScales.addAll(centralScales);
-	}
-
 }

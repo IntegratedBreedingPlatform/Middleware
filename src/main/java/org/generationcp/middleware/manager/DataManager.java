@@ -471,23 +471,6 @@ public abstract class DataManager extends DatabaseBroker{
         }
         return positiveIds;
     }
-
-    /**
-     * Retrieves the negative ids from the given list of ids
-     * 
-     * @param ids   The negative list of ids
-     * @return the negative ids from the given list
-     */
-    protected List<Integer> getNegativeIds(List<Integer> ids) {
-        List<Integer> negativeIds = new ArrayList<Integer>();
-        for (Integer id : ids) {
-            if (id < 0) {
-                negativeIds.add(id);
-            }
-        }
-        return negativeIds;
-    }
-    
     
     void doInTransaction(Work work) throws MiddlewareQueryException {    	
         Session session = getActiveSession();

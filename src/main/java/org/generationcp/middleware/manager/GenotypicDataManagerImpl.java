@@ -2396,6 +2396,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             } 
             dataset.setDatasetType(TYPE_MTA);
             dataset.setUploadTemplateDate(new Date());
+            //TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely, once confirmed.
             if (dataset.getDatasetId() < 0){
                 getDatasetDao().merge(dataset);
             }
@@ -2439,6 +2440,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             } 
             dataset.setDatasetType(TYPE_MTA);
             dataset.setUploadTemplateDate(new Date());
+            //TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely, once confirmed.
             if (dataset.getDatasetId() < 0){
                 getDatasetDao().merge(dataset);
             }

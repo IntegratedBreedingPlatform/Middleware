@@ -988,23 +988,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         // check progenitor number
         if (progenitorNumber == 1 || progenitorNumber == 2) {
-            // check if given gid refers to a local record
-            if (gid < 0) {
-                // proceed with update
-                if (progenitorNumber == 1) {
-                    child.setGpid1(progenitorId);
-                } else {
-                    child.setGpid2(progenitorId);
-                }
-
-                List<Germplasm> germplasms = new ArrayList<Germplasm>();
-                germplasms.add(child);
-                addOrUpdateGermplasms(germplasms, Operation.UPDATE);
+            if (progenitorNumber == 1) {
+                child.setGpid1(progenitorId);
             } else {
-                logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
-                        + ", progenitorNumber=" + progenitorNumber
-                        + "): The gid supplied as parameter does not refer to a local record. Only local records may be updated.", new Throwable(), LOG);
+                child.setGpid2(progenitorId);
             }
+
+            List<Germplasm> germplasms = new ArrayList<Germplasm>();
+            germplasms.add(child);
+            addOrUpdateGermplasms(germplasms, Operation.UPDATE);
         } else if (progenitorNumber > 2) {
             ProgenitorDAO dao = getProgenitorDao();
 
