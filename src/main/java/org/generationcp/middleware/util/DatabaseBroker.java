@@ -93,8 +93,8 @@ import org.hibernate.Transaction;
 
 public class DatabaseBroker {
 
-    protected HibernateSessionProvider sessionProviderForLocal;
-    protected String localDatabaseName;
+    protected HibernateSessionProvider sessionProvider;
+    protected String databaseName;
 
     protected static final int JDBC_BATCH_SIZE = 50;
   
@@ -102,30 +102,30 @@ public class DatabaseBroker {
  
     }
 
-    protected DatabaseBroker(HibernateSessionProvider sessionProviderForLocal) {
-        this.sessionProviderForLocal = sessionProviderForLocal;
+    protected DatabaseBroker(HibernateSessionProvider sessionProvider) {
+        this.sessionProvider = sessionProvider;
     }
 
-    protected DatabaseBroker(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-        this.sessionProviderForLocal = sessionProviderForLocal;
-        this.localDatabaseName = localDatabaseName;
+    protected DatabaseBroker(HibernateSessionProvider sessionProvider, String databaseName) {
+        this.sessionProvider = sessionProvider;
+        this.databaseName = databaseName;
     }
 
-    public HibernateSessionProvider getSessionProviderForLocal() {
-        return sessionProviderForLocal;
+    public HibernateSessionProvider getSessionProvider() {
+        return sessionProvider;
     }
     
-    public void setSessionProviderForLocal(HibernateSessionProvider sessionProviderForLocal) {
-    	this.sessionProviderForLocal = sessionProviderForLocal;
+    public void setSessionProvider(HibernateSessionProvider sessionProvider) {
+    	this.sessionProvider = sessionProvider;
     }
     
-    public Session getCurrentSessionForLocal() {
+    public Session getCurrentSession() {
         return getActiveSession();
     }
     
     protected Session getActiveSession() {
-    	if (sessionProviderForLocal != null) {
-            return sessionProviderForLocal.getSession();
+    	if (sessionProvider != null) {
+            return sessionProvider.getSession();
         }
         return null;
     }
@@ -554,18 +554,18 @@ public class DatabaseBroker {
     }
     
     protected final TermPropertyBuilder getTermPropertyBuilder() {
-        return new TermPropertyBuilder(sessionProviderForLocal);
+        return new TermPropertyBuilder(sessionProvider);
     }
     
     protected final void clearSessions() {
-    	if (sessionProviderForLocal != null) {
-    		this.sessionProviderForLocal.getSession().clear();;
+    	if (sessionProvider != null) {
+    		this.sessionProvider.getSession().clear();;
     	}
     }
     
     protected final void flushSessions() {
-    	if (sessionProviderForLocal != null) {
-    		this.sessionProviderForLocal.getSession().flush();
+    	if (sessionProvider != null) {
+    		this.sessionProvider.getSession().flush();
     	}
     }
 }

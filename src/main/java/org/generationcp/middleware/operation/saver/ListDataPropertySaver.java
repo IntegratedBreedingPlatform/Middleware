@@ -19,7 +19,7 @@ public class ListDataPropertySaver extends Saver {
 	
 	public List<ListDataInfo> saveProperties(List<ListDataInfo> listDataCollection) throws MiddlewareQueryException {
 		
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Session sessionForLocal = getCurrentSession();
         sessionForLocal.flush();
 
         // initialize session & transaction

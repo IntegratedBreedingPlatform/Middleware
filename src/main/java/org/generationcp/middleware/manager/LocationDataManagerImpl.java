@@ -40,8 +40,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public LocationDataManagerImpl() {
     }
 
-    public LocationDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
+    public LocationDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
     public List<Location> getAllLocations() throws MiddlewareQueryException {
@@ -220,7 +220,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public Integer addLocation(Location location) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Integer idLocationSaved = null;
@@ -249,7 +249,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         List<Integer> idLocationsSaved = new ArrayList<Integer>();
@@ -281,7 +281,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Integer idLocationSaved = null;
@@ -315,7 +315,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public void deleteLocation(Location location) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {

@@ -52,12 +52,12 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public InventoryDataManagerImpl() {
     }
     
-    public InventoryDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
+    public InventoryDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
-    public InventoryDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-        super(sessionProviderForLocal, localDatabaseName);
+    public InventoryDataManagerImpl(HibernateSessionProvider sessionProvider, String databaseName) {
+        super(sessionProvider, databaseName);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     private List<Integer> addOrUpdateLot(List<Lot> lots, Operation operation) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         int lotsSaved = 0;
@@ -228,7 +228,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     private List<Integer> addOrUpdateTransaction(List<org.generationcp.middleware.pojos.ims.Transaction> transactions, Operation operation)
             throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         int transactionsSaved = 0;
@@ -332,8 +332,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(int start, int numOfRows) throws MiddlewareQueryException {
         List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
 
-        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProviderForLocal());
-        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProvider());
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProvider());
 
         List<org.generationcp.middleware.pojos.ims.Transaction> transactions = getTransactionDao().getAllUncommitted(start, numOfRows);
 
@@ -363,8 +363,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public List<TransactionReportRow> generateReportOnAllReserveTransactions(int start, int numOfRows) throws MiddlewareQueryException {
 
         List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
-        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProviderForLocal());
-        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProvider());
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProvider());
 
         List<org.generationcp.middleware.pojos.ims.Transaction> transactions = getAllReserveTransactions(start, numOfRows);
         for (org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
@@ -395,8 +395,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public List<TransactionReportRow> generateReportOnAllWithdrawalTransactions(int start, int numOfRows) throws MiddlewareQueryException {
         List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
 
-        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProviderForLocal());
-        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProvider());
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProvider());
 
         List<org.generationcp.middleware.pojos.ims.Transaction> transactions = getTransactionDao().getAllWithdrawals(start, numOfRows);
         for (org.generationcp.middleware.pojos.ims.Transaction t : transactions) {
@@ -442,15 +442,15 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     @Override
     public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows) throws MiddlewareQueryException {
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Session sessionForLocal = getCurrentSession();
 
         SQLQuery query = sessionForLocal.createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
         query.setParameter("year", year);
         query.setFirstResult(start);
         query.setMaxResults(numOfRows);
 
-        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProviderForLocal());
-        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProvider());
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProvider());
         List<LotReportRow> report = new ArrayList<LotReportRow>();
 
         List<?> results = query.list();
@@ -523,8 +523,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     private List<LotReportRow> generateLotReportRows(List<Lot> listOfLots) throws MiddlewareQueryException {
 
-        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProviderForLocal());
-        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        LocationDataManagerImpl locationManager = new LocationDataManagerImpl(getSessionProvider());
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(getSessionProvider());
         List<LotReportRow> report = new ArrayList<LotReportRow>();
         for (Lot lot : listOfLots) {
             LotReportRow row = new LotReportRow();
@@ -551,7 +551,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     
     private List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("listid",id);
 		params.put("start",start);
 		params.put("numOfRows",numOfRows);

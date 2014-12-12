@@ -311,7 +311,7 @@ public class ProjectPropertySaver extends Saver {
 	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, 
 			int storedInId, int termId, Geolocation geolocation) throws MiddlewareQueryException {
 		
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		deleteVariable(project, termId);
 		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(storedInId)) {
 			deleteVariable(trialDataset, termId);

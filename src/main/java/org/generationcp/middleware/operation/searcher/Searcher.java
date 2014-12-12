@@ -22,16 +22,16 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public abstract class Searcher extends DatabaseBroker{
 
-    protected Searcher(HibernateSessionProvider sessionProviderForLocal) {
-       super(sessionProviderForLocal);
+    protected Searcher(HibernateSessionProvider sessionProvider) {
+       super(sessionProvider);
     }
     
     protected final ExperimentSearcher getExperimentSearcher() {
-    	return new ExperimentSearcher(sessionProviderForLocal);
+    	return new ExperimentSearcher(sessionProvider);
     }
     
     protected final StudySearcherByNameStartSeasonCountry getProjectSearcher() {
-    	return new StudySearcherByNameStartSeasonCountry(sessionProviderForLocal);
+    	return new StudySearcherByNameStartSeasonCountry(sessionProvider);
     }
 
 }

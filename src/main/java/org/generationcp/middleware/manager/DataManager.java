@@ -46,12 +46,12 @@ public abstract class DataManager extends DatabaseBroker{
     public DataManager() {
     }
 
-    public DataManager(HibernateSessionProvider sessionProviderForLocal) {
-    	super(sessionProviderForLocal);
+    public DataManager(HibernateSessionProvider sessionProvider) {
+    	super(sessionProvider);
     }
     
-    public DataManager(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-    	super(sessionProviderForLocal, localDatabaseName);
+    public DataManager(HibernateSessionProvider sessionProvider, String localDatabaseName) {
+    	super(sessionProvider, localDatabaseName);
     }
 
     /**
@@ -488,51 +488,51 @@ public abstract class DataManager extends DatabaseBroker{
     }
 
     protected final TermBuilder getTermBuilder() {
-    	return new TermBuilder(sessionProviderForLocal);
+    	return new TermBuilder(sessionProvider);
     }
     
     protected final MethodBuilder getMethodBuilder() {
-    	return new MethodBuilder(sessionProviderForLocal);
+    	return new MethodBuilder(sessionProvider);
     }
     
     protected final StandardVariableBuilder getStandardVariableBuilder() {
-    	return new StandardVariableBuilder(sessionProviderForLocal);
+    	return new StandardVariableBuilder(sessionProvider);
     }
 
     protected final StudyBuilder getStudyBuilder() {
-    	return new StudyBuilder(sessionProviderForLocal);
+    	return new StudyBuilder(sessionProvider);
     }
     
     protected final DataSetBuilder getDataSetBuilder() {
-    	return new DataSetBuilder(sessionProviderForLocal);
+    	return new DataSetBuilder(sessionProvider);
     }
     
     protected final ExperimentBuilder getExperimentBuilder() {
-    	return new ExperimentBuilder(sessionProviderForLocal);
+    	return new ExperimentBuilder(sessionProvider);
     }
 
     protected final StudyFactorBuilder getStudyFactorBuilder() {
-    	return new StudyFactorBuilder(sessionProviderForLocal);
+    	return new StudyFactorBuilder(sessionProvider);
     }
 
     protected final StudyVariateBuilder getStudyVariateBuilder() {
-    	return new StudyVariateBuilder(sessionProviderForLocal);
+    	return new StudyVariateBuilder(sessionProvider);
     }
 
     protected final StudyReferenceBuilder getStudyNodeBuilder() {
-    	return new StudyReferenceBuilder(sessionProviderForLocal);
+    	return new StudyReferenceBuilder(sessionProvider);
     }
     
     protected final StockBuilder getStockBuilder() {
-    	return new StockBuilder(sessionProviderForLocal);
+    	return new StockBuilder(sessionProvider);
     }
 
     protected final TraitBuilder getTraitBuilder() {
-        return new TraitBuilder(sessionProviderForLocal);
+        return new TraitBuilder(sessionProvider);
     }
     
     protected final TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
-        return new TrialEnvironmentBuilder(sessionProviderForLocal);
+        return new TrialEnvironmentBuilder(sessionProvider);
     }
     
     protected final VariableInfoBuilder getVariableInfoBuilder() {
@@ -540,102 +540,102 @@ public abstract class DataManager extends DatabaseBroker{
     }
 
     protected final VariableTypeBuilder getVariableTypeBuilder() {
-    	return new VariableTypeBuilder(sessionProviderForLocal);
+    	return new VariableTypeBuilder(sessionProvider);
     }
     
     protected final NameSynonymBuilder getNameSynonymBuilder() {
-    	return new NameSynonymBuilder(sessionProviderForLocal);
+    	return new NameSynonymBuilder(sessionProvider);
     }
 
     protected final StudySearcherByNameStartSeasonCountry getProjectSearcher() {
-    	return new StudySearcherByNameStartSeasonCountry(sessionProviderForLocal);
+    	return new StudySearcherByNameStartSeasonCountry(sessionProvider);
     }
     
     protected final StudySaver getStudySaver() {
-    	return new StudySaver(sessionProviderForLocal);
+    	return new StudySaver(sessionProvider);
     }
     
     protected final DatasetProjectSaver getDatasetProjectSaver() {
-    	return new DatasetProjectSaver(sessionProviderForLocal);
+    	return new DatasetProjectSaver(sessionProvider);
     }
     
     protected final ExperimentModelSaver getExperimentModelSaver() {
-    	return new ExperimentModelSaver(sessionProviderForLocal);
+    	return new ExperimentModelSaver(sessionProvider);
     }
     
     protected final PhenotypeSaver getPhenotypeSaver() {
-    	return new PhenotypeSaver(sessionProviderForLocal);
+    	return new PhenotypeSaver(sessionProvider);
     }
 
     protected final GeolocationSaver getGeolocationSaver() {
-    	return new GeolocationSaver(sessionProviderForLocal);
+    	return new GeolocationSaver(sessionProvider);
     }
     
     protected final ProjectSaver getProjectSaver() {
-    	return new ProjectSaver(sessionProviderForLocal);
+    	return new ProjectSaver(sessionProvider);
     }
 
     protected final ProjectRelationshipSaver getProjectRelationshipSaver() {
-        return new ProjectRelationshipSaver(sessionProviderForLocal);
+        return new ProjectRelationshipSaver(sessionProvider);
     }
     
     protected final ProjectPropertySaver getProjectPropertySaver() {
-    	return new ProjectPropertySaver(sessionProviderForLocal);
+    	return new ProjectPropertySaver(sessionProvider);
     }
     
     protected final StockSaver getStockSaver() {
-    	return new StockSaver(sessionProviderForLocal);
+    	return new StockSaver(sessionProvider);
     }
     
     protected final StandardVariableSaver getStandardVariableSaver() {
-    	return new StandardVariableSaver(sessionProviderForLocal);
+    	return new StandardVariableSaver(sessionProvider);
     }
     
     protected final CvTermSaver getTermSaver() {
-    	return new CvTermSaver(sessionProviderForLocal);
+    	return new CvTermSaver(sessionProvider);
     }
     
     protected final CvTermRelationshipSaver getTermRelationshipSaver() {
-    	return new CvTermRelationshipSaver(sessionProviderForLocal);
+    	return new CvTermRelationshipSaver(sessionProvider);
     }
     
     protected final DataSetDestroyer getDataSetDestroyer() {
-    	return new DataSetDestroyer(sessionProviderForLocal);
+    	return new DataSetDestroyer(sessionProvider);
     }
     
     protected final TraitGroupBuilder getTraitGroupBuilder() {
-        return new TraitGroupBuilder(sessionProviderForLocal);
+        return new TraitGroupBuilder(sessionProvider);
     }
 
     protected final PropertyBuilder getPropertyBuilder() {
-        return new PropertyBuilder(sessionProviderForLocal);
+        return new PropertyBuilder(sessionProvider);
     }
 
     protected final ExperimentPropertySaver getExperimentPropertySaver() {
-        return new ExperimentPropertySaver(sessionProviderForLocal);
+        return new ExperimentPropertySaver(sessionProvider);
     }
 
     protected final ListDataPropertySaver getListDataPropertySaver(){
-    	return new ListDataPropertySaver(sessionProviderForLocal);
+    	return new ListDataPropertySaver(sessionProvider);
     }
     
     protected final FolderBuilder getFolderBuilder() {
-        return new FolderBuilder(sessionProviderForLocal);
+        return new FolderBuilder(sessionProvider);
     }
     
     protected final LocdesSaver getLocdesSaver() {
-        return new LocdesSaver(sessionProviderForLocal);
+        return new LocdesSaver(sessionProvider);
     }
     
     protected final GeolocationPropertySaver getGeolocationPropertySaver() {
-    	return new GeolocationPropertySaver(sessionProviderForLocal);
+    	return new GeolocationPropertySaver(sessionProvider);
     }
     
     protected final ListInventoryBuilder getListInventoryBuilder() {
-    	return new ListInventoryBuilder(sessionProviderForLocal);
+    	return new ListInventoryBuilder(sessionProvider);
     }
 
     protected final NameBuilder getNameBuilder() {
-        return new NameBuilder(sessionProviderForLocal);
+        return new NameBuilder(sessionProvider);
     }
 }

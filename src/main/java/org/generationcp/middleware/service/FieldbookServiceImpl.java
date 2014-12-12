@@ -204,7 +204,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@SuppressWarnings("unchecked")
 	@Override
     public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         long startTime = System.currentTimeMillis();
@@ -884,7 +884,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         try {
             trans = session.beginTransaction(); 
@@ -996,7 +996,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	
 	@Override
 	public void deleteStudy(int studyId) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         try {
@@ -1064,7 +1064,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
         
         int listId = 0;
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         try {

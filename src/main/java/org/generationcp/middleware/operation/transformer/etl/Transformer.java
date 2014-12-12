@@ -17,40 +17,35 @@ import org.generationcp.middleware.util.DatabaseBroker;
 
 public abstract class Transformer extends DatabaseBroker {
 	
-	private StandardVariableBuilder standardVariableBuilder;
-	
-	protected Transformer(HibernateSessionProvider sessionProviderForLocal) {
-       super(sessionProviderForLocal);
+	protected Transformer(HibernateSessionProvider sessionProvider) {
+       super(sessionProvider);
     }
 	
 	protected final VariableTypeListTransformer getVariableTypeListTransformer(){
-		return new VariableTypeListTransformer(sessionProviderForLocal);
+		return new VariableTypeListTransformer(sessionProvider);
 	}
 	
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer(){
-	        return new MeasurementVariableTransformer(sessionProviderForLocal);
+		return new MeasurementVariableTransformer(sessionProvider);
 	}
 	
 	protected final StudyValuesTransformer getStudyValuesTransformer(){
-		return new StudyValuesTransformer(sessionProviderForLocal);
+		return new StudyValuesTransformer(sessionProvider);
 	}
 	
 	protected final DatasetValuesTransformer getDatasetValuesTransformer(){
-		return new DatasetValuesTransformer(sessionProviderForLocal);
+		return new DatasetValuesTransformer(sessionProvider);
 	}
 	
 	protected final VariableListTransformer getVariableListTransformer(){
-		return new VariableListTransformer(sessionProviderForLocal);
+		return new VariableListTransformer(sessionProvider);
 	}
 	
 	protected final ExperimentValuesTransformer getExperimentValuesTransformer(){
-		return new ExperimentValuesTransformer(sessionProviderForLocal);
+		return new ExperimentValuesTransformer(sessionProvider);
 	}
 	
     protected final StandardVariableBuilder getStandardVariableBuilder() {
-    	if (standardVariableBuilder == null) {
-    		standardVariableBuilder = new StandardVariableBuilder(sessionProviderForLocal);
-    	} 
-    	return standardVariableBuilder;
+    	return new StandardVariableBuilder(sessionProvider);
     }
 }

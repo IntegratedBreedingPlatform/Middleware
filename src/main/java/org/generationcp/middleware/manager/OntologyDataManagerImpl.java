@@ -59,8 +59,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public OntologyDataManagerImpl() {
     }
 
-    public OntologyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
+    public OntologyDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         Term existingStdVar = findTermByName(stdVariable.getName(), CvId.VARIABLES);
@@ -142,7 +142,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         trans = session.beginTransaction();
@@ -279,7 +279,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             return term;
         }
 
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -304,7 +304,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareException("Error in updateTerm: Cannot update terms in central.");
         }
         
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         if (term == null){
@@ -386,7 +386,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             return term;
         }
 
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -411,7 +411,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         
     @Override
     public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         Term term = findTermByName(name, cvId);
@@ -435,7 +435,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId, String cropOntologyId) 
             throws MiddlewareQueryException, MiddlewareException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Term term = findTermByName(name, cvId);
@@ -468,7 +468,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareException("Error in updateTerm: Cannot update terms in central.");
         }
         
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 		Term updatedTerm = null;
 
@@ -576,7 +576,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             return new TraitClass(term, getTermById(parentTraitClassId));
         }
 
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -668,7 +668,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException(errorCodes, "The variable you entered is invalid");
         }
         
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -692,7 +692,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
             throws MiddlewareException, MiddlewareQueryException{
         
-    	Session session = getCurrentSessionForLocal();
+    	Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -709,7 +709,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public void deleteStandardVariableLocalConstraints(int standardVariableId) 
             throws MiddlewareQueryException{
         
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -737,7 +737,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         Integer cvId = getEnumerationCvId(variable);
 
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -766,7 +766,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         Integer cvId = getEnumerationCvId(variable);
         
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -809,7 +809,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException{
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -828,7 +828,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         
     @Override
     public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         try {
@@ -852,7 +852,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -917,7 +917,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {

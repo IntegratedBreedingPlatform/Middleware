@@ -40,12 +40,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public GermplasmListManagerImpl() {
     }
     
-    public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
+    public GermplasmListManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
-    public GermplasmListManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-        super(sessionProviderForLocal, localDatabaseName);
+    public GermplasmListManagerImpl(HibernateSessionProvider sessionProvider, String databaseName) {
+        super(sessionProvider, databaseName);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
     	// FIXME : doing a unique query on a table that allows duplicate rows
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("listid",id);
 		params.put("start",start);
 		params.put("numOfRows",numOfRows);
@@ -124,7 +124,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("id",id);
 		return getGermplasmListDataDAO().
 				callStoredProcedureForObject("countGermplasmListDataByListId",
@@ -149,7 +149,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("listId",listId);
 		params.put("entryId",entryId);
 		return getGermplasmListDataDAO().
@@ -160,7 +160,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("listId",listId);
 		params.put("lrecId",lrecId);
 		return getGermplasmListDataDAO().
@@ -237,7 +237,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     private List<Integer> addOrUpdateGermplasmList(List<GermplasmList> germplasmLists, Operation operation) throws MiddlewareQueryException {
-    	Session sessionForLocal = getCurrentSessionForLocal();
+    	Session sessionForLocal = getCurrentSession();
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -300,7 +300,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException {
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Session sessionForLocal = getCurrentSession();
         // initialize session & transaction
         Session session = sessionForLocal;
         Transaction trans = null;
@@ -373,7 +373,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     private List<Integer> addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation)
             throws MiddlewareQueryException {
         
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Session sessionForLocal = getCurrentSession();
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -432,7 +432,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException {
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Session sessionForLocal = getCurrentSession();
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -481,7 +481,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Session sessionForLocal = getCurrentSession();
         // initialize session & transaction
         Session session = sessionForLocal;
         Transaction trans = null;

@@ -140,7 +140,7 @@ public class WorkbookSaver extends Saver {
      */
 	@SuppressWarnings("unchecked")
 	public int saveDataset(Workbook workbook, Map<String, ?> variableMap, boolean retainValues, boolean isDeleteObservations, String programUUID) throws Exception {
-	    Session session = getCurrentSessionForLocal(); 
+	    Session session = getCurrentSession(); 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -654,7 +654,7 @@ public class WorkbookSaver extends Saver {
 	public void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = getStockModelBuilder().getStockMapForDataset(datasetId);
 
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		int i = 0;
 		List<Integer> variableIndexesList = new ArrayList<Integer>();
 		//we get the indexes so that in the next rows we dont need to compare anymore per row
@@ -695,7 +695,7 @@ public class WorkbookSaver extends Saver {
 		
 		//observation values start at row 2
 		int i = 2;
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
 		Map<Integer,PhenotypeExceptionDto> exceptions = null;
@@ -1045,7 +1045,7 @@ public class WorkbookSaver extends Saver {
 		
 		//observation values start at row 2
 		int i = 2;
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
 		Map<Integer,PhenotypeExceptionDto> exceptions = null;

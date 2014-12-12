@@ -40,8 +40,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         super();
     }
 
-    public UserDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
+    public UserDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
     @SuppressWarnings("unchecked")

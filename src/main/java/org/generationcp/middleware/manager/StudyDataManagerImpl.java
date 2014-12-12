@@ -60,16 +60,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyDataManagerImpl() {
     }
     
-    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-		super(sessionProviderForLocal, localDatabaseName);
-		germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, localDatabaseName);
-		locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal);
+    public StudyDataManagerImpl(HibernateSessionProvider sessionProvider, String databaseName) {
+		super(sessionProvider, databaseName);
+		germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider, databaseName);
+		locationDataManager = new LocationDataManagerImpl(sessionProvider);
 	}
 
-    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal);
-        locationDataManager = new LocationDataManagerImpl(sessionProviderForLocal);
+    public StudyDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
+        locationDataManager = new LocationDataManagerImpl(sessionProvider);
     }
 
     @Override
@@ -129,11 +129,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) 
             throws MiddlewareQueryException {
         if (filter instanceof ParentFolderStudyQueryFilter) {
-            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal);
+            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProvider);
         } else if (filter instanceof GidStudyQueryFilter) {
-            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal);
+            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProvider);
         } else if (filter instanceof BrowseStudyQueryFilter) {
-            return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal);
+            return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, numOfRows, this.sessionProvider);
         }
         return null;
     }
@@ -141,7 +141,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, 
             StudyValues studyValues, String programUUID) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -165,7 +165,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, 
     		DatasetValues datasetValues, String programUUID) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -212,7 +212,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public void addExperiment(int dataSetId, ExperimentType experimentType, 
             ExperimentValues experimentValues) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -229,7 +229,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, 
             ExperimentValues experimentValues) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -248,7 +248,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			ExperimentType experimentType,
 			List<ExperimentValues> experimentValuesList)
 			throws MiddlewareQueryException {
-          Session session = getCurrentSessionForLocal();
+          Session session = getCurrentSession();
           Transaction trans = null;
 
           try {
@@ -269,7 +269,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -287,7 +287,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public int addStock(VariableList variableList) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -329,7 +329,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public void addDataSetVariableType(int datasetId, VariableType variableType) 
             throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -346,7 +346,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public void setExperimentValue(int experimentId, int variableId, String value) 
             throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -397,7 +397,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -412,7 +412,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -540,7 +540,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         if (info != null && !info.isEmpty()) {
 
-            Session session = getCurrentSessionForLocal();
+            Session session = getCurrentSession();
             Transaction trans = null;
 
             try {
@@ -571,7 +571,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             DmsProject project, VariableTypeList variableTypeList, 
             List<ExperimentValues> experimentValues, List<Integer> locationIds) 
                     throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -675,7 +675,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("Folder name is not unique");
         }
 
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -706,7 +706,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         if (isExisting) {
             throw new MiddlewareQueryException("Folder name is not unique");
         }
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         try {
             trans = session.beginTransaction();
@@ -738,7 +738,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         Transaction trans = null;
         try {
-            Session session = getCurrentSessionForLocal();
+            Session session = getCurrentSession();
 
             trans = session.beginTransaction();
 
@@ -770,7 +770,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("Folder is not empty");
         }
 
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         try {
             trans = session.beginTransaction();
@@ -1057,7 +1057,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
    public void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers)
 			throws MiddlewareQueryException {
 	   
-         Session session = getCurrentSessionForLocal();
+         Session session = getCurrentSession();
          Transaction trans = null;
          PhenotypeOutlierDao phenotypeOutlierDao = getPhenotypeOutlierDao();
          int i = 0;

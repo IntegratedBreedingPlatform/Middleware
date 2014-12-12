@@ -48,12 +48,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public GermplasmDataManagerImpl() {
     }
     
-    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
+    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
-    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-        super(sessionProviderForLocal, localDatabaseName);
+    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProvider, String databaseName) {
+        super(sessionProvider, databaseName);
     }
     
     @Override
@@ -166,7 +166,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("name",nameToUse);
 		params.put("altname",null);
 		params.put("altname2",null);
@@ -209,7 +209,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		
 		String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -249,7 +249,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("name",nameToUse);
 		params.put("altname",null);
 		params.put("altname2",null);
@@ -283,7 +283,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		
 		String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -374,7 +374,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Germplasm getGermplasmByGID(Integer gid) throws MiddlewareQueryException {
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
         
         return getGermplasmDao().
@@ -406,7 +406,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {      
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		if (status != null && status != 0) {
 			params.put("status",status);
@@ -426,7 +426,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getPreferredNameByGID(Integer gid) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredNamesRecordByGid",
@@ -437,7 +437,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException{
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredNameByGid",
@@ -456,7 +456,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredIDNamesRecordByGid",
@@ -486,7 +486,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private void updateGermplasmPrefNameAbbrev(Integer gid, String newPrefValue, String nameOrAbbrev) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -565,7 +565,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private List<Integer> addOrUpdateGermplasmName(List<Name> names, Operation operation) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         int namesSaved = 0;
@@ -610,7 +610,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException {
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getAttributeDao().
 				callStoredProcedureForList("getAttributesByGID",
@@ -724,7 +724,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Integer addMethod(Method method) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Integer methodId = null;
@@ -754,7 +754,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Method editMethod(Method method) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Method recordSaved = null;
@@ -785,7 +785,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         List<Integer> idMethodsSaved = new ArrayList<Integer>();
@@ -815,7 +815,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public void deleteMethod(Method method) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -877,7 +877,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Integer addBibliographicReference(Bibref bibref) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Integer idBibrefSaved = null;
@@ -931,7 +931,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private List<Integer> addOrUpdateAttributes(List<Attribute> attributes, Operation operation) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         List<Integer> idAttributesSaved = new ArrayList<Integer>();
@@ -1035,7 +1035,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private List<Integer> addOrUpdateGermplasms(List<Germplasm> germplasms, Operation operation) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         int germplasmsSaved = 0;
@@ -1077,7 +1077,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private int addOrUpdateProgenitors(List<Progenitor> progenitors) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         int progenitorsSaved = 0;
@@ -1135,7 +1135,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         int germplasmsSaved = 0;
@@ -1182,7 +1182,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public Integer addUserDefinedField(UserDefinedField field) throws MiddlewareQueryException{
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Integer isUdfldSaved = 0;
@@ -1210,7 +1210,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public List<Integer> addUserDefinedFields(List<UserDefinedField> fields) throws MiddlewareQueryException{
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         List<Integer> isUdfldSaved = new ArrayList<Integer>();
@@ -1249,7 +1249,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public Integer addAttribute(Attribute attr) throws MiddlewareQueryException{
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         Integer isAttrSaved = 0;
@@ -1277,7 +1277,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public List<Integer> addAttributes(List<Attribute> attrs) throws MiddlewareQueryException{
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         List<Integer> isAttrSaved = new ArrayList<Integer>();
@@ -1901,7 +1901,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         //search by gid
         if(q.matches("\\d+") || q.matches("-\\d+")) {
         	params = new LinkedHashMap<String,Object>();
-			params.put("central_db_name", localDatabaseName);
+			params.put("central_db_name", databaseName);
 			params.put("gid",q);
 			params.put("searchType", searchType);
 			params.put("searchPublicData",searchPublicData?1:0);
@@ -1914,7 +1914,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
 		//search by name
 		params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		List<String> names = GermplasmDataManagerUtil.createNamePermutations(q);
         String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -2017,7 +2017,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid)
 			throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", localDatabaseName);
+		params.put("central_db_name", databaseName);
 		params.put("v_gid",gid);
 		params.put("v_pro_no",null);
 		List<Germplasm> germplasms = getGermplasmListDataDAO().
@@ -2051,7 +2051,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void saveProgramFavorites(List<ProgramFavorite> list)
 			throws MiddlewareQueryException {
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		Transaction trans = null;
 
 		int favoriteSaved = 0;
@@ -2087,7 +2087,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void saveProgramFavorite(ProgramFavorite favorite)
 			throws MiddlewareQueryException {
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		Transaction trans = null;
 
 		try {
@@ -2110,7 +2110,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void deleteProgramFavorites(List<ProgramFavorite> list)
 			throws MiddlewareQueryException {
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		Transaction trans = null;
 
 		int favoriteDeleted = 0;
@@ -2144,7 +2144,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void deleteProgramFavorite(ProgramFavorite favorite)
 			throws MiddlewareQueryException {
-		Session session = getCurrentSessionForLocal();
+		Session session = getCurrentSession();
 		Transaction trans = null;
 
 		try {

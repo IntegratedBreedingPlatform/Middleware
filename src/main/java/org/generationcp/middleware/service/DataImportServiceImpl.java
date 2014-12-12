@@ -95,7 +95,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     @SuppressWarnings("unchecked")
     @Override
     public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations, String programUUID) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         Map<String, ?> variableMap = null;
         TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", LOG);
@@ -160,7 +160,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException {
         WorkbookParser parser = new WorkbookParser();
 
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProvider());
 
         // partially parse the file to parse the description sheet only at first
         return strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology);
@@ -457,7 +457,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         // perform validations on the parsed data that require db access
         List<Message> messages = new LinkedList<Message>();
 
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProvider());
 
         if (!isEntryExists(ontology, workbook.getFactors()) && !isEntryExists(ontology, workbook.getConditions())) {
             messages.add(new Message("error.entry.doesnt.exist.wizard"));
@@ -586,7 +586,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     public Map<String, List<Message>> validateProjectOntology(Workbook workbook) throws MiddlewareQueryException {
         Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
 
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProvider());
 
         if (!isEntryExists(ontology, workbook.getFactors())) {
             initializeIfNull(errors, Constants.MISSING_ENTRY);
@@ -619,7 +619,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     @Override
     public int saveProjectOntology(Workbook workbook, String programUUID)
             throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)", LOG);
         int studyId = 0;
@@ -643,7 +643,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     @Override
     public int saveProjectData(Workbook workbook) throws MiddlewareQueryException {
-        Session session = getCurrentSessionForLocal();
+        Session session = getCurrentSession();
         Transaction trans = null;
         TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)", LOG);
 
@@ -667,7 +667,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     @Override
     public Map<String, List<Message>> validateProjectData(Workbook workbook) throws MiddlewareQueryException {
         Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal());
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProvider());
         checkForExistingTrialInstance(ontology, workbook, errors);
 
         // the following code is a workaround versus the current state management in the ETL Wizard

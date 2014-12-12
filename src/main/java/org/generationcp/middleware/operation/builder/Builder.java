@@ -32,21 +32,20 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public abstract class Builder extends DatabaseBroker {
 	
-	public Builder(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);		
+	public Builder(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);		
 	}
-
     
     protected final StudyBuilder getStudyBuilder() {
-    	return new StudyBuilder(sessionProviderForLocal);
+    	return new StudyBuilder(sessionProvider);
     }
     
     protected final DataSetBuilder getDataSetBuilder() {
-    	return new DataSetBuilder(sessionProviderForLocal);
+    	return new DataSetBuilder(sessionProvider);
     }
 	
     protected final StudyVariableBuilder getStudyVariableBuilder() {
-    	return new StudyVariableBuilder(sessionProviderForLocal);
+    	return new StudyVariableBuilder(sessionProvider);
     }
     
     protected final VariableInfoBuilder getVariableInfoBuilder() {
@@ -54,58 +53,58 @@ public abstract class Builder extends DatabaseBroker {
     }
     
     protected final VariableTypeBuilder getVariableTypeBuilder() {
-    	return new VariableTypeBuilder(sessionProviderForLocal);
+    	return new VariableTypeBuilder(sessionProvider);
     }
     
     protected final ExperimentBuilder getExperimentBuilder() {
-    	return new ExperimentBuilder(sessionProviderForLocal);
+    	return new ExperimentBuilder(sessionProvider);
     }
     
     protected final StockModelBuilder getStockBuilder() {
-    	return new StockModelBuilder(sessionProviderForLocal);
+    	return new StockModelBuilder(sessionProvider);
     }
 
     protected final StandardVariableBuilder getStandardVariableBuilder() {
-    	return new StandardVariableBuilder(sessionProviderForLocal);
+    	return new StandardVariableBuilder(sessionProvider);
     }
     
     protected final TermBuilder getTermBuilder() {
-    	return new TermBuilder(sessionProviderForLocal);
+    	return new TermBuilder(sessionProvider);
     }
     
     protected final CvTermSaver getTermSaver() {
-    	return new CvTermSaver(sessionProviderForLocal);
+    	return new CvTermSaver(sessionProvider);
     }
 
 	protected final StandardVariableSaver getStandardVariableSaver() {
-		return new StandardVariableSaver(sessionProviderForLocal);
+		return new StandardVariableSaver(sessionProvider);
 	}
 	
 	protected final NameSynonymBuilder getNameSynonymBuilder() {
-	    return new NameSynonymBuilder(sessionProviderForLocal);
+	    return new NameSynonymBuilder(sessionProvider);
 	}
 	
 	protected final CvTermRelationshipSaver getCvTermRelationshipSaver() {
-	    return new CvTermRelationshipSaver(sessionProviderForLocal);
+	    return new CvTermRelationshipSaver(sessionProvider);
 	}
 	
 	protected final StudyDataManager getStudyDataManager() {
-	    return new StudyDataManagerImpl(sessionProviderForLocal);
+	    return new StudyDataManagerImpl(sessionProvider);
 	}
 	
 	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
-	    return new MeasurementVariableTransformer(sessionProviderForLocal);
+	    return new MeasurementVariableTransformer(sessionProvider);
 	}
 	
     protected final GermplasmDataManager getGermplasmDataManager() {
-        return new GermplasmDataManagerImpl(sessionProviderForLocal);
+        return new GermplasmDataManagerImpl(sessionProvider);
     }
     
     protected final OntologyDataManager getOntologyDataManager() {
-        return new OntologyDataManagerImpl(sessionProviderForLocal);
+        return new OntologyDataManagerImpl(sessionProvider);
     }
 
     protected final WorkbookBuilder getWorkbookBuilder() {
-    	return new WorkbookBuilder(sessionProviderForLocal);
+    	return new WorkbookBuilder(sessionProvider);
     }
 }
