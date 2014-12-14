@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DataSetupTest extends ServiceIntegraionTest {
+public class DataSetupTest extends DataManagerIntegrationTest {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetupTest.class);
 
@@ -80,10 +80,10 @@ public class DataSetupTest extends ServiceIntegraionTest {
 	
 	@BeforeClass
 	public static void setUp() {
-		dataImportService = serviceFactory.getDataImportService();
+		dataImportService = managerFactory.getDataImportService();
 		germplasmManager = managerFactory.getGermplasmDataManager();
 		germplasmListManager = managerFactory.getGermplasmListManager();
-		middlewareFieldbookService = serviceFactory.getFieldbookService();
+		middlewareFieldbookService = managerFactory.getFieldbookMiddlewareService();
 	}
 	
     @Test

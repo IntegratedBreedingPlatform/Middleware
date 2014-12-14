@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
@@ -35,7 +35,6 @@ import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
@@ -44,7 +43,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class OntologyServiceImplTest extends ServiceIntegraionTest {
+public class OntologyServiceImplTest extends DataManagerIntegrationTest {
     
     private static final String NUMBER_OF_RECORDS = " #RECORDS: ";
     private static final int AGRONOMIC_TRAIT_CLASS = 1340;
@@ -53,17 +52,11 @@ public class OntologyServiceImplTest extends ServiceIntegraionTest {
     private static final int CHARACTER_VARIABLE = 2;
     private static final int CATEGORICAL_VARIABLE = 3;
     
-    private static ServiceFactory serviceFactory;
     private static OntologyService ontologyService;
     
-    static DatabaseConnectionParameters local;
-    static DatabaseConnectionParameters central;
-
-
     @BeforeClass
     public static void setUp() throws Exception {
-		serviceFactory = new ServiceFactory("testDatabaseConfig.properties");
-        ontologyService = serviceFactory.getOntologyService();
+        ontologyService = managerFactory.getOntologyService();
     }
 
     @Test

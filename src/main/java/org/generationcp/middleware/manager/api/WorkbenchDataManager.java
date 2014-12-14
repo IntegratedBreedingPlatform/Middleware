@@ -199,7 +199,15 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException;
-    
+
+    /**
+     * Checks if person with specified email exists.
+     * @param email
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    boolean isPersonWithEmailExists(String email) throws MiddlewareQueryException;
+
     /**
      * Checks if a username exists.
      *
@@ -350,7 +358,7 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
-    
+
     /**
      * Deletes a user.
      *

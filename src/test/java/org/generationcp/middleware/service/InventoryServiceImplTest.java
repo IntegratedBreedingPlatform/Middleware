@@ -3,7 +3,7 @@ package org.generationcp.middleware.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.pojos.ims.LotsResult;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.utils.test.Debug;
@@ -14,14 +14,13 @@ import org.junit.runners.JUnit4;
 
 
 @RunWith(JUnit4.class)
-public class InventoryServiceImplTest extends ServiceIntegraionTest {
+public class InventoryServiceImplTest extends DataManagerIntegrationTest {
 
     private static InventoryService inventoryService;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        inventoryService = serviceFactory.getInventoryService();
-        
+        inventoryService = managerFactory.getInventoryMiddlewareService();
     }
 
     @Test

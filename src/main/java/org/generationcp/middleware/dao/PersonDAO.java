@@ -1,13 +1,13 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public
  * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * DAO class for {@link Person}.
- * 
+ *
  */
 public class PersonDAO extends GenericDAO<Person, Integer>{
 
@@ -48,7 +48,26 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
         }
         return false;
     }
-    
+
+    public boolean isPersonWithEmailExists(String email) throws MiddlewareQueryException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT COUNT(1) FROM PERSONS p ").append("WHERE UPPER(p.pemail) = :email");
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+            query.setParameter("email", email);
+
+            BigInteger count = (BigInteger) query.uniqueResult();
+
+            return count.longValue() > 0;
+
+        } catch (HibernateException e) {
+                logAndThrowException("Error with isPersonWithEmailExists(email=" + email
+                        + ") query from Person: " + e.getMessage(), e);
+        }
+
+        return false;
+    }
+
     @SuppressWarnings("unchecked")
 	public Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds) throws MiddlewareQueryException {
     	Map<Integer, String> map = new HashMap<Integer, String>();
@@ -59,13 +78,13 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
             		map.put(person.getId(), person.getDisplayName());
             	}
             }
-            
+
         } catch (HibernateException e) {
             logAndThrowException(String.format("Error with getPersonNamesByPersonIds(id=[%s])", StringUtils.join(personIds, ",")),e);
         }
         return map;
     }
-    
+
     @SuppressWarnings("unchecked")
 	public Map<Integer, String> getPersonNamesByUserIds(List<Integer> userIds) throws MiddlewareQueryException {
     	Map<Integer, String> map = new HashMap<Integer, String>();
@@ -74,21 +93,21 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
 				.append("SELECT DISTINCT users.userid, persons.fname, persons.ioname, persons.lname ")
 				.append("FROM persons JOIN users ON persons.personid = users.personid ")
 				.append("WHERE users.userid = :userIds ");
-		    
+
 			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("userIds", userIds);
-					             
+
 	        List<Object[]> results = query.list();
-	
+
 	        for (Object[] row : results){
 	        	Integer userId = (Integer) row[0];
 	        	String firstName = (String) row[1];
 	        	String middleName = (String) row[2];
 	        	String lastName = (String) row[3];
-	        	
+
 	        	map.put(userId, new Person(firstName, middleName, lastName).getDisplayName());
 	        }
-        
+
         } catch (HibernateException e) {
             logAndThrowException(String.format("Error with getPersonNamesByUserIds(id=[%s])", StringUtils.join(userIds, ",")),e);
         }

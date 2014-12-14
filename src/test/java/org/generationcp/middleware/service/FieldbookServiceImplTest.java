@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -58,15 +58,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class FieldbookServiceImplTest extends ServiceIntegraionTest {
+public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
         
     private static FieldbookService fieldbookService;
     private static DataImportService dataImportService;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        fieldbookService = serviceFactory.getFieldbookService();
-        dataImportService = serviceFactory.getDataImportService();
+        fieldbookService = managerFactory.getFieldbookMiddlewareService();
+        dataImportService = managerFactory.getDataImportService();
     }
 
     @Test

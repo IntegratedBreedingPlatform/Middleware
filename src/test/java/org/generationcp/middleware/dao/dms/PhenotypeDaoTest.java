@@ -13,26 +13,24 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class PhenotypeDaoTest extends ServiceIntegraionTest {
+public class PhenotypeDaoTest extends DataManagerIntegrationTest {
 
     private static PhenotypeDao dao;
     private static DataImportService dataImportService;
@@ -49,18 +47,7 @@ public class PhenotypeDaoTest extends ServiceIntegraionTest {
         dao = new PhenotypeDao();
         dao.setSession(localSessionUtil.getCurrentSession());
         
-        HibernateSessionProvider sessionProviderForLocal = new HibernateSessionPerThreadProvider(
-				localSessionUtil.getSessionFactory());
-		HibernateSessionProvider sessionProviderForCentral = new HibernateSessionPerThreadProvider(
-				centralSessionUtil.getSessionFactory());
-		
-		ManagerFactory managerFactory = new ManagerFactory();
-		managerFactory.setSessionProviderForCentral(sessionProviderForCentral);
-		managerFactory.setSessionProviderForLocal(sessionProviderForLocal);
-		managerFactory.setLocalDatabaseName(localConnectionParameters.getDbName());
-		managerFactory.setCentralDatabaseName(centralConnectionParams.getDbName());
-		
-        dataImportService = serviceFactory.getDataImportService();
+        dataImportService = managerFactory.getDataImportService();
         studyDataManager = managerFactory.getNewStudyDataManager();
         
         importFieldbookFile(FIELDBOOK_FILE_IBD_VALID);

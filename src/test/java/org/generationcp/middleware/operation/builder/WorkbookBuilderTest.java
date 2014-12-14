@@ -13,7 +13,7 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.List;
 
-import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -32,7 +32,7 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbookBuilderTest extends ServiceIntegraionTest {
+public class WorkbookBuilderTest extends DataManagerIntegrationTest {
     
     private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilderTest.class);
     
@@ -45,8 +45,8 @@ public class WorkbookBuilderTest extends ServiceIntegraionTest {
     @BeforeClass
 	public static void setUp() throws Exception {
     	workbookBuilder = new WorkbookBuilder(Mockito.mock(HibernateSessionProvider.class));
-    	dataImportService = serviceFactory.getDataImportService();
-    	fieldbookService = serviceFactory.getFieldbookService();
+    	dataImportService = managerFactory.getDataImportService();
+    	fieldbookService = managerFactory.getFieldbookMiddlewareService();
     }
  
     @Test
