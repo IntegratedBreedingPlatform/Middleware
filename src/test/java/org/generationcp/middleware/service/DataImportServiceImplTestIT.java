@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import junit.framework.Assert;
-
-import org.generationcp.middleware.ServiceIntegraionTest;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.etl.WorkbookTest2;
@@ -43,7 +41,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
+public class DataImportServiceImplTestIT extends DataManagerIntegrationTest {
 
     private static DataImportService dataImportService;
     
@@ -51,8 +49,8 @@ public class DataImportServiceImplTestIT extends ServiceIntegraionTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        dataImportService = serviceFactory.getDataImportService();
-        fieldbookService = serviceFactory.getFieldbookService();
+        dataImportService = managerFactory.getDataImportService();
+        fieldbookService = managerFactory.getFieldbookMiddlewareService();
     }
 
     @Test
