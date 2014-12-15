@@ -30,8 +30,8 @@ public class MiddlewareIntegrationTest {
 	protected final Logger LOG = LoggerFactory.getLogger(getClass());
 	protected static final int INDENT = 3;
 
-	protected static DatabaseConnectionParameters centralConnectionParams, localConnectionParameters, workbenchConnectionParameters;
-	protected static HibernateUtil centralSessionUtil, localSessionUtil, workbenchSessionUtil;
+	protected static DatabaseConnectionParameters connectionParameters, workbenchConnectionParameters;
+	protected static HibernateUtil sessionUtil, workbenchSessionUtil;
 
 	/**
 	 * We hold session factories in a static field and initialise them only once for all tests to use as opening a session factory is an
@@ -43,12 +43,10 @@ public class MiddlewareIntegrationTest {
 			if (config.getBoolean("drop.create.dbs")) {
 				DatabaseSetupUtil.setupTestDatabases();
 			}
-			localConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-			centralConnectionParams = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
+			connectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
 			workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
 
-			centralSessionUtil = new HibernateUtil(centralConnectionParams);
-			localSessionUtil = new HibernateUtil(localConnectionParameters);
+			sessionUtil = new HibernateUtil(connectionParameters);
 			workbenchSessionUtil = new HibernateUtil(workbenchConnectionParameters);
 
 		} catch (FileNotFoundException e) {

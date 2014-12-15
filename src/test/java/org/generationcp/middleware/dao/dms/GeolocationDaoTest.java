@@ -31,7 +31,7 @@ public class GeolocationDaoTest extends MiddlewareIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         dao = new GeolocationDao();
-        dao.setSession(centralSessionUtil.getCurrentSession());
+        dao.setSession(sessionUtil.getCurrentSession());
     }
 
 

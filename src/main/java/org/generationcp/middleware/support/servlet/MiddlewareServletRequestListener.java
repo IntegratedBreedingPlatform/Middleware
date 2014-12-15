@@ -162,21 +162,18 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
     public void requestInitialized(ServletRequestEvent event) {
         ServletRequest request = event.getServletRequest();
         
-        SessionFactory sessionFactoryForLocal = MiddlewareServletContextListener.getLocalSessionFactoryForRequestEvent(event);
-        SessionFactory sessionFactoryForCentral = MiddlewareServletContextListener.getCentralSessionFactoryForRequestEvent(event);
+        SessionFactory sessionFactory = MiddlewareServletContextListener.getSessionFactoryForRequestEvent(event);
         SessionFactory sessionFactoryForWorkbench = MiddlewareServletContextListener.getWorkbenchSessionFactoryForRequestEvent(event);
         
-        if (sessionFactoryForLocal == null && sessionFactoryForCentral == null) {
+        if (sessionFactory == null) {
             throw new RuntimeException("No SessionFactory found for request. See " + MiddlewareServletContextListener.class.getName() + " documentation for reference.");
         }
         
-        HibernateSessionProvider sessionProviderForLocal = new HibernateSessionPerRequestProvider(sessionFactoryForLocal);
-        HibernateSessionProvider sessionProviderForCentral = new HibernateSessionPerRequestProvider(sessionFactoryForCentral);
+        HibernateSessionProvider sessionProvider = new HibernateSessionPerRequestProvider(sessionFactory);
         HibernateSessionProvider sessionProviderForWorkbench = new HibernateSessionPerRequestProvider(sessionFactoryForWorkbench);
         
         ManagerFactory managerFactory = new ManagerFactory();
-        managerFactory.setSessionProviderForLocal(sessionProviderForLocal);
-        managerFactory.setSessionProviderForCentral(sessionProviderForCentral);
+        managerFactory.setSessionProvider(sessionProvider);
 
         WorkbenchDataManager workbenchDataManager = new WorkbenchDataManagerImpl(sessionProviderForWorkbench);
         

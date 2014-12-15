@@ -31,7 +31,7 @@ public class ExperimentPropertyDaoTest extends MiddlewareIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         dao = new ExperimentPropertyDao();
-        dao.setSession(centralSessionUtil.getCurrentSession());
+        dao.setSession(sessionUtil.getCurrentSession());
     }
 
     // FIXME: hardcoded project id

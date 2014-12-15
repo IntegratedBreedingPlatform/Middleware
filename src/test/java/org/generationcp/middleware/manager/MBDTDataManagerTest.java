@@ -57,8 +57,8 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
     public void prepareDatabaseItems() throws Exception {
         dut = managerFactory.getMbdtDataManager();
 		dataSource = DriverManagerDataSourceFactory.create(
-				localConnectionParameters.getDriverName(), localConnectionParameters.getUrl(),
-				localConnectionParameters.getUsername(), localConnectionParameters.getPassword());
+				connectionParameters.getDriverName(), connectionParameters.getUrl(),
+				connectionParameters.getUsername(), connectionParameters.getPassword());
     }
 
     protected void executeUpdate(String sql) throws Exception {

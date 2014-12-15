@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -56,9 +57,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputFormatter{
+public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory       factory;
     private static GenotypicDataManager manager;
 
     private static final String DATASET             = "Dataset";
@@ -76,24 +76,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local, central;
-		try {
-			local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-			        "localgroundnut");
-			central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-	                "centralgroundnut");
-	        factory = new ManagerFactory(local, central);
-	        manager = factory.getGenotypicDataManager();
-	        
-		} catch (FileNotFoundException e) {
-			Assert.fail(e.getMessage());
-		} catch (ConfigException e) {
-			Assert.fail(e.getMessage());
-		} catch (URISyntaxException e) {
-			Assert.fail(e.getMessage());
-		} catch (IOException e) {
-			Assert.fail(e.getMessage());
-		}    
+    	manager = managerFactory.getGenotypicDataManager();
 	}
 
     private Dataset createDataset() throws Exception {
@@ -1197,12 +1180,4 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
     	Debug.println("ROWS AFTER: ");
     	Debug.printObjects(INDENT, rowsAfter);
     }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-    	if(factory != null) {
-    		factory.close();
-    	}
-    }
-
 }

@@ -69,7 +69,6 @@ import java.net.URISyntaxException;
  */
 public class MiddlewareServletContextListener implements ServletContextListener {
     public final static String ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY = "MIDDLEWARE_LOCAL_SESSION_FACTORY";
-    public final static String ATTR_MIDDLEWARE_CENTRAL_SESSION_FACTORY = "MIDDLEWARE_CENTRAL_SESSION_FACTORY";
     public static final String ATTR_WORKBENCH_SESSION_FACTORY = "WORKBENCH_SESSION_FACTORY";
 
     private final static String PARAM_MIDDLEWARE_HIBERNATE_CONFIG = "middleware_hibernate_config_file";
@@ -77,16 +76,11 @@ public class MiddlewareServletContextListener implements ServletContextListener 
     private final static String PARAM_WORKBENCH_DATABASE_PROPERTY_FILE = "workbench_database_property_file";
     private final static String PARAM_MIDDLEWARE_RESOURCE_FILES = "middleware_additional_resources";
 
-    private SessionFactory sessionFactoryForLocal;
-    private SessionFactory sessionFactoryForCentral;
+    private SessionFactory sessionFactory;
     private SessionFactory sessionFactoryForWorkbench;
 
-    public static SessionFactory getLocalSessionFactoryForRequestEvent(ServletRequestEvent event) {
+    public static SessionFactory getSessionFactoryForRequestEvent(ServletRequestEvent event) {
         return (SessionFactory) event.getServletContext().getAttribute(ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY);
-    }
-
-    public static SessionFactory getCentralSessionFactoryForRequestEvent(ServletRequestEvent event) {
-        return (SessionFactory) event.getServletContext().getAttribute(ATTR_MIDDLEWARE_CENTRAL_SESSION_FACTORY);
     }
 
     public static SessionFactory getWorkbenchSessionFactoryForRequestEvent(ServletRequestEvent event) {
@@ -117,17 +111,13 @@ public class MiddlewareServletContextListener implements ServletContextListener 
 
         Exception exception = null;
         try {
-            DatabaseConnectionParameters paramsForLocal = new DatabaseConnectionParameters(databasePropertyFilename, "local");
-            DatabaseConnectionParameters paramsForCentral = new DatabaseConnectionParameters(databasePropertyFilename, "central");
-
+            DatabaseConnectionParameters params = new DatabaseConnectionParameters(databasePropertyFilename, "local");
             DatabaseConnectionParameters paramsForWorkbench = new DatabaseConnectionParameters(databasePropertyFilename, "workbench");
 
-            sessionFactoryForLocal = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForLocal, additionalResourceFiles);
-            sessionFactoryForCentral = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForCentral, additionalResourceFiles);
+            sessionFactory = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, params, additionalResourceFiles);
             sessionFactoryForWorkbench = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForWorkbench, additionalResourceFiles);
 
-            context.setAttribute(ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY, sessionFactoryForLocal);
-            context.setAttribute(ATTR_MIDDLEWARE_CENTRAL_SESSION_FACTORY, sessionFactoryForCentral);
+            context.setAttribute(ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY, sessionFactory);
             context.setAttribute(ATTR_WORKBENCH_SESSION_FACTORY, sessionFactoryForWorkbench);
         } catch (FileNotFoundException e) {
             exception = e;
@@ -146,18 +136,10 @@ public class MiddlewareServletContextListener implements ServletContextListener 
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        if (sessionFactoryForLocal != null) {
+        if (sessionFactory != null) {
             try {
-                sessionFactoryForLocal.close();
-                sessionFactoryForLocal = null;
-            } finally {
-            }
-        }
-
-        if (sessionFactoryForCentral != null) {
-            try {
-                sessionFactoryForCentral.close();
-                sessionFactoryForCentral = null;
+                sessionFactory.close();
+                sessionFactory = null;
             } finally {
             }
         }

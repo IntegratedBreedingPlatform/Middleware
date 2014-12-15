@@ -45,7 +45,7 @@ public class PhenotypeDaoTest extends DataManagerIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         dao = new PhenotypeDao();
-        dao.setSession(localSessionUtil.getCurrentSession());
+        dao.setSession(sessionUtil.getCurrentSession());
         
         dataImportService = managerFactory.getDataImportService();
         studyDataManager = managerFactory.getNewStudyDataManager();

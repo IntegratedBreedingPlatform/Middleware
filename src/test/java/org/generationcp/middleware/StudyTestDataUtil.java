@@ -14,8 +14,6 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -29,8 +27,8 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 	
 	private StudyTestDataUtil() {
-		studyDataManager = new StudyDataManagerImpl(managerFactory.getSessionProviderForLocal(), managerFactory.getLocalDatabaseName());
-		ontologyManager = new OntologyDataManagerImpl(managerFactory.getSessionProviderForLocal());
+		studyDataManager = managerFactory.getStudyDataManager();
+		ontologyManager = managerFactory.getOntologyDataManager();
 	}
 	
 	public static StudyTestDataUtil getInstance() {

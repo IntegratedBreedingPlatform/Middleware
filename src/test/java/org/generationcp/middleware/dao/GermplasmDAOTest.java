@@ -29,7 +29,7 @@ public class GermplasmDAOTest extends MiddlewareIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         dao = new GermplasmDAO();
-        dao.setSession(centralSessionUtil.getCurrentSession());
+        dao.setSession(sessionUtil.getCurrentSession());
     }
 
     /**

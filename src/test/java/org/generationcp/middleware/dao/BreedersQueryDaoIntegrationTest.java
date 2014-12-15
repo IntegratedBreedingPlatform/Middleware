@@ -17,7 +17,7 @@ public class BreedersQueryDaoIntegrationTest extends MiddlewareIntegrationTest {
 	
 	@BeforeClass
 	public static void setUp() {
-		dao = new BreedersQueryDao(centralSessionUtil.getCurrentSession());
+		dao = new BreedersQueryDao(sessionUtil.getCurrentSession());
 	}
 	
 	// FIXME I assume some Rice corp data in central schema for my test
