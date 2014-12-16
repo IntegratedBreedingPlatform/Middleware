@@ -181,7 +181,9 @@ public class TraitBuilder extends Builder{
         // get traits only observed in local environments
         for (TraitInfo localObservedTrait : localTraitInfoList){
         	CategoricalTraitInfo categoricalTrait = new CategoricalTraitInfo(localObservedTrait);
-        	if (!centralCategTraitList.contains(categoricalTrait)){
+        	if (categoricalTrait.getId() > 0 && !centralCategTraitList.contains(categoricalTrait)){
+        		centralCategTraitList.add(categoricalTrait);
+        	} else {
         		localCategTraitList.add(categoricalTrait);
         	}
         }
@@ -190,14 +192,14 @@ public class TraitBuilder extends Builder{
         if (!centralCategTraitList.isEmpty()){
         	setWorkingDatabase(Database.CENTRAL);
         	finalTraitInfoList.addAll(getCvTermDao().setCategoricalVariables(centralCategTraitList));
-        	getPhenotypeDao().setCategoricalTraitInfoValues(centralCategTraitList, environmentIds);
+        	getPhenotypeDao().setCategoricalTraitInfoValues(finalTraitInfoList, environmentIds);
         }
-        
+
         // Set name, description and get categorical domain values and count per value from local
         if (!localCategTraitList.isEmpty()){
         	setWorkingDatabase(Database.LOCAL);
         	finalTraitInfoList.addAll(getCvTermDao().setCategoricalVariables(localCategTraitList));
-        	getPhenotypeDao().setCategoricalTraitInfoValues(localCategTraitList, environmentIds);
+        	getPhenotypeDao().setCategoricalTraitInfoValues(finalTraitInfoList, environmentIds);
         }
 
         return finalTraitInfoList;
