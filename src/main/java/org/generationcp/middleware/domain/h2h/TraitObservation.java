@@ -20,18 +20,20 @@ public class TraitObservation {
 	private int gid ;
 	private int observationId; //  nd_experiment id
 	private String locationName; // name of the location where the value was observed
+	private Integer locationId;
 	
 	public TraitObservation(int id, String traitValue) {
 		this.id = id;
 		this.traitValue = traitValue;
 	}
 	
-	public TraitObservation(int id, String traitValue, int gid, int observationId, String locationName ){
+	public TraitObservation(int id, String traitValue, int gid, int observationId, String locationName, Integer locationId ){
 		this.id = id;
 		this.traitValue = traitValue;
 		this.gid = gid;
 		this.observationId = observationId;
 		this.locationName = locationName;
+		this.locationId = locationId;
 	}
 
 	public int getId() {
@@ -74,7 +76,15 @@ public class TraitObservation {
 		this.locationName = locationName;
 	}
 	
-    @Override
+    public Integer getLocationId() {
+		return locationId;
+	}
+
+	public void setLocationId(Integer locationId) {
+		this.locationId = locationId;
+	}
+
+	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("TraitObservation [");
@@ -88,6 +98,8 @@ public class TraitObservation {
         builder.append(observationId);
         builder.append(", locationName=");
         builder.append(locationName);
+        builder.append(", locationId=");
+        builder.append(locationId);
         builder.append("]");
         return builder.toString();
     }
