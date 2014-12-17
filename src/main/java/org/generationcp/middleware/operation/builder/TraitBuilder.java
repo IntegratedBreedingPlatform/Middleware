@@ -427,7 +427,7 @@ public class TraitBuilder extends Builder{
     			centralLocIDs.add(locationId);
     		}
     	}
-    	System.out.println("central loc IDs " + centralLocIDs);
+
     	if (!centralLocIDs.isEmpty()){
     		setWorkingDatabase(Database.CENTRAL);
     		Map<Integer, String> locationNamesIDMap = getLocationDao().getLocationNamesByLocationIDs(centralLocIDs);
@@ -439,7 +439,6 @@ public class TraitBuilder extends Builder{
     			}
     		}
     	}
-    	System.out.println("local " + localTraitObservations);
     	centralTraitObservations.addAll(localTraitObservations);
     	
     	return centralTraitObservations;
