@@ -98,14 +98,6 @@ public class Project implements Serializable{
     @Transient
     private Set<Location> locations;
 
-    // TODO: remove these fields
-    @Transient
-    private String action;
-    @Transient
-    private String status;
-    @Transient
-    private Contact owner;
-
     public Long getProjectId() {
         return projectId;
     }
@@ -194,30 +186,6 @@ public class Project implements Serializable{
         this.steps = steps;
     }
 
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Contact getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Contact owner) {
-        this.owner = owner;
-    }
-
     public void setLastOpenDate(Date lastOpenDate) {
         this.lastOpenDate = lastOpenDate;
     }
@@ -301,16 +269,7 @@ public class Project implements Serializable{
         builder.append(methods);
         builder.append(", locations=");
         builder.append(locations);
-        builder.append(", action=");
-        builder.append(action);
-        builder.append(", status=");
-        builder.append(status);
-        builder.append(", owner=");
-        builder.append(owner);
         builder.append("]");
         return builder.toString();
     }
-    
-    
-
 }
