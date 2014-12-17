@@ -408,18 +408,38 @@ public class TraitBuilder extends Builder{
             	centralEnvironmentIds.add(envId);
             }
         }
-    	
+
         if(!centralEnvironmentIds.isEmpty()){
         	setWorkingDatabase(Database.CENTRAL);
         	centralTraitObservations = getPhenotypeDao().getObservationsForTrait(traitId, centralEnvironmentIds);
         }
     	
-    	
     	if (!localEnvironmentIds.isEmpty()){
     		setWorkingDatabase(Database.LOCAL);
         	localTraitObservations = getPhenotypeDao().getObservationsForTrait(traitId, localEnvironmentIds);
     	}
-    	
+
+    	// get central location names referred to by local environments
+    	List<Integer> centralLocIDs = new ArrayList<Integer>();
+    	for (TraitObservation observation : localTraitObservations){
+    		Integer locationId = observation.getLocationId();
+			if (locationId != null && locationId > 0 && !centralLocIDs.contains(locationId)){
+    			centralLocIDs.add(locationId);
+    		}
+    	}
+    	System.out.println("central loc IDs " + centralLocIDs);
+    	if (!centralLocIDs.isEmpty()){
+    		setWorkingDatabase(Database.CENTRAL);
+    		Map<Integer, String> locationNamesIDMap = getLocationDao().getLocationNamesByLocationIDs(centralLocIDs);
+    		for (TraitObservation observation : localTraitObservations){
+    			int locationId = observation.getLocationId();
+    			String locationName = locationNamesIDMap.get(locationId);
+    			if (locationName != null){
+    				observation.setLocationName(locationName);
+    			}
+    		}
+    	}
+    	System.out.println("local " + localTraitObservations);
     	centralTraitObservations.addAll(localTraitObservations);
     	
     	return centralTraitObservations;
