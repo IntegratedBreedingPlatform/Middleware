@@ -110,6 +110,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         return null;
     }
 
+    //TODO Review logic to adjust to the merged DB world.
     public void validateId(Name name) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
     	if (name != null){

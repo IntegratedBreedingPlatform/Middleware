@@ -88,6 +88,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer>{
         return returnList;
     }
 
+    //TODO Review logic to adjust to the merged DB world.
     public void validateId(Attribute attribute) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
         Integer id = attribute.getAid();

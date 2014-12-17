@@ -576,10 +576,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             NameDAO dao = getNameDao();
 
             for (Name name : names) {
+            	//TODO Review logic to adjust to the merged DB world.
                 if (operation == Operation.ADD) {
-                    // Auto-assign negative IDs for new local DB records
-                    Integer negativeId = dao.getNextId("nid");
-                    name.setNid(negativeId);
+                    // Auto-assign IDs for new records
+                    Integer nextId = dao.getNextId("nid");
+                    name.setNid(nextId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if Name is a local DB record. Throws exception if
                     // Name is a central DB record.
@@ -732,9 +733,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans = session.beginTransaction();
             MethodDAO dao = getMethodDao();
 
-            // Auto-assign negative IDs for new local DB records
-            Integer negativeId = dao.getNextId("mid");
-            method.setMid(negativeId);
+            // Auto-assign IDs for new records
+            Integer nextId = dao.getNextId("mid");
+            method.setMid(nextId);
 
             Method recordSaved = dao.saveOrUpdate(method);
             methodId = recordSaved.getMid();
@@ -794,9 +795,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             MethodDAO dao = getMethodDao();
 
             for (Method method : methods) {
-                // Auto-assign negative IDs for new local DB records
-                Integer negativeId = dao.getNextId("mid");
-                method.setMid(negativeId);
+                // Auto-assign IDs for new DB records
+                Integer nextId = dao.getNextId("mid");
+                method.setMid(nextId);
 
                 Method recordSaved = dao.saveOrUpdate(method);
                 idMethodsSaved.add(recordSaved.getMid());
@@ -885,9 +886,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans = session.beginTransaction();
             BibrefDAO dao = getBibrefDao();
 
-            // Auto-assign negative IDs for new local DB records
-            Integer negativeId = dao.getNextId("refid");
-            bibref.setRefid(negativeId);
+            // Auto-assign IDs for new DB records
+            Integer nextId = dao.getNextId("refid");
+            bibref.setRefid(nextId);
 
             Bibref recordSaved = dao.saveOrUpdate(bibref);
             idBibrefSaved = recordSaved.getRefid();
@@ -940,10 +941,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             AttributeDAO dao = getAttributeDao();
 
             for (Attribute attribute : attributes) {
+            	//TODO Review logic to adjust to the merged DB world.
                 if (operation == Operation.ADD) {
-                    // Auto-assign negative IDs for new local DB records
-                    Integer negativeId = dao.getNextId("aid");
-                    attribute.setAid(negativeId);
+                    // Auto-assign IDs for new DB records
+                    Integer nextId = dao.getNextId("aid");
+                    attribute.setAid(nextId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if Attribute is a local DB record. Throws exception
                     // if Attribute is a central DB record.
@@ -1045,11 +1047,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             GermplasmDAO dao = getGermplasmDao();
 
             for (Germplasm germplasm : germplasms) {
+            	//TODO Review logic to adjust to the merged DB world.
                 if (operation == Operation.ADD) {
-                    // Auto-assign negative IDs for new local DB records
-                    Integer negativeId = dao.getNextId("gid");
-                    germplasm.setGid(negativeId);
-                    germplasm.setLgid(negativeId);
+                    // Auto-assign IDs for new DB records
+                    Integer nextId = dao.getNextId("gid");
+                    germplasm.setGid(nextId);
+                    germplasm.setLgid(nextId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if Germplasm is a local DB record. Throws exception if Germplasm is a central DB record.
                     dao.validateId(germplasm);
@@ -1148,15 +1151,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             for (Germplasm germplasm : germplasmNameMap.keySet()) {
                 Name name = germplasmNameMap.get(germplasm);
 
-                // Auto-assign negative IDs for new local DB records
-                Integer negativeId = dao.getNextId("gid");
-                germplasm.setGid(negativeId);
+                // Auto-assign IDs for new DB records
+                Integer nextId = dao.getNextId("gid");
+                germplasm.setGid(nextId);
                 germplasm.setLgid(Integer.valueOf(0));
 
                 Integer nameId = nameDao.getNextId("nid");
                 name.setNid(nameId);
                 name.setNstat(Integer.valueOf(1));
-                name.setGermplasmId(negativeId);
+                name.setGermplasmId(nextId);
 
                 Germplasm germplasmSaved = dao.save(germplasm);
                 isGermplasmsSaved.add(germplasmSaved.getGid());
@@ -1190,9 +1193,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         	trans = session.beginTransaction();
             UserDefinedFieldDAO dao =  getUserDefinedFieldDao();
             
-            // Auto-assign negative IDs for new local DB records
-            Integer negativeId = dao.getNextId("fldno");
-            field.setFldno(negativeId);
+            // Auto-assign IDs for new DB records
+            Integer nextId = dao.getNextId("fldno");
+            field.setFldno(nextId);
             dao.save(field);
             isUdfldSaved++;
 
@@ -1221,9 +1224,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             int udfldSaved = 0;
             for (UserDefinedField field : fields) {
 
-                // Auto-assign negative IDs for new local DB records
-                Integer negativeId = dao.getNextId("fldno");
-                field.setFldno(negativeId);
+                // Auto-assign IDs for new DB records
+                Integer nextId = dao.getNextId("fldno");
+                field.setFldno(nextId);
                 
                 UserDefinedField udflds = dao.save(field);
                 isUdfldSaved.add(udflds.getFldno());
@@ -1257,9 +1260,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         	trans = session.beginTransaction();
             AttributeDAO dao =  getAttributeDao();
             
-            // Auto-assign negative IDs for new local DB records
-            Integer negativeId = dao.getNextId("aid");
-            attr.setAid(negativeId);
+            // Auto-assign IDs for new DB records
+            Integer nextId = dao.getNextId("aid");
+            attr.setAid(nextId);
             dao.save(attr);
             isAttrSaved++;
 
@@ -1288,9 +1291,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             int attrSaved = 0;
             for (Attribute attr : attrs) {
 
-                // Auto-assign negative IDs for new local DB records
-                Integer negativeId = dao.getNextId("aid");
-                attr.setAid(negativeId);
+                // Auto-assign IDs for new DB records
+                Integer nextId = dao.getNextId("aid");
+                attr.setAid(nextId);
                 
                 Attribute newAttr = dao.save(attr);
                 isAttrSaved.add(newAttr.getAid());
@@ -2062,8 +2065,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			for (ProgramFavorite favorite : list) {
 
-				Integer negativeId = dao.getNextId("id");
-				favorite.setProgramFavoriteId(negativeId);
+				Integer nextId = dao.getNextId("id");
+				favorite.setProgramFavoriteId(nextId);
 				dao.save(favorite);
 				favoriteSaved++;
 
@@ -2093,8 +2096,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		try {
 			trans = session.beginTransaction();
 			ProgramFavoriteDAO dao = getProgramFavoriteDao();
-			Integer negativeId = dao.getNextId("id");
-			favorite.setProgramFavoriteId(negativeId);
+			Integer nextId = dao.getNextId("id");
+			favorite.setProgramFavoriteId(nextId);
 			dao.save(favorite);
 			trans.commit();
 		} catch (Exception e) {

@@ -229,9 +229,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans = session.beginTransaction();
             LocationDAO dao = getLocationDao();
 
-            // Auto-assign negative IDs for new local DB records
-            Integer negativeId = dao.getNextId("locid");
-            location.setLocid(negativeId);
+            // Auto-assign IDs for new DB records
+            Integer nextId = dao.getNextId("locid");
+            location.setLocid(nextId);
 
             Location recordSaved = dao.saveOrUpdate(location);
             idLocationSaved = recordSaved.getLocid();

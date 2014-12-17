@@ -47,7 +47,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
                 throw new MiddlewareQueryException("A project with the given name already exists");
             }
 
-            projectData.setProjectID(projectDAO.getNegativeId());
+            projectData.setProjectID(projectDAO.getNextId("projectID"));
         }
 
         projectData = projectDAO.save(projectData);

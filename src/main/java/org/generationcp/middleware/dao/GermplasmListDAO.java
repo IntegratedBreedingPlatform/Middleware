@@ -259,6 +259,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         return 0;
     }
 
+    //TODO Review logic to adjust to the merged DB world.
     public void validateId(GermplasmList germplasmList) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
     	if (germplasmList != null){
