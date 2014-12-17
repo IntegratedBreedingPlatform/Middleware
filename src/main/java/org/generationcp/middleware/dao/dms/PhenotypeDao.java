@@ -11,23 +11,35 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
-import org.generationcp.middleware.domain.h2h.*;
+import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
+import org.generationcp.middleware.domain.h2h.CategoricalValue;
+import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.ObservationKey;
+import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigInteger;
-import java.util.*;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -556,12 +568,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		try {
 			StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname ");
+			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname, gp.value as locationId ");
 			queryString.append("FROM phenotype p ");
 			queryString.append("INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ");
 			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id ");
 			queryString.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() + " ");
-			queryString.append("INNER JOIN location l ON l.locid = gp.value ");
+			queryString.append(" LEFT JOIN location l ON l.locid = gp.value ");
 			queryString.append("INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ");
 			queryString.append("INNER JOIN stock s ON s.stock_id = es.stock_id ");
 			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds ) ");
@@ -571,7 +583,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			 
 			 SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			 query.setParameter("traitId", traitId)
-			 .setParameterList("environmentIds", environmentIds);
+			 	.setParameterList("environmentIds", environmentIds);
+			 query.addScalar("observable_id", Hibernate.INTEGER);
+			 query.addScalar("value", Hibernate.STRING);
+			 query.addScalar("dbxref_id", Hibernate.INTEGER);
+			 query.addScalar("nd_experiment_id", Hibernate.INTEGER);
+			 query.addScalar("lname", Hibernate.STRING);
+			 query.addScalar("locationId", Hibernate.INTEGER);
 			 
 			 List<Object[]> list =  query.list();
 			 
@@ -580,9 +598,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	                String value = (String) row[1];
 	                Integer gid = (Integer) row[2];
 	                Integer observationId = (Integer) row[3];
-	                String locationName = row[4].toString();
+	                String locationName = (String) row[4];
+	                Integer locationId = (Integer) row[5];
 	                
-	                toreturn.add(new TraitObservation(id, value,gid,observationId,locationName));
+	                toreturn.add(new TraitObservation(id, value, gid, observationId, locationName, locationId));
 	            }
 
         } catch(HibernateException e) {
