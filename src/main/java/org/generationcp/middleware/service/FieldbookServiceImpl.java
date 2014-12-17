@@ -289,7 +289,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	                                if (phenotype == null && field.getValue() != null 
 	                                        && !"".equals(field.getValue().trim())){
 	                                    phenotype = new Phenotype();
-	                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+	                                    phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 	                                }
 	                                if (phenotype != null) {
 		                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()
@@ -400,7 +400,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             trans = session.beginTransaction();
             
             // Save germplasm list
-            listId = germplasmListDao.getNegativeId("id");
+            listId = germplasmListDao.getNextId("id");
             germplasmList.setId(listId);
             germplasmListDao.save(germplasmList);
 
@@ -433,11 +433,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 
                 // Save germplasm and name entries if non-existing
                 if (germplasmFound == null || germplasmFound.getGid() == null){
-                    Integer gId = germplasmDao.getNegativeId("gid");
+                    Integer gId = germplasmDao.getNextId("gid");
 
                     // Save name entries
                     for (Name name: germplasms.get(germplasm)){
-                        Integer nameId = nameDao.getNegativeId("nid");
+                        Integer nameId = nameDao.getNextId("nid");
                         name.setNid(nameId);
                         name.setGermplasmId(gId);
                         nameDao.save(name);
@@ -451,7 +451,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 } 
                                
                 // Save germplasmListData
-                Integer germplasmListDataId = getGermplasmListDataDAO().getNegativeId("id");
+                Integer germplasmListDataId = getGermplasmListDataDAO().getNextId("id");
                 germplasmListData.setId(germplasmListDataId);
                 germplasmListData.setGid(germplasm.getGid());
                 germplasmListData.setList(germplasmList);

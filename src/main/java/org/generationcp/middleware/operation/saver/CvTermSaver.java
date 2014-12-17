@@ -33,7 +33,7 @@ public class CvTermSaver extends Saver {
 
         Integer generatedId;
 		try {
-			generatedId = dao.getNegativeId("cvTermId");
+			generatedId = dao.getNextId("cvTermId");
 		} catch (MiddlewareQueryException e) {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
@@ -52,7 +52,7 @@ public class CvTermSaver extends Saver {
 
         CVTerm cvTerm = null; 
         if (termIds == null || termIds.isEmpty()){ // add
-            Integer generatedId = dao.getNegativeId("cvTermId");
+            Integer generatedId = dao.getNextId("cvTermId");
             cvTerm = create(generatedId, name, definition, cvId.getId(), false, false); 
         } else if (termIds.size() == 1){ // update
             cvTerm = create(termIds.get(0), name, definition, cvId.getId(), false, false); 

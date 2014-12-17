@@ -102,7 +102,7 @@ public class ExperimentModelSaver extends Saver {
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
 		
-		experimentModel.setNdExperimentId(getExperimentDao().getNegativeId("ndExperimentId"));
+		experimentModel.setNdExperimentId(getExperimentDao().getNextId("ndExperimentId"));
 		experimentModel.setTypeId(expType.getId());
 		experimentModel.setProperties(createProperties(experimentModel, values.getVariableList()));
 		
@@ -122,7 +122,7 @@ public class ExperimentModelSaver extends Saver {
    	//GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
 	private Geolocation createNewGeoLocation() throws MiddlewareQueryException {
 		Geolocation location = new Geolocation();
-		location.setLocationId(getGeolocationDao().getNegativeId("locationId"));
+		location.setLocationId(getGeolocationDao().getNextId("locationId"));
 		location.setDescription("1");
 		getGeolocationDao().save(location);
 		return location;
@@ -130,7 +130,7 @@ public class ExperimentModelSaver extends Saver {
 
 	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors) throws MiddlewareQueryException {
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
-			int id = getExperimentPropertyDao().getNegativeId("ndExperimentpropId");
+			int id = getExperimentPropertyDao().getNextId("ndExperimentpropId");
 			for (Variable variable : factors.getVariables()) {
 				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 					addProperty(experimentModel, variable, id--);
@@ -159,7 +159,7 @@ public class ExperimentModelSaver extends Saver {
 	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
 		ExperimentProject exproj = new ExperimentProject();
 		
-		exproj.setExperimentProjectId(getExperimentProjectDao().getNegativeId("experimentProjectId"));
+		exproj.setExperimentProjectId(getExperimentProjectDao().getNextId("experimentProjectId"));
 		exproj.setProjectId(projectId);
 		exproj.setExperiment(experimentModel);
 		getExperimentProjectDao().save(exproj);
@@ -167,7 +167,7 @@ public class ExperimentModelSaver extends Saver {
 	
 	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) throws MiddlewareQueryException {
 		ExperimentStock experimentStock = new ExperimentStock();
-		experimentStock.setExperimentStockId(getExperimentStockDao().getNegativeId("experimentStockId"));
+		experimentStock.setExperimentStockId(getExperimentStockDao().getNextId("experimentStockId"));
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
 		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
 		experimentStock.setExperiment(experiment);
@@ -232,7 +232,7 @@ public class ExperimentModelSaver extends Saver {
 		}
 		
 		Phenotype phenotype = new Phenotype();
-		phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+		phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 		phenotype.setValue(value == null ? null : value.toString());
 		phenotype.setObservableId(stdVariable.getId());
 		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
@@ -240,7 +240,7 @@ public class ExperimentModelSaver extends Saver {
 		getPhenotypeDao().save(phenotype);
 		
         ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
-		experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNegativeId("experimentPhenotypeId"));
+		experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId("experimentPhenotypeId"));
 		experimentPhenotype.setExperiment(experimentModel.getNdExperimentId());
 		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
 		getExperimentPhenotypeDao().save(experimentPhenotype);
@@ -254,7 +254,7 @@ public class ExperimentModelSaver extends Saver {
 		}
 		
 		Phenotype phenotype = new Phenotype();
-		phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+		phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 		phenotype.setcValue(value == null ? null : Integer.valueOf(value.toString()));
 		phenotype.setObservableId(stdVariable.getId());
 		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
@@ -262,7 +262,7 @@ public class ExperimentModelSaver extends Saver {
 		getPhenotypeDao().save(phenotype);
 		
         ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
-		experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNegativeId("experimentPhenotypeId"));
+		experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId("experimentPhenotypeId"));
 		experimentPhenotype.setExperiment(experimentModel.getNdExperimentId());
 		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
 		getExperimentPhenotypeDao().save(experimentPhenotype);
@@ -299,7 +299,7 @@ public class ExperimentModelSaver extends Saver {
 		}
 		ExperimentProperty property = new ExperimentProperty();
 		
-		property.setNdExperimentpropId(getExperimentPropertyDao().getNegativeId("ndExperimentpropId"));
+		property.setNdExperimentpropId(getExperimentPropertyDao().getNextId("ndExperimentpropId"));
 		property.setExperiment(experimentModel);
 		property.setTypeId(stdVariable.getId());
 		property.setValue(value == null ? null : value.toString());

@@ -216,7 +216,7 @@ public class PhenotypeSaver extends Saver{
     private Phenotype getPhenotypeObject(Phenotype phenotype) throws MiddlewareQueryException {
         if (phenotype == null) {
             phenotype = new Phenotype();
-            phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+            phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
         }
         return phenotype;
     }
@@ -235,7 +235,7 @@ public class PhenotypeSaver extends Saver{
 
         if (experimentPhenotype == null || experimentPhenotype.getExperimentPhenotypeId() == null) {
             experimentPhenotype = new ExperimentPhenotype();
-            experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNegativeId(
+            experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId(
                     "experimentPhenotypeId"));
             experimentPhenotype.setExperiment(experimentId);
             experimentPhenotype.setPhenotype(phenotypeId);
@@ -251,7 +251,7 @@ public class PhenotypeSaver extends Saver{
 			Phenotype phenotype = null;
 			if (phenotypeId == null) {
 				phenotype = new Phenotype();
-				phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+				phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 				phenotypeId = phenotype.getPhenotypeId();
 				phenotype.setObservableId(variableId);
 				phenotype.setUniqueName(phenotype.getPhenotypeId().toString());

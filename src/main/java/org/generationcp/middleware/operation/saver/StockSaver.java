@@ -48,7 +48,7 @@ public class StockSaver extends Saver {
 	
 	private StockModel createStock(VariableList variableList, StockModel stockModel) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
-			int propertyIndex = getStockPropertyDao().getNegativeId("stockPropId");
+			int propertyIndex = getStockPropertyDao().getNextId("stockPropId");
 			for (Variable variable : variableList.getVariables()) {
 				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
@@ -107,7 +107,7 @@ public class StockSaver extends Saver {
 	private StockModel getStockObject(StockModel stockModel) throws MiddlewareQueryException {
 		if (stockModel == null) {
 			stockModel = new StockModel();
-			stockModel.setStockId(getStockDao().getNegativeId("stockId"));
+			stockModel.setStockId(getStockDao().getNextId("stockId"));
 			stockModel.setIsObsolete(false);
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		}

@@ -43,7 +43,7 @@ public class ListDataPropertySaver extends Saver {
     						// create if combination of listdata ID and column name doesn't exist yet
     						if (property == null){
     							property = new ListDataProperty(listData, column.getColumnName());
-    							Integer negativeId = getListDataPropertyDAO().getNegativeId("listDataPropertyId");
+    							Integer negativeId = getListDataPropertyDAO().getNextId("listDataPropertyId");
 								property.setListDataPropertyId(negativeId); //assign next negative ID
     						}
     						String value = column.getValue();

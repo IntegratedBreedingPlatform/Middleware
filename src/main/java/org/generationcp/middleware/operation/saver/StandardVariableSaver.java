@@ -159,7 +159,7 @@ public class StandardVariableSaver extends Saver {
 		if(cvTerm == null) {
 		
 			cvTerm = new CVTerm();
-			cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+			cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
 			cvTerm.setCv(CV_VARIABLES);
 			cvTerm.setName(stdVar.getName());
 			cvTerm.setDefinition(stdVar.getDescription());
@@ -174,7 +174,7 @@ public class StandardVariableSaver extends Saver {
 	
     private CVTerm createCvTerm(Enumeration enumeration, Integer cvId) throws MiddlewareQueryException {
         CVTerm cvTerm = new CVTerm();
-        cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+        cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
         cvTerm.setCv(cvId);
         cvTerm.setName(enumeration.getName());
         cvTerm.setDefinition(enumeration.getDescription());
@@ -186,7 +186,7 @@ public class StandardVariableSaver extends Saver {
 
     public CV createCv(StandardVariable variable) throws MiddlewareQueryException{
         CV cv = new CV();
-        cv.setCvId(getCvDao().getNegativeId("cvId"));
+        cv.setCvId(getCvDao().getNextId("cvId"));
         cv.setName(String.valueOf(variable.getId()));
         cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
         getCvDao().save(cv);
@@ -218,7 +218,7 @@ public class StandardVariableSaver extends Saver {
 		
 			CVTermRelationship relationship = new CVTermRelationship();
 			
-			relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNegativeId("cvTermRelationshipId"));
+			relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNextId("cvTermRelationshipId"));
 			relationship.setSubjectId(subjectId);
 			relationship.setTypeId(typeId);
 			relationship.setObjectId(objectId);
@@ -230,7 +230,7 @@ public class StandardVariableSaver extends Saver {
     private Integer saveConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
         if (constraintValue != null) {
             CVTermProperty property = new CVTermProperty();
-            int negativeId = getCvTermPropertyDao().getNegativeId("cvTermPropertyId");
+            int negativeId = getCvTermPropertyDao().getNextId("cvTermPropertyId");
             property.setCvTermPropertyId(negativeId);
             property.setTypeId(typeId);
             property.setValue(constraintValue.toString());
@@ -260,7 +260,7 @@ public class StandardVariableSaver extends Saver {
 				if (!StringUtil.isEmpty(nameSynonym.getName())) {
 					CVTermSynonym cvTermSynonym = new CVTermSynonym();
 					
-					cvTermSynonym.setCvTermSynonymId(getCvTermSynonymDao().getNegativeId("cvTermSynonymId"));
+					cvTermSynonym.setCvTermSynonymId(getCvTermSynonymDao().getNextId("cvTermSynonymId"));
 					cvTermSynonym.setSynonym(nameSynonym.getName());
 					cvTermSynonym.setTypeId(nameSynonym.getType().getId());
 					cvTermSynonym.setCvTermId(cvTermId);
@@ -379,7 +379,7 @@ public class StandardVariableSaver extends Saver {
                 cropOntologyProperty.setCvTermId(traitId);
                 cropOntologyProperty.setRank(0);
                 cropOntologyProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
-                cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
+                cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNextId("cvTermPropertyId"));
             }
         }
         if (isForCreate) {

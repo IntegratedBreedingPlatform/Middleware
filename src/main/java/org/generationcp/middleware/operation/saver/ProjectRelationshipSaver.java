@@ -42,7 +42,7 @@ public class ProjectRelationshipSaver extends Saver {
         ProjectRelationshipDao projectRelationshipDao = getProjectRelationshipDao();
         int index = 0;
         for (ProjectRelationship relationship : relationships){
-        	Integer generatedId = projectRelationshipDao.getNegativeId("projectRelationshipId");
+        	Integer generatedId = projectRelationshipDao.getNextId("projectRelationshipId");
             relationship.setProjectRelationshipId(generatedId);
             relationship.setObjectProject(parent);
             relationship.setSubjectProject(project);

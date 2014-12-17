@@ -252,7 +252,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             for (GermplasmList germplasmList : germplasmLists) {
                 if (operation == Operation.ADD) {
                     // Auto-assign negative IDs for new local DB records
-                    Integer negativeId = getGermplasmListDAO().getNegativeId("id");
+                    Integer negativeId = getGermplasmListDAO().getNextId("id");
                     germplasmListIds.add(negativeId);
                     germplasmList.setId(negativeId);
                     getGermplasmListDAO().saveOrUpdate(germplasmList);
@@ -393,7 +393,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             for (GermplasmListData germplasmListData : germplasmListDatas) {
                 if (operation == Operation.ADD) {
                     // Auto-assign negative IDs for new local DB records
-                    Integer negativeListId = getGermplasmListDataDAO().getNegativeId("id");
+                    Integer negativeListId = getGermplasmListDataDAO().getNextId("id");
                     germplasmListData.setId(negativeListId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if GermplasmList is a local DB record. Throws

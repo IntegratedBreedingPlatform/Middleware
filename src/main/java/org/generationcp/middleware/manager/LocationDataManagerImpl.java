@@ -230,7 +230,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             LocationDAO dao = getLocationDao();
 
             // Auto-assign negative IDs for new local DB records
-            Integer negativeId = dao.getNegativeId("locid");
+            Integer negativeId = dao.getNextId("locid");
             location.setLocid(negativeId);
 
             Location recordSaved = dao.saveOrUpdate(location);
@@ -261,7 +261,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             for (Location location : locations) {
 
                 // Auto-assign negative IDs for new local DB records
-                Integer negativeId = dao.getNegativeId("locid");
+                Integer negativeId = dao.getNextId("locid");
                 location.setLocid(negativeId);
 
                 Location recordSaved = dao.saveOrUpdate(location);
@@ -291,13 +291,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
             // Auto-assign negative IDs for new local DB records
             LocationDAO locationDao = getLocationDao();
-            Integer negativeId = locationDao.getNegativeId("locid");
+            Integer negativeId = locationDao.getNextId("locid");
             location.setLocid(negativeId);
             Location recordSaved = locationDao.saveOrUpdate(location);
             idLocationSaved = recordSaved.getLocid();
 
             LocdesDAO locdesDao = getLocdesDao();
-            negativeId = locdesDao.getNegativeId("ldid");
+            negativeId = locdesDao.getNextId("ldid");
             locdes.setLdid(negativeId);
             locdes.setLocationId(idLocationSaved);
             locdesDao.saveOrUpdate(locdes);
@@ -377,7 +377,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public Integer getNextNegativeId() throws MiddlewareQueryException {
-        return getLocationDao().getNegativeId("locid");
+        return getLocationDao().getNextId("locid");
 
     }
 

@@ -71,7 +71,7 @@ public class GeolocationSaver extends Saver {
 		Geolocation geolocation = null;
 		
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
-			int propertyIndex = getGeolocationPropertyDao().getNegativeId("geolocationPropertyId");
+			int propertyIndex = getGeolocationPropertyDao().getNextId("geolocationPropertyId");
 			
 			for (Variable variable : factors.getVariables()) {
 
@@ -125,7 +125,7 @@ public class GeolocationSaver extends Saver {
 			}
 			if (geolocation == null) {
 				geolocation = new Geolocation();
-				geolocation.setLocationId(getGeolocationDao().getNegativeId("locationId"));
+				geolocation.setLocationId(getGeolocationDao().getNextId("locationId"));
 			}
 		}
 		return geolocation;

@@ -29,7 +29,7 @@ public class CvTermRelationshipSaver extends Saver {
         CVTermRelationshipDao dao = getCvTermRelationshipDao();
         Integer generatedId;
 		try {
-			generatedId = dao.getNegativeId("cvTermRelationshipId");
+			generatedId = dao.getNextId("cvTermRelationshipId");
 		} catch (MiddlewareQueryException e) {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}

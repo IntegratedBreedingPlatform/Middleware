@@ -205,14 +205,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
     
-    // The local (-ve) id generator
-    public Integer getNegativeId(String idName) throws MiddlewareQueryException {
-        // HACK!!!! - divert all -ve ID generation to +ve ID generation for single merged DB model.
-    	return getPositiveId(idName);
-    }
-    
-    // The +ve id generator
-    public Integer getPositiveId(String idName) throws MiddlewareQueryException {
+    public Integer getNextId(String idName) throws MiddlewareQueryException {
         try {
             Criteria crit = getSession().createCriteria(getPersistentClass());
             crit.setProjection(Projections.max(idName));

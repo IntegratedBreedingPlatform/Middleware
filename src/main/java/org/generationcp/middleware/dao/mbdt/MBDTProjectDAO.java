@@ -65,6 +65,6 @@ public class MBDTProjectDAO extends GenericDAO<MBDTProjectData, Integer> {
 
 
     public Integer getNegativeId() throws MiddlewareQueryException {
-        return super.getNegativeId("projectID");
+        return super.getNextId("projectID");
     }
 }

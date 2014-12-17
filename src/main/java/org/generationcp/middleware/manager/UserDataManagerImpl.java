@@ -65,7 +65,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             trans = session.beginTransaction();
             UserDAO dao = getUserDao();
 
-            Integer userId = dao.getNegativeId("userid");
+            Integer userId = dao.getNextId("userid");
             user.setUserid(userId);
 
             User recordSaved = dao.saveOrUpdate(user);
@@ -187,7 +187,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             trans = session.beginTransaction();
             PersonDAO dao = getPersonDao();
 
-            Integer personId = dao.getNegativeId("id");
+            Integer personId = dao.getNextId("id");
             person.setId(personId);
 
             Person recordSaved = dao.saveOrUpdate(person);

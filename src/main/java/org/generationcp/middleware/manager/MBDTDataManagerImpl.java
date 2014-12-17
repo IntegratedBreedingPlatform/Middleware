@@ -105,7 +105,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
                 throw new MiddlewareQueryException("A generation with the given name within the project already exists");
             }
 
-            Integer newId = generationDAO.getNegativeId("generationID");
+            Integer newId = generationDAO.getNextId("generationID");
             generation.setGenerationID(newId);
         }
 
@@ -167,7 +167,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
         for (Integer markerID : markerIDs) {
             SelectedMarker sm = new SelectedMarker(generation, markerID);
-            Integer newId = selectedMarkerDAO.getNegativeId("id");
+            Integer newId = selectedMarkerDAO.getNextId("id");
             sm.setId(newId);
 
             selectedMarkerDAO.saveOrUpdate(sm);
@@ -288,7 +288,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
             // create new entries with the default type
             for (Integer gid : gidSet) {
                 SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SR, gid);
-                Integer newId = selectedGenotypeDAO.getNegativeId("id");
+                Integer newId = selectedGenotypeDAO.getNextId("id");
                 genotype.setId(newId);
 
                 selectedGenotypeDAO.saveOrUpdate(genotype);
@@ -371,7 +371,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
             for (Integer gid : gidSet) {
                 SelectedGenotype genotype = new SelectedGenotype(generation, genotypeEnum, gid);
-                Integer newId = selectedGenotypeDAO.getNegativeId("id");
+                Integer newId = selectedGenotypeDAO.getNextId("id");
                 genotype.setId(newId);
 
                 selectedGenotypeDAO.saveOrUpdate(genotype);

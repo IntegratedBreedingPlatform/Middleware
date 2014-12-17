@@ -124,7 +124,7 @@ public class LocdesSaver extends Saver {
 	
 	private Locdes createLocdes(Integer locId, int typeId, Object value, int userId) throws MiddlewareQueryException {
 		Locdes locdes = new Locdes();
-		locdes.setLdid(getLocdesDao().getNegativeId("ldid"));
+		locdes.setLdid(getLocdesDao().getNextId("ldid"));
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
