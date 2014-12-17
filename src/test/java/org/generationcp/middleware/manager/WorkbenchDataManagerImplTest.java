@@ -46,7 +46,6 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.AfterClass;
@@ -223,7 +222,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testGetToolWithName() throws MiddlewareQueryException {
-        String toolName = "fieldbook";
+        String toolName = "fieldbook_web";
         Tool tool = manager.getToolWithName(toolName);
         Assert.assertNotNull(tool);
         Debug.println(INDENT, "testGetToolWithName(" + toolName + "): " + tool);
