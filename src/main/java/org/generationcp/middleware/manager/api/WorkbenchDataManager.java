@@ -12,11 +12,13 @@
 package org.generationcp.middleware.manager.api;
 
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.*;
 
 import java.util.List;
@@ -950,6 +952,36 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
 	Boolean isLastOpenedProjectChanged() throws MiddlewareQueryException;
+
+    /**
+     * Retrive all standard presets with specific crop + tool
+     * @param cropName
+     * @param toolId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId) throws MiddlewareQueryException;
+
+    /**
+     * Returns the DAO object for standard preset
+     * @return StandardPresetDAO
+     */
+    StandardPresetDAO getStandardPresetDAO() throws MiddlewareQueryException;
+
+
+    /** save or update a standard preset
+     * @param standardPreset
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    StandardPreset addStandardPreset(StandardPreset standardPreset) throws MiddlewareQueryException;
+
+    /** delete a standard preset by id
+     * @param standardPresetId
+     * @throws MiddlewareQueryException
+     */
+    void deleteStandardPreset(int standardPresetId) throws MiddlewareQueryException;
+
 
 	/**
      * Close the sessionProvider

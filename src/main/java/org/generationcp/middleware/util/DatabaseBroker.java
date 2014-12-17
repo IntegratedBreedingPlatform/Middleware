@@ -11,24 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
-import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.BreedersQueryDao;
-import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.ListDataProjectDAO;
-import org.generationcp.middleware.dao.ListDataPropertyDAO;
-import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.LocdesDAO;
-import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.PersonDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
@@ -190,6 +173,9 @@ public class DatabaseBroker {
     private LotDAO lotDao;
     private PersonDAO personDao;
     private TransactionDAO transactionDao;
+
+    // PresetDataManager DAO
+    private ProgramPresetDAO programPresetDAO;
 
     protected DatabaseBroker(){
     	
@@ -969,8 +955,7 @@ public class DatabaseBroker {
     	return listDataProjectDao;
     }
 
-    //================================  InventoryDataManager DAO Methods =============================
-	
+
     protected final LotDAO getLotDao() {
         if (lotDao == null) {
             lotDao = new LotDAO();
@@ -993,6 +978,18 @@ public class DatabaseBroker {
         }
         transactionDao.setSession(getActiveSession());
         return transactionDao;
+    }
+
+    //================================  InventoryDataManager DAO Methods =============================
+    protected ProgramPresetDAO getProgramPresetDAO() throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        if (programPresetDAO == null) {
+            programPresetDAO = new ProgramPresetDAO();
+        }
+
+        programPresetDAO.setSession(getActiveSession());
+        return programPresetDAO;
     }
 
     //===========================================================================================

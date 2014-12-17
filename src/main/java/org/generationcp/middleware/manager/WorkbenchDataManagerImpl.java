@@ -17,10 +17,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.*;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private TemplateSettingDAO templateSettingDAO;
 
     private String installationDirectory;
-    
+    private StandardPresetDAO standardPresetDAO;
+
     public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
         this.sessionProvider = sessionProvider;
     }
@@ -1607,6 +1608,83 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     		return true;
     	}
     	
+    }
+
+    @Override
+    public List<StandardPreset> getStandardPresetFromCropAndTool(String cropName,int toolId) throws MiddlewareQueryException{
+
+        try {
+            Criteria criteria = getCurrentSession().createCriteria(StandardPreset.class);
+
+            criteria.add(Restrictions.eq("cropName", cropName));
+            criteria.add(Restrictions.eq("toolId",toolId));
+
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName="
+                            + cropName + "): "
+                            + e.getMessage(), e);
+        }
+
+        return new ArrayList<StandardPreset>();
+    }
+
+    @Override
+    public StandardPresetDAO getStandardPresetDAO() throws MiddlewareQueryException {
+        if (standardPresetDAO == null) {
+            standardPresetDAO = new StandardPresetDAO();
+        }
+
+        standardPresetDAO.setSession(getCurrentSession());
+        return standardPresetDAO;
+    }
+
+    @Override
+    public StandardPreset addStandardPreset(StandardPreset standardPreset)
+            throws MiddlewareQueryException {
+
+        Transaction transaction = getCurrentSession().beginTransaction();
+
+        try {
+            StandardPreset result = this.getStandardPresetDAO().saveOrUpdate(standardPreset);
+
+            transaction.commit();
+
+            return result;
+
+        } catch (HibernateException e) {
+            rollbackTransaction(transaction);
+            logAndThrowException(
+                    "Cannot perform: WorkbenchDataManager.addStandardPreset(standardPreset="
+                            + standardPreset.getName() + "): "
+                            + e.getMessage(), e);
+        } finally {
+            getCurrentSession().flush();
+        }
+
+        return null;
+    }
+
+    @Override
+    public void deleteStandardPreset(int standardPresetId) throws MiddlewareQueryException {
+
+        Transaction transaction = getCurrentSession().beginTransaction();
+
+        try {
+            StandardPreset preset = this.getStandardPresetDAO().getById(standardPresetId);
+            getCurrentSession().delete(preset);
+            transaction.commit();
+
+        } catch (HibernateException e) {
+            rollbackTransaction(transaction);
+            logAndThrowException(
+                    "Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId="
+                            + standardPresetId + "): "
+                            + e.getMessage(), e);
+        } finally {
+            getCurrentSession().flush();
+        }
     }
     
     @Override
