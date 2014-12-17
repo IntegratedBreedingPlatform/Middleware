@@ -13,7 +13,6 @@ package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -67,12 +66,6 @@ public class Project implements Serializable{
     @OneToOne
     @JoinColumn(name = "crop_type", referencedColumnName = "crop_name")
     private CropType cropType;
-
-    @Column(name = "local_db_name")
-    private String localDbName;
-
-    @Column(name = "central_db_name")
-    private String centralDbName;
 
     @Basic(optional = true)
     @Column(name = "last_open_date")
@@ -135,22 +128,6 @@ public class Project implements Serializable{
         this.cropType = cropType;
     }
 
-    public String getLocalDbName() {
-        return localDbName;
-    }
-
-    public void setLocalDbName(String localDbName) {
-        this.localDbName = localDbName;
-    }
-
-    public String getCentralDbName() {
-        return centralDbName;
-    }
-
-    public void setCentralDbName(String centralDbName) {
-        this.centralDbName = centralDbName;
-    }
-
     public void setLastOpenDate(Date lastOpenDate) {
         this.lastOpenDate = lastOpenDate;
     }
@@ -181,6 +158,15 @@ public class Project implements Serializable{
 
     public void setLocations(Set<Location> locations) {
         this.locations = locations;
+    }
+    
+    /**
+     * @return the name of the (IBDB) database where program's breeding activities related information 
+     * 		such as Nurseries, Trials, Germplasm, Lists, Datasets etc are stored. 
+     */
+    @Transient
+    public String getDatabaseName() {
+    	return this.cropType.getLocalDatabaseNameWithProjectId(getProjectId());
     }
 
     @Override
@@ -218,10 +204,6 @@ public class Project implements Serializable{
         builder.append(userId);
         builder.append(", cropType=");
         builder.append(cropType);
-        builder.append(", localDbName=");
-        builder.append(localDbName);
-        builder.append(", centralDbName=");
-        builder.append(centralDbName);
         builder.append(", lastOpenDate=");
         builder.append(lastOpenDate);
         builder.append(", members=");

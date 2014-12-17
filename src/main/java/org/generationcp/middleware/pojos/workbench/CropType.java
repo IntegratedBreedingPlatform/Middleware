@@ -98,6 +98,7 @@ public class CropType implements Serializable{
         return getLocalDatabaseNameWithProjectId(project.getProjectId());
     }
     
+    //TODO rename/replace once the centralDbName column is renamed. ProjectId is no longer a factor in deriving crop db name.
     public String getLocalDatabaseNameWithProjectId(Long projectId) {
     	// HACK: hard coded to return the same single DB per crop.
     	return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
