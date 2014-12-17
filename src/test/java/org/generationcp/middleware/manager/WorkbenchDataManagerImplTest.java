@@ -182,8 +182,6 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         project.setUserId(1);
         project.setProjectName("Test Project " + new Random().nextInt(10000));
         project.setStartDate(new Date(System.currentTimeMillis()));
-        project.setTemplate(manager.getWorkflowTemplateByName("MARS").get(0));
-        project.setTemplateModified(Boolean.FALSE);
         project.setCropType(manager.getCropTypeByName(CropType.RICE));
         project.setLocalDbName("ibdbv2_rice_1_local");
         project.setCentralDbName("ibdbv2_rice_central");

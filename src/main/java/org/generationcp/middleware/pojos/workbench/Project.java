@@ -65,10 +65,6 @@ public class Project implements Serializable{
     private int userId;
 
     @OneToOne
-    @JoinColumn(name = "template_id")
-    private WorkflowTemplate template;
-
-    @OneToOne
     @JoinColumn(name = "crop_type", referencedColumnName = "crop_name")
     private CropType cropType;
 
@@ -78,16 +74,9 @@ public class Project implements Serializable{
     @Column(name = "central_db_name")
     private String centralDbName;
 
-    @Basic(optional = false)
-    @Column(name = "template_modified")
-    private boolean templateModified;
-
     @Basic(optional = true)
     @Column(name = "last_open_date")
     private Date lastOpenDate;
-
-    @Transient
-    private List<ProjectWorkflowStep> steps;
 
     @Transient
     private Set<User> members;
@@ -138,14 +127,6 @@ public class Project implements Serializable{
         this.startDate = startDate;
     }
 
-    public WorkflowTemplate getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(WorkflowTemplate template) {
-        this.template = template;
-    }
-
     public CropType getCropType() {
         return cropType;
     }
@@ -168,22 +149,6 @@ public class Project implements Serializable{
 
     public void setCentralDbName(String centralDbName) {
         this.centralDbName = centralDbName;
-    }
-
-    public boolean isTemplateModified() {
-        return templateModified;
-    }
-
-    public void setTemplateModified(boolean templateModified) {
-        this.templateModified = templateModified;
-    }
-
-    public List<ProjectWorkflowStep> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(List<ProjectWorkflowStep> steps) {
-        this.steps = steps;
     }
 
     public void setLastOpenDate(Date lastOpenDate) {
@@ -257,12 +222,8 @@ public class Project implements Serializable{
         builder.append(localDbName);
         builder.append(", centralDbName=");
         builder.append(centralDbName);
-        builder.append(", templateModified=");
-        builder.append(templateModified);
         builder.append(", lastOpenDate=");
         builder.append(lastOpenDate);
-        builder.append(", steps=");
-        builder.append(steps);
         builder.append(", members=");
         builder.append(members);
         builder.append(", methods=");
