@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
+<!-- 2014-12-11T11:56:21 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb61_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="cb0938fd-be58-4ab1-b459-be641e261730">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="1092"/>
+	<subDataset name="Table Dataset 1" uuid="b18dcdd7-feb4-4902-9aaa-e3410fb1d3b0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LoCycle" class="java.lang.String"/>
+	<parameter name="tid" class="java.lang.Integer"/>
+	<parameter name="occ" class="java.lang.Integer"/>
+	<parameter name="program" class="java.lang.String"/>
+	<parameter name="trial_name" class="java.lang.String"/>
+	<parameter name="trial_abbr" class="java.lang.String"/>
+	<parameter name="num_reporte" class="java.lang.Integer"/>
+	<parameter name="lid" class="java.lang.String"/>
+	<parameter name="cycle" class="java.lang.String"/>
+	<parameter name="Ientry" class="java.lang.Integer"/>
+	<parameter name="Fentry" class="java.lang.Integer"/>
+	<parameter name="dms_ip" class="java.lang.String"/>
+	<parameter name="gms_ip" class="java.lang.String"/>
+	<parameter name="version" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="offset_2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[offset_2]]></fieldDescription>
+	</field>
+	<field name="totalEntries" class="java.lang.Integer">
+		<fieldDescription><![CDATA[totalEntries]]></fieldDescription>
+	</field>
+	<field name="check_1" class="java.lang.Integer">
+		<fieldDescription><![CDATA[check_1]]></fieldDescription>
+	</field>
+	<field name="check_freq" class="java.lang.Integer">
+		<fieldDescription><![CDATA[check_freq]]></fieldDescription>
+	</field>
+	<field name="program" class="java.lang.String">
+		<fieldDescription><![CDATA[program]]></fieldDescription>
+	</field>
+	<field name="use_generic" class="java.lang.String">
+		<fieldDescription><![CDATA[use_generic]]></fieldDescription>
+	</field>
+	<field name="organization" class="java.lang.String">
+		<fieldDescription><![CDATA[organization]]></fieldDescription>
+	</field>
+	<field name="offset_1" class="java.lang.Integer">
+		<fieldDescription><![CDATA[offset_1]]></fieldDescription>
+	</field>
+	<field name="tid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[tid]]></fieldDescription>
+	</field>
+	<field name="new_cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[new_cycle]]></fieldDescription>
+	</field>
+	<field name="studyID" class="java.lang.Integer">
+		<fieldDescription><![CDATA[studyID]]></fieldDescription>
+	</field>
+	<field name="use_abreviation" class="java.lang.String">
+		<fieldDescription><![CDATA[use_abreviation]]></fieldDescription>
+	</field>
+	<field name="internat_type" class="java.lang.String">
+		<fieldDescription><![CDATA[internat_type]]></fieldDescription>
+	</field>
+	<field name="cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[cycle]]></fieldDescription>
+	</field>
+	<field name="trial_abbr" class="java.lang.String">
+		<fieldDescription><![CDATA[trial_abbr]]></fieldDescription>
+	</field>
+	<field name="trial_name" class="java.lang.String">
+		<fieldDescription><![CDATA[trial_name]]></fieldDescription>
+	</field>
+	<field name="offset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[offset]]></fieldDescription>
+	</field>
+	<field name="check_2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[check_2]]></fieldDescription>
+	</field>
+	<field name="ocurrencesList" class="java.util.List">
+		<fieldDescription><![CDATA[ocurrencesList]]></fieldDescription>
+	</field>
+	<field name="trial_mega_environment" class="java.lang.Integer">
+		<fieldDescription><![CDATA[trial_mega_environment]]></fieldDescription>
+	</field>
+	<field name="print_mega_environment" class="java.lang.String">
+		<fieldDescription><![CDATA[print_mega_environment]]></fieldDescription>
+	</field>
+	<field name="expansion_level" class="java.lang.Integer">
+		<fieldDescription><![CDATA[expansion_level]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="752" splitType="Immediate">
+			<staticText>
+				<reportElement x="239" y="260" width="86" height="12" uuid="d9225a94-3dc1-4c57-af59-4de293dcb8cc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[...............................................]]></text>
+			</staticText>
+			<textField pattern="MMM dd yyyy">
+				<reportElement x="339" y="220" width="55" height="12" uuid="069a566a-7489-4185-9799-1fb7dd785145"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="74" y="-149" width="227" height="15" uuid="41123ac2-7465-4c00-9e66-ccfd57cf064d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="320" width="66" height="12" uuid="c4eb6903-eb31-46ce-a423-87c854ffa9ad"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fieldbook Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="340" width="72" height="12" uuid="353474cf-6d6e-4cfe-8a63-89f8ae903936"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Entries Per Page]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" x="180" y="240" width="31" height="12" uuid="ff3a8742-36f6-414a-9f89-51ced3755d7f"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Trial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="260" width="59" height="12" uuid="4c42521b-bfce-44db-9fc4-f7fa1ba50311"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Abbreviation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="280" width="28" height="12" uuid="4409a8ba-5ab7-4857-8339-11a22a76c044"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cycle]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="300" width="56" height="12" uuid="37a45241-75d2-4f93-9e40-eac31c11dad3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Occurrence]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="180" y="220" width="21" height="12" uuid="6639af99-49b5-48fc-b686-5948440557f0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true" pdfFontName="Helvetica" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="339" y="240" width="38" height="12" uuid="176b7994-25b6-43a2-aa94-ef157bd56a88"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tid}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="373" y="240" width="117" height="12" uuid="b7d6b103-679d-4af6-9d79-c38b2ed2ccf0"/>
+				<textElement verticalAlignment="Middle" rotation="None">
+					<font size="7" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="339" y="260" width="155" height="12" uuid="c54c5ef7-cac6-4a14-861c-0d470ae85585"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{trial_abbr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="339" y="300" width="100" height="12" uuid="1e5ac2c2-e618-4954-beff-dd6544cddc39"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="339" y="320" width="35" height="12" uuid="d075f055-4201-4df1-ad49-eaaa8d455b0a"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{num_reporte}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="339" y="340" width="35" height="12" uuid="21489a5e-1ef6-4dce-9aa9-d50f2436841c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[20]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="380" width="80" height="12" uuid="8b334090-8e34-4401-b444-51d78f71e96f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Last Entry Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="180" y="360" width="83" height="12" uuid="6a75e26d-ed18-45be-b895-0e0520865c2f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[First Entry Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="206" y="280" width="119" height="12" uuid="8d7d6068-d9d0-4a22-a7d1-758fc511d403"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[..................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="203" y="220" width="122" height="12" uuid="ebd87d9a-f417-472c-990e-e888a3dbcb84"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[....................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="202" y="240" width="123" height="12" uuid="3101380d-caab-40f3-8c09-790aa0bbd897"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[....................................................................]]></text>
+			</staticText>
+			<textField pattern="h:mm a">
+				<reportElement x="390" y="220" width="100" height="12" uuid="4fddbcc4-90ad-429b-9934-c4e7ded134a3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="249" y="340" width="76" height="12" uuid="b29a9c64-1b3b-4bf1-9461-3297d4e357f2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[..........................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="245" y="320" width="80" height="12" uuid="c056141f-b3aa-41b1-ae52-757364594562"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[............................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="380" width="66" height="12" uuid="6c6b7609-eb27-4719-a5cb-f85f03f9a2a7"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[....................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="300" width="95" height="12" uuid="f129a7fa-224a-44b1-9b22-d725571c18e6"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[.....................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="260" y="360" width="65" height="12" uuid="8656b03b-fcb3-4d0a-baec-c52e9b26c36a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[....................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="360" width="3" height="12" uuid="ff0f5f13-c2f2-4549-bf41-89798ad490b3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="380" width="3" height="12" uuid="4b7225aa-c7b2-4b1c-926e-f7ef8fc9b0af"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="340" width="3" height="12" uuid="6a668d25-e9a8-42d8-84fb-546bf4847acb"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="320" width="3" height="12" uuid="f6691941-0ac1-435a-9683-93070da70d86"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="300" width="3" height="12" uuid="55127d67-c0ae-4d64-a5d8-ae840ac7f305"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="280" width="3" height="12" uuid="4554423e-8486-4e5c-9363-ccdca44def5e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="240" width="3" height="12" uuid="f55a8c7b-cf08-45bc-a336-aab887742a46"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="260" width="3" height="12" uuid="08514466-6b07-4121-84db-02846d488508"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="220" width="3" height="12" uuid="baf326ab-00f1-4fdb-989b-4ff9c901f439"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="195" y="75" width="201" height="20" uuid="41da4f53-70ff-47a0-9e51-3e12c1114ec9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CIMMYT  INTERNATIONAL  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="162" y="95" width="262" height="20" uuid="96227cdc-a2b0-4622-82f9-ef50bbfa878d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Tahoma" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[WHEAT IMPROVEMENT NETWORK]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="339" y="380" width="35" height="12" uuid="b2034b82-d2af-48eb-b1cd-f6ea48b9fad1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Fentry}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="339" y="360" width="35" height="12" uuid="f603a132-0336-4574-8672-d3aa3072b4d9"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Ientry}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="339" y="280" width="100" height="12" uuid="dd75c17f-b9d4-4993-aa69-58d036f6b862"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{cycle}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-2" positionType="Float" stretchType="RelativeToBandHeight" x="125" y="125" width="338" height="65" uuid="89785ab5-32ab-4e6d-a9ac-13fd6ac7d11f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true" pdfFontName="Helvetica"/>
+				</textElement>
+				<text><![CDATA[Integrated Breeding Fieldbook]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="5" y="720" width="207" height="15" uuid="581fb69e-9916-486d-97f0-dfae0ed2bf09"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[CIMMYT - Science Informatics Unit]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line-1" x="5" y="719" width="563" height="1" uuid="fe9fc3a7-7e65-4ffd-9ebc-73aea5134825"/>
+			</line>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-1" x="44" y="735" width="58" height="15" uuid="047d0fa7-ad85-4d1a-8229-c46f6ff7c3db"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{version}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="215" y="720" width="77" height="12" uuid="c9f779bc-d96e-4d70-850f-751a33624368"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm a">
+				<reportElement x="295" y="720" width="74" height="12" uuid="927ebbb4-9a97-4a7f-8ab6-328cffbb0a55"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-4" x="5" y="735" width="38" height="15" uuid="d6a3736f-6ad2-46f2-bb9d-3c8b65bea910"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<text><![CDATA[Version:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="50">
+			<subreport>
+				<reportElement x="0" y="0" width="572" height="50" uuid="027b8237-7e27-494e-b524-dbbb9c4a64f4"/>
+				<subreportParameter name="Fentry">
+					<subreportParameterExpression><![CDATA[$P{Fentry}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="cycle">
+					<subreportParameterExpression><![CDATA[$P{cycle}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="dms_ip">
+					<subreportParameterExpression><![CDATA[$P{dms_ip}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="trial_abbr">
+					<subreportParameterExpression><![CDATA[$P{trial_abbr}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="Ientry">
+					<subreportParameterExpression><![CDATA[$P{Ientry}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="gms_ip">
+					<subreportParameterExpression><![CDATA[$P{gms_ip}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="lid">
+					<subreportParameterExpression><![CDATA[$P{lid}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LoCycle">
+					<subreportParameterExpression><![CDATA[$P{LoCycle}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="program">
+					<subreportParameterExpression><![CDATA[$P{program}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="num_reporte">
+					<subreportParameterExpression><![CDATA[$P{num_reporte}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tid">
+					<subreportParameterExpression><![CDATA[$P{tid}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="trial_name">
+					<subreportParameterExpression><![CDATA[$P{trial_name}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="occ">
+					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ocurrencesList})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "WFb61_occ.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

@@ -83,3 +83,4 @@ Thumbs.db
 # Test DB scripts downloaded from git #
 #######################################
 updatedIbdbScripts/
+/bin

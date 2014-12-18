@@ -33,6 +33,9 @@
 			<id>default</id>
 			<properties>
 				<envConfig>ci</envConfig>
+				<jasper.version>5.5.0</jasper.version>
+				<itext.version>2.1.7</itext.version>
+				<reflections.version>0.9.9</reflections.version>
 			</properties>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -147,6 +150,24 @@
 			<groupId>org.tmatesoft.svnkit</groupId>
 			<artifactId>svnkit</artifactId>
 			<version>1.8.5</version>
+		</dependency>
+
+		<!-- Jasper reports module -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>${jasper.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>${itext.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>${reflections.version}</version>
 		</dependency>
 
 	</dependencies>

@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
+<!-- 2014-12-11T11:43:23 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb60_entry" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="d7fce64b-15ba-465b-9f85-5e5b7adf1833">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#FFFAFA">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="0dbcf670-dfce-419a-b35e-b8b8f9b112f2"/>
+	<subDataset name="Table Dataset 2" uuid="e953298c-32fa-4cf8-887f-9569b1930fb8"/>
+	<parameter name="tid" class="java.lang.Integer"/>
+	<parameter name="occ" class="java.lang.Integer"/>
+	<parameter name="program" class="java.lang.String"/>
+	<parameter name="trial_name" class="java.lang.String"/>
+	<parameter name="trial_abbr" class="java.lang.String"/>
+	<parameter name="LoCycle" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="cid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[cid]]></fieldDescription>
+	</field>
+	<field name="class" class="java.lang.Class">
+		<fieldDescription><![CDATA[class]]></fieldDescription>
+	</field>
+	<field name="code28" class="java.lang.String">
+		<fieldDescription><![CDATA[code28]]></fieldDescription>
+	</field>
+	<field name="crossname" class="java.lang.String">
+		<fieldDescription><![CDATA[crossname]]></fieldDescription>
+	</field>
+	<field name="entryNum" class="java.lang.Integer">
+		<fieldDescription><![CDATA[entryNum]]></fieldDescription>
+	</field>
+	<field name="f_cid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[f_cid]]></fieldDescription>
+	</field>
+	<field name="f_cross_name" class="java.lang.String">
+		<fieldDescription><![CDATA[f_cross_name]]></fieldDescription>
+	</field>
+	<field name="f_cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[f_cycle]]></fieldDescription>
+	</field>
+	<field name="f_ent" class="java.lang.Integer">
+		<fieldDescription><![CDATA[f_ent]]></fieldDescription>
+	</field>
+	<field name="f_gid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[f_gid]]></fieldDescription>
+	</field>
+	<field name="f_lid" class="java.lang.String">
+		<fieldDescription><![CDATA[f_lid]]></fieldDescription>
+	</field>
+	<field name="f_occ" class="java.lang.Integer">
+		<fieldDescription><![CDATA[f_occ]]></fieldDescription>
+	</field>
+	<field name="f_sel_hist" class="java.lang.String">
+		<fieldDescription><![CDATA[f_sel_hist]]></fieldDescription>
+	</field>
+	<field name="f_tabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[f_tabbr]]></fieldDescription>
+	</field>
+	<field name="f_sid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[f_sid]]></fieldDescription>
+	</field>
+	<field name="f_tid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[f_tid]]></fieldDescription>
+	</field>
+	<field name="f_tna" class="java.lang.String">
+		<fieldDescription><![CDATA[f_tna]]></fieldDescription>
+	</field>
+	<field name="f_trial_offset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[f_trial_offset]]></fieldDescription>
+	</field>
+	<field name="gid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[gid]]></fieldDescription>
+	</field>
+	<field name="flocycle" class="java.lang.String">
+		<fieldDescription><![CDATA[flocycle]]></fieldDescription>
+	</field>
+	<field name="intrid" class="java.lang.String">
+		<fieldDescription><![CDATA[intrid]]></fieldDescription>
+	</field>
+	<field name="level_no" class="java.lang.Integer">
+		<fieldDescription><![CDATA[level_no]]></fieldDescription>
+	</field>
+	<field name="m_cid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[m_cid]]></fieldDescription>
+	</field>
+	<field name="m_cross_name" class="java.lang.String">
+		<fieldDescription><![CDATA[m_cross_name]]></fieldDescription>
+	</field>
+	<field name="m_cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[m_cycle]]></fieldDescription>
+	</field>
+	<field name="m_ent" class="java.lang.Integer">
+		<fieldDescription><![CDATA[m_ent]]></fieldDescription>
+	</field>
+	<field name="m_gid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[m_gid]]></fieldDescription>
+	</field>
+	<field name="m_lid" class="java.lang.String">
+		<fieldDescription><![CDATA[m_lid]]></fieldDescription>
+	</field>
+	<field name="m_occ" class="java.lang.Integer">
+		<fieldDescription><![CDATA[m_occ]]></fieldDescription>
+	</field>
+	<field name="m_sel_hist" class="java.lang.String">
+		<fieldDescription><![CDATA[m_sel_hist]]></fieldDescription>
+	</field>
+	<field name="m_sid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[m_sid]]></fieldDescription>
+	</field>
+	<field name="m_tabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[m_tabbr]]></fieldDescription>
+	</field>
+	<field name="m_tna" class="java.lang.String">
+		<fieldDescription><![CDATA[m_tna]]></fieldDescription>
+	</field>
+	<field name="m_tid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[m_tid]]></fieldDescription>
+	</field>
+	<field name="m_trial_offset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[m_trial_offset]]></fieldDescription>
+	</field>
+	<field name="mlocycle" class="java.lang.String">
+		<fieldDescription><![CDATA[mlocycle]]></fieldDescription>
+	</field>
+	<field name="plot" class="java.lang.Integer">
+		<fieldDescription><![CDATA[plot]]></fieldDescription>
+	</field>
+	<field name="rep1" class="java.lang.Integer">
+		<fieldDescription><![CDATA[rep1]]></fieldDescription>
+	</field>
+	<field name="rep2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[rep2]]></fieldDescription>
+	</field>
+	<field name="rep3" class="java.lang.Integer">
+		<fieldDescription><![CDATA[rep3]]></fieldDescription>
+	</field>
+	<field name="rep4" class="java.lang.Integer">
+		<fieldDescription><![CDATA[rep4]]></fieldDescription>
+	</field>
+	<field name="replication_no" class="java.lang.Integer">
+		<fieldDescription><![CDATA[replication_no]]></fieldDescription>
+	</field>
+	<field name="s_ent" class="java.lang.Integer">
+		<fieldDescription><![CDATA[s_ent]]></fieldDescription>
+	</field>
+	<field name="s_intrid" class="java.lang.String">
+		<fieldDescription><![CDATA[s_intrid]]></fieldDescription>
+	</field>
+	<field name="s_occ" class="java.lang.Integer">
+		<fieldDescription><![CDATA[s_occ]]></fieldDescription>
+	</field>
+	<field name="s_occ_cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[s_occ_cycle]]></fieldDescription>
+	</field>
+	<field name="s_occ_lid" class="java.lang.String">
+		<fieldDescription><![CDATA[s_occ_lid]]></fieldDescription>
+	</field>
+	<field name="s_occ_offset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[s_occ_offset]]></fieldDescription>
+	</field>
+	<field name="s_ona" class="java.lang.String">
+		<fieldDescription><![CDATA[s_ona]]></fieldDescription>
+	</field>
+	<field name="s_tabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[s_tabbr]]></fieldDescription>
+	</field>
+	<field name="s_tid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[s_tid]]></fieldDescription>
+	</field>
+	<field name="s_tna" class="java.lang.String">
+		<fieldDescription><![CDATA[s_tna]]></fieldDescription>
+	</field>
+	<field name="s_trial_cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[s_trial_cycle]]></fieldDescription>
+	</field>
+	<field name="s_trial_offset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[s_trial_offset]]></fieldDescription>
+	</field>
+	<field name="sel_hist" class="java.lang.String">
+		<fieldDescription><![CDATA[sel_hist]]></fieldDescription>
+	</field>
+	<field name="sid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sid]]></fieldDescription>
+	</field>
+	<field name="slocycle" class="java.lang.String">
+		<fieldDescription><![CDATA[slocycle]]></fieldDescription>
+	</field>
+	<field name="subblock" class="java.lang.Integer">
+		<fieldDescription><![CDATA[subblock]]></fieldDescription>
+	</field>
+	<variable name="contador" class="java.lang.Integer" resetType="None" calculation="Count">
+		<variableExpression><![CDATA[$V{contador}]]></variableExpression>
+		<initialValueExpression><![CDATA[new java.lang.Integer(0)]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="41" splitType="Stretch">
+			<staticText>
+				<reportElement x="121" y="0" width="37" height="12" uuid="b2e958d2-85e8-421a-82c3-a5a3af3fa82f">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<text><![CDATA[TID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="215" y="0" width="37" height="12" uuid="d3d4c5d5-acec-437a-841d-9cd193d2fc83">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<text><![CDATA[OCC:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="478" y="0" width="30" height="12" uuid="e3f72661-c9be-4323-9275-06bbc064d6ef"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<text><![CDATA[PAGE:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="513" y="0" width="16" height="12" uuid="55a5428b-e30f-4627-b6a7-b0caf0145e8a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="156" y="0" width="41" height="12" uuid="ac81d05e-186a-4617-8537-91c536e961b3">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="252" y="0" width="46" height="12" uuid="1c69199d-0218-4d63-9c57-1b84290da801">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="10" width="63" height="12" uuid="2ab71a85-4b9d-42ad-a1ea-9ff0d583e2a8"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="10" width="131" height="12" uuid="47340346-75f1-4266-8e38-7f8fb1a89df2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="331" y="10" width="110" height="12" uuid="bfc1022e-3063-4789-b9e0-7e2e8f288e6c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{trial_abbr}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="6" y="40" width="516" height="1" uuid="8f6d8347-894e-43a6-a728-bf0be008262d"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="10" y="0" width="63" height="12" uuid="4afecc4a-ac3f-45e7-9a78-137033748c95">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{LoCycle}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="28" width="24" height="12" uuid="645faee6-b8e4-4d63-a331-d3b30b36ac0e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Plot]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="29" width="32" height="12" uuid="5a211d77-2991-4ef6-8ed5-f8c34d175b4f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Origin]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="427" y="28" width="25" height="12" uuid="bf93d9c1-bbc4-4aaf-8960-11daca77afe4"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Entry]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="462" y="28" width="22" height="12" uuid="fe663df3-8b57-490c-ba2e-db589c21c7b3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Rep]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="493" y="16" width="29" height="25" uuid="f4ca57ce-1b7f-4a38-b479-01b7129f80ce"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sub- Block]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="33">
+			<line>
+				<reportElement x="417" y="-1" width="1" height="34" uuid="ccf3e14c-1d0a-4348-b429-9b94c7bdb335"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="332" y="32" width="190" height="1" uuid="4422c4d5-4e6c-47f5-be5b-7afb6adb657b"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="489" y="-1" width="1" height="34" uuid="a503ceb6-2bf4-41ee-b84b-a380b00afd6c"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="37" y="-1" width="1" height="34" uuid="4422419b-d3af-40c0-9095-6cec4b3d0cf4"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="458" y="-1" width="1" height="34" uuid="4092aa64-e4ce-45a1-8a10-a6baebf3ff8a"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="379" y="19" width="33" height="12" uuid="bf33ecd7-77f6-491c-831d-51eb45050a93">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{s_ent}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="44" y="1" width="269" height="13" uuid="3307496c-d6c9-43b5-b495-2a27112a5a04">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Tahoma" size="8" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{crossname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="44" y="11" width="269" height="13" uuid="62e54768-1db4-4dde-b2f7-432cfd9a8795">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sel_hist}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="343" y="11" width="55" height="12" uuid="c8c9b5c7-00fb-4760-9959-680d519acf8f">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="Times New Roman" size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{s_tabbr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="343" y="1" width="55" height="12" uuid="2246c4e0-3f35-42d5-9652-43de8d11493d">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{slocycle}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="521" y="0" width="1" height="32" uuid="c3f8086e-cb24-490d-82ea-6c84df54a6d1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="6" y="32" width="326" height="1" uuid="f991a3d4-7f2e-439e-9761-39fdefce1c9c">
+					<printWhenExpression><![CDATA[(($V{contador})+1)%5==0]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="10" y="1" width="22" height="10" uuid="5d76ba1a-216b-4a7a-a228-6eb6a6f6ef5c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{plot}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="427" y="10" width="26" height="12" uuid="cccc669e-52f3-4054-9c19-82928f702764">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{entryNum}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="470" y="10" width="17" height="12" uuid="46f8fa9b-925b-4558-b9e3-05834336ab2b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{replication_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="499" y="10" width="20" height="12" uuid="618dbf2e-2652-4879-a29c-98559598c9b5">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{subblock}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="6" y="-1" width="1" height="33" uuid="dcdd41ad-0117-445e-a79e-4a7fbb9f0aca"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="331" y="-1" width="1" height="34" uuid="53b4b8b0-5437-4db2-afef-7cd92484da53"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="20">
+			<line>
+				<reportElement x="6" y="-1" width="280" height="1" uuid="ce6b69c2-9dde-4b01-8b2c-8ce5fb1db44d"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="100" y="0" width="279" height="20" uuid="50d3fd72-1f3a-464e-bcee-4edc5a0becd7"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="7"/>
+				</textElement>
+				<text><![CDATA[Observation and recording of disease data contribute to the development of germplasm with         durable genetic resistance, and in the global monitoring of disease virulence and intensity.]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+	<lastPageFooter>
+		<band height="15">
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="44" y="3" width="335" height="12" uuid="db9143e5-a692-4698-b859-20d717da3e20"/>
+				<textElement verticalAlignment="Bottom" rotation="None">
+					<font fontName="Tahoma" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[--END OF REPORT--]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+</jasperReport>
