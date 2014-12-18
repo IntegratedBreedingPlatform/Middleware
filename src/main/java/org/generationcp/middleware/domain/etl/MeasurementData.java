@@ -13,6 +13,7 @@ package org.generationcp.middleware.domain.etl;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 import java.util.List;
@@ -238,4 +239,18 @@ public class MeasurementData {
 		this.isAccepted = isAccepted;
 	}
 	
+	public boolean isCategoricalDisplayAcceptedValidValues(){
+		if(getMeasurementVariable() != null && getMeasurementVariable().getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId() && getMeasurementVariable().getPossibleValues() != null){
+			String displayValue = getDisplayValue();
+			if(displayValue != null && !displayValue.equalsIgnoreCase("")){
+				for(ValueReference valRef : getMeasurementVariable().getPossibleValues()){
+						if(valRef.getDescription().equalsIgnoreCase(displayValue)){
+							return false;
+						}
+				}
+				return true;			
+			}
+		}
+		return false;
+	}
 }

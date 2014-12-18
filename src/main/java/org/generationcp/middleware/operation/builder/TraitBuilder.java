@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
-import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -120,7 +119,6 @@ public class TraitBuilder extends Builder{
     }
     
     public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
-    	List<CategoricalTraitInfo> centralCategTraitList = new ArrayList<CategoricalTraitInfo>();
     	List<CategoricalTraitInfo> localCategTraitList = new ArrayList<CategoricalTraitInfo>();
     	List<CategoricalTraitInfo> finalTraitInfoList = new ArrayList<CategoricalTraitInfo>();
 
@@ -129,21 +127,17 @@ public class TraitBuilder extends Builder{
 
         localTraitInfoList.addAll(getPhenotypeDao().getTraitInfoCounts(environmentIds));
         
-        // Merge local and central results
         Collections.sort(localTraitInfoList);        
         
-        // get traits only observed in local environments
         for (TraitInfo localObservedTrait : localTraitInfoList){
         	CategoricalTraitInfo categoricalTrait = new CategoricalTraitInfo(localObservedTrait);
-        	if (!centralCategTraitList.contains(categoricalTrait)){
-        		localCategTraitList.add(categoricalTrait);
-        	}
+    		localCategTraitList.add(categoricalTrait);
         }
         
-        // Set name, description and get categorical domain values and count per value from local
+        // Set name, description and get categorical domain values and count per value
         if (!localCategTraitList.isEmpty()){
         	finalTraitInfoList.addAll(getCvTermDao().setCategoricalVariables(localCategTraitList));
-        	getPhenotypeDao().setCategoricalTraitInfoValues(localCategTraitList, environmentIds);
+        	getPhenotypeDao().setCategoricalTraitInfoValues(finalTraitInfoList, environmentIds);
         }
 
         return finalTraitInfoList;
