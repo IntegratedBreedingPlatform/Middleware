@@ -182,7 +182,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         project.setUserId(1);
         project.setProjectName("Test Project " + new Random().nextInt(10000));
         project.setStartDate(new Date(System.currentTimeMillis()));
-        project.setCropType(manager.getCropTypeByName(CropType.RICE));
+        project.setCropType(manager.getCropTypeByName(CropType.CropEnum.RICE.toString()));
         project.setLastOpenDate(new Date(System.currentTimeMillis()));
 		return project;
 	}
@@ -454,7 +454,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testGetCropTypeByName() throws MiddlewareQueryException {
-        String cropName = CropType.CHICKPEA;
+        String cropName = CropType.CropEnum.CHICKPEA.toString();
         CropType cropType = manager.getCropTypeByName(cropName);
         Assert.assertNotNull(cropName);      
         Debug.println(INDENT, "testGetCropTypeByName(" + cropName + "): " + cropType);

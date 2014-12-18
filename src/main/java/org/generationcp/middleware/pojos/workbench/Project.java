@@ -166,7 +166,7 @@ public class Project implements Serializable{
      */
     @Transient
     public String getDatabaseName() {
-    	return this.cropType.getLocalDatabaseNameWithProjectId(getProjectId());
+    	return this.cropType.getDbName();
     }
 
     @Override

@@ -27,17 +27,6 @@ public class CropType implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    // Initial pre-defined crops. Used mainly in testing
-    public final static String CHICKPEA = "Chickpea";
-    public final static String COWPEA = "Cowpea";
-    public final static String MAIZE = "Maize";
-    public final static String RICE = "Rice";
-    public final static String WHEAT = "Wheat";
-    public final static String CASSAVA = "Cassava";
-    public final static String GROUNDNUT = "Groundnut";
-    public final static String SORGHUM = "Sorghum";
-    public final static String PHASEOLUS = "Phaseolus";
-    
     public enum CropEnum {
     	CASSAVA,
     	CHICKPEA,
@@ -64,8 +53,8 @@ public class CropType implements Serializable{
     @Column(name = "crop_name")
     private String cropName;
 
-    @Column(name = "central_db_name")
-    private String centralDbName;
+    @Column(name = "db_name")
+    private String dbName;
 
     @Column(name = "schema_version")
     private String version;
@@ -84,27 +73,16 @@ public class CropType implements Serializable{
     public void setCropName(String cropName) {
         this.cropName = cropName;
     }
+  
+    public String getDbName() {
+		return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
+	}
 
-    public String getCentralDbName() {
-    	// HACK: hard coded to return the same single DB per crop.
-        return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
-    }
+	public void setDbName(String dbName) {
+		this.dbName = dbName;
+	}
 
-    public void setCentralDbName(String centralDbName) {
-        this.centralDbName = centralDbName;
-    }
-    
-    public String getLocalDatabaseNameWithProject(Project project) {
-        return getLocalDatabaseNameWithProjectId(project.getProjectId());
-    }
-    
-    //TODO rename/replace once the centralDbName column is renamed. ProjectId is no longer a factor in deriving crop db name.
-    public String getLocalDatabaseNameWithProjectId(Long projectId) {
-    	// HACK: hard coded to return the same single DB per crop.
-    	return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
-    }
-
-    @Override
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -149,7 +127,7 @@ public class CropType implements Serializable{
         builder.append("CropType [cropName=");
         builder.append(cropName);
         builder.append(", centralDbName=");
-        builder.append(centralDbName);
+        builder.append(dbName);
         builder.append(", version=");
         builder.append(version);
         builder.append("]");
