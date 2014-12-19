@@ -85,6 +85,27 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 
 	}
 
+	@Test
+	public void testGetProgramPresetFromProgramAndToolAndToolSection() throws Exception {
+		List<ProgramPreset> fullList = initializeProgramPresets();
+
+		for (int j = 1; j < 3; j++) {
+			List<ProgramPreset> presetsList = manager.getProgramPresetFromProgramAndTool(j, j);
+
+			for (ProgramPreset p : presetsList) {
+				assertEquals("should only retrieve all standard presets with same tool",Integer.valueOf(j),p.getToolId());
+				assertEquals("should only retrieve all standard presets with same program",Integer.valueOf(j),p.getProgramUuid());
+				assertEquals("should only retrieve all standard presets with same tool section","tool_section_" + j,p.getToolSection());
+
+			}
+		}
+
+		for (ProgramPreset p : fullList) {
+			manager.deleteProgramPreset(p.getProgramPresetsId());
+		}
+
+	}
+
 	protected List<ProgramPreset> initializeProgramPresets() throws MiddlewareQueryException {
 		List<ProgramPreset> fullList = new ArrayList<ProgramPreset>();
 
@@ -93,6 +114,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 				ProgramPreset preset = new ProgramPreset();
 				preset.setConfiguration("<configuration/>");
 				preset.setName("configuration_" + j + "_" + i);
+				preset.setToolSection("tool_section_" + j);
 				preset.setToolId(j);
 				preset.setProgramUuid(j);
 

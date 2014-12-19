@@ -968,6 +968,8 @@ public interface WorkbenchDataManager {
      */
     StandardPresetDAO getStandardPresetDAO() throws MiddlewareQueryException;
 
+    List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId,
+            String toolSection) throws MiddlewareQueryException;
 
     /** save or update a standard preset
      * @param standardPreset

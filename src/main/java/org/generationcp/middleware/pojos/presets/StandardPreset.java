@@ -3,12 +3,13 @@ package org.generationcp.middleware.pojos.presets;
 import javax.persistence.*;
 
 /**
- * Created by cyrus on 12/17/14.
+ * Created by cyrus on 12/19/14.
  */
 @Entity @Table(name = "standard_preset")
 public class StandardPreset {
 	private int standardPresetId;
 	private Integer toolId;
+	private String toolSection;
 	private String cropName;
 	private String name;
 	private String configuration;
@@ -30,6 +31,15 @@ public class StandardPreset {
 
 	public void setToolId(Integer toolId) {
 		this.toolId = toolId;
+	}
+
+	@Basic @Column(name = "tool_section")
+	public String getToolSection() {
+		return toolSection;
+	}
+
+	public void setToolSection(String toolSection) {
+		this.toolSection = toolSection;
 	}
 
 	@Basic @Column(name = "crop_name")
@@ -80,6 +90,8 @@ public class StandardPreset {
 			return false;
 		if (toolId != null ? !toolId.equals(that.toolId) : that.toolId != null)
 			return false;
+		if (toolSection != null ? !toolSection.equals(that.toolSection) : that.toolSection != null)
+			return false;
 
 		return true;
 	}
@@ -88,6 +100,7 @@ public class StandardPreset {
 	public int hashCode() {
 		int result = standardPresetId;
 		result = 31 * result + (toolId != null ? toolId.hashCode() : 0);
+		result = 31 * result + (toolSection != null ? toolSection.hashCode() : 0);
 		result = 31 * result + (cropName != null ? cropName.hashCode() : 0);
 		result = 31 * result + (name != null ? name.hashCode() : 0);
 		result = 31 * result + (configuration != null ? configuration.hashCode() : 0);

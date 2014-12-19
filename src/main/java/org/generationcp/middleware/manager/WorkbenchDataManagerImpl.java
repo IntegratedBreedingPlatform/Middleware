@@ -282,6 +282,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return templateSettingDAO;
     }
 
+    @Override
+    public StandardPresetDAO getStandardPresetDAO() {
+        if (standardPresetDAO == null) {
+            standardPresetDAO = new StandardPresetDAO();
+        }
+
+        standardPresetDAO.setSession(getCurrentSession());
+        return standardPresetDAO;
+    }
+
     private void rollbackTransaction(Transaction trans){
         if (trans != null){
             trans.rollback();
@@ -1611,7 +1621,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public List<StandardPreset> getStandardPresetFromCropAndTool(String cropName,int toolId) throws MiddlewareQueryException{
+    public List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId) throws MiddlewareQueryException{
 
         try {
             Criteria criteria = getCurrentSession().createCriteria(StandardPreset.class);
@@ -1631,13 +1641,25 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public StandardPresetDAO getStandardPresetDAO() throws MiddlewareQueryException {
-        if (standardPresetDAO == null) {
-            standardPresetDAO = new StandardPresetDAO();
+    public List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId,
+            String toolSection) throws MiddlewareQueryException{
+
+        try {
+            Criteria criteria = getCurrentSession().createCriteria(StandardPreset.class);
+
+            criteria.add(Restrictions.eq("cropName", cropName));
+            criteria.add(Restrictions.eq("toolId",toolId));
+            criteria.add(Restrictions.eq("toolSection",toolSection));
+
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName="
+                            + cropName + "): "
+                            + e.getMessage(), e);
         }
 
-        standardPresetDAO.setSession(getCurrentSession());
-        return standardPresetDAO;
+        return new ArrayList<StandardPreset>();
     }
 
     @Override

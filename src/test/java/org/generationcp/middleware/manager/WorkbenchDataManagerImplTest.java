@@ -1018,6 +1018,14 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
     }
 
     @Test
+    public void testGetAllStandardPreset() throws Exception {
+        List<StandardPreset> out = manager.getStandardPresetDAO().getAll();
+
+        assertTrue(out.size() > 0);
+
+    }
+
+    @Test
     public void testGetStandardPresetFromCropAndTool() throws Exception {
         List<StandardPreset> fulllist = initializeStandardPresets();
 
@@ -1035,6 +1043,27 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         }
     }
 
+    @Test
+    public void testGetStandardPresetFromCropAndToolAndToolSection() throws Exception {
+        List<StandardPreset> fulllist = initializeStandardPresets();
+
+        for (int j = 1; j < 3; j++) {
+            List<StandardPreset> presetsList = manager.getStandardPresetFromCropAndTool(
+                    "crop_name_" + j, j, "tool_section_" + j);
+            for (StandardPreset p : presetsList) {
+                assertEquals("should only retrieve all standard presets with same crop name","crop_name_" + j,p.getCropName());
+                assertEquals("should only retrieve all standard presets with same tool section","tool_section_" + j,p.getToolSection());
+                assertEquals("should be the same tool as requested",Integer.valueOf(j),p.getToolId());
+            }
+        }
+
+        // cleanup
+        for (StandardPreset p : fulllist) {
+            manager.deleteStandardPreset(p.getStandardPresetId());
+        }
+    }
+
+
     protected List<StandardPreset> initializeStandardPresets() throws MiddlewareQueryException {
         List<StandardPreset> fulllist = new ArrayList<StandardPreset>();
         for (int j = 1; j < 3; j++) {
@@ -1044,6 +1073,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
                 preset.setName("configuration_" + j + "_" + i);
                 preset.setToolId(j);
                 preset.setCropName("crop_name_" + j);
+                preset.setToolSection("tool_section_" + j);
 
                 fulllist.add(manager.addStandardPreset(preset));
             }

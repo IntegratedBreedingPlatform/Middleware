@@ -37,6 +37,10 @@ public interface PresetDataManager {
 	List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId)
 			throws MiddlewareQueryException;
 
+	List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId,
+			String toolSection)
+			throws MiddlewareQueryException;
+
 	/**
 	 * save or update a progam preset
 	 *

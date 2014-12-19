@@ -5,13 +5,14 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 
 /**
- * Created by cyrus on 12/17/14.
+ * Created by cyrus on 12/19/14.
  */
 @Entity @Table(name = "program_preset")
 public class ProgramPreset {
 	private int programPresetsId;
 	private Integer programUuid;
 	private Integer toolId;
+	private String toolSection;
 	private String name;
 	private String configuration;
 	private Boolean isDefault;
@@ -42,6 +43,15 @@ public class ProgramPreset {
 
 	public void setToolId(Integer toolId) {
 		this.toolId = toolId;
+	}
+
+	@Basic @Column(name = "tool_section")
+	public String getToolSection() {
+		return toolSection;
+	}
+
+	public void setToolSection(String toolSection) {
+		this.toolSection = toolSection;
 	}
 
 	@Basic @Column(name = "name")
@@ -95,6 +105,8 @@ public class ProgramPreset {
 			return false;
 		if (toolId != null ? !toolId.equals(that.toolId) : that.toolId != null)
 			return false;
+		if (toolSection != null ? !toolSection.equals(that.toolSection) : that.toolSection != null)
+			return false;
 
 		return true;
 	}
@@ -104,6 +116,7 @@ public class ProgramPreset {
 		int result = programPresetsId;
 		result = 31 * result + (programUuid != null ? programUuid.hashCode() : 0);
 		result = 31 * result + (toolId != null ? toolId.hashCode() : 0);
+		result = 31 * result + (toolSection != null ? toolSection.hashCode() : 0);
 		result = 31 * result + (name != null ? name.hashCode() : 0);
 		result = 31 * result + (configuration != null ? configuration.hashCode() : 0);
 		result = 31 * result + (isDefault != null ? isDefault.hashCode() : 0);

@@ -288,6 +288,10 @@ public class ManagerFactory implements Serializable {
         return new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
+    public PresetDataManager getPresetDataManager() {
+        return new PresetDataManagerImpl(sessionProviderForLocal,sessionProviderForCentral);
+    }
+
     public StudyDataManager getStudyDataManager() throws ConfigException {
         return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
@@ -335,6 +339,7 @@ public class ManagerFactory implements Serializable {
     public MBDTDataManager getMbdtDataManager() {
         return new MBDTDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
+
 
     /**
      * Closes the db connection by shutting down the HibernateUtil object
