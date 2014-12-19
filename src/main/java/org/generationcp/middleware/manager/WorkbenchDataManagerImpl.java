@@ -1663,7 +1663,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public StandardPreset addStandardPreset(StandardPreset standardPreset)
+    public StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset)
             throws MiddlewareQueryException {
 
         Transaction transaction = getCurrentSession().beginTransaction();
@@ -1678,7 +1678,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         } catch (HibernateException e) {
             rollbackTransaction(transaction);
             logAndThrowException(
-                    "Cannot perform: WorkbenchDataManager.addStandardPreset(standardPreset="
+                    "Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset="
                             + standardPreset.getName() + "): "
                             + e.getMessage(), e);
         } finally {

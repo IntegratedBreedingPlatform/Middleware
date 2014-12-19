@@ -1000,7 +1000,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         preset.setToolId(1);
         preset.setCropName("crop_name");
 
-        StandardPreset results = manager.addStandardPreset(preset);
+        StandardPreset results = manager.saveOrUpdateStandardPreset(preset);
 
         assertTrue("we retrieve the saved primary id",results.getStandardPresetId() > 0);
 
@@ -1075,7 +1075,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
                 preset.setCropName("crop_name_" + j);
                 preset.setToolSection("tool_section_" + j);
 
-                fulllist.add(manager.addStandardPreset(preset));
+                fulllist.add(manager.saveOrUpdateStandardPreset(preset));
             }
         }
 

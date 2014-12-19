@@ -48,7 +48,7 @@ public interface PresetDataManager {
 	 * @return
 	 * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
 	 */
-	ProgramPreset addProgramPreset(ProgramPreset programPreset) throws
+	ProgramPreset saveOrUpdateProgramPreset(ProgramPreset programPreset) throws
 			MiddlewareQueryException;
 
 	/**

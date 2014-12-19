@@ -32,7 +32,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		preset.setToolId(1);
 		preset.setProgramUuid(1);
 
-		ProgramPreset results = manager.addProgramPreset(preset);
+		ProgramPreset results = manager.saveOrUpdateProgramPreset(preset);
 
 		assertTrue("we retrieve the saved primary id",results.getProgramPresetsId() > 0);
 
@@ -118,7 +118,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 				preset.setToolId(j);
 				preset.setProgramUuid(j);
 
-				fullList.add(manager.addProgramPreset(preset));
+				fullList.add(manager.saveOrUpdateProgramPreset(preset));
 			}
 		}
 		return fullList;

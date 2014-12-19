@@ -97,7 +97,7 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	}
 
 	@Override
-	public ProgramPreset addProgramPreset(ProgramPreset programPreset)
+	public ProgramPreset saveOrUpdateProgramPreset(ProgramPreset programPreset)
 			throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 

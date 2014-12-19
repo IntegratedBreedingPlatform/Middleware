@@ -976,7 +976,7 @@ public interface WorkbenchDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    StandardPreset addStandardPreset(StandardPreset standardPreset) throws MiddlewareQueryException;
+    StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset) throws MiddlewareQueryException;
 
     /** delete a standard preset by id
      * @param standardPresetId
