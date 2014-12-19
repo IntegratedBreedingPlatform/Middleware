@@ -1,6 +1,5 @@
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.PresetDataManager;
@@ -78,7 +77,8 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	}
 
 	@Override
-	public List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId, String toolSection)
+	public List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId,
+			String toolSection)
 			throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 
@@ -87,7 +87,7 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 
 			criteria.add(Restrictions.eq("programUuid", programId));
 			criteria.add(Restrictions.eq("toolId", toolId));
-			criteria.add(Restrictions.eq("toolSection",toolSection));
+			criteria.add(Restrictions.eq("toolSection", toolSection));
 
 			return criteria.list();
 		} catch (HibernateException e) {
