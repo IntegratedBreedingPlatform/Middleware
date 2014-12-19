@@ -23,6 +23,10 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
+	public PresetDataManagerImpl() {
+		super();
+	}
+
 	@Override
 	public ProgramPreset getProgramPresetById(int id) throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
