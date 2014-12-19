@@ -1,6 +1,5 @@
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.PresetDataManager;
@@ -21,6 +20,10 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 			HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
+	}
+
+	public PresetDataManagerImpl() {
+		super();
 	}
 
 	@Override
@@ -74,7 +77,31 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	}
 
 	@Override
-	public ProgramPreset addProgramPreset(ProgramPreset programPreset)
+	public List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId,
+			String toolSection)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+
+		try {
+			Criteria criteria = getCurrentSessionForLocal().createCriteria(ProgramPreset.class);
+
+			criteria.add(Restrictions.eq("programUuid", programId));
+			criteria.add(Restrictions.eq("toolId", toolId));
+			criteria.add(Restrictions.eq("toolSection", toolSection));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId="
+							+ programId + "): "
+							+ e.getMessage(), e);
+		}
+
+		return new ArrayList<ProgramPreset>();
+	}
+
+	@Override
+	public ProgramPreset saveOrUpdateProgramPreset(ProgramPreset programPreset)
 			throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 
