@@ -87,15 +87,4 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer>{
         }
         return returnList;
     }
-
-    //TODO Review logic to adjust to the merged DB world.
-    public void validateId(Attribute attribute) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-        Integer id = attribute.getAid();
-        if (id != null && id.intValue() > 0) {
-            throw new MiddlewareQueryException("Error with validateId(attribute=" + attribute
-                    + "): Cannot update a Central Database record. "
-                    + "Attribute object to update must be a Local Record (ID must be negative)");
-        }
-    }
 }

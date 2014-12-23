@@ -186,22 +186,6 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
         return 0;
     }
 
-    //TODO Review logic to adjust to the merged DB world.
-    public void validateId(GermplasmListData germplasmListData) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-    	if (germplasmListData != null){
-        Integer id = germplasmListData.getId();
-        if (id != null && id.intValue() > 0) {
-            logAndThrowException("Error with validateId(germplasmListData=" + germplasmListData
-                    + "): Cannot update a Central Database record. "
-                    + "GermplasmListData object to update must be a Local Record (ID must be negative)", new Throwable());
-        }
-    	}else{
-            logAndThrowException("Error with validateId(germplasmListData=" + germplasmListData
-                    + "): GermplasmListData is null", new Throwable());
-    	}
-    }
-    
     @SuppressWarnings("unchecked")
 	public List<Integer> getGidsByListId(Integer listId) throws MiddlewareQueryException {
     	List<Integer> gids = new ArrayList<Integer>();

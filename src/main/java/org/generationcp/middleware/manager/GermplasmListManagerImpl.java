@@ -257,9 +257,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                     germplasmList.setId(nextId);
                     getGermplasmListDAO().saveOrUpdate(germplasmList);
                 } else if (operation == Operation.UPDATE) {
-                    // Check if GermplasmList is a local DB record. Throws
-                    // exception if GermplasmList is a central DB record.
-                    getGermplasmListDAO().validateId(germplasmList);
                     germplasmListIds.add(germplasmList.getId());
                     getGermplasmListDAO().merge(germplasmList);
                 }
@@ -395,10 +392,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                     // Auto-assign IDs for new DB records
                     Integer nextListId = getGermplasmListDataDAO().getNextId("id");
                     germplasmListData.setId(nextListId);
-                } else if (operation == Operation.UPDATE) {
-                    // Check if GermplasmList is a local DB record. Throws
-                    // exception if GermplasmList is a central DB record.
-                    getGermplasmListDataDAO().validateId(germplasmListData);
                 }
                 GermplasmListData recordSaved = getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
                 idGermplasmListDataSaved.add(recordSaved.getId());

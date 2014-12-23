@@ -514,12 +514,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
                 if (oldPref != null) {
                     oldPref.setNstat(0);
-                    dao.validateId(oldPref); // check if old Name is a local DB record
                     dao.saveOrUpdate(oldPref);
                 }
 
                 newPref.setNstat(newNstat); // update specified name as the new preferred name/abbreviation
-                dao.validateId(newPref); // check if new Name is a local DB record
                 dao.saveOrUpdate(newPref); // save the new name's status to the database
             } else {
                 // throw exception if no Name record with specified value does not exist
@@ -576,15 +574,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             NameDAO dao = getNameDao();
 
             for (Name name : names) {
-            	//TODO Review logic to adjust to the merged DB world.
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new records
                     Integer nextId = dao.getNextId("nid");
                     name.setNid(nextId);
-                } else if (operation == Operation.UPDATE) {
-                    // Check if Name is a local DB record. Throws exception if
-                    // Name is a central DB record.
-                    dao.validateId(name);
                 }
                 Name recordAdded = dao.saveOrUpdate(name);
                 idNamesSaved.add(recordAdded.getNid());
@@ -941,15 +934,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             AttributeDAO dao = getAttributeDao();
 
             for (Attribute attribute : attributes) {
-            	//TODO Review logic to adjust to the merged DB world.
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new DB records
                     Integer nextId = dao.getNextId("aid");
                     attribute.setAid(nextId);
-                } else if (operation == Operation.UPDATE) {
-                    // Check if Attribute is a local DB record. Throws exception
-                    // if Attribute is a central DB record.
-                    dao.validateId(attribute);
                 }
                 Attribute recordSaved = dao.saveOrUpdate(attribute);
                 idAttributesSaved.add(recordSaved.getAid());
@@ -1047,16 +1035,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             GermplasmDAO dao = getGermplasmDao();
 
             for (Germplasm germplasm : germplasms) {
-            	//TODO Review logic to adjust to the merged DB world.
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new DB records
                     Integer nextId = dao.getNextId("gid");
                     germplasm.setGid(nextId);
                     germplasm.setLgid(nextId);
-                } else if (operation == Operation.UPDATE) {
-                    // Check if Germplasm is a local DB record. Throws exception if Germplasm is a central DB record.
-                    dao.validateId(germplasm);
                 }
+                
                 Germplasm recordSaved = dao.saveOrUpdate(germplasm);
                 idGermplasmsSaved.add(recordSaved.getGid());
                 germplasmsSaved++;
