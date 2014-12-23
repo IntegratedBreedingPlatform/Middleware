@@ -2375,11 +2375,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException {
-        return GenericDAO.getLastId(getActiveSession(), instance, gdmsTable.getTableName(), gdmsTable.getIdName());
-    }
-
-    @Override
     public void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException {
         Session session = getActiveSession();
         Transaction trans = null;

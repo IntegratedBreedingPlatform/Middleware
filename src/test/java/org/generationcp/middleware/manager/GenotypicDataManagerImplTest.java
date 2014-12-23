@@ -2149,21 +2149,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
     }
 
     @Test
-    public void testGetLastId() throws Exception {
-        Database instance = Database.LOCAL;
-        for (GdmsTable gdmsTable : GdmsTable.values()) {
-            long lastId = manager.getLastId(instance, gdmsTable);
-            Debug.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-        }
-
-        instance = Database.CENTRAL;
-        for (GdmsTable gdmsTable : GdmsTable.values()) {
-            long lastId = manager.getLastId(instance, gdmsTable);
-            Debug.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-        }
-    }
-
-    @Test
     public void testAddMta() throws Exception {
         Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null,
                 "REMARKS", "int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
@@ -2181,34 +2166,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
         Debug.printObject(INDENT, mta);
         Debug.printObject(INDENT, mtaMetadata);
     }
-    
-    @Test
-    public void testAddMtaGCP9174() throws Exception {
-    	int nextDatasetId = (int) (manager.getLastId(Database.LOCAL, GdmsTable.GDMS_DATASET) - 1);
-        Dataset dataset = new Dataset(nextDatasetId, "sample","testing", "MTA", "Groundnut", "Groundnut", null, "", 
-        		"int", null, "Tassel", "LOD", "ICRISAT",  "TrusharShah", null, null);
-        
-        int nextMtaId = (int) (manager.getLastId(Database.LOCAL, GdmsTable.GDMS_MTA) - 1);
-
-        Mta mta = new Mta(nextMtaId, 964, nextDatasetId, 5, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T", 
-        		"absent", "present", 0.0f, 0.0f, 0.0f, 0.0f, "Bonferroni", 0.0f, 
-        		0.0f, "co-dominant", "association", "Ellis et al (2002) TAG 105:1038-1042", "");
-
-        MtaMetadata mtaMetadata = new MtaMetadata(nextMtaId, "project1", "population", 100, "Thousand");
-        
-        DatasetUsers users = new DatasetUsers(nextDatasetId, 1);
-        
-        manager.addMTA(dataset, mta, mtaMetadata, users);
-        
-        // non-null id means the records were inserted.
-        assertTrue(mta.getMtaId() != null && mtaMetadata.getDatasetID() != null);
-        
-        Debug.println("MTA added: ");
-        Debug.printObject(INDENT, dataset);
-        Debug.printObject(INDENT, mta);
-        Debug.printObject(INDENT, mtaMetadata);
-    }
-
     
     @Test
     public void testSetMTA() throws Exception {
