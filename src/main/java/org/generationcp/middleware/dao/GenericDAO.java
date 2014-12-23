@@ -210,19 +210,11 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             Criteria crit = getSession().createCriteria(getPersistentClass());
             crit.setProjection(Projections.max(idName));
             Integer maxId = (Integer) crit.uniqueResult();
-            if (maxId != null) {
-                if (maxId.intValue() <= 0) {
-                    maxId = Integer.valueOf(1);
-                } else {
-                    maxId = Integer.valueOf(maxId.intValue() + 1);
-                }
-            } else {
-                maxId = Integer.valueOf(1);
-            }
-            LOG.debug("Returning maxId " + maxId + " for entity " + getPersistentClass().getName());
-            return maxId;
+            Integer nextId = maxId != null ? Integer.valueOf(maxId.intValue() + 1) : Integer.valueOf(1);
+            LOG.debug("Returning nextId " + nextId + " for entity " + getPersistentClass().getName());
+            return nextId;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getPositiveId(idName=" + idName + "): " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in getNextId(idName=" + idName + "): " + e.getMessage(), e);
         }
     }
     
