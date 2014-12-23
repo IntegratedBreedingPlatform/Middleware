@@ -952,20 +952,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
     }
     
-    /**
-     * drop the projects local database. 
-     * 
-     * Drops the database of the given project. 
-     *
-     * @param project - the project to delete the database
-     * @throws MiddlewareQueryException
-     */
-    public void dropLocalDatabase(Project project) throws MiddlewareQueryException
-    {
-    	//getProjectDao().deleteDatabase(project.getLocalDbName());
-    	// TODO Remove this method from the API and its reference from delete proejct action.
-    }
-
     private List<Integer> addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation operation)
             throws MiddlewareQueryException {
         
