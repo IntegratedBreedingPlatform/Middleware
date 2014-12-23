@@ -2164,6 +2164,18 @@ public interface GenotypicDataManager{
     List<MarkerSampleId> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException;
 
     /**
+     * Retrieves the last ID of a given GDMS table.
+     * For the local instance, this will be the MIN value.
+     * For the central instance, this will be the MAX value.
+     *
+     * @param instance the instance
+     * @param gdmsTable the gdms table
+     * @return the last ID of the GDMS table
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException;
+    
+    /**
      * Adds the mta.
      *
      * @param dataset the dataset
