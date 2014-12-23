@@ -12,7 +12,6 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
@@ -226,19 +225,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
     
-    public static Integer getLastId(Session session, Database instance, String tableName, String idName) throws MiddlewareQueryException {
-    	try {
-    		// HACK!!!! - change all ID generation to grow in +ve direction for single merged DB model.
-    		SQLQuery query = session.createSQLQuery("SELECT MAX(" + idName + ") FROM " + tableName);
-    		Integer result = (Integer) query.uniqueResult();
-    		
-    		return result != null ? result : 0;    		
-    		
-    	} catch(HibernateException e) {
-    		throw new MiddlewareQueryException("Error in getMaxId(instance=" + instance + ", tableName=" + tableName + ", idName=" + idName + "): " + e.getMessage(), e);
-    	}
-    }
-
     public void flush() {
         getSession().flush();
     }
