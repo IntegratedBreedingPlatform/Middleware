@@ -9,7 +9,7 @@ import javax.persistence.*;
  */
 @Entity @Table(name = "program_preset")
 public class ProgramPreset {
-	private int programPresetsId;
+	private int programPresetId;
 	private Integer programUuid;
 	private Integer toolId;
 	private String toolSection;
@@ -18,13 +18,13 @@ public class ProgramPreset {
 	private Boolean isDefault;
 
 	@GeneratedValue
-	@Id @Column(name = "program_presets_id")
-	public int getProgramPresetsId() {
-		return programPresetsId;
+	@Id @Column(name = "program_preset_id")
+	public int getProgramPresetId() {
+		return programPresetId;
 	}
 
-	public void setProgramPresetsId(int programPresetsId) {
-		this.programPresetsId = programPresetsId;
+	public void setProgramPresetId(int programPresetsId) {
+		this.programPresetId = programPresetsId;
 	}
 
 	@Basic @Column(name = "program_uuid")
@@ -91,7 +91,7 @@ public class ProgramPreset {
 
 		ProgramPreset that = (ProgramPreset) o;
 
-		if (programPresetsId != that.programPresetsId)
+		if (programPresetId != that.programPresetId)
 			return false;
 		if (configuration != null ?
 				!configuration.equals(that.configuration) :
@@ -113,7 +113,7 @@ public class ProgramPreset {
 
 	@Override
 	public int hashCode() {
-		int result = programPresetsId;
+		int result = programPresetId;
 		result = 31 * result + (programUuid != null ? programUuid.hashCode() : 0);
 		result = 31 * result + (toolId != null ? toolId.hashCode() : 0);
 		result = 31 * result + (toolSection != null ? toolSection.hashCode() : 0);
