@@ -333,6 +333,16 @@ public class Method implements Serializable{
         builder.append(lmid);
         builder.append(", mdate=");
         builder.append(mdate);
+        builder.append(", snametype=");
+        builder.append(snametype);
+        builder.append(", separator=");
+        builder.append(separator);
+        builder.append(", prefix=");
+        builder.append(prefix);
+        builder.append(", count=");
+        builder.append(count);
+        builder.append(", suffix=");
+        builder.append(suffix);
         builder.append("]");
         return builder.toString();
     }
