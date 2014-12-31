@@ -243,7 +243,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+            throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
         }
     }
     
@@ -266,7 +266,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
           } catch (Exception e) {
               rollbackTransaction(trans);
-              throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+              throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
           }
 		
 	}
@@ -506,30 +506,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             List<FieldMapDatasetInfo> fieldMapDatasetInfos =
                     getExperimentPropertyDao().getFieldMapLabels(studyId);
             fieldMapInfo.setDatasets(fieldMapDatasetInfos);
-
-            // Set pedigree
+            
             if (fieldMapDatasetInfos != null) {
-                for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
-                    List<FieldMapTrialInstanceInfo> trialInstances =
-                            fieldMapDatasetInfo.getTrialInstances();
-                    if (trialInstances != null && !trialInstances.isEmpty()) {
-                        for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
-                            List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
-                            for (FieldMapLabel label : labels) {
-                                String pedigree = null;
-                                try {
-                                    pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
-                                } catch (MiddlewareQueryException e) {
-                                    //do nothing
-                                }
-
-                                label.setPedigree(pedigree);
-                            }
-                        }
-                    }
-                }
+            	setPedigree(fieldMapDatasetInfos);
             }
-
+            
             fieldMapInfos.add(fieldMapInfo);
         }
         
@@ -538,7 +519,33 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return fieldMapInfos;
     }
 
-    @Override
+    private void setPedigree(List<FieldMapDatasetInfo> fieldMapDatasetInfos) {
+    	for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
+            List<FieldMapTrialInstanceInfo> trialInstances =
+                    fieldMapDatasetInfo.getTrialInstances();
+            if (trialInstances == null || trialInstances.isEmpty()) {
+            	continue;
+            }
+            for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
+                List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
+                for (FieldMapLabel label : labels) {
+                    setPedigree(label);
+                }
+            }
+        }
+	}
+
+	private void setPedigree(FieldMapLabel label) {
+		String pedigree = null;
+        try {
+            pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
+        } catch (MiddlewareQueryException e) {
+            LOG.error(e.getMessage(),e);
+        }
+        label.setPedigree(pedigree);
+	}
+
+	@Override
     public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) 
             throws MiddlewareQueryException {
 
@@ -552,8 +559,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
                 if (isNew) {
                     getLocdesSaver().saveLocationDescriptions(info, userId);
-                }
-                else {
+                } else {
 	                getLocdesSaver().updateDeletedPlots(info, userId);
                 }
                 getGeolocationPropertySaver().saveFieldmapProperties(info);
@@ -586,30 +592,34 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
             }
             if (experimentValues != null && !experimentValues.isEmpty()) {
-                for (Integer locationId : locationIds) {
-                    //delete phenotypes by project id and locationId
-                    getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(
-                            project.getProjectId(), locationId);
-                }
-                for (ExperimentValues exp : experimentValues) {
-                    if (exp.getVariableList() != null && exp.getVariableList().size() > 0) {
-                        ExperimentModel experimentModel = getExperimentDao()
-                                .getExperimentByProjectIdAndLocation(
-                                        project.getProjectId(), exp.getLocationId());
-                        getPhenotypeSaver().savePhenotypes(experimentModel, exp.getVariableList());
-                    }
-                }
-
+            	updateExperimentValues(experimentValues,project.getProjectId(),locationIds);
             }
             trans.commit();
-
         } catch (Exception e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
         }
     }
 
-    @Override
+    private void updateExperimentValues(
+    		List<ExperimentValues> experimentValues,
+    		Integer projectId,List<Integer> locationIds) throws MiddlewareQueryException {
+    	for (Integer locationId : locationIds) {
+            //delete phenotypes by project id and locationId
+            getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(
+            		projectId, locationId);
+        }
+        for (ExperimentValues exp : experimentValues) {
+            if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
+                ExperimentModel experimentModel = getExperimentDao()
+                        .getExperimentByProjectIdAndLocation(
+                        		projectId, exp.getLocationId());
+                getPhenotypeSaver().savePhenotypes(experimentModel, exp.getVariableList());
+            }
+        }
+	}
+
+	@Override
     public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId)
             throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
@@ -625,25 +635,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
             if (datasetInfoList != null){
-                for (FieldMapDatasetInfo fieldMapDatasetInfo : datasetInfoList) {
-                    List<FieldMapTrialInstanceInfo> trialInstances =
-                            fieldMapDatasetInfo.getTrialInstances();
-                    if (trialInstances != null && !trialInstances.isEmpty()) {
-                        for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
-                            List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
-                            for (FieldMapLabel label : labels) {
-                                String pedigree = null;
-                                try {
-                                    pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
-                                } catch (MiddlewareQueryException e) {
-                                    //do nothing
-                                }
-
-                                label.setPedigree(pedigree);
-                            }
-                        }
-                    }
-                }
+            	setPedigree(datasetInfoList);
             }
         }
 
@@ -948,28 +940,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
     private void populateSiteAndPersonIfNecessary(List<StudyDetails> studyDetails) throws MiddlewareQueryException {
     	if (studyDetails != null && !studyDetails.isEmpty()) {
-	    	List<Integer> siteIds = new ArrayList<Integer>();
-	    	List<Integer> personIds = new ArrayList<Integer>();
-	    	
-	    	for (StudyDetails detail : studyDetails) {
-	    		if (detail.getSiteId() != null) {
-	    			siteIds.add(detail.getSiteId());
-	    		}
-	    		if (detail.getPiId() != null) {
-	    			personIds.add(detail.getPiId());
-	    		}
-	    	}
-	    	
 	    	Map<Integer, String> siteMap = new HashMap<Integer, String>();
 	    	Map<Integer, String> personMap = new HashMap<Integer, String>();
-	    	
-	    	if (!siteIds.isEmpty()) {
-	    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(siteIds));
-	    	}
-	    	if (!personIds.isEmpty()) {
-	    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(personIds));
-	    	}
-	    	
+	    	retrieveSitesAndPersonsFromStudyDetails(studyDetails,siteMap,personMap);
 	    	for (StudyDetails detail : studyDetails) {
 	    		if (detail.getSiteId() != null) {
 	    			detail.setSiteName(siteMap.get(detail.getSiteId()));
@@ -981,54 +954,92 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	}
     }
     
-    private Integer getBlockId(List<FieldMapInfo> infos) {
-    	if (infos != null) { 
-    		for (FieldMapInfo info : infos) {
-    			if (info.getDatasets() != null) {
-    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-    					if (dataset.getTrialInstances() != null) {
-    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-    							return trial.getBlockId();
-    						}
-    					}
-    				}
-    			}
+    private void retrieveSitesAndPersonsFromStudyDetails(
+    		List<StudyDetails> studyDetails,
+    		Map<Integer, String> siteMap, 
+    		Map<Integer, String> personMap) throws MiddlewareQueryException {
+    	List<Integer> siteIds = new ArrayList<Integer>();
+    	List<Integer> personIds = new ArrayList<Integer>();
+    	for (StudyDetails detail : studyDetails) {
+    		if (detail.getSiteId() != null) {
+    			siteIds.add(detail.getSiteId());
+    		}
+    		if (detail.getPiId() != null) {
+    			personIds.add(detail.getPiId());
     		}
     	}
+    	if (!siteIds.isEmpty()) {
+    		siteMap.putAll(getLocationDao().getLocationNamesByLocationIDs(siteIds));
+    	}
+    	if (!personIds.isEmpty()) {
+    		personMap.putAll(getPersonDao().getPersonNamesByPersonIds(personIds));
+    	}
+	}
+
+	private Integer getBlockId(List<FieldMapInfo> infos) {
+    	if (infos == null) { 
+    		return null;
+    	}
+		for (FieldMapInfo info : infos) {
+			if (info == null || info.getDatasets() == null) {
+				continue;
+			}
+			for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+				Integer blockId = getBlockId(dataset);
+				if(blockId!=null) {
+					return blockId;
+				}
+			}
+		}
     	return null;
     }
     
-    private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo) throws MiddlewareQueryException {
+    private Integer getBlockId(FieldMapDatasetInfo dataset) {
+    	if (dataset!=null && dataset.getTrialInstances() != null) {
+    		for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+    			return trial.getBlockId();
+    		}
+		}
+		return null;
+	}
+
+	private void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo) throws MiddlewareQueryException {
     	updateFieldMapWithBlockInformation(infos, blockInfo, false);
     }
     
     protected void updateFieldMapWithBlockInformation(List<FieldMapInfo> infos, FieldmapBlockInfo blockInfo, boolean isGetLocation) throws MiddlewareQueryException {
-    	Map<Integer, String> locationMap = new HashMap<Integer, String>();
-    	if (infos != null) {
-    		for (FieldMapInfo info : infos) {
-    			if (info.getDatasets() != null) {
-    				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-    					if (dataset.getTrialInstances() != null) {
-    						for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-                            	if (trial.getBlockId() != null) {
-                            		blockInfo = locationDataManager.getBlockInformation(trial.getBlockId());
-                            		trial.updateBlockInformation(blockInfo);
-                            	}
-    							if (isGetLocation) {
-	    							trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
-                                    trial.setSiteName(trial.getLocationName());
-	    							trial.setFieldName(getLocationName(locationMap, trial.getFieldId()));
-	    							trial.setBlockName(getLocationName(locationMap, trial.getBlockId()));
-    							}
-    						}
-    					}
-    				}
-    			}
-    		}
+    	if (infos == null) {
+    		return;
     	}
+    	Map<Integer, String> locationMap = new HashMap<Integer, String>();
+    	for (FieldMapInfo info : infos) {
+			if (info != null && info.getDatasets() != null) {
+				for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+					updateFieldMapTrialInstanceInfo(dataset,isGetLocation,locationMap);
+				}
+			}
+		}
     }
     
-    private void updateFieldMapInfoWithBlockInfo(List<FieldMapInfo> fieldMapInfos) throws MiddlewareQueryException {
+    private void updateFieldMapTrialInstanceInfo(
+			FieldMapDatasetInfo dataset, boolean isGetLocation,
+			Map<Integer, String> locationMap) throws MiddlewareQueryException {
+    	if (dataset != null && dataset.getTrialInstances() != null) {
+			for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+				if (trial.getBlockId() != null) {
+		    		trial.updateBlockInformation(locationDataManager.getBlockInformation(trial.getBlockId()));
+		    	}
+				if (isGetLocation) {
+					trial.setLocationName(getLocationName(locationMap, trial.getLocationId()));
+		            trial.setSiteName(trial.getLocationName());
+					trial.setFieldName(getLocationName(locationMap, trial.getFieldId()));
+					trial.setBlockName(getLocationName(locationMap, trial.getBlockId()));
+				}
+			}
+		}
+	}
+
+	private void updateFieldMapInfoWithBlockInfo(List<FieldMapInfo> fieldMapInfos) throws MiddlewareQueryException {
         updateFieldMapWithBlockInformation(fieldMapInfos, null, true);
     }
 
@@ -1083,7 +1094,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             		 phenotypeOutlierDao.saveOrUpdate(phenotypeOutlier);
             	 }
             	 
-            	 if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ // batch save
+            	 if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ 
+            		 // batch save
             		 phenotypeOutlierDao.flush();
             		 phenotypeOutlierDao.clear();
                  }
