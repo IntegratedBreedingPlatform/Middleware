@@ -64,8 +64,17 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	
     	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {}, new Class[]{});
     }
-
+    
     @Override
+    public List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation)
+            throws MiddlewareQueryException {
+        
+    	return getFromInstanceByMethod(getGermplasmListDAO(), "getByName", 
+    				new Object[] {name, operation, start, numOfRows},
+    				new Class[] {String.class, Operation.class, Integer.TYPE, Integer.TYPE});
+    }
+
+    @Deprecated
     public List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
             throws MiddlewareQueryException {
         
@@ -190,8 +199,22 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	return getFromInstanceByMethod(getGermplasmListDAO(), instance, "getAllTopLevelLists", 
     				new Object[] {start, numOfRows}, new Class[] {Integer.TYPE, Integer.TYPE});
     }
-
+    
     @Override
+    public List<GermplasmList> getAllTopLevelListsBatched(int batchSize) throws MiddlewareQueryException {
+        List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
+
+    	long topLevelCount = getGermplasmListDAO().countAllTopLevelLists();
+    	int start = 0;
+        while (start < topLevelCount) {
+            topLevelFolders.addAll(getGermplasmListDAO().getAllTopLevelLists(start, batchSize));
+            start += batchSize;
+        }
+        
+        return topLevelFolders;
+    }
+
+    @Deprecated
     public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException {
         List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
 

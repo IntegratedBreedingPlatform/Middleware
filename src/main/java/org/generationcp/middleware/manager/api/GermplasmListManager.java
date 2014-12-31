@@ -76,11 +76,30 @@ public interface GermplasmListManager{
      *            to be returned
      * @param operation
      *            - can be equal or like
+     * @return List of GermplasmList POJOs
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation)
+            throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the Germplasm List records with names matching the given
+     * parameter.
+     * 
+     * @param name
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param operation
+     *            - can be equal or like
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return List of GermplasmList POJOs
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
             throws MiddlewareQueryException;
 
@@ -249,11 +268,25 @@ public interface GermplasmListManager{
      * 
      * @param batchSize
      *            - the number of records to be retrieved per iteration
+     * @return - List of GermplasmList POJOs
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> getAllTopLevelListsBatched(int batchSize) throws MiddlewareQueryException;
+
+    /**
+     * Returns the Top Level Germplasm List Folders present in the specified database.
+     * Retrieval from the database is done by batch (as specified in batchSize) to reduce the load
+     * in instances where there is a large volume of top level folders to be retrieved. Though
+     * retrieval is by batch, this method still returns all of the top level folders as a single list.
+     * 
+     * @param batchSize
+     *            - the number of records to be retrieved per iteration
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return - List of GermplasmList POJOs
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException;
     
     /**

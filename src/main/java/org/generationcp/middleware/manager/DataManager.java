@@ -11,23 +11,57 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.builder.*;
+import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.ExperimentBuilder;
+import org.generationcp.middleware.operation.builder.FolderBuilder;
+import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
+import org.generationcp.middleware.operation.builder.MethodBuilder;
+import org.generationcp.middleware.operation.builder.NameBuilder;
+import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
+import org.generationcp.middleware.operation.builder.PropertyBuilder;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
+import org.generationcp.middleware.operation.builder.StockBuilder;
+import org.generationcp.middleware.operation.builder.StudyBuilder;
+import org.generationcp.middleware.operation.builder.StudyFactorBuilder;
+import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
+import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
+import org.generationcp.middleware.operation.builder.TermBuilder;
+import org.generationcp.middleware.operation.builder.TraitBuilder;
+import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
+import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
+import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.DataSetDestroyer;
-import org.generationcp.middleware.operation.saver.*;
+import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
+import org.generationcp.middleware.operation.saver.CvTermSaver;
+import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
+import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
+import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
+import org.generationcp.middleware.operation.saver.GeolocationPropertySaver;
+import org.generationcp.middleware.operation.saver.GeolocationSaver;
+import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
+import org.generationcp.middleware.operation.saver.LocdesSaver;
+import org.generationcp.middleware.operation.saver.PhenotypeSaver;
+import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
+import org.generationcp.middleware.operation.saver.ProjectRelationshipSaver;
+import org.generationcp.middleware.operation.saver.ProjectSaver;
+import org.generationcp.middleware.operation.saver.StandardVariableSaver;
+import org.generationcp.middleware.operation.saver.StockSaver;
+import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * The Class DataManager.
@@ -201,6 +235,38 @@ public abstract class DataManager extends DatabaseBroker{
         }
         return toReturn;
     }
+    
+    /**
+     * A generic implementation of the getXXXByXXXX(Database instance) method that calls a specific get method from a DAO.     <br/>
+     * Calls the corresponding method that returns list type as specified in the parameter methodName.     <br/>
+     *      <br/>
+     * Sample usage:     <br/>  
+     * <pre><code>
+     *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+     *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows}, 
+     *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
+     *    }
+     * </code></pre>
+     * @param dao   The DAO to call the method from
+     * @param methodName    The method to call
+     * @param parameters    The parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may add them to this
+     * @param parameterTypes    The types of the parameters passed to the methods
+     * @return the List result
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List getFromInstanceByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
+            throws MiddlewareQueryException {
+        List toReturn = new ArrayList();
+        try {
+            java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+            dao.setSession(getActiveSession());
+            toReturn.addAll((List) method.invoke(dao, parameters));
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
+        }
+        return toReturn;
+    }
 
     /**
      * A generic implementation of the getXXXByXXXX(Database instance) method that calls a specific get method from a DAO.     <br/>
@@ -220,6 +286,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return the List result
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List getFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
