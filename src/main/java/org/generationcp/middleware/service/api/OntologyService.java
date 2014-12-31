@@ -617,4 +617,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException
      */
     List<Scale> getAllInventoryScales() throws MiddlewareQueryException;
+
+    List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
+                throws MiddlewareQueryException;
 }
