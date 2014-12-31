@@ -108,7 +108,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					Integer id = (Integer)row[0]; //project.id
 					String name = (String) row [1]; //project.name
 					String description = (String) row [2]; //project.description
-					folderList.add(new FolderReference(id, name, description));
+					folderList.add(new FolderReference(DmsProject.SYSTEM_FOLDER_ID, id, name, description));
 				}
 			}
 		} catch (HibernateException e) {

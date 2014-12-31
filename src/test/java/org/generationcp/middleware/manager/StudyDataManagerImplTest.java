@@ -12,10 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +20,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.StudyTestDataUtil;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -60,8 +59,10 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -71,14 +72,20 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
     private static final Integer STUDY_ID   = 10010;
     private static final Integer DATASET_ID = 10045;
+    private static final Integer ROOT_STUDY_FOLDER = 1;
 
     private static StudyDataManager manager;
     private static OntologyDataManager ontologyManager;
+    private static Project commonTestProject;
+    private static WorkbenchTestDataUtil workbenchTestDataUtil;
 
     @BeforeClass
     public static void setUp() throws Exception {
         manager = managerFactory.getNewStudyDataManager();
         ontologyManager = managerFactory.getNewOntologyDataManager();
+        workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
+        workbenchTestDataUtil.setUpWorkbench();
+        commonTestProject = workbenchTestDataUtil.getCommonTestProject();
     }
 
     @Test
@@ -236,14 +243,24 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     }
 
     @Test
-    public void testGetRootFolders() throws Exception {
-    	//TODO setup data with programUUID and pass through..
-        List<FolderReference> rootFolders = manager.getRootFolders(Database.CENTRAL, null);
+    public void testGetRootFolders() throws Exception {    	
+    	List<FolderReference> rootFolders = manager.getRootFolders(commonTestProject.getUniqueID());
         assertNotNull(rootFolders);
-        assertTrue(rootFolders.size() > 0);
-        Debug.println(INDENT, "testGetRootFolders(): " + rootFolders.size());
+        assertTrue(rootFolders.isEmpty());
+        
+        StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
+    	String uniqueId = commonTestProject.getUniqueID();
+    	studyTestDataUtil.createFolderTestData(uniqueId);
+    	studyTestDataUtil.createStudyTestData(uniqueId);
+    	
+    	rootFolders = manager.getRootFolders(commonTestProject.getUniqueID());
+        assertNotNull(rootFolders);
+        assertFalse(rootFolders.isEmpty());
+        
+    	Debug.println(INDENT, "testGetRootFolders(): " + rootFolders.size());
         for (FolderReference node : rootFolders) {
             Debug.println(INDENT, "   " + node);
+            assertEquals(node.getParentFolderId(),ROOT_STUDY_FOLDER);
         }
     }
 
@@ -314,9 +331,10 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
         studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-        StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues, null);
-
-        assertTrue(studyRef.getId() < 0);
+        StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues, commonTestProject.getUniqueID());
+        
+        assertNotNull(studyRef.getId());
+        assertTrue(studyRef.getId() != 0);
         Debug.println(INDENT, "testAddStudy(): " + studyRef);
     }
 

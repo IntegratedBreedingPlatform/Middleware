@@ -26,7 +26,6 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 
 import java.util.List;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets
  * from the CHADO schema.
@@ -63,6 +62,8 @@ public interface StudyDataManager{
      */
     int getStudyIdByName(String studyName) throws MiddlewareQueryException;
 
+    
+    List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException;
     /**
      * Returns list of root or top-level folders from specified database.
      *
@@ -70,7 +71,7 @@ public interface StudyDataManager{
      * @return List of Folder POJOs or empty list if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException;
+    List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns list of children of a folder given its ID. Retrieves from central

@@ -20,10 +20,6 @@ public class StudyDestroyer extends Destroyer {
 	}
 
 	public void deleteStudy(int studyId) throws MiddlewareQueryException {
-		if (studyId > 0) {
-			throw new MiddlewareQueryException("Can not delete central study");
-		}
-		
 		DmsProject study = getDmsProjectDao().getById(studyId);
 		renameStudyAndDatasets(study);
 

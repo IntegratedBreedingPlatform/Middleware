@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.StudyTestDataUtil;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -49,9 +50,11 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.utils.test.Debug;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,11 +65,15 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
         
     private static FieldbookService fieldbookService;
     private static DataImportService dataImportService;
+    private static Project commonTestProject;
+    private static WorkbenchTestDataUtil workbenchTestDataUtil;
 
     @BeforeClass
     public static void setUp() throws Exception {
         fieldbookService = managerFactory.getFieldbookMiddlewareService();
         dataImportService = managerFactory.getDataImportService();
+        workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
+        commonTestProject = workbenchTestDataUtil.getCommonTestProject();
     }
 
     @Test
@@ -589,9 +596,10 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     @Test
     public void testDeleteStudy() throws Exception {
     	StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
-    	DmsProject testFolder = studyTestDataUtil.createFolderTestData();
-    	DmsProject testStudy1 = studyTestDataUtil.createStudyTestData();
-    	DmsProject testStudy2 = studyTestDataUtil.createStudyTestDataWithActiveStatus();
+    	String uniqueId = commonTestProject.getUniqueID();
+    	DmsProject testFolder = studyTestDataUtil.createFolderTestData(uniqueId);
+    	DmsProject testStudy1 = studyTestDataUtil.createStudyTestData(uniqueId);
+    	DmsProject testStudy2 = studyTestDataUtil.createStudyTestDataWithActiveStatus(uniqueId);
     	fieldbookService.deleteStudy(testFolder.getProjectId());
     	fieldbookService.deleteStudy(testStudy1.getProjectId());
     	fieldbookService.deleteStudy(testStudy2.getProjectId());
@@ -599,7 +607,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     	boolean folderExists = false;
     	boolean study1Exists = false;
     	boolean study2Exists = false;
-    	List<FolderReference> rootFolders = studyTestDataUtil.getLocalRootFolders();
+    	List<FolderReference> rootFolders = studyTestDataUtil.getLocalRootFolders(uniqueId);
     	for (FolderReference folderReference : rootFolders) {
 			if(folderReference.getId().equals(testFolder.getProjectId())) {
 				folderExists = true;

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
@@ -59,54 +60,19 @@ import org.junit.runners.MethodSorters;
 public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     private static WorkbenchDataManagerImpl manager;
-    
+    private static WorkbenchTestDataUtil workbenchTestDataUtil;
     private static Project commonTestProject;
-    private static User testUser1, testUser2;
-    private static Person testPerson1, testPerson2;
-    private static ProjectActivity testProjectActivity1, testProjectActivity2;
+    private static User testUser1;
+    
 
     @BeforeClass
     public static void setUp() throws MiddlewareQueryException  {
         HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(workbenchSessionUtil.getSessionFactory());
-        manager = new WorkbenchDataManagerImpl(sessionProvider);        
-
-        testPerson1 = createTestPersonData();
-        manager.addPerson(testPerson1);
-        testPerson2 = createTestPersonData();
-        manager.addPerson(testPerson2);
-        
-        testUser1 = createTestUserData();
-        testUser1.setPersonid(testPerson1.getId());
-        manager.addUser(testUser1);
-        testUser2 = createTestUserData();
-        testUser2.setPersonid(testPerson2.getId());
-        manager.addUser(testUser2);
-        
-        commonTestProject = createTestProjectData();
-        commonTestProject.setUserId(testUser1.getUserid());
-        manager.addProject(commonTestProject);
-        
-        testProjectActivity1 = createTestProjectActivityData(commonTestProject, testUser1);
-        manager.addProjectActivity(testProjectActivity1);
-        
-        testProjectActivity2 = createTestProjectActivityData(commonTestProject, testUser2);
-        manager.addProjectActivity(testProjectActivity2);
-        
-        UserInfo userInfo = new UserInfo();
-        userInfo.setUserId(3);
-        userInfo.setLoginCount(5);
-        manager.insertOrUpdateUserInfo(userInfo);
-        
-    	ProjectUserInfo pui =  new ProjectUserInfo();
-    	pui.setProjectId(new Integer(Integer.parseInt(commonTestProject.getProjectId().toString())));
-    	pui.setUserId(commonTestProject.getUserId());
-    	pui.setLastOpenDate(new Date());
-    	manager.saveOrUpdateProjectUserInfo(pui);
-        
-        WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
-        workbenchRuntimeData.setUserId(1);
-        manager.updateWorkbenchRuntimeData(workbenchRuntimeData);
-        
+        manager = new WorkbenchDataManagerImpl(sessionProvider);
+        workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
+        workbenchTestDataUtil.setUpWorkbench();
+        commonTestProject = workbenchTestDataUtil.getCommonTestProject();
+        testUser1 = workbenchTestDataUtil.getTestUser1();
     }
     
     @AfterClass
@@ -116,7 +82,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
   
     @Test
     public void testAddUser() throws MiddlewareQueryException {
-        User user = createTestUserData();
+        User user = workbenchTestDataUtil.createTestUserData();
         Integer result = manager.addUser(user);
         Assert.assertNotNull("Expected id of a newly saved record in workbench_user.", result);
         
@@ -125,23 +91,11 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         manager.deleteUser(readUser);
     }
 
-	private static User createTestUserData() {
-		User user = new User();
-        user.setInstalid(-1);
-        user.setStatus(-1);
-        user.setAccess(-1);
-        user.setType(-1);
-        user.setName("user_test" + new Random().nextInt());
-        user.setPassword("user_password");
-        user.setPersonid(1);
-        user.setAdate(20120101);
-        user.setCdate(20120101);
-		return user;
-	}
+	
 
     @Test
     public void testAddPerson() throws MiddlewareQueryException {
-        Person person = createTestPersonData();
+        Person person = workbenchTestDataUtil.createTestPersonData();
         Integer result = manager.addPerson(person);
         Assert.assertNotNull("Expected id of a newly saved record in persons.", result);
         
@@ -150,46 +104,21 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         manager.deletePerson(readPerson);
     }
 
-	private static Person createTestPersonData() {
-		Person person = new Person();
-        person.setInstituteId(1);
-        person.setFirstName("Test");
-        person.setMiddleName("M");
-        person.setLastName("Person " + new Random().nextInt());
-        person.setPositionName("King of Icewind Dale");
-        person.setTitle("His Highness");
-        person.setExtension("Ext");
-        person.setFax("Fax");
-        person.setEmail("lichking@blizzard.com");
-        person.setNotes("notes");
-        person.setContact("Contact");
-        person.setLanguage(-1);
-        person.setPhone("Phone");
-		return person;
-	}
+	
 
     @Test
     public void testAddProject() throws MiddlewareQueryException {
-        Project project = createTestProjectData();
+        Project project = workbenchTestDataUtil.createTestProjectData();
         manager.addProject(project);
         Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
         manager.deleteProject(project);
     }
 
-	private static Project createTestProjectData() throws MiddlewareQueryException {
-		Project project = new Project();
-        project.setUserId(1);
-        project.setProjectName("Test Project " + new Random().nextInt(10000));
-        project.setStartDate(new Date(System.currentTimeMillis()));
-        project.setCropType(manager.getCropTypeByName(CropType.CropEnum.RICE.toString()));
-        project.setLastOpenDate(new Date(System.currentTimeMillis()));
-		return project;
-	}
-
     @Test
     public void testAddProjectActivity() throws MiddlewareQueryException {
         
-    	ProjectActivity projectActivity = createTestProjectActivityData(commonTestProject, testUser1);
+    	ProjectActivity projectActivity = workbenchTestDataUtil.
+    			createTestProjectActivityData(commonTestProject,testUser1);
 
         Integer result = manager.addProjectActivity(projectActivity);
         Assert.assertNotNull("Expected id of a newly saved record in workbench_project_activity", result);
@@ -682,17 +611,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         Debug.println(INDENT, results.toString());
     }
 
-	private static ProjectActivity createTestProjectActivityData(Project project, User user) {
-		ProjectActivity projectActivity = new ProjectActivity();
-        projectActivity.setProject(project);
-        projectActivity.setName("Project Activity" + new Random().nextInt());
-        projectActivity.setDescription("Some project activity");
-        projectActivity.setUser(user);
-        projectActivity.setCreatedAt(new Date(System.currentTimeMillis()));
-		return projectActivity;
-	}
-
-    @Test
+	@Test
     public void testGetProjectsList() throws MiddlewareQueryException {
     	List<Project> results = manager.getProjects(0, 100);
     	Assert.assertNotNull(results);
@@ -770,7 +689,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testDeletePerson() throws MiddlewareQueryException  {
-        Person person = createTestPersonData();
+        Person person = workbenchTestDataUtil.createTestPersonData();
         manager.addPerson(person);
     	manager.deletePerson(person);
         Debug.println(INDENT, "Record is successfully deleted");
