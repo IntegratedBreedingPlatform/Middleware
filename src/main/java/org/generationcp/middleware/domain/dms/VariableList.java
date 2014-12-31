@@ -128,7 +128,7 @@ public class VariableList implements Serializable{
 	}
 	
 	public int size() {
-		return (variables != null ? variables.size() : 0);
+		return variables != null ? variables.size() : 0;
 	}
 
 	public void print(int indent) {
@@ -137,5 +137,9 @@ public class VariableList implements Serializable{
 				variable.print(indent);
 			}
 		}
+	}
+	
+	public boolean isEmpty() {
+		return variables == null || variables.isEmpty();
 	}
 }
