@@ -175,7 +175,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		 List<Germplasm> germplasmList = getGermplasmDataManager()
 		         .getGermplasmByName(name, 0, 1, Operation.EQUAL);
 		 Integer gid = null;
-		 if(germplasmList != null && germplasmList.size() > 0){
+		 if(germplasmList != null && !germplasmList.isEmpty()){
 			 gid = germplasmList.get(0).getGid();
 		 }
 		 return gid;
@@ -191,14 +191,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
 	@Override
     public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().create(id, StudyType.N);                        
-        return workbook;
+        return getWorkbookBuilder().create(id, StudyType.N);
     }
 
 	@Override
     public Workbook getTrialDataSet(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().create(id, StudyType.T);                        
-        return workbook;
+        return getWorkbookBuilder().create(id, StudyType.T);
     }
 
 	@SuppressWarnings("unchecked")
@@ -257,10 +255,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             		if (NonEditableFactors.find(factor.getTermId()) == null) {
             			for (MeasurementRow row : observations){
 	                        for (MeasurementData field : row.getDataList()){
-	                            if (factor.getName().equals(field.getLabel())){
-	                            	if (factor.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
-	                            		getExperimentPropertySaver().saveOrUpdateProperty(getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
-	                            	} 
+	                            if (factor.getName().equals(field.getLabel()) && 
+	                            		factor.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+	                            	getExperimentPropertySaver().saveOrUpdateProperty(
+	                            			getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
 	                            }
 	                        }
             			}
@@ -274,8 +272,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 	if (deletedVariateIds != null && !deletedVariateIds.isEmpty()
                 			&& deletedVariateIds.contains(variate.getTermId())) {
                 		//skip this was already deleted.
-                	}
-                	else {
+                	} else {
 	                    for (MeasurementRow row : observations){
 	                        for (MeasurementData field : row.getDataList()){
 	                            if (variate.getName().equals(field.getLabel())){
@@ -297,7 +294,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		                                        , field.getValue(), phenotype, field.isCustomCategoricalValue());
 		
 		                                i++;
-		                                if ( i % JDBC_BATCH_SIZE == 0 ) { //flush a batch of inserts and release memory
+		                                if ( i % JDBC_BATCH_SIZE == 0 ) { 
+		                                	//flush a batch of inserts and release memory
 		                                    session.flush();
 		                                    session.clear();
 		                                }
@@ -350,18 +348,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	            Method method = getGermplasmDataManager().getMethodByID(methodId);
                 // filter out generative method types
 	            
-	            if (method!= null) {
-	            	if(filterOutGenerative){
-	    	            if (method.getMtype() == null || !method.getMtype().equals("GEN")) {
-	    	            	 if(method.getGeneq() != null && validMethodClasses.contains(method.getGeneq())){
-	                            methodList.add(method);
-	    	            	 }
-	    	            } 
-	            	}else{
-	            		methodList.add(method);
-	            	}
+	            if (method == null) {
+	            	continue;
 	            }
-	            
+            	if(!filterOutGenerative) { 
+            		methodList.add(method);
+            	} else if((method.getMtype() == null || !method.getMtype().equals("GEN")) &&
+        			method.getGeneq() != null && validMethodClasses.contains(method.getGeneq())) {
+        			methodList.add(method);
+        		}
 	        }
 	        
 	        Collections.sort(methodList, new Comparator<Method>(){
@@ -425,7 +420,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                                 .getGermplasmByName(germplasm.getPreferredName()
                                         .getNval(), 0, 1, Operation.EQUAL);
                         
-                        if (germplasmsFound.size() > 0){
+                        if (!germplasmsFound.isEmpty()){
                             germplasmFound = germplasmsFound.get(0);
                         }
                     } 
@@ -458,7 +453,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 getGermplasmListDataDAO().save(germplasmListData);
 
                 i++;
-                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
+                if ( i % JDBC_BATCH_SIZE == 0 ) {  
+                	//flush a batch of inserts and release memory
                     session.flush();
                     session.clear();
                 }
@@ -488,7 +484,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         if (names == null || names.isEmpty()) {
             names = getByGidAndNtype(gid, GermplasmNameType.UNRESOLVED_NAME);
         }
-        return (names != null && !names.isEmpty() ? names.get(0).getNval() : null);
+        return names != null && !names.isEmpty() ? names.get(0).getNval() : null;
     }
     
     private List<Name> getByGidAndNtype(int gid, GermplasmNameType nType) throws MiddlewareQueryException {
@@ -499,7 +495,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException{
         List<GermplasmList> germplasmLists = getGermplasmListManager()
                 .getGermplasmListByName(name, 0, 1, Operation.EQUAL, Database.LOCAL);
-        if (germplasmLists.size() > 0){
+        if (!germplasmLists.isEmpty()){
             return germplasmLists.get(0);
         } 
         return null;
@@ -584,7 +580,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	Set<Integer> variableIds = new HashSet<Integer>();
     	
     	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
-    	if (propertyIds != null && propertyIds.size() > 0) {
+    	if (propertyIds != null && !propertyIds.isEmpty()) {
     	        Set<Integer> propertyVariableList = new HashSet<Integer>(); 
     	        createPropertyList(propertyVariableList, propertyIds, Database.LOCAL);
     	        filterByProperty(variableIds, propertyVariableList, isRemoveProperties);
@@ -643,7 +639,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                         inList = true;
                     }
                 }
-                if (inList == false) {
+                if (!inList) {
                     iter.remove();
                 }
             }
@@ -651,8 +647,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     public Workbook getStudyVariableSettings(int id, boolean isNursery)  throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().createStudyVariableSettings(id, isNursery);                        
-        return workbook;
+        return getWorkbookBuilder().createStudyVariableSettings(id, isNursery);
     }
 
 	@Override
@@ -1074,7 +1069,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         
             trans.commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(),e);
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with saveOrUpdateListDataProject(): " + e.getMessage(), e, LOG);
         }
