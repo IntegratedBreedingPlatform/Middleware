@@ -33,8 +33,8 @@ public class InventoryServiceImpl extends Service implements InventoryService {
     
     private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
-    public InventoryServiceImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-        super(sessionProviderForLocal, localDatabaseName);
+    public InventoryServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
+        super(sessionProvider, localDatabaseName);
     }
 
 	@Override

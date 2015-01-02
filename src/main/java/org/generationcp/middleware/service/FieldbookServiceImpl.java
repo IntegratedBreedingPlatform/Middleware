@@ -48,8 +48,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 	
-    public FieldbookServiceImpl(HibernateSessionProvider sessionProviderForLocal, String localDatabaseName) {
-        super(sessionProviderForLocal, localDatabaseName);
+    public FieldbookServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
+        super(sessionProvider, localDatabaseName);
     }
 
     @Override

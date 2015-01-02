@@ -26,8 +26,8 @@ import java.util.Set;
 
 public class OntologyServiceImpl extends Service implements OntologyService {
     
-    public OntologyServiceImpl(HibernateSessionProvider sessionProviderForLocal) {
-        super(sessionProviderForLocal);
+    public OntologyServiceImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
     /*======================= STANDARD VARIABLE ================================== */
