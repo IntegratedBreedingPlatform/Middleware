@@ -488,11 +488,11 @@ public interface FieldbookService {
     /**
      * Returns list of root or top-level folders from specified database.
      *
-     * @param instance Can be CENTRAL or LOCAL
+     * @param programUUID program's unique id
      * @return List of Folder POJOs or empty list if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException;
+    List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns list of children of a folder given its ID. Retrieves from central
