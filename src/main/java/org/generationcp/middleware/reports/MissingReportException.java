@@ -1,6 +1,8 @@
 package org.generationcp.middleware.reports;
 
-public class MissingReportException extends Exception {
+import org.generationcp.middleware.exceptions.MiddlewareException;
+
+public class MissingReportException extends MiddlewareException {
 
 	private static final long serialVersionUID = 1L;
 	private String key;
@@ -11,6 +13,7 @@ public class MissingReportException extends Exception {
 	}
 	
 	public MissingReportException(String key) {
+		super(key);
 		this.key = key;
 	}
 }

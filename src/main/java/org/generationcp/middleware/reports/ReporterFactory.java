@@ -64,7 +64,7 @@ public final class ReporterFactory {
 	 */
 	private void addReporter(Reporter report) {
 		if(reportersMap.containsKey(report.getReportCode()))
-			err.println("WARNINIG - ReporterFactory: overwriting report with code: "+report.getReportCode());
+			err.println("WARNINIG - ReporterFactory: overwriting existing report with code: "+report.getReportCode());
 		
 		reportersMap.put(report.getReportCode(), report);
 	}
@@ -82,6 +82,10 @@ public final class ReporterFactory {
 			return reportersMap.get(reportKey).createReporter();
 		
 		throw new MissingReportException(reportKey);
+	}
+	
+	public Set<String> getReportKeys(){
+		reportersMap.keySet();
 	}
 
 }
