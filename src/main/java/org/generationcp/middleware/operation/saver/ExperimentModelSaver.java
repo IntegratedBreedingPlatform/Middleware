@@ -133,7 +133,7 @@ public class ExperimentModelSaver extends Saver {
 			int id = getExperimentPropertyDao().getNextId("ndExperimentpropId");
 			for (Variable variable : factors.getVariables()) {
 				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-					addProperty(experimentModel, variable, id--);
+					addProperty(experimentModel, variable, id++);
 				}
 			}
 		}

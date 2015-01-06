@@ -81,7 +81,7 @@ public class StockSaver extends Saver {
 					stockModel = getStockObject(stockModel);
 					StockProperty stockProperty = getStockProperty(stockModel, variable);
 					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {
-						addProperty(stockModel, createProperty(propertyIndex--, variable));
+						addProperty(stockModel, createProperty(propertyIndex++, variable));
 					}			
 				} else {
 					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: " + variable.getVariableType().getId());
