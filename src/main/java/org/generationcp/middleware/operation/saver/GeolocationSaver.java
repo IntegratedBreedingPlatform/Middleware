@@ -100,7 +100,7 @@ public class GeolocationSaver extends Saver {
 					
 				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation, locationId);
-					addProperty(geolocation, createOrUpdateProperty(propertyIndex--, variable, geolocation));
+					addProperty(geolocation, createOrUpdateProperty(propertyIndex++, variable, geolocation));
 				
 				} else if (TermId.OBSERVATION_VARIATE.getId() == storedInId || TermId.CATEGORICAL_VARIATE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation, locationId);
