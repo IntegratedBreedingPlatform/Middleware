@@ -415,10 +415,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Transaction trans = null;
         
         Term term = findTermByName(name, cvId);
-        if (term != null && term.getId() >= 0) {
-            throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_UPDATE.getCode(), "The term you entered is invalid");
-        }
-
+        
         try {
             trans = session.beginTransaction();
             term = saveOrUpdateCvTerm(name, definition, cvId);
@@ -438,17 +435,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Session session = getCurrentSession();
         Transaction trans = null;
 
-        Term term = findTermByName(name, cvId);
-        if (term != null && term.getId() >= 0 && cvId.getId() != CvId.PROPERTIES.getId()) {
-            throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_UPDATE.getCode(), "The term you entered is invalid");
-        }
-
+        Term term = findTermByName(name, cvId);        
+        
         try {
             trans = session.beginTransaction();
-            if (term == null) {
-                term = saveOrUpdateCvTerm(name, definition, cvId);
-                saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
-            }
+            term = saveOrUpdateCvTerm(name, definition, cvId);
+            saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
+            
             if (cropOntologyId != null) {
                 getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
             }
@@ -513,11 +506,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             if(cvRelationship == null){
                 getTermRelationshipSaver().save(subjectId, typeId, objectId);
 			// update the existing relationship
-            }else{
-                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
-                    throw new MiddlewareException("Error in saveOrUpdateCvTermRelationship: Relationship found in central - cannot be updated.");
-                }
-
+            }else{                
                 cvRelationship.setObjectId(objectId);
                 getTermRelationshipSaver().saveOrUpdateRelationship(cvRelationship);
             }

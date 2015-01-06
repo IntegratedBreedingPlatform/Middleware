@@ -365,7 +365,9 @@ public class StandardVariableSaver extends Saver {
         }
         
         if (cropOntologyId == null || "".equals(cropOntologyId)) {
-            getCvTermPropertyDao().makeTransient(cropOntologyProperty);
+        	if(cropOntologyProperty != null){
+        		getCvTermPropertyDao().makeTransient(cropOntologyProperty);
+        	}
             return;
         }
 
@@ -406,11 +408,7 @@ public class StandardVariableSaver extends Saver {
         Term typeTerm = getTermBuilder().get(typeId);
         if (typeTerm != null) {
             CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
-            if(cvRelationship != null){ 
-                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
-                    throw new MiddlewareException("Error in deleteCvTermRelationship: Relationship found in central - cannot be deleted.");
-                }
-    
+            if(cvRelationship != null){     
                 CVTermRelationshipDao dao = getCvTermRelationshipDao();
                 try {
                     dao.makeTransient(cvRelationship);
