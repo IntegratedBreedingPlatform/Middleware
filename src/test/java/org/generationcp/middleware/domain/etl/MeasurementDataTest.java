@@ -49,6 +49,17 @@ public class MeasurementDataTest {
 	}
 	
 	@Test
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndValueMarkedMissing(){
+		MeasurementData data = Mockito.spy(new MeasurementData());
+		MeasurementVariable var = new MeasurementVariable();
+		var.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
+		var.setPossibleValues(new ArrayList<ValueReference>());
+		data.setMeasurementVariable(var);
+		Mockito.doReturn(MeasurementData.MISSING_VALUE).when(data).getDisplayValue();
+		Assert.assertFalse("Should return false since value is marked as missing", data.isCategoricalDisplayAcceptedValidValues());
+	}
+	
+	@Test
 	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndDisplayValueIsMatching(){
 		MeasurementData data = Mockito.spy(new MeasurementData());
 		MeasurementVariable var = new MeasurementVariable();
