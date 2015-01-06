@@ -258,7 +258,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
         List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
         List<DartValues> dartValueList = new ArrayList<DartValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
             
         	mappingRecords = createMappingRecords();
@@ -285,7 +285,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
             dartValues.setMarkerId(marker.getMarkerId());
             dartValueList.add(dartValues);
 
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setDart(dataset, datasetUser, markers, markerMetadataSets, 
@@ -328,7 +328,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
         List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
         List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
 
             mappingRecords = createMappingRecords();
@@ -352,7 +352,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
             alleleValues.setGid(accMetadataSet.getGermplasmId());
             alleleValueList.add(alleleValues);
             
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setSSR(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, alleleValueList);
@@ -394,7 +394,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
         List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
         List<CharValues> charValueList = new ArrayList<CharValues>();
 
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
         	
             mappingRecords = createMappingRecords();
@@ -418,7 +418,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
             charValues.setGid(accMetadataSet.getGermplasmId());
             charValueList.add(charValues);
 
-            id--;
+            id++;
         }
         
         Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, charValueList);
@@ -476,7 +476,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
         List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
         List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
 
             mappingRecords = createMappingRecords();
@@ -500,7 +500,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
             mappingPopValues.setGid(accMetadataSet.getGermplasmId());
             mappingPopValueList.add(mappingPopValues);
 
-            id--;
+            id++;
         }
         
         Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, markers, 
@@ -545,7 +545,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
         List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
         List<CharValues> charValueList = new ArrayList<CharValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
             
         	mappingRecords = createMappingRecords();
@@ -574,7 +574,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
             charValues.setGid(accMetadataSet.getGermplasmId());
             charValueList.add(charValues);
             
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, 
@@ -622,7 +622,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
         List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
         List<DartValues> dartValueList = new ArrayList<DartValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
             
         	mappingRecords = createMappingRecords();
@@ -655,7 +655,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
             dartValues.setMarkerId(marker.getMarkerId());
             dartValueList.add(dartValues);
 
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, markers, 

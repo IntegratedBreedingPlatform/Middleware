@@ -94,26 +94,26 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
     }
 
     protected void insertSampleMarkerData() throws Exception {
-        int i = -1;
+        int i = 1;
         for (int markerId : SAMPLE_SELECTED_MARKER_IDS) {
             executeUpdate("INSERT INTO mbdt_selected_markers VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + markerId + ")");
-            i--;
+            i++;
         }
     }
 
     protected void insertSampleAccessionData() throws Exception {
-        int i = -1;
+        int i = 1;
         for (int sampleSelectedAccessionGid : SAMPLE_SELECTED_ACCESSION_GIDS) {
             executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'SR')");
-            i--;
+            i++;
         }
     }
 
     protected void insertSampleParentData() throws Exception {
-        int i = -1;
+        int i = 1;
         for (int sampleSelectedAccessionGid : SAMPLE_PARENT_GIDS) {
             executeUpdate("INSERT INTO mbdt_selected_genotypes VALUES(" + i + ", " + SAMPLE_GENERATION_ID + ", " + sampleSelectedAccessionGid + ", 'D')");
-            i--;
+            i++;
         }
     }
 

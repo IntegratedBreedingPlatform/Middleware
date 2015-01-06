@@ -2464,7 +2464,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             	mtaMetadata.setDatasetID(dataset.getDatasetId());
             	mtaMetadataDao.merge(mtaMetadata);
 
-            	id--;
+            	id++;
             	
             	rowsSaved++;
 	            if (rowsSaved % (JDBC_BATCH_SIZE) == 0){
@@ -2717,7 +2717,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             	
             	if (marker.getMarkerId() == null){
             		marker.setMarkerId(markerGeneratedId);
-                    markerGeneratedId--;
+                    markerGeneratedId++;
             	}
                 markerDao.merge(marker);
                 
@@ -2989,7 +2989,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         for (CharValues charValues : charValuesList){
         	if (charValues.getAcId() == null){
         		charValues.setAcId(generatedId);
-                generatedId--;
+                generatedId++;
         	}
             charValuesDao.merge(charValues);
             
@@ -3037,7 +3037,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         for (MappingPopValues mappingPopValues : mappingPopValuesList){
         	if (mappingPopValues.getMpId() == null){
         		mappingPopValues.setMpId(generatedId);
-                generatedId--;
+                generatedId++;
         	}
             mappingPopValuesDao.merge(mappingPopValues);
             
@@ -3062,7 +3062,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         for (AlleleValues alleleValues : alleleValuesList){
         	if (alleleValues.getAnId() == null){
 	    		alleleValues.setAnId(generatedId);
-	    		generatedId--;
+	    		generatedId++;
         	}
             alleleValuesDao.merge(alleleValues);
             
@@ -3090,7 +3090,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         for (DartValues dartValues : dartValuesList){
         	if (dartValues.getAdId() == null){
         		dartValues.setAdId(generatedId);
-                generatedId--;
+                generatedId++;
         	}
             dartValuesDao.merge(dartValues);
             
