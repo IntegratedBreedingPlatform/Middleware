@@ -85,7 +85,7 @@ public final class ReporterFactory {
 	}
 	
 	public Set<String> getReportKeys(){
-		reportersMap.keySet();
+		return reportersMap.keySet();
 	}
 
 }

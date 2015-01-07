@@ -1,5 +1,6 @@
 package org.generationcp.middleware.reports;
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -13,6 +14,7 @@ import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
+import net.sf.jasperreports.engine.JasperExportManager;
 
 /**
  * Defines the base class for all Reporters. Each reporter pretending to
@@ -25,6 +27,7 @@ abstract class AbstractReporter implements Reporter{
 	private String fileNameExpr = getReportCode()+"-{tid}";
 	private String fileName = null;
 	private Pattern fileNameParamsPattern = Pattern.compile("\\{[\\w-_]*\\}");
+	private JasperPrint jrPrint;
 	
 	@Override
 	public String toString(){
@@ -49,10 +52,30 @@ abstract class AbstractReporter implements Reporter{
 			
 		}
 					
-		JasperPrint jrPrint = JasperFillManager.fillReport(jasperFilesPath, jrParams, jrDataSource);
+		jrPrint = JasperFillManager.fillReport(jasperFilesPath, jrParams, jrDataSource);
 
 		return jrPrint;
 	}
+	
+	private String buildOutputFileName(Map<String,Object> jrParams){
+		String fileName = this.fileNameExpr;
+		
+		
+		Matcher paramsMatcher = fileNameParamsPattern.matcher(this.fileNameExpr);
+		
+		 while (paramsMatcher.find()) {
+			 String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
+			 
+			 if(null == jrParams || null == jrParams.get(paramName)){
+				 fileName = fileName.replace(paramsMatcher.group(), "");
+			 }else{
+				 fileName = fileName.replace(paramsMatcher.group(), jrParams.get(paramName).toString());
+			 }
+		 }
+		
+		return fileName;
+	}
+
 	
 	/**
 	 * Returns a Map with the parameters required for creating a JasperPrint for this Reporter.
@@ -60,8 +83,9 @@ abstract class AbstractReporter implements Reporter{
 	 * subclasses extending AbstractReporter may add extra parameters to fill in its particular template.
 	 * @return Map of parameters for a JarperPrint 
 	 */
+
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 
 		if(args.containsKey("datePattern"))
 			params.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, args.get("datePattern"));
@@ -109,23 +133,15 @@ abstract class AbstractReporter implements Reporter{
 		return fileName;
 	}
 	
-	private String buildOutputFileName(Map<String,Object> jrParams){
-		String fileName = this.fileNameExpr;
-		
-		
-		Matcher paramsMatcher = fileNameParamsPattern.matcher(this.fileNameExpr);
-		
-		 while (paramsMatcher.find()) {
-			 String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
-			 
-			 if(null == jrParams || null == jrParams.get(paramName)){
-				 fileName = fileName.replace(paramsMatcher.group(), "");
-			 }else{
-				 fileName = fileName.replace(paramsMatcher.group(), jrParams.get(paramName).toString());
-			 }
-		 }
-		
-		return fileName;
+	public void asOutputStream(OutputStream output) throws BuildReportException{
+		if(null != jrPrint)
+			try {
+				JasperExportManager.exportReportToPdfStream(jrPrint, output);
+			} catch (JRException e) {
+				e.printStackTrace();
+				throw new BuildReportException(getReportCode());
+			}
+		else throw new BuildReportException(getReportCode());
 	}
 
 }

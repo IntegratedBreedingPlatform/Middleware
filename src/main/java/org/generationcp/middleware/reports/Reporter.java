@@ -1,5 +1,6 @@
 package org.generationcp.middleware.reports;
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -74,5 +75,12 @@ public interface Reporter {
 	 * @return the constructed file name
 	 */
 	String getFileName();
+
+	
+	/**
+	 * Sends the file to the specified output stream. It helps define the format the report is generated to.
+	 * @param output Out where the report has to be sent. This can be a servlet, file or any other output stream.
+	 */
+	void asOutputStream(OutputStream output) throws BuildReportException;
 
 }
