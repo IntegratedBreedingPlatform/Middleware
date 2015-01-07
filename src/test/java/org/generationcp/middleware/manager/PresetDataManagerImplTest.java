@@ -34,9 +34,9 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 
 		ProgramPreset results = manager.saveOrUpdateProgramPreset(preset);
 
-		assertTrue("we retrieve the saved primary id", results.getProgramPresetsId() > 0);
+		assertTrue("we retrieve the saved primary id", results.getProgramPresetId() > 0);
 
-		Integer id = results.getProgramPresetsId();
+		Integer id = results.getProgramPresetId();
 
 		// test retrieve from database using id
 		ProgramPreset retrievedResult = manager.getProgramPresetById(id);
@@ -64,7 +64,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		}
 
 		for (ProgramPreset p : fullList) {
-			manager.deleteProgramPreset(p.getProgramPresetsId());
+			manager.deleteProgramPreset(p.getProgramPresetId());
 		}
 	}
 
@@ -84,7 +84,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		}
 
 		for (ProgramPreset p : fullList) {
-			manager.deleteProgramPreset(p.getProgramPresetsId());
+			manager.deleteProgramPreset(p.getProgramPresetId());
 		}
 
 	}
@@ -108,7 +108,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		}
 
 		for (ProgramPreset p : fullList) {
-			manager.deleteProgramPreset(p.getProgramPresetsId());
+			manager.deleteProgramPreset(p.getProgramPresetId());
 		}
 
 	}

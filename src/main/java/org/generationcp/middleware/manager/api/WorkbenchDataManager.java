@@ -993,6 +993,10 @@ public interface WorkbenchDataManager {
 	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId,
 			String toolSection) throws MiddlewareQueryException;
 
+	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName,
+			int toolId,
+			String toolSection) throws MiddlewareQueryException;
+
 	/**
 	 * save or update a standard preset
 	 *

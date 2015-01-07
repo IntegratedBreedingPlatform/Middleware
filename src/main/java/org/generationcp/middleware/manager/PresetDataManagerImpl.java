@@ -101,6 +101,32 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	}
 
 	@Override
+	public List<ProgramPreset> getProgramPresetFromProgramAndToolByName(String presetName,int programId, int toolId,
+			String toolSection)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+
+		try {
+			Criteria criteria = getCurrentSessionForLocal().createCriteria(ProgramPreset.class);
+
+			criteria.add(Restrictions.eq("programUuid", programId));
+			criteria.add(Restrictions.eq("toolId", toolId));
+			criteria.add(Restrictions.eq("toolSection", toolSection));
+			criteria.add(Restrictions.like("name",presetName));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId="
+							+ programId + "): "
+							+ e.getMessage(), e);
+		}
+
+		return new ArrayList<ProgramPreset>();
+	}
+
+
+	@Override
 	public ProgramPreset saveOrUpdateProgramPreset(ProgramPreset programPreset)
 			throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();

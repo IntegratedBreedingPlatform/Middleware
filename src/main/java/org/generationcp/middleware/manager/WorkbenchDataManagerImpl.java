@@ -1757,6 +1757,30 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId,
+			String toolSection) throws MiddlewareQueryException {
+
+		try {
+			Criteria criteria = getCurrentSession().createCriteria(StandardPreset.class);
+
+			criteria.add(Restrictions.eq("cropName", cropName));
+			criteria.add(Restrictions.eq("toolId", toolId));
+			criteria.add(Restrictions.eq("toolSection", toolSection));
+	 		criteria.add(Restrictions.like("name",presetName));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName="
+							+ cropName + "): "
+							+ e.getMessage(), e);
+		}
+
+		return new ArrayList<StandardPreset>();
+	}
+
+
+	@Override
 	public StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset)
 			throws MiddlewareQueryException {
 
