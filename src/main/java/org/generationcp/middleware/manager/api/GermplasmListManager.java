@@ -557,6 +557,15 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException
      */
     List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;    
+
+    /**
+     * Search for germplasm lists given a search term Q
+     * @param q string
+     * @param o operation 
+     * @return - List of germplasm lists
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException;
     
     /**
      * Search for germplasm lists given a search term Q
@@ -566,6 +575,7 @@ public interface GermplasmListManager{
      * @return - List of germplasm lists
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException;
     
     

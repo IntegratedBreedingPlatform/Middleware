@@ -196,7 +196,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
         	params.put("numOfRows",5000);
         }
-        params.put("searchPublicData",1);
         
 		return getNameDao().
 				callStoredProcedureForList("searchGermplasmByName",
@@ -236,7 +235,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
         	params.put("numOfRows",5000);
         }
-        params.put("searchPublicData",1);
         
 		return getNameDao().
 				callStoredProcedureForList("searchGermplasmByName",
@@ -1864,7 +1862,87 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException{
     	return getLocationDao().getLocationNamesMapByGIDs(gids);
     }
+    
+    @Override
+    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents)
+            throws MiddlewareQueryException{
+    	//revised logic from GermplasmDAO.searchForGermplasms
+    	
+    	q = q.trim();
+        if(q.equals("")){
+            return new ArrayList<Germplasm>();
+        }
+        
+        Set<Germplasm> result = new LinkedHashSet<Germplasm>();
+    	
+        String searchType;
+        if(o.equals(Operation.EQUAL)){
+        	searchType = "EQUAL";
+        }
+        else{
+        	searchType = "LIKE";
+        }
+        
+        Map<String,Object> params = null;
+        //search by gid
+        if(q.matches("\\d+") || q.matches("-\\d+")) {
+        	params = new LinkedHashMap<String,Object>();
+			params.put("central_db_name", databaseName);
+			params.put("gid",q);
+			params.put("searchType", searchType);
+			List<Germplasm> germplasmsByGid = getGermplasmListDataDAO().
+					callStoredProcedureForList("searchGermplasmByID",
+							params,Germplasm.class);
+			if(germplasmsByGid!=null) {
+				result.addAll(germplasmsByGid);
+			}
+        }
+		//search by name
+		params = new LinkedHashMap<String,Object>();
+		params.put("central_db_name", databaseName);
+		List<String> names = GermplasmDataManagerUtil.createNamePermutations(q);
+        String originalName = names.get(0);
+        String standardizedName = names.get(1);
+        String noSpaceName = names.get(2);        
+		params.put("name",originalName);
+		params.put("altName",standardizedName);
+		params.put("altName2",noSpaceName);
+		params.put("searchType", searchType);
+		params.put("status", null);
+		params.put("type", null);
+		params.put("start", 0);
+		params.put("numOfRows", 5000);
+		List<Germplasm> germplasmsByName = getGermplasmListDataDAO().
+				callStoredProcedureForList("searchGermplasmByName",
+						params,Germplasm.class);
+		if(germplasmsByName!=null) {
+			result.addAll(germplasmsByName);
+		}
+		
+		//Add parents to results if specified by "includeParents" flag
+        if(includeParents){
+        	List<Integer> parentGids = new ArrayList<Integer>();
+            for(Germplasm g: result){
+                if(g!=null && g.getGpid1()!=null && g.getGpid1()!=0) {
+                    parentGids.add(g.getGpid1());
+                }
+                if(g!=null && g.getGpid2()!=null && g.getGpid2()!=0) {
+                    parentGids.add(g.getGpid2());
+                }
+            }
+            if(parentGids.size()>0){
+            	for (Integer gid : parentGids) {
+            		result.add(getGermplasmByGID(gid));
+				}
+            }
+        }
+		if(!result.isEmpty()) {
+			return new ArrayList<Germplasm>(result);
+		}
+        return new ArrayList<Germplasm>();
+    }
 
+    @Deprecated
     @Override
     public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData)
             throws MiddlewareQueryException{
@@ -1915,7 +1993,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		params.put("type", null);
 		params.put("start", 0);
 		params.put("numOfRows", 5000);
-		params.put("searchPublicData",searchPublicData?1:0);
 		List<Germplasm> germplasmsByName = getGermplasmListDataDAO().
 				callStoredProcedureForList("searchGermplasmByName",
 						params,Germplasm.class);
