@@ -269,7 +269,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
         	params.put("type",null);
         }
-        params.put("searchPublicData",1);
         
         return getNameDao().
 				callStoredProcedureForObject("countGermplasmByName",
@@ -300,8 +299,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		params.put("status",null);
         params.put("type",null);
         
-		params.put("searchPublicData",1);
-
         return getNameDao().
 				callStoredProcedureForObject("countGermplasmByName",
 						params,Long.class);
