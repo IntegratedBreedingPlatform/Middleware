@@ -113,6 +113,22 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 
 	}
 
+	@Test
+	public void testGetProgramPresetFromProgramAndToolByName() throws Exception {
+		List<ProgramPreset> fullList = initializeProgramPresets();
+
+		// this should exists
+		List<ProgramPreset> result = manager.getProgramPresetFromProgramAndToolByName("configuration_1_1",1,1,"tool_section_1");
+
+		assertTrue("result should not be empty", result.size() > 0);
+		assertEquals("Should return the same name","configuration_1_1",result.get(0).getName());
+
+		// cleanup
+		for (ProgramPreset p : fullList) {
+			manager.deleteProgramPreset(p.getProgramPresetId());
+		}
+	}
+
 	protected List<ProgramPreset> initializeProgramPresets() throws MiddlewareQueryException {
 		List<ProgramPreset> fullList = new ArrayList<ProgramPreset>();
 

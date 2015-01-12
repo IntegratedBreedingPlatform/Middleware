@@ -1063,6 +1063,23 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         }
     }
 
+    @Test
+    public void testGetStandardPresetFromProgramAndToolByName() throws Exception {
+        List<StandardPreset> fullList = initializeStandardPresets();
+
+        // this should exists
+        List<StandardPreset> result = manager.getStandardPresetFromCropAndToolByName(
+                "configuration_1_1", "crop_name_1", 1, "tool_section_1");
+
+        assertTrue("result should not be empty", result.size() > 0);
+        assertEquals("Should return the same name","configuration_1_1",result.get(0).getName());
+
+        // cleanup
+        for (StandardPreset p : fullList) {
+            manager.deleteStandardPreset(p.getStandardPresetId());
+        }
+    }
+
 
     protected List<StandardPreset> initializeStandardPresets() throws MiddlewareQueryException {
         List<StandardPreset> fulllist = new ArrayList<StandardPreset>();
