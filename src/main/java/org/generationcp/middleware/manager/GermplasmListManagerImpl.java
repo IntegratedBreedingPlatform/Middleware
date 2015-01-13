@@ -11,6 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
@@ -25,8 +31,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this
@@ -53,6 +57,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         return getGermplasmListDAO().getById(id, false);
     }
 
+    @Override
+    public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows) throws MiddlewareQueryException {
+    	return getFromInstanceByMethod(getGermplasmListDAO(),"getAllExceptDeleted", 
+    				new Object[] {start,  numOfRows}, new Class[] {Integer.TYPE, Integer.TYPE});
+    }
+    
+    @Deprecated
     @Override
     public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
     	return getFromInstanceByMethod(getGermplasmListDAO(), instance, "getAllExceptDeleted", 
@@ -83,6 +94,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     				new Class[] {String.class, Operation.class, Integer.TYPE, Integer.TYPE});
     }
 
+    @Override
+    public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException {
+        return getGermplasmListDAO().countByName(name, operation);
+    }
+    
+    @Deprecated
     @Override
     public long countGermplasmListByName(String name, Operation operation, Database instance) throws MiddlewareQueryException {
         return getGermplasmListDAO().countByName(name, operation);

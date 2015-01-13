@@ -11,6 +11,8 @@ o * Copyright (c) 2012, All Rights Reserved.
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -19,8 +21,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
-
-import java.util.List;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -48,12 +48,28 @@ public interface GermplasmListManager{
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
+     * 
+     * @return List of GermplasmList POJOs
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> getAllGermplasmLists(int start, int numOfRows) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns all Germplasm list records.
+     * 
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * 
      * @return List of GermplasmList POJOs
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     /**
@@ -108,10 +124,21 @@ public interface GermplasmListManager{
      * 
      * @param name
      * @param operation can be Operation.EQUAL or Operation.LIKE
+     * @return The count of Germplasm lists based on the given name and operation
+     */
+    long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the number of Germplasm List records with names matching the given parameter.
+     * 
+     * @param name
+     * @param operation can be Operation.EQUAL or Operation.LIKE
      * @param database
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return The count of Germplasm lists based on the given name and operation
      */
+    @Deprecated
     long countGermplasmListByName(String name, Operation operation, Database database) throws MiddlewareQueryException;
 
     /**
