@@ -265,7 +265,7 @@
 						<include>**/UserDataManagerImplTest.java</include>
 						<include>**/CrossStudyDataManagerImplTest.java</include>
 						<include>**/GermplasmDataManagerUtilTest.java</include>
-						<include>**/OntologyDataManagerTest.java</include>
+						<include>**/OntologyDataManagerImplTest.java</include>
 						<include>**/WorkbenchDataManagerImplTest.java</include>
 					</includes>
 				</configuration>
