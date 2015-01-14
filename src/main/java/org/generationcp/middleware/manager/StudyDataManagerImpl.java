@@ -1131,4 +1131,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyType getStudyType(int studyId) throws MiddlewareQueryException {
 		return getDmsProjectDao().getStudyType(studyId);
 	}
+	
+	@Override
+	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException {
+		List<Integer> projectIds = getDmsProjectDao().getAllProgramStudiesAndFolders(programUUID);
+		Session session = getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+        	trans = session.beginTransaction(); 
+        	for (Integer projectId : projectIds) {
+        		getStudyDestroyer().deleteStudy(projectId);
+        	}    
+        	trans.commit();
+        } catch (Exception e) {
+             rollbackTransaction(trans);
+             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
+        }
+        
+	}
 }

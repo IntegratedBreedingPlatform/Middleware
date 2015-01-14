@@ -40,6 +40,7 @@ import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.DataSetDestroyer;
+import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
@@ -704,5 +705,9 @@ public abstract class DataManager extends DatabaseBroker{
 
     protected final NameBuilder getNameBuilder() {
         return new NameBuilder(sessionProvider);
+    }
+    
+    protected final StudyDestroyer getStudyDestroyer() {
+    	return new StudyDestroyer(sessionProvider);
     }
 }

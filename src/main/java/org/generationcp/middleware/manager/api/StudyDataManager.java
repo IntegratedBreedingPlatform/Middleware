@@ -780,4 +780,11 @@ public interface StudyDataManager{
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
 	public StudyType getStudyType(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Soft-delete all program studies
+	 * @param programUUID Program UUID of the studies to be deleted
+	 * @throws MiddlewareQueryException if any error occurs during data access.
+	 */
+	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException;
 }

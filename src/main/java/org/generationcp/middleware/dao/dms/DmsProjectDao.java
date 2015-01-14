@@ -95,6 +95,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	        + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() 
 	        ;
 	
+	private static final String GET_ALL_PROGRAM_STUDIES_AND_FOLDERS =
+			"SELECT pr.subject_project_id "
+			+ "FROM project_relationship pr, project p "
+			+ "WHERE pr.type_id = "  + TermId.IS_STUDY.getId() + " "
+			+ "AND pr.subject_project_id = p.project_id "
+			+ "AND p.program_uuid = :program_uuid "
+			+ "AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() + " "
+			+ "AND pp.project_id = p.project_id AND pp.value = " +TermId.DELETED_STUDY.getId()+") "
+			+ "UNION SELECT pr.subject_project_id "
+			+ "FROM project_relationship pr, project p "
+			+ "WHERE pr.type_id = "  + TermId.HAS_PARENT_FOLDER.getId() + " "
+			+ "AND pr.subject_project_id = p.project_id "
+			+ "AND p.program_uuid = :program_uuid ";
+	
 	public List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException{
 		
 		List<FolderReference> folderList = new ArrayList<FolderReference>();
@@ -909,8 +923,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         }
         return folders;
     }
-
 	
+	public List<Integer> getAllProgramStudiesAndFolders(String programUUID) throws MiddlewareQueryException {
+		List<Integer> projectIds = null;
+		try {
+			SQLQuery query = getSession().createSQLQuery(GET_ALL_PROGRAM_STUDIES_AND_FOLDERS);
+			query.setParameter("program_uuid", programUUID);
+			projectIds =  (List<Integer>) query.list();
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getAllProgramStudiesAndFolders, query at DmsProjectDao: " + e.getMessage(), e);
+        }
+        return projectIds;
+	}
 	
 	public List<ValueReference> getDistinctProjectNames() throws MiddlewareQueryException {
 		List<ValueReference> results = new ArrayList<ValueReference>();

@@ -1302,4 +1302,30 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
     }
+    
+    @Test 
+    public void testDeleteProgramStudies() {
+    	StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
+    	String uniqueId = commonTestProject.getUniqueID();
+    	try {
+			studyTestDataUtil.createFolderTestData(uniqueId);
+			studyTestDataUtil.createStudyTestData(uniqueId);
+	    	studyTestDataUtil.createStudyTestDataWithActiveStatus(uniqueId);
+	    	
+	    	List<FolderReference> programStudiesAndFolders = 
+	    			studyTestDataUtil.getLocalRootFolders(commonTestProject.getUniqueID());
+	    	assertEquals("Current Program with programUUID "+commonTestProject.getUniqueID()+
+	    			" should return 3 children",
+	    			3,programStudiesAndFolders.size());
+	    	manager.deleteProgramStudies(commonTestProject.getUniqueID());
+	    	programStudiesAndFolders = 
+	    			studyTestDataUtil.getLocalRootFolders(commonTestProject.getUniqueID());
+	    	assertEquals("Current Program with programUUID "+commonTestProject.getUniqueID()+
+	    			" should return no children",
+	    			0,programStudiesAndFolders.size());
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+    	
+    }
 }
