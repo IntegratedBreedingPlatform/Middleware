@@ -378,4 +378,17 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
     	return getTermBuilder().getAllInventoryScales();
     }
+
+    /**
+     * Get All distinct values given a standard variable id.
+     *
+     * @param stdVarId the std var id
+     * @return the distinct standard variable values
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+
+    public List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
+            throws MiddlewareQueryException {
+        return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
+    }
 }
