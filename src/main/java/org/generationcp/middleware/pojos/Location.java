@@ -13,6 +13,7 @@ package org.generationcp.middleware.pojos;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -46,6 +47,10 @@ public class Location implements Serializable, Comparable<Location>{
     @Column(name = "locid")
     @XmlElement(name = "locationId")
     private Integer locid;
+    
+    @Basic(optional = true)
+    @Column(name = "program_uuid")
+    private String uniqueID;
     
     @Basic(optional = false)
     @Column(name = "ltype")
@@ -134,6 +139,14 @@ public class Location implements Serializable, Comparable<Location>{
     public void setLocid(Integer locid) {
         this.locid = locid;
     }
+    
+    public String getUniqueID() {
+		return uniqueID;
+	}
+
+	public void setUniqueID(String uniqueID) {
+		this.uniqueID = uniqueID;
+	}
 
     public Integer getLtype() {
         return ltype;

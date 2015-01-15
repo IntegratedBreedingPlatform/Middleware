@@ -11,16 +11,20 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Method}.
@@ -236,7 +240,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         List<Method> methods = new ArrayList<Method>();
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate ")
+            queryString.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
                     .append("FROM methods m WHERE m.mname = :mname");
             SQLQuery query = getSession().createSQLQuery(queryString.toString());
             query.setParameter("mname", name);
@@ -258,8 +262,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
                 Integer muid = (Integer) row[11];
                 Integer lmid = (Integer) row[12];
                 Integer mdate = (Integer) row[13];
+                String program_uuid = (String) row[14];
                 
-                Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate);
+                Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate,program_uuid);
                 methods.add(method);
             }
             

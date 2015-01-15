@@ -750,7 +750,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         try {
 
-            if (method.getMid() == null || method.getMid() > 0) {
+            if (method.getMid() == null) {
                 throw new Exception("method has no Id or is not a local method");
             }
 
@@ -2093,9 +2093,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return germplasms;
 	}
     
-	public List<ProgramFavorite> getProgramFavorites(FavoriteType type)
+	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, String program_uuid)
 			throws MiddlewareQueryException {
-		return this.getProgramFavoriteDao().getProgramFavorites(type);
+		return this.getProgramFavoriteDao().getProgramFavorites(type,program_uuid);
 	}
 
 	@Override
@@ -2105,9 +2105,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 	
 	@Override
-	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max)
+	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max, String program_uuid)
 			throws MiddlewareQueryException {
-		return this.getProgramFavoriteDao().getProgramFavorites(type, max);
+		return this.getProgramFavoriteDao().getProgramFavorites(type, max, program_uuid);
 	}
 
 	@Override
