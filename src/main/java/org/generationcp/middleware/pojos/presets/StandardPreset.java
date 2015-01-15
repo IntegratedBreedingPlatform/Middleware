@@ -71,27 +71,35 @@ public class StandardPreset {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 
 		StandardPreset that = (StandardPreset) o;
 
-		if (standardPresetId != that.standardPresetId)
+		if (standardPresetId != that.standardPresetId) {
 			return false;
+		}
 		if (configuration != null ?
 				!configuration.equals(that.configuration) :
-				that.configuration != null)
+				that.configuration != null) {
 			return false;
-		if (cropName != null ? !cropName.equals(that.cropName) : that.cropName != null)
+		}
+		if (cropName != null ? !cropName.equals(that.cropName) : that.cropName != null) {
 			return false;
-		if (name != null ? !name.equals(that.name) : that.name != null)
+		}
+		if (name != null ? !name.equals(that.name) : that.name != null) {
 			return false;
-		if (toolId != null ? !toolId.equals(that.toolId) : that.toolId != null)
+		}
+		if (toolId != null ? !toolId.equals(that.toolId) : that.toolId != null) {
 			return false;
-		if (toolSection != null ? !toolSection.equals(that.toolSection) : that.toolSection != null)
+		}
+		if (toolSection != null ? !toolSection.equals(that.toolSection) : that.toolSection != null) {
 			return false;
+		}
 
 		return true;
 	}
