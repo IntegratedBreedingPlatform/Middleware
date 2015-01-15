@@ -3,6 +3,7 @@ package org.generationcp.middleware.utils.test;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
@@ -124,9 +125,10 @@ public class MockDataUtil {
 	 * Create Method Test Data
 	 */
 	private static void mockMethodTestData(MethodDAO mDao) throws MiddlewareQueryException {
-    	Mockito.when(mDao.getById(1, false)).thenReturn(new Method(1, "MAN", "S", "C2W", "Maintenance", "Maintenance", 0, 0, 0, 0, 0, 0, 0, 0));
-    	Mockito.when(mDao.getById(2, false)).thenReturn(new Method(2, "DER", "S", "C2W", "Derivative", "Derivative", 0, 0, 0, 0, 0, 0, 0, 0));
-    	Mockito.when(mDao.getById(3, false)).thenReturn(new Method(3, "GEN", "S", "C2W", "Generative", "Generative", 0, 0, 0, 0, 0, 0, 0, 0));
+		String programUUID = UUID.randomUUID().toString();
+    	Mockito.when(mDao.getById(1, false)).thenReturn(new Method(1, "MAN", "S", "C2W", "Maintenance", "Maintenance", 0, 0, 0, 0, 0, 0, 0, 0, programUUID));
+    	Mockito.when(mDao.getById(2, false)).thenReturn(new Method(2, "DER", "S", "C2W", "Derivative", "Derivative", 0, 0, 0, 0, 0, 0, 0, 0, programUUID));
+    	Mockito.when(mDao.getById(3, false)).thenReturn(new Method(3, "GEN", "S", "C2W", "Generative", "Generative", 0, 0, 0, 0, 0, 0, 0, 0, programUUID));
 	}
 	
 	/**
