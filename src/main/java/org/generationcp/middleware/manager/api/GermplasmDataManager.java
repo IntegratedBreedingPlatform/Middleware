@@ -1290,11 +1290,11 @@ public interface GermplasmDataManager {
      * Gets the list of favorite methods/locations
      *
      * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
-     * @param program_uuid - unique id of the program where the favorites location/method were created 
+     * @param programUUID - unique id of the program where the favorites location/method were created 
      * @return list of ProgramFavorite
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String program_uuid) throws MiddlewareQueryException;
+    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String programUUID) throws MiddlewareQueryException;
     
     
     /**
@@ -1302,11 +1302,11 @@ public interface GermplasmDataManager {
      *
      * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
      * @param max - maximum number of records to return
-     * @param program_uuid - unique id of the program where the favorites location/method were created
+     * @param programUUID - unique id of the program where the favorites location/method were created
      * @return list of ProgramFavorite
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String program_uuid) throws MiddlewareQueryException;
+    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID) throws MiddlewareQueryException;
     
     /**
      * count favorite methods/locations

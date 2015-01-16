@@ -1041,9 +1041,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-    public List<Long> getFavoriteProjectLocationIds(String program_uuid)
+    public List<Long> getFavoriteProjectLocationIds(String programUUID)
             throws MiddlewareQueryException {
-        List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE,program_uuid);
+        List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE,programUUID);
         List<Long> longVals = new ArrayList<Long>();
         if(favList != null && !favList.isEmpty()){
             for(ProgramFavorite fav : favList){
@@ -1054,9 +1054,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
 	@Override
-    public List<Integer> getFavoriteProjectMethods(String program_uuid)
+    public List<Integer> getFavoriteProjectMethods(String programUUID)
             throws MiddlewareQueryException {
-        List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, program_uuid);
+        List<ProgramFavorite> favList = getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, programUUID);
         List<Integer> ids = new ArrayList<Integer>();
         if(favList != null && !favList.isEmpty()){
             for(ProgramFavorite fav : favList){

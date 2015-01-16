@@ -34,13 +34,13 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     private static final Logger LOG = LoggerFactory.getLogger(ProgramFavoriteDAO.class);
     
     
-    public List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String program_uuid) throws MiddlewareQueryException{
+    public List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String programUUID) throws MiddlewareQueryException{
     	
     	try{
     		
     		Criteria criteria = getSession().createCriteria(getPersistentClass());
     		criteria.add(Restrictions.eq("entityType", type.getName()));
-    		criteria.add(Restrictions.eq("uniqueID", program_uuid));
+    		criteria.add(Restrictions.eq("uniqueID", programUUID));
 
     		List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();
     		return result;
@@ -74,12 +74,12 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     	
     }
 
-	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max, String program_uuid) throws MiddlewareQueryException{
+	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max, String programUUID) throws MiddlewareQueryException{
 		try{
     		
     		Criteria criteria = getSession().createCriteria(getPersistentClass());
     		criteria.add(Restrictions.eq("entityType", type.getName()));
-    		criteria.add(Restrictions.eq("uniqueID", program_uuid));
+    		criteria.add(Restrictions.eq("uniqueID", programUUID));
     		criteria.setMaxResults(max);
 
     		List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();

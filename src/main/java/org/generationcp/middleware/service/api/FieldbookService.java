@@ -811,20 +811,20 @@ public interface FieldbookService {
 	 /**
      * Gets the favorite project location ids.
      *
-     * @param program_uuid - unique id of program
+     * @param programUUID - unique id of program
      * @return the favorite project location ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Long> getFavoriteProjectLocationIds(String program_uuid) throws MiddlewareQueryException;
+    List<Long> getFavoriteProjectLocationIds(String programUUID) throws MiddlewareQueryException;
     
     /**
      * Gets the favorite project methods.
      *
-     * @param program_uuid - unique id of program
+     * @param programUUID - unique id of program
      * @return the favorite project methods
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getFavoriteProjectMethods(String program_uuid) throws MiddlewareQueryException;
+    List<Integer> getFavoriteProjectMethods(String programUUID) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns germplasm lists by project id.

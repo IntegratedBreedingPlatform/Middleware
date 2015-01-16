@@ -262,9 +262,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
                 Integer muid = (Integer) row[11];
                 Integer lmid = (Integer) row[12];
                 Integer mdate = (Integer) row[13];
-                String program_uuid = (String) row[14];
+                String programUUID = (String) row[14];
                 
-                Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate,program_uuid);
+                Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate,programUUID);
                 methods.add(method);
             }
             
