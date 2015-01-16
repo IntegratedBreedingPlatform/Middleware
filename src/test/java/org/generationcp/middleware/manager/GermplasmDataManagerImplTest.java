@@ -12,13 +12,13 @@
 package org.generationcp.middleware.manager;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.oms.Term;
@@ -458,18 +458,19 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     @Test
     public void testAddMethods() throws MiddlewareQueryException {
         List<Method> methods = new ArrayList<Method>();
-        methods.add(new Method(-1, "GEN", "S", "UGM", "yesno", "description 1", 
+        String programUUID = UUID.randomUUID().toString();
+		methods.add(new Method(-1, "GEN", "S", "UGM", "yesno", "description 1", 
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), 
-                Integer.valueOf(2), Integer.valueOf(19980610)));
+                Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
         methods.add(new Method(-2, "GEN", "S", "UGM", "yesno", "description 2", 
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), 
-                Integer.valueOf(2), Integer.valueOf(19980610)));
+                Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
         methods.add(new Method(-3, "GEN", "S", "UGM", "yesno", "description 3", 
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), 
-                Integer.valueOf(2), Integer.valueOf(19980610)));
+                Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
 
         List<Integer> methodsAdded = manager.addMethod(methods);
         Debug.println(INDENT, "testAddMethods() Methods added: " + methodsAdded.size());
