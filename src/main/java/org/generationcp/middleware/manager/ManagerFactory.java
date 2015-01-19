@@ -100,6 +100,10 @@ public class ManagerFactory implements Serializable {
         return new OntologyDataManagerImpl(sessionProvider);
     }
 
+    public PresetDataManager getPresetDataManager() {
+        return new PresetDataManagerImpl(sessionProviderForLocal,sessionProviderForCentral);
+    }
+
     public StudyDataManager getStudyDataManager() throws ConfigException {
         return new StudyDataManagerImpl(sessionProvider);
     }

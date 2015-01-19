@@ -17,6 +17,8 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Contains the field map label needed by the Field Map tool:
@@ -78,6 +80,8 @@ public class FieldMapLabel implements Serializable{
     /* The direct ancestor (parent) of the gid */
     private String pedigree;
 
+    private Map<Integer, String> userFields;
+
     
     /**
      * Instantiates a new field map label.
@@ -96,12 +100,19 @@ public class FieldMapLabel implements Serializable{
      */
     public FieldMapLabel(Integer experimentId, Integer entryNumber, 
     		String germplasmName, Integer rep, Integer plotNo) {
-		this.experimentId = experimentId;
-		this.entryNumber = entryNumber;
-		this.germplasmName = germplasmName;
-		this.rep = rep;
-		this.plotNo = plotNo;
+		this(experimentId, entryNumber, germplasmName, rep, plotNo, null);
+        userFields = new HashMap<>();
 	}
+
+    public FieldMapLabel(Integer experimentId, Integer entryNumber,
+        		String germplasmName, Integer rep, Integer plotNo, Map<Integer, String> userFields) {
+    		this.experimentId = experimentId;
+    		this.entryNumber = entryNumber;
+    		this.germplasmName = germplasmName;
+    		this.rep = rep;
+    		this.plotNo = plotNo;
+        this.userFields = userFields;
+    }
 
 	/**
 	 * Gets the experiment id.
@@ -476,4 +487,11 @@ public class FieldMapLabel implements Serializable{
 		this.blockNo = blockNo;
 	}
 
+    public Map<Integer, String> getUserFields() {
+        return userFields;
+    }
+
+    public void setUserFields(Map<Integer, String> userFields) {
+        this.userFields = userFields;
+    }
 }

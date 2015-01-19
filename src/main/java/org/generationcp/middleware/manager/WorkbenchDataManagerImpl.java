@@ -1,13 +1,13 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public
  * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
@@ -17,10 +17,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.*;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Implementation of the WorkbenchDataManager interface. To instantiate this
  * class, a Hibernate Session must be passed to its constructor.
- */ 
+ */
 public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
@@ -67,6 +67,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private TemplateSettingDAO templateSettingDAO;
 
     private String installationDirectory;
+    private StandardPresetDAO standardPresetDAO;
     
     public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
         this.sessionProvider = sessionProvider;
@@ -281,6 +282,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         templateSettingDAO.setSession(getCurrentSession());
         return templateSettingDAO;
     }
+    
+    @Override
+	public StandardPresetDAO getStandardPresetDAO() {
+		if (standardPresetDAO == null) {
+			standardPresetDAO = new StandardPresetDAO();
+		}
+
+		standardPresetDAO.setSession(getCurrentSession());
+		return standardPresetDAO;
+	}
+
 
     private void rollbackTransaction(Transaction trans){
         if (trans != null){
@@ -1599,11 +1611,124 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
     
     @Override
+	public List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId)
+			throws MiddlewareQueryException {
+
+		try {
+			Criteria criteria = getCurrentSession().createCriteria(StandardPreset.class);
+
+			criteria.add(Restrictions.eq("cropName", cropName));
+			criteria.add(Restrictions.eq("toolId", toolId));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName="
+							+ cropName + "): "
+							+ e.getMessage(), e);
+		}
+
+		return new ArrayList<StandardPreset>();
+	}
+
+	@Override
+	public List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId,
+			String toolSection) throws MiddlewareQueryException {
+
+		try {
+			Criteria criteria = getCurrentSession().createCriteria(StandardPreset.class);
+
+			criteria.add(Restrictions.eq("cropName", cropName));
+			criteria.add(Restrictions.eq("toolId", toolId));
+			criteria.add(Restrictions.eq("toolSection", toolSection));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName="
+							+ cropName + "): "
+							+ e.getMessage(), e);
+		}
+
+		return new ArrayList<StandardPreset>();
+	}
+
+	@Override
+	public List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId,
+			String toolSection) throws MiddlewareQueryException {
+
+		try {
+			Criteria criteria = getCurrentSession().createCriteria(StandardPreset.class);
+
+			criteria.add(Restrictions.eq("cropName", cropName));
+			criteria.add(Restrictions.eq("toolId", toolId));
+			criteria.add(Restrictions.eq("toolSection", toolSection));
+	 		criteria.add(Restrictions.like("name",presetName));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(cropName="
+							+ cropName + "): "
+							+ e.getMessage(), e);
+		}
+
+		return new ArrayList<StandardPreset>();
+	}
+
+
+	@Override
+	public StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset)
+			throws MiddlewareQueryException {
+
+		Transaction transaction = getCurrentSession().beginTransaction();
+
+		try {
+			StandardPreset result = this.getStandardPresetDAO().saveOrUpdate(standardPreset);
+
+			transaction.commit();
+
+			return result;
+
+		} catch (HibernateException e) {
+			rollbackTransaction(transaction);
+			logAndThrowException(
+					"Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset="
+							+ standardPreset.getName() + "): "
+							+ e.getMessage(), e);
+		} finally {
+			getCurrentSession().flush();
+		}
+
+		return null;
+	}
+
+	@Override
+	public void deleteStandardPreset(int standardPresetId) throws MiddlewareQueryException {
+
+		Transaction transaction = getCurrentSession().beginTransaction();
+
+		try {
+			StandardPreset preset = this.getStandardPresetDAO().getById(standardPresetId);
+			getCurrentSession().delete(preset);
+			transaction.commit();
+
+		} catch (HibernateException e) {
+			rollbackTransaction(transaction);
+			logAndThrowException(
+					"Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId="
+							+ standardPresetId + "): "
+							+ e.getMessage(), e);
+		} finally {
+			getCurrentSession().flush();
+		}
+	}
+    
+    @Override
     public void close(){
     	if (sessionProvider != null){
     		sessionProvider.close();
     	}
     }
-    
 
 }

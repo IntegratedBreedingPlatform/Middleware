@@ -71,6 +71,7 @@
         <mapping class="org.generationcp.middleware.pojos.gdms.TrackData"/>
         <mapping class="org.generationcp.middleware.pojos.gdms.TrackMarker"/>
 
+        <!-- mapping for workbench schema -->
         <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.CropType"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchDataset"/>
@@ -92,9 +93,7 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.TemplateSetting"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/>
-        <!-- TODO: not sure if we're using this, just included as this is in the workbench schema -->
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting"/>
-        <!-- TODO: same as above -->
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink"/>
 
@@ -126,5 +125,10 @@
         <mapping class="org.generationcp.middleware.pojos.mbdt.MBDTGeneration"/>
         <mapping class="org.generationcp.middleware.pojos.mbdt.SelectedGenotype"/>
         <mapping class="org.generationcp.middleware.pojos.mbdt.SelectedMarker"/>
+        
+        <!-- Mapping for presets -->
+        <mapping class="org.generationcp.middleware.pojos.presets.ProgramPreset"/>
+        <mapping class="org.generationcp.middleware.pojos.presets.StandardPreset"/>
+        
     </session-factory>
 </hibernate-configuration>

@@ -1,22 +1,24 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public
  * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.*;
 
 import java.util.List;
@@ -24,7 +26,6 @@ import java.util.List;
 /**
  * This is the API used by the Workbench to retrieve Workbench project
  * information.
- * 
  */
 public interface WorkbenchDataManager {
 
@@ -931,22 +932,63 @@ public interface WorkbenchDataManager {
      * @return the last Project opened by the given user
      * @throws MiddlewareQueryException the middleware query exception
      */
+
 	Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException;
-	
+
 	/**
-     * Detects whether the selected project in Workbench has changed
-     *
-     * @return True if the project has changed, otherwise false
-     * @throws MiddlewareQueryException the middleware query exception
-     */
+	 * Detects whether the selected project in Workbench has changed
+	 *
+	 * @return True if the project has changed, otherwise false
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
 	Boolean isLastOpenedProjectChanged() throws MiddlewareQueryException;
 
 	/**
-     * Close the sessionProvider
-     *
-     * 
-     */
+	 * Retrive all standard presets with specific crop + tool
+	 *
+	 * @param cropName
+	 * @param toolId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId)
+			throws MiddlewareQueryException;
+
+	/**
+	 * Returns the DAO object for standard preset
+	 *
+	 * @return StandardPresetDAO
+	 */
+	StandardPresetDAO getStandardPresetDAO() throws MiddlewareQueryException;
+
+	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId,
+			String toolSection) throws MiddlewareQueryException;
+
+	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName,
+			int toolId,
+			String toolSection) throws MiddlewareQueryException;
+
+	/**
+	 * save or update a standard preset
+	 *
+	 * @param standardPreset
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset)
+			throws MiddlewareQueryException;
+
+	/**
+	 * delete a standard preset by id
+	 *
+	 * @param standardPresetId
+	 * @throws MiddlewareQueryException
+	 */
+	void deleteStandardPreset(int standardPresetId) throws MiddlewareQueryException;
+
+	/**
+	 * Close the sessionProvider
+	 */
 	void close();
-    
-    
+
 }

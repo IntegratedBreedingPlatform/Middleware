@@ -11,23 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
-import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.BreedersQueryDao;
-import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.ListDataProjectDAO;
-import org.generationcp.middleware.dao.ListDataPropertyDAO;
-import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.LocdesDAO;
-import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.PersonDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
@@ -99,7 +83,7 @@ public class DatabaseBroker {
     protected static final int JDBC_BATCH_SIZE = 50;
   
     protected DatabaseBroker() {
- 
+    	
     }
 
     protected DatabaseBroker(HibernateSessionProvider sessionProvider) {
@@ -534,7 +518,7 @@ public class DatabaseBroker {
     	listDataProjectDao.setSession(getActiveSession());
     	return listDataProjectDao;
     }
-
+    
     protected final LotDAO getLotDao() {
     	LotDAO lotDao = new LotDAO();
         lotDao.setSession(getActiveSession());
@@ -556,6 +540,15 @@ public class DatabaseBroker {
     protected final TermPropertyBuilder getTermPropertyBuilder() {
         return new TermPropertyBuilder(sessionProvider);
     }
+
+    //================================  InventoryDataManager DAO Methods =============================
+    protected ProgramPresetDAO getProgramPresetDAO() {
+    	ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
+        programPresetDAO.setSession(getActiveSession());
+        return programPresetDAO;
+    }
+
+    //===========================================================================================
     
     protected final void clearSessions() {
     	if (sessionProvider != null) {
