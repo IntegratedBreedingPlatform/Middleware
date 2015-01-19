@@ -19,8 +19,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		manager = new PresetDataManagerImpl(
-				DataManagerIntegrationTest.managerFactory.getSessionProviderForLocal(),
-				DataManagerIntegrationTest.managerFactory.getSessionProviderForCentral());
+				DataManagerIntegrationTest.managerFactory.getSessionProvider());
 	}
 
 	@Test

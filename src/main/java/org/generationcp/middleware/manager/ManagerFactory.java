@@ -24,6 +24,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.MBDTDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
@@ -101,7 +102,7 @@ public class ManagerFactory implements Serializable {
     }
 
     public PresetDataManager getPresetDataManager() {
-        return new PresetDataManagerImpl(sessionProviderForLocal,sessionProviderForCentral);
+        return new PresetDataManagerImpl(sessionProvider);
     }
 
     public StudyDataManager getStudyDataManager() throws ConfigException {
