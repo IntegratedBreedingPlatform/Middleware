@@ -43,7 +43,8 @@ public class MiddlewareIntegrationTest {
 			if (config.getBoolean("drop.create.dbs")) {
 				DatabaseSetupUtil.setupTestDatabases();
 			}
-			connectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
+			
+			connectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "crop");
 			workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
 
 			sessionUtil = new HibernateUtil(connectionParameters);
