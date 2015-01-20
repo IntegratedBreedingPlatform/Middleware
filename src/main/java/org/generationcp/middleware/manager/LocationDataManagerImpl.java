@@ -493,5 +493,37 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         }
         return value;
     }
+    
+    @Override
+	public List<Location> getProgramLocations(String programUUID)
+			throws MiddlewareQueryException {
+		return getLocationDao().getProgramLocations(programUUID);
+	}
+	
+    @Override
+	public void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException {
+		Session session = getCurrentSession();
+		Transaction trans = null;
+		LocationDAO locationDao = getLocationDao();
+		int deleted = 0;
+		try {
+			trans = session.beginTransaction();
+			List<Location> list = getProgramLocations(programUUID);
+			for (Location location : list) {
+				locationDao.makeTransient(location);
+				if (deleted % JDBC_BATCH_SIZE == 0) {
+					locationDao.flush();
+					locationDao.clear();
+				}
+			}
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
+					+ programUUID + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+	}
 
 }

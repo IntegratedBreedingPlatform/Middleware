@@ -12,13 +12,16 @@
 
 package org.generationcp.middleware.manager;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -26,6 +29,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,10 +37,15 @@ import org.junit.Test;
 public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 
     private static LocationDataManager manager;
+    private static Project commonTestProject;
+    private static WorkbenchTestDataUtil workbenchTestDataUtil;
 
     @BeforeClass
     public static void setUp() throws Exception {
         manager = managerFactory.getLocationDataManager();
+        workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
+        workbenchTestDataUtil.setUpWorkbench();
+        commonTestProject = workbenchTestDataUtil.getCommonTestProject();
     }
     
     @Test
@@ -407,5 +416,48 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
         }
 
     }
+    
+    @Test
+    public void getProgramLocationsAndDeleteByUniqueId() {
+    	//create program locations
+    	String programUUID = commonTestProject.getUniqueID();
+    	int testLocationID1 = 100000;
+    	int testLocationID2 = 100001;
+    	Location testLocation1 = createLocationTestData(testLocationID1,programUUID);
+    	Location testLocation2 = createLocationTestData(testLocationID2,programUUID);
+    	try {
+    		manager.addLocation(testLocation1);
+    		manager.addLocation(testLocation2);
+			//verify
+	        List<Location> locationList = manager.getProgramLocations(programUUID);
+	        assertEquals("There should be 2 program locations with programUUID["+programUUID+"]", 
+	        		2, locationList.size());
+	        //delete locations
+	        manager.deleteProgramLocationsByUniqueId(programUUID);
+	        locationList = manager.getProgramLocations(programUUID);
+	        assertTrue("There should be no program locations with programUUID["+programUUID+"]", 
+	        		locationList.isEmpty());
+		} catch (MiddlewareQueryException e) {
+			fail("Getting of Program Methods Failed ");
+		}
+    } 
+    
+    private Location createLocationTestData(int id, String programUUID) {
+    	Location location = new Location();
+    	location.setUniqueID(programUUID);
+        location.setLocid(id);
+        location.setLrplce(0);
+        location.setLname("TEST-LOCATION"+id);
+        location.setLabbr("");
+        location.setLtype(1);
+        location.setCntryid(1);
+        location.setLrplce(1);
+        location.setLtype(1);
+        location.setNllp(0);
+        location.setSnl1id(0);
+        location.setSnl2id(0);
+        location.setSnl3id(0);
+		return location;
+	}
 
 }

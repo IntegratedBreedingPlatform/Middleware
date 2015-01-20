@@ -608,4 +608,17 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
     	return locations;
     }
 
+	public List<Location> getProgramLocations(String programUUID) throws MiddlewareQueryException {
+		List<Location> locations = new ArrayList<Location>();
+		try{
+			Criteria criteria = getSession().createCriteria(Location.class);
+    		criteria.add(Restrictions.eq("uniqueID", programUUID));
+    		locations = (List<Location>) criteria.list();
+    	} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getProgramLocations(" + programUUID + ") in LocationDao: " + e.getMessage(), e);
+		}
+    	return locations;
+	}
+
 }

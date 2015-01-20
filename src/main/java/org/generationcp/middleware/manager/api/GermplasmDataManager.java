@@ -1374,4 +1374,17 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     boolean checkIfMatches(String name) throws MiddlewareQueryException;
+    
+    /**
+     * get all method records filtered by programUUID
+     * @param programUUID
+     * @return list of mid
+     */
+    List<Method> getProgramMethods(String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * delete all method records filtered by programUUID
+     * @param programUUID
+     */
+    void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException;
 }

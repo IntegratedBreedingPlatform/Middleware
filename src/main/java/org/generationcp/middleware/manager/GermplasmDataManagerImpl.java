@@ -2233,5 +2233,37 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public boolean checkIfMatches(String name) throws MiddlewareQueryException {
 		return getNameDao().checkIfMatches(name);
 	}
+
+	@Override
+	public List<Method> getProgramMethods(String programUUID)
+			throws MiddlewareQueryException {
+		return getMethodDao().getProgramMethods(programUUID);
+	}
+	
+	@Override
+	public void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException {
+		Session session = getCurrentSession();
+		Transaction trans = null;
+		MethodDAO methodDao = getMethodDao();
+		int deleted = 0;
+		try {
+			trans = session.beginTransaction();
+			List<Method> list = getProgramMethods(programUUID);
+			for (Method method : list) {
+				methodDao.makeTransient(method);
+				if (deleted % JDBC_BATCH_SIZE == 0) {
+					methodDao.flush();
+					methodDao.clear();
+				}
+			}
+			trans.commit();
+		} catch (Exception e) {
+			rollbackTransaction(trans);
+			logAndThrowException("Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId="
+					+ programUUID + "): " + e.getMessage(), e, LOG);
+		} finally {
+			session.flush();
+		}
+	}
 	
 }

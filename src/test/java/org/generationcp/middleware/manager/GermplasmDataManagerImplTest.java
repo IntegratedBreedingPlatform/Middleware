@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -30,10 +32,12 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,6 +48,8 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     private static GermplasmDataManager manager;
     private static LocationDataManager locationManager;
     private static UserDataManager userDataManager;
+    private static Project commonTestProject;
+    private static WorkbenchTestDataUtil workbenchTestDataUtil;
     
     // make sure a seed User(-1) is present in the db
     // otherwise add one
@@ -67,6 +73,10 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         	user.setType(1);
         	userDataManager.addUser(user);
         }
+        
+        workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
+        workbenchTestDataUtil.setUpWorkbench();
+        commonTestProject = workbenchTestDataUtil.getCommonTestProject();
     }
 
     @Test
@@ -920,4 +930,49 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         Debug.println(INDENT, "testAddAttribute("+attr+"): ");
         Debug.println(INDENT, success);
     }
+    
+    @Test
+    public void getProgramMethodsAndDeleteByUniqueId() {
+    	//create program locations
+    	String programUUID = commonTestProject.getUniqueID();
+    	int testMethodID1 = 100000;
+    	int testMethodID2 = 100001;
+    	Method testMethod1 = createMethodTestData(testMethodID1,programUUID);
+    	Method testMethod2 = createMethodTestData(testMethodID2,programUUID);
+    	try {
+			manager.addMethod(testMethod1);
+			manager.addMethod(testMethod2);
+			//verify
+	        List<Method> methodList = manager.getProgramMethods(programUUID);
+	        assertEquals("There should be 2 program methods with programUUID["+programUUID+"]", 
+	        		2, methodList.size());
+	        //delete locations
+	        manager.deleteProgramMethodsByUniqueId(programUUID);
+	        methodList = manager.getProgramMethods(programUUID);
+	        assertTrue("There should be no program methods with programUUID["+programUUID+"]", 
+	        		methodList.isEmpty());
+		} catch (MiddlewareQueryException e) {
+			fail("Getting and deleting of program methods failed ");
+		}
+    }
+
+	private Method createMethodTestData(int id, String programUUID) {
+		Method method = new Method();
+		method.setUniqueID(programUUID);
+		method.setMid(id);
+		method.setMname("TEST-LOCATION"+id);
+		method.setMdesc("TEST-LOCATION-DESC"+id);
+		method.setMcode("0");
+		method.setMgrp("0");
+		method.setMtype("0");
+		method.setReference(0);
+		method.setGeneq(0);	
+		method.setMprgn(0);
+		method.setMfprg(0);
+		method.setMattr(0);
+		method.setUser(0);
+		method.setLmid(0);
+		method.setMdate(0);
+		return method;
+	}  
 }

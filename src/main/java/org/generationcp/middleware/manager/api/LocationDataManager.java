@@ -397,4 +397,17 @@ public interface LocationDataManager {
     List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException;
     List<Location> getAllProvinces() throws MiddlewareQueryException;
     
+    /**
+     * get all location records filtered by programUUID
+     * @param programUUID
+     * @return list of locid
+     */
+    List<Location> getProgramLocations(String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * delete all location records filtered by programUUID
+     * @param programUUID
+     */
+    void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException;
+    
 }

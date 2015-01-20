@@ -274,4 +274,18 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         }
         return new ArrayList<Method>();
     }
+
+	@SuppressWarnings("unchecked")
+	public List<Method> getProgramMethods(String programUUID) throws MiddlewareQueryException {
+		List<Method> method = new ArrayList<Method>();
+		try{
+			Criteria criteria = getSession().createCriteria(Method.class);
+    		criteria.add(Restrictions.eq("uniqueID", programUUID));
+    		method = (List<Method>) criteria.list();
+    	} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getProgramMethods(" + programUUID + ") in MethodDao: " + e.getMessage(), e);
+		}
+    	return method;
+	}
 }
