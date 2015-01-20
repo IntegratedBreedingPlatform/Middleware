@@ -603,6 +603,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public boolean isPersonWithUsernameAndEmailExists(String username, String email) throws MiddlewareQueryException {
+		return getPersonDao().isPersonWithUsernameAndEmailExists(username,email);
+	}
+
+	@Override
 	public Integer addPerson(Person person) throws MiddlewareQueryException {
 		Transaction trans = null;
 		Session session = getCurrentSession();
