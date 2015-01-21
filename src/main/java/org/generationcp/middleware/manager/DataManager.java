@@ -68,7 +68,6 @@ import org.slf4j.LoggerFactory;
  * The Class DataManager.
  * Superclass of DataManager implementations.
  * Contains generic implementation of retrieval methods. 
- * Supports local-central dynamics.
  * Contains getters of Builder, Saver, Searcher objects.
  * 
  * @author Joyce Avestro
@@ -85,8 +84,8 @@ public abstract class DataManager extends DatabaseBroker{
     	super(sessionProvider);
     }
     
-    public DataManager(HibernateSessionProvider sessionProvider, String localDatabaseName) {
-    	super(sessionProvider, localDatabaseName);
+    public DataManager(HibernateSessionProvider sessionProvider, String databaseName) {
+    	super(sessionProvider, databaseName);
     }
 
     /**
@@ -287,8 +286,7 @@ public abstract class DataManager extends DatabaseBroker{
     }
 
     /**
-     * A generic implementation of the getXXXByXXXX(Integer id, ...) method that calls a specific get method from a DAO.     <br/>  
-     * This connects to the database corresponding to the value of the id (Local for negative id, Central for positive).     <br/>   
+     * A generic implementation of the getXXXByXXXX(Integer id, ...) method that calls a specific get method from a DAO.     <br/>     
      * Calls the corresponding method that returns list type as specified in the parameter methodName.     <br/>  
      *       <br/>
      * Sample usage:     <br/> 
@@ -332,7 +330,7 @@ public abstract class DataManager extends DatabaseBroker{
      *     }
      * <code></pre>
      * @param dao   The DAO to call the method from
-     * @return The number of entities from both central and local instances
+     * @return The number of entities
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
@@ -376,7 +374,7 @@ public abstract class DataManager extends DatabaseBroker{
 
     /**
      * A generic implementation of the countAllXXX(Database instance) method that calls countAll() from Generic DAO.     <br/>
-     * Returns the count of entities from both central and local databases based on the given DAO.     <br/>
+     * Returns the count of entities based on the given DAO.     <br/>
      *      <br/>
      * Sample usage:     <br/>
      * <pre><code>
@@ -386,7 +384,7 @@ public abstract class DataManager extends DatabaseBroker{
      * </code></pre>
      * @param dao The DAO to call the method from
      * @param instance The database instance to query from
-     * @return The number of entities from both central and local instances
+     * @return The number of entities
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
@@ -400,7 +398,6 @@ public abstract class DataManager extends DatabaseBroker{
     /**
      * A generic implementation of the countByXXXX(Integer id, ...) method that calls a specific count method from a DAO.     <br/>
      * Calls the corresponding count method as specified in the parameter methodName.      <br/>
-     * Retrieves data from the corresponding database. If the given id is positive, it connects to Central, otherwise it connects to Local.     <br/>
      *      <br/>
      * Sample usage:     <br/>
      * <pre><code>
@@ -411,7 +408,7 @@ public abstract class DataManager extends DatabaseBroker{
      *    }
      * </code></pre>
      * @param dao   The DAO to call the method from
-     * @param id    The id used to know the database instance to connect to
+     * @param id    The entity id 
      * @param methodName    The method to call
      * @param parameters    The parameters to be passed to the method
      * @param parameterTypes    The types of the parameters to be passed to the method
