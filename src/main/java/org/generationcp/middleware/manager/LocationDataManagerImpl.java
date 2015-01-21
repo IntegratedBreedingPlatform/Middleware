@@ -45,7 +45,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
 
     public List<Location> getAllLocations() throws MiddlewareQueryException {
-        List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
+        List<Location> locations = getLocationDao().getAll();
         Collections.sort(locations);
         return locations;
     }

@@ -43,10 +43,9 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         super(sessionProvider);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<User> getAllUsers() throws MiddlewareQueryException {
-        return (List<User>) getAllFromCentralAndLocal(getUserDao());
+        return (List<User>) getUserDao().getAll();
     }
 
     @Override
@@ -128,7 +127,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     @SuppressWarnings("unchecked")
     @Override
     public List<Person> getAllPersons() throws MiddlewareQueryException {
-        return (List<Person>) getAllFromCentralAndLocal(getPersonDao());
+        return (List<Person>) getPersonDao().getAll();
     }
 
     //TODO BMS-148 Rename method. No loger reads from two DBs.

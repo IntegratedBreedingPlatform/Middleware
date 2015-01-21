@@ -131,21 +131,6 @@ public abstract class DataManager extends DatabaseBroker{
     }
 
     /**
-     * Returns all the entities from both central and local databases based on the given DAO.   <br/>
-     * 
-     * @param dao 
-     * @return All entities from both local and central
-     * @throws MiddlewareQueryException
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
-        List toReturn = new ArrayList();
-        dao.setSession(getActiveSession());
-        toReturn.addAll(dao.getAll());
-        return toReturn;
-    }
-
-    /**
      * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).      <br/>
      * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.     <br/>
      * <br/>

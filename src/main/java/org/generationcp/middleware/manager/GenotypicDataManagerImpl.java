@@ -2183,7 +2183,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Mta> getAllMTAs() throws MiddlewareQueryException {
-        return super.getAllFromCentralAndLocal(getMtaDao());
+        return getMtaDao().getAll();
     }
 
     @Override

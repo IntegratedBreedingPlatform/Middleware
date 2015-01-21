@@ -59,7 +59,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public List<Location> getAllLocations() throws MiddlewareQueryException{
-        List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
+        List<Location> locations = getLocationDao().getAll();
         Collections.sort(locations);
         return locations;
     }
