@@ -552,7 +552,7 @@ public class DatabaseBroker {
     
     protected final void clearSessions() {
     	if (sessionProvider != null) {
-    		this.sessionProvider.getSession().clear();;
+    		this.sessionProvider.getSession().clear();
     	}
     }
     
