@@ -690,7 +690,27 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getAllMethods() throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the method records.
+     *
+     * @param programUUID - unique id of the current program
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getMethodsByUniqueID(String programUUID) throws MiddlewareQueryException;    
 
+    /**
+     * Returns the number of Methods with
+     * type matching the given parameter.
+     * Retrieves from both local and central databases.
+     *
+     * @param programUUID - unique id of the current program
+     * @return Number of Methods matching the given type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countMethodsByUniqueID(String programUUID) throws MiddlewareQueryException;
+    
     /**
      * Gets the all methods not generative.
      *
@@ -716,6 +736,29 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getMethodsByType(String type) throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the method records matching the given type.
+     * Retrieves from both local and central databases.
+     *
+     * @param type the type of the method
+     * @param programUUID - unique id of the current program
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getMethodsByType(String type, String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of Methods with
+     * type matching the given parameter.
+     * Retrieves from both local and central databases.
+     *
+     * @param type - search string for the methods
+     * @param programUUID - unique id of the current program
+     * @return Number of Methods matching the given type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countMethodsByType(String type, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns all the method records matching the given group and the methods having the 'G' group.

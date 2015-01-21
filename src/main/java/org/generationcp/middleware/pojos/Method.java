@@ -29,7 +29,7 @@ import java.util.List;
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "method")
-@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator", "prefix", "count", "suffix" })
+@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator", "prefix", "count", "suffix","program_uuid" })
 @XmlAccessorType(XmlAccessType.NONE)
 public class Method implements Serializable{
 

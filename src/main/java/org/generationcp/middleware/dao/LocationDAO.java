@@ -203,6 +203,22 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         }
         return new ArrayList<Location>();
     }
+    
+    public List<Location> getByType(Integer type, String programUUID) throws MiddlewareQueryException {
+        try {
+            if (type != null) {
+                Criteria criteria = getSession().createCriteria(Location.class);
+                criteria.add(Restrictions.eq("ltype", type));
+                criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+                criteria.addOrder(Order.asc("lname"));
+                return criteria.list();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByType(type=" + type + ") query from Location: "
+                    + e.getMessage(), e);
+        }
+        return new ArrayList<Location>();
+    }
 
     public List<Location> getByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -225,6 +241,22 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
             if (type != null) {
                 Criteria criteria = getSession().createCriteria(Location.class);
                 criteria.add(Restrictions.eq("ltype", type));
+                criteria.setProjection(Projections.rowCount());
+                return ((Long) criteria.uniqueResult()).longValue();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countBytype(type=" + type
+                    + ") query from Location: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+    
+    public long countByType(Integer type, String programUUID) throws MiddlewareQueryException {
+        try {
+            if (type != null) {
+                Criteria criteria = getSession().createCriteria(Location.class);
+                criteria.add(Restrictions.eq("ltype", type));
+                criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
                 criteria.setProjection(Projections.rowCount());
                 return ((Long) criteria.uniqueResult()).longValue();
             }
@@ -259,8 +291,11 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
                     Double latitude = (Double) result[11];
                     Double longitude = (Double) result[12];
                     Double altitude = (Double) result[13];
+                    String programUUID = (String) result[14];
                     
                     Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
+                    location.setUniqueID(programUUID);
+                    
                     Georef georef = new Georef();
                     georef.setLocid(locid);
                     georef.setLat(latitude);
@@ -606,6 +641,37 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
             logAndThrowException("Error with getByIds() query from Location: " + e.getMessage(), e);
         }    	
     	return locations;
+    }
+
+	public  List<Location> getByUniqueID(String programUUID) throws MiddlewareQueryException {
+		List<Location> locations = new ArrayList<Location>();
+    	
+    	if (programUUID == null || programUUID.isEmpty()){
+    		return locations;
+    	}
+    	
+        try {
+            Criteria criteria = getSession().createCriteria(Location.class);
+            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            locations = criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByIds() query from Location: " + e.getMessage(), e);
+        }    	
+    	return locations;
+	}
+	
+    public long countByUniqueID(String programUUID) throws MiddlewareQueryException {
+        try {
+            if (programUUID != null) {
+            	Criteria criteria = getSession().createCriteria(Location.class);
+                criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+                criteria.setProjection(Projections.rowCount());
+                return ((Long) criteria.uniqueResult()).longValue();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countByUniqueID(uniqueID=" + programUUID + ") query from Location: " + e.getMessage(), e);
+        }
+        return 0;
     }
 
 	public List<Location> getProgramLocations(String programUUID) throws MiddlewareQueryException {

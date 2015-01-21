@@ -39,6 +39,7 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -491,6 +492,15 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
             manager.deleteMethod(method);
         }
     }
+    
+    @Test
+    public void testGetMethodsByUniqueID() throws MiddlewareQueryException { 
+        String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+		List<Method> methodsFilteredByProgramUUID = manager.getMethodsByUniqueID(programUUID);
+        Assert.assertNotNull("Expecting to have returned results.", methodsFilteredByProgramUUID);
+		Debug.println(INDENT, "testGetMethodsByUniqueID(programUUID="+programUUID+"): " + methodsFilteredByProgramUUID.size());
+        Debug.printObjects(INDENT*2, methodsFilteredByProgramUUID);
+    }
 
     @Test
     public void testGetMethodsByType() throws MiddlewareQueryException {
@@ -499,20 +509,45 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         int numOfRows = 5;
 
         List<Method> methods = manager.getMethodsByType(type);
+        Assert.assertNotNull("Expecting to have returned results.", methods);
         Debug.println(INDENT, "testGetMethodsByType(type=" + type + "): " + methods.size());
         Debug.printObjects(INDENT*2, methods);
+        
+        String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+		List<Method> methodsFilteredByProgramUUID = manager.getMethodsByType(type,programUUID);
+		Assert.assertNotNull("Expecting to have returned results.", methodsFilteredByProgramUUID);
+        Debug.println(INDENT, "testGetMethodsByType(type=" + type + ", programUUID="+programUUID+"): " + methodsFilteredByProgramUUID.size());
+        Debug.printObjects(INDENT*2, methodsFilteredByProgramUUID);
 
         List<Method> methodList = manager.getMethodsByType(type, start, numOfRows);
+        Assert.assertNotNull("Expecting to have returned results.", methodList);
         Debug.println(INDENT, "testGetMethodsByType(type=" + type + ", start=" + start 
                 + ", numOfRows=" + numOfRows + "): " + methodList.size());
-        Debug.printObjects(INDENT*2, methods);
+        Debug.printObjects(INDENT*2, methodList);
     }
 
     @Test
+    public void testCountMethodsByUniqueID() throws Exception {
+    	String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+        long count = manager.countMethodsByUniqueID(programUUID);
+        Assert.assertTrue("Expecting to have returned results.", count > 0);
+        Debug.println(INDENT, "testCountMethodsByUniqueID(programUUID=" + programUUID + "): " + count);
+    }
+    
+    @Test
     public void testCountMethodsByType() throws Exception {
-        String type = "GEN"; // Tested with rice and cowpea
+        String type = "GEN";
         long count = manager.countMethodsByType(type);
+        Assert.assertTrue("Expecting to have returned results.", count > 0);
         Debug.println(INDENT, "testCountMethodsByType(type=" + type + "): " + count);
+        
+        type = "GEN";
+        String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+        long countWithProgramUUID = manager.countMethodsByType(type,programUUID);
+        Assert.assertTrue("Expecting to have returned results.", count > 0);
+        Debug.println(INDENT, "testCountMethodsByType(type=" + type + "): " + countWithProgramUUID);
+        
+        Assert.assertTrue("The results that is filtered by programUUID must be less than or equal to the results without programUUID.", count >= countWithProgramUUID);
     }
 
     @Test

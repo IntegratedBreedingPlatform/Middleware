@@ -660,11 +660,29 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public long countAllMethods() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getMethodDao());
     }
+    
+    @Override
+    public List<Method> getMethodsByUniqueID(String programUUID) throws MiddlewareQueryException {
+    	return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByUniqueID", new Object[] { programUUID },
+                new Class[] { String.class });
+    }
+    
+    @Override
+    public long countMethodsByUniqueID(String programUUID) throws MiddlewareQueryException {
+        return super
+                .countAllFromCentralAndLocalByMethod(getMethodDao(), "countByUniqueID", new Object[] { programUUID }, new Class[] { String.class });
+    }
 
     @Override
     public List<Method> getMethodsByType(String type) throws MiddlewareQueryException {
         return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByType", new Object[] { type },
                 new Class[] { String.class });
+    }
+    
+    @Override
+    public List<Method> getMethodsByType(String type, String programUUID) throws MiddlewareQueryException {
+        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByType", new Object[] { type, programUUID },
+                new Class[] { String.class, String.class });
     }
 
     @Override
@@ -679,6 +697,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return super
                 .countAllFromCentralAndLocalByMethod(getMethodDao(), "countByType", new Object[] { type }, new Class[] { String.class });
     }
+    
+    @Override
+    public long countMethodsByType(String type, String programUUID) throws MiddlewareQueryException {
+        return super
+                .countAllFromCentralAndLocalByMethod(getMethodDao(), "countByType", new Object[] { type, programUUID }, new Class[] { String.class, String.class });
+    }
+
 
     @Override
     public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException {

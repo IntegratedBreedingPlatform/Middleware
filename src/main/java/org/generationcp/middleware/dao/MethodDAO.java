@@ -53,12 +53,39 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         }
         return new ArrayList<Method>();
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Method> getByUniqueID(String programUUID) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            criteria.addOrder(Order.asc("mname"));
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMethodsByType(programUUID=" + programUUID + ") query from Method: " + e.getMessage(), e);
+        }
+        return new ArrayList<Method>();
+    }
 
     @SuppressWarnings("unchecked")
     public List<Method> getByType(String type) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
             criteria.add(Restrictions.eq("mtype", type));
+            criteria.addOrder(Order.asc("mname"));
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+        }
+        return new ArrayList<Method>();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Method> getByType(String type, String programUUID) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.eq("mtype", type));
+            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
@@ -94,6 +121,33 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         }
         return 0;
     }
+    
+    public long countByType(String type, String programUUID) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.eq("mtype", type));
+            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            criteria.setProjection(Projections.rowCount());
+            return ((Long) criteria.uniqueResult()).longValue(); // count
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+    
+    public long countByUniqueID(String programUUID) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            criteria.setProjection(Projections.rowCount());
+            return ((Long) criteria.uniqueResult()).longValue(); // count
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countMethodsByType(programUUID=" + programUUID + ") query from Method: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+    
+
 
     @SuppressWarnings("unchecked")
     public List<Method> getByGroup(String group) throws MiddlewareQueryException {

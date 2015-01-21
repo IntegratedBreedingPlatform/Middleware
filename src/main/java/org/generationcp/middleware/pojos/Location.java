@@ -99,7 +99,7 @@ public class Location implements Serializable, Comparable<Location>{
     @Transient
     private String parentLocationName;
 
-    public static final String GET_ALL_BREEDING_LOCATIONS = "SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt " +
+    public static final String GET_ALL_BREEDING_LOCATIONS = "SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.program_uuid " +
     		"FROM location l left join georef g on l.locid = g.locid WHERE l.ltype IN (410, 411, 412) ORDER BY lname";
     public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
     public static final String GET_LOCATION_NAMES_BY_GIDS =

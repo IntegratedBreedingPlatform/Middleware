@@ -60,7 +60,19 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public long countAllLocations() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getLocationDao());
     }
-
+    
+    @Override
+    public List<Location> getLocationsByUniqueID(String programUUID) throws MiddlewareQueryException {
+        List<Location> locations = new ArrayList<Location>();
+        locations.addAll(getLocationDao().getByUniqueID(programUUID));
+        return locations;
+    }
+    
+    @Override
+    public long countLocationsByUniqueID(String programUUID) throws MiddlewareQueryException {
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByUniqueID", new Object[]{ programUUID }, new Class[]{String.class});
+    }
+    
     @Override
     public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         List<Location> locations = new ArrayList<Location>();
@@ -106,6 +118,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type},
                 new Class[]{Integer.class});
     }
+    
+    @Override
+    public List<Location> getLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
+        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type, programUUID},
+                new Class[]{Integer.class, String.class});
+    }
 
     @Override
     public List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
@@ -117,6 +135,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     @Override
     public long countLocationsByType(Integer type) throws MiddlewareQueryException {
         return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[]{type}, new Class[]{Integer.class});
+    }
+    
+    @Override
+    public long countLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[]{type,programUUID}, new Class[]{Integer.class, String.class});
     }
 
     @Override

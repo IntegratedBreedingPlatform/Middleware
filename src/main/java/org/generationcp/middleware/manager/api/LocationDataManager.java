@@ -74,6 +74,28 @@ public interface LocationDataManager {
      * Returns the Location records with
      * names matching the given parameter.
      *
+     * @param programUUID - unique ID of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the number of Locations with names matching the given parameter.
+     *
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
+     * @return Number of Locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the Location records with
+     * names matching the given parameter.
+     *
      * @param name - search string for the name of the locations
      * @param op - can be EQUAL like LIKE
      * @return List of Location POJOs
@@ -184,6 +206,17 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Location records with type matching the given parameter. 
+     * The data is retrieved from both local and central databases.
+     *
+     * @param type - search string for the type of the locations
+     * @param programUUID - unique id of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns the Location records with type matching the given parameter. 
@@ -208,6 +241,17 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countLocationsByType(Integer type) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of Locations with types matching the given parameter. 
+     * The data is retrieved from both local and central databases.
+     *
+     * @param type - search string for the type of the locations
+     * @param programUUID - unique id of the current program
+     * @return Number of Locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Returns the udfld record identified by the given id.

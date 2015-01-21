@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -54,6 +55,23 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
         assertTrue(locationList != null);
         Debug.println(INDENT, "testGetAllLocations(): ");
         Debug.printObjects(INDENT, locationList);
+    }
+    
+    @Test
+    public void testGetLocationsByUniqueID() throws Exception {
+    	String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+        List<Location> locationList = manager.getLocationsByUniqueID(programUUID);
+        Assert.assertNotNull("Expecting to have returned results.", locationList);
+        Debug.println(INDENT, "testGetLocationsByUniqueID(): ");
+        Debug.printObjects(INDENT, locationList);
+    }
+    
+    @Test
+    public void testCountLocationsByUniqueID() throws Exception {
+    	String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+        long count = manager.countLocationsByUniqueID(programUUID);
+        Assert.assertTrue("Expecting to have returned results.", count > 0);
+        Debug.println(INDENT, "testCountLocationsByUniqueID(" + programUUID + "): " + count);
     }
 
     @Test
@@ -200,10 +218,18 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
         int numOfRows = 5;
 
         List<Location> locations = manager.getLocationsByType(type);
+        Assert.assertNotNull("Expecting to have returned results.", locations);
         Debug.println(INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
         Debug.printObjects(INDENT, locations);
+        
+        String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+        List<Location> locationsByProgramUUID = manager.getLocationsByType(type,programUUID);
+        Assert.assertNotNull("Expecting to have returned results.", locationsByProgramUUID);
+        Debug.println(INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
+        Debug.printObjects(INDENT, locationsByProgramUUID);
 
         List<Location> locationList = manager.getLocationsByType(type, start, numOfRows);
+        Assert.assertNotNull("Expecting to have returned results.", locationList);
         Debug.println(INDENT, "testGetLocationByType(type=" + type + ", start=" + start 
                 + ", numOfRows=" + numOfRows + "): "
                 + locationList.size());
@@ -214,6 +240,11 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
     public void testCountLocationsByType() throws Exception {
         Integer type = 405; // Tested in rice db
         long count = manager.countLocationsByType(type);
+        Debug.println(INDENT, "testCountLocationByType(type=" + type + "): " + count);
+        
+        String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+        type = 405;
+        count = manager.countLocationsByType(type,programUUID);
         Debug.println(INDENT, "testCountLocationByType(type=" + type + "): " + count);
     }
 
