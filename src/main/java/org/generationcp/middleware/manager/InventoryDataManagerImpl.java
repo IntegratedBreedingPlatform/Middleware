@@ -681,7 +681,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids)
 			throws MiddlewareQueryException {
 
-		List<Name> gidNames = super.getAllFromCentralAndLocalByMethod(getNameDao(),
+		List<Name> gidNames = super.getAllByMethod(getNameDao(),
 									"getNamesByGids", new Object[]{gids}, new Class[]{List.class});
 
 		List<InventoryDetails> inventoryDetails = getTransactionDao().getInventoryDetailsByGids(gids);

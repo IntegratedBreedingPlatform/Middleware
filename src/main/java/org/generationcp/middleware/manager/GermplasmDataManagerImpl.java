@@ -102,7 +102,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[] { country },
+        return (List<Location>) super.getAllByMethod(getLocationDao(), "getByCountry", new Object[] { country },
                 new Class[] { Country.class });
     }
 
@@ -124,7 +124,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[] { type },
+        return (List<Location>) getAllByMethod(getLocationDao(), "getByType", new Object[] { type },
                 new Class[] { Integer.class });
     }
 
@@ -608,7 +608,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException {
-        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getAttributeDao(), "getAttributeTypesByGIDList",
+        return (List<UserDefinedField>) super.getAllByMethod(getAttributeDao(), "getAttributeTypesByGIDList",
                 new Object[] { gidList }, new Class[] { List.class });
     }
     
@@ -621,7 +621,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
         
         // retrieve attribute values
-        List<Attribute> attributeList = super.getAllFromCentralAndLocalByMethod(getAttributeDao(), "getAttributeValuesByTypeAndGIDList",
+        List<Attribute> attributeList = super.getAllByMethod(getAttributeDao(), "getAttributeValuesByTypeAndGIDList",
                 new Object[] { attributeType, gidList }, new Class[] { Integer.class, List.class });
         for (Attribute attribute : attributeList) {
             returnMap.put(attribute.getGermplasmId(), attribute.getAval());
@@ -648,12 +648,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getAllMethods() throws MiddlewareQueryException {
-        return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethod", new Object[] {}, new Class[] {});
+        return (List<Method>) getAllByMethod(getMethodDao(), "getAllMethod", new Object[] {}, new Class[] {});
     }
 
     @Override
     public List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException {
-        return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethodsNotGenerative", new Object[] {}, new Class[] {});
+        return (List<Method>) getAllByMethod(getMethodDao(), "getAllMethodsNotGenerative", new Object[] {}, new Class[] {});
     }
 
     @Override
@@ -663,7 +663,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public List<Method> getMethodsByUniqueID(String programUUID) throws MiddlewareQueryException {
-    	return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByUniqueID", new Object[] { programUUID },
+    	return (List<Method>) super.getAllByMethod(getMethodDao(), "getByUniqueID", new Object[] { programUUID },
                 new Class[] { String.class });
     }
     
@@ -675,13 +675,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getMethodsByType(String type) throws MiddlewareQueryException {
-        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByType", new Object[] { type },
+        return (List<Method>) super.getAllByMethod(getMethodDao(), "getByType", new Object[] { type },
                 new Class[] { String.class });
     }
     
     @Override
     public List<Method> getMethodsByType(String type, String programUUID) throws MiddlewareQueryException {
-        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByType", new Object[] { type, programUUID },
+        return (List<Method>) super.getAllByMethod(getMethodDao(), "getByType", new Object[] { type, programUUID },
                 new Class[] { String.class, String.class });
     }
 
@@ -707,7 +707,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException {
-        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroup", new Object[] { group },
+        return (List<Method>) super.getAllByMethod(getMethodDao(), "getByGroup", new Object[] { group },
                 new Class[] { String.class });
     }
 
@@ -720,13 +720,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getMethodsByGroupAndType(String group, String type) throws MiddlewareQueryException {
-        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupAndType", new Object[] { group, type },
+        return (List<Method>) super.getAllByMethod(getMethodDao(), "getByGroupAndType", new Object[] { group, type },
                 new Class[] { String.class, String.class });
     }
     
     @Override
     public List<Method> getMethodsByGroupAndTypeAndName(String group, String type, String name) throws MiddlewareQueryException {
-        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupAndTypeAndName", new Object[] { group, type, name },
+        return (List<Method>) super.getAllByMethod(getMethodDao(), "getByGroupAndTypeAndName", new Object[] { group, type, name },
                 new Class[] { String.class, String.class, String.class });
     }
 
@@ -1326,27 +1326,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode) throws MiddlewareQueryException {
     	List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
-        return (List<GermplasmNameDetails>) super.getAllFromCentralAndLocalByMethod(getNameDao(), "getGermplasmNameDetailsByNames",
+        return (List<GermplasmNameDetails>) super.getAllByMethod(getNameDao(), "getGermplasmNameDetailsByNames",
                 new Object[] { namesToUse, mode }, new Class[]{List.class, GetGermplasmByNameModes.class});
     }
     
     @Override
     @Deprecated
     public List<Country> getAllCountry() throws MiddlewareQueryException {
-        return (List<Country>) super.getAllFromCentralAndLocalByMethod(getCountryDao(), "getAllCountry", new Object[] {}, new Class[] {});
+        return (List<Country>) super.getAllByMethod(getCountryDao(), "getAllCountry", new Object[] {}, new Class[] {});
     }
 
     @Override
     @Deprecated
     public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountryAndType", new Object[] { country,
+        return (List<Location>) super.getAllByMethod(getLocationDao(), "getByCountryAndType", new Object[] { country,
                 type}, new Class[]{Country.class, Integer.class});
     }
     
     @Override
     @Deprecated
     public List<Location> getLocationsByNameCountryAndType(String name,Country country, Integer type) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByNameCountryAndType", new Object[] { name,country,
+        return (List<Location>) super.getAllByMethod(getLocationDao(), "getByNameCountryAndType", new Object[] { name,country,
                 type}, new Class[]{String.class,Country.class, Integer.class});
     }
     
@@ -1354,7 +1354,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Deprecated
     public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return (List<LocationDetails>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationDetails", new Object[] { locationId,
+        return (List<LocationDetails>) super.getAllByMethod(getLocationDao(), "getLocationDetails", new Object[] { locationId,
             start,numOfRows}, new Class[]{Integer.class,Integer.class,Integer.class});
         
     }
@@ -1362,13 +1362,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType)
             throws MiddlewareQueryException {
-        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getUserDefinedFieldDao(), "getByFieldTableNameAndType",
+        return (List<UserDefinedField>) super.getAllByMethod(getUserDefinedFieldDao(), "getByFieldTableNameAndType",
                 new Object[] { tableName, fieldType }, new Class[] { String.class, String.class });
     }
 
     @Override
     public List<Method> getMethodsByGroupIncludesGgroup(String group) throws MiddlewareQueryException {
-        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupIncludesGgroup", new Object[] { group }, new Class[]{String.class});
+        return (List<Method>) super.getAllByMethod(getMethodDao(), "getByGroupIncludesGgroup", new Object[] { group }, new Class[]{String.class});
     }
 
     @Override

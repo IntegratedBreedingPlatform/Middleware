@@ -194,7 +194,7 @@ public abstract class DataManager extends DatabaseBroker{
      * Sample usage:     <br/> 
      *  <pre><code>
      *      public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-     *          return (List<Location>) getAllListFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type},
+     *          return (List<Location>) getAllByMethod(getLocationDao(), "getByType", new Object[]{type},
      *                      new Class[]{Integer.class});
      *      }
      *  </code></pre>
@@ -206,9 +206,8 @@ public abstract class DataManager extends DatabaseBroker{
      * @return the List result
      * @throws MiddlewareQueryException
      */
-    //TODO BMS-148 : No longer reads from two DBs, rename.
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
+    public List getAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         
         List toReturn = new ArrayList();
@@ -216,7 +215,7 @@ public abstract class DataManager extends DatabaseBroker{
             java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
             dao.setSession(getActiveSession());
             toReturn.addAll((List) method.invoke(dao, parameters));
-        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+        } catch (Exception e) {
             logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
         }
         return toReturn;

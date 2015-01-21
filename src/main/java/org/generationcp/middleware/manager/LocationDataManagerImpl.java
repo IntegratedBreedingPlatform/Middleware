@@ -96,7 +96,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[]{country},
+        return (List<Location>) super.getAllByMethod(getLocationDao(), "getByCountry", new Object[]{country},
                 new Class[]{Country.class});
     }
 
@@ -115,13 +115,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type},
+        return (List<Location>) getAllByMethod(getLocationDao(), "getByType", new Object[]{type},
                 new Class[]{Integer.class});
     }
     
     @Override
     public List<Location> getLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
-        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type, programUUID},
+        return (List<Location>) getAllByMethod(getLocationDao(), "getByType", new Object[]{type, programUUID},
                 new Class[]{Integer.class, String.class});
     }
 
@@ -177,7 +177,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     @Override
     public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType)
             throws MiddlewareQueryException {
-        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getUserDefinedFieldDao()
+        return (List<UserDefinedField>) super.getAllByMethod(getUserDefinedFieldDao()
                 , "getByFieldTableNameAndType", new Object[]{tableName, fieldType}
                 , new Class[]{String.class, String.class});
     }
@@ -356,19 +356,19 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Country> getAllCountry() throws MiddlewareQueryException {
-        return (List<Country>) super.getAllFromCentralAndLocalByMethod(getCountryDao(), "getAllCountry", new Object[]{}, new Class[]{});
+        return (List<Country>) super.getAllByMethod(getCountryDao(), "getAllCountry", new Object[]{}, new Class[]{});
     }
 
     @Override
     public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountryAndType", new Object[]{country,
+        return (List<Location>) super.getAllByMethod(getLocationDao(), "getByCountryAndType", new Object[]{country,
                 type}, new Class[]{Country.class, Integer.class});
     }
 
     @Override
     public List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type)
             throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao()
+        return (List<Location>) super.getAllByMethod(getLocationDao()
                 , "getByNameCountryAndType", new Object[]{name, country,
                 type}, new Class[]{String.class, Country.class, Integer.class});
     }
@@ -376,7 +376,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     @Override
     public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return (List<LocationDetails>) super.getAllFromCentralAndLocalByMethod(getLocationDao()
+        return (List<LocationDetails>) super.getAllByMethod(getLocationDao()
                 , "getLocationDetails", new Object[]{locationId,
                 start, numOfRows}, new Class[]{Integer.class, Integer.class, Integer.class});
 
@@ -410,7 +410,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         Integer fieldParentFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
         Integer fieldLtypeFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
 
-        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
+        return super.getAllByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
                 , new Object[]{String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId}
                 , new Class[]{String.class, Integer.class, Integer.class});
     }
@@ -421,7 +421,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         Integer blockParentFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
         Integer blockLtypeFldId = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
-        return super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
+        return super.getAllByMethod(getLocationDao(), "getLocationsByDTypeAndLType"
                 , new Object[]{String.valueOf(fieldId), blockParentFldId, blockLtypeFldId}
                 , new Class[]{String.class, Integer.class, Integer.class});
     }
@@ -474,7 +474,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public List<Location> getAllFields() throws MiddlewareQueryException {
         Integer fieldLtype = getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
         Integer relationshipType = getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
-        List<Location> locations = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByTypeWithParent"
+        List<Location> locations = super.getAllByMethod(getLocationDao(), "getByTypeWithParent"
                 , new Object[]{fieldLtype, relationshipType}, new Class[]{Integer.class, Integer.class});
 
         Set<Integer> parentIds = new HashSet<Integer>();
@@ -496,14 +496,14 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException {
-        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvincesByCountry", new Object[]{countryId}, new Class[]{Integer.class});
+        List<Location> provinces = super.getAllByMethod(getLocationDao(), "getAllProvincesByCountry", new Object[]{countryId}, new Class[]{Integer.class});
 
         return provinces;
     }
 
     @Override
     public List<Location> getAllProvinces() throws MiddlewareQueryException {
-        List<Location> provinces = super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getAllProvinces", new Object[]{}, new Class[]{});
+        List<Location> provinces = super.getAllByMethod(getLocationDao(), "getAllProvinces", new Object[]{}, new Class[]{});
         return provinces;
     }
 
