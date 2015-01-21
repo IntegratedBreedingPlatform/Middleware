@@ -769,7 +769,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countAllQtl() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getQtlDao());
+        return countAll(getQtlDao());
     }
 
     @Override

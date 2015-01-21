@@ -58,7 +58,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public long countAllLocations() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getLocationDao());
+        return countAll(getLocationDao());
     }
     
     @Override

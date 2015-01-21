@@ -73,7 +73,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public long countAllLocations() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getLocationDao());
+        return countAll(getLocationDao());
     }
 
     @Override
@@ -658,7 +658,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public long countAllMethods() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getMethodDao());
+        return countAll(getMethodDao());
     }
     
     @Override

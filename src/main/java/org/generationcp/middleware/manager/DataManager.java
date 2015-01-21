@@ -323,21 +323,20 @@ public abstract class DataManager extends DatabaseBroker{
 
     /**
      * A generic implementation of the countAllXXX() method that calls countAll() from Generic DAO.     <br/>
-     * Returns the count of entities from both central and local databases based on the given DAO.     <br/> 
+     * Returns the count of entities based on the given DAO.     <br/> 
      *      <br/>
      * Sample usage:     <br/>
      * <pre><code>
      *     public long countAllLocations() throws MiddlewareQueryException {
-     *          return countAllFromCentralAndLocal(getLocationDao());
+     *          return countAll(getLocationDao());
      *     }
      * <code></pre>
      * @param dao   The DAO to call the method from
      * @return The number of entities from both central and local instances
      * @throws MiddlewareQueryException
      */
-    //TODO BMS-148 : No longer reads from two DBs, rename.
     @SuppressWarnings("rawtypes")
-    public long countAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
+    public long countAll(GenericDAO dao) throws MiddlewareQueryException {
         long count = 0;
         dao.setSession(getActiveSession());
         count = count + dao.countAll();

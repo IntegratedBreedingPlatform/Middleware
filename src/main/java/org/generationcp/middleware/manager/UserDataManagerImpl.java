@@ -50,7 +50,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
     @Override
     public long countAllUsers() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getUserDao());
+        return countAll(getUserDao());
     }
 
     @Override
@@ -142,7 +142,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     }
 
     public long countAllPersons() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getPersonDao());
+        return countAll(getPersonDao());
     }
 
     @Override
