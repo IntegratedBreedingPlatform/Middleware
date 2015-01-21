@@ -95,7 +95,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[] { name, op }, new Class[] { String.class,
+        return countAllByMethod(getLocationDao(), "countByName", new Object[] { name, op }, new Class[] { String.class,
                 Operation.class });
     }
 
@@ -117,7 +117,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[] { country },
+        return countAllByMethod(getLocationDao(), "countByCountry", new Object[] { country },
                 new Class[] { Country.class });
     }
 
@@ -139,7 +139,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     @Deprecated
     public long countLocationsByType(Integer type) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[] { type }, new Class[] { Integer.class });
+        return countAllByMethod(getLocationDao(), "countByType", new Object[] { type }, new Class[] { Integer.class });
     }
 
     @Override
@@ -156,7 +156,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public long countGermplasmByPrefName(String name) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countByPrefName", new Object[] { name },
+        return super.countAllByMethod(getGermplasmDao(), "countByPrefName", new Object[] { name },
                 new Class[] { String.class });
     }
 
@@ -670,7 +670,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public long countMethodsByUniqueID(String programUUID) throws MiddlewareQueryException {
         return super
-                .countAllFromCentralAndLocalByMethod(getMethodDao(), "countByUniqueID", new Object[] { programUUID }, new Class[] { String.class });
+                .countAllByMethod(getMethodDao(), "countByUniqueID", new Object[] { programUUID }, new Class[] { String.class });
     }
 
     @Override
@@ -695,13 +695,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public long countMethodsByType(String type) throws MiddlewareQueryException {
         return super
-                .countAllFromCentralAndLocalByMethod(getMethodDao(), "countByType", new Object[] { type }, new Class[] { String.class });
+                .countAllByMethod(getMethodDao(), "countByType", new Object[] { type }, new Class[] { String.class });
     }
     
     @Override
     public long countMethodsByType(String type, String programUUID) throws MiddlewareQueryException {
         return super
-                .countAllFromCentralAndLocalByMethod(getMethodDao(), "countByType", new Object[] { type, programUUID }, new Class[] { String.class, String.class });
+                .countAllByMethod(getMethodDao(), "countByType", new Object[] { type, programUUID }, new Class[] { String.class, String.class });
     }
 
 
@@ -732,7 +732,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public long countMethodsByGroup(String group) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMethodDao(), "countByGroup", new Object[] { group },
+        return super.countAllByMethod(getMethodDao(), "countByGroup", new Object[] { group },
                 new Class[] { String.class });
     }
 

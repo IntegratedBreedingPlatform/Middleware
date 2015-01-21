@@ -345,13 +345,12 @@ public abstract class DataManager extends DatabaseBroker{
 
     /**
      * A generic implementation of the countByXXXX() method that calls a specific count method from a DAO.     <br/>  
-     * Calls the corresponding count method as specified in the parameter methodName.     <br/>                       
-     * Retrieves data from both local and central databases.      <br/>             
+     * Calls the corresponding count method as specified in the parameter methodName.     <br/>                                    
      *      <br/> 
      * Sample usage:     <br/>
      *  <pre><code>
      *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException { 
-     *      return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class}); 
+     *      return countAllByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class}); 
      *  }
      *  </code></pre>
      * @param dao   The DAO to call the method from
@@ -361,16 +360,15 @@ public abstract class DataManager extends DatabaseBroker{
      * @return the count
      * @throws MiddlewareQueryException
      */
-    //TODO BMS-148 : No longer reads from two DBs, rename.
     @SuppressWarnings("rawtypes")
-    public long countAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
+    public long countAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         long count = 0;
         try {
             java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
             dao.setSession(getActiveSession());
             count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
-        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+        } catch (Exception e) {
             logAndThrowException("Error in counting: " + e.getMessage(), e);
         }
         return count;

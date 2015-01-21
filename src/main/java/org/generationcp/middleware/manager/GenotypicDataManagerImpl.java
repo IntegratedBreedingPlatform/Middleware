@@ -73,7 +73,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countMapIDsByQTLName", new Object[]{qtlName},
+        return super.countAllByMethod(getQtlDao(), "countMapIDsByQTLName", new Object[]{qtlName},
                 new Class[]{String.class});
     }
 
@@ -207,7 +207,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countDatasetNamesByQtlId(Integer qtlId) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getDatasetDao(), "countDatasetNamesByQtlId",
+        return super.countAllByMethod(getDatasetDao(), "countDatasetNamesByQtlId",
                 new Object[]{qtlId}, new Class[]{Integer.class});
     }
 
@@ -427,7 +427,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkerInfoByMarkerName(String markerName) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerInfoDao(), "countByMarkerName", new Object[]{markerName},
+        return super.countAllByMethod(getMarkerInfoDao(), "countByMarkerName", new Object[]{markerName},
                 new Class[]{String.class});
     }
 
@@ -440,7 +440,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkerInfoByGenotype(String genotype) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerInfoDao(), "countByGenotype", 
+        return super.countAllByMethod(getMarkerInfoDao(), "countByGenotype", 
         		new Object[]{genotype}, new Class[]{String.class});
     }
 
@@ -454,7 +454,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkerInfoByDbAccessionId(String dbAccessionId) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerInfoDao(), "countByDbAccessionId", 
+        return super.countAllByMethod(getMarkerInfoDao(), "countByDbAccessionId", 
         		new Object[]{dbAccessionId}, new Class[]{String.class});
     }
 
@@ -501,7 +501,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countMarkerNamesByMarkerType",
+        return super.countAllByMethod(getMarkerDao(), "countMarkerNamesByMarkerType",
                 new Object[]{markerType}, new Class[]{String.class});
     }
 
@@ -514,7 +514,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     
     @Override
     public long countGIDsFromCharValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getCharValuesDao(), "countGIDsByMarkerId", new Object[]{markerId},
+        return super.countAllByMethod(getCharValuesDao(), "countGIDsByMarkerId", new Object[]{markerId},
                 new Class[]{Integer.class});
     }
 
@@ -574,7 +574,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countAllDbAccessionIdsFromMarker() throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countAllDbAccessionIds", new Object[]{}, new Class[]{});
+        return super.countAllByMethod(getMarkerDao(), "countAllDbAccessionIds", new Object[]{}, new Class[]{});
     }
 
     @Override
@@ -610,7 +610,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
             throws MiddlewareQueryException {
-        return (int) countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countNIdsByMarkerIdsAndDatasetIdsAndNotGIds",
+        return (int) countAllByMethod(getAccMetadataSetDao(), "countNIdsByMarkerIdsAndDatasetIdsAndNotGIds",
                 new Object[]{datasetIds, markerIds, gIds}, new Class[]{List.class, List.class, List.class});
     }
 
@@ -643,7 +643,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getDatasetDao(), "countDatasetIdsForFingerPrinting", 
+        return super.countAllByMethod(getDatasetDao(), "countDatasetIdsForFingerPrinting", 
         		new Object[]{}, new Class[]{});
     }
 
@@ -656,7 +656,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countDatasetIdsForMapping() throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getDatasetDao(), "countDatasetIdsForMapping", 
+        return super.countAllByMethod(getDatasetDao(), "countDatasetIdsForMapping", 
         		new Object[]{}, new Class[]{});
     }
 
@@ -670,7 +670,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countAccMetadataSetsByGids",
+        return super.countAllByMethod(getAccMetadataSetDao(), "countAccMetadataSetsByGids",
                 new Object[]{gids}, new Class[]{List.class});
     }
 
@@ -684,7 +684,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerMetadataSetDao(), "countMarkersByGidAndDatasetIds",
+        return super.countAllByMethod(getMarkerMetadataSetDao(), "countMarkersByGidAndDatasetIds",
                 new Object[]{gid, datasetIds}, new Class[]{Integer.class, List.class});
     }
 
@@ -698,19 +698,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkersByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countMarkersByIds", 
+        return super.countAllByMethod(getMarkerDao(), "countMarkersByIds", 
         		new Object[]{markerIds}, new Class[]{List.class});
     }
 
     @Override
     public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(), "countAlleleValuesByGids", 
+        return super.countAllByMethod(getAlleleValuesDao(), "countAlleleValuesByGids", 
         		new Object[]{gids}, new Class[]{List.class});
     }
 
     @Override
     public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getCharValuesDao(), "countCharValuesByGids", 
+        return super.countAllByMethod(getCharValuesDao(), "countCharValuesByGids", 
         		new Object[]{gids}, new Class[]{List.class});
     }
 
@@ -722,7 +722,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(),
+        return super.countAllByMethod(getAlleleValuesDao(),
                 "countIntAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
@@ -734,7 +734,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(),
+        return super.countAllByMethod(getAlleleValuesDao(),
                 "countCharAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
@@ -746,7 +746,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(),
+        return super.countAllByMethod(getAlleleValuesDao(),
                 "countMappingAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
@@ -788,7 +788,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlIdByName", new Object[]{name}, new Class[]{String.class});
+        return super.countAllByMethod(getQtlDao(), "countQtlIdByName", new Object[]{name}, new Class[]{String.class});
     }
 
     //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
@@ -829,7 +829,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlAndQtlDetailsByName"
+        return super.countAllByMethod(getQtlDao(), "countQtlAndQtlDetailsByName"
                 , new Object[]{name}, new Class[]{String.class});
     }
 
@@ -943,7 +943,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((qtlIds == null) || (qtlIds.isEmpty())) {
             return 0;
         }
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlAndQtlDetailsByQtlIds"
+        return super.countAllByMethod(getQtlDao(), "countQtlAndQtlDetailsByQtlIds"
                 , new Object[]{qtlIds}, new Class[]{List.class});
     }
 
@@ -956,7 +956,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countQtlByTrait(Integer trait) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlByTrait", new Object[]{trait}, new Class[]{Integer.class});
+        return super.countAllByMethod(getQtlDao(), "countQtlByTrait", new Object[]{trait}, new Class[]{Integer.class});
     }
 
     @Override
@@ -980,7 +980,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMappingPopDao(), "countAllParentsFromMappingPopulation", 
+        return super.countAllByMethod(getMappingPopDao(), "countAllParentsFromMappingPopulation", 
         		new Object[]{}, new Class[]{});
     }
 
@@ -993,7 +993,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countMapDetailsByName", 
+        return super.countAllByMethod(getMapDao(), "countMapDetailsByName", 
         		new Object[]{nameLike}, new Class[]{String.class});
     }
 
@@ -1019,7 +1019,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countAllMapDetails() throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countAllMapDetails", new Object[]{}, new Class[]{});
+        return super.countAllByMethod(getMapDao(), "countAllMapDetails", new Object[]{}, new Class[]{});
     }
 
     @Override
@@ -1031,7 +1031,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countMapIdsByQtlName", 
+        return super.countAllByMethod(getQtlDetailsDao(), "countMapIdsByQtlName", 
         		new Object[]{qtlName}, new Class[]{String.class});
     }
 
@@ -1046,7 +1046,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkerIdsByQtl(String qtlName, String chromosome, float min, float max) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countMarkerIdsByQtl",
+        return super.countAllByMethod(getQtlDetailsDao(), "countMarkerIdsByQtl",
                 new Object[]{qtlName, chromosome, min, max}, new Class[]{String.class, String.class, Float.TYPE, Float.TYPE});
     }
 
@@ -2073,7 +2073,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countQtlDataByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countQtlDataByQtlTraits", new Object[]{qtlTraits},
+        return super.countAllByMethod(getQtlDetailsDao(), "countQtlDataByQtlTraits", new Object[]{qtlTraits},
                 new Class[]{List.class});
     }
 
@@ -2087,19 +2087,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countQtlDetailsByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByQtlTraits", new Object[]{qtlTraits},
+        return super.countAllByMethod(getQtlDao(), "countQtlDetailsByQtlTraits", new Object[]{qtlTraits},
                 new Class[]{List.class});
     }
 
     @Override
     public long countAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countNidsByDatasetIds",
+        return super.countAllByMethod(getAccMetadataSetDao(), "countNidsByDatasetIds",
                 new Object[]{datasetIds}, new Class[]{List.class});
     }
 
     @Override
     public long countMarkersFromMarkerMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMarkerMetadataSetDao(), "countByDatasetIds",
+        return super.countAllByMethod(getMarkerMetadataSetDao(), "countByDatasetIds",
                 new Object[]{datasetIds}, new Class[]{List.class});
     }
 
@@ -2110,13 +2110,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMappingPopValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(this.getMappingPopValuesDao(), "countByGids", new Object[]{gIds},
+        return super.countAllByMethod(this.getMappingPopValuesDao(), "countByGids", new Object[]{gIds},
                 new Class[]{List.class});
     }
 
     @Override
     public long countMappingAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(this.getAlleleValuesDao(), "countByGids", new Object[]{gIds},
+        return super.countAllByMethod(this.getAlleleValuesDao(), "countByGids", new Object[]{gIds},
                 new Class[]{List.class});
     }
 
@@ -2188,7 +2188,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countAllMTAs() throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getMtaDao(), "countAll", new Object[]{}, new Class[]{});
+        return super.countAllByMethod(getMtaDao(), "countAll", new Object[]{}, new Class[]{});
     }
 
     @Override

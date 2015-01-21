@@ -70,7 +70,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     
     @Override
     public long countLocationsByUniqueID(String programUUID) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByUniqueID", new Object[]{ programUUID }, new Class[]{String.class});
+        return countAllByMethod(getLocationDao(), "countByUniqueID", new Object[]{ programUUID }, new Class[]{String.class});
     }
     
     @Override
@@ -90,7 +90,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[]{name, op}, new Class[]{String.class,
+        return countAllByMethod(getLocationDao(), "countByName", new Object[]{name, op}, new Class[]{String.class,
                 Operation.class});
     }
 
@@ -109,7 +109,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country},
+        return countAllByMethod(getLocationDao(), "countByCountry", new Object[]{country},
                 new Class[]{Country.class});
     }
 
@@ -134,12 +134,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public long countLocationsByType(Integer type) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[]{type}, new Class[]{Integer.class});
+        return countAllByMethod(getLocationDao(), "countByType", new Object[]{type}, new Class[]{Integer.class});
     }
     
     @Override
     public long countLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[]{type,programUUID}, new Class[]{Integer.class, String.class});
+        return countAllByMethod(getLocationDao(), "countByType", new Object[]{type,programUUID}, new Class[]{Integer.class, String.class});
     }
 
     @Override
@@ -394,7 +394,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
     @Override
     public Long countAllBreedingLocations() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDAO()
+        return countAllByMethod(getLocationDAO()
                 , "countAllBreedingLocations", new Object[]{}, new Class[]{});
     }
 

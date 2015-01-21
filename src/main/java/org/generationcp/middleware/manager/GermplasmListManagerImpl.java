@@ -73,7 +73,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countAllGermplasmLists() throws MiddlewareQueryException {
     	
-    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {}, new Class[]{});
+    	return countAllByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {}, new Class[]{});
     }
     
     @Override
@@ -130,7 +130,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListByGID(Integer gid) throws MiddlewareQueryException {
     	
-    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByGID", new Object[] {gid}, 
+    	return countAllByMethod(getGermplasmListDAO(), "countByGID", new Object[] {gid}, 
     	        new Class[]{Integer.class});
     }
 
@@ -206,7 +206,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListDataByGID(Integer gid) throws MiddlewareQueryException {
     	
-    	return countAllFromCentralAndLocalByMethod(getGermplasmListDataDAO(), "countByGID", new Object[] {gid}, 
+    	return countAllByMethod(getGermplasmListDataDAO(), "countByGID", new Object[] {gid}, 
     	        new Class[]{Integer.class});
     }
 
