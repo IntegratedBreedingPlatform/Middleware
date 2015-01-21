@@ -31,7 +31,9 @@ import org.hibernate.criterion.Restrictions;
  * 
  */
 public class MethodDAO extends GenericDAO<Method, Integer>{
-    @SuppressWarnings("unchecked")
+    private static final String UNIQUE_ID = "uniqueID";
+
+	@SuppressWarnings("unchecked")
     public List<Method> getMethodsByIds(List<Integer> ids) throws MiddlewareQueryException {
         try {
             return getSession().createCriteria(Method.class).add(Restrictions.in("mid",ids)).list();
@@ -58,7 +60,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
     public List<Method> getByUniqueID(String programUUID) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
-            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
@@ -85,7 +87,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
             criteria.add(Restrictions.eq("mtype", type));
-            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
@@ -126,7 +128,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
             criteria.add(Restrictions.eq("mtype", type));
-            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
@@ -138,7 +140,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
     public long countByUniqueID(String programUUID) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
-            criteria.add(Restrictions.or(Restrictions.eq("uniqueID", programUUID),Restrictions.isNull("uniqueID")));
+            criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
@@ -334,7 +336,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
 		List<Method> method = new ArrayList<Method>();
 		try{
 			Criteria criteria = getSession().createCriteria(Method.class);
-    		criteria.add(Restrictions.eq("uniqueID", programUUID));
+    		criteria.add(Restrictions.eq(UNIQUE_ID, programUUID));
     		method = (List<Method>) criteria.list();
     	} catch (HibernateException e) {
             logAndThrowException(

@@ -39,6 +39,9 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    
+	private static final String PROGRAM_UUID = "program_uuid";
+
+
 	private static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT DISTINCT subject.project_id, subject.name,  subject.description " 
 			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study  "
@@ -114,7 +117,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		List<FolderReference> folderList = new ArrayList<FolderReference>();
 		try {
 			Query query = getSession().createSQLQuery(GET_ROOT_FOLDERS);
-			query.setParameter("program_uuid", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			List<Object[]> list =  query.list();
 			
 			if (list != null && !list.isEmpty()) {
@@ -140,7 +143,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			Query query = getSession().createSQLQuery(GET_CHILDREN_OF_FOLDER);
 			query.setParameter("folderId", folderId);
-			query.setParameter("program_uuid", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			List<Object[]> list =  query.list();
 			
 			for (Object[] row : list){
@@ -928,7 +931,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		List<Integer> projectIds = null;
 		try {
 			SQLQuery query = getSession().createSQLQuery(GET_ALL_PROGRAM_STUDIES_AND_FOLDERS);
-			query.setParameter("program_uuid", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			projectIds =  (List<Integer>) query.list();
         } catch(HibernateException e) {
             logAndThrowException("Error at getAllProgramStudiesAndFolders, query at DmsProjectDao: " + e.getMessage(), e);
