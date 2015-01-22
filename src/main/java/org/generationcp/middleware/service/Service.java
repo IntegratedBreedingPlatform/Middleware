@@ -33,8 +33,8 @@ public abstract class Service extends DatabaseBroker {
         super(sessionProvider);		
 	}
 	
-	public Service(HibernateSessionProvider sessionProvider, String localDatabaseName) {
-        super(sessionProvider, localDatabaseName);
+	public Service(HibernateSessionProvider sessionProvider, String databaseName) {
+        super(sessionProvider, databaseName);
     }
 	
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
