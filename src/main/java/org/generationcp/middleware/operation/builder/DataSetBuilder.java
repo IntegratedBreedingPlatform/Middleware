@@ -105,7 +105,7 @@ public class DataSetBuilder extends Builder {
 	public DmsProject getTrialDataset(int studyId, int measurementDatasetId) throws MiddlewareQueryException {
 	    setWorkingDatabase(studyId);
 	    DmsProject trialDataset = null;
-	    DmsProject study = getDmsProjectDao().getById(studyId);
+	    DmsProject study = getDmsProjectById(studyId);
 	    List<ProjectRelationship> datasets = study.getRelatedBys();
 	    if (datasets != null) {
 	    	trialDataset = datasets.get(0).getSubjectProject();
@@ -191,5 +191,9 @@ public class DataSetBuilder extends Builder {
 			}
 		}
 		return newList;
+	}
+	
+	protected DmsProject getDmsProjectById(int studyId) throws MiddlewareQueryException {
+		return getDmsProjectDao().getById(studyId);
 	}
 }
