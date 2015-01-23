@@ -56,6 +56,7 @@ public class DatabaseSetupUtil{
 
 	private static void setUpMysqlConfig() throws Exception{
 		Class.forName("com.mysql.jdbc.Driver");
+		
 		cropConnectionParameters = new DatabaseConnectionParameters(TEST_DATABASE_CONFIG_PROPERTIES, "crop");
 		workbenchConnectionParameters = new DatabaseConnectionParameters(TEST_DATABASE_CONFIG_PROPERTIES, "workbench");
 
@@ -63,9 +64,39 @@ public class DatabaseSetupUtil{
 		Properties prop = new Properties();
 		prop.load(in);
 
-		MYSQL_PATH = prop.getProperty("mysql.path", "");
+		MYSQL_PATH = prop.getProperty("mysql.path", "mysql");
+
+		LOG.debug("  >>> MYSQL_PATH:" + MYSQL_PATH);
+
+		checkSQLPath();
 	}
 
+
+	private static void checkSQLPath() throws IOException, InterruptedException {
+		ProcessBuilder	pb = new ProcessBuilder("bash", "-c", "find / -name my.cnf");
+
+		Process process = pb.start();
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String line;
+
+		StringBuilder stdOut = new StringBuilder();
+		while ( (line = reader.readLine()) != null) {
+			stdOut.append(line);
+		}
+		reader.close();
+
+		BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+		StringBuilder errorOut = new StringBuilder();
+		while ((line = errorReader.readLine()) != null) {
+			errorOut.append(line);
+		}
+		errorReader.close();
+		process.waitFor();
+
+		LOG.debug("Find mysql  >>> stdOut:" + stdOut);
+		LOG.debug("Find mysql  >>> errorOut:" + errorOut);
+	}
 
 	private static Map<String, List<File>> setupScripts() throws FileNotFoundException, URISyntaxException{
 		Map<String, List<File>> scriptsMap = new HashMap<String, List<File>>();
@@ -340,7 +371,7 @@ public class DatabaseSetupUtil{
 		int exitValue = mysqlProcess.waitFor();
 		return exitValue == 0;
 	}
-
+	
 	private static boolean runSQLCommand(String sqlCommand, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
 		ProcessBuilder pb;
 		String mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
@@ -380,9 +411,10 @@ public class DatabaseSetupUtil{
          */
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		String line;
-		
+
+		StringBuilder stdOut = new StringBuilder();
 		while ( (line = reader.readLine()) != null) {
-			//System.out.println(line);
+			stdOut.append(line);
 		}
 		reader.close();
         /* When the process writes to stderr the output goes to a fixed-size buffer. 
