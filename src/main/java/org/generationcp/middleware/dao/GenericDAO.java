@@ -57,6 +57,18 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         LOG.error(message, e);
         throw new MiddlewareQueryException(message, e);
     }
+    
+    protected String getLogExceptionMessage(String methodName, String paramVar, String paramValue, String exceptionMessage, String className){
+    	String message = "Error with " + methodName + "(";
+    	
+    	if(paramVar.length()!=0){
+    		message += paramVar + "=" + paramValue;
+    	}
+    	
+    	message += ") query from " +className + ": " + exceptionMessage;
+    	
+    	return message;
+    }
 
     public T getById(ID id) throws MiddlewareQueryException {
     	return getById(id, false);

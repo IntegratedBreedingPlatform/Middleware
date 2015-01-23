@@ -38,11 +38,10 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             return getSession().createCriteria(Method.class).add(Restrictions.in("mid",ids)).list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByIds() query from Method: " + e.getMessage(),e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByIds","",null,e.getMessage(),"Method"), e);
         }
 
         return new ArrayList<Method>();
-
     }
 
     @SuppressWarnings("unchecked")
@@ -51,7 +50,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             Query query = getSession().getNamedQuery(Method.GET_ALL);
             return (List<Method>) query.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getAllMethod() query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getAllMethod","",null,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -64,11 +63,11 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByType(programUUID=" + programUUID + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException(getLogExceptionMessage("getMethodsByType","programUUID",programUUID,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
-
+    
     @SuppressWarnings("unchecked")
     public List<Method> getByType(String type) throws MiddlewareQueryException {
         try {
@@ -77,7 +76,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByType","type",type,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -91,7 +90,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByType","type",type,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -107,7 +106,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setMaxResults(numOfRows);            
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByType","type",type,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -119,7 +118,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            logAndThrowException("Error with countMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("countMethodsByType","type",type,e.getMessage(),"Method"), e);
         }
         return 0;
     }
@@ -132,7 +131,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            logAndThrowException("Error with countMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("countMethodsByType","type",type,e.getMessage(),"Method"), e);
         }
         return 0;
     }
@@ -144,7 +143,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            logAndThrowException("Error with countMethodsByType(programUUID=" + programUUID + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("countMethodsByType","programUUID",programUUID,e.getMessage(),"Method"), e);
         }
         return 0;
     }
@@ -159,7 +158,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByGroup","group",group,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -176,7 +175,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByGroup","group",group,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -191,7 +190,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setMaxResults(numOfRows);            
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByGroup","group",group,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -212,7 +211,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByGroupAndType(group=" + group + " and "+type+") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByGroupAndType","group|type",group+"|"+type,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -243,7 +242,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodsByGroupAndType(group=" + group + " and "+type+") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByGroupAndType","group|type",group+"|"+type,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -262,7 +261,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
 
             return criteria.list();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getAllMethodsNotGenerative() query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getAllMethodsNotGenerative","",null,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -275,7 +274,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            logAndThrowException("Error with countMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("countMethodsByGroup","group",group,e.getMessage(),"Method"), e);
         }
         return 0;
     }   
@@ -286,7 +285,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.add(Restrictions.eq("mcode", code));
             return (Method) criteria.uniqueResult();
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMethodByCode(code=" + code + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getMethodsByCode","code",code,e.getMessage(),"Method"), e);
         }
         return new Method();
     }
@@ -326,7 +325,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             
             return methods;
         } catch (HibernateException e) {
-            logAndThrowException("Error with getByName(name=" + name + ") query from Method: " + e.getMessage(), e);
+        	logAndThrowException(getLogExceptionMessage("getByName","name",name,e.getMessage(),"Method"), e);
         }
         return new ArrayList<Method>();
     }
@@ -339,8 +338,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
     		criteria.add(Restrictions.eq(UNIQUE_ID, programUUID));
     		method = (List<Method>) criteria.list();
     	} catch (HibernateException e) {
-            logAndThrowException(
-                    "Error in getProgramMethods(" + programUUID + ") in MethodDao: " + e.getMessage(), e);
+    		logAndThrowException(getLogExceptionMessage("getProgramMethods","programUUID",programUUID,e.getMessage(),"Method"), e);
 		}
     	return method;
 	}
