@@ -67,35 +67,6 @@ public class DatabaseSetupUtil{
 		MYSQL_PATH = prop.getProperty("mysql.path", "mysql");
 
 		LOG.debug("  >>> MYSQL_PATH:" + MYSQL_PATH);
-
-		checkSQLPath();
-	}
-
-
-	private static void checkSQLPath() throws IOException, InterruptedException {
-		ProcessBuilder	pb = new ProcessBuilder("bash", "-c", "find / -name my.cnf");
-
-		Process process = pb.start();
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		String line;
-
-		StringBuilder stdOut = new StringBuilder();
-		while ( (line = reader.readLine()) != null) {
-			stdOut.append(line);
-		}
-		reader.close();
-
-		BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-		StringBuilder errorOut = new StringBuilder();
-		while ((line = errorReader.readLine()) != null) {
-			errorOut.append(line);
-		}
-		errorReader.close();
-		process.waitFor();
-
-		LOG.debug("Find mysql  >>> stdOut:" + stdOut);
-		LOG.debug("Find mysql  >>> errorOut:" + errorOut);
 	}
 
 	private static Map<String, List<File>> setupScripts() throws FileNotFoundException, URISyntaxException{
