@@ -415,6 +415,14 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     }
 
     @Test
+    public void testGetExperimentsWithTrialEnvironments() throws Exception {
+    	List<Experiment> experiments = manager.getExperimentsWithTrialEnvironment(5803, 5803, 0, 50);
+        for (Experiment experiment : experiments) {
+            experiment.print(INDENT);
+        }
+    }
+
+    @Test
     public void testAddDataSet() throws Exception {
         // Parent study, assign a parent study id value, if none exists in db,
         // you may create a dummy one. or you may run testAddStudy first to

@@ -232,6 +232,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
+    public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows) 
+            throws MiddlewareQueryException {
+        clearSessions();
+        
+        VariableTypeList trialVariableTypes = getDataSetBuilder().getVariableTypes(trialDataSetId);
+        VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
+        
+        variableTypes.addAll(trialVariableTypes);
+        
+        return getExperimentBuilder().build(
+                dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
+    }
+
+    @Override
 	public List<Experiment> getExperiments(int dataSetId, int start,
 			int numOfRows, VariableTypeList varTypeList)
 			throws MiddlewareQueryException {

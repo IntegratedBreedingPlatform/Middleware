@@ -793,4 +793,6 @@ public interface StudyDataManager{
      */
 	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) throws MiddlewareQueryException;
 
+public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId,
+			int start, int numRows) throws MiddlewareQueryException;
 }
