@@ -802,4 +802,7 @@ public interface StudyDataManager{
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
 	public StudyType getStudyType(int studyId) throws MiddlewareQueryException;
+
+	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId,
+			int start, int numRows) throws MiddlewareQueryException;
 }

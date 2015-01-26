@@ -108,25 +108,14 @@ public class DataSetBuilder extends Builder {
 	    DmsProject study = getDmsProjectDao().getById(studyId);
 	    List<ProjectRelationship> datasets = study.getRelatedBys();
 	    if (datasets != null) {
+	    	trialDataset = datasets.get(0).getSubjectProject();
+	    	int lowest = Math.abs(trialDataset.getProjectId());
 	        for (ProjectRelationship dataset : datasets) {
-	            String datasetType = null; 
-                for (ProjectProperty prop : dataset.getSubjectProject().getProperties()) {
-                    if (prop.getTypeId() == TermId.DATASET_TYPE.getId()) {
-                        datasetType = prop.getValue();
-                    }
-                }
-                if (datasetType != null) {
-    	            if (Integer.parseInt(datasetType) == DataSetType.SUMMARY_DATA.getId() 
-    	                    || (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId())
-    	                    && Integer.parseInt(datasetType) != DataSetType.MEANS_DATA.getId()
-    	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId))) {
-    	                trialDataset = dataset.getSubjectProject();
-    	                break;
-    	            }
-                } else if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
-                        && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
+	        	Integer projectId = dataset.getSubjectProject().getProjectId();
+	        	int id = Math.abs(projectId);
+	        	if(id < lowest) {
+    				lowest = id;
                     trialDataset = dataset.getSubjectProject();
-                    break;
                 }
 	        }
 	    }
