@@ -89,5 +89,9 @@ public final class ReporterFactory {
 		
 		throw new MissingReportException(reportKey);
 	}
+	
+	public Set<String> getReportKeys(){
+		return reportersMap.keySet();
+	}
 
 }

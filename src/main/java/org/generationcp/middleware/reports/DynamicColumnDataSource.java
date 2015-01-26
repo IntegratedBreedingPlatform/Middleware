@@ -2,6 +2,9 @@ package org.generationcp.middleware.reports;
 
 import java.util.Iterator;
 import java.util.List;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRField;
+import net.sf.jasperreports.engine.data.JRAbstractBeanDataSource;
 
 class DynamicColumnDataSource extends JRAbstractBeanDataSource{
 	

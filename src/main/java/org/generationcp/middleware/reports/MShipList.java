@@ -8,6 +8,13 @@ import java.util.Map;
 
 import org.generationcp.middleware.pojos.report.SiteEntry;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+
 public class MShipList extends AbstractDynamicReporter{
 
 	@Override
@@ -19,7 +26,7 @@ public class MShipList extends AbstractDynamicReporter{
 
 	@Override
 	public String getReportCode() {
-		return "MFb";
+		return "MFbShipList";
 	}
 
 	@Override

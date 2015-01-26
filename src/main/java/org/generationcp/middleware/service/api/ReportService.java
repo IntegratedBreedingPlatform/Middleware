@@ -31,7 +31,7 @@ public interface ReportService {
 	 * Sends the file to the specified output stream.
 	 * @param output Out where the report has to be sent. This can be a servlet, file or any other output stream.
 	 */
-	void getStreamReport(String code, Integer studyId, OutputStream output) throws MiddlewareException, MiddlewareQueryException, JRException;
+	void getStreamReport(String code, Integer studyId, OutputStream output) throws MiddlewareException, MiddlewareQueryException, JRException, BuildReportException;
 
 	/**
 	 * Returns a Set of keys available to be passed to a ReporterFactory, for generating a particular report. 

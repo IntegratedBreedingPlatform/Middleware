@@ -4,6 +4,13 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+
 public class MFieldbookTrial extends AbstractReporter{
 
 	@Override
@@ -15,7 +22,7 @@ public class MFieldbookTrial extends AbstractReporter{
 
 	@Override
 	public String getReportCode() {
-		return "MFb2";
+		return "MFbTrial";
 	}
 
 	@Override

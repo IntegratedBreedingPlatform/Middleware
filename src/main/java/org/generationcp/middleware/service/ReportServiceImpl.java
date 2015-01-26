@@ -52,7 +52,7 @@ public class ReportServiceImpl extends Service implements ReportService{
 	}
 
 	public void getStreamReport(String code, Integer studyId, OutputStream output) throws MiddlewareException
-			, MiddlewareQueryException, JRException
+			, MiddlewareQueryException, JRException, BuildReportException
 	{
 		Study study = getStudyDataManager().getStudy(studyId);
 		List<GermplasmListData> germListData =  getGermplasmListManager().getGermplasmListDataByListId(studyId, 0, 0);
