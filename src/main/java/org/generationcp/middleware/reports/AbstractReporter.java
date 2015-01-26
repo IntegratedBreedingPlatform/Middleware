@@ -27,7 +27,7 @@ abstract class AbstractReporter implements Reporter{
 	private String fileNameExpr = getReportCode()+"-{tid}";
 	private String fileName = null;
 	private Pattern fileNameParamsPattern = Pattern.compile("\\{[\\w-_]*\\}");
-	private JasperPrint jrPrint;
+	JasperPrint jrPrint;
 	
 	@Override
 	public String toString(){
@@ -37,7 +37,7 @@ abstract class AbstractReporter implements Reporter{
 	/**
 	 * Uses the data passed to build a JasperPrint, which can be used to generate a file, an outputStream or any other format for distribution.
 	 */
-	public final JasperPrint buildJRPrint(Map<String, Object> args) throws JRException{
+	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException{
 		
 		String jasperFilesPath = getTemplatePath();
 		Map<String, Object> jrParams = null;
@@ -47,35 +47,18 @@ abstract class AbstractReporter implements Reporter{
 			jrParams = buildJRParams(args);
 			fileName = buildOutputFileName(jrParams);
 
-			if(args.containsKey("dataSource"))
+			if(args.containsKey("dataSource")){
 				jrDataSource = buildJRDataSource((Collection<?>)args.get("dataSource"));
+				System.out.println ("datasource done!!!");
+			}
 			
 		}
 					
 		jrPrint = JasperFillManager.fillReport(jasperFilesPath, jrParams, jrDataSource);
 
 		return jrPrint;
+		
 	}
-	
-	private String buildOutputFileName(Map<String,Object> jrParams){
-		String fileName = this.fileNameExpr;
-		
-		
-		Matcher paramsMatcher = fileNameParamsPattern.matcher(this.fileNameExpr);
-		
-		 while (paramsMatcher.find()) {
-			 String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
-			 
-			 if(null == jrParams || null == jrParams.get(paramName)){
-				 fileName = fileName.replace(paramsMatcher.group(), "");
-			 }else{
-				 fileName = fileName.replace(paramsMatcher.group(), jrParams.get(paramName).toString());
-			 }
-		 }
-		
-		return fileName;
-	}
-
 	
 	/**
 	 * Returns a Map with the parameters required for creating a JasperPrint for this Reporter.
@@ -83,9 +66,8 @@ abstract class AbstractReporter implements Reporter{
 	 * subclasses extending AbstractReporter may add extra parameters to fill in its particular template.
 	 * @return Map of parameters for a JarperPrint 
 	 */
-
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
-		Map<String, Object> params = new HashMap<>();
+		Map<String, Object> params = new HashMap<String, Object>();
 
 		if(args.containsKey("datePattern"))
 			params.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, args.get("datePattern"));
@@ -132,16 +114,53 @@ abstract class AbstractReporter implements Reporter{
 	public String getFileName(){
 		return fileName;
 	}
+	public void setFileName(String fileName){
+		this.fileName = fileName;
+	}
 	
-	public void asOutputStream(OutputStream output) throws BuildReportException{
+	protected String buildOutputFileName(Map<String,Object> jrParams){
+		String fileName = this.fileNameExpr;
+		
+		
+		Matcher paramsMatcher = fileNameParamsPattern.matcher(this.fileNameExpr);
+		
+		 while (paramsMatcher.find()) {
+			 String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
+			 
+			 if(null == jrParams || null == jrParams.get(paramName)){
+				 fileName = fileName.replace(paramsMatcher.group(), "");
+			 }else{
+				 fileName = fileName.replace(paramsMatcher.group(), jrParams.get(paramName).toString());
+			 }
+		 }
+		
+		return fileName;
+	}
+	
+	@Override
+	public void asOutputStream(OutputStream output) throws BuildReportException {
 		if(null != jrPrint)
 			try {
 				JasperExportManager.exportReportToPdfStream(jrPrint, output);
 			} catch (JRException e) {
 				e.printStackTrace();
-				throw new BuildReportException(getReportCode());
 			}
 		else throw new BuildReportException(getReportCode());
 	}
 
+	/**
+	 * Does not set the input and output of this exporter, only configures it.
+	 * @return
+	 */
+	protected JRXlsxExporter createDefaultExcelExporter(){
+		JRXlsxExporter ex = new JRXlsxExporter();
+		
+		SimpleXlsReportConfiguration jrConfig = new SimpleXlsReportConfiguration();
+		jrConfig.setOnePagePerSheet(false);
+		jrConfig.setDetectCellType(true);
+		jrConfig.setIgnoreCellBorder(true);
+		jrConfig.setWhitePageBackground(true);
+		
+		return ex;
+	}
 }

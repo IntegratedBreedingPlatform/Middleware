@@ -2,13 +2,11 @@ package org.generationcp.middleware.reports;
 
 import static java.lang.System.err;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.generationcp.middleware.reports.MissingReportException;
 import org.reflections.Reflections;
 
 public final class ReporterFactory {
@@ -34,12 +32,20 @@ public final class ReporterFactory {
 	 * @throws IllegalArgumentException 
 	 */
 	private static void initFactory() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException{
-		Reflections reflections = new Reflections("org.generationcp.middleware.reports");
+		Reflections reflections = new Reflections("org.cimmyt.reporter");
 		Set<Class<? extends AbstractReporter>> classes = reflections.getSubTypesOf(AbstractReporter.class);
+		
+		
 		for(Class<?> c : classes){
-			Class<?> r = Class.forName(c.getName());
-			Reporter instance = (Reporter)r.newInstance();
-			ReporterFactory.instance().addReporter(instance);
+			System.out.print("CLASS: "+c.getName());
+			
+			int classModifiers = c.getModifiers();
+			System.out.println(" modif: "+Modifier.toString(classModifiers));
+			if(! Modifier.toString(classModifiers).contains("abstract")){
+				Class<?> r = Class.forName(c.getName());
+				Reporter instance = (Reporter)r.newInstance();
+				ReporterFactory.instance().addReporter(instance);
+			}
 		}
 		
 	}
@@ -64,7 +70,7 @@ public final class ReporterFactory {
 	 */
 	private void addReporter(Reporter report) {
 		if(reportersMap.containsKey(report.getReportCode()))
-			err.println("WARNINIG - ReporterFactory: overwriting existing report with code: "+report.getReportCode());
+			err.println("WARNINIG - ReporterFactory: overwriting report with code: "+report.getReportCode());
 		
 		reportersMap.put(report.getReportCode(), report);
 	}
@@ -82,10 +88,6 @@ public final class ReporterFactory {
 			return reportersMap.get(reportKey).createReporter();
 		
 		throw new MissingReportException(reportKey);
-	}
-	
-	public Set<String> getReportKeys(){
-		return reportersMap.keySet();
 	}
 
 }

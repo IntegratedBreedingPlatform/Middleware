@@ -2,18 +2,17 @@ package org.generationcp.middleware.reports;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
 
-public class BuildReportException extends MiddlewareException {
+public class BuildReportException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	private String key;
 
 	@Override
 	public String getMessage() {
-		return "Datasource for report with key ["+key+"] has not been set.";
+		return "Datasource for report with key ["+key+"] has not been set or report is not built yet.";
 	}
 	
 	public BuildReportException(String key) {
-		super(key);
 		this.key = key;
 	}
 }

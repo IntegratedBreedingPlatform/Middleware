@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
+<!-- 2015-01-23T11:18:03 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MFb3_main" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="8a465670-cc4a-4270-965f-8efb86e33b71">
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="template.engine" value="tabular_template"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="net.sf.jasperreports.export.xls.freeze.row" value="12"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.sheet.names.shipment" value="shipments"/>
+	<style name="Table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+			<topPen lineWidth="1.0" lineColor="#000000"/>
+			<leftPen lineWidth="1.0" lineColor="#000000"/>
+			<bottomPen lineWidth="1.0" lineColor="#000000"/>
+			<rightPen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#EFEFEF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="tableDataset" uuid="d43eb3e2-4701-467a-b58e-365d9fb63e47">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
+	<parameter name="recLastName" class="java.lang.String"/>
+	<parameter name="recFirstName" class="java.lang.String"/>
+	<parameter name="institution" class="java.lang.String"/>
+	<parameter name="shippingAddress" class="java.lang.String"/>
+	<parameter name="country" class="java.lang.String"/>
+	<parameter name="contactNumber" class="java.lang.String"/>
+	<parameter name="phytoInstr" class="java.lang.String"/>
+	<parameter name="shippingInstr" class="java.lang.String"/>
+	<parameter name="shipFrom" class="java.lang.String"/>
+	<parameter name="shipId" class="java.lang.String"/>
+	<parameter name="prepDate" class="java.lang.String"/>
+	<parameter name="carrier" class="java.lang.String"/>
+	<parameter name="airwayBill" class="java.lang.String"/>
+	<parameter name="dateSent" class="java.lang.String"/>
+	<parameter name="quantity" class="java.lang.String"/>
+	<parameter name="commments" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<title>
+		<band height="120" splitType="Stretch">
+			<staticText>
+				<reportElement x="530" y="0" width="200" height="45" uuid="ce848945-afc1-4a6b-9dc9-da92de303e26">
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="Tahoma" size="32" isBold="true" pdfFontName="Tahoma" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[CIMMYT]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="15" width="150" height="15" uuid="0c6a97fb-82b4-4ae7-a65a-9fea2082b117"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$P{recFirstName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="0" width="150" height="15" uuid="cbedd6a9-2703-4f11-8e0c-eb8e92006a6c"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{recLastName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="120" height="15" uuid="b642d5f8-7566-4d44-b43e-d1ef21f15482"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Recipient LastName:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="15" width="120" height="15" uuid="48ccaf5b-6300-4120-9ee8-2099d2f03e34"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Recipient FirstName:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="45" width="120" height="15" uuid="b47bc48e-9cd9-493a-8d4c-0bab258fadbb"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Shipping Addr:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="120" height="15" uuid="ec50be3e-8b62-4583-b55a-703be68b5937"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Institution:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="30" width="150" height="15" uuid="d9ac3af8-4b05-45ad-af85-e0a3f46b19da"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{institution}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="45" width="150" height="15" uuid="aaa5cf66-08b2-47b3-b7c9-bd9e6841bddc"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$P{shippingAddress}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="75" width="120" height="15" uuid="bd29a077-3e19-4fc5-8b9a-072fc61baafe"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Ph/Fax/email:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="60" width="150" height="15" uuid="8247bc6d-cf2e-40cf-a54b-7aeef13bf15e"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{country}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="105" width="150" height="15" uuid="5cd73453-c7a8-4fff-9748-6d2d6b698fed"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$P{shippingInstr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="90" width="150" height="15" uuid="8853f900-616c-4a04-a038-1039fab4f9ee"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{phytoInstr}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="120" height="15" uuid="b4e90292-94e2-4e51-aeca-0b20d89f5b80"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Country:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="75" width="150" height="15" uuid="e23fbd95-193c-4750-9b8b-600eff37127b"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textFieldExpression><![CDATA[$P{contactNumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="90" width="120" height="15" uuid="978a9b40-8a42-4893-a9e4-e98d3330321f"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Phyto Instr:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="105" width="120" height="15" uuid="9059a22f-0bc9-47cb-b89a-19d985cbaa08"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Shipping Instr:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="0" width="100" height="15" uuid="3676e87a-9ea3-4391-a2b5-3f76800ed583"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Shipment from:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="15" width="100" height="15" uuid="29677911-a664-4873-83d8-9452faa82f67"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Shipment ID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="30" width="100" height="15" uuid="562c4d77-3146-4722-8859-340785da1a02"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Prep. Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="45" width="100" height="15" uuid="2ba1301a-631d-4ac8-91a2-7e79b96f7cf3"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Carrier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="75" width="100" height="15" uuid="3a2b356b-baa0-4709-bb48-5ec9cdcf3162"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Date Sent:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="60" width="100" height="15" uuid="205abc82-d713-49e4-bfce-9bfe49859550"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Airway bill:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="90" width="100" height="15" uuid="ccfb0094-e116-4904-ae4f-b6783a5fe1ba"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Quantity:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="105" width="100" height="15" uuid="3ca539b8-522e-4c04-8da4-8ef5690dd1c7"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Comments:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="370" y="0" width="120" height="15" uuid="d430252b-7f8e-408e-a627-6e04b26712a3"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{shipFrom}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="15" width="120" height="15" uuid="c7359533-6cdc-4f69-8513-9cf052ab3fe2"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{shipId}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="45" width="120" height="15" uuid="8977e005-401a-4514-963d-4bf114a1fa86"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{carrier}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="30" width="120" height="15" uuid="bef0c014-62de-43ba-aa81-97c7cfefe202"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{prepDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="75" width="120" height="15" uuid="d4c92ddb-2f2a-45ef-b1d3-b3429e762a00"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{dateSent}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="60" width="120" height="15" uuid="5bba02fc-4920-423f-88de-6c854b36d52f"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{airwayBill}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="105" width="120" height="15" uuid="b98249a2-f81f-4476-bdcc-18e0d1ecd6dc"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{commments}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="90" width="120" height="15" uuid="7972a01d-9103-4344-b3fb-b22b90b8f177"/>
+				<box bottomPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{quantity}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="5"/>
+	</pageHeader>
+</jasperReport>
