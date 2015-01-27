@@ -411,7 +411,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		String name = "Test Method " + new Random().nextInt(10000);
 		String definition = "Test Definition";
 		Term term = manager.addMethod(name, definition);
-		Assert.assertTrue(term.getId() < 0);
+		Assert.assertTrue(term.getId() > 0);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "testAddMethod():  " + term);
 		term = manager.getTermById(term.getId());
 		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + term);
@@ -778,7 +778,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		CvId cvId = CvId.METHODS;
 		Term term = manager.addTerm(name, definition, cvId);
 		Assert.assertNotNull(term);
-		Assert.assertTrue(term.getId() < 0);
+		Assert.assertTrue(term.getId() > 0);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "testAddTerm():  " + term);
 		term = manager.getTermById(term.getId());
 		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + term);
