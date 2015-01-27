@@ -859,8 +859,10 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
-	
-	/** 
+
+    ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo) throws MiddlewareQueryException;
+
+    /**
 	 * Deletes a list data project given the project_id and the type.
 	 * @param projectId
 	 * @param type

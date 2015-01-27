@@ -1133,6 +1133,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         setWorkingDatabase(listId);
         return getListDataProjectDAO().getByListId(listId);
     }
+
+    @Override
+    public ListDataProject getListDataProjectByListIdAndEntryNo(int listId,int entryNo) throws MiddlewareQueryException {
+        setWorkingDatabase(listId);
+        return getListDataProjectDAO().getByListIdAndEntryNo(listId,entryNo);
+    }
 	
 	@Override
     public void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException {
