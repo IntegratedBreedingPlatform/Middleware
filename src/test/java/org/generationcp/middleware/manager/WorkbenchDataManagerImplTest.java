@@ -932,11 +932,14 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         assertNull("standard preset with id=" + id + " should no longer exist",manager.getStandardPresetDAO().getById(id));
     }
 
+    
     @Test
     public void testGetAllStandardPreset() throws Exception {
         List<StandardPreset> out = manager.getStandardPresetDAO().getAll();
-
-        assertTrue(out.size() > 0);
+        
+        // TODO : Are we expecting any preloaded data here ? There is no such insert query in merger-db scripts.
+        // Reviewer : Naymesh
+        assertTrue(out.size() == 0);
 
     }
 
