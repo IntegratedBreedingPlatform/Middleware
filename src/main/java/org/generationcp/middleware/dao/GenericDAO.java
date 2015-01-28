@@ -19,6 +19,9 @@ import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
@@ -270,38 +273,43 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             final Map<String,Object> params,
             final Class<Type> returnType) {
 
-        final String sql = buildSQLQuery(procedureName, params);
-        LOG.debug("sql = " + sql);
-        SQLQuery query = session.createSQLQuery(sql);
-        if (params != null && params.size() > 0) {
-        	for (Map.Entry<String,Object> entry : params.entrySet()) {
-                LOG.debug(entry.getKey() + " = " + entry.getValue());
-                query.setParameter(entry.getKey().toString(), entry.getValue());
-            }
-        }
-        if(returnType!=null && !isWrapperType(returnType)) {
-        	query.addEntity(returnType);
-        }
-        
-        Object object = query.uniqueResult();
-        if(object!=null && object instanceof BigInteger) {
-        	BigInteger b = (BigInteger) object;
-        	if(returnType.getName().equals(Integer.class.getName())) {
-        		return (Type)(Integer)b.intValue();
-        	} else if(returnType.getName().equals(Long.class.getName())) {
-        		return (Type)(Long)b.longValue();
-        	}
-        	return (Type) b;
-        } else if(object!=null && object instanceof BigDecimal) {
-        	BigDecimal b = (BigDecimal) object;
-        	if(returnType.getName().equals(Float.class.getName())) {
-        		return (Type)(Float)b.floatValue();
-        	} else if(returnType.getName().equals(Double.class.getName())) {
-        		return (Type)(Double)b.doubleValue();
-        	}
-        	return (Type) b;
-        } else {
-        	return (Type) object;
+    	Monitor monitor = MonitorFactory.start("callStoredProcedureForObject." + procedureName);
+        try {
+	    	final String sql = buildSQLQuery(procedureName, params);
+	        LOG.debug("sql = " + sql);
+	        SQLQuery query = session.createSQLQuery(sql);
+	        if (params != null && params.size() > 0) {
+	        	for (Map.Entry<String,Object> entry : params.entrySet()) {
+	                LOG.debug(entry.getKey() + " = " + entry.getValue());
+	                query.setParameter(entry.getKey().toString(), entry.getValue());
+	            }
+	        }
+	        if(returnType!=null && !isWrapperType(returnType)) {
+	        	query.addEntity(returnType);
+	        }
+	        
+	        Object object = query.uniqueResult();
+	        if(object!=null && object instanceof BigInteger) {
+	        	BigInteger b = (BigInteger) object;
+	        	if(returnType.getName().equals(Integer.class.getName())) {
+	        		return (Type)(Integer)b.intValue();
+	        	} else if(returnType.getName().equals(Long.class.getName())) {
+	        		return (Type)(Long)b.longValue();
+	        	}
+	        	return (Type) b;
+	        } else if(object!=null && object instanceof BigDecimal) {
+	        	BigDecimal b = (BigDecimal) object;
+	        	if(returnType.getName().equals(Float.class.getName())) {
+	        		return (Type)(Float)b.floatValue();
+	        	} else if(returnType.getName().equals(Double.class.getName())) {
+	        		return (Type)(Double)b.doubleValue();
+	        	}
+	        	return (Type) b;
+	        } else {
+	        	return (Type) object;
+	        }
+        } finally {
+        	LOG.debug("" + monitor.stop());
         }
     }
     
@@ -331,6 +339,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             final Map<String,Object> params,
             final Class<Type> returnType) {
 
+		Monitor monitor = MonitorFactory.start("callStoredProcedureForList." + procedureName);
         final String sql = buildSQLQuery(procedureName, params);
         LOG.debug("sql = " + sql);
         SQLQuery query = session.createSQLQuery(sql);
@@ -344,7 +353,10 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         	query.addEntity(returnType);
         }
 
-        return query.list();
+        @SuppressWarnings("rawtypes")
+		List result = query.list();
+        LOG.debug("" + monitor.stop());
+		return result;
     }
 
     private String buildSQLQuery(String procedureName, Map<String,Object> params) {
