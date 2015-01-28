@@ -61,7 +61,7 @@ public interface StudyDataManager{
      * @return the study id by name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int getStudyIdByName(String studyName) throws MiddlewareQueryException;
+    Integer getStudyIdByName(String studyName) throws MiddlewareQueryException;
 
     /**
      * Returns list of root or top-level folders from specified database.
