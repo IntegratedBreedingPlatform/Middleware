@@ -869,5 +869,19 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException;
+
+	/**
+     * Saves germplasm list crosses types.
+     * ListData items are always added to the database, before saving the germplasm list.
+     * 
+     * @param listDataItems the list data to add - the key of the Map is the germplasm 
+     *                                      associated to the germplasm list data value
+     * @param germplasmList the germplasm list to add
+     * 
+     * @return The id of the newly-created germplasm list
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	Integer saveCrossesGermplasmList(Map<Germplasm, GermplasmListData> listDataItems,
+			GermplasmList germplasmList) throws MiddlewareQueryException;
 	
 }
