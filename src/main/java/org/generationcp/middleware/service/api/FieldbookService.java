@@ -851,6 +851,7 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId) throws MiddlewareQueryException;
+	void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves a list data project

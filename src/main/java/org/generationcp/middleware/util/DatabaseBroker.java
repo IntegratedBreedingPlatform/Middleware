@@ -344,7 +344,7 @@ public class DatabaseBroker {
      * 
      * @return The current active session
      */
-    protected Session getActiveSession() {
+    public Session getActiveSession() {
         return activeSession;
     }
 
@@ -922,7 +922,7 @@ public class DatabaseBroker {
 
     //================================ GermplasmListDataManager DAO Methods =============================
     
-    protected final GermplasmListDAO getGermplasmListDAO() {
+    public final GermplasmListDAO getGermplasmListDAO() {
 		if (germplasmListDao == null) {
 			germplasmListDao = new GermplasmListDAO();
 		}
@@ -1017,6 +1017,15 @@ public class DatabaseBroker {
     protected final TermPropertyBuilder getTermPropertyBuilder() {
         return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+	public void setGermplasmListDao(GermplasmListDAO germplasmListDao) {
+		this.germplasmListDao = germplasmListDao;
+	}
+	public void setSessionForLocal(Session sessionForLocal) {
+		this.sessionForLocal = sessionForLocal;
+	}
+	public void setSessionForCentral(Session sessionForCentral) {
+		this.sessionForCentral = sessionForCentral;
+	}
 	
 	
 }

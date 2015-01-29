@@ -1238,4 +1238,28 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
         return listId;
     }
+	
+	@Override
+	public void updateGermlasmListInfoStudy(int crossesListId, int studyId)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction(); 
+
+            getListDataProjectSaver().updateGermlasmListInfoStudy(crossesListId, studyId);
+        
+            trans.commit();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with updateGermlasmListInfoStudy(): " + e.getMessage(), e, LOG);
+        }
+		
+	}
+	
+	 
 }
