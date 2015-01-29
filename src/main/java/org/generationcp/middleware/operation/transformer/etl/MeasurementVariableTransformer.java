@@ -13,8 +13,12 @@ public class MeasurementVariableTransformer extends Transformer {
             HibernateSessionProvider sessionProviderForCentral) {
 				super(sessionProviderForLocal, sessionProviderForCentral);
 	}
+    
+    public List<MeasurementVariable> transform(VariableTypeList variableTypeList, boolean isFactor) {
+    	return transform(variableTypeList,isFactor,false);
+    }
 	
-	public List<MeasurementVariable> transform(VariableTypeList variableTypeList, boolean isFactor) {
+	public List<MeasurementVariable> transform(VariableTypeList variableTypeList, boolean isFactor, boolean isTrial) {
 		
 	    List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 	    
@@ -22,6 +26,9 @@ public class MeasurementVariableTransformer extends Transformer {
 	        for (VariableType variableType : variableTypeList.getVariableTypes()) {
 	            StandardVariable stdVariable = variableType.getStandardVariable();
 	            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+	            if (!isFactor && isTrial) {
+	            	label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
+	            }
 	            
 	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), 
 	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),

@@ -137,7 +137,7 @@ public class DataSetBuilder extends Builder {
 		long expCount = getStudyDataManager().countExperiments(datasetId);
 		List<Experiment> experiments = getStudyDataManager().getExperiments(datasetId, 0, (int)expCount, variables);
 		List<MeasurementVariable> factorList = getMeasurementVariableTransformer().transform(variables.getFactors(), true);
-		List<MeasurementVariable> variateList = getMeasurementVariableTransformer().transform(variables.getVariates(), false);
+		List<MeasurementVariable> variateList = getMeasurementVariableTransformer().transform(variables.getVariates(), false, true);
 		Workbook workbook = new Workbook();
 		workbook.setObservations(getWorkbookBuilder().buildDatasetObservations(experiments, variables, factorList, variateList));
 		workbook.setFactors(factorList);
