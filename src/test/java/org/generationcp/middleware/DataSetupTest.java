@@ -15,11 +15,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
@@ -36,6 +34,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 	private static GermplasmDataManager germplasmManager;
 	private static GermplasmListManager germplasmListManager;
 	private static FieldbookService middlewareFieldbookService;
+	private static GermplasmTestDataGenerator germplasmTestDataGenerator;
 	
 	private static final int NUMBER_OF_GERMPLASM = 20;
 	private static final String GERMPLSM_PREFIX = "GP-VARIETY-";
@@ -84,6 +83,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		germplasmManager = managerFactory.getGermplasmDataManager();
 		germplasmListManager = managerFactory.getGermplasmListManager();
 		middlewareFieldbookService = managerFactory.getFieldbookMiddlewareService();
+		germplasmTestDataGenerator = new GermplasmTestDataGenerator(germplasmManager);
 	}
 	
     @Test
@@ -92,10 +92,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		int randomInt = new Random().nextInt(100);
 		
 		//Germplasm
-		Integer[] gids = new Integer[NUMBER_OF_GERMPLASM];
-		for (int i = 0; i < NUMBER_OF_GERMPLASM; i++) {
-			gids[i] = createGermplasm(GERMPLSM_PREFIX + i);
-		}
+		Integer[] gids = germplasmTestDataGenerator.createGermplasmRecords(NUMBER_OF_GERMPLASM, GERMPLSM_PREFIX);
 				
 		//Germplasm list
 		GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
@@ -305,30 +302,5 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		
 		return variable;
 	}
-	
-	private Integer createGermplasm(String germplasmName) throws MiddlewareQueryException {
-		Germplasm g = new Germplasm();
-        g.setGdate(Integer.valueOf(20141014));
-        g.setGnpgs(Integer.valueOf(0));
-        g.setGpid1(Integer.valueOf(0));
-        g.setGpid2(Integer.valueOf(0));
-        g.setGrplce(Integer.valueOf(0));
-        g.setLocationId(Integer.valueOf(1));
-        g.setMethodId(Integer.valueOf(1));
-        g.setMgid(Integer.valueOf(1));
-        g.setUserId(Integer.valueOf(1));
-        g.setReferenceId(Integer.valueOf(1));
 
-        Name n = new Name();
-        n.setLocationId(Integer.valueOf(1));
-        n.setNdate(Integer.valueOf(20141014));
-        n.setNval(germplasmName);
-        n.setReferenceId(Integer.valueOf(1));
-        n.setTypeId(Integer.valueOf(1));
-        n.setUserId(Integer.valueOf(1));
-
-        germplasmManager.addGermplasm(g, n);
-        
-        return g.getGid();
-	}
 }
