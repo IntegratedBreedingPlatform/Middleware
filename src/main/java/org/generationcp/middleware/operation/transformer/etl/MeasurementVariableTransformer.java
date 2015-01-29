@@ -22,7 +22,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		
 	    List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 	    
-	    if (variableTypeList != null && variableTypeList.size() > 0) {
+	    if (variableTypeList != null && !variableTypeList.isEmpty()) {
 	        for (VariableType variableType : variableTypeList.getVariableTypes()) {
 	            StandardVariable stdVariable = variableType.getStandardVariable();
 	            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
@@ -56,15 +56,15 @@ public class MeasurementVariableTransformer extends Transformer {
 		
 	    List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 	    
-	    if (variableList != null && variableList.size() > 0) {
+	    if (variableList != null && !variableList.isEmpty()) {
 	        for (Variable variable : variableList.getVariables()) {
 	        	VariableType variableType = variable.getVariableType();
 	            StandardVariable stdVariable = variableType.getStandardVariable();
 	            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
-	            if (!isFactor && !isStudy) {  //for trial constants
+	            //for trial constants
+	            if (!isFactor && !isStudy) {  
 	            	label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 	            }
-	            
 	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), 
 	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 	                    stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), "", 

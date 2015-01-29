@@ -129,8 +129,7 @@ public class DataSetBuilder extends Builder {
 		VariableTypeList variables = null;
 		if (isMeasurementDataset) {
 			variables = filterVariables(dataset.getVariableTypes(), siblingVariables);
-		}
-		else {
+		} else {
 			variables = dataset.getVariableTypes();
 		}
 		variables = filterDatasetVariables(variables, !isTrial, isMeasurementDataset);

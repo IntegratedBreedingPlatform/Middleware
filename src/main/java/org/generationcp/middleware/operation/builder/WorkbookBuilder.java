@@ -524,7 +524,6 @@ public class WorkbookBuilder extends Builder {
 		            	//we set the cValue id if the isCustomValue flag is false, since this is an id of the valid value
 		            	//we check if its a number to be sure
 		            	measurementData.setcValueId(variable.getValue());
-		            	//measurementData.setValue(null);
 		            }
 		            measurementDataList.add(measurementData);
 		            break;
@@ -701,7 +700,7 @@ public class WorkbookBuilder extends Builder {
 		    }
 		    
 	    
-		    if (filteredVariables.size() > 0) {
+		    if (!filteredVariables.isEmpty()) {
 		    	variates = getMeasurementVariableTransformer().transform(filteredVariables.getVariates(), false);
 		    }
 	    }
@@ -834,12 +833,12 @@ public class WorkbookBuilder extends Builder {
 	
 	private VariableTypeList removeTrialDatasetVariables(VariableTypeList variables, VariableList conditions, VariableList constants) {
 		List<String> trialList = new ArrayList<String>();
-		if (conditions != null && conditions.size() > 0) {
+		if (conditions != null && !conditions.isEmpty()) {
 			for (Variable condition : conditions.getVariables()) {
 				trialList.add(condition.getVariableType().getLocalName());
 			}
 		}
-		if (constants != null && constants.size() > 0) {
+		if (constants != null && !constants.isEmpty()) {
 			for (Variable constant : constants.getVariables()) {
 				trialList.add(constant.getVariableType().getLocalName());
 			}
