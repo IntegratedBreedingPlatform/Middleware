@@ -1193,7 +1193,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         Session session = getCurrentSession();
         Transaction trans = null;
 
-        Integer isUdfldSaved = 0;
         try {
         	trans = session.beginTransaction();
             UserDefinedFieldDAO dao =  getUserDefinedFieldDao();
@@ -1202,19 +1201,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             Integer nextId = dao.getNextId("fldno");
             field.setFldno(nextId);
             dao.save(field);
-            isUdfldSaved++;
 
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(fields="
-                    + isUdfldSaved + "): " + e.getMessage(), e, LOG);
+            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
         
-        return isUdfldSaved;
+        return field.getFldno();
     }
     
     public List<Integer> addUserDefinedFields(List<UserDefinedField> fields) throws MiddlewareQueryException{
