@@ -281,6 +281,22 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
         Debug.println(INDENT, "Germplasms Added: ");
         Debug.printObjects(INDENT*2, new ArrayList<Germplasm>(germplasms.keySet()));
     }
+    
+    @Test
+    public void testSaveCrossesGermplasmListCimmytWheat() throws MiddlewareQueryException {
+        Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
+        Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
+        GermplasmList germplasmList = createGermplasmsCimmytWheat(germplasms, listData);
+        
+        Integer listId = fieldbookService.saveCrossesGermplasmList(listData, germplasmList);
+
+        assertTrue(listId != null && listId < 0);
+        
+        Debug.println(INDENT, "Germplasm List Added: ");
+        Debug.println(INDENT*2, germplasmList.toString());
+        Debug.println(INDENT, "Germplasms Added: ");
+        Debug.printObjects(INDENT*2, new ArrayList<Germplasm>(germplasms.keySet()));
+    }
 
     @Test
     public void testGetDistinctStandardVariableValues() throws Exception {
