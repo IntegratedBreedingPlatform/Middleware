@@ -195,43 +195,24 @@ public class DatabaseSetupUtil{
 	 * @return true if all test databases created successfully
 	 * @throws Exception
 	 */
-	public static boolean setupTestDatabases() throws Exception{
-		try {
-			setUpMysqlConfig();
-			setupIBDBScriptsConfig();
+	public static void setupTestDatabases() throws Exception {
+		setUpMysqlConfig();
+		setupIBDBScriptsConfig();
 
-			// drop database to ensure fresh DB
-			dropTestDatabases();
+		// drop database to ensure fresh DB
+		dropTestDatabases();
 
-			// delete old prefix directory
-			File scriptsDir = new File(prefixDirectory);
-			if(scriptsDir.exists()){
-				if(scriptsDir.isFile()) throw new Exception("File name conflict: a file with directory name exist. Please remove file or change directory name.");
-				deleteFileTree(scriptsDir);
-			}
-
-			Map<String, List<File>> scriptsMap = setupScripts();
-
-			createTestDatabase(workbenchConnectionParameters, scriptsMap.get(WORKBENCH_SCRIPT));
-			createTestDatabase(cropConnectionParameters, scriptsMap.get(CROP_SCRIPT));
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return false;
-		} catch (ConfigException e) {
-			e.printStackTrace();
-			return false;
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			return false;
+		// delete old prefix directory
+		File scriptsDir = new File(prefixDirectory);
+		if(scriptsDir.exists()){
+			if(scriptsDir.isFile()) throw new Exception("File name conflict: a file with directory name exist. Please remove file or change directory name.");
+			deleteFileTree(scriptsDir);
 		}
-		return true;
+
+		Map<String, List<File>> scriptsMap = setupScripts();
+
+		createTestDatabase(workbenchConnectionParameters, scriptsMap.get(WORKBENCH_SCRIPT));
+		createTestDatabase(cropConnectionParameters, scriptsMap.get(CROP_SCRIPT));	
 	}
 
 

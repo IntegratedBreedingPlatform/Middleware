@@ -50,16 +50,6 @@ public class MiddlewareIntegrationTest {
 			sessionUtil = new HibernateUtil(connectionParameters);
 			workbenchSessionUtil = new HibernateUtil(workbenchConnectionParameters);
 
-		} catch (FileNotFoundException e) {
-			logExceptionInfoAndFail(e);
-		} catch (ConfigException e) {
-			logExceptionInfoAndFail(e);
-		} catch (URISyntaxException e) {
-			logExceptionInfoAndFail(e);
-		} catch (IOException e) {
-			logExceptionInfoAndFail(e);
-		} catch (ConfigurationException e) {
-			logExceptionInfoAndFail(e);
 		} catch (ConversionException e) {
 			Assert.fail("Boolean config for drop.create.dbs in testDatabaseConfig.properties was not formed properly - needs to be true,t,false or f" + e.getMessage());		
 		} catch (Exception e) {
