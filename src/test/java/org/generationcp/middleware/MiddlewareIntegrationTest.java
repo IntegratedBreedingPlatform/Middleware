@@ -68,7 +68,10 @@ public class MiddlewareIntegrationTest {
 	}
 	
 	static void logExceptionInfoAndFail(Exception e) {
-		String msg = "Exception " + e.getMessage() + " caused by: " + e.getCause().getMessage();
+		String msg = "Exception " + e.getMessage();
+		if(e.getCause() != null) {
+			msg += " caused by: " + e.getCause().getMessage();
+		}
 		LOG.info(msg);
 		Assert.fail(msg);
 	}
