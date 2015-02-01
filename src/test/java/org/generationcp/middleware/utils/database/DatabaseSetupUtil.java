@@ -222,17 +222,17 @@ public class DatabaseSetupUtil{
 			runSQLCommand("CREATE DATABASE  IF NOT EXISTS `"+connectionParams.getDbName()+"`; USE `"+connectionParams.getDbName()+"`;", connectionParams);
 
 			if (connectionParams.equals(workbenchConnectionParameters)) {
-				LOG.debug("Creating WORKBENCH db .......");
+				LOG.info("Creating WORKBENCH db .......");
 				initializeWorkbenchDatabase();
 			} else {
-				LOG.debug("Creating CROP db ......");
+				LOG.info("Creating CROP db ......");
 				initializeCropDatabase();
 			}
 
 			//NOTE: This will run additional scripts if required while setup
 			if (!initDataFiles.isEmpty()){
 				runAllSetupScripts(initDataFiles, connectionParams);
-				LOG.debug("  >>> Ran init data scripts successfully");
+				LOG.info("  >>> Ran init data scripts successfully");
 			}
 
 		} else {
@@ -283,15 +283,13 @@ public class DatabaseSetupUtil{
 			for(int index = 0 ; index < fileList.size() ; index++) {
 				File sqlFile = fileList.get(index);
 				if (sqlFile.getName().endsWith(".sql")) {
-					if (!runScriptFromFile(sqlFile, connectionParams)) {
-						throw new Exception("Error in executing " + sqlFile.getAbsolutePath());
-					}
+					runScriptFromFile(sqlFile, connectionParams);
 				}
 			}
 		}
 	}
 
-	private static boolean runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
+	private static void runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
 		ProcessBuilder pb;
 		String mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
 		
@@ -321,9 +319,10 @@ public class DatabaseSetupUtil{
 		}
 
 		Process mysqlProcess = pb.start();
+		LOG.info("Running :  " + pb.command());
 		readProcessInputAndErrorStream(mysqlProcess);
 		int exitValue = mysqlProcess.waitFor();
-		return exitValue == 0;
+		LOG.info("Process exited with code :  " + exitValue);
 	}
 	
 	private static boolean runSQLCommand(String sqlCommand, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
