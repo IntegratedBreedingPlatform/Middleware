@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MiddlewareIntegrationTest {
 
-	protected final Logger LOG = LoggerFactory.getLogger(getClass());
+	protected static final Logger LOG = LoggerFactory.getLogger(MiddlewareIntegrationTest.class);
 	protected static final int INDENT = 3;
 
 	protected static DatabaseConnectionParameters connectionParameters, workbenchConnectionParameters;
@@ -51,20 +51,26 @@ public class MiddlewareIntegrationTest {
 			workbenchSessionUtil = new HibernateUtil(workbenchConnectionParameters);
 
 		} catch (FileNotFoundException e) {
-			Assert.fail(e.getMessage());
+			logExceptionInfoAndFail(e);
 		} catch (ConfigException e) {
-			Assert.fail(e.getMessage());
+			logExceptionInfoAndFail(e);
 		} catch (URISyntaxException e) {
-			Assert.fail(e.getMessage());
+			logExceptionInfoAndFail(e);
 		} catch (IOException e) {
-			Assert.fail(e.getMessage());
+			logExceptionInfoAndFail(e);
 		} catch (ConfigurationException e) {
-			Assert.fail(e.getMessage());
+			logExceptionInfoAndFail(e);
 		} catch (ConversionException e) {
 			Assert.fail("Boolean config for drop.create.dbs in testDatabaseConfig.properties was not formed properly - needs to be true,t,false or f" + e.getMessage());		
 		} catch (Exception e) {
-			Assert.fail(e.getMessage());
+			logExceptionInfoAndFail(e);
 		} 
+	}
+	
+	static void logExceptionInfoAndFail(Exception e) {
+		String msg = "Exception " + e.getMessage() + " caused by: " + e.getCause().getMessage();
+		LOG.info(msg);
+		Assert.fail(msg);
 	}
 
 	@Rule

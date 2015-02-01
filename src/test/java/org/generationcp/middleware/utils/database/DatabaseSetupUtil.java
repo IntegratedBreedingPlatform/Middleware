@@ -313,6 +313,8 @@ public class DatabaseSetupUtil{
 	private static boolean runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
 		ProcessBuilder pb;
 		String mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
+		
+		LOG.info("Executing script: " + sqlFile.getAbsolutePath());
 
 		if (connectionParams.getPassword() == null || connectionParams.getPassword().equalsIgnoreCase("")) {
 
