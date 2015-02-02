@@ -135,7 +135,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
                 criteria.add(Restrictions.eq("cntryid", countryId));
             }
 
-            if (type != null) {
+            if (type != null && 0 != type.intValue()) {
                 criteria.add(Restrictions.eq("ltype", type));
             }
 

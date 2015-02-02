@@ -40,6 +40,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
     private static LocationDataManager manager;
     private static Project commonTestProject;
     private static WorkbenchTestDataUtil workbenchTestDataUtil;
+    private final static Integer COUNTRY_LTYPEID = 405;
+    private final static Integer PHILIPPINES_CNTRYID = 171;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -490,5 +492,77 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
         location.setSnl3id(0);
 		return location;
 	}
+    
+    @Test
+    public void testGetLocationsByNameCountryAndType_NullFilter() throws MiddlewareQueryException {
+    	String locationName = "";
+    	Country country = null;
+    	Integer locationTypeId = null;
+    	List<Location> locationList = 
+    			manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+    	Assert.assertFalse("Location list should not be empty",locationList.isEmpty());
+    }
+    
+    @Test
+    public void testGetLocationsByNameCountryAndType_NullFilterWithZeroLocationTypeId() throws MiddlewareQueryException {
+    	String locationName = "";
+    	Country country = null;
+    	Integer locationTypeId = 0;
+    	List<Location> locationList = 
+    			manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+    	Assert.assertFalse("Location list should not be empty",locationList.isEmpty());
+    	boolean hasLocationWithNonZeroLtypeId = false;
+    	for (Location location : locationList) {
+			if(location.getLtype()!=null && 0 != location.getLtype().intValue()) {
+				hasLocationWithNonZeroLtypeId = true;
+				break;
+			}
+		}
+    	Assert.assertTrue("Location list should contain items with non-zero lytpeId",hasLocationWithNonZeroLtypeId);
+    }
+    
+    @Test
+    public void testGetLocationsByNameCountryAndType_WithNonZeroLocationTypeId() throws MiddlewareQueryException {
+    	String locationName = "";
+    	Country country = null;
+    	Integer locationTypeId = COUNTRY_LTYPEID;
+    	List<Location> locationList = 
+    			manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+    	Assert.assertFalse("Location list should not be empty",locationList.isEmpty());
+    	for (Location location : locationList) {
+    		Assert.assertEquals("Location should have a lytpeId = "
+    				+COUNTRY_LTYPEID,COUNTRY_LTYPEID,location.getLtype());
+		}
+    }
+    
+    @Test
+    public void testGetLocationsByNameCountryAndType_WithNonZeroCountryId() throws MiddlewareQueryException {
+    	String locationName = "";
+    	Country country = new Country();
+    	country.setCntryid(PHILIPPINES_CNTRYID);
+    	Integer locationTypeId = null;
+    	List<Location> locationList = 
+    			manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+    	Assert.assertFalse("Location list should not be empty",locationList.isEmpty());
+    	for (Location location : locationList) {
+    		Assert.assertEquals("Location should have a countryId = "
+    				+PHILIPPINES_CNTRYID,PHILIPPINES_CNTRYID,location.getCntryid());
+		}
+    }
+    
+    @Test
+    public void testGetLocationsByNameCountryAndType_WithNonEmptyLocationName() throws MiddlewareQueryException {
+    	String locationName = "Phil";
+    	Country country = null;
+    	Integer locationTypeId = null;
+    	List<Location> locationList = 
+    			manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+    	Assert.assertFalse("Location list should not be empty",locationList.isEmpty());
+    	for (Location location : locationList) {
+    		Assert.assertTrue("Location should have a location name having the keyword "
+    				+locationName,
+    				location.getLname().toLowerCase().contains(locationName.toLowerCase()));
+		}
+    }
 
 }
