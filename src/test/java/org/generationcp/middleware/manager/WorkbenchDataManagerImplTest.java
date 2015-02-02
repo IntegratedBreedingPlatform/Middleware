@@ -11,6 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,7 +39,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -41,7 +46,6 @@ import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
@@ -52,9 +56,6 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertNull;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
@@ -437,20 +438,19 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testGetRoleByProjectAndUser() throws MiddlewareQueryException {
-        // Assumption: first project stored in the db has associated project users with role
-        Project project = manager.getProjects().get(0); // get first project
-        List<ProjectUserRole> projectUsers = manager.getProjectUserRolesByProject(project); // get project users
+
+        List<ProjectUserRole> projectUsers = manager.getProjectUserRolesByProject(commonTestProject);
         Assert.assertNotNull(projectUsers);
         Assert.assertTrue(!projectUsers.isEmpty());
         
         if (projectUsers.size()>0){
             ProjectUserRole projectUser = projectUsers.get(0); // get the first user of the project
             User user = manager.getUserById(projectUser.getUserId());
-            List<Role> roles = manager.getRolesByProjectAndUser(project, user); // get the roles
-            Debug.println(INDENT, "testGetRoleByProjectAndUser(project=" + project.getProjectName() 
+            List<Role> roles = manager.getRolesByProjectAndUser(commonTestProject, user); // get the roles
+            Debug.println(INDENT, "testGetRoleByProjectAndUser(project=" + commonTestProject.getProjectName() 
                     + ", user=" + user.getName() + "): \n  " + roles);
         } else {
-            Debug.println(INDENT, "testGetRoleByProjectAndUser(project=" + project.getProjectName() 
+            Debug.println(INDENT, "testGetRoleByProjectAndUser(project=" + commonTestProject.getProjectName() 
                     + "): Error in data - Project has no users. ");
         }
     }
