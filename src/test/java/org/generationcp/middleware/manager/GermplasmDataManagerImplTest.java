@@ -42,7 +42,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-// Test using RICE database
 public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 
     private static GermplasmDataManager manager;

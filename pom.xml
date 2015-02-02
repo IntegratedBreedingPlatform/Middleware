@@ -274,6 +274,7 @@
 						<include>**/GermplasmDataManagerUtilTest.java</include>
 						<include>**/OntologyDataManagerImplTest.java</include>
 						<include>**/WorkbenchDataManagerImplTest.java</include>
+						<include>**/GermplasmDataManagerImplTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>
