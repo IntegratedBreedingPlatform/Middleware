@@ -81,7 +81,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	}
 
 	@Test
-	public void testGetStandardVariableSummariesCentral() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummaries() throws MiddlewareQueryException {
 		final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
 		List<Integer> idList = Arrays.asList(PLANT_HEIGHT_ID, GRAIN_YIELD_ID);
 
@@ -96,7 +96,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	}
 
 	@Test
-	public void testGetStandardVariableSummaryCentral() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummary() throws MiddlewareQueryException {
 		// Load summary from the view based method
 		StandardVariableSummary summary = manager
 				.getStandardVariableSummary(OntologyDataManagerImplTestConstants.PLANT_HEIGHT_ID);
@@ -113,8 +113,8 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	}
 
 	@Test
-	public void testGetStandardVariableSummaryLocal() throws MiddlewareQueryException {
-		// First create a local Standardvariable
+	public void testGetStandardVariableSummaryNew() throws MiddlewareQueryException {
+		// First create a new Standardvariable
 		StandardVariable myOwnPlantHeight = new StandardVariable();
 		myOwnPlantHeight.setName("MyOwnPlantHeight " + new Random().nextInt(1000));
 		myOwnPlantHeight.setDescription(myOwnPlantHeight.getName() + " - Description.");
@@ -477,14 +477,14 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 	/**
 	 * This tests the ability of the application to retrieve the standard
-	 * variables associated with known central headers
+	 * variables associated with known headers
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	public void testGetStandardVariablesInProjectsKnownCentralHeaders() throws Exception {
+	public void testGetStandardVariablesInProjectsKnownHeaders() throws Exception {
 		List<String> headers = Arrays
-				.asList(OntologyDataManagerImplTestConstants.CENTRAL_COMMON_HEADERS);
+				.asList(OntologyDataManagerImplTestConstants.COMMON_HEADERS);
 
 		Map<String, List<StandardVariable>> results = manager
 				.getStandardVariablesInProjects(headers);
@@ -1024,37 +1024,9 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	}
 
 	@Test
-	public void testAddOrUpdateTermAndRelationshipFoundInCentral() throws Exception {
-		String name = "Season";
-		String definition = "Growing Season " + (int) (Math.random() * 100); // add
-																				// random
-																				// number
-																				// to
-																				// see
-																				// the
-																				// update
-		try {
-			manager.addOrUpdateTermAndRelationship(name, definition,
-					CvId.PROPERTIES, TermId.IS_A.getId(),
-					OntologyDataManagerImplTestConstants.OBJECT_ID, null);
-		} catch (MiddlewareException e) {
-			Debug.println(MiddlewareIntegrationTest.INDENT,
-					"MiddlewareException expected: \"" + e.getMessage() + "\"");
-			Assert.assertTrue(e.getMessage().contains(
-					" is retrieved from the central database and cannot be updated"));
-		}
-	}
-
-	@Test
-	public void testAddOrUpdateTermAndRelationshipNotInCentral() throws Exception {
+	public void testAddOrUpdateTermAndRelationship() throws Exception {
 		String name = "Study condition NEW";
-		String definition = "Study condition NEW class " + (int) (Math.random() * 100); // add
-																						// random
-																						// number
-																						// to
-																						// see
-																						// the
-																						// update
+		String definition = "Study condition NEW class " + (int) (Math.random() * 100);
 		Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
 		Term newTerm = manager.addOrUpdateTermAndRelationship(name,
 				definition, CvId.PROPERTIES, TermId.IS_A.getId(),
@@ -1069,38 +1041,9 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	}
 
 	@Test
-	public void testUpdateTermAndRelationshipFoundInCentral() throws Exception {
-		String name = "Slope";
-		String definition = "Land slope " + (int) (Math.random() * 100); // add
-																			// random
-																			// number
-																			// to
-																			// see
-																			// the
-																			// update
-		Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
-		try {
-			manager.updateTermAndRelationship(new Term(
-					origTerm.getId(), name, definition), TermId.IS_A.getId(),
-					OntologyDataManagerImplTestConstants.OBJECT_ID);
-		} catch (MiddlewareException e) {
-			Debug.println(MiddlewareIntegrationTest.INDENT,
-					"MiddlewareException expected: \"" + e.getMessage() + "\"");
-			Assert.assertTrue(e.getMessage().contains("Cannot update terms in central"));
-		}
-	}
-
-	@Test
-	public void testUpdateTermAndRelationshipNotInCentral() throws Exception {
+	public void testUpdateTermAndRelationship() throws Exception {
 		String name = "Slope NEW";
-		String definition = "Slope NEW class " + (int) (Math.random() * 100); // add
-																				// random
-																				// number
-																				// to
-																				// see
-																				// the
-																				// update
-
+		String definition = "Slope NEW class " + (int) (Math.random() * 100);
 		Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
 		if (origTerm == null) { // first run, add before update
 			origTerm = manager.addOrUpdateTermAndRelationship(name,
@@ -1121,49 +1064,17 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 	}
 
 	@Test
-	public void testAddOrUpdateTermFoundInCentral() throws Exception {
-		String name = "Score";
-		// add random number to see the update
-		String definition = "Score NEW " + (int) (Math.random() * 100);
-		try {
-			manager.addOrUpdateTerm(name, definition, CvId.SCALES);
-		} catch (MiddlewareQueryException e) {
-			Debug.println(MiddlewareIntegrationTest.INDENT,
-					"MiddlewareException expected: \"" + e.getMessage() + "\"");
-			Assert.assertTrue(e.getMessage().contains("The term you entered is invalid"));
-		}
-	}
-
-	@Test
 	public void testAddOrUpdateTermNotInCentral() throws Exception {
 		String name = "Real";
 		// add random number to see the update
 		String definition = "Real Description NEW " + (int) (Math.random() * 100); 
 		Term origTerm = manager.findTermByName(name, CvId.SCALES);
-		Term newTerm = manager.addOrUpdateTerm(name, definition,
-				CvId.SCALES);
+		Term newTerm = manager.addOrUpdateTerm(name, definition, CvId.SCALES);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Original:  " + origTerm);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Updated :  " + newTerm);
 
-		if (origTerm != null) { // if the operation is update, the ids must be
-								// same
+		if (origTerm != null) { // if the operation is update, the ids must be same
 			Assert.assertSame(origTerm.getId(), newTerm.getId());
-		}
-	}
-
-	@Test
-	public void testUpdateTermFoundInCentral() throws Exception {
-		String name = "Score";
-		// add random number to see the update
-		String definition = "Score NEW " + (int) (Math.random() * 100); 
-		Term origTerm = manager.findTermByName(name, CvId.SCALES);
-		try {
-			manager.updateTerm(new Term(origTerm.getId(), name,
-					definition));
-		} catch (MiddlewareException e) {
-			Debug.println(MiddlewareIntegrationTest.INDENT,
-					"MiddlewareException expected: \"" + e.getMessage() + "\"");
-			Assert.assertTrue(e.getMessage().contains("Cannot update terms in central"));
 		}
 	}
 
