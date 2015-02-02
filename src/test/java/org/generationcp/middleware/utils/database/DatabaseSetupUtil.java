@@ -161,9 +161,6 @@ public class DatabaseSetupUtil{
 				return a.getName().compareTo(b.getName());
 			}
 		});
-
-		LOG.info("Running files : " + Arrays.asList(files));
-
 		runAllSetupScripts(Arrays.asList(files), connection);
 	}
 
@@ -283,17 +280,19 @@ public class DatabaseSetupUtil{
 			for(int index = 0 ; index < fileList.size() ; index++) {
 				File sqlFile = fileList.get(index);
 				if (sqlFile.getName().endsWith(".sql")) {
-					runScriptFromFile(sqlFile, connectionParams);
+					if (!runScriptFromFile(sqlFile, connectionParams)) {
+						throw new Exception("Error in executing " + sqlFile.getAbsolutePath());
+					}
 				}
 			}
 		}
 	}
 
-	private static void runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
+	private static boolean runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
 		ProcessBuilder pb;
 		String mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
 		
-		LOG.info("Executing script: " + sqlFile.getAbsolutePath());
+		LOG.info("Executing script: " + sqlFile.getName());
 
 		if (connectionParams.getPassword() == null || connectionParams.getPassword().equalsIgnoreCase("")) {
 
@@ -319,10 +318,9 @@ public class DatabaseSetupUtil{
 		}
 
 		Process mysqlProcess = pb.start();
-		LOG.info("Running :  " + pb.command());
 		readProcessInputAndErrorStream(mysqlProcess);
 		int exitValue = mysqlProcess.waitFor();
-		LOG.info("Process exited with code :  " + exitValue);
+		return exitValue == 0;
 	}
 	
 	private static boolean runSQLCommand(String sqlCommand, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
@@ -380,9 +378,7 @@ public class DatabaseSetupUtil{
 		while ((line = errorReader.readLine()) != null) {
 			errorOut.append(line);
 		}
-
 		errorReader.close();
-
 		return errorOut.toString();
 	}
 }
