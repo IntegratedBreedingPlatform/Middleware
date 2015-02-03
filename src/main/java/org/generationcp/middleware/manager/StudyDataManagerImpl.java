@@ -97,10 +97,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-    public int getStudyIdByName(String studyName) throws MiddlewareQueryException {
-        Integer id = null;
+    public Integer getStudyIdByName(String studyName) throws MiddlewareQueryException {
         setWorkingDatabase(Database.CENTRAL);
-        id = getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
+        Integer id = getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
         if (id == null) {
             setWorkingDatabase(Database.LOCAL);
             id = getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);

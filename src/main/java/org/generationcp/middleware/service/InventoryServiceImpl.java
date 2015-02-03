@@ -110,5 +110,11 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		
 		return result;
 	}
+
+	@Override
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId,
+			String germplasmListType) throws MiddlewareQueryException {
+		return getInventoryDataManager().getInventoryDetailsByGermplasmList(listId, germplasmListType);
+	}
 	
 }

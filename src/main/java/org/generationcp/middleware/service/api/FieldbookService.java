@@ -851,6 +851,7 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId) throws MiddlewareQueryException;
+	void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves a list data project
@@ -859,13 +860,29 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
-	
-	/** 
+
+    ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo) throws MiddlewareQueryException;
+
+    /**
 	 * Deletes a list data project given the project_id and the type.
 	 * @param projectId
 	 * @param type
 	 * @throws MiddlewareQueryException
 	 */
 	void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException;
+
+	/**
+     * Saves germplasm list crosses types.
+     * ListData items are always added to the database, before saving the germplasm list.
+     * 
+     * @param listDataItems the list data to add - the key of the Map is the germplasm 
+     *                                      associated to the germplasm list data value
+     * @param germplasmList the germplasm list to add
+     * 
+     * @return The id of the newly-created germplasm list
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	Integer saveCrossesGermplasmList(Map<Germplasm, GermplasmListData> listDataItems,
+			GermplasmList germplasmList) throws MiddlewareQueryException;
 	
 }
