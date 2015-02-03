@@ -40,7 +40,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         try {
         	if (gid != null){
 	            StringBuilder queryString = new StringBuilder();
-	            queryString.append("SELECT {n.*} from NAMES n WHERE n.gid = :gid ");
+	            queryString.append("SELECT {n.*} from names n WHERE n.gid = :gid ");
 	
 	            if (status != null && status != 0) {
 	                queryString.append("AND n.nstat = :nstat ");
