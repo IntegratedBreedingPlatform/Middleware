@@ -79,6 +79,7 @@ public class DatabaseBroker {
 
     protected HibernateSessionProvider sessionProvider;
     protected String databaseName;
+    private GermplasmListDAO germplasmListDao;
 
     protected static final int JDBC_BATCH_SIZE = 50;
   
@@ -110,9 +111,10 @@ public class DatabaseBroker {
     protected Session getActiveSession() {
     	if (sessionProvider != null) {
             return sessionProvider.getSession();
-        }
-        return null;
-    }
+    	}
+    	return null;
+	}
+    
  
     /**
      * Rolls back a given transaction
@@ -495,9 +497,15 @@ public class DatabaseBroker {
 	}
 
     protected final GermplasmListDAO getGermplasmListDAO() {
-    	GermplasmListDAO germplasmListDao = new GermplasmListDAO();
+    	if(germplasmListDao == null) {
+    		germplasmListDao = new GermplasmListDAO();
+		}
 		germplasmListDao.setSession(getActiveSession());
 		return germplasmListDao;
+	}
+    
+    public void setGermplasmListDao(GermplasmListDAO germplasmListDao) {
+		this.germplasmListDao = germplasmListDao;
 	}
 	
 	protected final GermplasmListDataDAO getGermplasmListDataDAO() {
@@ -505,9 +513,8 @@ public class DatabaseBroker {
 		germplasmListDataDao.setSession(getActiveSession());
 		return germplasmListDataDao;
 	}
-	
-    
-    protected final ListDataPropertyDAO getListDataPropertyDAO() {
+
+	protected final ListDataPropertyDAO getListDataPropertyDAO() {
     	ListDataPropertyDAO listDataPropertyDao = new ListDataPropertyDAO();
 		listDataPropertyDao.setSession(getActiveSession());
 		return listDataPropertyDao;

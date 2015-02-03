@@ -20,8 +20,8 @@ public class ListDataProjectSaver extends Saver {
 	public int saveOrUpdateListDataProject(int projectId,
 			GermplasmListType type, Integer originalListId,
 			List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
-		
-		boolean isAdvanced = type == GermplasmListType.ADVANCED; 
+
+		boolean isAdvanced = (type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES); 
 		GermplasmList snapList = isAdvanced ? null : getGermplasmList(projectId, type);
 		boolean isCreate = snapList == null;
 		
@@ -86,6 +86,14 @@ public class ListDataProjectSaver extends Saver {
 		else {
 			setDefaultGermplasmListInfo(germplasmList,userId);
 		}
+	}
+	
+	public void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException{
+		GermplasmList crossesList = getGermplasmListDAO().getById(crossesListId);
+		if (crossesList != null) {
+			crossesList.setProjectId(studyId);		
+		}
+		getGermplasmListDAO().saveOrUpdate(crossesList);
 	}
 
 	private void setDefaultGermplasmListInfo(GermplasmList snapList, int userId) {

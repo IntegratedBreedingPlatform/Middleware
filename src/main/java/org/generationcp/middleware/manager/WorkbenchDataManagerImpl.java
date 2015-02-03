@@ -585,6 +585,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
         return getUserDao().isUsernameExists(userName);
     }
+    
+    @Override
+	public boolean isPersonWithUsernameAndEmailExists(String username, String email) throws MiddlewareQueryException {
+		return getPersonDao().isPersonWithUsernameAndEmailExists(username,email);
+	}
 
     @Override
     public Integer addPerson(Person person) throws MiddlewareQueryException {

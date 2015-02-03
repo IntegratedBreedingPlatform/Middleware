@@ -561,13 +561,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
     
 	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
-			Integer listId) throws MiddlewareQueryException {
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId,
+			String germplasmType) throws MiddlewareQueryException {
 		
 		GermplasmList germplasmList = getGermplasmListDAO().getById(listId);
 		List<GermplasmListData> listData = null;
 		
-		if (germplasmList.getType() != null && germplasmList.getType().equalsIgnoreCase(GermplasmListType.ADVANCED.name())) {
+		if (germplasmList.getType() != null && germplasmList.getType().equalsIgnoreCase(germplasmType)) {
 			
 			germplasmList = getGermplasmListDAO().getById(listId);
 			List<ListDataProject> listDataProjects = getListDataProjectDAO().getByListId(listId);
@@ -674,6 +674,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		}
 		Collections.sort(inventoryDetails);
 		return inventoryDetails;
+	}
+
+	@Override
+	public List<InventoryDetails> getInventoryDetailsByGermplasmList(
+			Integer listId) throws MiddlewareQueryException {
+		
+		return this.getInventoryDetailsByGermplasmList(listId, GermplasmListType.ADVANCED.name());
+		
     }
     
     @SuppressWarnings("unchecked")

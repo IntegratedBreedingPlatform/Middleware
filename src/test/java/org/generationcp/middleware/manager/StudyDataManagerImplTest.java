@@ -436,6 +436,14 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
             experiment.print(INDENT);
         }
     }
+    
+    @Test
+    public void testGetExperimentsWithTrialEnvironments() throws Exception {
+    	List<Experiment> experiments = manager.getExperimentsWithTrialEnvironment(5803, 5803, 0, 50);
+        for (Experiment experiment : experiments) {
+            experiment.print(INDENT);
+        }
+    }
 
     @Test
     public void testAddDataSet() throws Exception {

@@ -86,7 +86,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-    public int getStudyIdByName(String studyName) throws MiddlewareQueryException {
+    public Integer getStudyIdByName(String studyName) throws MiddlewareQueryException {
         return getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
     }
 
@@ -191,6 +191,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throws MiddlewareQueryException {
         clearSessions();
         VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
+        return getExperimentBuilder().build(
+                dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
+    }
+
+    @Override
+    public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows) 
+            throws MiddlewareQueryException {
+        clearSessions();
+        
+        VariableTypeList trialVariableTypes = getDataSetBuilder().getVariableTypes(trialDataSetId);
+        VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
+        
+        variableTypes.addAll(trialVariableTypes);
+        
         return getExperimentBuilder().build(
                 dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
     }

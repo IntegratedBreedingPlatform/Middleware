@@ -77,6 +77,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
     
@@ -506,6 +509,68 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
 
         LOG.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): " 
+                    + ((System.currentTimeMillis() - startTime)/60));
+
+        return listId;
+
+    }
+    
+    @Override
+    public Integer saveCrossesGermplasmList(Map<Germplasm, GermplasmListData> listDataItems
+                            , GermplasmList germplasmList)
+            throws MiddlewareQueryException {
+        
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        Integer listId = null;
+        
+        GermplasmListDAO germplasmListDao = getGermplasmListDAO();
+        
+        long startTime = System.currentTimeMillis();
+
+        try {
+            trans = session.beginTransaction();
+            
+            // Save germplasm list
+            listId = germplasmListDao.getNextId("id");
+            germplasmList.setId(listId);
+            germplasmListDao.save(germplasmList);
+
+            int i = 0;
+
+            // Save germplasms, names, list data
+            for (Entry<Germplasm, GermplasmListData> entry : listDataItems.entrySet()) {
+
+                // Save germplasmListData
+                Integer germplasmListDataId = getGermplasmListDataDAO().getNextId("id");
+                
+                Germplasm germplasm = entry.getKey();
+                GermplasmListData germplasmListData = entry.getValue();
+                
+                germplasmListData.setId(germplasmListDataId);
+                germplasmListData.setGid(germplasm.getGid());
+                germplasmListData.setList(germplasmList);
+                getGermplasmListDataDAO().save(germplasmListData);
+
+                i++;
+                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
+                    session.flush();
+                    session.clear();
+                }
+                
+            }
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasmList=" + germplasmList + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+
+        LOG.debug("========== saveCrossesGermplasmList Duration (ms): " 
                     + ((System.currentTimeMillis() - startTime)/60));
 
         return listId;
@@ -1075,6 +1140,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException {
         return getListDataProjectDAO().getByListId(listId);
     }
+
+    @Override
+    public ListDataProject getListDataProjectByListIdAndEntryNo(int listId,int entryNo) throws MiddlewareQueryException {
+        return getListDataProjectDAO().getByListIdAndEntryNo(listId,entryNo);
+    }
 	
 	@Override
     public void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException {
@@ -1109,4 +1179,27 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
         return listId;
     }
+	
+	@Override
+	public void updateGermlasmListInfoStudy(int crossesListId, int studyId)
+			throws MiddlewareQueryException {
+		Session session = getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction(); 
+
+            getListDataProjectSaver().updateGermlasmListInfoStudy(crossesListId, studyId);
+        
+            trans.commit();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with updateGermlasmListInfoStudy(): " + e.getMessage(), e, LOG);
+        }
+		
+	}
+	
+	 
 }

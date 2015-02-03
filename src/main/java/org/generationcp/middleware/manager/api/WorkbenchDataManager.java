@@ -200,6 +200,15 @@ public interface WorkbenchDataManager {
     boolean isPersonWithEmailExists(String email) throws MiddlewareQueryException;
 
     /**
+	 * Checks if person with specified username AND email exists.
+	 * @param username
+	 * @param email
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	boolean isPersonWithUsernameAndEmailExists(String username, String email) throws MiddlewareQueryException;
+
+	/**
      * Checks if a username exists.
      *
      * @param userName - the user name to check
@@ -932,7 +941,6 @@ public interface WorkbenchDataManager {
      * @return the last Project opened by the given user
      * @throws MiddlewareQueryException the middleware query exception
      */
-
 	Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException;
 
 	/**

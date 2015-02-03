@@ -60,7 +60,7 @@ public interface StudyDataManager{
      * @return the study id by name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    int getStudyIdByName(String studyName) throws MiddlewareQueryException;
+    Integer getStudyIdByName(String studyName) throws MiddlewareQueryException;
 
     
     List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException;
@@ -787,4 +787,7 @@ public interface StudyDataManager{
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
 	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException;
+
+	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId,
+			int start, int numRows) throws MiddlewareQueryException;
 }
