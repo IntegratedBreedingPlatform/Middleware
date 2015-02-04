@@ -11,7 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -894,12 +897,28 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     }
     
     @Test
+    public void testGetMethodByNameWithProgramUUID() throws Exception {
+        String name = "breeders seed";
+        String programUUID = commonTestProject.getUniqueID();
+        Method method = manager.getMethodByName(name, programUUID);
+        assertNotNull("Expecting the return method is not null.",method);
+    }
+    
+    @Test
     public void testGetMethodByCode() throws Exception {
         String code = "VBS";
         Method method = manager.getMethodByCode(code);
         assertNotNull(method);
         Debug.println(INDENT, "testGetMethodByCode("+code+"): ");
         Debug.println(INDENT, method);
+    }
+    
+    @Test
+    public void testGetMethodByCodeWithProgramUUID() throws Exception {
+        String code = "VBS";
+        String programUUID = commonTestProject.getUniqueID();
+        Method method = manager.getMethodByCode(code, programUUID);
+        assertNotNull("Expecting the return method is not null.",method);
     }
     
     @Test

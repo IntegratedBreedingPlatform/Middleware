@@ -279,6 +279,18 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         return 0;
     }   
     
+    public Method getByCode(String code, String programUUID) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.eq("mcode", code));
+            criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
+            return (Method) criteria.uniqueResult();
+        } catch (HibernateException e) {
+        	logAndThrowException(getLogExceptionMessage("getMethodsByCode","code",code,e.getMessage(),"Method"), e);
+        }
+        return new Method();
+    }
+    
     public Method getByCode(String code) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
@@ -320,6 +332,48 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
                 String programUUID = (String) row[14];
                 
                 Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate,programUUID);
+                methods.add(method);
+            }
+            
+            return methods;
+        } catch (HibernateException e) {
+        	logAndThrowException(getLogExceptionMessage("getByName","name",name,e.getMessage(),"Method"), e);
+        }
+        return new ArrayList<Method>();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Method> getByName(String name, String uniqueId) throws MiddlewareQueryException {
+        List<Method> methods = new ArrayList<Method>();
+        try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, program_uuid ")
+                    .append("FROM methods m WHERE m.mname = :mname ")
+            		.append("AND m.program_uuid = :uniqueId");
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("mname", name);
+            query.setParameter("uniqueId", uniqueId);
+
+            List<Object[]> list = query.list();
+            
+            for (Object[] row : list){
+                Integer mid = (Integer) row[0];
+                String mtype = (String) row[1];
+                String mgrp = (String) row[2];
+                String mcode = (String) row[3];
+                String mname = (String) row[4];
+                String mdesc = (String) row[5];
+                Integer mref = (Integer) row[6];
+                Integer mprgn = (Integer) row[7];
+                Integer mfprg = (Integer) row[8];
+                Integer mattr = (Integer) row[9];
+                Integer geneq = (Integer) row[10];
+                Integer muid = (Integer) row[11];
+                Integer lmid = (Integer) row[12];
+                Integer mdate = (Integer) row[13];
+                String programUUID = (String) row[14];
+                
+                Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn, mfprg, mattr, geneq, muid, lmid, mdate, programUUID);
                 methods.add(method);
             }
             

@@ -91,6 +91,18 @@ public interface LocationDataManager {
      */
     long countLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
     
+    /**
+     * Returns the Location records with
+     * names matching the given parameter.
+     *
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
+     * @param programUUID - uniqueID of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException;
+    
     
     /**
      * Returns the Location records with
@@ -103,6 +115,20 @@ public interface LocationDataManager {
      */
     List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
     
+    /**
+     * Returns the Location records with names matching the given parameter.
+     *
+     * @param name - search string for the name of the locations
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param op - can be EQUAL like LIKE
+     * @param programUUID - uniqueID of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op, String programUUID) 
+            throws MiddlewareQueryException;
 
     /**
      * Returns the Location records with names matching the given parameter.
@@ -117,14 +143,17 @@ public interface LocationDataManager {
      */
     List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) 
             throws MiddlewareQueryException;
-    
+
     /**
-     * Returns all country records.
+     * Returns the number of Locations with names matching the given parameter.
      *
-     * @return List of Location POJOs
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
+     * @param programUUID - uniqueID of the current program
+     * @return Number of Locations
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Country> getAllCountry() throws MiddlewareQueryException;
+    long countLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Returns the number of Locations with names matching the given parameter.
@@ -135,7 +164,14 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
-
+    
+    /**
+     * Returns all country records.
+     *
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Country> getAllCountry() throws MiddlewareQueryException;
 
     /**
      * Returns all the Location records with country matching the given parameter. 

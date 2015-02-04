@@ -2079,6 +2079,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}    
 	
 	@Override
+	public Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException {
+	    Method method = new Method();
+        method = getMethodDao().getByCode(code, programUUID);
+	    return method;
+	}
+	
+	@Override
 	public Method getMethodByCode(String code) throws MiddlewareQueryException {
 	    Method method = new Method();
         method = getMethodDao().getByCode(code);
@@ -2089,9 +2096,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Method getMethodByName(String name) throws MiddlewareQueryException {
 	    List<Method> methods = new ArrayList<Method>();
         methods = getMethodDao().getByName(name);
-        if (methods != null && methods.size() > 0) {
-            Method method = methods.get(0); 
-            return method;
+        if (methods != null && !methods.isEmpty()) {
+            return methods.get(0);
+        } else {
+            return new Method();
+        }
+	}
+	
+	@Override
+	public Method getMethodByName(String name, String programUUID) throws MiddlewareQueryException {
+	    List<Method> methods = new ArrayList<Method>();
+        methods = getMethodDao().getByName(name, programUUID);
+        if (methods != null && !methods.isEmpty()) {
+            return methods.get(0);
         } else {
             return new Method();
         }

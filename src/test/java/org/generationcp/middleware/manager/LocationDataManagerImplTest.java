@@ -166,12 +166,34 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
                 + ", numOfRows=" + numOfRows + "): ");
         Debug.printObjects(INDENT, locationList2);
     }
+    
+    @Test
+    public void testGetLocationsByNameWithProgramUUID() throws Exception {
+        String name = "AFGHANISTAN";
+        int start = 0;
+        int numOfRows = 5;
+        String programUUID = commonTestProject.getUniqueID();
+
+        List<Location> locationList = manager.getLocationsByName(name, Operation.EQUAL, programUUID);
+        assertTrue("Expecting the location list returned is not null.",locationList != null);
+        
+        List<Location> locationList2 = manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL, programUUID);
+        assertTrue("Expecting the location list 2 returned is not null.",locationList2 != null);
+    }
 
     @Test
     public void testCountLocationsByName() throws Exception {
         String name = "AFGHANISTAN";
         long count = manager.countLocationsByName(name, Operation.EQUAL);
         Debug.println(INDENT, "testCountLocationByName(" + name + "): " + count);
+    }
+    
+    @Test
+    public void testCountLocationsByNameWithProgramUUID() throws Exception {
+        String name = "AFGHANISTAN";
+        String programUUID = commonTestProject.getUniqueID();
+        long count = manager.countLocationsByName(name, Operation.EQUAL, programUUID);
+        Assert.assertTrue("Expecting the count returned is greated than 0", count > 0);
     }
 
     @Test

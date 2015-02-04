@@ -1313,6 +1313,16 @@ public interface GermplasmDataManager {
      * Gets the method by code.
      *
      * @param code the code
+     * @param programUUID - uniqueId of the current program 
+     * @return the method by code
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the method by code.
+     *
+     * @param code the code
      * @return the method by code
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -1326,6 +1336,16 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Method getMethodByName(String name) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the method by name.
+     *
+     * @param code the code
+     * @param programUUID - uniqueID of the current program
+     * @return the method by name
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Method getMethodByName(String name, String programUUID) throws MiddlewareQueryException;
     
     List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid) throws MiddlewareQueryException;
     

@@ -72,8 +72,30 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     public long countLocationsByUniqueID(String programUUID) throws MiddlewareQueryException {
         return countAllByMethod(getLocationDao(), "countByUniqueID", new Object[]{ programUUID }, new Class[]{String.class});
     }
+
+    @Override
+    public List<Location> getLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException {
+        List<Location> locations = new ArrayList<Location>();
+        locations.addAll(getLocationDao().getByNameAndUniqueID(name, op, programUUID));
+        return locations;
+    }
+
+    @Override
+    public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op, String programUUID) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countByNameAndUniqueID", "getByNameAndUniqueID");
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{name, op, programUUID},
+                new Class[]{String.class, Operation.class, String.class});
+    }
+
+
+    @Override
+    public long countLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException {
+        return countAllByMethod(getLocationDao(), "countByNameAndUniqueID", new Object[]{name, op, programUUID}, new Class[]{String.class,
+                Operation.class, String.class});
+    }
     
     @Override
+    @Deprecated
     public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         List<Location> locations = new ArrayList<Location>();
         locations.addAll(getLocationDao().getByName(name, op));
@@ -81,6 +103,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
     }
 
     @Override
+    @Deprecated
     public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByName", "getByName");
         return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{name, op},
@@ -89,6 +112,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 
     @Override
+    @Deprecated
     public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         return countAllByMethod(getLocationDao(), "countByName", new Object[]{name, op}, new Class[]{String.class,
                 Operation.class});
