@@ -662,6 +662,9 @@ public interface WorkbenchDataManager {
 	 */
 	Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
 
+	Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId)
+			throws MiddlewareQueryException;
+
 	/**
 	 * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
 	 *

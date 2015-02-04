@@ -1167,6 +1167,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return userMap.getIbdbUserId();
 	}
 
+
+	@Override
+	public Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId)
+			throws MiddlewareQueryException {
+		Integer ibdbUserId = null;
+		IbdbUserMap userMapEntry = this.getIbdbUserMap(workbenchUserId, projectId);
+		if (userMapEntry != null) {
+			ibdbUserId = userMapEntry.getIbdbUserId();
+		}
+		return ibdbUserId;
+	}
+
+
 	@Override
 	public IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId)
 			throws MiddlewareQueryException {
