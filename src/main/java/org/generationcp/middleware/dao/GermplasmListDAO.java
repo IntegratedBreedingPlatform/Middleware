@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
-    private static final Integer STATUS_DELETED = 9;
+    public static final Integer STATUS_DELETED = 9;
     protected static final List<SimpleExpression> restrictedList = new ArrayList();
     
     static{
