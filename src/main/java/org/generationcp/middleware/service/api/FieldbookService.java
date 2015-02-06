@@ -885,4 +885,5 @@ public interface FieldbookService {
 	Integer saveCrossesGermplasmList(Map<Germplasm, GermplasmListData> listDataItems,
 			GermplasmList germplasmList) throws MiddlewareQueryException;
 	
+	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)  throws MiddlewareQueryException;
 }

@@ -31,6 +31,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -1261,5 +1262,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		
 	}
 	
-	 
+	@Override
+	public void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)
+			throws MiddlewareQueryException {
+		Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+	}
+
+	
 }
