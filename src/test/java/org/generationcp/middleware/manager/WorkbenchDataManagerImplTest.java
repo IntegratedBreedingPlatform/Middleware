@@ -11,10 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +26,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -54,6 +51,9 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
@@ -990,6 +990,113 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         Boolean isDefault = true;
         
         return new TemplateSetting(templateSettingId, projectId, name, tool, configuration, isDefault);
+    }
+
+    @Test
+    public void testCRUDStandardPresetDAO() throws Exception {
+        StandardPreset preset = new StandardPreset();
+        preset.setConfiguration("<configuration/>");
+        preset.setName("configuration_01");
+        preset.setToolId(1);
+        preset.setCropName("crop_name");
+
+        StandardPreset results = manager.saveOrUpdateStandardPreset(preset);
+
+        assertTrue("we retrieve the saved primary id",results.getStandardPresetId() > 0);
+
+        Integer id = results.getStandardPresetId();
+
+        // test retrieve from database using id
+        StandardPreset retrievedResult = manager.getStandardPresetDAO().getById(id);
+
+        assertEquals("we retrieved the correct object from database",results,retrievedResult);
+
+        // we test deletion, also serves as cleanup
+        manager.deleteStandardPreset(id);
+
+        assertNull("standard preset with id=" + id + " should no longer exist",manager.getStandardPresetDAO().getById(id));
+    }
+
+    @Test
+    public void testGetAllStandardPreset() throws Exception {
+        List<StandardPreset> out = manager.getStandardPresetDAO().getAll();
+
+        assertTrue(out.size() > 0);
+
+    }
+
+    @Test
+    public void testGetStandardPresetFromCropAndTool() throws Exception {
+        List<StandardPreset> fulllist = initializeStandardPresets();
+
+        for (int j = 1; j < 3; j++) {
+            List<StandardPreset> presetsList = manager.getStandardPresetFromCropAndTool("crop_name_" + j,j);
+            for (StandardPreset p : presetsList) {
+                assertEquals("should only retrieve all standard presets with crop_name_1","crop_name_" + j,p.getCropName());
+                assertEquals("should be the same tool as requested",Integer.valueOf(j),p.getToolId());
+            }
+        }
+
+        // cleanup
+        for (StandardPreset p : fulllist) {
+            manager.deleteStandardPreset(p.getStandardPresetId());
+        }
+    }
+
+    @Test
+    public void testGetStandardPresetFromCropAndToolAndToolSection() throws Exception {
+        List<StandardPreset> fulllist = initializeStandardPresets();
+
+        for (int j = 1; j < 3; j++) {
+            List<StandardPreset> presetsList = manager.getStandardPresetFromCropAndTool(
+                    "crop_name_" + j, j, "tool_section_" + j);
+            for (StandardPreset p : presetsList) {
+                assertEquals("should only retrieve all standard presets with same crop name","crop_name_" + j,p.getCropName());
+                assertEquals("should only retrieve all standard presets with same tool section","tool_section_" + j,p.getToolSection());
+                assertEquals("should be the same tool as requested",Integer.valueOf(j),p.getToolId());
+            }
+        }
+
+        // cleanup
+        for (StandardPreset p : fulllist) {
+            manager.deleteStandardPreset(p.getStandardPresetId());
+        }
+    }
+
+    @Test
+    public void testGetStandardPresetFromProgramAndToolByName() throws Exception {
+        List<StandardPreset> fullList = initializeStandardPresets();
+
+        // this should exists
+        List<StandardPreset> result = manager.getStandardPresetFromCropAndToolByName(
+                "configuration_1_1", "crop_name_1", 1, "tool_section_1");
+
+        assertTrue("result should not be empty", result.size() > 0);
+        assertEquals("Should return the same name","configuration_1_1",result.get(0).getName());
+
+        // cleanup
+        for (StandardPreset p : fullList) {
+            manager.deleteStandardPreset(p.getStandardPresetId());
+        }
+    }
+
+
+    protected List<StandardPreset> initializeStandardPresets() throws MiddlewareQueryException {
+        List<StandardPreset> fulllist = new ArrayList<StandardPreset>();
+        for (int j = 1; j < 3; j++) {
+            for (int i = 1; i < 6; i++) {
+                StandardPreset preset = new StandardPreset();
+                preset.setConfiguration("<configuration/>");
+                preset.setName("configuration_" + j + "_" + i);
+                preset.setToolId(j);
+                preset.setCropName("crop_name_" + j);
+                preset.setToolSection("tool_section_" + j);
+
+                fulllist.add(manager.saveOrUpdateStandardPreset(preset));
+            }
+        }
+
+        return fulllist;
     }
 
 }

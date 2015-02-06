@@ -32,6 +32,14 @@ public interface InventoryService {
 	 * @return the inventory details by germplasm list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
+	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId, String germplasmListType) throws MiddlewareQueryException;
+	/**
+	 * Gets the inventory details by germplasm list.
+	 *
+	 * @param listId the list id
+	 * @return the inventory details by germplasm list
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
 	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId) throws MiddlewareQueryException;
 	
 	/**

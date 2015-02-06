@@ -36,6 +36,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     /** The labels. */
     private List<FieldMapLabel> labels;
+
+    private Map<Integer, String> labelHeaders;
     
     /** The block name. */
     private String blockName;
@@ -649,5 +651,11 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 		}
 	}
 
+    public Map<Integer, String> getLabelHeaders() {
+        return labelHeaders;
+    }
 
+    public void setLabelHeaders(Map<Integer, String> labelHeaders) {
+        this.labelHeaders = labelHeaders;
+    }
 }

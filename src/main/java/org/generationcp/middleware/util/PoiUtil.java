@@ -53,6 +53,17 @@ public class PoiUtil {
         return cell == null ? null : cell.getNumericCellValue();
     }
 
+    public static String getCellStringValue(Workbook wb,Integer sheetNumber, Integer rowNumber
+            , Integer columnNumber){
+
+        Sheet sheet = wb.getSheetAt(sheetNumber);
+        Row row = sheet.getRow(rowNumber);
+        Cell cell = row.getCell(columnNumber);
+        return getCellStringValue(cell);
+
+    }
+
+
     public static String getCellStringValue(Cell cell) {
         try {
             return cell == null ? null : cell.getStringCellValue().trim();

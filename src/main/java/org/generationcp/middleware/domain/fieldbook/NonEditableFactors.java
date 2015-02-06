@@ -48,8 +48,9 @@ public enum NonEditableFactors {
 	/** The range no. */
 	RANGE_NO(TermId.RANGE_NO.getId()),
 	
-	TRIAL_INSTANCE(TermId.TRIAL_INSTANCE_FACTOR.getId());
+	ENTRY_TYPE(TermId.ENTRY_TYPE.getId()),
 	
+	TRIAL_INSTANCE(TermId.TRIAL_INSTANCE_FACTOR.getId());
 	
 	/** The id. */
 	private int id;

@@ -245,7 +245,6 @@ public enum TermId {
     , CHECK_START (8411)
     , CHECK_INTERVAL (8412)
     , CHECK_PLAN (8413)
-    
     //Germplasm List Column Labels
     , AVAILABLE_INVENTORY (60000)
     , BREEDING_METHOD_NAME (60001)
@@ -271,6 +270,8 @@ public enum TermId {
     , TOTAL_INVENTORY (60018)
     , UNITS_INVENTORY (60019)
     
+    , ENTRY_TYPE(8255)
+
 ;
 	
 	private final int id;

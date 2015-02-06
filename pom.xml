@@ -4,19 +4,19 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-	<version>3.1.1.SNAPSHOT</version>
+	<version>3.1.2.SNAPSHOT</version>
 	<name>ibp middleware</name>
 
 	<distributionManagement>
 		<repository>
 			<id>efficio-nexus</id>
 			<name>Releases</name>
-			<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/releases/</url>
+			<url>http://apps.leafnode.io:8081/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>efficio-nexus</id>
 			<name>Snapshots</name>
-			<url>http://gcp.efficio.us.com:8081/nexus/content/repositories/snapshots/</url>
+			<url>http://apps.leafnode.io:8081/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

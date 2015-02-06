@@ -162,6 +162,10 @@ public class VariableTypeList implements Serializable{
 	}
 	
 	public int size() {
-		return (variableTypes != null ? variableTypes.size() : 0);
+		return variableTypes != null ? variableTypes.size() : 0;
+	}
+	
+	public boolean isEmpty() {
+		return variableTypes == null || variableTypes.isEmpty();
 	}
 }

@@ -128,7 +128,11 @@ public class VariableList implements Serializable{
 	}
 	
 	public int size() {
-		return (variables != null ? variables.size() : 0);
+		return variables != null ? variables.size() : 0;
+	}
+	
+	public boolean isEmpty() {
+		return variables == null || variables.isEmpty();
 	}
 
 	public void print(int indent) {
