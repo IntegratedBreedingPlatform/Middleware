@@ -71,14 +71,21 @@ public interface Reporter {
 	void setFileNameExpression(String fileNameExpr);
 
 	/**
-	 * Creates a file name for the specified reporter by using the report name string
+	 * Creates a file name for the specified reporter by using the report name expression and applying proper parameters.
 	 * @return the constructed file name
 	 */
 	String getFileName();
-	
+
+	/**
+	 * Returns the specific file extension for this reporter, without separator at the beginning; that is, it returns 'pdf' instead of '.pdf'.
+	 * @return the file extension for this reporter.
+	 */
+	String getFileExtension();
+
 	/**
 	 * Sends the file to the specified output stream
 	 * @param output Out where the report has to be sent. This can be a servlet, file or any other output stream.
+	 * @throws BuildReportException If the JasperPrint is null or cannot generate a proper document.
 	 */
 	void asOutputStream(OutputStream output) throws BuildReportException;
 

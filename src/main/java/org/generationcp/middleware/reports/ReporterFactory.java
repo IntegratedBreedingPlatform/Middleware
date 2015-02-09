@@ -32,15 +32,13 @@ public final class ReporterFactory {
 	 * @throws IllegalArgumentException 
 	 */
 	private static void initFactory() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException{
-		Reflections reflections = new Reflections("org.cimmyt.reporter");
+		Reflections reflections = new Reflections("org.generationcp.middleware.reports");
 		Set<Class<? extends AbstractReporter>> classes = reflections.getSubTypesOf(AbstractReporter.class);
 		
 		
 		for(Class<?> c : classes){
-			System.out.print("CLASS: "+c.getName());
 			
 			int classModifiers = c.getModifiers();
-			System.out.println(" modif: "+Modifier.toString(classModifiers));
 			if(! Modifier.toString(classModifiers).contains("abstract")){
 				Class<?> r = Class.forName(c.getName());
 				Reporter instance = (Reporter)r.newInstance();

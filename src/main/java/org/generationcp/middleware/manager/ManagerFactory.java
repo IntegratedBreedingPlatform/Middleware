@@ -19,10 +19,12 @@ import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
+import org.generationcp.middleware.service.ReportServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -327,7 +329,7 @@ public class ManagerFactory implements Serializable {
     public InventoryService getInventoryMiddlewareService() throws ConfigException {
         return new InventoryServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
-    
+
     public DataImportService getDataImportService() throws ConfigException {
         return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
@@ -338,6 +340,10 @@ public class ManagerFactory implements Serializable {
 
     public MBDTDataManager getMbdtDataManager() {
         return new MBDTDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public ReportService getReportService() throws ConfigException {
+        return new ReportServiceImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
     }
 
 

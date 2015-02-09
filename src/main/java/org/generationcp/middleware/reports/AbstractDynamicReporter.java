@@ -1,9 +1,15 @@
 package org.generationcp.middleware.reports;
 
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -22,6 +28,11 @@ import net.sf.jasperreports.engine.design.JRDesignTextField;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.type.HorizontalAlignEnum;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
 
 public abstract class AbstractDynamicReporter extends AbstractReporter {
@@ -43,7 +54,6 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	List<String> columnHeaders = null;
     
-    @SuppressWarnings("unchecked")
 	@Override
 	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException{
 		
@@ -59,14 +69,12 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 			if(args.containsKey("dataSource")){
 				collectionDataSource = (Collection<?>)args.get("dataSource");
-				columnHeaders = (List<String>)(args.get("columnHeaders"));
+				columnHeaders = buildColumnHeaders(collectionDataSource.iterator().next());
 				
 				jrDataSource = buildJRDataSource(collectionDataSource);
-				System.out.println("datasource done!!!");
 			
 		        JasperDesign jasperReportDesign = JRXmlLoader.load(getTemplatePath().replace(".jasper", ".jrxml"));
 			 
-				//modifies the jasper design to accept the data source of unknown number of columns
 				addDynamicColumns(jasperReportDesign, columnHeaders.size());
 				 
 				jasperReport = JasperCompileManager.compileReport(jasperReportDesign);
@@ -78,15 +86,59 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 		return jrPrint;
 
 	}
+
+	/**
+	 * Creates the list of columns headers to be used when generating a dynamic Jasper Design.
+	 * @param param  any source object that contains the column headers
+	 * @return The plains String List with the header's names.
+	 */
+    protected  List<String> buildColumnHeaders(Object param){
+    	
+    	MeasurementRow row =  (MeasurementRow)param;
+		List<String> columnHeaders = new ArrayList<>();
+		
+		for(MeasurementData rowData : (Collection<MeasurementData>) row.getDataList()){		
+			columnHeaders.add(rowData.getLabel());
+		}
+
+		return columnHeaders;
+    }
 	
 	@Override
 	public JRDataSource buildJRDataSource(Collection<?> dataRecords){
 		
 		return new DynamicColumnDataSource(columnHeaders, convertBeanCollectionToStringLists(dataRecords));
 	}
-	
-	public abstract List<List<String>> convertBeanCollectionToStringLists(Collection<?> dataRecords);
 
+	/**
+	 * Converts a Collection of beans (usually passed via 'dataSource' parameter) to a List containing the records to
+	 * be used as datasource, where each record is defined by a String List.
+	 * @param dataRecords A collection of beans to be parsed
+	 * @return A 
+	 */
+	@SuppressWarnings("unchecked")
+	protected List<List<String>> convertBeanCollectionToStringLists( Collection<?> dataRecords) {
+		List<List<String>> dataSource = new ArrayList<>();
+		
+		for(MeasurementRow row : (Collection<MeasurementRow>)dataRecords){
+			List<String> sourceItem = new ArrayList<>();
+			for(MeasurementData dataItem : row.getDataList()){
+				sourceItem.add(dataItem.getValue());
+			}
+			
+			dataSource.add(sourceItem);
+		}
+		
+		return dataSource;
+	}
+	
+	/**
+	 * Regenerates a JasperDesign, by adding it a Header Band for columns headers; and 
+	 * a detail band for displaying data records. The column width is uniformly distributed among columns. 
+	 * @param jasperDesign the design where both bands(header and detail) will be added to.
+	 * @param numColumns the number of columns to generate.
+	 * @throws JRException If the Jasper Design modification fails.
+	 */
 	private void addDynamicColumns(JasperDesign jasperDesign, int numColumns) throws JRException{
 		 
         JRDesignBand detailBand = new JRDesignBand();
@@ -152,6 +204,10 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	}
 	
+	/**
+	 * Helper method definig the predefined style to be used in Jasper elements.
+	 * @return A default style with small font size.
+	 */
     private JRDesignStyle getNormalStyle() {
         JRDesignStyle normalStyle = new JRDesignStyle();
         normalStyle.setName("Sans_Normal");
@@ -164,6 +220,10 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
         return normalStyle;
     }
  
+	/**
+	 * Helper method definig the predefined style to be used in Jasper columns headers.
+	 * @return A default style with bold and small font size.
+	 */
     private JRDesignStyle getColumnHeaderStyle() {
         JRDesignStyle columnHeaderStyle = new JRDesignStyle();
         columnHeaderStyle.setName("Sans_Header");
@@ -176,4 +236,51 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
         columnHeaderStyle.setPdfEmbedded(false);
         return columnHeaderStyle;
     }
+    
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, Object> buildJRParams(Map<String,Object> args){
+		Map<String, Object> params = super.buildJRParams(args);
+
+		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>)args.get("studyConditions");
+
+		for(MeasurementVariable var : studyConditions){
+			switch(var.getName()){
+				case "SITE_NAME" : params.put("site", var.getValue()); break;
+				case "STUDY_NAME" : params.put("nursery", var.getValue()); break;
+				case "CROP_SEASON" : params.put("season", var.getValue()); break;
+				case "BreedingProgram" : params.put("seedPrep", var.getValue()); break; //add seed prep. Condition
+				case "TRIAL_INSTANCE" : params.put("siteNum", var.getValue()); break;
+			}
+		}
+
+		return params;
+	}
+	
+	/**
+	 * Overrides the default super implementation, in PDF format, to Excel format.
+	 */
+	@Override
+	public void asOutputStream(OutputStream output) throws BuildReportException {
+		if(null != jrPrint){
+			try {
+		
+				JRXlsxExporter ex = createDefaultExcelExporter();
+				ex.setExporterInput(new SimpleExporterInput(jrPrint));
+				ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
+				
+                ex.exportReport();
+                
+			} catch (JRException e) {
+				e.printStackTrace();
+			}
+		}
+		else throw new BuildReportException(getReportCode());
+	}
+
+
+	@Override
+	public String getFileExtension(){
+		return "xlsx";
+	}
 }

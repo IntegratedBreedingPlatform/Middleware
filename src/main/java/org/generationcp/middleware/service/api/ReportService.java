@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.JRException;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.reports.BuildReportException;
+import org.generationcp.middleware.reports.Reporter;
 
 public interface ReportService {
 
@@ -25,13 +26,15 @@ public interface ReportService {
 	 * @throws MiddlewareQueryException
 	 * @throws JRException
 	 */
-	JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, MiddlewareQueryException, JRException, IOException;
+	JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, MiddlewareQueryException, JRException, IOException, BuildReportException;
 
 	/**
-	 * Sends the file to the specified output stream.
+	 * Sends the file to the specified output stream. Additionally, returns a Reporter instance, in case some
+	 * extra information about the report is needed, such as file extension, report file name, etc.
 	 * @param output Out where the report has to be sent. This can be a servlet, file or any other output stream.
+	 * @return a Reporter instance, describirn the report being generated.
 	 */
-	void getStreamReport(String code, Integer studyId, OutputStream output) throws MiddlewareException, MiddlewareQueryException, JRException, BuildReportException;
+	Reporter getStreamReport(String code, Integer studyId, OutputStream output) throws MiddlewareException, MiddlewareQueryException, JRException, IOException, BuildReportException;
 
 	/**
 	 * Returns a Set of keys available to be passed to a ReporterFactory, for generating a particular report. 

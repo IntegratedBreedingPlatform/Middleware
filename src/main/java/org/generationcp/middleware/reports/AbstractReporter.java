@@ -113,17 +113,6 @@ abstract class AbstractReporter implements Reporter{
 		this.fileNameExpr = fileNameExpr;
 	}
 
-	/**
-	 * Returns the filename for an instance of this Reporter, applying defined parameters.
-	 * @return the file name for this Reporter.
-	 */
-	public String getFileName(){
-		return fileName;
-	}
-	public void setFileName(String fileName){
-		this.fileName = fileName;
-	}
-	
 	protected String buildOutputFileName(Map<String,Object> jrParams){
 		String fileName = this.fileNameExpr;
 		
@@ -168,5 +157,16 @@ abstract class AbstractReporter implements Reporter{
 		jrConfig.setWhitePageBackground(true);
 		
 		return ex;
+	}
+
+	public String getFileName(){
+		return fileName+"."+getFileExtension();
+	}
+	public void setFileName(String fileName){
+		this.fileName = fileName;
+	}
+	
+	public String getFileExtension(){
+		return "pdf";
 	}
 }

@@ -1,8 +1,16 @@
 package org.generationcp.middleware.reports;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.pojos.report.SiteEntry;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -11,7 +19,7 @@ import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
-public class MFieldbookNur extends AbstractReporter{
+public class MFieldbookNur extends AbstractDynamicReporter{
 
 	@Override
 	public Reporter createReporter() {
@@ -31,41 +39,12 @@ public class MFieldbookNur extends AbstractReporter{
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
 		Map<String, Object> params = super.buildJRParams(args);
-		
-		params.put("site", args.get("site"));
-		params.put("nursery", args.get("nursery"));
-		params.put("season", args.get("season"));
-		params.put("seedPrep", args.get("seedPrep"));
-		params.put("siteNum", args.get("siteNum"));
+		//add more specific parameters here 
 		
 		return params;
 	}
 
-	@Override
-	public JRDataSource buildJRDataSource(Collection<?> args){
-		
-		JRDataSource dataSource = new JRBeanCollectionDataSource(args);
-		return dataSource;
-	}
-
-	@Override
-	public void asOutputStream(OutputStream output) throws BuildReportException {
-		if(null != jrPrint){
-			try {
-		
-				JRXlsxExporter ex = createDefaultExcelExporter();
-				ex.setExporterInput(new SimpleExporterInput(jrPrint));
-				ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
-				
-                ex.exportReport();
-                
-			} catch (JRException e) {
-				e.printStackTrace();
-			}
-		}		else throw new BuildReportException(getReportCode());
-	}
-
-	
 }
