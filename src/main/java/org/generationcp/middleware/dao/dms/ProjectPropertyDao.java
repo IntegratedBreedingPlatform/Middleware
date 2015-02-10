@@ -52,7 +52,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 			if (propertyNames.size() > 0) {
 								
-				StringBuffer sqlString = new StringBuffer()
+				StringBuilder sqlString = new StringBuilder()
 					.append("SELECT DISTINCT ppValue.value, ppStdVar.id ")
 					.append( "FROM projectprop ppValue  ")
 					.append("INNER JOIN (SELECT project_id, value id, rank FROM projectprop WHERE type_id = 1070) AS ppStdVar  " )

@@ -39,6 +39,8 @@ import org.hibernate.Session;
 
 public class ProjectPropertySaver extends Saver {
 
+	protected static final String PROJECT_PROPERTY_ID = "projectPropertyId";
+
 	public ProjectPropertySaver(
 			HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
@@ -52,7 +54,7 @@ public class ProjectPropertySaver extends Saver {
 		List<VariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 		
 		if (variableTypes != null && !variableTypes.isEmpty()) {
-			int index = getProjectPropertyDao().getNegativeId("projectPropertyId");
+			int index = getProjectPropertyDao().getNegativeId(PROJECT_PROPERTY_ID);
 			for (VariableType variableType : variableTypes) {
 				List<ProjectProperty> list = createVariableProperties(index, project, variableType);
 				properties.addAll(list);
@@ -70,7 +72,7 @@ public class ProjectPropertySaver extends Saver {
 		Integer generatedId;
 		ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
         for (ProjectProperty property : properties){
-            generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
+            generatedId = projectPropertyDao.getNegativeId(PROJECT_PROPERTY_ID);
             property.setProjectPropertyId(generatedId);
             property.setProject(project);
             projectPropertyDao.save(property);
@@ -79,9 +81,10 @@ public class ProjectPropertySaver extends Saver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(int index, DmsProject project, VariableType variableType) throws MiddlewareQueryException {
+	private List<ProjectProperty> createVariableProperties(int startIndex, DmsProject project, VariableType variableType) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
+		int index = startIndex;
 		properties.add(new ProjectProperty(index--, project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
@@ -101,7 +104,7 @@ public class ProjectPropertySaver extends Saver {
 				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId
 				|| TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
 					ProjectProperty property = new ProjectProperty();
-					property.setProjectPropertyId(getProjectPropertyDao().getNegativeId("projectPropertyId"));
+					property.setProjectPropertyId(getProjectPropertyDao().getNegativeId(PROJECT_PROPERTY_ID));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
 					property.setValue(variable.getValue());
 					property.setRank(variable.getVariableType().getRank());
@@ -124,7 +127,7 @@ public class ProjectPropertySaver extends Saver {
 	
 	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
 		ProjectProperty property = new ProjectProperty();
-		property.setProjectPropertyId(getProjectPropertyDao().getNegativeId("projectPropertyId"));
+		property.setProjectPropertyId(getProjectPropertyDao().getNegativeId(PROJECT_PROPERTY_ID));
 		property.setTypeId(typeId);
 		property.setValue(value);
 		property.setRank(rank);
@@ -425,8 +428,9 @@ public class ProjectPropertySaver extends Saver {
 	}
 
 	//Iterate and update rank, exclude deleted variables
-	private int updateVariableRank(List<Integer> variableIds, int rank,
+	private int updateVariableRank(List<Integer> variableIds, int startRank,
 			Map<Integer, List<Integer>> projectPropIDMap) {
+		int rank = startRank;
 		for (Integer variableId : variableIds){
 			List<Integer> projectPropIds = projectPropIDMap.get(variableId);
 			if (projectPropIds != null) {
