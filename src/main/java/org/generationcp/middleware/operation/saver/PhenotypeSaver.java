@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 public class PhenotypeSaver extends Saver{
@@ -188,23 +190,23 @@ public class PhenotypeSaver extends Saver{
         if (TermId.OBSERVATION_VARIATE.getId() == storedIn) {
             phenotype.setValue(value);
         } else if (TermId.CATEGORICAL_VARIATE.getId() == storedIn) {
-        	if(isCustomCategoricalValue){
+        	if (value == null || value.equals("")) {
+        		phenotype.setcValue(null);
+        		phenotype.setValue(null);
+        	} else if(!NumberUtils.isNumber(value)){
         		phenotype.setcValue(null);
         		phenotype.setValue(value);
-        	}else{
-        		phenotype.setValue(null);
-	            if (value != null && !value.equals("")) {
-	            	if(NumberUtils.isNumber(value)){
-	            		phenotype.setcValue(Double.valueOf(value).intValue());
-	            	}else{
-	            		phenotype.setValue(value);
-	            		phenotype.setcValue(null);
-	            	}
-	            } else {
-	            	phenotype.setcValue(null);
-	            }
-	            
-        	}
+    		} else {
+    			Integer phenotypeValue = Double.valueOf(value).intValue();
+        		Map<Integer,String> possibleValuesMap = getPossibleValuesMap(variableId);
+        		if(possibleValuesMap.containsKey(phenotypeValue)){
+        			phenotype.setcValue(phenotypeValue);
+        			phenotype.setValue(possibleValuesMap.get(phenotypeValue));
+        		} else {
+        			phenotype.setcValue(null);
+            		phenotype.setValue(value);
+        		}
+        	}   
         }
         phenotype.setObservableId(variableId);
         phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
@@ -213,7 +215,19 @@ public class PhenotypeSaver extends Saver{
         return phenotype;
     }
 
-    private Phenotype getPhenotypeObject(Phenotype phenotype) throws MiddlewareQueryException {
+    private Map<Integer,String> getPossibleValuesMap(int variableId) throws MiddlewareQueryException {
+		Map<Integer, String> possibleValuesMap = new HashMap<Integer,String>();
+		List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(variableId);
+		for (CVTermRelationship cvTermRelationship : relationships) {
+			if(TermId.HAS_VALUE.getId() == cvTermRelationship.getTypeId()) {
+				possibleValuesMap.put(cvTermRelationship.getObjectId(),
+						getCvTermDao().getById(cvTermRelationship.getObjectId()).getName());
+			}
+		}
+		return possibleValuesMap;
+	}
+
+	private Phenotype getPhenotypeObject(Phenotype phenotype) throws MiddlewareQueryException {
         if (phenotype == null) {
             phenotype = new Phenotype();
             phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));

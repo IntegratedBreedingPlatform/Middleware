@@ -54,7 +54,6 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.utils.test.Debug;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -196,6 +195,87 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
         		workbook.getTrialConstants().size());
         assertTrue("Expected the same trial constants retrieved but found a different constant.", 
         		WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConstants(), workbook.getTrialConstants()));
+        
+    }
+    
+    @Test
+    public void testTrialSaveMeasurementRows_WithAcceptedAndMissingValues() throws MiddlewareQueryException {
+    	WorkbookTest.setTestWorkbook(null);
+    	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+    	int id = dataImportService.saveDataset(workbook,null);
+    	Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
+    	
+        WorkbookTest.addVariatesAndObservations(createdWorkbook);
+        fieldbookService.saveMeasurementRows(createdWorkbook);
+        Workbook updatedWorkbook = fieldbookService.getTrialDataSet(id);
+        
+        List<MeasurementRow> previousObservations =  createdWorkbook.getObservations();
+        List<MeasurementRow> observations =  updatedWorkbook.getObservations();
+        int observationIndex = 0;
+        for (MeasurementRow observation : observations){
+        	List<MeasurementData> previousFields = previousObservations.get(observationIndex).getDataList();
+        	List<MeasurementData> fields = observation.getDataList();
+        	int dataIndex = 0;
+            for (MeasurementData field : fields){
+            	if(field.getMeasurementVariable().getTermId() == WorkbookTest.CRUST_ID) {
+            		String previousCValueId = previousFields.get(dataIndex).getcValueId();
+            		assertEquals("Cvalue id must be the same", previousCValueId,
+            				field.getcValueId());
+            		if(previousCValueId == null) {
+	            		String previousValue = previousFields.get(dataIndex).getValue();
+	            		if(null == previousValue || "".equals(previousValue)) {
+	            			assertEquals("Value must be empty","",field.getValue());
+	            		} else {
+	            			assertEquals("Value must be the same", previousValue,
+	                				field.getValue());
+	            		}
+            		}
+            	}
+            	dataIndex++;
+            }
+            observationIndex++;
+        }   
+        WorkbookTest.setTestWorkbook(null);
+    }
+    
+    @Test
+    public void testNurserySaveMeasurementRows_WithAcceptedAndMissingValues() throws MiddlewareQueryException {
+    	WorkbookTest.setTestWorkbook(null);
+    	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+    	int id = dataImportService.saveDataset(workbook, null);
+    	Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
+    	
+        WorkbookTest.addVariatesAndObservations(createdWorkbook);
+        fieldbookService.saveMeasurementRows(createdWorkbook);
+        Workbook updatedWorkbook = fieldbookService.getNurseryDataSet(id);
+        
+        List<MeasurementRow> previousObservations =  createdWorkbook.getObservations();
+        List<MeasurementRow> observations =  updatedWorkbook.getObservations();
+        int observationIndex = 0;
+        for (MeasurementRow observation : observations){
+        	List<MeasurementData> previousFields = previousObservations.get(observationIndex).getDataList();
+        	List<MeasurementData> fields = observation.getDataList();
+        	int dataIndex = 0;
+            for (MeasurementData field : fields){
+            	if(field.getMeasurementVariable().getTermId() == WorkbookTest.CRUST_ID) {
+            		String previousCValueId = previousFields.get(dataIndex).getcValueId();
+            		assertEquals("Cvalue id must be the same", previousCValueId,
+            				field.getcValueId());
+            		if(previousCValueId == null) {
+	            		String previousValue = previousFields.get(dataIndex).getValue();
+	            		if(null == previousValue || "".equals(previousValue)) {
+	            			assertEquals("Value must be empty","",field.getValue());
+	            		} else {
+	            			assertEquals("Value must be the same", previousValue,
+	                				field.getValue());
+	            		}
+            		}
+            	}
+            	dataIndex++;
+            }
+            observationIndex++;
+        }   
+        WorkbookTest.setTestWorkbook(null);
     }
     
     @Test
