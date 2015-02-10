@@ -1321,4 +1321,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		setWorkingDatabase(studyId);
 		return getDmsProjectDao().getStudyType(studyId);
 	}
+
+	@Override
+	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getProjectPropertySaver().updateVariablesRanking(datasetId, variableIds);
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
+        }
+		
+	}
 }

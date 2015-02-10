@@ -805,4 +805,12 @@ public interface StudyDataManager{
 
 	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId,
 			int start, int numRows) throws MiddlewareQueryException;
+	
+	/**
+	 * Updates the rank or order of given variables as they ordered in the given list
+	 * 
+	 * @param datasetId - project Id of
+	 * @param variableIds - list of variable IDs in the order that they will be saved
+	 */
+	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException;
 }

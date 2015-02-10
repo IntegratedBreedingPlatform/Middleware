@@ -11,6 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -23,8 +31,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
-
-import java.util.*;
 
 /**
  * DAO class for {@link ProjectProperty}.
@@ -199,5 +205,89 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
                     "Error in getVariablesOfSiblingDatasets("    + datasetId + ") in ProjectPropertyDao: " + e.getMessage(), e);
 		}
 		return ids;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getDatasetVariableIdsForGivenStoredInIds(Integer projectId, List<Integer> storedInIds, List<Integer> varIdsToExclude){
+		List<Integer> variableIds = new ArrayList<Integer>();
+		String mainSql = " SELECT value "
+				+ " FROM projectprop p "
+				+ " WHERE project_id = :projectId and type_id = :stdVarConstant ";
+		String existsClause = " AND EXISTS ( "
+				+ "		SELECT null "
+				+ "		FROM projectprop pp "
+				+ "		WHERE pp.project_id = p.project_id "
+				+ "		AND pp.rank = p.rank "
+				+ "		AND pp.type_id in (:storedInIds)"
+				+ " ) ORDER BY rank "
+				;
+		boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
+		
+		StringBuilder sb = new StringBuilder(mainSql);
+		if (doExcludeIds){
+			sb.append("AND value NOT IN (:excludeIds) ");
+		}
+		sb.append(existsClause);
+		
+		Query query = getSession().createSQLQuery(sb.toString());
+		query.setParameter("projectId", projectId);
+		query.setParameter("stdVarConstant", TermId.STANDARD_VARIABLE.getId());
+		if (doExcludeIds){
+			query.setParameterList("excludeIds", varIdsToExclude);
+		}
+		query.setParameterList("storedInIds", storedInIds);
+		List<String> results = (List<String>) query.list();
+		for (String value : results){
+			variableIds.add(Integer.parseInt(value)); 
+		}
+		
+		return variableIds;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public Map<Integer, List<Integer>> getProjectPropertyIDsPerVariableId(Integer projectId){
+		Map<Integer, List<Integer>> projectPropertyIDsMap = new LinkedHashMap<Integer, List<Integer>>();
+		String sql = "SELECT rank, projectprop_id, value, type_id "
+				+ "FROM projectprop "
+				+ "WHERE project_id = :projectId "
+				+ "ORDER BY rank ";
+		Query query = getSession().createSQLQuery(sql);
+		query.setParameter("projectId", projectId);
+		List<Object[]> results = (List<Object[]>) query.list();
+		
+		List<Integer> projectPropIds = new ArrayList<Integer>();
+		Integer currentRank = 1;
+		Integer currentVariableId = 1;
+        for (Object[] row : results) {
+        	Integer rank = (Integer) row[0];
+        	if (rank.compareTo(currentRank) > 0){
+        		projectPropertyIDsMap.put(currentVariableId, projectPropIds);
+        		projectPropIds = new ArrayList<>();
+        		currentRank = rank;
+        	}
+        	
+        	String value = (String) row[2];
+        	Integer typeId = (Integer) row[3];
+        	if (typeId == TermId.STANDARD_VARIABLE.getId()) {
+        		currentVariableId = Integer.parseInt(value);
+        	}
+        	projectPropIds.add((Integer) row[1]);
+        }
+        if (!projectPropIds.isEmpty()){
+        	projectPropertyIDsMap.put(currentVariableId, projectPropIds);
+        }
+        
+		return projectPropertyIDsMap;
+	}
+	
+	
+	public void updateRank(List<Integer> projectPropIds, int rank){
+		String sql = " UPDATE projectprop SET rank = " + rank + 
+					 " WHERE projectprop_id IN (:projectPropIds)";
+		
+		Query query = getSession().createSQLQuery(sql);
+		query.setParameterList("projectPropIds", projectPropIds);
+		query.executeUpdate();
 	}
 }
