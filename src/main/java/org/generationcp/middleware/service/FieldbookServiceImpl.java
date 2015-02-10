@@ -77,8 +77,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Map.Entry;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -392,7 +390,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	            }
             	if(!filterOutGenerative) { 
             		methodList.add(method);
-            	} else if((method.getMtype() == null || !method.getMtype().equals("GEN")) &&
+            	} else if((method.getMtype() == null || !"GEN".equals(method.getMtype())) &&
         			method.getGeneq() != null && validMethodClasses.contains(method.getGeneq())) {
         			methodList.add(method);
         		}
@@ -556,7 +554,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 getGermplasmListDataDAO().save(germplasmListData);
 
                 i++;
-                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
+                //flush a batch of inserts and release memory
+                if ( i % JDBC_BATCH_SIZE == 0 ) {
                     session.flush();
                     session.clear();
                 }
@@ -1196,7 +1195,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             trans.commit();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(),e);
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with updateGermlasmListInfoStudy(): " + e.getMessage(), e, LOG);
         }
