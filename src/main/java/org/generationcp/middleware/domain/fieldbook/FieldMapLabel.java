@@ -12,13 +12,13 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.util.Debug;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.util.Debug;
 
 /**
  * Contains the field map label needed by the Field Map tool:
@@ -82,6 +82,11 @@ public class FieldMapLabel implements Serializable{
 
     private Map<Integer, String> userFields;
 
+    /* Inventory related columns */
+    private Double inventoryAmount;
+    private String seedLocationName;
+    private String scaleName;
+    
     
     /**
      * Instantiates a new field map label.
@@ -494,4 +499,28 @@ public class FieldMapLabel implements Serializable{
     public void setUserFields(Map<Integer, String> userFields) {
         this.userFields = userFields;
     }
+
+	public Double getInventoryAmount() {
+		return inventoryAmount;
+	}
+
+	public void setInventoryAmount(Double inventoryAmount) {
+		this.inventoryAmount = inventoryAmount;
+	}
+
+	public String getSeedLocationName() {
+		return seedLocationName;
+	}
+
+	public void setSeedLocationName(String seedLocationName) {
+		this.seedLocationName = seedLocationName;
+	}
+
+	public String getScaleName() {
+		return scaleName;
+	}
+
+	public void setScaleName(String scaleName) {
+		this.scaleName = scaleName;
+	}
 }
