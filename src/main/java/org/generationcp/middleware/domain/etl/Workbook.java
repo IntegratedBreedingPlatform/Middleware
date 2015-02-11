@@ -75,6 +75,7 @@ public class Workbook {
 	private Integer importType;
 	private List<StandardVariable> expDesignVariables;
 	private boolean hasExistingDataOverwrite;
+	private List<Integer> columnOrderedLists;
 	
 	public void reset() {
 		trialHeaders = null;
@@ -176,7 +177,35 @@ public class Workbook {
 			    measurementDatasetVariables.addAll(variates);
 			}
 		}
+		measurementDatasetVariables = arrangeMeasurementVariables(measurementDatasetVariables);
 		return measurementDatasetVariables;
+	}
+	
+	protected List<MeasurementVariable> arrangeMeasurementVariables(List<MeasurementVariable> varList){
+		List<MeasurementVariable> tempVarList = new ArrayList<MeasurementVariable>();
+		if(columnOrderedLists != null && !columnOrderedLists.isEmpty()){
+			//we order the list based on column orders
+			for(Integer termId : columnOrderedLists){
+				int index = 0;
+				boolean isFound = false;
+				for(index = 0 ; index < varList.size() ; index++){
+					MeasurementVariable measurementVar = varList.get(index);
+					if(termId.intValue() == measurementVar.getTermId()){
+						tempVarList.add(measurementVar);
+						isFound = true;
+						break;
+					}
+				}
+				if(isFound){
+					//we remove it from the list
+					varList.remove(index);
+				}
+			}
+			//we join the new list with the remaining items
+			tempVarList.addAll(varList);
+			return tempVarList;
+		}
+		return varList;
 	}
 	
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
@@ -196,6 +225,7 @@ public class Workbook {
             }
 		}
 		list.addAll(getMeasurementDatasetVariables());
+		list = arrangeMeasurementVariables(list);
 		return list;
 	}
 
@@ -938,6 +968,14 @@ public class Workbook {
 
 	public void setHasExistingDataOverwrite(boolean hasExistingDataOverwrite) {
 		this.hasExistingDataOverwrite = hasExistingDataOverwrite;
+	}
+
+	public List<Integer> getColumnOrderedLists() {
+		return columnOrderedLists;
+	}
+
+	public void setColumnOrderedLists(List<Integer> columnOrderedLists) {
+		this.columnOrderedLists = columnOrderedLists;
 	}
 	
 }
