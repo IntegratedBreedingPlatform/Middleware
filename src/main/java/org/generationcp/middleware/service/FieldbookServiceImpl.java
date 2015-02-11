@@ -203,13 +203,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
 	@Override
     public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().create(id, StudyType.N);                        
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.N);   
+        setOrderVariableByRank(workbook);
         return workbook;
     }
 
 	@Override
     public Workbook getTrialDataSet(int id) throws MiddlewareQueryException {
-        Workbook workbook = getWorkbookBuilder().create(id, StudyType.T);                        
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.T);
+        setOrderVariableByRank(workbook);
         return workbook;
     }
 
@@ -1266,6 +1268,25 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)
 			throws MiddlewareQueryException {
 		Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+		getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
+	}
+
+	public boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException {
+		if(workbook != null){
+			Integer studyId = workbook.getStudyDetails().getId(); 
+			String studyName = workbook.getStudyDetails().getStudyName();
+			Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+			setWorkingDatabase(plotDatasetId);
+			List<Integer> storedInIds = new ArrayList<Integer>();
+			storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+			storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+			storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+			storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
+			  
+			workbook.setColumnOrderedLists(getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));
+			return true;
+		}
+		return false;
 	}
 
 	

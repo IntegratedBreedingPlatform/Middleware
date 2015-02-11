@@ -886,4 +886,5 @@ public interface FieldbookService {
 			GermplasmList germplasmList) throws MiddlewareQueryException;
 	
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)  throws MiddlewareQueryException;
+	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException;
 }
