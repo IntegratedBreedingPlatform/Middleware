@@ -84,7 +84,7 @@ public class FieldMapLabel implements Serializable{
 
     /* Inventory related columns */
     private Double inventoryAmount;
-    private String seedLocationName;
+    private Integer lotId;
     private String scaleName;
     
     
@@ -508,12 +508,12 @@ public class FieldMapLabel implements Serializable{
 		this.inventoryAmount = inventoryAmount;
 	}
 
-	public String getSeedLocationName() {
-		return seedLocationName;
+	public Integer getLotId() {
+		return lotId;
 	}
 
-	public void setSeedLocationName(String seedLocationName) {
-		this.seedLocationName = seedLocationName;
+	public void setLotId(Integer lotId) {
+		this.lotId = lotId;
 	}
 
 	public String getScaleName() {
