@@ -138,7 +138,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
     	// FIXME : doing a unique query on a table that allows duplicate rows
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("listid",id);
 		params.put("start",start);
 		params.put("numOfRows",numOfRows);
@@ -150,7 +149,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("id",id);
 		return getGermplasmListDataDAO().
 				callStoredProcedureForObject("countGermplasmListDataByListId",
@@ -175,7 +173,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("listId",listId);
 		params.put("entryId",entryId);
 		return getGermplasmListDataDAO().
@@ -186,7 +183,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("listId",listId);
 		params.put("lrecId",lrecId);
 		return getGermplasmListDataDAO().

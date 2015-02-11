@@ -551,7 +551,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     
     private List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("listid",id);
 		params.put("start",start);
 		params.put("numOfRows",numOfRows);

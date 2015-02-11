@@ -166,7 +166,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("name",nameToUse);
 		params.put("altname",null);
 		params.put("altname2",null);
@@ -208,7 +207,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		
 		String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -247,7 +245,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("name",nameToUse);
 		params.put("altname",null);
 		params.put("altname2",null);
@@ -280,7 +277,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		
 		String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -369,9 +365,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Germplasm getGermplasmByGID(Integer gid) throws MiddlewareQueryException {
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
-        
+        if(gid==null || gid.intValue() == 0) {
+        	return null;
+        }
         return getGermplasmDao().
 				callStoredProcedureForObject("getUpdatedGermplasmByID",
 						params,Germplasm.class);
@@ -401,7 +398,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {      
 		
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		if (status != null && status != 0) {
 			params.put("status",status);
@@ -421,7 +417,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getPreferredNameByGID(Integer gid) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredNamesRecordByGid",
@@ -432,7 +427,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException{
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredNameByGid",
@@ -451,7 +445,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getNameDao().
 				callStoredProcedureForObject("getPreferredIDNamesRecordByGid",
@@ -599,7 +592,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException {
         Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("gid",gid);
 		return getAttributeDao().
 				callStoredProcedureForList("getAttributesByGID",
@@ -1906,7 +1898,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         //search by gid
         if(q.matches("\\d+") || q.matches("-\\d+")) {
         	params = new LinkedHashMap<String,Object>();
-			params.put("central_db_name", databaseName);
 			params.put("gid",q);
 			params.put("searchType", searchType);
 			List<Germplasm> germplasmsByGid = getGermplasmListDataDAO().
@@ -1918,7 +1909,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
 		//search by name
 		params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		List<String> names = GermplasmDataManagerUtil.createNamePermutations(q);
         String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -1986,7 +1976,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         //search by gid
         if(q.matches("\\d+") || q.matches("-\\d+")) {
         	params = new LinkedHashMap<String,Object>();
-			params.put("central_db_name", databaseName);
 			params.put("gid",q);
 			params.put("searchType", searchType);
 			params.put("searchPublicData",searchPublicData?1:0);
@@ -1999,7 +1988,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
 		//search by name
 		params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		List<String> names = GermplasmDataManagerUtil.createNamePermutations(q);
         String originalName = names.get(0);
         String standardizedName = names.get(1);
@@ -2118,7 +2106,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid)
 			throws MiddlewareQueryException {
 		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", databaseName);
 		params.put("v_gid",gid);
 		params.put("v_pro_no",null);
 		List<Germplasm> germplasms = getGermplasmListDataDAO().
