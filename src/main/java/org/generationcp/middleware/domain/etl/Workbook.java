@@ -181,7 +181,7 @@ public class Workbook {
 		return measurementDatasetVariables;
 	}
 	
-	protected List<MeasurementVariable> arrangeMeasurementVariables(List<MeasurementVariable> varList){
+	public List<MeasurementVariable> arrangeMeasurementVariables(List<MeasurementVariable> varList){
 		List<MeasurementVariable> tempVarList = new ArrayList<MeasurementVariable>();
 		if(columnOrderedLists != null && !columnOrderedLists.isEmpty()){
 			//we order the list based on column orders
