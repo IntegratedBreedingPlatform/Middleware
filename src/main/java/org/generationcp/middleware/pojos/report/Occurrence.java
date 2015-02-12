@@ -8,6 +8,11 @@ public class Occurrence {
 			this.occ = occ;
 		}
 
+		public Occurrence(List<GermplasmEntry> entriesList){
+			this.entriesList = entriesList;
+			this.entriesList2 = entriesList;
+		}
+
 	private String station_id;
 	private String lid;
 	private List<GermplasmEntry> entriesList;

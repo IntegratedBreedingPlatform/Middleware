@@ -35,7 +35,7 @@ public class MFieldbookNur extends AbstractDynamicReporter{
 
 	@Override
 	public String getTemplateName() {
-		return "MFb1_main.jasper";
+		return "MFb1_main";
 	}
 
 	@Override

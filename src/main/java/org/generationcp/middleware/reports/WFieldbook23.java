@@ -1,8 +1,16 @@
 package org.generationcp.middleware.reports;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.pojos.report.GermplasmEntry;
+import org.generationcp.middleware.pojos.report.Occurrence;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -34,39 +42,82 @@ public class WFieldbook23 extends AbstractReporter{
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
 		Map<String, Object> params = super.buildJRParams(args);
 		
-		Integer dummyInt = new Integer(111);
+		@SuppressWarnings("unchecked")
+		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>)args.get("studyConditions");
 		
-		params.put("tid", dummyInt);
-		params.put("occ", 123);
-		params.put("lid", "lid");
-		params.put("LoCycle", "LoCycle");
-		params.put("program", "program");
-		params.put("trial_name", "trial_name");
-		params.put("trial_abbr", "trial_abbr");
-		params.put("num_reporte", dummyInt);
+		params.put("fb_class", getReportCode());
+		params.put("num_reporte", 23);
+		params.put("tid", args.get("studyId"));
 		
-		params.put("Ientry", dummyInt);
-		params.put("Fentry", dummyInt);
-		params.put("lname", "lname");
-		params.put("labbr", "labbr");
-		params.put("country", "country");
-		params.put("cycle", "cycleA");
-		params.put("fb_class", "fb_class");
+		for(MeasurementVariable var : studyConditions){
 
-		params.put("offset", dummyInt);
-		params.put("organization", "organization");
-		params.put("version", "version");
-		
-		params.put("dms_ip", "dms_ip");
-		params.put("gms_ip", "gms_ip");
-		
+			switch(var.getName()){
+				case "BreedingProgram" : params.put("program", var.getValue());
+					break;
+				case "STUDY_NAME" : params.put("trial_abbr", var.getValue());
+					break;
+				case "STUDY_TITLE" : params.put("trial_name", var.getValue());
+					break;
+				case "CROP_SEASON" : params.put("cycle", var.getValue());
+									 params.put("LoCycle", var.getValue());
+					break;
+				case "SITE_NAME" : params.put("labbr", var.getValue());
+								   params.put("lname", var.getValue());
+					break;
+				case "TRIAL_INSTANCE" : params.put("occ", Integer.valueOf(var.getValue()));
+					break;
+				default : 
+					params.put("lid", "???");
+					params.put("Ientry",  Integer.valueOf(-99));
+					params.put("Fentry",  Integer.valueOf(-99));
+					params.put("country", "???");
+					params.put("offset", "???");
+					params.put("organization", "???");
+					params.put("version", "???");
+					params.put("dms_ip", "???");
+					params.put("gms_ip", "???");
+					break;
+			}
+		}
+	
 		return params;
 	}
 
 	@Override
 	public JRDataSource buildJRDataSource(Collection<?> args){
-		//TODO add custom data source beans for this report
-		JRDataSource dataSource = new JRBeanCollectionDataSource(args);
+		
+		List<GermplasmEntry> entries = new ArrayList<>();
+		//this null record is added because in Jasper, the record pointer in the data source is incremented by every element that receives it.
+		//since the datasource used in entry, is previously passed from occ to entry subreport. 
+		entries.add(null);
+		
+		for(MeasurementRow row : (Collection<MeasurementRow>)args){
+			GermplasmEntry entry = new GermplasmEntry();
+			for(MeasurementData dataItem : row.getDataList()){
+				switch(dataItem.getLabel()){
+				case "ENTRY_NO" : entry.setEntryNum(Integer.valueOf(dataItem.getValue()));
+				case "DESIGNATION" : entry.setSel_hist(dataItem.getValue());
+//TODO: pending mappings
+//				case "" : entry.setF_cross_name(dataItem.getValue());
+//				case "" : entry.setF_sel_hist(dataItem.getValue());
+//				case "" : entry.setF_tabbr(dataItem.getValue());
+//				case "" : entry.setFlocycle(dataItem.getValue());
+//				case "" : entry.setF_ent(Integer.valueOf(dataItem.getValue()));
+//
+//				case "" : entry.setM_cross_name(dataItem.getValue());
+//				case "" : entry.setM_sel_hist(dataItem.getValue());
+//				case "" : entry.setM_tabbr(dataItem.getValue());
+//				case "" : entry.setMlocycle(dataItem.getValue());
+//				case "" : entry.setM_ent(dataItem.getValue());
+						break;
+					
+				}
+			}
+			
+			entries.add(entry);
+		}
+		
+		JRDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(new Occurrence(entries)));
 		return dataSource;
 	}
 

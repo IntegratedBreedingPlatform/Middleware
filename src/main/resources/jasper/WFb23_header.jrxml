@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-03T16:10:40 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-11T11:52:42 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="wfb_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="47db8205-62d7-4489-a5ad-ae8fa86f56b8">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -33,71 +33,10 @@
 	<parameter name="gms_ip" class="java.lang.String"/>
 	<parameter name="imagen_logo" class="java.io.InputStream"/>
 	<parameter name="version" class="java.lang.String"/>
-	<field name="offset_2" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_2]]></fieldDescription>
-	</field>
-	<field name="totalEntries" class="java.lang.Integer">
-		<fieldDescription><![CDATA[totalEntries]]></fieldDescription>
-	</field>
-	<field name="check_1" class="java.lang.Integer">
-		<fieldDescription><![CDATA[check_1]]></fieldDescription>
-	</field>
-	<field name="check_freq" class="java.lang.Integer">
-		<fieldDescription><![CDATA[check_freq]]></fieldDescription>
-	</field>
-	<field name="program" class="java.lang.String">
-		<fieldDescription><![CDATA[program]]></fieldDescription>
-	</field>
-	<field name="use_generic" class="java.lang.String">
-		<fieldDescription><![CDATA[use_generic]]></fieldDescription>
-	</field>
-	<field name="organization" class="java.lang.String">
-		<fieldDescription><![CDATA[organization]]></fieldDescription>
-	</field>
-	<field name="offset_1" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_1]]></fieldDescription>
-	</field>
-	<field name="tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[tid]]></fieldDescription>
-	</field>
-	<field name="new_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[new_cycle]]></fieldDescription>
-	</field>
-	<field name="studyID" class="java.lang.Integer">
-		<fieldDescription><![CDATA[studyID]]></fieldDescription>
-	</field>
-	<field name="use_abreviation" class="java.lang.String">
-		<fieldDescription><![CDATA[use_abreviation]]></fieldDescription>
-	</field>
-	<field name="internat_type" class="java.lang.String">
-		<fieldDescription><![CDATA[internat_type]]></fieldDescription>
-	</field>
-	<field name="cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[cycle]]></fieldDescription>
-	</field>
-	<field name="trial_abbr" class="java.lang.String">
-		<fieldDescription><![CDATA[trial_abbr]]></fieldDescription>
-	</field>
-	<field name="trial_name" class="java.lang.String">
-		<fieldDescription><![CDATA[trial_name]]></fieldDescription>
-	</field>
-	<field name="offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset]]></fieldDescription>
-	</field>
-	<field name="check_2" class="java.lang.Integer">
-		<fieldDescription><![CDATA[check_2]]></fieldDescription>
-	</field>
-	<field name="ocurrencesList" class="java.util.List">
-		<fieldDescription><![CDATA[ocurrencesList]]></fieldDescription>
-	</field>
-	<field name="trial_mega_environment" class="java.lang.Integer">
-		<fieldDescription><![CDATA[trial_mega_environment]]></fieldDescription>
-	</field>
-	<field name="print_mega_environment" class="java.lang.String">
-		<fieldDescription><![CDATA[print_mega_environment]]></fieldDescription>
-	</field>
-	<field name="expansion_level" class="java.lang.Integer">
-		<fieldDescription><![CDATA[expansion_level]]></fieldDescription>
+	<parameter name="organization" class="java.lang.String"/>
+	<parameter name="offset" class="java.lang.String"/>
+	<field name="entriesList2" class="java.util.List">
+		<fieldDescription><![CDATA[entriesList2]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -256,7 +195,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tid}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField" x="377" y="240" width="122" height="12" uuid="a99b8676-4dc8-42c4-84dd-93086c695c69"/>
@@ -277,21 +216,21 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{organization}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{organization}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField" x="339" y="380" width="91" height="12" uuid="0a5a35a6-9262-4a29-a3af-de48121395c0"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{program}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField" x="339" y="400" width="35" height="12" uuid="3ef4db70-c120-4dd0-a77c-9b9aed7c75fd"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{offset}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{offset}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField" x="339" y="300" width="100" height="12" uuid="01b1edeb-d947-46cf-991c-7ab83c05034c"/>
@@ -763,50 +702,23 @@
 		<band height="50" splitType="Stretch">
 			<subreport isUsingCache="true">
 				<reportElement key="subreport" x="0" y="0" width="572" height="50" uuid="c495d5ae-7da3-4fd6-b467-e5b996370b37"/>
-				<subreportParameter name="Fentry">
-					<subreportParameterExpression><![CDATA[$P{Fentry}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="cycle">
-					<subreportParameterExpression><![CDATA[$P{cycle}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="lname">
-					<subreportParameterExpression><![CDATA[$P{lname}]]></subreportParameterExpression>
-				</subreportParameter>
 				<subreportParameter name="dms_ip">
 					<subreportParameterExpression><![CDATA[$P{dms_ip}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="labbr">
-					<subreportParameterExpression><![CDATA[$P{labbr}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="trial_abbr">
 					<subreportParameterExpression><![CDATA[$P{trial_abbr}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="Ientry">
-					<subreportParameterExpression><![CDATA[$P{Ientry}]]></subreportParameterExpression>
-				</subreportParameter>
 				<subreportParameter name="gms_ip">
 					<subreportParameterExpression><![CDATA[$P{gms_ip}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="country">
-					<subreportParameterExpression><![CDATA[$P{country}]]></subreportParameterExpression>
-				</subreportParameter>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="lid">
-					<subreportParameterExpression><![CDATA[$P{lid}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="fb_class">
-					<subreportParameterExpression><![CDATA[$P{fb_class}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="LoCycle">
 					<subreportParameterExpression><![CDATA[$P{LoCycle}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="program">
 					<subreportParameterExpression><![CDATA[$P{program}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="num_reporte">
-					<subreportParameterExpression><![CDATA[$P{num_reporte}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="tid">
 					<subreportParameterExpression><![CDATA[$P{tid}]]></subreportParameterExpression>
@@ -817,7 +729,7 @@
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ocurrencesList})]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{entriesList2})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "WFb23_occ.jasper"]]></subreportExpression>
 			</subreport>
 		</band>

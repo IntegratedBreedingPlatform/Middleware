@@ -81,6 +81,7 @@ public class ReportServiceImpl extends Service implements ReportService{
 		dataBeans.put("studyConditions", wb.getConditions());  //List<MeasurementVariable>
 		dataBeans.put("dataSource",wb.getObservations()); //list<measurementRow>
 		dataBeans.put("studyObservations", wb.getTrialObservations());//list<measurementRow>
+		dataBeans.put("studyId", studyId);//list<measurementRow>
 		
 		return dataBeans;
 	}

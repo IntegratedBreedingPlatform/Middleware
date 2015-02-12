@@ -3,6 +3,8 @@ package org.generationcp.middleware.pojos.report;
 
 public class GermplasmEntry {
 	
+	public GermplasmEntry(){
+	}
 	public GermplasmEntry(Integer entryNum){
 		this.entryNum = entryNum;
 	}
@@ -15,7 +17,7 @@ public class GermplasmEntry {
 	private String code28;
 	private String s_intrid;
 	private String rep2;
-	private String m_cross_name = "m-cross/name";
+	private String m_cross_name;
 	private Integer subblock;
 	private Integer s_occ;
 	private Integer entryNum;
@@ -24,22 +26,22 @@ public class GermplasmEntry {
 	private String m_tna;
 	private String s_tna;
 	private Integer m_gid;
-	private String m_sel_hist = "m-sel-hist";
+	private String m_sel_hist;
 	private Integer m_lid;
 	private Integer f_lid;
 	private String m_cycle;
 	private Integer f_sid;
-	private String f_cross_name ="f-cross/name";
-	private String crossname = "dummy//Cross/Name";
+	private String f_cross_name;
+	private String crossname;
 	private Integer s_tid;
 	private Integer s_trial_offset;
 	private Integer m_tid;
 	private Integer cid;
-	private String f_tabbr = "f-abbr";
+	private String f_tabbr;
 	private Integer level_no;
-	private Integer m_ent = 0;
+	private Integer m_ent;
 	private Integer replication_no;
-	private String mlocycle = "m-locycle";
+	private String mlocycle;
 	private Integer f_ent;
 	private String f_tna;
 	private Integer m_trial_offset;
@@ -60,7 +62,7 @@ public class GermplasmEntry {
 	private String flocycle;
 	private String s_tabbr;
 	private Integer f_cid;
-	private String sel_hist = "sel-hist";
+	private String sel_hist;
 	private String m_tabbr;
 	private Integer s_occ_offset;
 	private Integer f_gid;

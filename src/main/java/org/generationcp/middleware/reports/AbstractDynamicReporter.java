@@ -73,7 +73,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 				
 				jrDataSource = buildJRDataSource(collectionDataSource);
 			
-		        JasperDesign jasperReportDesign = JRXmlLoader.load(getTemplatePath().replace(".jasper", ".jrxml"));
+		        JasperDesign jasperReportDesign = JRXmlLoader.load(jasperFilesPath.replace(".jasper", ".jrxml"));
 			 
 				addDynamicColumns(jasperReportDesign, columnHeaders.size());
 				 
@@ -249,7 +249,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 				case "SITE_NAME" : params.put("site", var.getValue()); break;
 				case "STUDY_NAME" : params.put("nursery", var.getValue()); break;
 				case "CROP_SEASON" : params.put("season", var.getValue()); break;
-				case "BreedingProgram" : params.put("seedPrep", var.getValue()); break; //add seed prep. Condition
+				case "BreedingProgram" : params.put("seedPrep", "???????"); break; //add seed prep. Condition
 				case "TRIAL_INSTANCE" : params.put("siteNum", var.getValue()); break;
 			}
 		}

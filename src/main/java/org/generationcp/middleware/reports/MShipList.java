@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.pojos.report.SiteEntry;
 
 import net.sf.jasperreports.engine.JRDataSource;
@@ -31,69 +32,36 @@ public class MShipList extends AbstractDynamicReporter{
 
 	@Override
 	public String getTemplateName() {
-		return "MFb3_main2.jasper";
+		return "MFb3_main";
 	}
 
 	@Override
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
 		Map<String, Object> params = super.buildJRParams(args);
 		
-		params.put("recLastName", args.get("recLastName"));
-		params.put("recFirstName", args.get("recFirstName"));
-		params.put("institution", args.get("institution"));
-		params.put("shippingAddress", args.get("shippingAddress"));
-		params.put("country", args.get("country"));
-		params.put("contactNumber", args.get("contactNumber"));
-		params.put("phytoInstr", args.get("phytoInstr"));
-		params.put("shippingInstr", args.get("shippingInstr"));
-		params.put("shipFrom", args.get("shipFrom"));
-		params.put("shipId", args.get("shipId"));
-		params.put("prepDate", args.get("prepDate"));
-		params.put("carrier", args.get("carrier"));
-		params.put("airwayBill", args.get("airwayBill"));
-		params.put("dateSent", args.get("dateSent"));
-		params.put("quantity", args.get("quantity"));
-		params.put("commments", args.get("commments"));
-
-		return params;
-	}
-
-	@Override
-	public void asOutputStream(OutputStream output) throws BuildReportException {
-		if(null != jrPrint){
-			try {
+		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>)args.get("studyConditions");
 		
-				JRXlsxExporter ex = createDefaultExcelExporter();
-				ex.setExporterInput(new SimpleExporterInput(jrPrint));
-				ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
-				
-                ex.exportReport();
-                
-			} catch (JRException e) {
-				e.printStackTrace();
+		for(MeasurementVariable var : studyConditions){
+			switch(var.getName()){
+				case "TRIAL_INSTANCE" :params.put("recLastName", "???");
+					params.put("recFirstName", "???");
+					params.put("institution", "???");
+					params.put("shippingAddress", "???");
+					params.put("country", "???");
+					params.put("contactNumber", "???");
+					params.put("phytoInstr", "???");
+					params.put("shippingInstr", "???");
+					params.put("shipFrom", "???"); break;
+				case "STUDY_NAME" : params.put("shipId", var.getValue()); //is an assembled code, udes for generating filenam.
+					params.put("prepDate", "???");
+					params.put("carrier", "???");
+					params.put("airwayBill", "???");
+					params.put("dateSent", "???");
+					params.put("quantity", "???");
+					params.put("commments", "???"); break;
 			}
-		}		else throw new BuildReportException(getReportCode());
-	}
-
-	@Override
-	public List<List<String>> convertBeanCollectionToStringLists( Collection<?> dataRecords) {
-		List<List<String>> dataSource = new ArrayList<>();
-		for(Object e : dataRecords){
-			SiteEntry entry = (SiteEntry)e;
-			List<String> record = new ArrayList<>();
-			record.add(entry.getAnthesisDate());
-			record.add(entry.getFloweringF());
-			record.add(entry.getFloweringM());
-			record.add(entry.getHeightPlant());
-			record.add(entry.getHeightEar());
-			record.add(entry.getHeightEar());
-			record.add(entry.getHeightEar());
-			record.add(entry.getHeightEar());
-			record.add(entry.getHeightEar());
-			dataSource.add(record);
 		}
-		
-		return dataSource;
+		return params;
 	}
 
 	

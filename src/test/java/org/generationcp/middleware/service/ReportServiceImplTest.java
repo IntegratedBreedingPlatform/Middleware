@@ -51,8 +51,14 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
     
     
     private static final int PROJECT_ID = -2; // local nursery;
-    private static final String MAIZE_FIELDBOOK_NURSERY_KEY = "MFbNur";
-    private static final String MAIZE_NURSERY_FOR_PROJ_ID = "Maize_NUR_El Batan Station.xlsx";
+    private static final String KEY_MAIZE_FIELDBOOK_NURSERY = "MFbNur";
+    private static final String KEY_MAIZE_FIELDBOOK_TRIAL = "MFbTrial";
+    private static final String KEY_MAIZE_FIELDBOOK_SHIPM = "MFbShipList";
+    
+    private static final int PROJECT_WHEAT_ID = -2; // local trial;
+    private static final String KEY_WHEAT_FIELDBOOK_23 = "WFb23";
+    private static final String KEY_WHEAT_FIELDBOOK_24 = "WFb24";
+    private static final String KEY_WHEAT_FIELDBOOK_25 = "WFb25";
     
     @BeforeClass
     public static void setUp() throws Exception {
@@ -61,51 +67,74 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
         dataImportService = managerFactory.getDataImportService();
     }
 
+    //TODO create separate class for testing keys
+    //TODO create separate class for testing total number of parameters by report type
+    
     
     @Test
     public void testGetReportKeys(){
-    	//reportFactory is working well and registering Reporter's impl-classes?
     	assertTrue(reportService.getReportKeys().size() > 0);
     }
 
     @Test
-    public void testGetStreamReport_MaizeNursery() throws MiddlewareQueryException,  JRException
-    ,FileNotFoundException,MiddlewareException, BuildReportException, IOException{
-    	
-    	boolean hasMaizeNurseryFb = reportService.getReportKeys().contains(MAIZE_FIELDBOOK_NURSERY_KEY);
-
-    	if(hasMaizeNurseryFb){
-    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-    		Reporter rep = reportService.getStreamReport(MAIZE_FIELDBOOK_NURSERY_KEY, PROJECT_ID, baos);
-
-    		assertTrue(baos.size() > 0);
-    		assertEquals("xlsx", rep.getFileExtension());
-    		assertEquals(rep.getFileName(), MAIZE_NURSERY_FOR_PROJ_ID);
-    		
-    	}
-    	
+    public void testGetStreamReport_MaizeNursery(){
+    	 assertReportGenerated(PROJECT_ID, KEY_MAIZE_FIELDBOOK_NURSERY);
     }    
+  
 
     @Test
-    public void testGenerateFile() throws MiddlewareQueryException,  JRException
-    ,FileNotFoundException,MiddlewareException, BuildReportException, IOException{
+    public void testGetStreamReport_MaizeTrial(){    	
+  	  assertReportGenerated(PROJECT_ID, KEY_MAIZE_FIELDBOOK_TRIAL);
     	
-    	boolean hasMaizeNurseryFb = reportService.getReportKeys().contains(MAIZE_FIELDBOOK_NURSERY_KEY);
+    }   
 
-    	if(hasMaizeNurseryFb){
-    		
-    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+  @Test
+  public void testGetStreamReport_ShipList(){
+	  assertReportGenerated(PROJECT_ID, KEY_MAIZE_FIELDBOOK_SHIPM);
 
-    		Reporter rep = reportService.getStreamReport(MAIZE_FIELDBOOK_NURSERY_KEY, PROJECT_ID, baos);
+  }    
 
+    @Test
+    public void testGetStreamReport_WheatFb23(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_23);
+    }
 
-    		File xlsx = new File(rep.getFileName());
-    		
-    		baos.writeTo(new FileOutputStream(xlsx));
-    		
+    @Test
+    public void testGetStreamReport_WheatFb24(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_24);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb25(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_25);
+    }
+
+   /**
+    * Tests that a particular report is indeed created, given a studyId. 
+    * @param studyId id of the test study
+    * @param reportCode specific report code to generate.
+    */
+    private void assertReportGenerated(Integer studyId, String reportCode){
+    	
+    	boolean hasReportKey = reportService.getReportKeys().contains(reportCode);
+
+    	if(hasReportKey){
+    		try{
+	    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	
+	    		Reporter rep = reportService.getStreamReport(reportCode, studyId, baos);
+	
+	    		assertTrue("Failed test - empty report for code ["+reportCode+"].", baos.size() > 0);
+
+	    		//additionally creates the file in 'target' folder, for human validation ;) 
+	    		File xlsx = new File("target",rep.getFileName());
+	    		baos.writeTo(new FileOutputStream(xlsx));
+	    		
+    		}catch(Exception e){
+    			e.printStackTrace();
+    			assertTrue("Failed test - generate report with code ["+reportCode+"].", false);
+    		}
     	}
-    	
-    }    
+    }
 
 }

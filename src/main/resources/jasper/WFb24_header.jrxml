@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-08T15:23:13 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-11T16:32:36 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb24_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="5f576586-aeee-45c7-b108-6a34721c600e">
 	<property name="ireport.zoom" value="1.4641000000000006"/>
 	<property name="ireport.x" value="0"/>
@@ -97,6 +97,9 @@
 	</field>
 	<field name="expansion_level" class="java.lang.Integer">
 		<fieldDescription><![CDATA[expansion_level]]></fieldDescription>
+	</field>
+	<field name="entriesList" class="java.util.List">
+		<fieldDescription><![CDATA[entriesList]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -789,7 +792,7 @@
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ocurrencesList})]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{entriesList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "WFb24_occ.jasper"]]></subreportExpression>
 			</subreport>
 		</band>

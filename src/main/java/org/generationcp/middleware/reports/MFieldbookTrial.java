@@ -2,7 +2,10 @@ package org.generationcp.middleware.reports;
 
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -11,7 +14,7 @@ import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
-public class MFieldbookTrial extends AbstractReporter{
+public class MFieldbookTrial extends AbstractDynamicReporter{
 
 	@Override
 	public Reporter createReporter() {
@@ -27,58 +30,35 @@ public class MFieldbookTrial extends AbstractReporter{
 
 	@Override
 	public String getTemplateName() {
-		return "MFb2_main.jasper";
+		return "MFb2_main";
 	}
 
+	
 	@Override
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
 		Map<String, Object> params = super.buildJRParams(args);
 		
-		params.put("site", args.get("site"));
-		params.put("nursery", args.get("nursery"));
-		params.put("season", args.get("season"));
-		params.put("seedPrep", args.get("seedPrep"));
-		params.put("siteNum", args.get("siteNum"));
+		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>)args.get("studyConditions");
 
-		params.put("location", args.get("location"));
-		params.put("country", args.get("country"));
-		params.put("environment", args.get("environment"));
-		params.put("plantingDate", args.get("plantingDate"));
-		params.put("trialName", args.get("trialName"));
-		params.put("netPlotLength", args.get("netPlotLength"));
-		params.put("distanceBetweenStations", args.get("distanceBetweenStations"));
-		params.put("distanceBetweenRows", args.get("distanceBetweenRows"));
-		params.put("rowsHarvested", args.get("rowsHarvested"));
-		params.put("collaborator", args.get("collaborator"));
-		params.put("breedingProgram", args.get("breedingProgram"));
-		params.put("harvestDate", args.get("harvestDate"));
+		for(MeasurementVariable var : studyConditions){
+			switch(var.getName()){
+
+				case "SITE_NAME" : params.put("location", var.getValue());
+				params.put("country", "???"); 
+				params.put("environment", "???"); break;
+				case "START_DATE" : params.put("plantingDate", var.getValue()); break;
+				case "STUDY_NAME" : params.put("trialName", var.getValue());
+				params.put("netPlotLength", "???");
+				params.put("distanceBetweenStations", "???");
+				params.put("distanceBetweenRows", "???");
+				params.put("rowsHarvested", "???");
+				params.put("collaborator", "???"); break;
+				case "BreedingProgram" : params.put("breedingProgram", var.getValue()); break;
+				case "END_DATE" : params.put("harvestDate", var.getValue()); break;
+			}
+		}
 
 		return params;
 	}
-
-	@Override
-	public JRDataSource buildJRDataSource(Collection<?> args){
-		
-		JRDataSource dataSource = new JRBeanCollectionDataSource(args);
-		return dataSource;
-	}
-
-	@Override
-	public void asOutputStream(OutputStream output) throws BuildReportException {
-		if(null != jrPrint){
-			try {
-		
-				JRXlsxExporter ex = createDefaultExcelExporter();
-				ex.setExporterInput(new SimpleExporterInput(jrPrint));
-				ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
-				
-                ex.exportReport();
-                
-			} catch (JRException e) {
-				e.printStackTrace();
-			}
-		}		else throw new BuildReportException(getReportCode());
-	}
-
 	
 }
