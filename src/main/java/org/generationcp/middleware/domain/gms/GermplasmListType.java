@@ -2,5 +2,5 @@ package org.generationcp.middleware.domain.gms;
 
 public enum GermplasmListType {
 
-	NURSERY, CHECK, TRIAL, ADVANCED, CROSSES;
+	LST, NURSERY, CHECK, TRIAL, ADVANCED, CROSSES;
 }
