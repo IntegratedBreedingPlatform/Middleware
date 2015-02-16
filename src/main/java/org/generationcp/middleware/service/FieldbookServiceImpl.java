@@ -1275,15 +1275,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		if(workbook != null){
 			Integer studyId = workbook.getStudyDetails().getId(); 
 			String studyName = workbook.getStudyDetails().getStudyName();
-			Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
-			setWorkingDatabase(plotDatasetId);
-			List<Integer> storedInIds = new ArrayList<Integer>();
-			storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
-			storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
-			storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
-			storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
-			  
-			workbook.setColumnOrderedLists(getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));
+			if(studyId != null){
+				Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+				setWorkingDatabase(plotDatasetId);
+				List<Integer> storedInIds = new ArrayList<Integer>();
+				storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
+				  
+				workbook.setColumnOrderedLists(getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));
+			}
 			return true;
 		}
 		return false;
