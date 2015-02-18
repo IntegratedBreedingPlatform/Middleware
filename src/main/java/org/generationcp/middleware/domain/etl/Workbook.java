@@ -181,15 +181,47 @@ public class Workbook {
 		return measurementDatasetVariables;
 	}
 	
+	public List<MeasurementRow> arrangeMeasurementObservation(List<MeasurementRow> observations){
+		
+		if(columnOrderedLists != null && !columnOrderedLists.isEmpty()){		
+			for(MeasurementRow row : observations){
+				//we need to arrange each data list
+				List<MeasurementData> measureDataList = row.getDataList();
+				List<MeasurementData> newMeasureData = new ArrayList<MeasurementData>();
+				for(Integer termId : columnOrderedLists){
+					int index = 0;
+					boolean isFound = false;
+					for(index = 0 ; index < measureDataList.size() ; index++){
+						MeasurementData measurementData = measureDataList.get(index);
+						if(termId.intValue() == measurementData.getMeasurementVariable().getTermId()){
+							newMeasureData.add(measurementData);
+							isFound = true;
+							break;
+						}
+					}
+					if(isFound){
+						//we remove it from the list
+						measureDataList.remove(index);
+					}
+				}
+				newMeasureData.addAll(measureDataList);
+				row.setDataList(newMeasureData);
+			}
+		}
+		return observations;
+	}
+	
 	public List<MeasurementVariable> arrangeMeasurementVariables(List<MeasurementVariable> varList){
 		List<MeasurementVariable> tempVarList = new ArrayList<MeasurementVariable>();
+		List<MeasurementVariable> copyVarList = new ArrayList<MeasurementVariable>();
+		copyVarList.addAll(varList);
 		if(columnOrderedLists != null && !columnOrderedLists.isEmpty()){
 			//we order the list based on column orders
 			for(Integer termId : columnOrderedLists){
 				int index = 0;
 				boolean isFound = false;
-				for(index = 0 ; index < varList.size() ; index++){
-					MeasurementVariable measurementVar = varList.get(index);
+				for(index = 0 ; index < copyVarList.size() ; index++){
+					MeasurementVariable measurementVar = copyVarList.get(index);
 					if(termId.intValue() == measurementVar.getTermId()){
 						tempVarList.add(measurementVar);
 						isFound = true;
@@ -198,11 +230,11 @@ public class Workbook {
 				}
 				if(isFound){
 					//we remove it from the list
-					varList.remove(index);
+					copyVarList.remove(index);
 				}
 			}
 			//we join the new list with the remaining items
-			tempVarList.addAll(varList);
+			tempVarList.addAll(copyVarList);
 			return tempVarList;
 		}
 		return varList;
