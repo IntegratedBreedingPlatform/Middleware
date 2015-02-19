@@ -260,6 +260,10 @@ public enum TermId {
     , PREFERRED_ID (60011)
     , PREFERRED_NAME (60012)
     , SEED_RESERVATION (60013)
+    , FEMALE_PARENT (60023)
+    , MALE_PARENT (60024)
+    , FGID (60025)
+    , MGID (60026)
     
     //Inventory List Column Labels
     , COMMENT_INVENTORY (60014)
