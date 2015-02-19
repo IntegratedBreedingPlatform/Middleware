@@ -588,7 +588,7 @@ public class DatabaseBroker {
     	return experimentProjectDao;
     }
     
-    protected final ProjectPropertyDao getProjectPropertyDao() {
+    public ProjectPropertyDao getProjectPropertyDao() {
     	 if (projectPropertyDao == null) {
              projectPropertyDao = new ProjectPropertyDao();
          }

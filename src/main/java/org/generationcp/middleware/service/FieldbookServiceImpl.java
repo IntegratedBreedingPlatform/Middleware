@@ -51,7 +51,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
 
-	
+    public FieldbookServiceImpl() {
+        super();
+    }
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
             HibernateSessionProvider sessionProviderForCentral,
@@ -1084,7 +1086,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     @Override
 	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
-		return getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
+		Workbook workbook = getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
+		setOrderVariableByRank(workbook, datasetId);
+		return workbook;
 	}
 	
 	@Override
@@ -1276,20 +1280,25 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			Integer studyId = workbook.getStudyDetails().getId(); 
 			String studyName = workbook.getStudyDetails().getStudyName();
 			if(studyId != null){
-				Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
-				setWorkingDatabase(plotDatasetId);
-				List<Integer> storedInIds = new ArrayList<Integer>();
-				storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
-				storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
-				storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
-				storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
-				  
-				workbook.setColumnOrderedLists(getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));
+				Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);				
+				this.setOrderVariableByRank(workbook, plotDatasetId);
 			}
 			return true;
 		}
 		return false;
 	}
-
+	public boolean setOrderVariableByRank(Workbook workbook, Integer plotDatasetId) throws MiddlewareQueryException {
+		if(workbook != null){			
+				setWorkingDatabase(plotDatasetId);
+				List<Integer> storedInIds = new ArrayList<Integer>();
+				storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());				  
+				workbook.setColumnOrderedLists(getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));			
+			return true;
+		}
+		return false;
+	}
 	
 }
