@@ -11,8 +11,20 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -21,22 +33,20 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.hibernate.Session;
 
-import java.util.*;
-
 public class ProjectPropertySaver extends Saver {
+
+	protected static final String PROJECT_PROPERTY_ID = "projectPropertyId";
 
 	public ProjectPropertySaver(
 			HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
-
+	
 	public List<ProjectProperty> create(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
@@ -44,7 +54,7 @@ public class ProjectPropertySaver extends Saver {
 		List<VariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 		
 		if (variableTypes != null && !variableTypes.isEmpty()) {
-			int index = getProjectPropertyDao().getNegativeId("projectPropertyId");
+			int index = getProjectPropertyDao().getNegativeId(PROJECT_PROPERTY_ID);
 			for (VariableType variableType : variableTypes) {
 				List<ProjectProperty> list = createVariableProperties(index, project, variableType);
 				properties.addAll(list);
@@ -62,7 +72,7 @@ public class ProjectPropertySaver extends Saver {
 		Integer generatedId;
 		ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
         for (ProjectProperty property : properties){
-            generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
+            generatedId = projectPropertyDao.getNegativeId(PROJECT_PROPERTY_ID);
             property.setProjectPropertyId(generatedId);
             property.setProject(project);
             projectPropertyDao.save(property);
@@ -71,9 +81,10 @@ public class ProjectPropertySaver extends Saver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(int index, DmsProject project, VariableType variableType) throws MiddlewareQueryException {
+	private List<ProjectProperty> createVariableProperties(int startIndex, DmsProject project, VariableType variableType) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
+		int index = startIndex;
 		properties.add(new ProjectProperty(index--, project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
@@ -93,7 +104,7 @@ public class ProjectPropertySaver extends Saver {
 				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId
 				|| TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
 					ProjectProperty property = new ProjectProperty();
-					property.setProjectPropertyId(getProjectPropertyDao().getNegativeId("projectPropertyId"));
+					property.setProjectPropertyId(getProjectPropertyDao().getNegativeId(PROJECT_PROPERTY_ID));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
 					property.setValue(variable.getValue());
 					property.setRank(variable.getVariableType().getRank());
@@ -116,7 +127,7 @@ public class ProjectPropertySaver extends Saver {
 	
 	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
 		ProjectProperty property = new ProjectProperty();
-		property.setProjectPropertyId(getProjectPropertyDao().getNegativeId("projectPropertyId"));
+		property.setProjectPropertyId(getProjectPropertyDao().getNegativeId(PROJECT_PROPERTY_ID));
 		property.setTypeId(typeId);
 		property.setValue(value);
 		property.setRank(rank);
@@ -398,4 +409,36 @@ public class ProjectPropertySaver extends Saver {
 			}
 		}
 	}
+	
+	public void updateVariablesRanking(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException{
+		setWorkingDatabase(Database.LOCAL);
+		
+		int rank = getProjectPropertyDao().getNextRank(datasetId);
+		Map<Integer, List<Integer>> projectPropIDMap = getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);
+		rank = updateVariableRank(variableIds, rank, projectPropIDMap);
+		
+		// if any factors were added but not included in list of variables, update their ranks also so they come last
+		List<Integer> storedInIds = new ArrayList<Integer>();
+		storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+		storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+		storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+
+		List<Integer> germplasmPlotVariateIds = getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(datasetId, storedInIds, variableIds);
+		updateVariableRank(germplasmPlotVariateIds, rank, projectPropIDMap);
+	}
+
+	//Iterate and update rank, exclude deleted variables
+	private int updateVariableRank(List<Integer> variableIds, int startRank,
+			Map<Integer, List<Integer>> projectPropIDMap) {
+		int rank = startRank;
+		for (Integer variableId : variableIds){
+			List<Integer> projectPropIds = projectPropIDMap.get(variableId);
+			if (projectPropIds != null) {
+				getProjectPropertyDao().updateRank(projectPropIds, rank);
+				rank++;
+			}
+		}
+		return rank;
+	}
+	
 }
