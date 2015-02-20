@@ -131,7 +131,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         List<Lot> lots = new ArrayList<Lot>();
         lots.add(lot);
         List<Integer> ids = addOrUpdateLot(lots, Operation.ADD);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -144,7 +144,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         List<Lot> lots = new ArrayList<Lot>();
         lots.add(lot);
         List<Integer> ids = addOrUpdateLot(lots, Operation.UPDATE);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -164,12 +164,10 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             LotDAO dao = getLotDao();
 
             for (Lot lot : lots) {
-                if (operation == Operation.ADD) {
-                	if (lot.getId() == null){
-                        // Auto-assign IDs for new local DB records
-                		Integer id = dao.getNextId("id");
-                		lot.setId(id);
-                	}
+                if (operation == Operation.ADD && lot.getId() == null){
+                    // Auto-assign IDs for new local DB records
+            		Integer id = dao.getNextId("id");
+            		lot.setId(id);
                 }
                 Lot recordSaved = dao.saveOrUpdate(lot);
                 idLotsSaved.add(recordSaved.getId());
@@ -182,16 +180,16 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             }
             // end transaction, commit to database
             trans.commit();
-        } catch (Exception e) {
+        } catch (ConstraintViolationException e) {
+        	rollbackTransaction(trans);
+        	throw new MiddlewareQueryException(e.getMessage());
+    	} catch (MiddlewareQueryException e) {
+        	rollbackTransaction(trans);
+        	throw e;
+    	} catch (Exception e) {
             rollbackTransaction(trans);
-            if (e.getCause() instanceof ConstraintViolationException && e instanceof MiddlewareQueryException) {
-            	throw (MiddlewareQueryException) e;
-            }
-            else {
-	            logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots + ", operation="
+            logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots + ", operation="
 	                    + operation + "): " + e.getMessage(), e, LOG);
-            }
-        	
         } finally {
             session.flush();
         }
@@ -204,7 +202,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         List<org.generationcp.middleware.pojos.ims.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.ims.Transaction>();
         transactions.add(transaction);
         List<Integer> ids = addTransactions(transactions);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -217,7 +215,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         List<org.generationcp.middleware.pojos.ims.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.ims.Transaction>();
         transactions.add(transaction);
         List<Integer> ids = addOrUpdateTransaction(transactions, Operation.UPDATE);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -571,8 +569,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 							listDataProject.getGroupName(), 1, null));
 				}
 			}
-		}
-		else { 
+		} else { 
 			listData = getGermplasmListDataByListId(listId,0,Integer.MAX_VALUE);
 		}
 
@@ -613,13 +610,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		List<CVTerm> scales = new ArrayList<CVTerm>();
 		Map<Integer, String> userNames = new HashMap<Integer, String>();
 		
-		if (locationIds.size() > 0) {
+		if (!locationIds.isEmpty()) {
             locations.addAll(getLocationDao().getByIds(new ArrayList<Integer>(locationIds)));
         }
-		if (userIds.size() > 0) {
+		if (!userIds.isEmpty()) {
             userNames.putAll(getPersonDao().getPersonNamesByUserIds(new ArrayList<Integer>(userIds)));
         }
-		if (scaleIds.size() > 0) {
+		if (!scaleIds.isEmpty()) {
             scales.addAll(getCvTermDao().getByIds(new ArrayList<Integer>(scaleIds)));
         }
 
@@ -712,13 +709,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		List<CVTerm> scales = new ArrayList<CVTerm>();
 		Map<Integer, String> userNames = new HashMap<Integer, String>();
 		
-		if (locationIds.size() > 0) {
+		if (!locationIds.isEmpty()) {
             locations.addAll(getLocationDao().getByIds(new ArrayList<Integer>(locationIds)));
         }
-		if (userIds.size() > 0) {
+		if (!userIds.isEmpty()) {
             userNames.putAll(getPersonDao().getPersonNamesByUserIds(new ArrayList<Integer>(userIds)));
         }
-		if (scaleIds.size() > 0) {
+		if (!scaleIds.isEmpty()) {
             scales.addAll(getCvTermDao().getByIds(new ArrayList<Integer>(scaleIds)));
         }
 
@@ -758,9 +755,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
 	public List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId)
 			throws MiddlewareQueryException {
-		List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
-		// TODO - get gids from study/nd_experiment, call getInventoryDetailsByGids, set sourceName
-		return inventoryDetails;
+    	// FIXME - get gids from study/nd_experiment, call getInventoryDetailsByGids, set sourceName
+		return new ArrayList<InventoryDetails>();
 	}
 
 	@Override
