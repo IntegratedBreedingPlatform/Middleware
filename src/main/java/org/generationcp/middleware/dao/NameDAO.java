@@ -214,7 +214,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             
             List<Object> results = query.list();
             for(Object result : results){
-                Object resultArray[] = (Object[]) result;
+                Object[] resultArray = (Object[]) result;
                 Integer gid = (Integer) resultArray[0];
                 String preferredId = (String) resultArray[1];
                 toreturn.put(gid, preferredId);
@@ -239,7 +239,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             
             List<Object> results = query.list();
             for(Object result : results){
-                Object resultArray[] = (Object[]) result;
+                Object[] resultArray = (Object[]) result;
                 Integer gid = (Integer) resultArray[0];
                 String preferredId = (String) resultArray[1];
                 toreturn.put(gid, preferredId);
@@ -297,15 +297,16 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 			criteria.add(Restrictions.in("germplasmId", gids));
 
 			List<Name> list = (List<Name>)  criteria.list();
-			if (list != null) {
-				for (Name name : list) {
-					List<Name> names = map.get(name.getGermplasmId());
-					if (names == null) {
-						names = new ArrayList<Name>();
-						map.put(name.getGermplasmId(), names);
-					}
-					names.add(name);
+			if (list == null) {
+				return map;
+			}
+			for (Name name : list) {
+				List<Name> names = map.get(name.getGermplasmId());
+				if (names == null) {
+					names = new ArrayList<Name>();
+					map.put(name.getGermplasmId(), names);
 				}
+				names.add(name);
 			}
 			
         } catch (HibernateException e) {
@@ -350,8 +351,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     		sql.append("SELECT COUNT(nid) FROM names ");
     		if (keyword == null) {
     			sql.append(" WHERE REPLACE(nval, ' ', '') IN ('").append(keyword1).append("', ").append("'").append(keyword2).append("')");
-    		} 
-    		else {
+    		} else {
     			sql.append(" WHERE REPLACE(nval, ' ', '') = '").append(keyword).append("'");
     		}
 
