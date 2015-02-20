@@ -362,9 +362,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 // get germplasm's existing preferred name/abbreviation, set as
                 // alternative name, change nstat to 0
                 Name oldPref = null;
-                int newNstat = 0; // nstat to be assigned to newPref: 1 for
-                // Name, 2 for Abbreviation
-
+                int newNstat = 0; 
+                // nstat to be assigned to newPref: 1 for Name, 2 for Abbreviation
                 if ("Name".equals(nameOrAbbrev)) {
                     oldPref = getPreferredNameByGID(gid);
                     newNstat = 1;
@@ -377,9 +376,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                     oldPref.setNstat(0);
                     dao.saveOrUpdate(oldPref);
                 }
-
-                newPref.setNstat(newNstat); // update specified name as the new preferred name/abbreviation
-                dao.saveOrUpdate(newPref); // save the new name's status to the database
+                // update specified name as the new preferred name/abbreviation then save the new name's status to the database
+                newPref.setNstat(newNstat); 
+                dao.saveOrUpdate(newPref); 
             } else {
                 // throw exception if no Name record with specified value does not exist
                 logAndThrowException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
@@ -402,7 +401,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<Name> names = new ArrayList<Name>();
         names.add(name);
         List<Integer> ids = addOrUpdateGermplasmName(names, Operation.ADD);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -415,7 +414,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<Name> names = new ArrayList<Name>();
         names.add(name);
         List<Integer> ids = addOrUpdateGermplasmName(names, Operation.UPDATE);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -637,7 +636,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         try {
 
             if (method.getMid() == null) {
-                throw new Exception("method has no Id or is not a local method");
+                throw new MiddlewareQueryException("method has no Id or is not a local method");
             }
 
             trans = session.beginTransaction();
@@ -729,7 +728,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException {
         List<Location> results = new ArrayList<Location>();
 
-        if (ids != null && ids.size()>0) {
+        if (ids != null && !ids.isEmpty()) {
            results.addAll(getLocationDao().getLocationByIds(ids));
         }
         
@@ -784,7 +783,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<Attribute> attributes = new ArrayList<Attribute>();
         attributes.add(attribute);
         List<Integer> ids = addGermplasmAttribute(attributes);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -797,7 +796,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<Attribute> attributes = new ArrayList<Attribute>();
         attributes.add(attribute);
         List<Integer> ids = updateGermplasmAttribute(attributes);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -974,7 +973,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<Germplasm> germplasms = new ArrayList<Germplasm>();
         germplasms.add(germplasm);
         List<Integer> ids = updateGermplasm(germplasms);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -999,7 +998,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         germplasm.setGid(Integer.valueOf(1));
         germplasmNameMap.put(germplasm, preferredName);
         List<Integer> ids = addGermplasm(germplasmNameMap);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -1516,7 +1515,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                                         } else if(firstParent.getGid().equals(secondParent.getGpid2()) && secondParent.getGpid1() != null){
                                             toCheck = getGermplasmWithPrefName(secondParent.getGpid1());
                                         }
-                                        Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(firstParent.getGid(), toCheck);
+                                        Object[] numOfDosesAndOtherParent = determineNumberOfRecurringParent(firstParent.getGid(), toCheck);
                                         parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
                                         
                                         backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
@@ -1535,7 +1534,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                                         } else if(secondParent.getGid().equals(firstParent.getGpid2()) && firstParent.getGpid1() != null){
                                             toCheck = getGermplasmWithPrefName(firstParent.getGpid1());
                                         }
-                                        Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(secondParent.getGid(), toCheck);
+                                        Object[] numOfDosesAndOtherParent = determineNumberOfRecurringParent(secondParent.getGid(), toCheck);
                                         parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
                                         
                                         backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
@@ -1627,7 +1626,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * representing the parent crossed with the recurring parent.
      */
     private Object[] determineNumberOfRecurringParent(Integer recurringParentGid, Germplasm toCheck) throws MiddlewareQueryException{
-        Object toreturn[] = new Object[2];
+        Object[] toreturn = new Object[2];
         if(toCheck == null){
             toreturn[0] = Integer.valueOf(0);
             toreturn[1] = null;
@@ -1640,7 +1639,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             if(toCheck.getGpid2() != null){
                 nextToCheck = getGermplasmWithPrefName(toCheck.getGpid2());
             }
-            Object returned[] = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
+            Object[] returned = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
             toreturn[0] = ((Integer) returned[0]) + 1;
             toreturn[1] = returned[1];
         } else if(toCheck.getGpid2() != null && toCheck.getGpid2().equals(recurringParentGid)){
@@ -1648,11 +1647,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             if(toCheck.getGpid1() != null){
                 nextToCheck = getGermplasmWithPrefName(toCheck.getGpid1());
             }
-            Object returned[] = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
+            Object[] returned = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
             toreturn[0] = ((Integer) returned[0]) + 1;
             toreturn[1] = returned[1];
-        }
-        else{
+        } else{
             toreturn[0] = Integer.valueOf(0);
             toreturn[1] = toCheck;
         }
@@ -1699,9 +1697,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     @Override
-    public List<Germplasm> getGermplasmByGidRange(int startGID, int endGID) throws MiddlewareQueryException {
+    public List<Germplasm> getGermplasmByGidRange(int startGIDParam, int endGIDParam) throws MiddlewareQueryException {
         List<Germplasm> germplasmList = new ArrayList<Germplasm>();
         
+        int startGID = startGIDParam;
+        int endGID = endGIDParam;
         //assumes the lesser value be the start of the range
         if(endGID < startGID){ 
             int temp = endGID;
