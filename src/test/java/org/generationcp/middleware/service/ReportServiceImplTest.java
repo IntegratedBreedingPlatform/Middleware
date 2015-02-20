@@ -59,6 +59,15 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
     private static final String KEY_WHEAT_FIELDBOOK_23 = "WFb23";
     private static final String KEY_WHEAT_FIELDBOOK_24 = "WFb24";
     private static final String KEY_WHEAT_FIELDBOOK_25 = "WFb25";
+    private static final String KEY_WHEAT_FIELDBOOK_26 = "WFb26";
+    private static final String KEY_WHEAT_FIELDBOOK_28 = "WFb28";
+    private static final String KEY_WHEAT_FIELDBOOK_29 = "WFb29";
+    private static final String KEY_WHEAT_FIELDBOOK_41 = "WFb41";
+    private static final String KEY_WHEAT_FIELDBOOK_42 = "WFb42";
+    private static final String KEY_WHEAT_FIELDBOOK_43 = "WFb43";
+    private static final String KEY_WHEAT_FIELDBOOK_47 = "WFb47";
+    private static final String KEY_WHEAT_FIELDBOOK_60 = "WFb60";
+    private static final String KEY_WHEAT_FIELDBOOK_61 = "WFb61";
     
     @BeforeClass
     public static void setUp() throws Exception {
@@ -107,6 +116,51 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetStreamReport_WheatFb25(){
   	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_25);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb26(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_26);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb28(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_28);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb29(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_29);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb41(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_41);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb42(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_42);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb43(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_43);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb47(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_47);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb60(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_60);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatFb61(){
+  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_61);
     }
 
    /**

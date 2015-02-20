@@ -15,12 +15,12 @@ import org.generationcp.middleware.pojos.report.Occurrence;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-public class WFieldbook24 extends AbstractReporter{
+public class WFieldbook24 extends AbstractWheatTrialReporter{
 
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WFieldbook24();
-		r.setFileNameExpression(this.getReportCode()+"_{trial_name}_{occ}");
+		r.setFileNameExpression(this.getReportCode()+"-NB_{trial_name}-{occ}");
 		
 		return r;
 	}
@@ -34,78 +34,5 @@ public class WFieldbook24 extends AbstractReporter{
 	public String getTemplateName() {
 		return "WFb24_header.jasper";
 	}
-
-	@Override
-	public Map<String, Object> buildJRParams(Map<String,Object> args){
-		Map<String, Object> params = super.buildJRParams(args);
-		
-		@SuppressWarnings("unchecked")
-		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>)args.get("studyConditions");
-		
-		params.put("tid", args.get("studyId"));
-//		params.put("fb_class", getReportCode());
-		
-		for(MeasurementVariable var : studyConditions){
-
-			switch(var.getName()){
-				case "BreedingProgram" : params.put("program", var.getValue());
-					break;
-				case "STUDY_NAME" : params.put("trial_abbr", var.getValue());
-					break;
-				case "STUDY_TITLE" : params.put("trial_name", var.getValue());
-					break;
-				case "CROP_SEASON" : params.put("cycle", var.getValue());
-									 params.put("LoCycle", var.getValue());
-					break;
-				case "TRIAL_INSTANCE" : params.put("occ", Integer.valueOf(var.getValue()));
-					break;
-				default : 
-					params.put("lid", "???");
-					params.put("dms_ip", "???");
-					params.put("gms_ip", "???");
-					break;
-			}
-		}
-
-		return params;
-	}
-
-	@Override
-	public JRDataSource buildJRDataSource(Collection<?> args){
-
-		List<GermplasmEntry> entries = new ArrayList<>();
-		//this null record is added because in Jasper, the record pointer in the data source is incremented by every element that receives it.
-		//since the datasource used in entry, is previously passed from occ to entry subreport. 
-		entries.add(null);
-		
-		for(MeasurementRow row : (Collection<MeasurementRow>)args){
-			GermplasmEntry entry = new GermplasmEntry();
-			for(MeasurementData dataItem : row.getDataList()){
-				switch(dataItem.getLabel()){
-					case "ENTRY_NO" : entry.setEntryNum(Integer.valueOf(dataItem.getValue()));
-						break;
-					case "CROSS" : entry.setLinea1(dataItem.getValue());
-									 entry.setLinea2(dataItem.getValue());
-						break;
-					case "DESIGNATION" : entry.setLinea3(dataItem.getValue());
-									 entry.setLinea4(dataItem.getValue());
-									 entry.setLinea5(dataItem.getValue());
-						break;
-					//TODO: pending mappings
-					default : entry.setS_ent(-99);
-							  entry.setS_tabbr("???");
-							  entry.setSlocycle("???");
-					
-				}
-			}
-			
-			entries.add(entry);
-		}
-		
-		JRDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(new Occurrence(entries)));
-		return dataSource;
-	
-	}
-	
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-10T16:55:44 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-19T14:17:00 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c7d4edd0-4e16-4806-906c-b84aff204f10">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -294,14 +294,14 @@
 				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="13" width="63" height="12" uuid="ecfce32f-8b51-4076-b4bd-1aad9b62ba07"/>
+				<reportElement x="10" y="13" width="111" height="12" uuid="ecfce32f-8b51-4076-b4bd-1aad9b62ba07"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="83" y="13" width="195" height="12" uuid="ee372e00-2228-4939-bebd-6c7d2a902c7f"/>
+				<reportElement x="156" y="13" width="122" height="12" uuid="ee372e00-2228-4939-bebd-6c7d2a902c7f"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="8"/>
 				</textElement>
@@ -445,40 +445,32 @@
 			<textField>
 				<reportElement x="40" y="1" width="238" height="12" uuid="4015415d-3f44-464d-9979-bfc13635c5c3"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea1}.length()>50 ? $F{linea1}.substring(0,$F{linea1}.substring(0,50).lastIndexOf("/")+1) : 
+$F{linea1})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="40" y="9" width="238" height="12" uuid="704d2348-28e2-4209-9427-edf8e1d45679"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="7" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea2}.length()>50 ? $F{linea2}.substring($F{linea2}.lastIndexOf("/",50)+1,$F{linea2}.length()) : "")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="40" y="9" width="238" height="12" uuid="f08628a5-19cd-4a25-b8ee-0645b1d0aee0"/>
+				<reportElement x="40" y="17" width="238" height="8" uuid="f08628a5-19cd-4a25-b8ee-0645b1d0aee0"/>
 				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7"/>
+					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea3}.length()>50 ? $F{linea3}.substring(0,$F{linea3}.substring(0,50).lastIndexOf("-")+1) : 
+$F{linea3})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="40" y="17" width="238" height="12" uuid="573a34f4-0d63-44eb-9f39-1be65fbeae2f"/>
+				<reportElement x="40" y="25" width="238" height="8" uuid="573a34f4-0d63-44eb-9f39-1be65fbeae2f"/>
 				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7"/>
+					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea4}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="40" y="23" width="212" height="12" uuid="345845bd-547f-44bd-8f5e-c748d4172474">
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{linea5}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea4}.length()>50 ? $F{linea4}.substring($F{linea4}.lastIndexOf("-",50)+1,$F{linea4}.length()) : "")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

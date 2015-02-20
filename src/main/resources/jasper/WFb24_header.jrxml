@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-11T16:32:36 -->
+<!-- 2015-02-18T15:37:27 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb24_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="5f576586-aeee-45c7-b108-6a34721c600e">
 	<property name="ireport.zoom" value="1.4641000000000006"/>
 	<property name="ireport.x" value="0"/>
@@ -32,9 +32,8 @@
 	<parameter name="gms_ip" class="java.lang.String"/>
 	<parameter name="dms_ip" class="java.lang.String"/>
 	<parameter name="version" class="java.lang.String"/>
-	<field name="offset_2" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_2]]></fieldDescription>
-	</field>
+	<parameter name="organization" class="java.lang.String"/>
+	<parameter name="offset" class="java.lang.Integer"/>
 	<field name="totalEntries" class="java.lang.Integer">
 		<fieldDescription><![CDATA[totalEntries]]></fieldDescription>
 	</field>
@@ -44,20 +43,8 @@
 	<field name="check_freq" class="java.lang.Integer">
 		<fieldDescription><![CDATA[check_freq]]></fieldDescription>
 	</field>
-	<field name="program" class="java.lang.String">
-		<fieldDescription><![CDATA[program]]></fieldDescription>
-	</field>
 	<field name="use_generic" class="java.lang.String">
 		<fieldDescription><![CDATA[use_generic]]></fieldDescription>
-	</field>
-	<field name="organization" class="java.lang.String">
-		<fieldDescription><![CDATA[organization]]></fieldDescription>
-	</field>
-	<field name="offset_1" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_1]]></fieldDescription>
-	</field>
-	<field name="tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[tid]]></fieldDescription>
 	</field>
 	<field name="new_cycle" class="java.lang.String">
 		<fieldDescription><![CDATA[new_cycle]]></fieldDescription>
@@ -79,9 +66,6 @@
 	</field>
 	<field name="trial_name" class="java.lang.String">
 		<fieldDescription><![CDATA[trial_name]]></fieldDescription>
-	</field>
-	<field name="offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset]]></fieldDescription>
 	</field>
 	<field name="check_2" class="java.lang.Integer">
 		<fieldDescription><![CDATA[check_2]]></fieldDescription>
@@ -167,7 +151,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{organization}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{organization}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="355" y="500" width="3" height="12" uuid="ecb0d8bb-a390-49c8-97bf-2423337036b6"/>
@@ -256,7 +240,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{program}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="250" y="609" width="101" height="1" uuid="126f5c4a-e049-450f-9683-b98aa7847133"/>
@@ -473,7 +457,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tid}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="363" y="320" width="24" height="12" uuid="907ce367-b0ce-47d7-aa6f-ba42d7633bda"/>
@@ -582,7 +566,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{offset}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{offset}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="355" y="380" width="3" height="12" uuid="8e231aa4-0062-4f96-a323-f6acc1fce5dc"/>
@@ -685,12 +669,6 @@
 					<pen lineStyle="Dotted"/>
 				</graphicElement>
 			</line>
-			<line>
-				<reportElement x="201" y="290" width="150" height="2" uuid="4d57021d-e0ea-4fd6-9651-fc1db4c8a641"/>
-				<graphicElement>
-					<pen lineStyle="Dotted"/>
-				</graphicElement>
-			</line>
 			<staticText>
 				<reportElement stretchType="RelativeToTallestObject" x="180" y="240" width="36" height="12" uuid="443fd24b-0423-470f-a2f8-1d29882b9063"/>
 				<textElement verticalAlignment="Middle">
@@ -726,6 +704,12 @@
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
+			<line>
+				<reportElement x="202" y="286" width="149" height="1" uuid="040e96f5-83ba-4a40-8465-bede2417e570"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
 		</band>
 	</title>
 	<pageHeader>

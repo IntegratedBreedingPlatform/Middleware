@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-09T15:57:29 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-18T11:40:26 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb25_entry" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a812020a-af24-404a-88f8-803bcc90a7ec">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
@@ -309,21 +309,21 @@
 				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="35" y="18" width="60" height="19" uuid="cd2bf421-86c5-4e39-b46b-aaf914a91fa2"/>
+				<reportElement x="35" y="18" width="131" height="19" uuid="cd2bf421-86c5-4e39-b46b-aaf914a91fa2"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="18" width="181" height="19" uuid="5edfbbfc-8920-4e07-8610-9c36b9359ab9"/>
+				<reportElement x="181" y="18" width="100" height="19" uuid="5edfbbfc-8920-4e07-8610-9c36b9359ab9"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="324" y="18" width="101" height="19" uuid="c86dbecb-d609-49c0-8973-3b2ac4a894c1"/>
+				<reportElement x="304" y="18" width="101" height="19" uuid="c86dbecb-d609-49c0-8973-3b2ac4a894c1"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -432,30 +432,32 @@
 			<textField>
 				<reportElement x="80" y="0" width="327" height="12" uuid="9c3aff81-f7e2-4a0a-807d-e330fbeb9c64"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
-					<font fontName="Times New Roman" size="6" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea1}.length()>50 ? $F{linea1}.substring(0,$F{linea1}.substring(0,50).lastIndexOf("/")+1) : 
+$F{linea1})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="80" y="8" width="327" height="12" uuid="9c3aff81-f7e2-4a0a-807d-e330fbeb9c64"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
-					<font fontName="Times New Roman" size="6" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea2}.length()>50 ? $F{linea2}.substring($F{linea2}.lastIndexOf("/",50)+1,$F{linea2}.length()) : "")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="80" y="16" width="327" height="12" uuid="02378c39-8e79-4719-adea-e22dff2f6241"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea3}.length()>50 ? $F{linea3}.substring(0,$F{linea3}.substring(0,50).lastIndexOf("-")+1) : 
+$F{linea3})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="80" y="24" width="327" height="12" uuid="08f67678-395a-4ffc-bb1f-5d5ce6c29e46"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea4}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea4}.length()>50 ? $F{linea4}.substring($F{linea4}.lastIndexOf("-",50)+1,$F{linea4}.length()) : "")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

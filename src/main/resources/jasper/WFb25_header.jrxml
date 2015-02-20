@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-09T15:15:46 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-18T16:20:10 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb25_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="8b3ac4dd-ee30-4c1a-a6f3-430aa36a7db7">
 	<property name="ireport.zoom" value="1.366026910730141"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<subDataset name="Table Dataset 1" uuid="6a13925a-9884-47dc-ab7c-f782033c51e7"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
@@ -24,16 +25,15 @@
 	<parameter name="lname" class="java.lang.String"/>
 	<parameter name="cycle" class="java.lang.String"/>
 	<parameter name="fb_class" class="java.lang.String"/>
-	<parameter name="gms_ip" class="java.lang.String"/>
 	<parameter name="dms_ip" class="java.lang.String"/>
+	<parameter name="gms_ip" class="java.lang.String"/>
 	<parameter name="version" class="java.lang.String"/>
+	<parameter name="organization" class="java.lang.String"/>
+	<parameter name="offset" class="java.lang.Integer"/>
 	<parameter name="imagen_logo" class="java.io.InputStream"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
-	<field name="offset_2" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_2]]></fieldDescription>
-	</field>
 	<field name="totalEntries" class="java.lang.Integer">
 		<fieldDescription><![CDATA[totalEntries]]></fieldDescription>
 	</field>
@@ -43,20 +43,8 @@
 	<field name="check_freq" class="java.lang.Integer">
 		<fieldDescription><![CDATA[check_freq]]></fieldDescription>
 	</field>
-	<field name="program" class="java.lang.String">
-		<fieldDescription><![CDATA[program]]></fieldDescription>
-	</field>
 	<field name="use_generic" class="java.lang.String">
 		<fieldDescription><![CDATA[use_generic]]></fieldDescription>
-	</field>
-	<field name="organization" class="java.lang.String">
-		<fieldDescription><![CDATA[organization]]></fieldDescription>
-	</field>
-	<field name="offset_1" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_1]]></fieldDescription>
-	</field>
-	<field name="tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[tid]]></fieldDescription>
 	</field>
 	<field name="new_cycle" class="java.lang.String">
 		<fieldDescription><![CDATA[new_cycle]]></fieldDescription>
@@ -79,14 +67,11 @@
 	<field name="trial_name" class="java.lang.String">
 		<fieldDescription><![CDATA[trial_name]]></fieldDescription>
 	</field>
-	<field name="offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset]]></fieldDescription>
-	</field>
 	<field name="check_2" class="java.lang.Integer">
 		<fieldDescription><![CDATA[check_2]]></fieldDescription>
 	</field>
-	<field name="ocurrencesList" class="java.util.List">
-		<fieldDescription><![CDATA[ocurrencesList]]></fieldDescription>
+	<field name="entriesList" class="java.util.List">
+		<fieldDescription><![CDATA[entriesList]]></fieldDescription>
 	</field>
 	<field name="trial_mega_environment" class="java.lang.Integer">
 		<fieldDescription><![CDATA[trial_mega_environment]]></fieldDescription>
@@ -121,7 +106,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tid}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="396" y="239" width="117" height="12" uuid="52460ad3-ead8-4f74-8719-312f5e1216de"/>
@@ -142,21 +127,21 @@
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{organization}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{organization}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="362" y="380" width="91" height="12" uuid="7b5a21a7-b4f2-4be8-b2f5-6e9360b17203"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{program}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="362" y="400" width="35" height="12" uuid="4bec2d4e-710f-4571-9ec7-7bf84feaf85d"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{offset}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{offset}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="362" y="300" width="100" height="12" uuid="a0635914-44b0-4a35-a45d-1fc105fae5d9"/>
@@ -786,7 +771,7 @@
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ocurrencesList})]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{entriesList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "WFb25_occ.jasper"]]></subreportExpression>
 			</subreport>
 		</band>

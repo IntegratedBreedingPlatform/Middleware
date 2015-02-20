@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-11T16:49:48 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-19T16:33:55 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb47_entry" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b95bf503-abe3-4763-affc-407b9a2206cc">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
@@ -290,14 +290,14 @@
 	<columnHeader>
 		<band height="28" splitType="Stretch">
 			<staticText>
-				<reportElement x="181" y="-1" width="37" height="13" uuid="353154cd-6e9f-41f2-8dba-7650ed66354b"/>
+				<reportElement x="210" y="0" width="27" height="13" uuid="353154cd-6e9f-41f2-8dba-7650ed66354b"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="9"/>
 				</textElement>
 				<text><![CDATA[TID:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="304" y="-1" width="37" height="13" uuid="2ddcc3f0-9c85-4f2e-9eda-1156decaefbd"/>
+				<reportElement x="304" y="0" width="37" height="13" uuid="2ddcc3f0-9c85-4f2e-9eda-1156decaefbd"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="9"/>
 				</textElement>
@@ -318,21 +318,21 @@
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="218" y="-1" width="63" height="13" uuid="98d97d74-4e61-4bb1-b0e8-25a90683c8a0"/>
+				<reportElement x="237" y="0" width="63" height="13" uuid="98d97d74-4e61-4bb1-b0e8-25a90683c8a0"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="341" y="-1" width="37" height="13" uuid="3c34549b-24ed-40a7-b388-2594671a0d18"/>
+				<reportElement x="342" y="0" width="37" height="13" uuid="3c34549b-24ed-40a7-b388-2594671a0d18"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="3" y="0" width="58" height="12" uuid="bc0d01e2-f49a-411c-8da0-d7d8f1b71e29"/>
+				<reportElement x="9" y="0" width="110" height="12" uuid="bc0d01e2-f49a-411c-8da0-d7d8f1b71e29"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="9"/>
 				</textElement>
@@ -365,7 +365,7 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="21" y="15" width="31" height="12" uuid="f87dfd96-e783-4243-9ffa-24f15b283689">
+				<reportElement x="14" y="15" width="31" height="12" uuid="f87dfd96-e783-4243-9ffa-24f15b283689">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -420,14 +420,14 @@
 				<text><![CDATA[ENTRY]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="67" y="0" width="27" height="12" uuid="4775c673-bf24-478e-bb8e-eddb9895ec7b"/>
+				<reportElement x="120" y="0" width="27" height="12" uuid="4775c673-bf24-478e-bb8e-eddb9895ec7b"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{lid}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="102" y="0" width="56" height="12" uuid="e51b3e59-5c30-47a2-a49c-55b648f39ac6"/>
+				<reportElement x="150" y="0" width="56" height="12" uuid="e51b3e59-5c30-47a2-a49c-55b648f39ac6"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="9"/>
 				</textElement>

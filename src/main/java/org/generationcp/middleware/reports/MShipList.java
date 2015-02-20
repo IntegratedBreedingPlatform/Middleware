@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.pojos.report.SiteEntry;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;

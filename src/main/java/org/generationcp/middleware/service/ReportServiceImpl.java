@@ -25,8 +25,6 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.report.Site;
-import org.generationcp.middleware.pojos.report.SiteEntry;
 import org.generationcp.middleware.reports.BuildReportException;
 import org.generationcp.middleware.reports.Reporter;
 import org.generationcp.middleware.reports.ReporterFactory;

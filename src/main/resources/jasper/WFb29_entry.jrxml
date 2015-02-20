@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-10T16:01:26 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-19T11:59:08 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb29_entry" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="ecea7c71-ba0d-433e-a663-07035c0dbe41">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -294,7 +294,7 @@
 				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="19" y="1" width="60" height="12" uuid="51c2ffd6-5b93-4eaa-9133-3d59538feec4">
+				<reportElement x="19" y="1" width="101" height="12" uuid="51c2ffd6-5b93-4eaa-9133-3d59538feec4">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -304,7 +304,7 @@
 				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="72" y="10" width="199" height="12" uuid="a4d57795-c187-45cc-a306-5692d5010673">
+				<reportElement x="70" y="12" width="117" height="12" uuid="a4d57795-c187-45cc-a306-5692d5010673">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -330,7 +330,7 @@
 				</graphicElement>
 			</line>
 			<textField>
-				<reportElement x="87" y="1" width="84" height="12" uuid="535592e4-496d-4d35-9099-da8800cb0715">
+				<reportElement x="130" y="1" width="57" height="10" uuid="535592e4-496d-4d35-9099-da8800cb0715">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -551,53 +551,43 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea1}.length()>50 ? $F{linea1}.substring(0,$F{linea1}.substring(0,50).lastIndexOf("/")+1) : 
+$F{linea1})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="55" y="8" width="216" height="12" uuid="c8fa8f95-e9a2-4f16-b451-c81445dc934a"/>
+				<reportElement x="55" y="6" width="216" height="12" uuid="c8fa8f95-e9a2-4f16-b451-c81445dc934a"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="7" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea2}.length()>50 ? $F{linea2}.substring($F{linea2}.lastIndexOf("/",50)+1,$F{linea2}.length()) : "")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="55" y="8" width="216" height="12" uuid="e68c479e-63c7-44d5-bd3d-0d0ac985ae02">
+				<reportElement x="55" y="18" width="216" height="8" uuid="e68c479e-63c7-44d5-bd3d-0d0ac985ae02">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7"/>
+					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea3}.length()>50 ? $F{linea3}.substring(0,$F{linea3}.substring(0,50).lastIndexOf("-")+1) : 
+$F{linea3})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="55" y="16" width="216" height="12" uuid="8645d741-10e1-45e2-88c4-c769f968aed1">
+				<reportElement x="55" y="26" width="216" height="8" uuid="8645d741-10e1-45e2-88c4-c769f968aed1">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7"/>
+					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea4}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="55" y="23" width="216" height="12" uuid="22e35943-8836-488d-a3c9-b8ef2f4cc3e3">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{linea5}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea4}.length()>50 ? $F{linea4}.substring($F{linea4}.lastIndexOf("-",50)+1,$F{linea4}.length()) : "")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="1">
+		<band height="3">
 			<line>
 				<reportElement x="19" y="-1" width="376" height="1" uuid="9bd9dfbf-3ef1-46b5-aa6a-1a0bddb2112c"/>
 				<graphicElement>

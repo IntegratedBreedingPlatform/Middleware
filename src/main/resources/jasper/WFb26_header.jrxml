@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-09T16:41:42 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-18T16:25:20 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb26_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="d2d09ff1-8954-4f03-9bf3-c6716eeef7ad">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
@@ -18,6 +18,7 @@
 	<parameter name="num_reporte" class="java.lang.Integer"/>
 	<parameter name="Ientry" class="java.lang.Integer"/>
 	<parameter name="Fentry" class="java.lang.Integer"/>
+	<parameter name="offset" class="java.lang.Integer"/>
 	<parameter name="country" class="java.lang.String"/>
 	<parameter name="labbr" class="java.lang.String"/>
 	<parameter name="lname" class="java.lang.String"/>
@@ -27,74 +28,12 @@
 	<parameter name="gms_ip" class="java.lang.String"/>
 	<parameter name="dms_ip" class="java.lang.String"/>
 	<parameter name="version" class="java.lang.String"/>
+	<parameter name="organization" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
-	<field name="offset_2" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_2]]></fieldDescription>
-	</field>
-	<field name="totalEntries" class="java.lang.Integer">
-		<fieldDescription><![CDATA[totalEntries]]></fieldDescription>
-	</field>
-	<field name="check_1" class="java.lang.Integer">
-		<fieldDescription><![CDATA[check_1]]></fieldDescription>
-	</field>
-	<field name="check_freq" class="java.lang.Integer">
-		<fieldDescription><![CDATA[check_freq]]></fieldDescription>
-	</field>
-	<field name="program" class="java.lang.String">
-		<fieldDescription><![CDATA[program]]></fieldDescription>
-	</field>
-	<field name="use_generic" class="java.lang.String">
-		<fieldDescription><![CDATA[use_generic]]></fieldDescription>
-	</field>
-	<field name="organization" class="java.lang.String">
-		<fieldDescription><![CDATA[organization]]></fieldDescription>
-	</field>
-	<field name="offset_1" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset_1]]></fieldDescription>
-	</field>
-	<field name="tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[tid]]></fieldDescription>
-	</field>
-	<field name="new_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[new_cycle]]></fieldDescription>
-	</field>
-	<field name="studyID" class="java.lang.Integer">
-		<fieldDescription><![CDATA[studyID]]></fieldDescription>
-	</field>
-	<field name="use_abreviation" class="java.lang.String">
-		<fieldDescription><![CDATA[use_abreviation]]></fieldDescription>
-	</field>
-	<field name="internat_type" class="java.lang.String">
-		<fieldDescription><![CDATA[internat_type]]></fieldDescription>
-	</field>
-	<field name="cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[cycle]]></fieldDescription>
-	</field>
-	<field name="trial_abbr" class="java.lang.String">
-		<fieldDescription><![CDATA[trial_abbr]]></fieldDescription>
-	</field>
-	<field name="trial_name" class="java.lang.String">
-		<fieldDescription><![CDATA[trial_name]]></fieldDescription>
-	</field>
-	<field name="offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[offset]]></fieldDescription>
-	</field>
-	<field name="check_2" class="java.lang.Integer">
-		<fieldDescription><![CDATA[check_2]]></fieldDescription>
-	</field>
-	<field name="ocurrencesList" class="java.util.List">
-		<fieldDescription><![CDATA[ocurrencesList]]></fieldDescription>
-	</field>
-	<field name="trial_mega_environment" class="java.lang.Integer">
-		<fieldDescription><![CDATA[trial_mega_environment]]></fieldDescription>
-	</field>
-	<field name="print_mega_environment" class="java.lang.String">
-		<fieldDescription><![CDATA[print_mega_environment]]></fieldDescription>
-	</field>
-	<field name="expansion_level" class="java.lang.Integer">
-		<fieldDescription><![CDATA[expansion_level]]></fieldDescription>
+	<field name="entriesList" class="java.util.List">
+		<fieldDescription><![CDATA[entriesList]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -239,7 +178,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tid}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="397" y="240" width="117" height="12" uuid="571afd69-3f64-416d-a825-2ce3dfbe8ab1"/>
@@ -260,21 +199,21 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{organization}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{organization}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="363" y="380" width="91" height="12" uuid="7c0a5887-5653-4366-bfa8-2c3ea13d3a2f"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{program}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="363" y="400" width="35" height="12" uuid="82f849a2-8599-4ff8-89c0-aad26c52cf7c"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{offset}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{offset}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="363" y="300" width="100" height="12" uuid="6d6efffc-39f1-40d6-a508-b4e64c464205"/>
@@ -785,7 +724,7 @@
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ocurrencesList})]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{entriesList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "WFb26_occ.jasper"]]></subreportExpression>
 			</subreport>
 		</band>

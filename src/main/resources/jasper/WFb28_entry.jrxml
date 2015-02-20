@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-10T14:27:19 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-18T16:57:50 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb28_entry" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="8eeab49e-4920-4270-b267-38b96996e1dc">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="184"/>
@@ -282,21 +282,21 @@
 				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="10" y="13" width="63" height="12" uuid="5bca1ced-f20d-47b3-973f-708f74f210a8"/>
+				<reportElement x="10" y="13" width="106" height="12" uuid="5bca1ced-f20d-47b3-973f-708f74f210a8"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="91" y="13" width="175" height="12" uuid="72f5810d-fc68-4df3-8ff1-70a57e513dcd"/>
+				<reportElement x="121" y="13" width="94" height="12" uuid="72f5810d-fc68-4df3-8ff1-70a57e513dcd"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="284" y="13" width="110" height="12" uuid="d9071cf6-5aaf-427b-9753-69dc4f492dac"/>
+				<reportElement x="215" y="13" width="110" height="12" uuid="d9071cf6-5aaf-427b-9753-69dc4f492dac"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="8"/>
 				</textElement>
@@ -456,46 +456,36 @@
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="Times New Roman" size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea1}.length()>50 ? $F{linea1}.substring(0,$F{linea1}.substring(0,50).lastIndexOf("/")+1) : 
+$F{linea1})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="42" y="8" width="238" height="12" uuid="04efc47d-02ed-4ba0-95db-7534f5dbbad7"/>
+				<reportElement x="42" y="4" width="238" height="12" uuid="04efc47d-02ed-4ba0-95db-7534f5dbbad7"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea2}.length()>50 ? $F{linea2}.substring($F{linea2}.lastIndexOf("/",50)+1,$F{linea2}.length()) : "")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="42" y="8" width="238" height="12" uuid="533ca32e-c200-40c2-851e-a8966b371452">
+				<reportElement x="42" y="16" width="238" height="9" uuid="533ca32e-c200-40c2-851e-a8966b371452">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Top">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea3}.length()>50 ? $F{linea3}.substring(0,$F{linea3}.substring(0,50).lastIndexOf("-")+1) : 
+$F{linea3})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="42" y="16" width="238" height="12" uuid="42324028-3b1c-46e7-b355-a5fb674b26fa">
+				<reportElement x="42" y="25" width="238" height="10" uuid="42324028-3b1c-46e7-b355-a5fb674b26fa">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Top">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea4}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="42" y="23" width="238" height="12" uuid="8e7901ad-e609-44b7-a02a-fa449c48d06b">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="7"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{linea5}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea4}.length()>50 ? $F{linea4}.substring($F{linea4}.lastIndexOf("-",50)+1,$F{linea4}.length()) : "")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

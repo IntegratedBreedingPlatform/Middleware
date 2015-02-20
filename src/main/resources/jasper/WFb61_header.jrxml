@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-11T11:56:21 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-13T15:40:48 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb61_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="cb0938fd-be58-4ab1-b459-be641e261730">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -80,8 +80,8 @@
 	<field name="check_2" class="java.lang.Integer">
 		<fieldDescription><![CDATA[check_2]]></fieldDescription>
 	</field>
-	<field name="ocurrencesList" class="java.util.List">
-		<fieldDescription><![CDATA[ocurrencesList]]></fieldDescription>
+	<field name="entriesList" class="java.util.List">
+		<fieldDescription><![CDATA[entriesList]]></fieldDescription>
 	</field>
 	<field name="trial_mega_environment" class="java.lang.Integer">
 		<fieldDescription><![CDATA[trial_mega_environment]]></fieldDescription>
@@ -477,7 +477,7 @@
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ocurrencesList})]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{entriesList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "WFb61_occ.jasper"]]></subreportExpression>
 			</subreport>
 		</band>

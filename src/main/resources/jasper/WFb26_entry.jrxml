@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-12-10T09:43:18 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-18T16:30:02 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="96603671-ff14-4c98-86d9-601baa7e8f24">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="114"/>
@@ -435,37 +435,32 @@
 			<textField>
 				<reportElement x="55" y="0" width="238" height="12" uuid="43559f5c-be43-4252-b1e6-d6690f7259df"/>
 				<textElement textAlignment="Left" verticalAlignment="Top">
-					<font fontName="Times New Roman" size="6" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea1}.length()>50 ? $F{linea1}.substring(0,$F{linea1}.substring(0,50).lastIndexOf("/")+1) : 
+$F{linea1})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="55" y="8" width="238" height="12" uuid="5d488669-d1d0-4627-bce5-04751ab1a652"/>
+				<reportElement x="55" y="6" width="238" height="12" uuid="5d488669-d1d0-4627-bce5-04751ab1a652"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="6" isBold="true"/>
+					<font fontName="Times New Roman" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea2}.length()>50 ? $F{linea2}.substring($F{linea2}.lastIndexOf("/",50)+1,$F{linea2}.length()) : "")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="55" y="8" width="238" height="12" uuid="61e6da35-07f7-422c-aaf8-70bcf223fc8b"/>
+				<reportElement x="55" y="18" width="238" height="9" uuid="61e6da35-07f7-422c-aaf8-70bcf223fc8b"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea3}.length()>50 ? $F{linea3}.substring(0,$F{linea3}.substring(0,50).lastIndexOf("-")+1) : 
+$F{linea3})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="55" y="16" width="238" height="12" uuid="87c26130-f20d-4f2a-ba0a-a3ce27693072"/>
+				<reportElement x="55" y="27" width="238" height="7" uuid="87c26130-f20d-4f2a-ba0a-a3ce27693072"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Times New Roman" size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{linea4}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="56" y="23" width="238" height="12" uuid="c135dde6-7972-499f-bb88-1bbbd11eef16"/>
-				<textElement verticalAlignment="Top">
-					<font fontName="Times New Roman" size="6"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{linea5}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{linea4}.length()>50 ? $F{linea4}.substring($F{linea4}.lastIndexOf("-",50)+1,$F{linea4}.length()) : "")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
