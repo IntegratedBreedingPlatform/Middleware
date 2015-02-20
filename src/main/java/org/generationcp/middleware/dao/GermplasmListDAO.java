@@ -37,14 +37,14 @@ import java.util.List;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
     private static final Integer STATUS_DELETED = 9;
-    protected static final List<SimpleExpression> restrictedList = new ArrayList();
+    protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList();
     
     static{
-    	restrictedList.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-    	restrictedList.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-    	restrictedList.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-    	restrictedList.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
-    	restrictedList.add(Restrictions.ne("type", GermplasmListType.CROSSES.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CROSSES.toString()));
     }    
     
     @SuppressWarnings("unchecked")
@@ -308,7 +308,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
     	}    	        
     }
     protected List<SimpleExpression> getRestrictedSnapshopTypes(){
-    	return restrictedList;
+    	return RETRICTED_LIST;
     }
     
     /**
@@ -329,7 +329,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         } catch (HibernateException e) {
             logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(), e);
         }
-        return null;
+        return new ArrayList();
     }
     
     /**
@@ -350,7 +350,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         } catch (HibernateException e) {
             logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(), e);
         }    	
-        return null;
+        return new ArrayList();
     }    
     
     /**
@@ -361,9 +361,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      * @throws MiddlewareQueryException 
      */
     @SuppressWarnings("unchecked")
-    public List<GermplasmList> searchForGermplasmLists(String q, Operation o) throws MiddlewareQueryException{
-    	q = q.trim();
-    	if(q.equals("")){
+    public List<GermplasmList> searchForGermplasmLists(String searchedString, Operation o) throws MiddlewareQueryException{
+    	String q = searchedString.trim();
+    	if("".equals(q)){
     		return new ArrayList<GermplasmList>();
     	}
         try {
@@ -393,9 +393,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         	query.setParameter("gid", q);
         	
         	query.addEntity("listnms", GermplasmList.class);
-            List<GermplasmList> germplasmLists = query.list();
-
-            return germplasmLists;
+            return query.list();
 
         } catch (Exception e) {
                 logAndThrowException("Error with searchGermplasmLists(" + q + ") " + e.getMessage(), e);
