@@ -15,41 +15,37 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.operation.searcher.Searcher;
 
 import java.util.List;
 
-//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 
 	private int gid;
 	private int numOfRows;
 	
-	private long countOfLocalStudies;
-	private long countOfCentralStudies;
+	private long countOfStudies;
 	
 	private int currentRow;
 	
 	private List<StudyReference> buffer;
 	private int bufIndex;
 
-	public StudyResultSetByGid(GidStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProviderForLocal)
+	public StudyResultSetByGid(GidStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProvider)
 			throws MiddlewareQueryException {
 
-		super(sessionProviderForLocal);
+		super(sessionProvider);
 		
 		this.gid = filter.getGid();
 		this.numOfRows = numOfRows;
 		
-		this.countOfLocalStudies = countStudies(Database.LOCAL, gid);
-		this.countOfCentralStudies = countStudies(Database.CENTRAL, gid);
+		this.countOfStudies = countStudies(gid);
 		
 		this.currentRow = 0;
 		this.bufIndex = 0;
 	}
 	
-	private long countStudies(Database database, int gid) throws MiddlewareQueryException {
+	private long countStudies(int gid) throws MiddlewareQueryException {
 		return this.getStockDao().countStudiesByGid(gid);
 	}
 
@@ -72,29 +68,13 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	}
 
 	private void fillBuffer() throws MiddlewareQueryException {
-		if (currentRow < this.countOfLocalStudies) {
-			fillBufferFromLocalStudies();
-		}
-		else {
-			fillBufferFromCentralStudies();
-		}
-	}
-
-	private void fillBufferFromLocalStudies() throws MiddlewareQueryException {
-		int start = currentRow - (int) countOfLocalStudies;
-		buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
-		bufIndex = 0;
-	}
-
-	private void fillBufferFromCentralStudies() throws MiddlewareQueryException {
-		int start = currentRow - (int) countOfLocalStudies;
+		int start = currentRow - (int) countOfStudies;
 		buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
 		bufIndex = 0;
 	}
 
 	@Override
 	public long size() {
-		return this.countOfLocalStudies +
-			   this.countOfCentralStudies;
+		return this.countOfStudies;
 	}
 }
