@@ -571,8 +571,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
         return locationList;
     }
 
-    public Map<Integer, String> getNamesByIdsIntoMap(Collection<Integer> ids) throws MiddlewareQueryException {
-        Map<Integer, String> map = new HashMap<Integer, String>();
+    public Map<Integer, Location> getNamesByIdsIntoMap(Collection<Integer> ids) throws MiddlewareQueryException {
+        Map<Integer, Location> map = new HashMap<Integer, Location>();
         try {
             Criteria criteria = getSession().createCriteria(Location.class);
             criteria.add(Restrictions.in("locid", ids));
@@ -580,7 +580,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
             if (locations != null && !locations.isEmpty()) {
                 for (Location location : locations) {
-                    map.put(location.getLocid(), location.getLname());
+                    map.put(location.getLocid(), location);
                 }
             }
 
