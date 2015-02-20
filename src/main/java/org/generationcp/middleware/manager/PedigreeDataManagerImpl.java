@@ -111,12 +111,12 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		return 0;
 	}
 
-	private Integer getGermplasmProgenitorID(Integer gid, Integer pro_no) 
+	private Integer getGermplasmProgenitorID(Integer gid, Integer proNo) 
 			throws MiddlewareQueryException {
 		if(gid==null) {
 			return null;
 		}
-		Germplasm germplasm = getParentByGIDAndProgenitorNumber(gid,pro_no);
+		Germplasm germplasm = getParentByGIDAndProgenitorNumber(gid,proNo);
 		if(germplasm!=null) {
 			return germplasm.getGid();
 		}
@@ -133,7 +133,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
             rootNode.setGermplasm(root);
             if (level > 1) {
-                if(includeDerivativeLines == true) {
+                if(includeDerivativeLines) {
                     rootNode = addParents(rootNode, level);
                 } else {
                     rootNode = addParentsExcludeDerivativeLines(rootNode, level);
@@ -337,7 +337,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         Germplasm germplasm = germplasmDataManager.getGermplasmWithPrefName(gid);
         
         if (germplasm == null) {
-            return null;
+            return new Object[0];
         } else if (steps == 0 || germplasm.getGnpgs() != -1) {
             return new Object[] { germplasm, Integer.valueOf(steps) };
         } else {
@@ -502,8 +502,9 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * @throws MiddlewareQueryException
      */
     @Deprecated
-    private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasms, Germplasm currentGermplasm, int locationID) throws MiddlewareQueryException {
-		// get parents of node
+    private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasmsParam, Germplasm currentGermplasm, int locationID) throws MiddlewareQueryException {
+    	List<Germplasm> germplasms = germplasmsParam;
+    	// get parents of node
         if (currentGermplasm.getGnpgs() == -1) {
             // get the source germplasm
             Germplasm parent = germplasmDataManager.getGermplasmWithMethodType(currentGermplasm.getGpid2());
