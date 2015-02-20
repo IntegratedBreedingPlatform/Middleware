@@ -628,18 +628,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
         try {
     		StringBuilder sql = new StringBuilder()
-    		.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, trait.name, trait.definition, c_scale.scaleName, cr_type.object_id ") 
+    		.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, trait.name, trait.definition, c_scale.name, cr_type.object_id ") 
     		.append("FROM phenotype p ")
     		.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
     		.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
     		.append("				AND e.nd_geolocation_id IN (:environmentIds) ")
-    		.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id ")
-    		.append("	INNER JOIN  (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-    		.append("	    AND cr_scale.type_id = 1220 ")
-    		.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+    		.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
+    		.append("	LEFT JOIN cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
+    		.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
     		.append("	    AND cr_type.type_id = 1105 ")
-    		.append("INNER JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ") 
-    		.append("INNER JOIN cvterm trait ON cr_property.object_id = trait.cvterm_id ")
+    		.append("LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ") 
+    		.append("LEFT JOIN cvterm trait ON cr_property.object_id = trait.cvterm_id ")
     		;
 
     		Query query = getSession().createSQLQuery(sql.toString())

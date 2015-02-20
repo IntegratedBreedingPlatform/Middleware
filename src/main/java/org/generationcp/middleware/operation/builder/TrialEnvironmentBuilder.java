@@ -271,16 +271,17 @@ public class TrialEnvironmentBuilder extends Builder {
         
         // Step 1: Get Trial Environments for each GID
         Map<Integer, Set<Integer>> localGermplasmEnvironments = getExperimentStockDao().getEnvironmentsOfGermplasms(localGids);
-
+        
         // Step 2: Get the trial environment details
         Set<Integer> localEnvironmentIds = getEnvironmentIdsFromMap(localGermplasmEnvironments);
         Set<TrialEnvironment> localTrialEnvironmentDetails = new HashSet<TrialEnvironment>();
-        localTrialEnvironmentDetails.addAll(getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
+        localTrialEnvironmentDetails.addAll(getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));  
         
         // Step 3: Get environment traits
         List<TrialEnvironment> localTrialEnvironments = getPhenotypeDao().getEnvironmentTraits(localTrialEnvironmentDetails);
 
-        // STEP 3B: Get the trait id and name from central (ONLY FOR LOCAL)
+        //Step 3.5: Lookup central locations and traits used in local environments
+        List<Integer> locationIds = new ArrayList<Integer>();
         List<Integer> traitIds = new ArrayList<Integer>();
         
         for (TrialEnvironment env : localTrialEnvironments){
@@ -290,6 +291,15 @@ public class TrialEnvironmentBuilder extends Builder {
                     traitIds.add(trait.getId());
                 }
             }
+            LocationDto location = env.getLocation();
+			if (location != null && location.getId() > 0){
+				locationIds.add(location.getId());
+            }
+        }
+        
+        if (!locationIds.isEmpty()){
+        	setWorkingDatabase(Database.CENTRAL);
+        	getGeolocationDao().setLocationNameProvinceAndCountryForLocationsIds(localTrialEnvironments, locationIds);
         }
         
         if (traitIds.size() > 0){
