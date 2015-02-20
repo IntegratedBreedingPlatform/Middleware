@@ -13,9 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
@@ -229,7 +227,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
         List<Integer> idList = addGermplasmList(list);
-        return idList.size() > 0 ? idList.get(0) : null;
+        return !idList.isEmpty() ? idList.get(0) : null;
     }
 
     @Override
@@ -242,7 +240,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
         List<Integer> idList = updateGermplasmList(list);
-        return idList.size() > 0 ? idList.get(0) : null;
+        return !idList.isEmpty() ? idList.get(0) : null;
     }
 
     @Override
@@ -360,7 +358,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         List<GermplasmListData> list = new ArrayList<GermplasmListData>();
         list.add(germplasmListData);
         List<Integer> ids = addGermplasmListData(list);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
@@ -373,7 +371,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         List<GermplasmListData> list = new ArrayList<GermplasmListData>();
         list.add(germplasmListData);
         List<Integer> ids = updateGermplasmListData(list);
-        return ids.size() > 0 ? ids.get(0) : null;
+        return !ids.isEmpty() ? ids.get(0) : null;
     }
 
     @Override
