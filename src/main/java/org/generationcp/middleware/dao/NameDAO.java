@@ -44,6 +44,8 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 	
 	            if (status != null && status != 0) {
 	                queryString.append("AND n.nstat = :nstat ");
+	            } else {
+	            	queryString.append("AND n.nstat != 9 ");
 	            }
 	
 	            if (type != null) {

@@ -1004,5 +1004,13 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 		method.setLmid(0);
 		method.setMdate(0);
 		return method;
-	}  
+	} 
+	
+	@Test
+	public void testGetGermplasmWithMethodType() throws Exception {
+		Integer gid = 1;
+		Germplasm germplasm = manager.getGermplasmWithMethodType(gid);
+		Assert.assertNotNull("It should not be null",germplasm);
+		Assert.assertEquals("It should be equals",gid,germplasm.getGid());
+	}
 }

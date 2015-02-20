@@ -37,13 +37,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     private static final String STATUS_DELETED = "9";
 
-    @Deprecated
     @Override
     public Germplasm getById(Integer gid,  boolean lock) throws MiddlewareQueryException {
     	return getById(gid);
     }
     	
-    @Deprecated
     @Override
     public Germplasm getById(Integer gid) throws MiddlewareQueryException {
         try {
@@ -89,22 +87,24 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return 0;
     }
 
-    @Deprecated
     @SuppressWarnings("unchecked")
     public List<Germplasm> getByName(String name, Operation operation, Integer status, GermplasmNameType type, int start, int numOfRows)
             throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=grplce AND ");
+            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid " +
+            		"WHERE g.gid!=g.grplce AND g.grplce = 0 ");
 
             if (operation == null || operation == Operation.EQUAL) {
-                queryString.append("n.nval = :name ");
+                queryString.append("AND n.nval = :name ");
             } else if (operation == Operation.LIKE) {
-                queryString.append("n.nval LIKE :name ");
+                queryString.append("AND n.nval LIKE :name ");
             }
 
             if (status != null && status != 0) {
                 queryString.append("AND n.nstat = :nstat ");
+            } else {
+            	queryString.append("AND n.nstat != "+STATUS_DELETED);
             }
 
             if (type != null) {
@@ -178,7 +178,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
 	} 
 
-    @Deprecated
     @SuppressWarnings("unchecked")    
     public List<Germplasm> getByName(List<String> names, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
         try {            
@@ -190,15 +189,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                 // Search using = by default
                 SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_EQUAL);
                 if (operation == Operation.LIKE) {
-                    query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_USING_LIKE);
+                    query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_LIKE);
                 }  
                 
                 // Set the parameters
                 query.setParameter("name", originalName);
-                if (operation == Operation.EQUAL) {
-                    query.setParameter("noSpaceName", noSpaceName);
-                    query.setParameter("standardizedName", standardizedName);
-                }
+                query.setParameter("noSpaceName", noSpaceName);
+                query.setParameter("standardizedName", standardizedName);
                 
                 query.addEntity("g", Germplasm.class);
                 query.setFirstResult(start);
@@ -214,11 +211,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     }
 
 
-    @Deprecated
     public long countByName(String name, Operation operation, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT COUNT(DISTINCT n.gid) FROM names n LEFT OUTER JOIN germplsm g ON g.gid = n.gid AND g.gid!=g.grplce WHERE ");
+            queryString.append("SELECT COUNT(DISTINCT n.gid) FROM names n LEFT OUTER JOIN germplsm g ON g.gid = n.gid AND g.gid!=g.grplce AND g.grplce = 0 WHERE ");
 
             if (operation == null || operation == Operation.EQUAL) {
                 queryString.append("n.nval = :name ");
@@ -228,6 +224,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             if (status != null && status != 0) {
                 queryString.append("AND n.nstat = :nstat ");
+            } else {
+            	queryString.append("AND n.nstat != "+STATUS_DELETED);
             }
 
             if (type != null) {
@@ -253,7 +251,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return 0;
     }
     
-    @Deprecated
     public long countByName(List<String> names, Operation operation) throws MiddlewareQueryException {
         try {
             if (names != null){
@@ -264,15 +261,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                 // Count using = by default
                 SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);            
                 if (operation == Operation.LIKE) {
-                    query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_USING_LIKE);
+                    query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_LIKE);
                 } 
     
                 // Set the parameters
                 query.setParameter("name", originalName);
-                if (operation == Operation.EQUAL){
-                    query.setParameter("noSpaceName", noSpaceName);
-                    query.setParameter("standardizedName", standardizedName);
-                }
+                query.setParameter("noSpaceName", noSpaceName);
+                query.setParameter("standardizedName", standardizedName);
     
                 return ((BigInteger) query.uniqueResult()).longValue();
             }
@@ -481,7 +476,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
    }
 
-    @Deprecated
     @SuppressWarnings("unchecked")
     public List<Germplasm> getGermplasmDescendantByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -499,7 +493,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
 
-    @Deprecated
     public Germplasm getProgenitorByGID(Integer gid, Integer pro_no) throws MiddlewareQueryException {
         try {
             if (gid != null & pro_no != null){
@@ -527,7 +520,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return null;
     }
 
-    @Deprecated
     public long countGermplasmDescendantByGID(Integer gid) throws MiddlewareQueryException {
         try {
             if (gid != null){
@@ -542,7 +534,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return 0;
     }
 
-    @Deprecated
     public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         List<Germplasm> toreturn = new ArrayList<Germplasm>();
         try {
@@ -571,7 +562,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return toreturn;
     }
     
-    @Deprecated
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
         try {
             if (gid != null){
@@ -714,7 +704,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
-    @Deprecated
     @SuppressWarnings("rawtypes")
     public Germplasm getByGIDWithMethodType(Integer gid) throws MiddlewareQueryException {
         try {
@@ -810,28 +799,29 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             
             //First priority, germplasms with GID=q
             
-            SQLQuery p1_query;
-            
-            if((q.contains("%") || q.contains("_")) && o.equals(Operation.LIKE)){
-            	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE);
-            } else {
-            	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
-                p1_query.setParameter("gidLength", q.length());
+            if(q.matches("\\d+") || q.matches("-\\d+")) {
+            	SQLQuery p1_query;
+	            if((q.contains("%") || q.contains("_")) && o.equals(Operation.LIKE)){
+	            	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE);
+	            } else {
+	            	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
+	                p1_query.setParameter("gidLength", q.length());
+	            }
+	            p1_query.setParameter("gid", q);
+	            p1_query.addEntity("germplsm", Germplasm.class);
+	
+	            result.addAll(p1_query.list());
             }
-            p1_query.setParameter("gid", q);
-            p1_query.addEntity("germplsm", Germplasm.class);
-
-            result.addAll(p1_query.list());
             
             //Second priority, get germplasms with nVal like q
             SQLQuery p2_query1;
             if(o.equals(Operation.EQUAL)) {
-                    p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
+                    p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME);
                     p2_query1.setParameter("q", q);
                     p2_query1.setParameter("qNoSpaces", q.replace(" ", ""));
                     p2_query1.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
             } else {
-                    p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
+                    p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME);
                     if(q.contains("%") || q.contains("_")){
                     	p2_query1.setParameter("q", q);
                     	p2_query1.setParameter("qNoSpaces", q.replace(" ", ""));
@@ -843,54 +833,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     }
             }
             p2_query1.setParameter("deletedStatus", STATUS_DELETED);
-            List p2_result1 = p2_query1.list();
+            p2_query1.addEntity("germplsm", Germplasm.class);
+            result.addAll(p2_query1.list());
             
-            if(searchByNameInLocalDbAlso && localSession != null){
-            	SQLQuery p2_query2;
-                if(o.equals(Operation.EQUAL)) {
-                    p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
-                    p2_query2.setParameter("q", q);
-                    p2_query2.setParameter("qNoSpaces", q.replace(" ", ""));
-                    p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
-                } else {
-                	if(q.contains("%") || q.contains("_")){
-                        p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
-                        p2_query2.setParameter("q", q);
-                        p2_query2.setParameter("qNoSpaces", q.replace(" ", ""));
-                        p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
-                	} else {
-                        p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
-                        p2_query2.setParameter("q", q+"%");
-                        p2_query2.setParameter("qNoSpaces", q.replace(" ", "")+"%");
-                        p2_query2.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");                		
-                	}
-                }
-                p2_query2.setParameter("deletedStatus", STATUS_DELETED);
-                p2_result1.addAll(p2_query2.list());
-            }
-            
-            if(p2_result1.size()>0 && p2_result1.get(0)!=null){
-                SQLQuery p2_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
-                p2_query2.setParameterList("gids", p2_result1);
-                p2_query2.addEntity("germplsm", Germplasm.class);
-                List p2_query2_list = p2_query2.list();
-                for(Object g : p2_query2_list){
-                    if(!result.contains(g)) {
-                        result.add((Germplasm) g);
-                    }
-                }
-            }
-            
-            //Third priority, get germplasms in list with listname like (full text search) q
-
             //Add parents to results if specified by "includeParents" flag
             if(includeParents){
                 for(Germplasm g: result){
                     List<Integer> parentGids = new ArrayList<Integer>();
-                    if(g!=null && g.getGpid1()!=null) {
+                    if(g!=null && g.getGpid1()!=null && g.getGpid1()!=0) {
                         parentGids.add(g.getGpid1());
                     }
-                    if(g!=null && g.getGpid2()!=null) {
+                    if(g!=null && g.getGpid2()!=null && g.getGpid2()!=0) {
                         parentGids.add(g.getGpid2());
                     }
                     

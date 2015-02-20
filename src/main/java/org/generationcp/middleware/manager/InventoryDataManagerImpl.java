@@ -550,13 +550,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
     
     private List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("listid",id);
-		params.put("start",start);
-		params.put("numOfRows",numOfRows);
-		return getGermplasmListDataDAO().
-				callStoredProcedureForList("getGermplasmListDataByListId",
-						params,GermplasmListData.class);
+		return getGermplasmListDataDAO().getByListId(id, start, numOfRows);
     }
     
 	@Override
@@ -568,7 +562,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		
 		if (germplasmList.getType() != null && germplasmList.getType().equalsIgnoreCase(germplasmType)) {
 			
-			germplasmList = getGermplasmListDAO().getById(listId);
 			List<ListDataProject> listDataProjects = getListDataProjectDAO().getByListId(listId);
 			listData = new ArrayList<GermplasmListData>();
 			if (listDataProjects != null) {

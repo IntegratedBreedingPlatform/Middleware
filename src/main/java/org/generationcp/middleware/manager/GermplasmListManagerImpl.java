@@ -136,23 +136,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-    	// FIXME : doing a unique query on a table that allows duplicate rows
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("listid",id);
-		params.put("start",start);
-		params.put("numOfRows",numOfRows);
-		return getGermplasmListDataDAO().
-				callStoredProcedureForList("getGermplasmListDataByListId",
-						params,GermplasmListData.class);
+    	return getGermplasmListDataDAO().getByListId(id, start, numOfRows);
     }
 
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("id",id);
-		return getGermplasmListDataDAO().
-				callStoredProcedureForObject("countGermplasmListDataByListId",
-						params,Long.class);
+    	return getGermplasmListDataDAO().countByListId(id);
     }
     
     @Override
@@ -172,23 +161,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("listId",listId);
-		params.put("entryId",entryId);
-		return getGermplasmListDataDAO().
-				callStoredProcedureForObject("getGermplasmListDataByListIdAndEntryId",
-						params,GermplasmListData.class);
+    	return getGermplasmListDataDAO().getByListIdAndEntryId(listId, entryId);
     }
     
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("listId",listId);
-		params.put("lrecId",lrecId);
-		return getGermplasmListDataDAO().
-				callStoredProcedureForObject("getGermplasmListDataByListIdAndLrecId",
-						params,GermplasmListData.class);
-		
+    	 return getGermplasmListDataDAO().getByListIdAndLrecId(listId, lrecId);
     }
 
     @Override

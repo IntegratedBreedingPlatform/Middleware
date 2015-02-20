@@ -599,5 +599,15 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
     	Query query = session.createSQLQuery("SELECT lrstatus FROM listdata WHERE lrecid = " + id);
     	return (Integer) query.uniqueResult();
     }
+    
+    @Test
+	public void testGetGermplasmListDataByListIdAndLrecId() throws Exception {
+    	Integer listId = 1;
+    	Integer lrecId = 1;
+    	GermplasmListData data = manager.getGermplasmListDataByListIdAndLrecId(listId, lrecId);
+    	Assert.assertNotNull("It should not be null",data);
+    	Assert.assertEquals("It should be equal", listId, data.getList().getId());
+    	Assert.assertEquals("It should be equal", lrecId, data.getId());
+	}
 
 }
