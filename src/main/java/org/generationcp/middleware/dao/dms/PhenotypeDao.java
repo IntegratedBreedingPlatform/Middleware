@@ -96,7 +96,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             
             List<Object[]> list = new ArrayList<Object[]>();
             
-            if(environmentIds.size()>0 && numericVariableIds.size()>0){
+            if(!environmentIds.isEmpty() && !numericVariableIds.isEmpty()){
             	list = query.list();
             	
             	for (Object[] row : list){
@@ -143,7 +143,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && variableIds.size()>0) {
+            if(!environmentIds.isEmpty() && !variableIds.isEmpty()) {
                 list = query.list();
             }
               
@@ -270,7 +270,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0) {
+            if(!environmentIds.isEmpty()) {
                 list = query.list();
             }
 
@@ -324,7 +324,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && environmentIds.size()>0) {
+            if(!environmentIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -380,7 +380,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(traitIds.size()>0) {
+            if(!traitIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -451,7 +451,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && traitIds.size()>0) {
+            if(!environmentIds.isEmpty() && !traitIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -491,7 +491,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && traitIds.size()>0) {
+            if(!environmentIds.isEmpty() && !traitIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -616,7 +616,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
     public List<TrialEnvironment> getEnvironmentTraits(Set<TrialEnvironment> trialEnvironments) throws MiddlewareQueryException {
         List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
         
-        if (trialEnvironments.size() == 0){
+        if (trialEnvironments.isEmpty()){
             return environmentDetails;
         }
         List<Integer> environmentIds = new ArrayList<Integer>();
@@ -785,7 +785,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			this.flush();
 			
-			if (cvTermIds.size() == 0) {
+			if (cvTermIds.isEmpty()) {
                 return new ArrayList<Object[]>();
             }
 			
@@ -918,8 +918,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			criteria.add(Restrictions.eq("observableId", typeId));
 			if (isEnumeration) {
                 criteria.add(Restrictions.eq("cValueId", Integer.parseInt(value)));
-			}
-			else {
+			} else {
 				criteria.add(Restrictions.eq("value", value));
 			}
 			return criteria.list();
@@ -1029,7 +1028,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		
 		SQLQuery query = getSession().createSQLQuery(sql.toString());
 		
-		if (query.list().size() > 0){
+		if (!query.list().isEmpty()){
 			return true;
 		}else{
 			return false;

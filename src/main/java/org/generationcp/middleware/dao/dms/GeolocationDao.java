@@ -113,7 +113,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			Query query = getSession().createSQLQuery(sql)
 								.setParameter("description", description);
 			List<Integer> ids = query.list();
-			if (ids.size() >= 1) {
+			if (!ids.isEmpty()) {
 				return getById(ids.get(0));
 			}
 						
@@ -156,11 +156,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.addScalar("description");
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
+				//otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5], (String) row[7])));
-				} //otherwise it's invalid data and should not be included
+				} 
 			}
 			
 		} catch(HibernateException e) {
@@ -185,11 +186,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			setStartAndNumOfRows(query, start, numOfRows);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
+				//otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5], (String) row[7])));
-				} //otherwise it's invalid data and should not be included
+				} 
 			}
 			
 		} catch(HibernateException e) {
@@ -272,7 +274,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
     public List<TrialEnvironment> getTrialEnvironmentDetails(Set<Integer> environmentIds) throws MiddlewareQueryException {
         List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
         
-        if (environmentIds.size() == 0){
+        if (environmentIds.isEmpty()){
             return environmentDetails;
         }
 
@@ -341,7 +343,6 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		        + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
 		        + "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
 		        + " WHERE l.locid in (:locationIds)";
-		        ;        
         SQLQuery query = getSession().createSQLQuery(sql);
         query.setParameterList("locationIds", locationIds);
 		query.addScalar("locid", Hibernate.INTEGER);
@@ -401,11 +402,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.setParameterList("traitIds", traitIds);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
+				//otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5])));
-				} //otherwise it's invalid data and should not be included
+				} 
 			}
 			
 		} catch(HibernateException e) {
@@ -422,7 +424,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id "
 					+ "   and ep.project_id = pr.subject_project_id "
 					+ "   and pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()  
-					+ "   and pr.object_project_id = p.project_id "//link to the dataset instead
+					//link to the dataset instead
+					+ "   and pr.object_project_id = p.project_id "
 					+ "   and e.nd_geolocation_id = g.nd_geolocation_id "
 					+ "   and p.name = :projectName"  
 					+ "   and g.description = :locationDescription";
