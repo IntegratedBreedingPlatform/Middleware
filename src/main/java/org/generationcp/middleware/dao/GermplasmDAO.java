@@ -817,7 +817,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                         parentGids.add(g.getGpid2());
                     }
                     
-                    if(parentGids.isEmpty()){
+                    if(!parentGids.isEmpty()){
                         SQLQuery pQuery = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
                         pQuery.setParameterList("gids", parentGids);
                         pQuery.addEntity("germplsm", Germplasm.class);
