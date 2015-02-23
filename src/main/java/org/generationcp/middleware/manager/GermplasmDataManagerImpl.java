@@ -171,9 +171,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-		List<String> methods = Arrays.asList("countByName", "getByName");
-        return (List<Germplasm>) getFromCentralAndLocalByMethod(getGermplasmDao(), methods, start, numOfRows, new Object[] { names, op },
-                new Class[] { List.class, Operation.class });
+		return getGermplasmDao().getByName(names,op,start,numOfRows);
     }
 
     @Override

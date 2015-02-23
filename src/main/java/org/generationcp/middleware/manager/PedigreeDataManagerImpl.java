@@ -75,7 +75,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		if(parentGermplasm!=null) {
 			Integer numOfPedigree = getPedigreeLevelCount(parentGermplasm.getGid(),includeDerivativeLine);
 			if(numOfPedigree>maxPedigreeLevel) {
-				return maxPedigreeLevel;
+				return numOfPedigree;
 			}
 		}
 		return maxPedigreeLevel;
