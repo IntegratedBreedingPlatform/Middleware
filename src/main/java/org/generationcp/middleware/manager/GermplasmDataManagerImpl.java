@@ -149,18 +149,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
-    public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[] { name, start,
-                numOfRows }, new Class[] { String.class, Integer.TYPE, Integer.TYPE });
-    }
-
-    @Override
-    public long countGermplasmByPrefName(String name) throws MiddlewareQueryException {
-        return super.countAllByMethod(getGermplasmDao(), "countByPrefName", new Object[] { name },
-                new Class[] { String.class });
-    }
-
-    @Override
     public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, GetGermplasmByNameModes mode, Operation op,
             Integer status, GermplasmNameType type, Database instance) throws MiddlewareQueryException {
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);

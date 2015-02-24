@@ -724,14 +724,6 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         assertTrue(!results.isEmpty());
         Debug.printObjects(INDENT, results);
     }
-    
-    @Test
-    public void testCountGermplasmByPrefName() throws Exception {
-        String name = "CHALIMBANA"; //change nval
-        long count = manager.countGermplasmByPrefName(name);
-        assertNotNull(count);
-        Debug.println(INDENT, "testCountGermplasmByPrefName("+name+"): " + count);
-    }
 
     @Test
     public void testGetAllGermplasm() throws Exception {

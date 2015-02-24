@@ -407,30 +407,6 @@ public interface GermplasmDataManager {
 
     
     /**
-     * Retrieves all the Germplasm entries from the given database instance matching the given preferred name.
-     *
-     * @param name - the preferred name to match
-     * @param start - the starting index of the sublist of results to be returned
-     * @param numOfRows - the number of rows to be included in the sublist of results
-     * to be returned
-     * @param instance - can be Database.CENTRAL or Database.LOCAL
-     * @return All the germplasms from the database instance satisfying the given preferred name
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
-
-
-    /**
-     * Counts all the Germplasm entries from central and local database instances matching the given preferred name.
-     *
-     * @param name - the preferred name to match
-     * @return The number of germplasms from the satisfying the given preferred name
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    long countGermplasmByPrefName(String name) throws MiddlewareQueryException;
-
-    
-    /**
      * Returns the germplasm records that were created by the methods with names
      * matching the given parameter.
      *
