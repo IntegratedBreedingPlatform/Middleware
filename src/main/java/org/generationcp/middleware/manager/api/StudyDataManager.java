@@ -26,7 +26,6 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 
 import java.util.List;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets
  * from the CHADO schema.
@@ -805,4 +804,12 @@ public interface StudyDataManager{
 
 	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId,
 			int start, int numRows) throws MiddlewareQueryException;
+	
+	/**
+	 * Updates the rank or order of given variables as they ordered in the given list
+	 * 
+	 * @param datasetId - project Id of
+	 * @param variableIds - list of variable IDs in the order that they will be saved
+	 */
+	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException;
 }

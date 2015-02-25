@@ -86,7 +86,7 @@ public abstract class Service extends DatabaseBroker {
         return new UserDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
-    protected final WorkbookBuilder getWorkbookBuilder() {
+    protected WorkbookBuilder getWorkbookBuilder() {
         return new WorkbookBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
@@ -126,7 +126,7 @@ public abstract class Service extends DatabaseBroker {
 	    return new MeasurementVariableTransformer(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-    protected final DataSetBuilder getDataSetBuilder() {
+    protected DataSetBuilder getDataSetBuilder() {
     	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     

@@ -294,7 +294,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+            throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
         }
     }
     
@@ -318,7 +318,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
           } catch (Exception e) {
               rollbackTransaction(trans);
-              throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+              throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
           }
 		
 	}
@@ -607,7 +607,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                                 try {
                                     pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
                                 } catch (MiddlewareQueryException e) {
-                                    //do nothing
+                                   LOG.error("Error in getting pedigree", e);
                                 }
 
                                 label.setPedigree(pedigree);
@@ -640,8 +640,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
                 if (isNew) {
                     getLocdesSaver().saveLocationDescriptions(info, userId);
-                }
-                else {
+                } else {
 	                getLocdesSaver().updateDeletedPlots(info, userId);
                 }
                 getGeolocationPropertySaver().saveFieldmapProperties(info);
@@ -681,7 +680,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                             project.getProjectId(), locationId);
                 }
                 for (ExperimentValues exp : experimentValues) {
-                    if (exp.getVariableList() != null && exp.getVariableList().size() > 0) {
+                    if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
                         ExperimentModel experimentModel = getExperimentDao()
                                 .getExperimentByProjectIdAndLocation(
                                         project.getProjectId(), exp.getLocationId());
@@ -726,7 +725,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                                 try {
                                     pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
                                 } catch (MiddlewareQueryException e) {
-                                    //do nothing
+                                    LOG.error("Error in getting pedigree", e);
                                 }
 
                                 label.setPedigree(pedigree);
@@ -1129,16 +1128,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    		if (detail.getSiteId() != null) {
 	    			if (detail.getSiteId() > 0) {
 	    				centralSite.add(detail.getSiteId());
-	    			}
-	    			else {
+	    			} else {
 	    				localSite.add(detail.getSiteId());
 	    			}
 	    		}
 	    		if (detail.getPiId() != null) {
 	    			if (detail.getPiId() > 0) {
 	    				centralPerson.add(detail.getPiId());
-	    			}
-	    			else {
+	    			} else {
 	    				localPerson.add(detail.getPiId());
 	    			}
 	    		}
@@ -1282,8 +1279,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             		 phenotypeOutlier.setPhenotypeOutlierId(phenotypeOutlierDao.getNegativeId("phenotypeOutlierId"));
             		 phenotypeOutlierDao.saveOrUpdate(phenotypeOutlier);
             	 }
-            	 
-            	 if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ // batch save
+            	// batch save
+            	 if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ 
             		 phenotypeOutlierDao.flush();
             		 phenotypeOutlierDao.clear();
                  }
@@ -1320,5 +1317,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyType getStudyType(int studyId) throws MiddlewareQueryException {
 		setWorkingDatabase(studyId);
 		return getDmsProjectDao().getStudyType(studyId);
+	}
+
+	@Override
+	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getProjectPropertySaver().updateVariablesRanking(datasetId, variableIds);
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
+        }
+		
 	}
 }

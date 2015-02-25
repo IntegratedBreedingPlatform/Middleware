@@ -528,7 +528,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             parentIds.add(location.getParentLocationId());
         }
 
-        Map<Integer, String> namesMap = new HashMap<Integer, String>();
+        Map<Integer, Location> namesMap = new HashMap<Integer, Location>();
         if (!parentIds.isEmpty()) {
             setWorkingDatabase(Database.LOCAL);
             namesMap.putAll(getLocationDao().getNamesByIdsIntoMap(parentIds));
@@ -537,7 +537,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
         }
 
         for (Location location : locations) {
-            location.setParentLocationName(namesMap.get(location.getParentLocationId()));
+        	Location tempParent = namesMap.get(location.getParentLocationId());
+            location.setParentLocationName(tempParent.getLname());
+            location.setParentLocationAbbr(tempParent.getLabbr());
         }
 
         return locations;

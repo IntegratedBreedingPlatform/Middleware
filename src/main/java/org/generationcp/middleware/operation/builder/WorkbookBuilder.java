@@ -215,7 +215,8 @@ public class WorkbookBuilder extends Builder {
                     }
                 }
 	        }
-		
+
+		workbook.setStudyId(id);
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
 		workbook.setVariates(variates);
