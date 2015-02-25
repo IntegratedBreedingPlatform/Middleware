@@ -787,7 +787,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 				
 				for (Location location: locations){
 					if (detail.getLocationId() != null && detail.getLocationId().equals(location.getLocid())){
+                        // in preparation for BMS-143 (use abbreviation when exporting inventory details of advance list
 						detail.setLocationName(location.getLname());
+                        detail.setLocationAbbr(location.getLabbr());
 						break;
 					}
 				}
