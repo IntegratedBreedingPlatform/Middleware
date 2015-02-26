@@ -116,6 +116,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         projectUserMysqlAccountDAO.setSession(getCurrentSession());
         return projectUserMysqlAccountDAO;
     }
+
     private ProjectDAO getProjectDao() {
         if (projectDao == null){
             projectDao = new ProjectDAO();
@@ -132,7 +133,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return projectUserMysqlAccountDao;
     }
     
-    
     @Override
     public ProjectUserInfoDAO getProjectUserInfoDao() {
         if (projectUserInfoDao == null){
@@ -141,8 +141,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         projectUserInfoDao.setSession(getCurrentSession());
         return projectUserInfoDao;
     }
-    
-    
     
     public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException
     {
@@ -258,7 +256,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return projectBackupDao;
     }
 
-
     private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
         if (workbenchSidebarCategoryDAO == null){
             workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
@@ -293,7 +290,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return standardPresetDAO;
 	}
 
-
     private void rollbackTransaction(Transaction trans){
         if (trans != null){
             trans.rollback();
@@ -308,8 +304,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private void logAndThrowException(String message) throws MiddlewareQueryException{
         LOG.error(message);
         throw new MiddlewareQueryException(message);
-    }
-    
+    }    
 
     @Override
     public List<Project> getProjects() throws MiddlewareQueryException {
@@ -421,15 +416,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                 deleteProjectUserRole(projectUser);
             }
            
- 	    List<ProjectUserMysqlAccount> mysqlaccounts = getProjectUserMysqlAccountDAO().getByProjectId(project.getProjectId().intValue());
+ 	    	List<ProjectUserMysqlAccount> mysqlaccounts = getProjectUserMysqlAccountDAO().getByProjectId(project.getProjectId().intValue());
             if(mysqlaccounts != null) {
                 for (ProjectUserMysqlAccount mysqlaccount : mysqlaccounts) {
                     deleteProjectUserMysqlAccount(mysqlaccount);
                 }
             }
-           
-            		
-           
             
             List<WorkbenchDataset> datasets = getWorkbenchDatasetByProjectId(projectId, 0,
                     (int) countWorkbenchDatasetByProjectId(projectId));
@@ -440,8 +432,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             List<ProjectUserInfo> projectUserInfos = getByProjectId(projectId.intValue());
             for (ProjectUserInfo projectUserInfo : projectUserInfos) {
             	deleteProjectUserInfoDao(projectUserInfo);
-            } 
-            
+            }
             
             List<ProjectBackup> projectBackups = getProjectBackups(project);
             for (ProjectBackup projectBackup : projectBackups) {
@@ -462,14 +453,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             	deleteTemplateSetting(templateSetting);
             }
             
-    	}catch (Exception e) {
+    	} catch (Exception e) {
               
                 logAndThrowException("Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): "
                         + e.getMessage(), e);
             }
     }
-    public void deleteIbdbProjectBackup(IbdbUserMap ibdbUserMap) throws MiddlewareQueryException
-    {
+
+    public void deleteIbdbProjectBackup(IbdbUserMap ibdbUserMap) throws MiddlewareQueryException {
     	Session session = getCurrentSession();
         Transaction trans = null;
         try{
@@ -483,13 +474,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                     + e.getMessage(), e);
         }
     }
-    public List<IbdbUserMap> getIbdbUserMapsByProjectId(Long projectId) throws MiddlewareQueryException
-    {
+	
+    public List<IbdbUserMap> getIbdbUserMapsByProjectId(Long projectId) throws MiddlewareQueryException {
     	return getIbdbUserMapDao().getIbdbUserMapByID(projectId);
     }
     
-    public void deleteProjectUserInfoDao(ProjectUserInfo projectUserInfo)  throws MiddlewareQueryException
-    {
+    public void deleteProjectUserInfoDao(ProjectUserInfo projectUserInfo)  throws MiddlewareQueryException {
     	Session session = getCurrentSession();
         Transaction trans = null;
         try{
@@ -503,8 +493,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                     + e.getMessage(), e);
         }
     }
-    public void deleteProjectUserMysqlAccount(ProjectUserMysqlAccount mysqlaccount) throws MiddlewareQueryException
-    {
+
+    public void deleteProjectUserMysqlAccount(ProjectUserMysqlAccount mysqlaccount) throws MiddlewareQueryException {
     	Session session = getCurrentSession();
         Transaction trans = null;
         try{
@@ -518,6 +508,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                     + e.getMessage(), e);
         }
     }
+
     @Override
     public void deleteProject(Project project) throws MiddlewareQueryException {
         Transaction trans = null;
@@ -662,7 +653,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public Project getProjectByName(String projectName) throws MiddlewareQueryException{
         return getProjectDao().getByName(projectName);
     }
-
 
     public Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException {
         Session session = getCurrentSession();
@@ -1103,6 +1093,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return userMap.getIbdbUserId();
     }
     
+    @Override
+	public Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId)
+		throws MiddlewareQueryException {
+		Integer ibdbUserId = null;
+		IbdbUserMap userMapEntry = this.getIbdbUserMap(workbenchUserId, projectId);
+		if (userMapEntry != null) {
+			ibdbUserId = userMapEntry.getIbdbUserId();
+		}
+		return ibdbUserId;
+	}
     
     @Override
     public IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException {

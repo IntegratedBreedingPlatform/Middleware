@@ -55,20 +55,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationType;
-import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.LocdesType;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -82,6 +69,10 @@ import java.util.Map.Entry;
 public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
+
+    public FieldbookServiceImpl() {
+        super();
+    }
 	
     public FieldbookServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
         super(sessionProvider, localDatabaseName);
@@ -226,12 +217,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
 	@Override
     public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
-        return getWorkbookBuilder().create(id, StudyType.N);
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.N);   
+        setOrderVariableByRank(workbook);
+        return workbook;
     }
 
 	@Override
     public Workbook getTrialDataSet(int id) throws MiddlewareQueryException {
-        return getWorkbookBuilder().create(id, StudyType.T);
+        Workbook workbook = getWorkbookBuilder().create(id, StudyType.T);
+        setOrderVariableByRank(workbook);
+        return workbook;
     }
 
 	@SuppressWarnings("unchecked")
@@ -1047,7 +1042,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     @Override
 	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
-		return getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
+		Workbook workbook = getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
+		setOrderVariableByRank(workbook, datasetId);
+		return workbook;
 	}
 	
 	@Override
@@ -1202,5 +1199,36 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		
 	}
 	
-	 
+	@Override
+	public void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)
+			throws MiddlewareQueryException {
+		Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
+		getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
+	}
+
+	public boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException {
+		if(workbook != null){
+			Integer studyId = workbook.getStudyDetails().getId(); 
+			String studyName = workbook.getStudyDetails().getStudyName();
+			if(studyId != null){
+				Integer plotDatasetId = getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);				
+				this.setOrderVariableByRank(workbook, plotDatasetId);
+			}
+			return true;
+		}
+		return false;
+	}
+	public boolean setOrderVariableByRank(Workbook workbook, Integer plotDatasetId) throws MiddlewareQueryException {
+		if(workbook != null){			
+				List<Integer> storedInIds = new ArrayList<Integer>();
+				storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+				storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());				  
+				workbook.setColumnOrderedLists(getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));			
+			return true;
+		}
+		return false;
+	}
+	
 }

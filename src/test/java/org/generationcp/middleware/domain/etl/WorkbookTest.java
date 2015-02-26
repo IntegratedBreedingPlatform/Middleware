@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import junit.framework.Assert;
+
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -25,6 +27,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
+import org.junit.Test;
 
 public class WorkbookTest {
 	
@@ -559,5 +562,59 @@ public class WorkbookTest {
 			}
 		}
 	}
-
+	
+	private MeasurementVariable createMeasurementVariable(Integer termId){
+		MeasurementVariable var = new MeasurementVariable();
+		var.setTermId(termId);
+		return var;
+	}
+	@Test
+	public void testArrangeMeasurementVariables(){
+		Workbook workbook = new Workbook();
+		List<MeasurementVariable> varList = new ArrayList<MeasurementVariable>();
+		varList.add(createMeasurementVariable(10));
+		varList.add(createMeasurementVariable(20));
+		varList.add(createMeasurementVariable(30));
+		List<Integer> columnOrderedList = new ArrayList<Integer>();
+		columnOrderedList.add(new Integer(20));
+		columnOrderedList.add(new Integer(30));
+		columnOrderedList.add(new Integer(10));
+		workbook.setColumnOrderedLists(columnOrderedList);
+		varList = workbook.arrangeMeasurementVariables(varList);
+		
+		Assert.assertEquals("1st element should have term id 20", 20, varList.get(0).getTermId());
+		Assert.assertEquals("2nd element should have term id 30", 30, varList.get(1).getTermId());
+		Assert.assertEquals("3rd element should have term id 10", 10, varList.get(2).getTermId());
+	}
+	
+	private MeasurementData createMeasurementData(int termId){
+		MeasurementData data = new MeasurementData();
+		MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(termId);
+		data.setMeasurementVariable(measurementVariable);
+		return data;
+	}
+	@Test
+	public void testArrangeMeasurementObservation(){
+		Workbook workbook = new Workbook();
+		List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		MeasurementRow row = new MeasurementRow();
+		List<MeasurementData> dataList = new ArrayList<MeasurementData>();		
+		dataList.add(createMeasurementData(10));
+		dataList.add(createMeasurementData(20));
+		dataList.add(createMeasurementData(30));
+		row.setDataList(dataList);
+		observations.add(row);
+		
+		List<Integer> columnOrderedList = new ArrayList<Integer>();
+		columnOrderedList.add(new Integer(20));
+		columnOrderedList.add(new Integer(30));
+		columnOrderedList.add(new Integer(10));
+		workbook.setColumnOrderedLists(columnOrderedList);
+		List<MeasurementRow> newObservations = workbook.arrangeMeasurementObservation(observations);
+		
+		Assert.assertEquals("1st element should have term id 20", 20, newObservations.get(0).getDataList().get(0).getMeasurementVariable().getTermId());
+		Assert.assertEquals("1st element should have term id 30", 30, newObservations.get(0).getDataList().get(1).getMeasurementVariable().getTermId());
+		Assert.assertEquals("1st element should have term id 10", 10, newObservations.get(0).getDataList().get(2).getMeasurementVariable().getTermId());
+	}
 }

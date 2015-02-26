@@ -75,6 +75,7 @@ public class Workbook {
 	private Integer importType;
 	private List<StandardVariable> expDesignVariables;
 	private boolean hasExistingDataOverwrite;
+	private List<Integer> columnOrderedLists;
 	
 	public void reset() {
 		trialHeaders = null;
@@ -176,7 +177,67 @@ public class Workbook {
 			    measurementDatasetVariables.addAll(variates);
 			}
 		}
+		measurementDatasetVariables = arrangeMeasurementVariables(measurementDatasetVariables);
 		return measurementDatasetVariables;
+	}
+	
+	public List<MeasurementRow> arrangeMeasurementObservation(List<MeasurementRow> observations){
+		
+		if(columnOrderedLists != null && !columnOrderedLists.isEmpty()){		
+			for(MeasurementRow row : observations){
+				//we need to arrange each data list
+				List<MeasurementData> measureDataList = row.getDataList();
+				List<MeasurementData> newMeasureData = new ArrayList<MeasurementData>();
+				for(Integer termId : columnOrderedLists){
+					int index = 0;
+					boolean isFound = false;
+					for(index = 0 ; index < measureDataList.size() ; index++){
+						MeasurementData measurementData = measureDataList.get(index);
+						if(termId.intValue() == measurementData.getMeasurementVariable().getTermId()){
+							newMeasureData.add(measurementData);
+							isFound = true;
+							break;
+						}
+					}
+					if(isFound){
+						//we remove it from the list
+						measureDataList.remove(index);
+					}
+				}
+				newMeasureData.addAll(measureDataList);
+				row.setDataList(newMeasureData);
+			}
+		}
+		return observations;
+	}
+	
+	public List<MeasurementVariable> arrangeMeasurementVariables(List<MeasurementVariable> varList){
+		List<MeasurementVariable> tempVarList = new ArrayList<MeasurementVariable>();
+		List<MeasurementVariable> copyVarList = new ArrayList<MeasurementVariable>();
+		copyVarList.addAll(varList);
+		if(columnOrderedLists != null && !columnOrderedLists.isEmpty()){
+			//we order the list based on column orders
+			for(Integer termId : columnOrderedLists){
+				int index = 0;
+				boolean isFound = false;
+				for(index = 0 ; index < copyVarList.size() ; index++){
+					MeasurementVariable measurementVar = copyVarList.get(index);
+					if(termId.intValue() == measurementVar.getTermId()){
+						tempVarList.add(measurementVar);
+						isFound = true;
+						break;
+					}
+				}
+				if(isFound){
+					//we remove it from the list
+					copyVarList.remove(index);
+				}
+			}
+			//we join the new list with the remaining items
+			tempVarList.addAll(copyVarList);
+			return tempVarList;
+		}
+		return varList;
 	}
 	
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
@@ -196,6 +257,7 @@ public class Workbook {
             }
 		}
 		list.addAll(getMeasurementDatasetVariables());
+		list = arrangeMeasurementVariables(list);
 		return list;
 	}
 
@@ -938,6 +1000,14 @@ public class Workbook {
 
 	public void setHasExistingDataOverwrite(boolean hasExistingDataOverwrite) {
 		this.hasExistingDataOverwrite = hasExistingDataOverwrite;
+	}
+
+	public List<Integer> getColumnOrderedLists() {
+		return columnOrderedLists;
+	}
+
+	public void setColumnOrderedLists(List<Integer> columnOrderedLists) {
+		this.columnOrderedLists = columnOrderedLists;
 	}
 	
 }

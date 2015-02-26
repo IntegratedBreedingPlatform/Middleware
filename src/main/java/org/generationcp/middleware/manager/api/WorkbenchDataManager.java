@@ -641,7 +641,10 @@ public interface WorkbenchDataManager {
      */
     Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
     
-    /**
+    Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId)
+			throws MiddlewareQueryException;
+
+	/**
      * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
      *
      * @param workbenchUserId - the specified Workbench User ID
@@ -649,9 +652,8 @@ public interface WorkbenchDataManager {
      * @return Returns the IbdbUserMap object associated with the specified Workbench User ID and Project ID.
      * Returns null when there is no IbdbUserMap matching the specified Workbench User ID and Project ID.
      * @throws MiddlewareQueryException the middleware query exception
-     */
-    IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException;
-    
+	 */
+    IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException;   
     
     /**
      * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
@@ -879,8 +881,7 @@ public interface WorkbenchDataManager {
      * @return the all workbench sidebar links by category id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category) throws MiddlewareQueryException;
-    
+    List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category) throws MiddlewareQueryException;   
     
     /**
      * Returns the correspoding workbench user id.
@@ -891,8 +892,7 @@ public interface WorkbenchDataManager {
      * Returns null when there is no IBDB User ID matching the specified Workbench User ID and Project ID.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
-    
+    Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;  
     
     /**
      * Gets the template settings.
@@ -941,6 +941,7 @@ public interface WorkbenchDataManager {
      * @return the last Project opened by the given user
      * @throws MiddlewareQueryException the middleware query exception
      */
+
 	Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException;
 
 	/**

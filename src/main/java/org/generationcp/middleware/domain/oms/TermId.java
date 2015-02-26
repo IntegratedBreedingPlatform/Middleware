@@ -245,6 +245,8 @@ public enum TermId {
     , CHECK_START (8411)
     , CHECK_INTERVAL (8412)
     , CHECK_PLAN (8413)
+    
+    , ENTRY_TYPE(8255)
 ;
 	
 	private final int id;

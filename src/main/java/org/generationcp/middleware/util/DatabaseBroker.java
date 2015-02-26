@@ -11,7 +11,25 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
-import org.generationcp.middleware.dao.*;
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.BreedersQueryDao;
+import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.ListDataProjectDAO;
+import org.generationcp.middleware.dao.ListDataPropertyDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.LocdesDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.ProgramPresetDAO;
+import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
@@ -83,7 +101,13 @@ public class DatabaseBroker {
 
     protected static final int JDBC_BATCH_SIZE = 50;
   
-    protected DatabaseBroker() {
+   // PresetDataManager DAO
+    private ProgramPresetDAO programPresetDAO;
+    
+    //StudyDataManager DAO
+    private ProjectPropertyDao projectPropertyDao;
+
+    protected DatabaseBroker(){
     	
     }
 
@@ -226,8 +250,10 @@ public class DatabaseBroker {
     	return experimentProjectDao;
     }
     
-    protected final ProjectPropertyDao getProjectPropertyDao() {
-    	ProjectPropertyDao projectPropertyDao = new ProjectPropertyDao();
+    public ProjectPropertyDao getProjectPropertyDao() {
+    	 if (projectPropertyDao == null) {
+             projectPropertyDao = new ProjectPropertyDao();
+         }
 		projectPropertyDao.setSession(getActiveSession());
 		return projectPropertyDao;
 	}
@@ -568,4 +594,9 @@ public class DatabaseBroker {
     		this.sessionProvider.getSession().flush();
     	}
     }
+	
+	public void setProjectPropertyDao(ProjectPropertyDao projectPropertyDao){
+		this.projectPropertyDao = projectPropertyDao;
+	}
+	
 }

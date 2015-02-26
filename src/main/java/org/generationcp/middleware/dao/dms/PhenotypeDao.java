@@ -96,7 +96,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             
             List<Object[]> list = new ArrayList<Object[]>();
             
-            if(environmentIds.size()>0 && numericVariableIds.size()>0){
+            if(!environmentIds.isEmpty() && !numericVariableIds.isEmpty()){
             	list = query.list();
             	
             	for (Object[] row : list){
@@ -143,7 +143,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && variableIds.size()>0) {
+            if(!environmentIds.isEmpty() && !variableIds.isEmpty()) {
                 list = query.list();
             }
               
@@ -270,7 +270,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0) {
+            if(!environmentIds.isEmpty()) {
                 list = query.list();
             }
 
@@ -324,7 +324,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && environmentIds.size()>0) {
+            if(!environmentIds.isEmpty() && !traitIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -380,7 +380,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(traitIds.size()>0) {
+            if(!traitIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -451,7 +451,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && traitIds.size()>0) {
+            if(!environmentIds.isEmpty() && !traitIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -491,7 +491,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(environmentIds.size()>0 && traitIds.size()>0) {
+            if(!environmentIds.isEmpty() && !traitIds.isEmpty()) {
                 list = query.list();
             }
             
@@ -616,7 +616,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
     public List<TrialEnvironment> getEnvironmentTraits(Set<TrialEnvironment> trialEnvironments) throws MiddlewareQueryException {
         List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
         
-        if (trialEnvironments.size() == 0){
+        if (trialEnvironments.isEmpty()){
             return environmentDetails;
         }
         List<Integer> environmentIds = new ArrayList<Integer>();
@@ -628,18 +628,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
         try {
     		StringBuilder sql = new StringBuilder()
-    		.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, trait.name, trait.definition, c_scale.scaleName, cr_type.object_id ") 
+    		.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, trait.name, trait.definition, c_scale.name, cr_type.object_id ") 
     		.append("FROM phenotype p ")
     		.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
     		.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
     		.append("				AND e.nd_geolocation_id IN (:environmentIds) ")
-    		.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id ")
-    		.append("	INNER JOIN  (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-    		.append("	    AND cr_scale.type_id = 1220 ")
-    		.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+    		.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
+    		.append("	LEFT JOIN cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
+    		.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
     		.append("	    AND cr_type.type_id = 1105 ")
-    		.append("INNER JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ") 
-    		.append("INNER JOIN cvterm trait ON cr_property.object_id = trait.cvterm_id ")
+    		.append("LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ") 
+    		.append("LEFT JOIN cvterm trait ON cr_property.object_id = trait.cvterm_id ")
     		;
 
     		Query query = getSession().createSQLQuery(sql.toString())
@@ -786,7 +785,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			this.flush();
 			
-			if (cvTermIds.size() == 0) {
+			if (cvTermIds.isEmpty()) {
                 return new ArrayList<Object[]>();
             }
 			
@@ -919,8 +918,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			criteria.add(Restrictions.eq("observableId", typeId));
 			if (isEnumeration) {
                 criteria.add(Restrictions.eq("cValueId", Integer.parseInt(value)));
-			}
-			else {
+			} else {
 				criteria.add(Restrictions.eq("value", value));
 			}
 			return criteria.list();
@@ -1030,7 +1028,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		
 		SQLQuery query = getSession().createSQLQuery(sql.toString());
 		
-		if (query.list().size() > 0){
+		if (!query.list().isEmpty()){
 			return true;
 		}else{
 			return false;

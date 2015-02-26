@@ -1107,7 +1107,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             		 phenotypeOutlier.setPhenotypeOutlierId(phenotypeOutlierDao.getNextId("phenotypeOutlierId"));
             		 phenotypeOutlierDao.saveOrUpdate(phenotypeOutlier);
             	 }
-            	 
             	 if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ 
             		 // batch save
             		 phenotypeOutlierDao.flush();
@@ -1162,6 +1161,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
              rollbackTransaction(trans);
              logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
         }
-        
+	}
+
+	@Override
+	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getProjectPropertySaver().updateVariablesRanking(datasetId, variableIds);
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
+        }
 	}
 }

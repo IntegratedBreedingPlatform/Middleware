@@ -86,20 +86,15 @@ public class TrialEnvironmentBuilder extends Builder {
 		int storedInId = variableType.getStandardVariable().getStoredIn().getId();
 		if (storedInId == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
 			value = location.getDescription();
-		}
-		else if (storedInId == TermId.LATITUDE_STORAGE.getId()) {
+		} else if (storedInId == TermId.LATITUDE_STORAGE.getId()) {
 			value = location.getLatitude() == null ? null : Double.toString(location.getLatitude());
-		}
-		else if (storedInId == TermId.LONGITUDE_STORAGE.getId()) {
+		} else if (storedInId == TermId.LONGITUDE_STORAGE.getId()) {
 			value = location.getLongitude() == null ? null : Double.toString(location.getLongitude());
-		}
-	    else if (storedInId == TermId.DATUM_STORAGE.getId()) {
+		} else if (storedInId == TermId.DATUM_STORAGE.getId()) {
 	    	value = location.getGeodeticDatum();
-	    }
-		else if (storedInId == TermId.ALTITUDE_STORAGE.getId()) {
+	    } else if (storedInId == TermId.ALTITUDE_STORAGE.getId()) {
 			value = location.getAltitude() == null ? null : Double.toString(location.getAltitude());
-		}
-		else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		} else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			value = getPropertyValue(variableType.getId(), location.getProperties());
 		}
 		return value;
@@ -171,7 +166,7 @@ public class TrialEnvironmentBuilder extends Builder {
 	                        if (index > -1){
 	                            TrialEnvironment newEnv = trialEnvironments.get(index);
 	                            // If the environment has no traits, do not include in the list of common environments
-	                            if (newEnv != null && newEnv.getTraits() != null && newEnv.getTraits().size() > 0){ 
+	                            if (newEnv != null && newEnv.getTraits() != null && !newEnv.getTraits().isEmpty()){ 
 	                                environments.add(newEnv);
 	                            }
 	                        }
