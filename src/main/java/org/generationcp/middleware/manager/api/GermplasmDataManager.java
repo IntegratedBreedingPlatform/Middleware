@@ -1465,4 +1465,13 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     boolean checkIfMatches(String name) throws MiddlewareQueryException;
+    
+    /**
+     * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes in <b>linkedNodes</b> atribute,
+     * being the first node the female and the second one the male parent. The information is ultimately stored in Germplasm beans, containing only gids and information about names.
+     * The key of the map is the gid. 
+     * @param studyId The identifier for the study which parents will be retuned.
+     * @return The parents for each germplasm in a study.
+     */
+    Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-11T11:41:24 -->
+<!-- 2015-02-26T16:47:38 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="585" pageHeight="778" columnWidth="585" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e8f35f09-6a39-4fab-a23e-d79d2e6b4f3c">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="866"/>
@@ -64,70 +64,70 @@
 	<pageHeader>
 		<band height="32" splitType="Stretch">
 			<staticText>
-				<reportElement x="176" y="-3" width="23" height="12" uuid="fa4f7194-d13e-4411-8676-266ce6187870"/>
+				<reportElement x="257" y="0" width="23" height="12" uuid="fa4f7194-d13e-4411-8676-266ce6187870"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<text><![CDATA[TID:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="220" y="-3" width="39" height="12" uuid="42ec60a3-2aa4-4435-bb93-4410f1220288"/>
+				<reportElement x="280" y="0" width="39" height="12" uuid="42ec60a3-2aa4-4435-bb93-4410f1220288"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="270" y="-3" width="27" height="12" uuid="7f0177aa-811d-4957-ad13-e3ec5bcec479"/>
+				<reportElement x="336" y="1" width="27" height="12" uuid="7f0177aa-811d-4957-ad13-e3ec5bcec479"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<text><![CDATA[OCC:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="316" y="-3" width="36" height="12" uuid="1dfe3d24-b2aa-4810-992f-2190bca6b117"/>
+				<reportElement x="363" y="0" width="36" height="12" uuid="1dfe3d24-b2aa-4810-992f-2190bca6b117"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="458" y="-4" width="34" height="15" isRemoveLineWhenBlank="true" uuid="b46842ac-6e0d-4157-8cb9-540eac70cab3"/>
+				<reportElement x="458" y="0" width="34" height="15" isRemoveLineWhenBlank="true" uuid="b46842ac-6e0d-4157-8cb9-540eac70cab3"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<text><![CDATA[Page:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="508" y="-4" width="31" height="17" uuid="f95d761b-a517-4cd5-92a7-429bcfb02c7f"/>
+				<reportElement x="510" y="0" width="31" height="17" uuid="f95d761b-a517-4cd5-92a7-429bcfb02c7f"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+1]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="13" y="13" width="54" height="12" uuid="ae63a6a7-20f9-4f76-a08f-b4c8469bc6a1"/>
+				<reportElement x="12" y="14" width="156" height="12" uuid="ae63a6a7-20f9-4f76-a08f-b4c8469bc6a1"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{program}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="82" y="14" width="215" height="12" uuid="159e27ee-ee7f-41c5-8cce-b533d3201453"/>
+				<reportElement x="176" y="14" width="174" height="12" uuid="159e27ee-ee7f-41c5-8cce-b533d3201453"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="332" y="13" width="91" height="12" isPrintWhenDetailOverflows="true" uuid="8e3de264-cd30-4bc4-b5c2-6d9f0ec6a20c"/>
+				<reportElement x="363" y="14" width="91" height="12" isPrintWhenDetailOverflows="true" uuid="8e3de264-cd30-4bc4-b5c2-6d9f0ec6a20c"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{trial_abbr}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="14" y="-3" width="79" height="13" uuid="19bdbc0f-2e3d-4221-b1b8-29bdc1f88c03"/>
+				<reportElement x="12" y="0" width="79" height="13" uuid="19bdbc0f-2e3d-4221-b1b8-29bdc1f88c03"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -154,9 +154,9 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{f_cross_name}.length()>44) ?
+				<textFieldExpression><![CDATA[(($F{f_cross_name}.length()>50) ?
 
-   $F{f_cross_name}.substring(0, $F{f_cross_name}.substring(0,44).lastIndexOf("/")).concat("/...")
+   $F{f_cross_name}.substring(0, $F{f_cross_name}.substring(0,50).lastIndexOf("/")).concat("/...")
 
 
     : $F{f_cross_name})]]></textFieldExpression>
@@ -180,9 +180,9 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{f_sel_hist}.length()>50) ?
+				<textFieldExpression><![CDATA[(($F{f_sel_hist}.length()>60) ?
 
-   $F{f_sel_hist}.substring(0, $F{f_sel_hist}.substring(0,50).lastIndexOf("-")).concat("-...")
+   $F{f_sel_hist}.substring(0, $F{f_sel_hist}.substring(0,60).lastIndexOf("-")).concat("-...")
 
 
     : $F{f_sel_hist})]]></textFieldExpression>
@@ -192,9 +192,9 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{m_cross_name}.length()>44) ?
+				<textFieldExpression><![CDATA[(($F{m_cross_name}.length()>50) ?
 
-   $F{m_cross_name}.substring(0, $F{m_cross_name}.substring(0,44).lastIndexOf("/")).concat("/...")
+   $F{m_cross_name}.substring(0, $F{m_cross_name}.substring(0,50).lastIndexOf("/")).concat("/...")
 
 
     : $F{m_cross_name})]]></textFieldExpression>
@@ -204,9 +204,9 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{m_sel_hist}.length()>50) ?
+				<textFieldExpression><![CDATA[(($F{m_sel_hist}.length()>60) ?
 
-   $F{m_sel_hist}.substring(0, $F{m_sel_hist}.substring(0,50).lastIndexOf("-")).concat("-...")
+   $F{m_sel_hist}.substring(0, $F{m_sel_hist}.substring(0,60).lastIndexOf("-")).concat("-...")
 
 
     : $F{m_sel_hist})]]></textFieldExpression>
@@ -244,14 +244,14 @@
 				</graphicElement>
 			</line>
 			<textField>
-				<reportElement x="423" y="7" width="29" height="11" uuid="2c769e07-df78-41bf-bf67-a6f7374fa8cb"/>
+				<reportElement x="423" y="7" width="35" height="11" uuid="2c769e07-df78-41bf-bf67-a6f7374fa8cb"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{flocycle}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="423" y="33" width="29" height="11" uuid="463ea4e3-8d4e-4e0b-964c-d822de0d59f1"/>
+				<reportElement x="423" y="33" width="35" height="11" uuid="463ea4e3-8d4e-4e0b-964c-d822de0d59f1"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>

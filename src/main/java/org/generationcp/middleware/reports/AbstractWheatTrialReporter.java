@@ -61,6 +61,7 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 				default : 
 					params.put("dms_ip", "???");
 					params.put("gms_ip", "???");
+					params.put("version", "v-1");
 					break;
 			}
 		}
@@ -97,18 +98,7 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					
 				}
 			}
-			//delete!!
-			String cross = "123/456/789/10/asdsa-rg/43rfdf/ererter/354erg-hjk8-/3/ertert-ert56-y56-56y",
-					desig = "56y56y-56y56y56-y56y56y-56y56y-56y-56yerg-fgt5rygh-56gyruyi-o09p89-765hg-4f3-d3";
-			entry.setLinea1(cross);
-			entry.setLinea2(cross);
-			entry.setLinea3(desig);
-			entry.setLinea4(desig);
-			
-			entries.add(entry);
-			entries.add(entry);
-			entries.add(entry);
-			entries.add(entry);
+
 			entries.add(entry);
 		}
 		

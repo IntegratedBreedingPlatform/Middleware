@@ -56,6 +56,7 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
     private static final String KEY_MAIZE_FIELDBOOK_SHIPM = "MFbShipList";
     
     private static final int PROJECT_WHEAT_ID = -2; // local trial;
+    private static final int PROJECT_WHEAT_CROSSES_ID = -8; // local nursery;
     private static final String KEY_WHEAT_FIELDBOOK_23 = "WFb23";
     private static final String KEY_WHEAT_FIELDBOOK_24 = "WFb24";
     private static final String KEY_WHEAT_FIELDBOOK_25 = "WFb25";
@@ -105,7 +106,7 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetStreamReport_WheatFb23(){
-  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_23);
+  	  assertReportGenerated(PROJECT_WHEAT_CROSSES_ID, KEY_WHEAT_FIELDBOOK_23);
     }
 
     @Test
@@ -150,7 +151,7 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetStreamReport_WheatFb47(){
-  	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_47);
+  	  assertReportGenerated(PROJECT_WHEAT_CROSSES_ID, KEY_WHEAT_FIELDBOOK_47);
     }
 
     @Test

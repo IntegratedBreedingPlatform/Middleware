@@ -10,13 +10,13 @@ public class GermplasmEntry {
 	}
 
 	private String s_trial_cycle;
-	private String rep4;
+	private Integer rep4;
 	private String slocycle;
 	private String m_occ;
 	private String intrid;
 	private String code28;
 	private String s_intrid;
-	private String rep2;
+	private Integer rep2;
 	private String m_cross_name;
 	private Integer subblock;
 	private Integer s_occ;
@@ -27,8 +27,8 @@ public class GermplasmEntry {
 	private String s_tna;
 	private Integer m_gid;
 	private String m_sel_hist;
-	private Integer m_lid;
-	private Integer f_lid;
+	private String m_lid;
+	private String f_lid;
 	private String m_cycle;
 	private Integer f_sid;
 	private String f_cross_name;
@@ -166,10 +166,10 @@ public class GermplasmEntry {
 	public void setS_trial_cycle(String s_trial_cycle) {
 		this.s_trial_cycle = s_trial_cycle;
 	}
-	public String getRep4() {
+	public Integer getRep4() {
 		return rep4;
 	}
-	public void setRep4(String rep4) {
+	public void setRep4(Integer rep4) {
 		this.rep4 = rep4;
 	}
 	public String getSlocycle() {
@@ -202,10 +202,10 @@ public class GermplasmEntry {
 	public void setS_intrid(String s_intrid) {
 		this.s_intrid = s_intrid;
 	}
-	public String getRep2() {
+	public Integer getRep2() {
 		return rep2;
 	}
-	public void setRep2(String rep2) {
+	public void setRep2(Integer rep2) {
 		this.rep2 = rep2;
 	}
 	public Integer getSubblock() {
@@ -244,16 +244,16 @@ public class GermplasmEntry {
 	public void setM_gid(Integer m_gid) {
 		this.m_gid = m_gid;
 	}
-	public Integer getM_lid() {
+	public String getM_lid() {
 		return m_lid;
 	}
-	public void setM_lid(Integer m_lid) {
+	public void setM_lid(String m_lid) {
 		this.m_lid = m_lid;
 	}
-	public Integer getF_lid() {
+	public String getF_lid() {
 		return f_lid;
 	}
-	public void setF_lid(Integer f_lid) {
+	public void setF_lid(String f_lid) {
 		this.f_lid = f_lid;
 	}
 	public String getM_cycle() {

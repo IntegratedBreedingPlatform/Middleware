@@ -33,6 +33,7 @@ abstract class AbstractReporter implements Reporter{
 	private String fileNameExpr = getReportCode()+"-{tid}";
 	private String fileName = null;
 	private Pattern fileNameParamsPattern = Pattern.compile("\\{[\\w-_]*\\}");
+	private boolean isParentsInfoRequired = false;
 	JasperPrint jrPrint;
 	
 	@Override
@@ -55,7 +56,6 @@ abstract class AbstractReporter implements Reporter{
 
 			if(args.containsKey("dataSource")){
 				jrDataSource = buildJRDataSource((Collection<?>)args.get("dataSource"));
-				System.out.println ("datasource done!!!");
 			}
 			
 		}
@@ -144,7 +144,7 @@ abstract class AbstractReporter implements Reporter{
 	}
 
 	/**
-	 * Does not set the input and output of this exporter, only configures it.
+	 * Does not set the input and output of this exporter, only returns a pre-configured xlsx exporter.
 	 * @return
 	 */
 	protected JRXlsxExporter createDefaultExcelExporter(){
@@ -168,5 +168,13 @@ abstract class AbstractReporter implements Reporter{
 	
 	public String getFileExtension(){
 		return "pdf";
+	}
+	
+	public boolean isParentsInfoRequired(){
+		return isParentsInfoRequired;
+	}
+	
+	protected void setParentInfoRequired(boolean isParentsInfoRequired){
+		this.isParentsInfoRequired = isParentsInfoRequired;
 	}
 }

@@ -71,6 +71,12 @@ public interface Reporter {
 	void setFileNameExpression(String fileNameExpr);
 
 	/**
+	 * Returns a flag indicating a reporter will need information about direct progenitors (male and female). This flag just indicates if such information is required, proper
+	 * extraction is responsibility of implementations. Data providers for this class should read this flag to avoid making unnecessary queries to the Database, improving performance.
+	 */
+	boolean isParentsInfoRequired();
+
+	/**
 	 * Creates a file name for the specified reporter by using the report name expression and applying proper parameters.
 	 * @return the constructed file name
 	 */

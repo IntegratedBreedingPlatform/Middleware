@@ -11,6 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The different types for germplasm names. Taken from the udflds table. The
  * primary key is included for querying purposes.
@@ -54,6 +57,7 @@ public enum GermplasmNameType {
     ;
 
     private final int userDefinedField;
+    private static Map<Integer, GermplasmNameType> values = new HashMap<>();
 
     private GermplasmNameType(int id) {
         this.userDefinedField = id;
@@ -61,5 +65,20 @@ public enum GermplasmNameType {
 
     public int getUserDefinedFieldID() {
         return this.userDefinedField;
+    }
+    
+    
+    public static GermplasmNameType valueOf(int userDefinedField){
+    	if( values.isEmpty() ){
+        	for(GermplasmNameType type : GermplasmNameType.values()){
+        		values.put(type.userDefinedField, type);
+        	}
+    
+    	}
+    	
+    	if(values.containsKey(userDefinedField))
+    		return values.get(userDefinedField);
+    	else
+    	   	return null;
     }
 }
