@@ -934,4 +934,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(termId);
 		return getNameSynonymBuilder().create(synonyms);
 	}
+
+    @Override
+    public List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException {
+        return getCvTermDao().getAllTraitClasses();
+    }
 }

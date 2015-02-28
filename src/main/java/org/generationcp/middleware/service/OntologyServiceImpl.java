@@ -391,4 +391,9 @@ public class OntologyServiceImpl extends Service implements OntologyService {
             throws MiddlewareQueryException {
         return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
     }
+
+    @Override
+    public List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllTraitClass();
+    }
 }

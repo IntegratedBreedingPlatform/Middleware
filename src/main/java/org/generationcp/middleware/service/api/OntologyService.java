@@ -620,4 +620,12 @@ public interface OntologyService{
 
     List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
                 throws MiddlewareQueryException;
+
+
+    /**
+     * Return All Trait Classes
+     * * @return
+     * @throws MiddlewareQueryException*
+     */
+    List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException;
 }

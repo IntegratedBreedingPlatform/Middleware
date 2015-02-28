@@ -568,5 +568,12 @@ public interface OntologyDataManager {
      * @return
      */
     List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
+
+    /**
+     * Returns List of Trait Classes*
+     * @return
+     * @throws MiddlewareQueryException*
+     */
+    List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException;
 	
 }
