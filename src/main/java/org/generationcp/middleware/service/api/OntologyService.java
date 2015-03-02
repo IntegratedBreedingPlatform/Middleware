@@ -628,4 +628,12 @@ public interface OntologyService{
      * @throws MiddlewareQueryException*
      */
     List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException;
+
+
+    /**
+     * Return Property
+     * * @return
+     * @throws MiddlewareQueryException*
+     */
+    Property getPropertyById(Integer propertyId) throws MiddlewareQueryException;
 }

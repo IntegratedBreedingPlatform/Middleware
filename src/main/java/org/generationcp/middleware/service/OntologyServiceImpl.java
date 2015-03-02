@@ -396,4 +396,9 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException {
         return getOntologyDataManager().getAllTraitClass();
     }
+
+    @Override
+    public Property getPropertyById(Integer propertyId) throws MiddlewareQueryException {
+        return getOntologyDataManager().getPropertyById(propertyId);
+    }
 }

@@ -74,12 +74,7 @@ import org.generationcp.middleware.dao.gdms.TrackDataDAO;
 import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.dao.oms.CVDao;
-import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
-import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
-import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
-import org.generationcp.middleware.dao.oms.StandardVariableDao;
+import org.generationcp.middleware.dao.oms.*;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
@@ -163,6 +158,12 @@ public class DatabaseBroker {
     	cvTermDao.setSession(getActiveSession());
 		return cvTermDao;
 	}
+
+    protected final PropertyDao getPropertyDao() {
+        PropertyDao propertyDao = new PropertyDao();
+        propertyDao.setSession(getActiveSession());
+        return propertyDao;
+    }
     
     protected final StandardVariableDao getStandardVariableDao() {
     	return new StandardVariableDao(getActiveSession());
