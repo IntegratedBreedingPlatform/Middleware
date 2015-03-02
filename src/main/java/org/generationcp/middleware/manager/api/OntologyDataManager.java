@@ -57,7 +57,7 @@ public interface OntologyDataManager {
     /**
      * Gets standard variable summaries for given a list of ids. Returns an empty list if no matches are found.
      *
-     * @param stdVariableIds the list of standard variable ids
+     * @param standardVariableIds the list of standard variable ids
      * @return the list of standard variable summaries
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -107,7 +107,7 @@ public interface OntologyDataManager {
 	 * Must provide the property, method, scale, dataType, and storedIn info.
 	 * Otherwise, it will throw an exception.
 	 *
-	 * @param stdVariable the std variable
+	 * @param stdVariableList the std variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException;

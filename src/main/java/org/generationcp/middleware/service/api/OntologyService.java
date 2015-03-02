@@ -42,7 +42,7 @@ public interface OntologyService{
     /**
      * Gets the standard variables given a list of ids
      *
-     * @param stdVariableIds the list of standard variable ids
+     * @param standardVariableIds the list of standard variable ids
      * @return the list of standard variables
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -52,7 +52,7 @@ public interface OntologyService{
     /**
      * Gets standard variable summaries for given a list of ids
      *
-     * @param stdVariableIds the list of standard variable ids
+     * @param standardVariableIds the list of standard variable ids
      * @return the list of standard variable summaries
      * @throws MiddlewareQueryException the middleware query exception
      */
