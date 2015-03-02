@@ -19,7 +19,10 @@ import org.junit.Test;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import java.util.List;
+
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class PropertyDaoTest extends MiddlewareIntegrationTest {
 
@@ -32,10 +35,19 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
     }
 
     @Test
-    public void testGetProperties() throws Exception {
+    public void testGetPropertyById() throws Exception {
         Property property = dao.getPropertyById(1050);
         assertNotNull(property);
         property.print(2);
+    }
+
+    @Test
+    public void testGetAllProperties() throws Exception {
+        List<Property> properties = dao.getAllProperties();
+        for(Property p : properties){
+            p.print(2);
+        }
+        assertTrue(properties.size() > 0);
     }
     
     @AfterClass

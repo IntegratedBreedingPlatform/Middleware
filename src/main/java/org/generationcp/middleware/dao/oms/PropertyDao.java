@@ -30,6 +30,57 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
     /**
      * This will fetch entire Property by propertyId*
+     * @return
+     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+     */
+    public List<Property> getAllProperties() throws MiddlewareQueryException {
+        Map<Integer, Property> map = new HashMap<>();
+
+        try {
+
+            SQLQuery query = getSession().createSQLQuery(
+                    "select {p.*}, {tp.*}, {c.*}  from cvterm p" +
+                            " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() +
+                            " join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id inner join cvterm c on c.cvterm_id = cvtr.object_id " +
+                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p.is_obsolete = 0")
+                    .addEntity("p", CVTerm.class)
+                    .addEntity("tp", CVTermProperty.class)
+                    .addEntity("c", CVTerm.class);
+
+            List<Object[]> result = query.list();
+
+            if (result != null && !result.isEmpty()) {
+                
+                Property p;
+                
+                for (Object[] row : result) {
+                    Term term = TermBuilder.mapCVTermToTerm((CVTerm) row[0]);
+                    if(map.containsKey(term.getId())){
+                        p = map.get(term.getId());
+                    }
+                    else {
+                        p = new Property(term);
+                        if(row[1] instanceof CVTermProperty){
+                            p.setCropOntologyId(((CVTermProperty) row[1]).getValue());
+                        }
+                        map.put(term.getId(), p);
+                    }
+                    
+                    if(row.length <= 1) continue;
+                    Term pc = row[1] instanceof CVTerm ? TermBuilder.mapCVTermToTerm((CVTerm) row[1]) : TermBuilder.mapCVTermToTerm((CVTerm) row[2]);
+                    p.addClass(pc);
+                }
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getStandadardVariableIdByTermId :" + e.getMessage(), e);
+        }
+        
+        return new ArrayList<>(map.values());
+    }
+    
+    /**
+     * This will fetch entire Property by propertyId*
      * @param propertyId
      * @return
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
@@ -42,7 +93,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
                     "select {p.*}, {tp.*}, {c.*}  from cvterm p" +
                             " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() +
                             " join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id inner join cvterm c on c.cvterm_id = cvtr.object_id " +
-                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cvterm_id = :propertyId")
+                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cvterm_id = :propertyId and p.is_obsolete = 0")
                     .addEntity("p", CVTerm.class)
                     .addEntity("tp", CVTermProperty.class)
                     .addEntity("c", CVTerm.class);
