@@ -263,6 +263,18 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      */
     Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
+
+    /**
+     * Adds a property.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cropOntologyId the is a type
+     * @param classes the classes*
+     * @return the Term entry corresponding to the newly-added property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
     
     /**
      * Adds or updates a property with the given name and definition.
@@ -625,7 +637,7 @@ public interface OntologyService{
      * * @return
      * @throws MiddlewareQueryException*
      */
-    List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException;
+    List<Term> getAllTraitClass() throws MiddlewareQueryException;
 
 
     /**

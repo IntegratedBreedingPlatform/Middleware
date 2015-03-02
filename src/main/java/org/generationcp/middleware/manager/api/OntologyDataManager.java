@@ -294,6 +294,20 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
+
+    /**
+     * Adds a new property to the database that adds the property term and it's is a relationship)
+     * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a
+     * Returns the added term.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cropOntologyId the CropOntologyId
+     * @param classes the list of classes
+     * @return Term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
 	
 	/**
 	 * Given the termId, retrieve the Property POJO.
@@ -591,6 +605,6 @@ public interface OntologyDataManager {
      * @return
      * @throws MiddlewareQueryException*
      */
-    List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException;
+    List<Term> getAllTraitClass() throws MiddlewareQueryException;
 	
 }

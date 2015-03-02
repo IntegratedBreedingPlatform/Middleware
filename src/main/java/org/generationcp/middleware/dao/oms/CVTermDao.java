@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -889,6 +890,36 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return traitClasses;
 
 	}
+
+    /**
+     * Retrieves all the trait classes (id, name, definition, parent trait class)
+     *
+     * @return List of trait class references
+     */
+    public List<Term> getAllClasses() throws MiddlewareQueryException {
+        
+        List<Term> traitClasses = new ArrayList<>();
+
+        try {
+
+            SQLQuery query = getSession().createSQLQuery("SELECT cvt.* FROM cvterm cvt JOIN cvterm_relationship cvr ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = " +
+                    TermId.IS_A.getId() + " WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003) ORDER BY cvr.object_id ")
+                    .addEntity("cvt", CVTerm.class);
+
+            List<Object[]> list = query.list();
+
+            for (Object row : list) {
+                traitClasses.add(TermBuilder.mapCVTermToTerm((CVTerm) row));
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "Error at getAllTraitClasses() query on CVTermDao: " + e.getMessage(), e);
+        }
+
+        return traitClasses;
+
+    }
 
 	/**
 	 * Retrieves the properties of a Trait Class

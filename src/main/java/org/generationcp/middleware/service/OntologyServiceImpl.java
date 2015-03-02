@@ -168,7 +168,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException {
         return new Property(getOntologyDataManager().addProperty(name, definition, isA));
     }
-    
+
+    @Override
+    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException {
+        return getOntologyDataManager().addProperty(name, definition, cropOntologyId, classes);
+    }
 
     @Override
     public Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException, MiddlewareException {
@@ -393,7 +397,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
-    public List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException {
+    public List<Term> getAllTraitClass() throws MiddlewareQueryException {
         return getOntologyDataManager().getAllTraitClass();
     }
 

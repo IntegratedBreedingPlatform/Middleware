@@ -1275,5 +1275,22 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 		Assert.assertNull(term);
 	}
-	
+
+    @Test
+    public void testAddNewPropertyWithCropOntologyAndClasses() throws Exception {
+        String name = "Germplasm type 2";
+        String definition = "Germplasm type description 2";
+        String cropOntologyId = "CO_322:0000046";
+        List<Term> allClasses = manager.getAllTraitClass();
+        List<String> classes = new ArrayList<>(Arrays.asList(allClasses.get(0).getName(), allClasses.get(1).getName()));
+        
+        Debug.println(MiddlewareIntegrationTest.INDENT, "testAddProperty(name=" + name
+                + ", definition=" + definition + ", CropOntologyId=" + cropOntologyId + ", Classes=" + classes +"): ");
+        Property property = manager.addProperty(name, definition, cropOntologyId, classes);
+        property.print(MiddlewareIntegrationTest.INDENT);
+        
+        Property savedProperty = manager.getPropertyById(property.getId());
+        savedProperty.print(MiddlewareIntegrationTest.INDENT);
+    }
+
 }

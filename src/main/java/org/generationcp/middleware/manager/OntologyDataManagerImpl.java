@@ -404,6 +404,46 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		return term;
 	}
+
+    @Override
+    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
+        Term term = findTermByName(name, CvId.PROPERTIES);
+        if(term != null) throw new MiddlewareQueryException("Property is already available with name: " + name);
+
+        Property p = null;
+
+        Session session = getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction();
+            term = getTermSaver().save(name, definition, CvId.PROPERTIES);
+            p = new Property(term);
+            
+            if (cropOntologyId != null) {
+                p.setCropOntologyId(cropOntologyId);
+                getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
+            }
+            
+            List<Term> allClasses = getAllTraitClass();
+
+            for (String sClass : classes) {
+                for (Term tClass : allClasses) {
+                    if (!sClass.equals(tClass.getName())) continue;
+                    getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), tClass.getId());
+                    p.addClass(tClass);
+                    break;
+                }
+            }
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+        }
+
+        return p;
+    }
         
     @Override
     public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
@@ -946,7 +986,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
     @Override
-    public List<TraitClassReference> getAllTraitClass() throws MiddlewareQueryException {
-        return getCvTermDao().getAllTraitClasses();
+    public List<Term> getAllTraitClass() throws MiddlewareQueryException {
+        return getCvTermDao().getAllClasses();
     }
 }
