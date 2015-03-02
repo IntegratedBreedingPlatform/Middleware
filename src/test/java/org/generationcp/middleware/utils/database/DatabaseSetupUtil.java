@@ -22,6 +22,8 @@ import org.generationcp.middleware.util.ResourceFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import org.tmatesoft.svn.core.wc2.SvnCheckout;
 import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
 import org.tmatesoft.svn.core.wc2.SvnTarget;
@@ -38,7 +40,7 @@ public class DatabaseSetupUtil{
 	private static String WORKBENCH_SCRIPT = "/workbench";
 	private static String CROP_SCRIPT = "/merged";
 	
-	private static final String DEFAULT_IBDB_GIT_URL = "https://github.com/digitalabs/IBDBScripts/trunk";
+	private static final String DEFAULT_IBDB_GIT_URL = "https://github.com/IntegratedBreedingPlatform/IBDBScripts/trunk";
 
 	private static DatabaseConnectionParameters cropConnectionParameters, workbenchConnectionParameters;
 
@@ -46,7 +48,8 @@ public class DatabaseSetupUtil{
 	private static String TEST_DB_REQUIRED_PREFIX = "test_";
 
 	private static String gitUrl;
-
+    private static String gitUser;
+    private static String gitPassword;
 
 
 	@Test
@@ -132,6 +135,11 @@ public class DatabaseSetupUtil{
 		} else {
 			gitUrl = ibdbScriptsGitUrl;
 		}
+
+        String ibdbScriptsGitUser = prop.getProperty("test.ibdb.scripts.git.user", null);
+        if(ibdbScriptsGitUrl != null) gitUser = ibdbScriptsGitUser;
+        String ibdbScriptsGitPassword = prop.getProperty("test.ibdb.scripts.git.password", null);
+        if(ibdbScriptsGitUrl != null) gitPassword = ibdbScriptsGitPassword;
 	}
 
 	private static void checkoutAndRunIBDBScripts(String checkoutURL, String gitUrl, DatabaseConnectionParameters connection) throws Exception {
@@ -139,6 +147,12 @@ public class DatabaseSetupUtil{
 		File scriptsDir = new File(checkoutURL);
 		
 		SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
+
+        if(gitUser != null) {
+            ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(gitUser, gitPassword);
+            svnOperationFactory.setAuthenticationManager(authManager);
+        }
+
 		try {
 
 			SvnCheckout checkout = svnOperationFactory.createCheckout();

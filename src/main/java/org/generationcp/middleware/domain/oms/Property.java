@@ -13,11 +13,30 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Property {
     
 	private Term term;
 	
 	private Term isA;
+
+    public List<Term> getClasses() {
+        return classes;
+    }
+
+    public void setClasses(List<Term> classes) {
+        this.classes = classes;
+    }
+    
+    public void addClass(Term t)
+    {
+        if(this.classes == null) this.classes = new ArrayList<Term>();
+        this.classes.add(t);
+    }
+
+    private List<Term> classes;
 	
 	private String cropOntologyId;
 	
@@ -117,13 +136,28 @@ public class Property {
 		return builder.toString();
 	}
 
-    public void print(int indent) {
+    public void print(int indent)
+    {
         Debug.println(indent, "Property: ");
         Debug.println(indent + 3, "term: ");
         term.print(indent + 6);
+
+        if(cropOntologyId != null)
+        {
+            Debug.print(indent + 6, "cropOntologyId: " + this.getCropOntologyId());
+        }
+
         if (isA != null){
             Debug.println(indent + 3, "IsA: ");
             isA.print(indent + 6);
+        }
+        
+        if(classes != null){
+            Debug.println(indent + 3, "Classes: ");
+            for(Term c : classes){
+                Debug.println(indent + 6, "Term: ");
+                c.print(indent + 9);
+            }
         }
     }
 	
