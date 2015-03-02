@@ -26,6 +26,15 @@ public class Property {
         return classes;
     }
 
+    public List<String> getClassNames(){
+        List<String> classNames = new ArrayList<>();
+        if(classes == null) return classNames;
+        for(Term c : classes ){
+            classNames.add(c.getName());
+        }
+        return classNames;
+    }
+    
     public void setClasses(List<Term> classes) {
         this.classes = classes;
     }
