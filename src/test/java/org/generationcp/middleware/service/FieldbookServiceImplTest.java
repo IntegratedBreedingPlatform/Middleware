@@ -632,4 +632,15 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     	assertFalse("Study should no longer be found",study2Exists);
     }
     
+    @Test
+    public void testGetFavoriteLocationByProjectId() throws MiddlewareQueryException{
+    	List<Long> locationIds = new ArrayList<Long>();
+    	locationIds.add(1L);
+    	locationIds.add(2L);
+    	
+    	List<Location> locations = fieldbookService.getFavoriteLocationByProjectId(locationIds);
+    	
+    	assertEquals("Expecting to return the same number of Location objects from the input of List of Ids",locationIds.size(), locations.size());
+    }
+    
 }
