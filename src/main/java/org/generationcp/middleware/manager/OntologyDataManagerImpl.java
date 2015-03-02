@@ -523,6 +523,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public Property getPropertyById(int propertyId) throws MiddlewareQueryException {
         return getPropertyDao().getPropertyById(propertyId);
     }
+
+    @Override
+    public List<Property> getAllProperties() throws MiddlewareQueryException {
+        return getPropertyDao().getAllProperties();
+    }
 	
 	@Override
 	public Property getProperty(String name) throws MiddlewareQueryException {

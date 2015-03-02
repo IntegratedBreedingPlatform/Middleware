@@ -401,4 +401,9 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public Property getPropertyById(Integer propertyId) throws MiddlewareQueryException {
         return getOntologyDataManager().getPropertyById(propertyId);
     }
+    
+    @Override
+    public List<Property> getAllPropertiesWithClassAndCropOntology() throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllProperties();
+    }
 }

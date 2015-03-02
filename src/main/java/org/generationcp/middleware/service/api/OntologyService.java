@@ -253,8 +253,6 @@ public interface OntologyService{
      */
     List<Property> getAllProperties() throws MiddlewareQueryException;
 
-
-    
     /**
      * Adds a property. If the property is already found in the local database, it simply retrieves the record found.
      *
@@ -636,4 +634,11 @@ public interface OntologyService{
      * @throws MiddlewareQueryException*
      */
     Property getPropertyById(Integer propertyId) throws MiddlewareQueryException;
+
+    /**
+     * Return Property
+     * * @return
+     * @throws MiddlewareQueryException*
+     */
+    List<Property> getAllPropertiesWithClassAndCropOntology() throws MiddlewareQueryException;
 }
