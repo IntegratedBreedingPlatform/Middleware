@@ -147,9 +147,9 @@ public class Property {
         builder.append(", definition=");
         builder.append(term.getDefinition());
         builder.append(", IsA=");
-        builder.append(isA);
+        builder.append(isA == null ? "NULL" : isA);
         builder.append(", Classes=");
-        builder.append(classes.toString());
+        builder.append(classes == null ? "NULL" : classes.toString());
         builder.append("]");
 		return builder.toString();
 	}

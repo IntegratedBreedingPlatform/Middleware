@@ -568,8 +568,23 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public List<Property> getAllProperties() throws MiddlewareQueryException {
         return getPropertyDao().getAllProperties();
     }
-	
-	@Override
+
+    @Override
+    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
+        return getPropertyDao().getAllPropertiesWithClass(className);
+    }
+
+    @Override
+    public List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException {
+        return getPropertyDao().getAllPropertiesWithClasses(classes);
+    }
+
+    @Override
+    public List<Property> searchProperties(String filter) throws MiddlewareQueryException {
+        return getPropertyDao().searchProperties(filter);
+    }
+
+    @Override
 	public Property getProperty(String name) throws MiddlewareQueryException {
 		Property property = new Property();
 		

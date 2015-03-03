@@ -296,20 +296,7 @@ public interface OntologyDataManager {
     @Deprecated
 	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
 
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     *
-     * @param name the name
-     * @param definition the definition
-     * @param cropOntologyId the CropOntologyId
-     * @param classes the list of classes
-     * @return Term
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
-	
-	/**
+   /**
 	 * Given the termId, retrieve the Property POJO.
      * *
      * @Deprecated Use Property getPropertyById(int propertyId) instead
@@ -323,6 +310,17 @@ public interface OntologyDataManager {
     @Deprecated
 	Property getProperty(int termId) throws MiddlewareQueryException;
 
+
+    /**
+     * Given the name, retrieve the Property POJO.
+     * @Deprecated This method will not be used in new Ontology redesign
+     * @param name the name
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    @Deprecated
+    Property getProperty(String name) throws MiddlewareQueryException;
+
     /**
      * Given the termId, retrieve the Property POJO.
      *
@@ -333,33 +331,56 @@ public interface OntologyDataManager {
     Property getPropertyById(int propertyId) throws MiddlewareQueryException;
 
     /**
-     * Given the termId, retrieve the Property POJO.
-     *
+     * Get all properties
      * @return property
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllProperties() throws MiddlewareQueryException;
-	
-	/**
-	 * Given the name, retrieve the Property POJO.
-	 *
-	 * @param name the name
-	 * @return property
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Property getProperty(String name) throws MiddlewareQueryException;
-	
-   /**
+
+    /**
+     * Get all properties by className
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
+
+    /**
+     * Get all properties by className
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException;
+
+    /**
+     * This will search properties withing name and description
+     * @return
+     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+     */
+    List<Property> searchProperties(String filter) throws MiddlewareQueryException;
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cropOntologyId the CropOntologyId
+     * @param classes the list of classes
+     * @return Term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
+
+    /**
      * Retrieves ALL the trait classes containing the hierarchical structure of the trait classes.
-     * If includePropertiesAndVariables = true, it retrieves the properties and standard variables 
+     * If includePropertiesAndVariables = true, it retrieves the properties and standard variables
      * in a hierarchical structure as well:  Trait Group --> Properties --> Standard Variables.
-     * 
+     *
      * The list is returned in alphabetical order of the name.
      * @param includePropertiesAndVariables true if we want to load the property and standard variable, else false
      * @return the trait groups
      * @throws MiddlewareQueryException the middleware query exception
      */
-
     List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException;
 
     /**

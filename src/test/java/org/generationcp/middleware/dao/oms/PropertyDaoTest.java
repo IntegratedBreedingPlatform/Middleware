@@ -19,6 +19,8 @@ import org.junit.Test;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
@@ -36,10 +38,38 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testGetPropertyById() throws Exception {
-        Property property = dao.getPropertyById(1050);
+        Property property = dao.getPropertyById(2020);
         assertNotNull(property);
         property.print(2);
     }
+
+    @Test
+    public void testGetAllPropertiesByClassName() throws Exception {
+        List<Property> properties = dao.getAllPropertiesWithClass("agronomic");
+        for(Property p : properties){
+            p.print(2);
+        }
+        assertTrue(properties.size() > 0);
+    }
+
+    @Test
+    public void testGetAllPropertiesByClassNames() throws Exception {
+        List<Property> properties = dao.getAllPropertiesWithClasses(new ArrayList<>(Arrays.asList("Agronomic", "Biotic stress")));
+        for(Property p : properties){
+            p.print(2);
+        }
+        assertTrue(properties.size() > 0);
+    }
+
+    @Test
+    public void testGetAllPropertiesByFilter() throws Exception {
+        List<Property> properties = dao.searchProperties("study");
+        for(Property p : properties){
+            p.print(2);
+        }
+        assertTrue(properties.size() > 0);
+    }
+
 
     @Test
     public void testGetAllProperties() throws Exception {

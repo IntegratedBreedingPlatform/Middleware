@@ -224,7 +224,7 @@ public interface OntologyService{
     void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException;
     
     /*======================= PROPERTY ================================== */
-   
+
     /**
      * Gets the property with the given id.
      *
@@ -232,8 +232,9 @@ public interface OntologyService{
      * @return the matching property
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Property getProperty(int id) throws MiddlewareQueryException;
-
+    
     
     /**
      * Gets the property with the given name.
@@ -242,16 +243,8 @@ public interface OntologyService{
      * @return the matching property
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Property getProperty(String name) throws MiddlewareQueryException;
-    
-    
-    /**
-     * Gets all properties from Central and Local.
-     *
-     * @return All the properties
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllProperties() throws MiddlewareQueryException;
 
     /**
      * Adds a property. If the property is already found in the local database, it simply retrieves the record found.
@@ -262,20 +255,9 @@ public interface OntologyService{
      * @return the Term entry corresponding to the newly-added property
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
 
-    /**
-     * Adds a property.
-     *
-     * @param name the name
-     * @param definition the definition
-     * @param cropOntologyId the is a type
-     * @param classes the classes*
-     * @return the Term entry corresponding to the newly-added property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
-    
     /**
      * Adds or updates a property with the given name and definition.
      * If the given property name is not found in the databases, a new record is added to local database.
@@ -290,6 +272,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException, MiddlewareException;
 
     /**
@@ -299,6 +282,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
+    @Deprecated
     void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
 
     /**
@@ -308,8 +292,60 @@ public interface OntologyService{
      * @param isAId the is a id
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException;
+
+    /**
+     * Given the termId, retrieve the Property POJO.
+     *
+     * @param propertyId the term id
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property getPropertyById(int propertyId) throws MiddlewareQueryException;
+
+    /**
+     * Get all properties
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllProperties() throws MiddlewareQueryException;
+
+    /**
+     * Get all properties by className
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
+
+    /**
+     * Get all properties by className
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException;
+
+    /**
+     * This will search properties withing name and description
+     * @return
+     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
+     */
+    List<Property> searchProperties(String filter) throws MiddlewareQueryException;
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cropOntologyId the CropOntologyId
+     * @param classes the list of classes
+     * @return Term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
     
+
     /*======================= SCALE ================================== */
 
     /**
