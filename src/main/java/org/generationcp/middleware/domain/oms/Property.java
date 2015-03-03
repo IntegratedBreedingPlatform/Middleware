@@ -19,7 +19,11 @@ import java.util.List;
 public class Property {
     
 	private Term term;
-	
+
+    /**
+     * @Deprecated Term isA is deprecated. Use Classes instead
+     */
+    @Deprecated
 	private Term isA;
 
     public List<Term> getClasses() {
@@ -41,7 +45,7 @@ public class Property {
     
     public void addClass(Term t)
     {
-        if(this.classes == null) this.classes = new ArrayList<Term>();
+        if(this.classes == null) this.classes = new ArrayList<>();
         this.classes.add(t);
     }
 
@@ -66,11 +70,13 @@ public class Property {
         this.cropOntologyId = cropOntologyId;
     }
 
+    @Deprecated
     public Term getIsA() {
 		return isA;
 	}
 
-	public void setIsA(Term isA) {
+    @Deprecated
+    public void setIsA(Term isA) {
 		this.isA = isA;
 	}
 
@@ -106,7 +112,8 @@ public class Property {
     public void setDefinition(String definition) {
         term.setDefinition(definition);
     }
-    
+
+    @Deprecated
     public int getIsAId() {
         if(isA != null){
             return isA.getId();
@@ -141,6 +148,8 @@ public class Property {
         builder.append(term.getDefinition());
         builder.append(", IsA=");
         builder.append(isA);
+        builder.append(", Classes=");
+        builder.append(classes.toString());
         builder.append("]");
 		return builder.toString();
 	}

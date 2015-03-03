@@ -286,19 +286,19 @@ public interface OntologyDataManager {
 	 * Adds a new property to the database that adds the property term and it's is a relationship)
 	 * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a
 	 * Returns the added term.
-	 *
+	 * @Deprecated Use AddProperty with supplying cropOntologyId and Classes
 	 * @param name the name
 	 * @param definition the definition
 	 * @param isA the is a
 	 * @return Term
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
+    @Deprecated
 	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
 
     /**
-     * Adds a new property to the database that adds the property term and it's is a relationship)
-     * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a
-     * Returns the added term.
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
      *
      * @param name the name
      * @param definition the definition
@@ -311,11 +311,16 @@ public interface OntologyDataManager {
 	
 	/**
 	 * Given the termId, retrieve the Property POJO.
+     * *
+     * @Deprecated Use Property getPropertyById(int propertyId) instead
 	 *
 	 * @param termId the term id
 	 * @return property
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+     * @deprecated
+     * Use getPropertyById as it loads Property based on new re-desinged approach.
+     */
+    @Deprecated
 	Property getProperty(int termId) throws MiddlewareQueryException;
 
     /**
