@@ -22,14 +22,11 @@ import org.hibernate.SQLQuery;
 
 import java.util.*;
 
-/**
- * DAO class for {@link org.generationcp.middleware.pojos.oms.CVTerm}.
- */
 @SuppressWarnings("unchecked")
 public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
     /**
-     * This will fetch entire Property by propertyId*
+     * This will fetch list of properties with CropOntologyId and Trait classes
      * @return
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
@@ -73,7 +70,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
             }
 
         } catch (HibernateException e) {
-            logAndThrowException("Error at getStandadardVariableIdByTermId :" + e.getMessage(), e);
+            logAndThrowException("Error at getAllProperties :" + e.getMessage(), e);
         }
         
         return new ArrayList<>(map.values());
@@ -118,7 +115,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
             }
 
         } catch (HibernateException e) {
-            logAndThrowException("Error at getStandadardVariableIdByTermId :" + e.getMessage(), e);
+            logAndThrowException("Error at getPropertyById :" + e.getMessage(), e);
         }
         return null;
     }
