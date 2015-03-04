@@ -36,18 +36,18 @@ public class DatabaseSetupUtil{
 
 	private static final String TEST_DATABASE_CONFIG_PROPERTIES = "testDatabaseConfig.properties";
 	private static final String prefixDirectory = "./updatedIbdbScripts";
-	private static String SQL_SCRIPTS_FOLDER = "./sql";
-	private static String WORKBENCH_SCRIPT = "/workbench";
+    private static String WORKBENCH_SCRIPT = "/workbench";
 	private static String CROP_SCRIPT = "/merged";
-	
+    private static String TEST_DB_REQUIRED_PREFIX = "test_";
+    private static String SQL_SCRIPTS_FOLDER = "./sql";
+    
 	private static final String DEFAULT_IBDB_GIT_URL = "https://github.com/IntegratedBreedingPlatform/IBDBScripts/trunk";
 
 	private static DatabaseConnectionParameters cropConnectionParameters, workbenchConnectionParameters;
 
 	private static String MYSQL_PATH = "";
-	private static String TEST_DB_REQUIRED_PREFIX = "test_";
 
-	private static String gitUrl;
+    private static String gitUrl;
 
 
 	@Test
@@ -71,11 +71,11 @@ public class DatabaseSetupUtil{
 	}
 
 	private static Map<String, List<File>> setupScripts() throws FileNotFoundException, URISyntaxException{
-		Map<String, List<File>> scriptsMap = new HashMap<String, List<File>>();
+		Map<String, List<File>> scriptsMap = new HashMap<>();
 
-		try{
-			File wbFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER+WORKBENCH_SCRIPT).toURI());
-			if(wbFile != null && wbFile.isDirectory()){
+        try{
+			File wbFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER +WORKBENCH_SCRIPT).toURI());
+			if(wbFile.isDirectory()){
 				scriptsMap.put(WORKBENCH_SCRIPT,  Arrays.asList(wbFile.listFiles()));
 			}
 		}catch(FileNotFoundException e){
@@ -84,7 +84,7 @@ public class DatabaseSetupUtil{
 
 		try{
 			File cropFile = new File(ResourceFinder.locateFile(SQL_SCRIPTS_FOLDER + CROP_SCRIPT).toURI());
-			if(cropFile != null && cropFile.isDirectory()){
+			if(cropFile.isDirectory()){
 				scriptsMap.put(CROP_SCRIPT, Arrays.asList(cropFile.listFiles()));
 			}
 		}catch(FileNotFoundException e){
@@ -95,7 +95,7 @@ public class DatabaseSetupUtil{
 	}
 
 	private static boolean isTestDatabase(String dbName){
-		return dbName != null && dbName.startsWith(TEST_DB_REQUIRED_PREFIX);
+        return dbName != null && dbName.startsWith(TEST_DB_REQUIRED_PREFIX);
 	}
 
 	private static void initializeWorkbenchDatabase() throws Exception {
@@ -160,7 +160,8 @@ public class DatabaseSetupUtil{
 		LOG.debug("  >>> Checkout from " + gitUrl + " successful.");
 
 		File[] files = scriptsDir.listFiles();
-		Arrays.sort(files, new Comparator<File>() {
+        assert files != null;
+        Arrays.sort(files, new Comparator<File>() {
 			public int compare(File a, File b) {
 				return a.getName().compareTo(b.getName());
 			}
@@ -245,7 +246,7 @@ public class DatabaseSetupUtil{
 	/**
 	 * Drops all test databases (central, local, workbench)
 	 *
-	 * @return
+	 * @return boolean IsSuccess
 	 * @throws Exception
 	 */
 	public static boolean dropTestDatabases() throws Exception{
@@ -281,14 +282,13 @@ public class DatabaseSetupUtil{
 
 	private static void runAllSetupScripts(List<File> fileList, DatabaseConnectionParameters connectionParams) throws Exception{
 		if(fileList != null && !fileList.isEmpty()){
-			for(int index = 0 ; index < fileList.size() ; index++) {
-				File sqlFile = fileList.get(index);
-				if (sqlFile.getName().endsWith(".sql")) {
-					if (!runScriptFromFile(sqlFile, connectionParams)) {
-						throw new Exception("Error in executing " + sqlFile.getAbsolutePath());
-					}
-				}
-			}
+            for (File sqlFile : fileList) {
+                if (sqlFile.getName().endsWith(".sql")) {
+                    if (!runScriptFromFile(sqlFile, connectionParams)) {
+                        throw new Exception("Error in executing " + sqlFile.getAbsolutePath());
+                    }
+                }
+            }
 		}
 	}
 
@@ -371,6 +371,9 @@ public class DatabaseSetupUtil{
 		while ( (line = reader.readLine()) != null) {
 			stdOut.append(line);
 		}
+        
+        LOG.debug(stdOut.toString());
+        
 		reader.close();
         /* When the process writes to stderr the output goes to a fixed-size buffer. 
          * If the buffer fills up then the process blocks until the buffer gets emptied. 

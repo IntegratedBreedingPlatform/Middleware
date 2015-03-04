@@ -56,9 +56,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	public static final String DELETE_TERM_ERROR_MESSAGE = "The term you selected cannot be deleted";
 
-    public OntologyDataManagerImpl() {
-    }
-
     public OntologyDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
     }
@@ -143,14 +140,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        Transaction trans = null;
-        
-        trans = session.beginTransaction();
+        Transaction trans = session.beginTransaction();
 
         try {
 
-        	 for (StandardVariable stdVariable : stdVariableList){
-		                getStandardVariableSaver().save(stdVariable);
+        	 for (StandardVariable stdVariable : stdVariableList){getStandardVariableSaver().save(stdVariable);
         	 }
             
             trans.commit();
@@ -172,14 +166,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym)
             throws MiddlewareQueryException {
-        Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+        Set<StandardVariable> standardVariables = new HashSet<>();
         standardVariables.addAll(getStandardVariablesByNameOrSynonym(nameOrSynonym));
         return standardVariables;
     }
 
     private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym)
             throws MiddlewareQueryException {
-        Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+        Set<StandardVariable> standardVariables = new HashSet<>();
         List<Integer> stdVarIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
         for (Integer stdVarId : stdVarIds) {
             standardVariables.add(getStandardVariable(stdVarId));
@@ -240,8 +234,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException {
-        List<Term> methodTerms = new ArrayList<Term>();
-        Set<Integer> methodIds = new HashSet<Integer>();
+        List<Term> methodTerms = new ArrayList<>();
+        Set<Integer> methodIds = new HashSet<>();
         List<Integer> localMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
         if (localMethodIds != null) {
             methodIds.addAll(localMethodIds);
@@ -254,8 +248,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException {
-        List<Term> scaleTerms = new ArrayList<Term>();
-        Set<Integer> scaleIds = new HashSet<Integer>();
+        List<Term> scaleTerms = new ArrayList<>();
+        Set<Integer> scaleIds = new HashSet<>();
         List<Integer> localMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
         if (localMethodIds != null) {
             scaleIds.addAll(localMethodIds);
@@ -330,10 +324,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, int start,
             int numOfRows) throws MiddlewareQueryException {
 
-        TreeMap<String, StandardVariable> standardVariables = new TreeMap<String, StandardVariable>();
-        List<Integer> localStdVariableIds = new ArrayList<Integer>();
-
-        localStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
+        TreeMap<String, StandardVariable> standardVariables = new TreeMap<>();
+        List<Integer> localStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
 
         for (Integer stdVarId : localStdVariableIds) {
             StandardVariable sd = getStandardVariableBuilder().create(stdVarId);
@@ -359,11 +351,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException {
-        List<Term> terms = new ArrayList<Term>();
-        List<CVTerm> cvTerms = new ArrayList<CVTerm>();
-        List<Integer> termIds = new ArrayList<Integer>();
-
-        termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
+        List<Term> terms = new ArrayList<>();
+        List<CVTerm> cvTerms = new ArrayList<>();
+        List<Integer> termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
         for (Integer id : termIds) {
             cvTerms.add(getCvTermDao().getById(id));
         }
@@ -410,7 +400,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Term term = findTermByName(name, CvId.PROPERTIES);
         if(term != null) throw new MiddlewareQueryException("Property is already available with name: " + name);
 
-        Property p = null;
+        Property p;
 
         Session session = getCurrentSession();
         Transaction trans = null;
@@ -450,7 +440,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Session session = getCurrentSession();
         Transaction trans = null;
         
-        Term term = findTermByName(name, cvId);
+        Term term;
         
         try {
             trans = session.beginTransaction();
@@ -462,7 +452,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
 
         return term;
-        
     }
     
     @Override
@@ -491,15 +480,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return term;
     }
 
-    public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException{        
+    public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException{
+
+        if (term == null){
+            return null;
+        }
         
         Session session = getCurrentSession();
         Transaction trans = null;
-		Term updatedTerm = null;
-
-        if (term == null){
-        	return null;
-        }
+		Term updatedTerm;
 
         try {
             trans = session.beginTransaction();
@@ -644,7 +633,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
-        Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+        Set<StandardVariable> standardVariables = new HashSet<>();
         List<Term> terms = getAllTermsByCvId(CvId.VARIABLES);
         for (Term term : terms) {
             standardVariables.add(getStandardVariable(term.getId()));
@@ -655,7 +644,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId,  Integer scaleId) 
                     throws MiddlewareQueryException{
-        List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+        List<StandardVariable> standardVariables = new ArrayList<>();
 
         if (traitClassId != null){
             standardVariables.addAll(getStandardVariablesOfTraitClass(Database.LOCAL, traitClassId));
@@ -672,10 +661,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
     
     private List<StandardVariable> getStandardVariablesOfTraitClass(Database instance, Integer traitClassId) throws MiddlewareQueryException{
-        List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+        List<StandardVariable> standardVariables = new ArrayList<>();
         List<PropertyReference> properties = getCvTermDao().getPropertiesOfTraitClass(traitClassId);
 
-        List<Integer> propertyIds = new ArrayList<Integer>();
+        List<Integer> propertyIds = new ArrayList<>();
         for (PropertyReference property : properties){
             propertyIds.add(property.getId());
         }
@@ -933,7 +922,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
-        List<Property> properties = getPropertyBuilder().getAllPropertiesWithTraitClass();
+        List<Property> properties = getCvTermDao().getAllPropertiesWithTraitClass();
+
         Collections.sort(properties, new Comparator<Property>() {
 
             @Override

@@ -26,7 +26,6 @@ import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
-import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
@@ -509,7 +508,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return the positive ids from the given list
      */
     protected List<Integer> getPositiveIds(List<Integer> ids) {
-        List<Integer> positiveIds = new ArrayList<Integer>();
+        List<Integer> positiveIds = new ArrayList<>();
         for (Integer id : ids) {
             if (id >= 0) {
                 positiveIds.add(id);
@@ -651,10 +650,6 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final TraitGroupBuilder getTraitGroupBuilder() {
         return new TraitGroupBuilder(sessionProvider);
-    }
-
-    protected final PropertyBuilder getPropertyBuilder() {
-        return new PropertyBuilder(sessionProvider);
     }
 
     protected final ExperimentPropertySaver getExperimentPropertySaver() {
