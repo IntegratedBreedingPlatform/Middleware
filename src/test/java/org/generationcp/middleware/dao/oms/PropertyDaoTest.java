@@ -15,6 +15,7 @@ package org.generationcp.middleware.dao.oms;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 
+import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Test;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -49,7 +50,8 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
         for(Property p : properties){
             p.print(2);
         }
-        assertTrue(properties.size() > 0);
+        Debug.println("Properties: " + properties.size());
+        assertTrue(properties.size() == 14);
     }
 
     @Test
@@ -77,6 +79,7 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
         for(Property p : properties){
             p.print(2);
         }
+        Debug.println("Properties: " + properties.size());
         assertTrue(properties.size() > 0);
     }
     

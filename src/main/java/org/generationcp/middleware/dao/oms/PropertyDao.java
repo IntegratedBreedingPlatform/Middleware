@@ -37,7 +37,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
     public Property getPropertyById(int propertyId) throws MiddlewareQueryException {
 
         try {
-            List<Property> properties = getProperties(new ArrayList<>(Arrays.asList(propertyId)));
+            List<Property> properties = getProperties(false, new ArrayList<>(Arrays.asList(propertyId)));
             if(properties.size() == 0) return null;
             if(properties.size() > 1) throw new MiddlewareQueryException("Property with id:" + propertyId + " expected: 1, found: " + properties.size());
             return properties.get(0);
@@ -55,7 +55,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
     public List<Property> getAllProperties() throws MiddlewareQueryException {
 
         try {
-            return getProperties(new ArrayList<Integer>());
+            return getProperties(true, null);
         } catch (HibernateException e) {
             logAndThrowException("Error at getAllProperties :" + e.getMessage(), e);
         }
@@ -77,7 +77,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
             List<Integer> propertyIds = criteria.list();
 
-            return getProperties(propertyIds);
+            return getProperties(false, propertyIds);
 
         } catch (HibernateException e) {
             logAndThrowException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
@@ -104,7 +104,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
             List<Integer> propertyIds = query.list();
             
-            return getProperties(propertyIds);
+            return getProperties(false, propertyIds);
 
         } catch (HibernateException e) {
             logAndThrowException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
@@ -131,7 +131,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
             List<Integer> propertyIds = query.list();
 
-            return getProperties(propertyIds);
+            return getProperties(false, propertyIds);
 
         } catch (HibernateException e) {
             logAndThrowException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
@@ -145,9 +145,15 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
      * @return
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
-    private List<Property> getProperties(List<Integer> propertyIds) throws MiddlewareQueryException {
+    private List<Property> getProperties(Boolean fetchAll, List<Integer> propertyIds) throws MiddlewareQueryException {
         Map<Integer, Property> map = new HashMap<>();
 
+        if(propertyIds == null) propertyIds = new ArrayList<>();
+        
+        if(!fetchAll && propertyIds.size() == 0){
+            return new ArrayList<>(map.values());
+        }
+        
         try {
             
             String filterClause = "";
