@@ -36,6 +36,8 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     private static final Logger LOG = LoggerFactory.getLogger(GenericDAO.class);
     private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
     
+    protected final String SHOULD_NOT_OBSOLETE = "is_obsolete = 0";
+    
     private Class<T> persistentClass;
     private Session session;
 

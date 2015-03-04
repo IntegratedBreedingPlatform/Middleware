@@ -30,8 +30,8 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
     /**
      * This will fetch Property by propertyId*
-     * @param propertyId
-     * @return
+     * @param propertyId select property by propertyId
+     * @return Property
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
     public Property getPropertyById(int propertyId) throws MiddlewareQueryException {
@@ -49,7 +49,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
     /**
      * This will fetch all Properties*
-     * @return
+     * @return List<Property>
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
     public List<Property> getAllProperties() throws MiddlewareQueryException {
@@ -64,7 +64,8 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
     
     /**
      * This will search properties withing name and description
-     * @return
+     * @param filter Search anywhere from PropertyName or PropertyDescription
+     * @return List<Property>
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
     public List<Property> searchProperties(String filter) throws MiddlewareQueryException {
@@ -87,7 +88,8 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
     /**
      * This will fetch all of properties className
-     * @return
+     * @param className Filter all properties having trait class supplied in function
+     * @return List<Property>
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
     public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
@@ -114,7 +116,8 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
     /**
      * This will fetch all of properties classes
-     * @return
+     * @param classes filter all properties having multiple trait classes
+     * @return List<Property>
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
     public List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException {
@@ -141,8 +144,10 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
 
     /**
      * This will fetch list of properties by passing propertyIds
-     * This method is private and consumed by other methods*
-     * @return
+     * This method is private and consumed by other methods 
+     * @param fetchAll will tell weather query should get all properties or not.
+     * @param propertyIds will tell weather propertyIds should be pass to filter result. Combination of these two will give flexible usage.
+     * @return List<Property>
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
      */
     private List<Property> getProperties(Boolean fetchAll, List<Integer> propertyIds) throws MiddlewareQueryException {
@@ -165,7 +170,7 @@ public class PropertyDao extends GenericDAO<CVTerm, Integer> {
                     "select {p.*}, {tp.*}, {c.*}  from cvterm p" +
                             " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() +
                             " join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id inner join cvterm c on c.cvterm_id = cvtr.object_id " +
-                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p.is_obsolete = 0" +
+                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p." + SHOULD_NOT_OBSOLETE +
                             filterClause + " Order BY p.name")
                     .addEntity("p", CVTerm.class)
                     .addEntity("tp", CVTermProperty.class)
