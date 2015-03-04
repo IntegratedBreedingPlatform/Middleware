@@ -42,7 +42,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
 			logAndThrowException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + objectId 
 					+ ") query from CVTermRelationship: " + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -59,7 +59,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
 			logAndThrowException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + subjectId 
 					+ ") query from CVTermRelationship: " + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -73,7 +73,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
 		} catch(HibernateException e) {
 			logAndThrowException("Error with getBySubject=" + subjectId + ") query from CVTermRelationship: " 
 					+ e.getMessage(), e);
-			return new ArrayList<CVTermRelationship>();
+			return new ArrayList<>();
 		}
 	}
 	
