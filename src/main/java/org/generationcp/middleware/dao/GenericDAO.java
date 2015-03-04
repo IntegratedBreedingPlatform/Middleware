@@ -156,7 +156,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
             criteria.setProjection(Projections.rowCount());
-            return ((Long) criteria.uniqueResult()).longValue();
+            return (Long) criteria.uniqueResult();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
         }
@@ -227,7 +227,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             Criteria crit = getSession().createCriteria(getPersistentClass());
             crit.setProjection(Projections.max(idName));
             Integer maxId = (Integer) crit.uniqueResult();
-            Integer nextId = maxId != null ? Integer.valueOf(maxId.intValue() + 1) : Integer.valueOf(1);
+            Integer nextId = maxId != null ? Integer.valueOf(maxId + 1) : Integer.valueOf(1);
             LOG.debug("Returning nextId " + nextId + " for entity " + getPersistentClass().getName());
             return nextId;
         } catch (HibernateException e) {
@@ -330,9 +330,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
         
         query.executeUpdate();
-        
-
-        
     }
 	
 	@SuppressWarnings("unchecked")
@@ -348,7 +345,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         if (params != null && params.size() > 0) {
         	for (Map.Entry<String,Object> entry : params.entrySet()) {
                 LOG.debug(entry.getKey() + " = " + entry.getValue());
-                query.setParameter(entry.getKey().toString(), entry.getValue());
+                query.setParameter(entry.getKey(), entry.getValue());
             }
         }
         if(returnType!=null && !isWrapperType(returnType)) {
@@ -391,7 +388,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     
     private static Set<Class<?>> getWrapperTypes()
     {
-        Set<Class<?>> ret = new HashSet<Class<?>>();
+        Set<Class<?>> ret = new HashSet<>();
         ret.add(Boolean.class);
         ret.add(Character.class);
         ret.add(Byte.class);
