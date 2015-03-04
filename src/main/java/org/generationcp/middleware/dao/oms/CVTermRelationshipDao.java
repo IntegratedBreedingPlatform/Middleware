@@ -122,18 +122,6 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
         }
     }
 
-    public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareQueryException {
-        try {
-           saveOrUpdate(cvTermRelationship);
-
-        } catch(HibernateException e) {
-            logAndThrowException("Error with getBySubject=" + cvTermRelationship.getSubjectId() + ") query from CVTermRelationship: " 
-                    + e.getMessage(), e);
-            return null;
-        }
-        return cvTermRelationship;
-    }
-
     @SuppressWarnings("unchecked")
     public CVTermRelationship getRelationshipByObjectId(int objectId) throws MiddlewareQueryException {
         try {
@@ -152,5 +140,17 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
                     + e.getMessage(), e);
             return null;
         }
+    }
+
+    public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareQueryException {
+        try {
+            saveOrUpdate(cvTermRelationship);
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error with getBySubject=" + cvTermRelationship.getSubjectId() + ") query from CVTermRelationship: "
+                    + e.getMessage(), e);
+            return null;
+        }
+        return cvTermRelationship;
     }
 }
