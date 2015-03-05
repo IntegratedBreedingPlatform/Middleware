@@ -15,11 +15,14 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class GenericDAO<T, ID extends Serializable> {
@@ -68,6 +71,16 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getById(id=" + id + "): " + e.getMessage(), e);
         }
+    }
+
+    public List<T> filterByColumnValue(String columnName, Object value) throws MiddlewareQueryException {
+        Criterion criterion = value == null ? Restrictions.isNull(columnName) : Restrictions.eq(columnName, value);
+        return getByCriteria(new ArrayList<>(Arrays.asList(criterion)));
+    }
+    
+    public List<T> filterByColumnValues(String columnName, List<?> values) throws MiddlewareQueryException {
+        if (values == null || values.isEmpty()) return new ArrayList<>();
+        return getByCriteria(new ArrayList<>(Arrays.asList(Restrictions.in(columnName, values))));
     }
 
     @SuppressWarnings("unchecked")

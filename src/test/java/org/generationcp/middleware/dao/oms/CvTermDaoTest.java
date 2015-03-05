@@ -13,6 +13,7 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -61,6 +62,19 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
 			      OR (syn.synonym IN (:nameOrSynonyms) AND syn.cvterm_id = cvterm.cvterm_id)) 
          */
         
+    }
+
+    @Test
+    public void testFilterByColumnValue() throws Exception {
+        List<CVTerm> cvTerms = dao.filterByColumnValue("name", "Test Method");
+        assertEquals(cvTerms.size(), 1);
+    }
+
+    @Test
+    public void testFilterByColumnValues() throws Exception {
+        List<Integer> ids = Arrays.asList(2020, 2030);
+        List<CVTerm> cvTerms = dao.filterByColumnValues("cvTermId", ids);
+        assertEquals(cvTerms.size(), 2);
     }
     
     @Test
@@ -152,7 +166,7 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
                     property.print(4);
                 }
             } else {
-                Debug.println(4, traitClassId + " (size = 0) : " + properties);
+                Debug.println(4, traitClassId + " (size = 0) : " + null);
             }
         }
     }
@@ -170,7 +184,7 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
             if (properties != null){
                 Debug.println(4, id + " (size = " + properties.size() + ") : " + properties);
             } else {
-                Debug.println(4, id + " (size = 0) : " + properties);
+                Debug.println(4, id + " (size = 0) : " + null);
             }
         }
     }
