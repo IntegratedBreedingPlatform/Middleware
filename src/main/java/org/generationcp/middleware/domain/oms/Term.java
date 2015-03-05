@@ -40,6 +40,14 @@ public class Term implements Serializable{
 		this.definition = definition;
 	}
 
+    public Term(int id, String name, String definition, int vocabularyId, Boolean obsolete) {
+        this.id = id;
+        this.name = name;
+        this.definition = definition;
+        this.vocabularyId = vocabularyId;
+        this.obsolete = obsolete;
+    }
+
 	public int getId() {
 		return id;
 	}
@@ -98,15 +106,7 @@ public class Term implements Serializable{
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Term [id=");
-		builder.append(id);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", definition=");
-		builder.append(definition);
-		builder.append("]");
-		return builder.toString();
+        return "Term [id=" + id + ", name=" + name + ", definition=" + definition + ", vocabularyId=" + vocabularyId + ", obsolete=" + obsolete + "]";
 	}
 
 	public void setObsolete(Boolean obsolete) {
