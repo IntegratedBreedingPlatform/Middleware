@@ -1459,9 +1459,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(),
-					e);
+			logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
 		}
 		return list;
 	}
+    
+    /*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
+    
+    
 }
