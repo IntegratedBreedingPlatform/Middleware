@@ -140,20 +140,20 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean isObsolete() {
-		return isObsolete > 0 ? true : false;
+		return isObsolete > 0;
 	}
 
 	public void setIsObsolete(Boolean isObsolete) {
 
-		this.isObsolete = (int) (isObsolete ? 1 : 0);
+		this.isObsolete = isObsolete ? 1 : 0;
 	}
 
 	public Boolean isRelationshipType() {
-		return isRelationshipType > 0 ? true : false;
+		return isRelationshipType > 0;
 	}
 
 	public void setIsRelationshipType(Boolean isRelationshipType) {
-		this.isRelationshipType = (int) (isRelationshipType ? 1 : 0);
+		this.isRelationshipType = isRelationshipType ? 1 : 0;
 	}
 
 	@Override

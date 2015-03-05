@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
@@ -80,6 +81,16 @@ public class Term implements Serializable{
 		this.definition = definition;
 	}
 
+    public static Term fromCVTerm(CVTerm cvTerm){
+        Term term = new Term();
+        term.setId(cvTerm.getCvTermId());
+        term.setName(cvTerm.getName());
+        term.setDefinition(cvTerm.getDefinition());
+        term.setVocabularyId(cvTerm.getCv());
+        term.setObsolete(cvTerm.isObsolete());
+        return term;
+    }
+    
     public void print(int indent) {
 		Debug.println(indent, "Id: " + getId());
 		Debug.println(indent, "Vocabulary: " + getVocabularyId());
