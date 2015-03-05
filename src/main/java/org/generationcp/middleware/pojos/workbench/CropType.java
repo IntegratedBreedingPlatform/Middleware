@@ -28,15 +28,14 @@ public class CropType implements Serializable{
     private static final long serialVersionUID = 1L;
 
     // Initial pre-defined crops. Used mainly in testing
-    public final static String CHICKPEA = "Chickpea";
-    public final static String COWPEA = "Cowpea";
-    public final static String MAIZE = "Maize";
-    public final static String RICE = "Rice";
-    public final static String WHEAT = "Wheat";
-    public final static String CASSAVA = "Cassava";
-    public final static String GROUNDNUT = "Groundnut";
-    public final static String SORGHUM = "Sorghum";
-    public final static String PHASEOLUS = "Phaseolus";
+    public static final String CHICKPEA = "Chickpea";
+    public static final String COWPEA = "Cowpea";
+    public static final String MAIZE = "Maize";
+    public static final String RICE = "Rice";
+    public static final String WHEAT = "Wheat";
+    public static final String CASSAVA = "Cassava";
+    public static final String GROUNDNUT = "Groundnut";
+    public static final String SORGHUM = "Sorghum";
     
     public enum CropEnum {
     	CASSAVA,
