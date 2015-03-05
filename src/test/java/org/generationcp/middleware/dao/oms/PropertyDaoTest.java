@@ -12,13 +12,10 @@
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.oms;
-import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
-
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.Debug;
-import org.junit.Test;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +23,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 
 public class PropertyDaoTest extends MiddlewareIntegrationTest {
 
@@ -37,6 +39,12 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
         dao.setSession(sessionUtil.getCurrentSession());
     }
 
+    @Test
+    public void testGenericTest() throws Exception {
+        List<CVTerm> terms = dao.filterByColumnValue(CVTerm.class, "name", "Project");
+        System.out.println(terms.size());
+    }
+    
     @Test
     public void testGetPropertyById() throws Exception {
         Property property = dao.getPropertyById(2020);
