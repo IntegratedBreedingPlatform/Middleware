@@ -288,6 +288,7 @@
 						<include>**/GermplasmDataManagerUtilTest.java</include>
 						<include>**/OntologyDataManagerImplTest.java</include>
 						<include>**/WorkbenchDataManagerImplTest.java</include>
+						<includes>**/ReportServiceImplTest.java</includes>
 					</includes>
 				</configuration>
 			</plugin>

@@ -69,6 +69,10 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
     private static final String KEY_WHEAT_FIELDBOOK_47 = "WFb47";
     private static final String KEY_WHEAT_FIELDBOOK_60 = "WFb60";
     private static final String KEY_WHEAT_FIELDBOOK_61 = "WFb61";
+    private static final String KEY_WHEAT_TAGS_04 = "WTAG04";
+    private static final String KEY_WHEAT_TAGS_22 = "WTAG22";
+    private static final String KEY_WHEAT_LABELS_05 = "WLBL05";
+    private static final String KEY_WHEAT_LABELS_21 = "WLBL21";
     
     @BeforeClass
     public static void setUp() throws Exception {
@@ -162,6 +166,27 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetStreamReport_WheatFb61(){
   	  assertReportGenerated(PROJECT_WHEAT_ID, KEY_WHEAT_FIELDBOOK_61);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatTag04(){
+  	  assertReportGenerated(PROJECT_WHEAT_CROSSES_ID, KEY_WHEAT_TAGS_04);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatTag22(){
+  	  assertReportGenerated(PROJECT_WHEAT_CROSSES_ID, KEY_WHEAT_TAGS_22);
+    }
+
+    @Test
+    public void testGetStreamReport_WheatLabel05(){
+  	  assertReportGenerated(PROJECT_WHEAT_CROSSES_ID, KEY_WHEAT_LABELS_05);
+    }
+
+
+    @Test
+    public void testGetStreamReport_WheatLabel21(){
+  	  assertReportGenerated(PROJECT_WHEAT_CROSSES_ID, KEY_WHEAT_LABELS_21);
     }
 
    /**

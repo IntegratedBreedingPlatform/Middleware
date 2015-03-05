@@ -332,4 +332,38 @@ public abstract class StringUtil{
     public static boolean isEmptyOrWhitespaceOnly(String s) {
         return isEmpty(s) || s.matches("\\A\\s*\\z");
     }
+    
+    /**
+     * Prepares a value for being displayed in a fixed length fashion. For example: 
+     * <pre>format("ABC", 5, true) returns "ABC  "</pre>
+     * <pre>format(123, 6, false) returns "   123"</pre>
+     * <pre>format("ABCDE", 4, false) returns "ABCD"</pre>
+     * 
+     * @param field The object's value to print
+     * @param maxSize The space allowed for printing this value, or the maximum number of characters allowed for printing the field
+     * @param isLeftAligned indicate if field is aligned to left or right, in case the field is shorter the space allowed for it 
+     * @return 
+     */
+	public static String format(Object field, int maxSize, boolean isLeftAligned){
+		String notAvailableValue = "N/A";
+		String value = (null == field ? notAvailableValue : field.toString().trim());
+		
+		if(value.length() > maxSize){
+			value = value.substring(0,maxSize);
+		}
+		
+		try{
+			String expression = new StringBuilder("%")
+				.append(isLeftAligned?"-":"")
+				.append(maxSize)
+				.append('s')
+				.toString();
+			
+			value = String.format(expression, value);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return value;
+	}
+
 }
