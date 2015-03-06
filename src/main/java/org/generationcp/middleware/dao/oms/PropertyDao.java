@@ -18,9 +18,9 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.hibernate.*;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -227,5 +227,69 @@ public class PropertyDao extends OntologyBaseDAO {
         }
 
         return new ArrayList<>(map.values());
+    }
+
+    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
+        
+        if(classes == null) classes = new ArrayList<>();
+        
+        Property p;
+
+        Session session = getSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            p = new Property(Term.fromCVTerm(getCvTermDao().save(name, definition, CvId.PROPERTIES)));
+
+            if (cropOntologyId != null) {
+                p.setCropOntologyId(cropOntologyId);
+                getCvTermPropertyDao().save(p.getId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
+            }
+
+            List<Term> allClasses = getCvTermDao().getAllClasses();
+
+            for (String sClass : classes) {
+                for (Term tClass : allClasses) {
+                    if (!sClass.equals(tClass.getName())) continue;
+                    getCvTermRelationshipDao().save(p.getId(), TermId.IS_A.getId(), tClass.getId());
+                    p.addClass(tClass);
+                    break;
+                }
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            rollbackTransaction(transaction);
+            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+        }
+
+        return p;
+    }
+
+    public void delete(Integer propertyId) throws MiddlewareQueryException{
+
+        Session session = getSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            
+            CVTerm term = getCvTermDao().getByIdForced(propertyId);
+
+            List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(propertyId);
+            for(CVTermRelationship r : relationships) getCvTermRelationshipDao().makeTransient(r);
+
+            List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermId(propertyId);
+            for(CVTermProperty p : properties) getCvTermPropertyDao().makeTransient(p);
+            
+            getCvTermDao().makeTransient(term);
+
+            transaction.commit();
+        } catch (Exception e) {
+            rollbackTransaction(transaction);
+            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+        }
     }
 }

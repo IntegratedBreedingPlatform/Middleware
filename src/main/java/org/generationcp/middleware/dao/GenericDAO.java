@@ -29,8 +29,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericDAO.class);
 
-    protected final String SHOULD_NOT_OBSOLETE = "is_obsolete = 0";
-    
     private Class<T> persistentClass;
     private Session session;
 
@@ -50,7 +48,13 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     public Class<T> getPersistentClass() {
         return this.persistentClass;
     }
-    
+
+    public T getByIdForced(ID id) throws MiddlewareQueryException {
+        T entity = getById(id);
+        if(entity == null) logAndThrowException("Entity does not exist", new MiddlewareQueryException(getPersistentClass().getSimpleName() + ":" + id));
+        return entity;
+    }
+
     public T getById(ID id) throws MiddlewareQueryException {
     	return getById(id, false);
     }
@@ -163,6 +167,11 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in merge(entity): " + e.getMessage(), e);
         }
+    }
+
+    public void delete(ID id) throws MiddlewareQueryException {
+        T entity = getByIdForced(id);
+        makeTransient(entity);
     }
 
     public void makeTransient(T entity) throws MiddlewareQueryException {

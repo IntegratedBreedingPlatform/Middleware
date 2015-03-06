@@ -1465,6 +1465,24 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
     
     /*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
-    
-    
+
+    public CVTerm save(String name, String definition, CvId cvId)  throws MiddlewareQueryException{
+        
+        Integer generatedId;
+        
+        try {
+            generatedId = getNextId(CVTerm.ID_NAME);
+        } catch (MiddlewareQueryException e) {
+            throw new MiddlewareQueryException(e.getMessage(), e);
+        }
+        
+        CVTerm cvTerm = new CVTerm();
+        cvTerm.setCvTermId(generatedId);
+        cvTerm.setCv(cvId.getId());
+        cvTerm.setName(name);
+        cvTerm.setDefinition(definition);
+        cvTerm.setIsObsolete(false);
+        cvTerm.setIsRelationshipType(false);
+        return save(cvTerm);
+    }
 }

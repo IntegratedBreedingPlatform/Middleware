@@ -29,7 +29,7 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 
     @SuppressWarnings("unchecked")
     public List<CVTermProperty> getByCvTermId(int cvTermId) throws MiddlewareQueryException {
-        List<CVTermProperty> properties = new ArrayList<CVTermProperty>();
+        List<CVTermProperty> properties = new ArrayList<>();
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
             criteria.add(Restrictions.eq("cvTermId", cvTermId));
@@ -58,7 +58,7 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
     
     @SuppressWarnings("unchecked")
     public List<CVTermProperty> getByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
-        List<CVTermProperty> properties = new ArrayList<CVTermProperty>();
+        List<CVTermProperty> properties = new ArrayList<>();
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
             criteria.add(Restrictions.eq("cvTermId", cvTermId));
@@ -87,5 +87,13 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
             logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
         }
         return property;
+    }
+
+    public CVTermProperty save(Integer cvTermId, Integer typeId, String value, Integer rank) throws MiddlewareQueryException{
+        CVTermProperty property = getOneByCvTermAndType(cvTermId, typeId);
+        if(property == null) return save(new CVTermProperty(getNextId(CVTermProperty.ID_NAME), cvTermId, typeId, value, rank));
+        property.setValue(value);
+        property.setRank(rank);
+        return merge(property);
     }
 }

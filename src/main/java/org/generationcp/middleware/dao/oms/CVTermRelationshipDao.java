@@ -26,7 +26,7 @@ import java.util.List;
  * DAO class for {@link CVTermRelationship}.
  * 
  */
-public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> {
+public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getSubjectIdsByTypeAndObject(Integer typeId, Integer objectId) throws MiddlewareQueryException {
@@ -107,7 +107,6 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
             criteria.add(Restrictions.eq("typeId", typeId));
             criteria.add(Restrictions.eq("subjectId", subjectId));
             
-            
             List<CVTermRelationship> cvList = criteria.list();
             if(cvList == null || cvList.isEmpty()){
                 return null;
@@ -152,5 +151,12 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
             return null;
         }
         return cvTermRelationship;
+    }
+    
+    public CVTermRelationship save(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareQueryException{
+        CVTermRelationship relationship = getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
+        if(relationship != null) return relationship;
+        CVTermRelationship cvTermRelationship = new CVTermRelationship(getNextId(CVTermRelationship.ID_NAME), typeId, subjectId, objectId);
+        return save(cvTermRelationship);
     }
 }

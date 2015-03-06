@@ -34,6 +34,8 @@ public class CVTermRelationship implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
+    public static final String ID_NAME = "cvTermRelationshipId";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "cvterm_relationship_id")
@@ -67,8 +69,7 @@ public class CVTermRelationship implements Serializable{
 	public CVTermRelationship() {
 	}
 
-	public CVTermRelationship(Integer cvTermRelationshipId, Integer typeId,
-			Integer subjectId, Integer objectId) {
+	public CVTermRelationship(Integer cvTermRelationshipId, Integer typeId, Integer subjectId, Integer objectId) {
 		super();
 		this.cvTermRelationshipId = cvTermRelationshipId;
 		this.typeId = typeId;

@@ -26,6 +26,7 @@ import java.io.Serializable;
 public class CVTermProperty implements Serializable {
 
 	private static final long serialVersionUID = -6496723408899540369L;
+    public static final String ID_NAME = "cvTermPropertyId";
 
 	@Id
 	@Basic(optional = false)
@@ -56,6 +57,18 @@ public class CVTermProperty implements Serializable {
 	public Integer getCvTermPropertyId() {
 		return cvTermPropertyId;
 	}
+
+    public CVTermProperty() {
+    }
+
+    public CVTermProperty(Integer cvTermPropertyId, Integer cvTermId, Integer typeId, String value, Integer rank) {
+        super();
+        this.cvTermPropertyId = cvTermPropertyId;
+        this.cvTermId = cvTermId;
+        this.typeId = typeId;
+        this.value = value;
+        this.rank = rank;
+    }
 
 	public void setCvTermPropertyId(Integer cvTermPropertyId) {
 		this.cvTermPropertyId = cvTermPropertyId;

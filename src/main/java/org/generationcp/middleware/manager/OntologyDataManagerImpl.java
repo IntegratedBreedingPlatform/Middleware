@@ -261,11 +261,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
-        return getTermBuilder().findTermByName(name, cvId);
-    }
-
-    @Override
     public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {
         Term term = findTermByName(name, cvId);
 
@@ -396,46 +391,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
     @Override
-    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
-        Term term = findTermByName(name, CvId.PROPERTIES);
-        if(term != null) throw new MiddlewareQueryException("Property is already available with name: " + name);
-
-        Property p;
-
-        Session session = getCurrentSession();
-        Transaction trans = null;
-        
-        try {
-            trans = session.beginTransaction();
-            term = getTermSaver().save(name, definition, CvId.PROPERTIES);
-            p = new Property(term);
-            
-            if (cropOntologyId != null) {
-                p.setCropOntologyId(cropOntologyId);
-                getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
-            }
-            
-            List<Term> allClasses = getAllTraitClass();
-
-            for (String sClass : classes) {
-                for (Term tClass : allClasses) {
-                    if (!sClass.equals(tClass.getName())) continue;
-                    getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), tClass.getId());
-                    p.addClass(tClass);
-                    break;
-                }
-            }
-
-            trans.commit();
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
-        }
-
-        return p;
-    }
-        
-    @Override
     public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
         Session session = getCurrentSession();
         Transaction trans = null;
@@ -460,7 +415,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Session session = getCurrentSession();
         Transaction trans = null;
 
-        Term term = findTermByName(name, cvId);        
+        Term term;
         
         try {
             trans = session.beginTransaction();
@@ -547,31 +502,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 		return property;
 	}
-
-    @Override
-    public Property getPropertyById(int propertyId) throws MiddlewareQueryException {
-        return getPropertyDao().getPropertyById(propertyId);
-    }
-
-    @Override
-    public List<Property> getAllProperties() throws MiddlewareQueryException {
-        return getPropertyDao().getAllProperties();
-    }
-
-    @Override
-    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
-        return getPropertyDao().getAllPropertiesWithClass(className);
-    }
-
-    @Override
-    public List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException {
-        return getPropertyDao().getAllPropertiesWithClasses(classes);
-    }
-
-    @Override
-    public List<Property> searchProperties(String filter) throws MiddlewareQueryException {
-        return getPropertyDao().searchProperties(filter);
-    }
 
     @Override
 	public Property getProperty(String name) throws MiddlewareQueryException {
@@ -983,15 +913,56 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     	return getStandardVariableBuilder().validateEnumerationUsage(standardVariableId, enumerationId);
     }
 
-    
 	@Override
 	public List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException {
 		List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(termId);
 		return getNameSynonymBuilder().create(synonyms);
 	}
+    
+    /*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
 
     @Override
     public List<Term> getAllTraitClass() throws MiddlewareQueryException {
         return getCvTermDao().getAllClasses();
     }
+
+    @Override
+    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+        CVTerm cvTerm = getCvTermDao().getByNameAndCvId(name, cvId.getId());
+        if(cvTerm != null){
+            return Term.fromCVTerm(cvTerm);
+        }
+        return null;
+    }
+
+    @Override
+    public Property getPropertyById(int propertyId) throws MiddlewareQueryException {
+        return getPropertyDao().getPropertyById(propertyId);
+    }
+
+    @Override
+    public List<Property> getAllProperties() throws MiddlewareQueryException {
+        return getPropertyDao().getAllProperties();
+    }
+
+    @Override
+    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
+        return getPropertyDao().getAllPropertiesWithClass(className);
+    }
+
+    @Override
+    public List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException {
+        return getPropertyDao().getAllPropertiesWithClasses(classes);
+    }
+
+    @Override
+    public List<Property> searchProperties(String filter) throws MiddlewareQueryException {
+        return getPropertyDao().searchProperties(filter);
+    }
+    
+    @Override
+    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
+        return getPropertyDao().addProperty(name, definition, cropOntologyId, classes);
+    }
+    
 }

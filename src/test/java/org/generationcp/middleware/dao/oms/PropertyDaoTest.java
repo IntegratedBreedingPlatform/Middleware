@@ -21,12 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 public class PropertyDaoTest extends MiddlewareIntegrationTest {
@@ -38,7 +37,7 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
         dao = new PropertyDao();
         dao.setSession(sessionUtil.getCurrentSession());
     }
-
+    
     @Test
     public void testGenericTest() throws Exception {
         List<CVTerm> terms = dao.filterByColumnValue(CVTerm.class, "name", "Project");
@@ -80,7 +79,6 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
         assertTrue(properties.size() > 0);
     }
 
-
     @Test
     public void testGetAllProperties() throws Exception {
         List<Property> properties = dao.getAllProperties();
@@ -89,6 +87,17 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
         }
         Debug.println("Properties: " + properties.size());
         assertTrue(properties.size() > 0);
+    }
+
+    @Test
+    public void testSaveAndDeleteProperty() throws Exception {
+        Property p = dao.addProperty("test", "test", "COID", new ArrayList<>(Arrays.asList("Agronomic")));
+        Property addedP = dao.getPropertyById(p.getId());
+        assertNotNull(addedP);
+        assertEquals(p.getName(), addedP.getName());
+        p.print(2);
+        dao.delete(p.getId());
+        assertNull(dao.getPropertyById(p.getId()));
     }
     
     @AfterClass

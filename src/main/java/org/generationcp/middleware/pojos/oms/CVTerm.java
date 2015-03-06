@@ -33,6 +33,7 @@ import java.io.Serializable;
 public class CVTerm implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+    public static final String ID_NAME = "cvTermId";
 
 	@Id
 	@Basic(optional = false)
