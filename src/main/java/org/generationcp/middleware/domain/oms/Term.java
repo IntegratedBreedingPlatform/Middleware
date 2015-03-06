@@ -90,6 +90,16 @@ public class Term implements Serializable{
         term.setObsolete(cvTerm.isObsolete());
         return term;
     }
+
+    public CVTerm toCVTerm(){
+        CVTerm cvTerm = new CVTerm();
+        cvTerm.setCv(this.getVocabularyId());
+        cvTerm.setCvTermId(this.getId());
+        cvTerm.setName(this.getName());
+        cvTerm.setDefinition(this.getDefinition());
+        cvTerm.setIsObsolete(this.isObsolete());
+        return cvTerm;
+    }
     
     public void print(int indent) {
 		Debug.println(indent, "Id: " + getId());
