@@ -336,7 +336,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         return toReturn;
     }
     
-    public long countQtlDataByQtlTraits(List<String> qtlTraits)  throws MiddlewareQueryException{
+    public long countQtlDataByQtlTraits(List<Integer> qtlTraits)  throws MiddlewareQueryException{
         try {
         	if (qtlTraits != null && !qtlTraits.isEmpty()){        	
 	            SQLQuery query = getSession().createSQLQuery(COUNT_QTL_DATA_BY_QTL_TRAITS);
