@@ -12,10 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
+import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -41,8 +38,8 @@ public abstract class BaseDAO {
         return this.session;
     }
 
-    protected Object getById(Class clazz, Long id) {
-        return session.get(clazz, id);
+    public <TE> TE getById(Class<TE> type, Long id) {
+        return (TE) session.get(type, id);
     }
 
     protected List getAll(Class clazz) {
@@ -65,6 +62,17 @@ public abstract class BaseDAO {
             return criteria.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getByCriteria(" + criterion + "): " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Rolls back a given transaction
+     *
+     * @param trans current transaction
+     */
+    public void rollbackTransaction(Transaction trans) {
+        if (trans != null) {
+            trans.rollback();
         }
     }
 
