@@ -60,6 +60,50 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         super(sessionProvider);
     }
 
+    /*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
+
+    /**
+     * This area uses newly created DAO to prevent impl file to keep on increasing size
+     * Based on redesign completes, we can remove unused code of old ontology and merge code derived from OntologyBaseDAO
+     */
+
+    @Override
+    public List<Term> getAllTraitClass() throws MiddlewareQueryException {
+        return getCvTermDao().getAllClasses();
+    }
+
+    @Override
+    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+        CVTerm cvTerm = getCvTermDao().getByNameAndCvId(name, cvId.getId());
+        if(cvTerm != null){
+            return Term.fromCVTerm(cvTerm);
+        }
+        return null;
+    }
+
+    @Override
+    public Property getPropertyById(int propertyId) throws MiddlewareQueryException {
+        return getPropertyDao().getPropertyById(propertyId);
+    }
+
+    @Override
+    public List<Property> getAllProperties() throws MiddlewareQueryException {
+        return getPropertyDao().getAllProperties();
+    }
+
+    @Override
+    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
+        return getPropertyDao().getAllPropertiesWithClass(className);
+    }
+
+    @Override
+    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
+        return getPropertyDao().addProperty(name, definition, cropOntologyId, classes);
+    }
+
+    /*-------------------------   END AREA FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
+
+
     @Override
     public Term getTermById(int termId) throws MiddlewareQueryException {
         return getTermBuilder().get(termId);
@@ -918,51 +962,4 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(termId);
 		return getNameSynonymBuilder().create(synonyms);
 	}
-    
-    /*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
-
-    @Override
-    public List<Term> getAllTraitClass() throws MiddlewareQueryException {
-        return getCvTermDao().getAllClasses();
-    }
-
-    @Override
-    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
-        CVTerm cvTerm = getCvTermDao().getByNameAndCvId(name, cvId.getId());
-        if(cvTerm != null){
-            return Term.fromCVTerm(cvTerm);
-        }
-        return null;
-    }
-
-    @Override
-    public Property getPropertyById(int propertyId) throws MiddlewareQueryException {
-        return getPropertyDao().getPropertyById(propertyId);
-    }
-
-    @Override
-    public List<Property> getAllProperties() throws MiddlewareQueryException {
-        return getPropertyDao().getAllProperties();
-    }
-
-    @Override
-    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
-        return getPropertyDao().getAllPropertiesWithClass(className);
-    }
-
-    @Override
-    public List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException {
-        return getPropertyDao().getAllPropertiesWithClasses(classes);
-    }
-
-    @Override
-    public List<Property> searchProperties(String filter) throws MiddlewareQueryException {
-        return getPropertyDao().searchProperties(filter);
-    }
-    
-    @Override
-    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
-        return getPropertyDao().addProperty(name, definition, cropOntologyId, classes);
-    }
-    
 }

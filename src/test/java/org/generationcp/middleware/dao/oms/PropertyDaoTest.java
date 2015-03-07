@@ -62,24 +62,6 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
     }
 
     @Test
-    public void testGetAllPropertiesByClassNames() throws Exception {
-        List<Property> properties = dao.getAllPropertiesWithClasses(new ArrayList<>(Arrays.asList("Agronomic", "Biotic stress")));
-        for(Property p : properties){
-            p.print(2);
-        }
-        assertTrue(properties.size() > 0);
-    }
-
-    @Test
-    public void testGetAllPropertiesByFilter() throws Exception {
-        List<Property> properties = dao.searchProperties("study");
-        for(Property p : properties){
-            p.print(2);
-        }
-        assertTrue(properties.size() > 0);
-    }
-
-    @Test
     public void testGetAllProperties() throws Exception {
         List<Property> properties = dao.getAllProperties();
         for(Property p : properties){
@@ -91,7 +73,7 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testSaveAndDeleteProperty() throws Exception {
-        Property p = dao.addProperty("test", "test", "COID", new ArrayList<>(Arrays.asList("Agronomic")));
+        Property p = dao.addProperty("test", "test", "CO:1234567890", new ArrayList<>(Arrays.asList("Agronomic")));
         Property addedP = dao.getPropertyById(p.getId());
         assertNotNull(addedP);
         assertEquals(p.getName(), addedP.getName());

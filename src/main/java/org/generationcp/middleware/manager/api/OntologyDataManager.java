@@ -29,7 +29,51 @@ import java.util.Set;
  */
 public interface OntologyDataManager {
 
-	/**
+    /**
+     * Returns List of Trait Classes*
+     * @return
+     * @throws MiddlewareQueryException*
+     */
+    List<Term> getAllTraitClass() throws MiddlewareQueryException;
+
+    /**
+     * Given the termId, retrieve the Property POJO.
+     *
+     * @param propertyId the term id
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property getPropertyById(int propertyId) throws MiddlewareQueryException;
+
+    /**
+     * Get all properties
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllProperties() throws MiddlewareQueryException;
+
+    /**
+     * Get all properties by className
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cropOntologyId the CropOntologyId
+     * @param classes the list of classes
+     * @return Term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
+    
+    
+    /**
 	 * Retrieves a Term record given its id. This can also be used to retrieve traits, methods and scales.
 	 *
 	 * @param termId the term id
@@ -65,8 +109,8 @@ public interface OntologyDataManager {
     
     /**
      * Gets summary for a standard variable identified by given id. Returns {@code null} if no match is found.
-     * @param standardVariableId
-     * @return
+     * @param standardVariableId Standard Variable Id
+     * @return StandardVariableSummary
      * @throws MiddlewareQueryException
      */
     StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException;
@@ -286,7 +330,6 @@ public interface OntologyDataManager {
 	 * Adds a new property to the database that adds the property term and it's is a relationship)
 	 * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a
 	 * Returns the added term.
-	 * @Deprecated Use AddProperty with supplying cropOntologyId and Classes
 	 * @param name the name
 	 * @param definition the definition
 	 * @param isA the is a
@@ -299,9 +342,7 @@ public interface OntologyDataManager {
    /**
 	 * Given the termId, retrieve the Property POJO.
      * *
-     * @Deprecated Use Property getPropertyById(int propertyId) instead
-	 *
-	 * @param termId the term id
+     * @param termId the term id
 	 * @return property
 	 * @throws MiddlewareQueryException the middleware query exception
      * @deprecated
@@ -313,63 +354,12 @@ public interface OntologyDataManager {
 
     /**
      * Given the name, retrieve the Property POJO.
-     * @Deprecated This method will not be used in new Ontology redesign
      * @param name the name
      * @return property
      * @throws MiddlewareQueryException the middleware query exception
      */
     @Deprecated
     Property getProperty(String name) throws MiddlewareQueryException;
-
-    /**
-     * Given the termId, retrieve the Property POJO.
-     *
-     * @param propertyId the term id
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property getPropertyById(int propertyId) throws MiddlewareQueryException;
-
-    /**
-     * Get all properties
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllProperties() throws MiddlewareQueryException;
-
-    /**
-     * Get all properties by className
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
-
-    /**
-     * Get all properties by className
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException;
-
-    /**
-     * This will search properties withing name and description
-     * @return
-     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
-     */
-    List<Property> searchProperties(String filter) throws MiddlewareQueryException;
-
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     *
-     * @param name the name
-     * @param definition the definition
-     * @param cropOntologyId the CropOntologyId
-     * @param classes the list of classes
-     * @return Term
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
 
     /**
      * Retrieves ALL the trait classes containing the hierarchical structure of the trait classes.
@@ -611,8 +601,8 @@ public interface OntologyDataManager {
 	/**
 	 * validate if the enumeration is being used.
 	 * 
-	 * @param standardVariableId
-	 * @param enumerationId
+	 * @param standardVariableId Standard Variable Id
+	 * @param enumerationId Enumeration Id
 	 * @return true if valid
 	 * @throws MiddlewareQueryException
 	 */
@@ -625,12 +615,6 @@ public interface OntologyDataManager {
      * @return
      */
     List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
-
-    /**
-     * Returns List of Trait Classes*
-     * @return
-     * @throws MiddlewareQueryException*
-     */
-    List<Term> getAllTraitClass() throws MiddlewareQueryException;
+    
 	
 }

@@ -20,9 +20,6 @@ public class Property {
     
 	private Term term;
 
-    /**
-     * @Deprecated Term isA is deprecated. Use Classes instead
-     */
     @Deprecated
 	private Term isA;
 
@@ -30,6 +27,7 @@ public class Property {
         return classes;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getClassNames(){
         List<String> classNames = new ArrayList<>();
         if(classes == null) return classNames;
@@ -139,19 +137,7 @@ public class Property {
             return "";
         }
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("Property [id=");
-        builder.append(term.getId());
-        builder.append(", name=");
-        builder.append(term.getName());
-        builder.append(", definition=");
-        builder.append(term.getDefinition());
-        builder.append(", IsA=");
-        builder.append(isA == null ? "NULL" : isA);
-        builder.append(", Classes=");
-        builder.append(classes == null ? "NULL" : classes.toString());
-        builder.append("]");
-		return builder.toString();
+        return "Property [id=" + term.getId() + ", name=" + term.getName() + ", definition=" + term.getDefinition() + ", IsA=" + (isA == null ? "NULL" : isA) + ", Classes=" + (classes == null ? "NULL" : classes.toString()) + "]";
 	}
 
     public void print(int indent)
@@ -178,5 +164,4 @@ public class Property {
             }
         }
     }
-	
 }

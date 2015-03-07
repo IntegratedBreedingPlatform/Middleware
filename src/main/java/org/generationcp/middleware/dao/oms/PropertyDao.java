@@ -21,9 +21,6 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.*;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -65,30 +62,6 @@ public class PropertyDao extends OntologyBaseDAO {
     }
     
     /**
-     * This will search properties withing name and description
-     * @param filter Search anywhere from PropertyName or PropertyDescription
-     * @return List<Property>
-     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
-     */
-    public List<Property> searchProperties(String filter) throws MiddlewareQueryException {
-        
-        try{
-            Criteria criteria = getSession().createCriteria(CVTerm.class)
-                    .add(Restrictions.eq("cvId", CvId.PROPERTIES.getId()))
-                    .add(Restrictions.or(Restrictions.like("name", filter, MatchMode.ANYWHERE), Restrictions.like("definition", filter, MatchMode.ANYWHERE)))
-                    .setProjection(Projections.property("cvTermId"));
-
-            List<Integer> propertyIds = criteria.list();
-
-            return getProperties(false, propertyIds);
-
-        } catch (HibernateException e) {
-            logAndThrowException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
-        }
-        return new ArrayList<>();
-    }
-
-    /**
      * This will fetch all of properties className
      * @param className Filter all properties having trait class supplied in function
      * @return List<Property>
@@ -108,34 +81,6 @@ public class PropertyDao extends OntologyBaseDAO {
 
             List<Integer> propertyIds = query.list();
             
-            return getProperties(false, propertyIds);
-
-        } catch (HibernateException e) {
-            logAndThrowException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
-        }
-        return new ArrayList<>();
-    }
-
-    /**
-     * This will fetch all of properties classes
-     * @param classes filter all properties having multiple trait classes
-     * @return List<Property>
-     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
-     */
-    public List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException {
-
-        try{
-
-            SQLQuery query = getSession().createSQLQuery(
-                    "SELECT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id" +
-                            " inner join cvterm dt on dt.cvterm_id = cvtr.object_id" +
-                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p.is_obsolete = 0" +
-                            " and dt.name in (:classNames)");
-
-            query.setParameterList("classNames", classes);
-
-            List<Integer> propertyIds = query.list();
-
             return getProperties(false, propertyIds);
 
         } catch (HibernateException e) {

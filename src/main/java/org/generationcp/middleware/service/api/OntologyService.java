@@ -26,7 +26,53 @@ import java.util.Set;
  * This is the API for Ontology Browser requirements.
  * 
  */
+@SuppressWarnings("unused")
 public interface OntologyService{
+
+    /*======================= Classes ================================== */
+    /**
+     * Return All Trait Classes
+     * * @return
+     * @throws MiddlewareQueryException*
+     */
+    List<Term> getAllTraitClass() throws MiddlewareQueryException;
+
+    /*======================= Properties ================================== */
+    
+    /**
+     * Get all properties by className
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
+
+    /**
+     * Return Property
+     * * @return
+     * @throws MiddlewareQueryException*
+     */
+    Property getPropertyById(Integer propertyId) throws MiddlewareQueryException;
+
+    /**
+     * Return Property
+     * * @return
+     * @throws MiddlewareQueryException*
+     */
+    List<Property> getAllPropertiesWithClassAndCropOntology() throws MiddlewareQueryException;
+    
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cropOntologyId the CropOntologyId
+     * @param classes the list of classes
+     * @return Term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
+    
     
     /*======================= STANDARD VARIABLE ================================== */
 
@@ -296,55 +342,11 @@ public interface OntologyService{
     void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException;
 
     /**
-     * Given the termId, retrieve the Property POJO.
-     *
-     * @param propertyId the term id
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property getPropertyById(int propertyId) throws MiddlewareQueryException;
-
-    /**
      * Get all properties
      * @return property
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllProperties() throws MiddlewareQueryException;
-
-    /**
-     * Get all properties by className
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
-
-    /**
-     * Get all properties by className
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllPropertiesWithClasses(List<String> classes) throws MiddlewareQueryException;
-
-    /**
-     * This will search properties withing name and description
-     * @return
-     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException
-     */
-    List<Property> searchProperties(String filter) throws MiddlewareQueryException;
-
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     *
-     * @param name the name
-     * @param definition the definition
-     * @param cropOntologyId the CropOntologyId
-     * @param classes the list of classes
-     * @return Term
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
-    
 
     /*======================= SCALE ================================== */
 
@@ -551,7 +553,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareQueryException, MiddlewareException;
+    TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException;
     
     /**
      * Delete trait class.
@@ -642,8 +644,8 @@ public interface OntologyService{
     /**
      * Validates if the enumeration is being used.
      * 
-     * @param standardVariableId
-     * @param enumerationId
+     * @param standardVariableId Standard Variable Id
+     * @param enumerationId enumeration Id
      * @return true if valid
      * @throws MiddlewareQueryException
      */
@@ -651,42 +653,19 @@ public interface OntologyService{
  
     /**
      * find all variables given the property
-     * @param propertyId
-     * @return
+     * @param propertyId property id
+     * @return List<StandardVariableReference>
      * @throws MiddlewareQueryException
      */
     List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException;
     
     /**
-     * Return all invenotry scales.
-     * @return
+     * Return all inventory scales.
+     * @return List<ValueReference>
      * @throws MiddlewareQueryException
      */
     List<Scale> getAllInventoryScales() throws MiddlewareQueryException;
 
-    List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
-                throws MiddlewareQueryException;
+    List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException;
 
-
-    /**
-     * Return All Trait Classes
-     * * @return
-     * @throws MiddlewareQueryException*
-     */
-    List<Term> getAllTraitClass() throws MiddlewareQueryException;
-
-
-    /**
-     * Return Property
-     * * @return
-     * @throws MiddlewareQueryException*
-     */
-    Property getPropertyById(Integer propertyId) throws MiddlewareQueryException;
-
-    /**
-     * Return Property
-     * * @return
-     * @throws MiddlewareQueryException*
-     */
-    List<Property> getAllPropertiesWithClassAndCropOntology() throws MiddlewareQueryException;
 }
