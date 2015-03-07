@@ -74,7 +74,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public boolean isTermReferred(int termId) throws MiddlewareQueryException {
-        return getCvTermRelationshipDao().isTermReferred(termId) || getCvTermPropertyDao().isTermHasProperties(termId);
+        return getCvTermRelationshipDao().isTermReferred(termId);
     }
 
     @Override
