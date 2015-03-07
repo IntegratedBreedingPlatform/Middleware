@@ -73,7 +73,7 @@ public interface OntologyService{
      * @return Term
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
     
     
     /*======================= STANDARD VARIABLE ================================== */

@@ -31,7 +31,7 @@ public interface OntologyDataManager {
 
     /**
      * Returns List of Trait Classes*
-     * @return
+     * @return List<Term>
      * @throws MiddlewareQueryException*
      */
     List<Term> getAllTraitClass() throws MiddlewareQueryException;
@@ -72,7 +72,7 @@ public interface OntologyDataManager {
      * @return Term
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException;
+    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
     
     
     /**

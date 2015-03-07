@@ -102,7 +102,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
+    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
+        if(classes == null || classes.size() == 0) throw new MiddlewareException("Property should contain minimum one class");
         return getPropertyDao().addProperty(name, definition, cropOntologyId, classes);
     }
 

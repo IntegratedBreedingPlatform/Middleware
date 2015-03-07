@@ -56,7 +56,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
-    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException {
+    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
         return getOntologyDataManager().addProperty(name, definition, cropOntologyId, classes);
     }
     
