@@ -31,6 +31,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
+    public boolean isTermReferred(int termId) throws MiddlewareQueryException {
+        return getOntologyDataManager().isTermReferred(termId);
+    }
+
+    @Override
     public List<Term> getAllTraitClass() throws MiddlewareQueryException {
         return getOntologyDataManager().getAllTraitClass();
     }

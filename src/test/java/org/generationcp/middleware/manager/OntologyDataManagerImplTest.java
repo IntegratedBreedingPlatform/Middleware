@@ -53,6 +53,11 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 				.getNewOntologyDataManager();
 	}
 
+    @Test
+    public void testIsTermReferred() throws Exception {
+        Assert.assertTrue(manager.isTermReferred(2020));
+    }
+
 	@Test
 	public void testGetCvTermById() throws Exception {
 		Term term = manager.getTermById(6040);

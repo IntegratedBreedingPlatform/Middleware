@@ -39,7 +39,7 @@ public class TraitClassReference extends Reference implements Serializable, Comp
     public TraitClassReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
-		properties = new ArrayList<PropertyReference>();		
+		properties = new ArrayList<>();
 	}
 
     public TraitClassReference(Integer id, String name, String description) {
@@ -97,7 +97,7 @@ public class TraitClassReference extends Reference implements Serializable, Comp
     
     public void addTraitClassChild(TraitClassReference traitClassChild){
         if (traitClassChildren == null){
-            traitClassChildren = new ArrayList<TraitClassReference>();
+            traitClassChildren = new ArrayList<>();
         }
         traitClassChildren.add(traitClassChild);
     }
@@ -154,8 +154,7 @@ public class TraitClassReference extends Reference implements Serializable, Comp
      */
     @Override
     public int compareTo(TraitClassReference compareValue) {
-        String compareName = ((TraitClassReference) compareValue).getName(); 
+        String compareName = compareValue.getName();
         return getName().compareToIgnoreCase(compareName);
     }
-
 }

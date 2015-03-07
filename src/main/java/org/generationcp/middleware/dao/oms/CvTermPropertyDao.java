@@ -16,6 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
@@ -40,22 +41,7 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
         }
         return properties;
     }
-    
 
-    @SuppressWarnings("unchecked")
-    public List<CVTermProperty> getByCvTermIds(List<Integer> cvTermIds) throws MiddlewareQueryException {
-        List<CVTermProperty> properties = new ArrayList<CVTermProperty>();
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.in("cvTermId", cvTermIds));
-            properties = criteria.list();
-            
-        } catch(HibernateException e) {
-            logAndThrowException("Error at getByCvTermIds=" + cvTermIds + " query on CVTermPropertyDao: " + e.getMessage(), e);
-        }
-        return properties;
-    }
-    
     @SuppressWarnings("unchecked")
     public List<CVTermProperty> getByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
         List<CVTermProperty> properties = new ArrayList<>();
@@ -87,6 +73,19 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
             logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
         }
         return property;
+    }
+
+    public boolean isTermHasProperties(int termId) throws MiddlewareQueryException {
+        try {
+
+            SQLQuery query = getSession().createSQLQuery("SELECT value FROM cvtermprop where cvterm_id = :termId limit 1;");
+            query.setParameter("termId", termId);
+            List list = query.list();
+            return list.size() > 0;
+        } catch (HibernateException e) {
+            logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
+        }
+        return false;
     }
 
     public CVTermProperty save(Integer cvTermId, Integer typeId, String value, Integer rank) throws MiddlewareQueryException{

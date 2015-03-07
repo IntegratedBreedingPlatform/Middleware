@@ -73,7 +73,7 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testSaveAndDeleteProperty() throws Exception {
-        Property p = dao.addProperty("test", "test", "CO:1234567890", new ArrayList<>(Arrays.asList("Agronomic")));
+        Property p = dao.addProperty("test", "test", "COID", new ArrayList<>(Arrays.asList("Agronomic")));
         Property addedP = dao.getPropertyById(p.getId());
         assertNotNull(addedP);
         assertEquals(p.getName(), addedP.getName());

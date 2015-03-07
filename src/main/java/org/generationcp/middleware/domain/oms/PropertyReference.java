@@ -34,7 +34,7 @@ public class PropertyReference extends Reference implements Serializable, Compar
 	public PropertyReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
-		standardVariables = new ArrayList<StandardVariableReference>();
+		standardVariables = new ArrayList<>();
     }
 
 	public PropertyReference(Integer id, String name, String description) {
@@ -91,7 +91,7 @@ public class PropertyReference extends Reference implements Serializable, Compar
      */
     @Override
     public int compareTo(PropertyReference compareValue) {
-        String compareName = ((PropertyReference) compareValue).getName(); 
+        String compareName = compareValue.getName();
         return getName().compareToIgnoreCase(compareName);
     }
 

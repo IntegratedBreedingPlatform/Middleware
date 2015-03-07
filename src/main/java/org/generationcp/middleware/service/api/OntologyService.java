@@ -29,6 +29,8 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public interface OntologyService{
 
+    boolean isTermReferred(int termId) throws MiddlewareQueryException;
+    
     /*======================= Classes ================================== */
     /**
      * Return All Trait Classes
@@ -346,6 +348,7 @@ public interface OntologyService{
      * @return property
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Property> getAllProperties() throws MiddlewareQueryException;
 
     /*======================= SCALE ================================== */

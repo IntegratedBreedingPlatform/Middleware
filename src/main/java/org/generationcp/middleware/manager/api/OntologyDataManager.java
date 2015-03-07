@@ -36,6 +36,8 @@ public interface OntologyDataManager {
      */
     List<Term> getAllTraitClass() throws MiddlewareQueryException;
 
+    boolean isTermReferred(int termId) throws MiddlewareQueryException;
+    
     /**
      * Given the termId, retrieve the Property POJO.
      *

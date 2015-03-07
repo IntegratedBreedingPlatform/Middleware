@@ -16,6 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -151,6 +152,19 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
             return null;
         }
         return cvTermRelationship;
+    }
+
+    public boolean isTermReferred(int termId) throws MiddlewareQueryException {
+        try {
+
+            SQLQuery query = getSession().createSQLQuery("SELECT subject_id FROM cvterm_relationship where object_id = :objectId limit 1;");
+            query.setParameter("objectId", termId);
+            List list = query.list();
+            return list.size() > 0;
+        } catch (HibernateException e) {
+            logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
+        }
+        return false;
     }
     
     public CVTermRelationship save(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareQueryException{

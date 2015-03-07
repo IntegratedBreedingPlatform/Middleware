@@ -57,7 +57,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<Integer> getTermsByNameOrSynonym(String nameOrSynonym, int cvId)
 			throws MiddlewareQueryException {
-		List<Integer> termIds = new ArrayList<Integer>();
+		List<Integer> termIds = new ArrayList<>();
 		try {
 
 			StringBuilder sqlString = new StringBuilder()
@@ -121,7 +121,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					if (stdVarMap.containsKey(nameOrSynonym)) {
 						stdVarIds = stdVarMap.get(nameOrSynonym);
 					} else {
-						stdVarIds = new HashSet<Integer>();
+						stdVarIds = new HashSet<>();
 						stdVarMap.put(nameOrSynonym, stdVarIds);
 					}
 					stdVarIds.add(cvtermId);
@@ -183,7 +183,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public List<CVTerm> getByIds(List<Integer> ids) throws MiddlewareQueryException {
-		List<CVTerm> terms = new ArrayList<CVTerm>();
+		List<CVTerm> terms = new ArrayList<>();
 
 		if (ids != null && !ids.isEmpty()) {
 			try {
@@ -203,7 +203,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<CVTerm> getValidCvTermsByIds(List<Integer> ids, int storedInId, int dataTypeId)
 			throws MiddlewareQueryException {
-		List<CVTerm> terms = new ArrayList<CVTerm>();
+		List<CVTerm> terms = new ArrayList<>();
 
 		if (ids != null && !ids.isEmpty()) {
 			try {
@@ -247,7 +247,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<CVTerm> getVariablesByType(List<Integer> types, Integer storedIn)
 			throws MiddlewareQueryException {
-		List<CVTerm> terms = new ArrayList<CVTerm>();
+		List<CVTerm> terms = new ArrayList<>();
 
 		try {
 			StringBuilder queryString = new StringBuilder()
@@ -291,10 +291,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<CategoricalTraitInfo> setCategoricalVariables(
 			List<CategoricalTraitInfo> traitInfoList) throws MiddlewareQueryException {
-		List<CategoricalTraitInfo> categoricalTraitInfoList = new ArrayList<CategoricalTraitInfo>();
+		List<CategoricalTraitInfo> categoricalTraitInfoList = new ArrayList<>();
 
 		// Get trait IDs
-		List<Integer> traitIds = new ArrayList<Integer>();
+		List<Integer> traitIds = new ArrayList<>();
 		for (CategoricalTraitInfo trait : traitInfoList) {
 			traitIds.add(trait.getId());
 		}
@@ -346,7 +346,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			// Most probably because of the two cvterm id-name present in the query.
 			// The steps that follow will just retrieve the name of the categorical values in each variable.
 
-			List<Integer> valueIds = new ArrayList<Integer>();
+			List<Integer> valueIds = new ArrayList<>();
 			valueIds.addAll(valueIdName.keySet());
 
 			if (valueIds != null && !valueIds.isEmpty()) {
@@ -385,7 +385,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public List<TraitInfo> getTraitInfo(List<Integer> traitIds) throws MiddlewareQueryException {
-		List<TraitInfo> traits = new ArrayList<TraitInfo>();
+		List<TraitInfo> traits = new ArrayList<>();
 
 		try {
 
@@ -483,12 +483,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			logAndThrowException(
 					"Error at getStandardVariableIdsByPhenotypicType :" + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	public List<CVTerm> getTermsByCvId(CvId cvId, int start, int numOfRows)
 			throws MiddlewareQueryException {
-		List<CVTerm> terms = new ArrayList<CVTerm>();
+		List<CVTerm> terms = new ArrayList<>();
 
 		try {
 
@@ -566,7 +566,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		} catch (HibernateException e) {
 			logAndThrowException("Error at findMethodTermIdsByTrait :" + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	public List<Integer> findScaleTermIdsByTrait(Integer traitId)
@@ -592,7 +592,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		} catch (HibernateException e) {
 			logAndThrowException("Error at findScaleTermIdsByTrait :" + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	/**
@@ -666,7 +666,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<CVTerm> getIsAOfTermsByCvId(CvId cvId, int start, int numOfRows)
 			throws MiddlewareQueryException {
-		List<CVTerm> terms = new ArrayList<CVTerm>();
+		List<CVTerm> terms = new ArrayList<>();
 
 		try {
 
@@ -813,7 +813,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public List<TraitClassReference> getTraitClasses(TermId classType)
 			throws MiddlewareQueryException {
 
-		List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+		List<TraitClassReference> traitClasses = new ArrayList<>();
 
 		try {
 			/*
@@ -858,7 +858,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 * @return List of trait class references
 	 */
 	public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
-		List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+		List<TraitClassReference> traitClasses = new ArrayList<>();
 
 		try {
 			StringBuilder sqlString = new StringBuilder()
@@ -926,7 +926,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 */
 	public List<PropertyReference> getPropertiesOfTraitClass(Integer traitClassId)
 			throws MiddlewareQueryException {
-		List<Integer> traitClasses = new ArrayList<Integer>();
+		List<Integer> traitClasses = new ArrayList<>();
 		traitClasses.add(traitClassId);
 		return getPropertiesOfTraitClasses(traitClasses).get(traitClassId);
 	}
@@ -937,7 +937,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public Map<Integer, List<PropertyReference>> getPropertiesOfTraitClasses(
 			List<Integer> traitClassIds) throws MiddlewareQueryException {
 
-		Map<Integer, List<PropertyReference>> propertiesOfTraitClasses = new HashMap<Integer, List<PropertyReference>>();
+		Map<Integer, List<PropertyReference>> propertiesOfTraitClasses = new HashMap<>();
 
 		if (traitClassIds.isEmpty()) {
 			return propertiesOfTraitClasses;
@@ -961,7 +961,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			List<Object[]> list = query.list();
 
-			List<PropertyReference> properties = new ArrayList<PropertyReference>();
+			List<PropertyReference> properties = new ArrayList<>();
 			Integer prevTraitClassId = traitClassIds.get(0);
 
 			for (Object[] row : list) {
@@ -972,7 +972,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				if (!prevTraitClassId.equals(traitClassId)) {
 					propertiesOfTraitClasses.put(prevTraitClassId, properties);
-					properties = new ArrayList<PropertyReference>();
+					properties = new ArrayList<>();
 					prevTraitClassId = traitClassId;
 				}
 				properties.add(new PropertyReference(cvtermId, cvtermName, cvtermDefinition));
@@ -993,7 +993,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 */
 	public List<StandardVariableReference> getStandardVariablesOfProperty(Integer propertyId)
 			throws MiddlewareQueryException {
-		List<Integer> properties = new ArrayList<Integer>();
+		List<Integer> properties = new ArrayList<>();
 		properties.add(propertyId);
 		return getStandardVariablesOfProperties(properties).get(propertyId);
 	}
@@ -1003,7 +1003,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 */
 	public Map<Integer, List<StandardVariableReference>> getStandardVariablesOfProperties(
 			List<Integer> propertyIds) throws MiddlewareQueryException {
-		Map<Integer, List<StandardVariableReference>> variablesOfProperties = new HashMap<Integer, List<StandardVariableReference>>();
+		Map<Integer, List<StandardVariableReference>> variablesOfProperties = new HashMap<>();
 
 		if (propertyIds.isEmpty()) {
 			return variablesOfProperties;
@@ -1025,7 +1025,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			List<Object[]> list = query.list();
 
-			List<StandardVariableReference> variables = new ArrayList<StandardVariableReference>();
+			List<StandardVariableReference> variables = new ArrayList<>();
 			Integer prevPropertyId = propertyIds.get(0);
 
 			for (Object[] row : list) {
@@ -1036,7 +1036,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				if (!prevPropertyId.equals(traitClassId)) {
 					variablesOfProperties.put(prevPropertyId, variables);
-					variables = new ArrayList<StandardVariableReference>();
+					variables = new ArrayList<>();
 					prevPropertyId = traitClassId;
 				}
 				variables
@@ -1094,7 +1094,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 */
 	public List<Integer> getStandardVariableIds(Integer traitClassId, Integer propertyId,
 			Integer methodId, Integer scaleId) throws MiddlewareQueryException {
-		List<Integer> standardVariableIds = new ArrayList<Integer>();
+		List<Integer> standardVariableIds = new ArrayList<>();
 		try {
 			StringBuilder queryString = new StringBuilder()
 					.append("SELECT DISTINCT cvr.subject_id ")
@@ -1148,7 +1148,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			if (result != null && !result.isEmpty()) {
 				for (Integer row : result) {
-					standardVariableIds.add((Integer) row);
+					standardVariableIds.add(row);
 				}
 			}
 
@@ -1161,7 +1161,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	@SuppressWarnings("unused")
 	private List<Integer> getStandardVariablesBelongingToTraitClass(
 			List<Integer> standardVariableIds) throws MiddlewareQueryException {
-		List<Integer> standardVariablesOfTraitClass = new ArrayList<Integer>();
+		List<Integer> standardVariablesOfTraitClass = new ArrayList<>();
 
 		if (standardVariableIds == null || standardVariableIds.isEmpty()) {
 			return standardVariablesOfTraitClass;
@@ -1198,7 +1198,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
-		List<Property> properties = new ArrayList<Property>();
+		List<Property> properties = new ArrayList<>();
 		try {
 			StringBuilder sql = new StringBuilder()
 					.append("SELECT p.cvterm_id, p.name, p.definition, pr.object_id, coId.value ")
@@ -1282,7 +1282,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<StandardVariableReference> getAllTreatmentFactors(List<Integer> hiddenFields,
 			boolean showOnlyPaired) throws MiddlewareQueryException {
-		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+		List<StandardVariableReference> list = new ArrayList<>();
 
 		try {
 
@@ -1372,9 +1372,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return false;
 	}
 
-	public List<StandardVariable> getAllPossibleTreatmentPairs(int cvTermId, int propertyId,
-			List<Integer> hiddenFields) throws MiddlewareQueryException {
-		List<StandardVariable> list = new ArrayList<StandardVariable>();
+	public List<StandardVariable> getAllPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields) throws MiddlewareQueryException {
+        
+        List<StandardVariable> list = new ArrayList<>();
 
 		try {
 			StringBuilder sqlString = new StringBuilder()
@@ -1428,7 +1428,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
-		List<Scale> list = new ArrayList<Scale>();
+		List<Scale> list = new ArrayList<>();
 		try {
 			StringBuilder sql = new StringBuilder()
 					.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname ")
