@@ -59,7 +59,17 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
         return getOntologyDataManager().addProperty(name, definition, cropOntologyId, classes);
     }
-    
+
+    @Override
+    public Property updateProperty(Integer id, String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
+        return getOntologyDataManager().updateProperty(id, name, definition, cropOntologyId, classes);
+    }
+
+    @Override
+    public void deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyDataManager().deleteProperty(id);
+    }
+
     /*======================= STANDARD VARIABLE ================================== */
 
     @Override

@@ -213,6 +213,50 @@ public class PropertyDao extends OntologyBaseDAO {
         return p;
     }
 
+    public Property updateProperty(Integer id, String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException{
+
+        if(classes == null) classes = new ArrayList<>();
+
+        Property p = getPropertyById(id);
+        
+        if(p == null) throw new MiddlewareQueryException("Property does not exist");
+        
+        Session session = getSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            p.setName(name);
+            p.setDefinition(definition);
+            getCvTermDao().update(p.getTerm().toCVTerm());
+            
+            if(!Objects.equals(p.getCropOntologyId(), cropOntologyId)){
+                getCvTermPropertyDao().save(p.getId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
+            }
+
+            List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(id);
+            for(CVTermRelationship r : relationships) getCvTermRelationshipDao().makeTransient(r);
+
+            List<Term> allClasses = getCvTermDao().getAllClasses();
+            for (String sClass : classes) {
+                for (Term tClass : allClasses) {
+                    if (!sClass.equals(tClass.getName())) continue;
+                    getCvTermRelationshipDao().save(p.getId(), TermId.IS_A.getId(), tClass.getId());
+                    p.addClass(tClass);
+                    break;
+                }
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            rollbackTransaction(transaction);
+            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+        }
+
+        return p;
+    }
+
     public void delete(Integer propertyId) throws MiddlewareQueryException{
 
         Session session = getSession();

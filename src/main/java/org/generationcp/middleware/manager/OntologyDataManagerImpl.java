@@ -12,15 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
@@ -105,6 +97,36 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
         if(classes == null || classes.size() == 0) throw new MiddlewareException("Property should contain minimum one class");
         return getPropertyDao().addProperty(name, definition, cropOntologyId, classes);
+    }
+
+    @Override
+    public void deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
+        getPropertyDao().delete(id);
+    }
+
+    @Override
+    public Property updateProperty(Integer id, String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
+        if(classes == null || classes.size() == 0) throw new MiddlewareException("Property should contain minimum one class");
+        boolean isReferred = isTermReferred(id);
+        Property existingProperty = getProperty(id);
+        if(existingProperty == null) throw new MiddlewareException("Can not update property because it does not exist with ID:" + id);
+        if(isReferred){
+            boolean equal = Objects.equals(cropOntologyId, existingProperty.getCropOntologyId());
+            List<Term> existingClasses = existingProperty.getClasses();
+            if(equal && existingClasses == null) equal = false;
+            if(equal && existingClasses.size() == classes.size()) equal = false;
+            if(equal){
+                for (String c : classes ) {
+                    for (Term tc : existingClasses) {
+                        if(Objects.equals(c, tc.getName())) continue;
+                        equal = false;
+                        break;
+                    }
+                }
+            }
+            if(!equal)  throw new MiddlewareException("Property is in use. Only description is updatable.");
+        }
+        return getPropertyDao().updateProperty(id, name, definition, cropOntologyId, classes);
     }
 
     /*-------------------------   END AREA FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */

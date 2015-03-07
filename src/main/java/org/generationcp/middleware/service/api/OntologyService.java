@@ -70,11 +70,31 @@ public interface OntologyService{
      * @param definition the definition
      * @param cropOntologyId the CropOntologyId
      * @param classes the list of classes
-     * @return Term
+     * @return Property
      * @throws MiddlewareQueryException the middleware query exception
      */
     Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
-    
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     * @param id of property
+     * @param name of property
+     * @param definition of property
+     * @param cropOntologyId of property
+     * @param classes of property
+     * @return Property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property updateProperty(Integer id, String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     * @param id of property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
     
     /*======================= STANDARD VARIABLE ================================== */
 

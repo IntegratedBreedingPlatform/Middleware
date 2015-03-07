@@ -73,11 +73,27 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testSaveAndDeleteProperty() throws Exception {
-        Property p = dao.addProperty("test", "test", "COID", new ArrayList<>(Arrays.asList("Agronomic")));
+        Property p = dao.addProperty("test", "test", "CO_322:0000046", new ArrayList<>(Arrays.asList("Agronomic")));
         Property addedP = dao.getPropertyById(p.getId());
         assertNotNull(addedP);
         assertEquals(p.getName(), addedP.getName());
         p.print(2);
+        dao.delete(p.getId());
+        assertNull(dao.getPropertyById(p.getId()));
+    }
+
+    @Test
+    public void testSaveAndUpdateDeleteProperty() throws Exception {
+        Property p = dao.addProperty("test", "test", "CO_322:0000046", new ArrayList<>(Arrays.asList("Agronomic")));
+        Property addedP = dao.getPropertyById(p.getId());
+        assertNotNull(addedP);
+        assertEquals(p.getName(), addedP.getName());
+        p.print(2);
+        dao.updateProperty(p.getId(), p.getName(), "new test", "CO_322:0000047", new ArrayList<>(Arrays.asList("Agronomic", "Biotic Stress")));
+        Property updatedProperty = dao.getPropertyById(p.getId());
+        assertEquals(updatedProperty.getDefinition(), "new test");
+        assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
+        assertEquals(updatedProperty.getClasses().size(), 2);
         dao.delete(p.getId());
         assertNull(dao.getPropertyById(p.getId()));
     }
