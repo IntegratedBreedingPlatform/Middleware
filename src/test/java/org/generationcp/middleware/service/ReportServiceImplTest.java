@@ -57,6 +57,7 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
     
     private static final int PROJECT_WHEAT_ID = -2; // local trial;
     private static final int PROJECT_WHEAT_CROSSES_ID = -8; // local nursery;
+    private static final int PROJECT_WHEAT_TRIAL_ID = -11; // local nursery;
     private static final String KEY_WHEAT_FIELDBOOK_23 = "WFb23";
     private static final String KEY_WHEAT_FIELDBOOK_24 = "WFb24";
     private static final String KEY_WHEAT_FIELDBOOK_25 = "WFb25";

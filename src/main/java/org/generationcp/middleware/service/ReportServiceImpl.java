@@ -86,7 +86,8 @@ public class ReportServiceImpl extends Service implements ReportService{
 	 */
 	private Map<String,Object> extractFieldbookData(Integer studyId, boolean parentsInfoRequireed)throws MiddlewareQueryException{
 
-		Workbook wb = getWorkbookBuilder().create(studyId);
+		StudyType studyType = getStudyDataManager().getStudyType(studyId);
+		Workbook wb = getWorkbookBuilder().create(studyId, studyType);
 		List<MeasurementRow> observations =  wb.getObservations();
 		
 		if(parentsInfoRequireed){

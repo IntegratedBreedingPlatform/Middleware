@@ -120,12 +120,16 @@ public class WTags04 extends AbstractReporter{
 	public void asOutputStream(OutputStream output) throws BuildReportException {
 		try{
 			StringBuilder sb = new StringBuilder();
-			sb.append(buildPrintTestRecord());
-			sb.append(buildPrintTestRecord());
+			
+			int rowSpan = 40;
+			int rowSize = 40;
+			
+			sb.append(buildPrintTestRecord(rowSpan, rowSize));
+			sb.append(buildPrintTestRecord(rowSpan, rowSize));
 
 			for(int i = 1; i<dataSource.size(); i++){
 				sb.append(
-						buildRecord(dataSource.get(i), dataSource.get(0)));
+						buildRecord(dataSource.get(i), dataSource.get(0), rowSpan, rowSize));
 			}
 			output.write(sb.toString().getBytes());
 		}catch(IOException e){
@@ -135,7 +139,7 @@ public class WTags04 extends AbstractReporter{
 	}
 
 	
-	protected String buildRecord(List<String> row, List<String> headers){
+	protected String buildRecord(List<String> row, List<String> headers, int rowSpan, int rowSize){
 		String study
 		,occ
 		,subProg
@@ -145,7 +149,8 @@ public class WTags04 extends AbstractReporter{
 		,pedigreeA = null
 		,pedigreeB = null
 		,selHistA = null
-		,selHistB = null;
+		,selHistB = null
+		,entryType = null;
 		
 		study = studyMeta.get("STUDY_NAME");
 		occ = studyMeta.get("TRIAL_INSTANCE");
@@ -167,6 +172,8 @@ public class WTags04 extends AbstractReporter{
 									selHistA = selHistA.length() > 36 ? selHistA.substring(0, selHistA.substring(0,36).lastIndexOf("-")+1) : selHistA;
 									selHistB = selHistB.length() > 36 ? selHistB.substring(selHistB.lastIndexOf("-", 36)+1,selHistB.length()) : "";
 					break;
+				case "ENTRY_TYPE" : entryType = row.get(i);
+					break;
 			}
 		}
 		
@@ -174,47 +181,57 @@ public class WTags04 extends AbstractReporter{
 		
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(StringUtil.stringOf(" ", 40))
+		sb.append(StringUtil.stringOf(" ", rowSpan))
 		  .append(StringUtil.format(study, 30, true)).append(" OCC: ")
 		  .append(StringUtil.format(occ, 4, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
 		  .append(StringUtil.format(subProg, 3, true)).append(" ")
 		  .append(StringUtil.format(type, 5, true)).append(" ")
 		  .append(StringUtil.format(season, 13, true))
 		  .append(StringUtil.format("ENTRY", 7, false)).append(" ")
 		  .append(StringUtil.format(entry, 6, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 25))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan - 15))
 		  .append(StringUtil.format("CIMMYT", 6, false))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
-		  .append(StringUtil.format(pedigreeA, 40, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
-		  .append(StringUtil.format(pedigreeB, 40, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
-		  .append(StringUtil.format("", 4, true))
-		  .append(StringUtil.format(selHistA, 36, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
-		  .append(StringUtil.format("", 4, true))
-		  .append(StringUtil.format(selHistB, 36, true)).append("\r\n\r\n");
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan));
 		
-		return sb.toString();
+		if(entryType == null || !entryType.equals("T")){ //test entry, meaning Not-a-check.
+			sb.append(StringUtil.format(pedigreeA, rowSize, true))
+			  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			  .append(StringUtil.format(pedigreeB, rowSize, true))
+			  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			  .append(StringUtil.format("", 4, true))
+			  .append(StringUtil.format(selHistA, 36, true))
+			  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			  .append(StringUtil.format("", 4, true))
+			  .append(StringUtil.format(selHistB, 36, true));
+		}else{
+			sb.append(StringUtil.format("LOCAL CHECK ", rowSize, true))
+			  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			  .append(StringUtil.format("** CHECK **", rowSize, true))
+			  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan *2))
+			  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2));
+		}
+		
+		
+		return sb.append("\r\n\r\n").toString();
 	}
 	
-	private String buildPrintTestRecord(){
+	private String buildPrintTestRecord(int rowSpan, int rowSize){
 		return new StringBuilder()
-			.append(StringUtil.stringOf(" ",40))
-			.append(StringUtil.stringOf("X",40))
-			.append("\r\n").append(StringUtil.stringOf(" ", 40))
-			.append(StringUtil.stringOf("X",40))
-			.append("\r\n").append(StringUtil.stringOf(" ", 40))
-			.append(StringUtil.stringOf("X",40))
-			.append("\r\n").append(StringUtil.stringOf(" ", 40))
-			.append(StringUtil.stringOf("X",40))
-			.append("\r\n").append(StringUtil.stringOf(" ", 40))
-			.append(StringUtil.stringOf("X",40))
-			.append("\r\n").append(StringUtil.stringOf(" ", 40))
-			.append(StringUtil.stringOf("X",40))
-			.append("\r\n").append(StringUtil.stringOf(" ", 40))
-			.append(StringUtil.stringOf("X",40))
+			.append(StringUtil.stringOf(" ",rowSpan))
+			.append(StringUtil.stringOf("X",rowSize))
+			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			.append(StringUtil.stringOf("X",rowSize))
+			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			.append(StringUtil.stringOf("X",rowSize))
+			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			.append(StringUtil.stringOf("X",rowSize))
+			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			.append(StringUtil.stringOf("X",rowSize))
+			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			.append(StringUtil.stringOf("X",rowSize))
+			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			.append(StringUtil.stringOf("X",rowSize))
 			.append("\r\n\r\n")
 			.toString();
 	}
