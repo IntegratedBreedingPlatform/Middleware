@@ -17,6 +17,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
+import java.util.Random;
+
 
 /**
  * Base class with common functionality - mainly session factory creation - required for Middleware integration tests (i.e. tests that
@@ -78,4 +80,8 @@ public class MiddlewareIntegrationTest {
 		LOG.debug("+++++ Test: " + getClass().getSimpleName() + "." + name.getMethodName() + " took " + ((double) elapsedTime / 1000000)
 				+ " ms = " + ((double) elapsedTime / 1000000000) + " s +++++");
 	}
+    
+    protected static String getNewRandomName(){
+        return "Name_" + new Random().nextInt(10000);
+    }
 }

@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -196,14 +197,16 @@ public class PropertyDao extends OntologyBaseDAO {
             List<Term> allClasses = getCvTermDao().getAllClasses();
 
             for (String sClass : classes) {
+                boolean found = false;
                 for (Term tClass : allClasses) {
                     if (!sClass.equals(tClass.getName())) continue;
                     getCvTermRelationshipDao().save(p.getId(), TermId.IS_A.getId(), tClass.getId());
                     p.addClass(tClass);
+                    found = true;
                     break;
                 }
+                if(!found) throw new MiddlewareException("Term Class:" + sClass + "not found");
             }
-
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
@@ -229,29 +232,46 @@ public class PropertyDao extends OntologyBaseDAO {
 
             p.setName(name);
             p.setDefinition(definition);
-            getCvTermDao().update(p.getTerm().toCVTerm());
+            getCvTermDao().merge(p.getTerm().toCVTerm());
             
             if(!Objects.equals(p.getCropOntologyId(), cropOntologyId)){
                 getCvTermPropertyDao().save(p.getId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
             }
 
-            List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(id);
-            for(CVTermRelationship r : relationships) getCvTermRelationshipDao().makeTransient(r);
+            Map<Integer, Term> relationsToDelete = new HashMap<>();
+            for(Term cl : p.getClasses()){
+                relationsToDelete.put(cl.getId(), cl);
+            }
 
+            p.getClasses().clear();
+            
             List<Term> allClasses = getCvTermDao().getAllClasses();
             for (String sClass : classes) {
+                boolean found = false;
                 for (Term tClass : allClasses) {
-                    if (!sClass.equals(tClass.getName())) continue;
+                    if (!sClass.equalsIgnoreCase(tClass.getName())) continue;
                     getCvTermRelationshipDao().save(p.getId(), TermId.IS_A.getId(), tClass.getId());
                     p.addClass(tClass);
+                    if(relationsToDelete.containsKey(tClass.getId())) relationsToDelete.remove(tClass.getId());
+                    found = true;
                     break;
                 }
+                if(!found) throw new MiddlewareException("Term Class:" + sClass + "not found");
+            }
+            
+            //Removing old classes which are not in used
+            for (Term cl : relationsToDelete.values()){
+                session.createQuery("delete CVTermRelationship where typeId = :typeId and subjectId = :subjectId and objectId = :objectId")
+                        .setParameter("typeId", TermId.IS_A.getId())
+                        .setParameter("subjectId", id)
+                        .setParameter("objectId", cl.getId())
+                        .executeUpdate();
             }
 
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in updateProperty " + e.getMessage(), e);
         }
 
         return p;

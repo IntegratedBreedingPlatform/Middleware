@@ -14,7 +14,6 @@
 package org.generationcp.middleware.dao.oms;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.Debug;
 
 import java.util.ArrayList;
@@ -39,12 +38,6 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
     }
     
     @Test
-    public void testGenericTest() throws Exception {
-        List<CVTerm> terms = dao.filterByColumnValue(CVTerm.class, "name", "Project");
-        System.out.println(terms.size());
-    }
-    
-    @Test
     public void testGetPropertyById() throws Exception {
         Property property = dao.getPropertyById(2020);
         assertNotNull(property);
@@ -58,7 +51,7 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
             p.print(2);
         }
         Debug.println("Properties: " + properties.size());
-        assertTrue(properties.size() == 14);
+        assertTrue(properties.size() >= 14);
     }
 
     @Test
@@ -72,36 +65,38 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
     }
 
     @Test
-    public void testSaveAndDeleteProperty() throws Exception {
-        Property p = dao.addProperty("test", "test", "CO_322:0000046", new ArrayList<>(Arrays.asList("Agronomic")));
-        Property addedP = dao.getPropertyById(p.getId());
-        assertNotNull(addedP);
-        assertEquals(p.getName(), addedP.getName());
-        p.print(2);
-        dao.delete(p.getId());
-        assertNull(dao.getPropertyById(p.getId()));
+    public void testSaveProperty() throws Exception {
+        Property property = dao.addProperty(getNewRandomName(), "test", "CO_322:0000046", new ArrayList<>(Arrays.asList("Agronomic")));
+        property.print(INDENT);
+        assertNotNull(property.getId());
+        assertEquals(property.getDefinition(), "test");
+        assertEquals(property.getClasses().size(), 1);
+        assertEquals(property.getCropOntologyId(), "CO_322:0000046");
     }
 
     @Test
-    public void testSaveAndUpdateDeleteProperty() throws Exception {
-        Property p = dao.addProperty("test", "test", "CO_322:0000046", new ArrayList<>(Arrays.asList("Agronomic")));
-        Property addedP = dao.getPropertyById(p.getId());
-        assertNotNull(addedP);
-        assertEquals(p.getName(), addedP.getName());
-        p.print(2);
-        dao.updateProperty(p.getId(), p.getName(), "new test", "CO_322:0000047", new ArrayList<>(Arrays.asList("Agronomic", "Biotic Stress")));
-        Property updatedProperty = dao.getPropertyById(p.getId());
-        assertEquals(updatedProperty.getDefinition(), "new test");
+    public void testUpdateProperty() throws Exception {
+        Property property = dao.addProperty(getNewRandomName(), "test", "CO_322:0000046", new ArrayList<>(Arrays.asList("Agronomic")));
+        dao.updateProperty(property.getId(), property.getName(), "update", "CO_322:0000047", new ArrayList<>(Arrays.asList("Biotic stress")));
+        Property updatedProperty = dao.getPropertyById(property.getId());
+        updatedProperty.print(INDENT);
+        assertEquals(updatedProperty.getDefinition(), "update");
         assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
-        assertEquals(updatedProperty.getClasses().size(), 2);
-        dao.delete(p.getId());
-        assertNull(dao.getPropertyById(p.getId()));
+        assertEquals(updatedProperty.getClasses().size(), 1);
+        assertEquals(updatedProperty.getClasses().get(0).getName(), "Biotic stress");
     }
-    
+
+    @Test
+    public void testDeleteProperty() throws Exception {
+        Property property = dao.addProperty(getNewRandomName(), "test", "CO_322:0000046", new ArrayList<>(Arrays.asList("Agronomic")));
+        property.print(INDENT);
+        dao.delete(property.getId());
+        assertNull(dao.getPropertyById(property.getId()));
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         dao.setSession(null);
         dao = null;
     }
-
 }

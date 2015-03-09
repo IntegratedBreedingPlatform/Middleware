@@ -98,6 +98,7 @@ public class Term implements Serializable{
         cvTerm.setName(this.getName());
         cvTerm.setDefinition(this.getDefinition());
         cvTerm.setIsObsolete(this.isObsolete());
+        cvTerm.setIsRelationshipType(false);
         return cvTerm;
     }
     
