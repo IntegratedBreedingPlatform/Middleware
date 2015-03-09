@@ -246,7 +246,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     public void testGetRootFolders() throws Exception {    	
     	List<FolderReference> rootFolders = manager.getRootFolders(commonTestProject.getUniqueID());
         assertNotNull(rootFolders);
-        assertTrue(rootFolders.isEmpty());
+        //this should contain the nursery and trial templates
+        assertFalse(rootFolders.isEmpty());
         
         StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
     	String uniqueId = commonTestProject.getUniqueID();
@@ -266,10 +267,14 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetChildrenOfFolder() throws Exception {
-        List<Integer> folderIds = Arrays.asList(1000, 2000);
+    	StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
+    	String uniqueId = commonTestProject.getUniqueID();
+    	studyTestDataUtil.createFolderTestData(uniqueId);
+    	
+        List<Integer> folderIds = Arrays.asList(25000, 1);
         for (Integer folderId : folderIds) {
-        	//TODO setup data with programUUID and pass through..
-            List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId, null);
+        	Debug.println(INDENT, " folderId = " + folderId);
+        	List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId, commonTestProject.getUniqueID());
             assertNotNull(childrenNodes);
             assertTrue(childrenNodes.size() > 0);
             Debug.println(INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());

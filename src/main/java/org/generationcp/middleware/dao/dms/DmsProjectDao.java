@@ -52,7 +52,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = subject.project_id AND pp.value = " 
 			+ "         "+TermId.DELETED_STUDY.getId()+") "
-			+ " AND subject.program_uuid = :program_uuid "
+			+ " AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL)"
 			+ " ORDER BY name "
 			;
 
@@ -77,7 +77,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		    + " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
 			+ "         "+TermId.DELETED_STUDY.getId()+") "
-			+ " AND p.program_uuid = :program_uuid "
+			+ " AND (p.program_uuid = :program_uuid OR p.program_uuid IS NULL)"
 		    + " ORDER BY p.project_id ";
 	
 	private static final String COUNT_PROJECTS_WITH_VARIABLE =

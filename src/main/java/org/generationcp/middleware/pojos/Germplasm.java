@@ -230,11 +230,11 @@ public class Germplasm implements Serializable{
     public static final String SEARCH_GERMPLASM_BY_GID_LIKE = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid LIKE :gid AND gid!=grplce AND g.grplce = 0";    
+    		"WHERE gid LIKE :gid AND gid!=grplce AND grplce = 0";    
     public static final String SEARCH_GERMPLASM_BY_GIDS = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid IN (:gids) AND gid!=grplce AND g.grplce = 0";
+    		"WHERE gid IN (:gids) AND gid!=grplce AND grplce = 0";
     public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = 
     		"SELECT DISTINCT g.* " +
     		"FROM names n, germplsm g " +
