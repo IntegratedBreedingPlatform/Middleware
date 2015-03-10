@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -39,12 +40,10 @@ public class PropertyDao extends OntologyBaseDAO {
         try {
             List<Property> properties = getProperties(false, new ArrayList<>(Arrays.asList(propertyId)));
             if(properties.size() == 0) return null;
-            if(properties.size() > 1) throw new MiddlewareQueryException("Property with id:" + propertyId + " expected: 1, found: " + properties.size());
             return properties.get(0);
         } catch (HibernateException e) {
-            logAndThrowException("Error at getPropertyById :" + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at getPropertyById :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
-        return null;
     }
 
     /**
@@ -57,9 +56,8 @@ public class PropertyDao extends OntologyBaseDAO {
         try {
             return getProperties(true, null);
         } catch (HibernateException e) {
-            logAndThrowException("Error at getAllProperties :" + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at getAllProperties :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
-        return null;
     }
     
     /**
@@ -85,9 +83,8 @@ public class PropertyDao extends OntologyBaseDAO {
             return getProperties(false, propertyIds);
 
         } catch (HibernateException e) {
-            logAndThrowException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
-        return new ArrayList<>();
     }
 
     /**
@@ -169,7 +166,7 @@ public class PropertyDao extends OntologyBaseDAO {
             }
 
         } catch (HibernateException e) {
-            logAndThrowException("Error at getProperties :" + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
 
         return new ArrayList<>(map.values());
@@ -210,7 +207,7 @@ public class PropertyDao extends OntologyBaseDAO {
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at addProperty :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
 
         return p;
@@ -271,13 +268,13 @@ public class PropertyDao extends OntologyBaseDAO {
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error in updateProperty " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at updateProperty :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
 
         return p;
     }
 
-    public void delete(Integer propertyId) throws MiddlewareQueryException{
+    public void delete(Integer propertyId) throws MiddlewareQueryException, MiddlewareException{
 
         Session session = getSession();
         Transaction transaction = null;
@@ -285,20 +282,29 @@ public class PropertyDao extends OntologyBaseDAO {
         try {
             transaction = session.beginTransaction();
             
-            CVTerm term = getCvTermDao().getByIdForced(propertyId);
+            CVTerm term = getCvTermDao().getById(propertyId);
+            if(term == null) {
+                throw new MiddlewareException(String.format("Term for Property does not exist with id:%d", propertyId), ErrorCode.ENTITY_NOT_FOUND,  propertyId);
+            }
 
+            //Deleting existing relationships for property
             List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(propertyId);
-            for(CVTermRelationship r : relationships) getCvTermRelationshipDao().makeTransient(r);
+            for(CVTermRelationship r : relationships){
+                getCvTermRelationshipDao().makeTransient(r);
+            }
 
+            //Deleting existing values for property
             List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermId(propertyId);
-            for(CVTermProperty p : properties) getCvTermPropertyDao().makeTransient(p);
-            
-            getCvTermDao().makeTransient(term);
+            for(CVTermProperty p : properties){
+                getCvTermPropertyDao().makeTransient(p);
+            }
 
+            getCvTermDao().makeTransient(term);
             transaction.commit();
-        } catch (Exception e) {
+
+        } catch (HibernateException e) {
             rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at deleteProperty :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
     }
 }

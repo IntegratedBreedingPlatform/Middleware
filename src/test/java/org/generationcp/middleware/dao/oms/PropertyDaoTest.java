@@ -14,21 +14,22 @@
 package org.generationcp.middleware.dao.oms;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.utils.test.Debug;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
 
 
 public class PropertyDaoTest extends MiddlewareIntegrationTest {
-
+    
     private static PropertyDao dao;
 
     @BeforeClass
@@ -92,6 +93,16 @@ public class PropertyDaoTest extends MiddlewareIntegrationTest {
         property.print(INDENT);
         dao.delete(property.getId());
         assertNull(dao.getPropertyById(property.getId()));
+    }
+
+    @Test
+    public void testDeletePropertyForI18nMessage() throws Exception {
+        try{
+            dao.delete(0);    
+        } catch (MiddlewareException e){
+            assertEquals(e.getMessageKey(), ErrorCode.ENTITY_NOT_FOUND);
+            assertEquals(e.getMessage(), String.format("Term for Property does not exist with id:%d", 0));
+        }
     }
 
     @AfterClass

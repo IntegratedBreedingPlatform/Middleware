@@ -15,16 +15,12 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class BaseDAO {
-
-    private static final Logger LOG = LoggerFactory.getLogger(BaseDAO.class);
 
     protected final String SHOULD_NOT_OBSOLETE = "is_obsolete = 0";
 
@@ -83,12 +79,5 @@ public abstract class BaseDAO {
         if(val instanceof Integer) return (Integer) val != 0;
         if(val instanceof Boolean) return (Boolean) val;
         return false;
-    }
-    
-    /*          END TYPE CASTING                    */
-    
-    protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException{
-        LOG.error(message, e);
-        throw new MiddlewareQueryException(message, e);
     }
 }
