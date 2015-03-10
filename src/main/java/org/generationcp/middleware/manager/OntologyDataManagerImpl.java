@@ -37,6 +37,7 @@ import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -349,12 +350,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 term = getTermSaver().save(name, definition, cvId);
                 trans.commit();
             } else {
-                throw new MiddlewareQueryException("Variables cannot be used in this method.");
+                throw new MiddlewareQueryException("Variables cannot be used in this method.", ErrorCode.INVALID_METHOD_USAGE);
             }
             return term;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in addTerm: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at addTerm :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
     }
     
@@ -374,7 +375,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at updateTerm :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
     }
     
@@ -869,11 +870,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 getTermSaver().delete(getCvTermDao().getById(cvTermId), cvId);
                 trans.commit();
             } else {
-                throw new MiddlewareQueryException("variables cannot be used in this method");
+                throw new MiddlewareQueryException("variables cannot be used in this method", ErrorCode.INVALID_METHOD_USAGE);
             }
-        } catch (MiddlewareQueryException e) {
+        } catch (HibernateException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException(e.getCode(), e);
+            throw new MiddlewareQueryException("Error at deleteProperty :" + e.getMessage(), ErrorCode.DATA_PROVIDER_FAILED);
         }
     }
     

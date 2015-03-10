@@ -14,8 +14,8 @@ public enum ErrorCode {
     , STUDY_FORMAT_INVALID("error.review.study.summary.format.invalid")
     , ENTITY_NOT_FOUND("entity.does.not.exist")
     , DATA_PROVIDER_FAILED("hibernate.query.execute.exception")
+    , INVALID_METHOD_USAGE("middleware.invalid.method.usage")
     ;
-    
     private String code;
     
     private ErrorCode(String code) {
