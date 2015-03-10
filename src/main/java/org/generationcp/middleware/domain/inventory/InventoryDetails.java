@@ -112,7 +112,17 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.comment = comment;
 	}
 
-
+	public InventoryDetails(Integer gid, String germplasmName, Integer locationId,
+			Integer userId, Double amount, Integer sourceId, Integer scaleId, Integer entryId) {
+		this.gid = gid;
+		this.germplasmName = germplasmName;
+		this.locationId = locationId;
+		this.userId = userId;
+		this.amount = amount;
+		this.sourceId = sourceId;
+		this.scaleId = scaleId;
+		this.entryId = entryId;
+	}
 
 	/**
 	 * Gets the gid.
