@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.exceptions;
 
+import org.generationcp.middleware.util.Message;
+
 /**
  * Exceptions for database-related Middleware issues.
  *
@@ -20,6 +22,8 @@ public class MiddlewareQueryException extends Exception{
     private static final long serialVersionUID = 1L;
     
     private String code;
+
+    private Message message;
 
     public MiddlewareQueryException(String message) {
         super(message);
@@ -36,5 +40,13 @@ public class MiddlewareQueryException extends Exception{
     
     public String getCode() {
         return this.code;
+    }
+
+    public String getMessageKey() {
+        return this.message.getMessageKey();
+    }
+
+    public String[] getMessageParameters(){
+        return this.message.getMessageParams();
     }
 }
