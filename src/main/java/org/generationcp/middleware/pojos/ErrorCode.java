@@ -12,6 +12,8 @@ public enum ErrorCode {
     , ONTOLOGY_HAS_IS_A_RELATIONSHIP("error.ontology.has.trait.class")
     , ONTOLOGY_HAS_LINKED_PROPERTY("error.ontology.has.linked.property")
     , STUDY_FORMAT_INVALID("error.review.study.summary.format.invalid")
+    , ENTITY_NOT_FOUND("entity.does.not.exist")
+    , DATA_PROVIDER_FAILED("hibernate.query.execute.exception")
     ;
     
     private String code;

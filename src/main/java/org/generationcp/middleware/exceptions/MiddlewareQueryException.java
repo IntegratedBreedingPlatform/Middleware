@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.exceptions;
 
-import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.pojos.ErrorCode;
 
 /**
  * Exceptions for database-related Middleware issues.
@@ -23,7 +23,9 @@ public class MiddlewareQueryException extends Exception{
     
     private String code;
 
-    private Message message;
+    private ErrorCode errorCode;
+
+    private Object[] messageParams;
 
     public MiddlewareQueryException(String message) {
         super(message);
@@ -37,16 +39,20 @@ public class MiddlewareQueryException extends Exception{
         super(message);
         this.code = code;
     }
+
+    public MiddlewareQueryException(String logMessage, ErrorCode errorCode, Object... params) {
+        super(logMessage);
+        this.errorCode = errorCode;
+        this.messageParams = params;
+    }
     
     public String getCode() {
         return this.code;
     }
 
     public String getMessageKey() {
-        return this.message.getMessageKey();
+        return this.errorCode.getCode();
     }
 
-    public String[] getMessageParameters(){
-        return this.message.getMessageParams();
-    }
+    public Object[] getMessageParameters(){ return this.messageParams; }
 }

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.exceptions;
 
-import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.pojos.ErrorCode;
 
 /**
  * Exceptions for non-database Middleware issues.
@@ -21,7 +21,9 @@ public class MiddlewareException extends Exception{
 
     private static final long serialVersionUID = 1L;
 
-    private Message message;
+    private ErrorCode errorCode;
+
+    private Object[] messageParams;
     
     public MiddlewareException(String message) {
         super(message);
@@ -31,17 +33,16 @@ public class MiddlewareException extends Exception{
         super(message, cause);
     }
     
-    public MiddlewareException(String logMessage, String messageKey, String... params) {
+    public MiddlewareException(String logMessage, ErrorCode errorCode, Object... params) {
         super(logMessage);
-        this.message = new Message(messageKey, params);
+        this.errorCode = errorCode;
+        this.messageParams = params;
     }
     
     public String getMessageKey() {
-        return this.message.getMessageKey();
+        return this.errorCode.getCode();
     }
     
-    public String[] getMessageParameters(){
-        return this.message.getMessageParams();
-    }
+    public Object[] getMessageParameters(){ return this.messageParams; }
     
 }
