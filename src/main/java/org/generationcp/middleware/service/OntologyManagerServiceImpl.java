@@ -11,7 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.OntologyManagerService;
@@ -32,5 +34,30 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     @Override
     public List<Term> getDataTypes() throws MiddlewareQueryException {
         return getOntologyConstantDataManager().getDataTypes();
+    }
+
+    @Override
+    public Method getMethod(int id) throws MiddlewareQueryException {
+        return getOntologyMethodDataManager().getMethod(id);
+    }
+
+    @Override
+    public List<Method> getAllMethods() throws MiddlewareQueryException {
+        return getOntologyMethodDataManager().getAllMethods();
+    }
+
+    @Override
+    public void addMethod(Method method) throws MiddlewareQueryException {
+        getOntologyMethodDataManager().addMethod(method);
+    }
+
+    @Override
+    public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyMethodDataManager().updateMethod(method);
+    }
+
+    @Override
+    public void deleteMethod(int id) throws MiddlewareQueryException {
+        getOntologyMethodDataManager().deleteMethod(id);
     }
 }

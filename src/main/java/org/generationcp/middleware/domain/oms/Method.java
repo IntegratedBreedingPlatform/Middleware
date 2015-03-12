@@ -18,6 +18,7 @@ public class Method {
     private Term term;
     
     public Method() {
+        this.term = new Term();
     }
 
     public Method(Term term) {
@@ -67,15 +68,7 @@ public class Method {
             return "";
         }
 
-		StringBuilder builder = new StringBuilder();
-		builder.append("Method [id=");
-        builder.append(term.getId());
-        builder.append(", name=");
-        builder.append(term.getName());
-        builder.append(", definition=");
-        builder.append(term.getDefinition());
-        builder.append("]");
-		return builder.toString();
+        return "Method [id=" + term.getId() + ", name=" + term.getName() + ", definition=" + term.getDefinition() + "]";
 	}
 
     public void print(int indent) {

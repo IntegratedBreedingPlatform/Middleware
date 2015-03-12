@@ -57,6 +57,7 @@ import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
 import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
+import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -470,20 +471,20 @@ public abstract class DataManager extends DatabaseBroker{
 
     protected void logAndThrowException(String message) throws MiddlewareQueryException {
         LOG.error(message);
-        throw new MiddlewareQueryException(message);
+        throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
     }
 
 
     /**
      * Logs an error based on the given message using the given Logger parameter.
-     * 
+     * TODO: Do not use this method outside DataManager. Currently it has been referred to many places and need to clean this.
      * @param message   The message to log and to set on the exception
      * @param e     The origin of the exception
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
         LOG.error(e.getMessage(), e);
-        throw new MiddlewareQueryException(message + e.getMessage(), e);
+        throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
     }
 
 
@@ -497,8 +498,8 @@ public abstract class DataManager extends DatabaseBroker{
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
-        LOG.error(e.getMessage(), e);
-        throw new MiddlewareQueryException(message + e.getMessage(), e);
+        log.error(e.getMessage(), e);
+        throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
     }
 
     /**
