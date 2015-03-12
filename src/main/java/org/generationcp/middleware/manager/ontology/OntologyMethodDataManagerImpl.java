@@ -65,6 +65,9 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             logAndThrowException("Method exist with same name");
         }
 
+        //Constant CvId
+        method.getTerm().setVocabularyId(CvId.METHODS.getId());
+
         Session session = getCurrentSession();
         Transaction trans = null;
 
@@ -89,6 +92,9 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
         }
 
         assert term != null;
+
+        //Constant CvId
+        method.getTerm().setVocabularyId(CvId.METHODS.getId());
 
         Session session = getCurrentSession();
         Transaction trans = null;
