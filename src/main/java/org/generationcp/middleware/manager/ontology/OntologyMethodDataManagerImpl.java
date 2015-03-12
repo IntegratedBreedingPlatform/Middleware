@@ -85,7 +85,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     @Override
     public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException {
 
-        CVTerm term = getCvTermDao().getByNameAndCvId(method.getName(), CvId.METHODS.getId());
+        CVTerm term = getCvTermDao().getById(method.getId());
 
         if (term == null) {
             logAndThrowException("Method does not exist with that id");
