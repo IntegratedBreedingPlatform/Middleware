@@ -11,18 +11,46 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.util.Debug;
 
-import java.util.List;
+import java.util.Map;
 
 public class Scale {
-    
+
     private Term term;
-    
-    
+    private DataType dataType;
+    private Map<String, String> categories;
+
+    public static enum DataType {
+
+        NUMERIC_VARIABLE(1110)
+        , DATE_TIME_VARIABLE(1117)
+        , CHARACTER_VARIABLE(1120)
+        , CATEGORICAL_VARIABLE(1130);
+
+        private final int id;
+
+        private DataType(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return this.id;
+        }
+
+        public static DataType getById(int id) {
+            for (DataType term : values()) {
+                if (term.getId() == id) {
+                    return term;
+                }
+            }
+            return null;
+        }
+    }
+
     public Scale() {
+
     }
 
     public Scale(Term term) {
@@ -54,23 +82,21 @@ public class Scale {
     }
 
     public String getDefinition() {
-       return term.getDefinition();
+        return term.getDefinition();
     }
 
     public void setDefinition(String definition) {
         term.setDefinition(definition);
     }
 
-    private Term dataType;
-    
-    public Term getDataType() {
+    public DataType getDataType() {
         return dataType;
     }
 
-    public void setDataType(Term dataType) {
+    public void setDataType(DataType dataType) {
         this.dataType = dataType;
-    }    
-    
+    }
+
     private VariableConstraints constraints;
 
     public VariableConstraints getConstraints() { return constraints; }
@@ -79,82 +105,23 @@ public class Scale {
         this.constraints = constraints;
     }
 
-    private List<Enumeration> enumerations;
-    
-    public List<Enumeration> getEnumerations() {
-        return enumerations;
+    public Map<String, String> getCategories() {
+        return categories;
     }
 
-    public Enumeration getEnumeration(Integer id){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getId().equals(id)){
-                return enumeration;
-            }
-        }
-        return null;
-    }
-
-    public Enumeration getEnumeration(String name, String description){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getName().equalsIgnoreCase(name) && enumeration.getDescription().equalsIgnoreCase(description)){
-                return enumeration;
-            }
-        }
-        return null;
-    }
-
-    public Enumeration getEnumerationByName(String name){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getName().equalsIgnoreCase(name) ){
-                return enumeration;
-            }
-        }
-        return null;
-    }
-
-    public Enumeration getEnumerationByDescription(String description){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getDescription().equalsIgnoreCase(description)){
-                return enumeration;
-            }
-        }
-        return null;
-    }
-
-
-    public void setEnumerations(List<Enumeration> enumerations) {
-        this.enumerations = enumerations;
+    public void setCategories(Map<String, String> categories) {
+        this.categories = categories;
     }
 
     @Override
-	public String toString() {
-	    
-	    if (term == null){
-	        return "";
-	    }
-	    
-		StringBuilder builder = new StringBuilder();
-		builder.append("Scale [id=");
-        builder.append(term.getId());
-        builder.append(", name=");
-        builder.append(term.getName());
-        builder.append(", definition=");
-        builder.append(term.getDefinition());
-		builder.append("]");
-		return builder.toString();
-	}
+    public String toString() {
+
+        if (term == null){
+            return "";
+        }
+
+        return "Scale [id=" + term.getId() + ", name=" + term.getName() + ", definition=" + term.getDefinition() + "]";
+    }
 
     public void print(int indent) {
         Debug.println(indent, "Scale: ");
@@ -164,5 +131,5 @@ public class Scale {
             Debug.println(indent + 3, "null");
         }
     }
-	
+
 }
