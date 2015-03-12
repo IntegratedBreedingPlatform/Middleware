@@ -15,7 +15,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.manager.ontology.api.OntologyConstantDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.junit.Assert;
 
 import org.junit.BeforeClass;
@@ -23,13 +23,13 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class OntologyConstantDataManagerImplTest extends DataManagerIntegrationTest {
+public class OntologyBasicDataManagerImplTest extends DataManagerIntegrationTest {
 
-	private static OntologyConstantDataManager manager;
+	private static OntologyBasicDataManager manager;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		manager = DataManagerIntegrationTest.managerFactory.getOntologyConstantDataManager();
+		manager = DataManagerIntegrationTest.managerFactory.getOntologyBasicDataManager();
 	}
 
     @Test

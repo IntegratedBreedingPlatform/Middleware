@@ -22,7 +22,7 @@ import java.util.List;
  * 
  * 
  */
-public interface OntologyConstantDataManager {
+public interface OntologyBasicDataManager {
 
     /**
      * Return All Trait Classes

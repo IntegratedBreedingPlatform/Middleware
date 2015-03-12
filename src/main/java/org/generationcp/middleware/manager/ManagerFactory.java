@@ -27,9 +27,9 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.manager.ontology.OntologyConstantDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyBasicDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.api.OntologyConstantDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
@@ -105,8 +105,8 @@ public class ManagerFactory implements Serializable {
         return new OntologyDataManagerImpl(sessionProvider);
     }
 
-    public OntologyConstantDataManager getOntologyConstantDataManager() {
-        return new OntologyConstantDataManagerImpl(sessionProvider);
+    public OntologyBasicDataManager getOntologyBasicDataManager() {
+        return new OntologyBasicDataManagerImpl(sessionProvider);
     }
 
     public OntologyMethodDataManager getOntologyMethodDataManager() {
