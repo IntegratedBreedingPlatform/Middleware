@@ -55,6 +55,7 @@ public class Property {
 	private String cropOntologyId;
 	
 	public Property() {
+        this.term = new Term();
 	}
 
     public Property(Term term) {
