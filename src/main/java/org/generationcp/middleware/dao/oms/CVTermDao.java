@@ -1494,7 +1494,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("cvId", cvId));
+            criteria.add(Restrictions.eq("cvId", cvId.getId()));
             criteria.add(Restrictions.eq("isObsolete", 0));
 
             terms = criteria.list();
