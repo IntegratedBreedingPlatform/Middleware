@@ -21,6 +21,9 @@ public class Property {
 	private Term term;
 
     @Deprecated
+    /**
+     * @Deprecated Properties will have multiple classes associated to it. isA should not be used in Ontology Manager Redesign
+     */
 	private Term isA;
 
     public List<Term> getClasses() {
