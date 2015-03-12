@@ -52,12 +52,9 @@ public class Property {
         this.classes.add(t);
     }
 
-    public void clearClasses(){
-        this.classes.clear();
-    }
-
     public Property() {
         this.term = new Term();
+        this.term.setVocabularyId(CvId.PROPERTIES.getId());
 	}
 
     public Property(Term term) {

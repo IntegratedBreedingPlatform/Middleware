@@ -19,6 +19,7 @@ public class Method {
     
     public Method() {
         this.term = new Term();
+        this.term.setVocabularyId(CvId.METHODS.getId());
     }
 
     public Method(Term term) {
