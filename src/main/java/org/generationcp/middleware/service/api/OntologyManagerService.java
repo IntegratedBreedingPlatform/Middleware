@@ -13,6 +13,7 @@
 package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -91,6 +92,56 @@ public interface OntologyManagerService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteMethod(int id) throws MiddlewareQueryException;
+
+    /*======================= Properties ================================== */
+    /**
+     * Given the termId, retrieve the Property POJO.
+     *
+     * @param id the term id having cvId = Property
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Property getProperty(int id) throws MiddlewareQueryException;
+
+    /**
+     * Get all properties
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllProperties() throws MiddlewareQueryException;
+
+    /**
+     * Get all properties by className
+     * @return property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     *
+     * @param property to be added
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void addProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     * @param property to be updated
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Adds a new property to the database.
+     * This is new method which ignores isA flat relationship to define single class per property
+     * @param propertyId of property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteProperty(Integer propertyId) throws MiddlewareQueryException, MiddlewareException;
+
 
 
 }

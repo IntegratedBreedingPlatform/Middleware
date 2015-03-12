@@ -12,6 +12,7 @@
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -64,5 +65,35 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     @Override
     public void deleteMethod(int id) throws MiddlewareQueryException {
         getOntologyMethodDataManager().deleteMethod(id);
+    }
+
+    @Override
+    public Property getProperty(int id) throws MiddlewareQueryException {
+        return getOntologyPropertyDataManager().getProperty(id);
+    }
+
+    @Override
+    public List<Property> getAllProperties() throws MiddlewareQueryException {
+        return getOntologyPropertyDataManager().getAllProperties();
+    }
+
+    @Override
+    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
+        return getOntologyPropertyDataManager().getAllPropertiesWithClass(className);
+    }
+
+    @Override
+    public void addProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyPropertyDataManager().addProperty(property);
+    }
+
+    @Override
+    public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyPropertyDataManager().updateProperty(property);
+    }
+
+    @Override
+    public void deleteProperty(Integer propertyId) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyPropertyDataManager().deleteProperty(propertyId);
     }
 }
