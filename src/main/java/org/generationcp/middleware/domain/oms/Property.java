@@ -19,6 +19,8 @@ import java.util.List;
 public class Property {
     
 	private Term term;
+    private List<Term> classes;
+    private String cropOntologyId;
 
     @Deprecated
     /**
@@ -50,11 +52,11 @@ public class Property {
         this.classes.add(t);
     }
 
-    private List<Term> classes;
-	
-	private String cropOntologyId;
-	
-	public Property() {
+    public void clearClasses(){
+        this.classes.clear();
+    }
+
+    public Property() {
         this.term = new Term();
 	}
 
