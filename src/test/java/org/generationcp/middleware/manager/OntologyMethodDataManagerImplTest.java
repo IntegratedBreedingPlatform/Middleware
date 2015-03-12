@@ -23,8 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.AfterClass;
 import org.junit.Test;
 
-import java.util.Random;
-
 public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyMethodDataManager manager;
@@ -34,7 +32,7 @@ public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTes
 	@BeforeClass
 	public static void setUp() throws Exception {
 		manager = DataManagerIntegrationTest.managerFactory.getOntologyMethodDataManager();
-        String name = "Test Method " + new Random().nextInt(10000);
+        String name = getNewRandomName();
         String definition = "Test Definition";
         testMethod = new Method();
         testMethod.setName(name);
