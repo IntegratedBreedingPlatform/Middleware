@@ -43,6 +43,11 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     }
 
     @Override
+    public boolean isTermReferred(int termId) throws MiddlewareQueryException {
+        return getOntologyBasicDataManager().isTermReferred(termId);
+    }
+
+    @Override
     public Method getMethod(int id) throws MiddlewareQueryException {
         return getOntologyMethodDataManager().getMethod(id);
     }

@@ -39,4 +39,9 @@ public class OntologyBasicDataManagerImpl extends DataManager implements Ontolog
     public Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
         return Term.fromCVTerm(getCvTermDao().getByNameAndCvId(name, cvId));
     }
+
+    @Override
+    public boolean isTermReferred(int termId) throws MiddlewareQueryException {
+        return getCvTermRelationshipDao().isTermReferred(termId);
+    }
 }

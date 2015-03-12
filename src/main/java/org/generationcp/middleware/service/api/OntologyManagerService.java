@@ -50,6 +50,13 @@ public interface OntologyManagerService {
      */
     Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException;
 
+    /**
+     * @param termId TermId
+     * @return true is term is referred
+     * @throws MiddlewareQueryException
+     */
+    boolean isTermReferred(int termId) throws MiddlewareQueryException;
+
     /*======================= Methods ================================== */
     /**
      * Gets the method with the given id.

@@ -38,4 +38,6 @@ public interface OntologyBasicDataManager {
 
 
     Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException;
+
+    boolean isTermReferred(int termId) throws MiddlewareQueryException;
 }
