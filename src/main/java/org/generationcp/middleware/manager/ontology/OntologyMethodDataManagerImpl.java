@@ -20,6 +20,7 @@ import java.util.List;
 public class OntologyMethodDataManagerImpl extends DataManager implements OntologyMethodDataManager {
 
     private static final String METHOD_DOES_NOT_EXIST = "Method does not exist with that id";
+    private static final String TERM_IS_NOT_METHOD = "That term is not a METHOD";
 
     private static final Logger LOG = LoggerFactory.getLogger(OntologyMethodDataManager.class);
 
@@ -31,8 +32,12 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     public Method getMethod(int id) throws MiddlewareQueryException {
         CVTerm term = getCvTermDao().getById(id);
 
+        if(term == null){
+            return null;
+        }
+
         if (term.getCv() != CvId.METHODS.getId()) {
-            logAndThrowException(METHOD_DOES_NOT_EXIST);
+            logAndThrowException(TERM_IS_NOT_METHOD, new MiddlewareException("TERM:" + id), LOG);
         }
 
         return new Method(Term.fromCVTerm(term));
@@ -70,7 +75,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error at addTerm" + e.getMessage(), e, LOG);
+            logAndThrowException("Error at addMethod" + e.getMessage(), e, LOG);
         }
     }
 
@@ -99,7 +104,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error at addTerm" + e.getMessage(), e, LOG);
+            logAndThrowException("Error at updateMethod" + e.getMessage(), e, LOG);
         }
 
     }
@@ -109,8 +114,8 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
         CVTerm term = getCvTermDao().getById(id);
 
-        if (term.getCv() != CvId.METHODS.getId()) {
-            logAndThrowException(METHOD_DOES_NOT_EXIST);
+        if (term == null || term.getCv() != CvId.METHODS.getId()) {
+            logAndThrowException(METHOD_DOES_NOT_EXIST, new MiddlewareException("METHOD:" + id), LOG);
         }
 
         Session session = getCurrentSession();
@@ -124,7 +129,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error at addTerm" + e.getMessage(), e, LOG);
+            logAndThrowException("Error at deleteMethod" + e.getMessage(), e, LOG);
         }
     }
 }
