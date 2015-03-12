@@ -541,5 +541,16 @@ public class DatabaseBroker {
 	public void setProjectPropertyDao(ProjectPropertyDao projectPropertyDao){
 		this.projectPropertyDao = projectPropertyDao;
 	}
-	
+
+    /**
+     * Parse hibernate query result value to boolean with null check
+     * @param val value
+     * @return
+     */
+    protected boolean typeSafeObjectToBoolean(Object val){
+        if(val == null) return false;
+        if(val instanceof Integer) return (Integer) val != 0;
+        if(val instanceof Boolean) return (Boolean) val;
+        return false;
+    }
 }
