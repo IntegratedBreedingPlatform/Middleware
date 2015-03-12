@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.junit.Assert;
@@ -50,5 +51,11 @@ public class OntologyBasicDataManagerImplTest extends DataManagerIntegrationTest
         for(Term d : dataTypes){
             d.print(MiddlewareIntegrationTest.INDENT);
         }
+    }
+
+    @Test
+    public void testGetTermByNameAndCvId() throws Exception {
+        Term term = manager.getTermByNameAndCvId("Project", CvId.PROPERTIES.getId());
+        Assert.assertNotNull(term);
     }
 }

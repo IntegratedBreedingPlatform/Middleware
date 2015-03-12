@@ -82,6 +82,10 @@ public class Term implements Serializable{
 	}
 
     public static Term fromCVTerm(CVTerm cvTerm){
+        if(cvTerm == null) {
+            return null;
+        }
+
         Term term = new Term();
         term.setId(cvTerm.getCvTermId());
         term.setName(cvTerm.getName());
