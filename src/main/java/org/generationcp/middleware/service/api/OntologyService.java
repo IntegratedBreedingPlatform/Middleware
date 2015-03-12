@@ -26,75 +26,7 @@ import java.util.Set;
  * This is the API for Ontology Browser requirements.
  * 
  */
-@SuppressWarnings("unused")
 public interface OntologyService{
-
-    boolean isTermReferred(int termId) throws MiddlewareQueryException;
-    
-    /*======================= Classes ================================== */
-    /**
-     * Return All Trait Classes
-     * * @return
-     * @throws MiddlewareQueryException*
-     */
-    List<Term> getAllTraitClass() throws MiddlewareQueryException;
-
-    /*======================= Properties ================================== */
-    
-    /**
-     * Get all properties by className
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
-
-    /**
-     * Return Property
-     * * @return
-     * @throws MiddlewareQueryException*
-     */
-    Property getPropertyById(Integer propertyId) throws MiddlewareQueryException;
-
-    /**
-     * Return Property
-     * * @return
-     * @throws MiddlewareQueryException*
-     */
-    List<Property> getAllPropertiesWithClassAndCropOntology() throws MiddlewareQueryException;
-    
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     *
-     * @param name the name
-     * @param definition the definition
-     * @param cropOntologyId the CropOntologyId
-     * @param classes the list of classes
-     * @return Property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
-
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     * @param id of property
-     * @param name of property
-     * @param definition of property
-     * @param cropOntologyId of property
-     * @param classes of property
-     * @return Property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property updateProperty(Integer id, String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
-
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     * @param id of property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    void deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
     
     /*======================= STANDARD VARIABLE ================================== */
 
@@ -110,7 +42,7 @@ public interface OntologyService{
     /**
      * Gets the standard variables given a list of ids
      *
-     * @param standardVariableIds the list of standard variable ids
+     * @param stdVariableIds the list of standard variable ids
      * @return the list of standard variables
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -120,7 +52,7 @@ public interface OntologyService{
     /**
      * Gets standard variable summaries for given a list of ids
      *
-     * @param standardVariableIds the list of standard variable ids
+     * @param stdVariableIds the list of standard variable ids
      * @return the list of standard variable summaries
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -292,7 +224,7 @@ public interface OntologyService{
     void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException;
     
     /*======================= PROPERTY ================================== */
-
+   
     /**
      * Gets the property with the given id.
      *
@@ -300,9 +232,8 @@ public interface OntologyService{
      * @return the matching property
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
     Property getProperty(int id) throws MiddlewareQueryException;
-    
+
     
     /**
      * Gets the property with the given name.
@@ -311,9 +242,19 @@ public interface OntologyService{
      * @return the matching property
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
     Property getProperty(String name) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets all properties from Central and Local.
+     *
+     * @return All the properties
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Property> getAllProperties() throws MiddlewareQueryException;
 
+
+    
     /**
      * Adds a property. If the property is already found in the local database, it simply retrieves the record found.
      *
@@ -323,9 +264,8 @@ public interface OntologyService{
      * @return the Term entry corresponding to the newly-added property
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
     Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
-
+    
     /**
      * Adds or updates a property with the given name and definition.
      * If the given property name is not found in the databases, a new record is added to local database.
@@ -340,7 +280,6 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
     Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException, MiddlewareException;
 
     /**
@@ -350,7 +289,6 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    @Deprecated
     void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
 
     /**
@@ -360,17 +298,8 @@ public interface OntologyService{
      * @param isAId the is a id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    @Deprecated
     void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException;
-
-    /**
-     * Get all properties
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<Property> getAllProperties() throws MiddlewareQueryException;
-
+    
     /*======================= SCALE ================================== */
 
     /**
@@ -576,7 +505,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException;
+    TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareQueryException, MiddlewareException;
     
     /**
      * Delete trait class.
@@ -667,8 +596,8 @@ public interface OntologyService{
     /**
      * Validates if the enumeration is being used.
      * 
-     * @param standardVariableId Standard Variable Id
-     * @param enumerationId enumeration Id
+     * @param standardVariableId
+     * @param enumerationId
      * @return true if valid
      * @throws MiddlewareQueryException
      */
@@ -676,19 +605,19 @@ public interface OntologyService{
  
     /**
      * find all variables given the property
-     * @param propertyId property id
-     * @return List<StandardVariableReference>
+     * @param propertyId
+     * @return
      * @throws MiddlewareQueryException
      */
     List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException;
     
     /**
-     * Return all inventory scales.
-     * @return List<ValueReference>
+     * Return all invenotry scales.
+     * @return
      * @throws MiddlewareQueryException
      */
     List<Scale> getAllInventoryScales() throws MiddlewareQueryException;
 
-    List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException;
-
+    List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
+                throws MiddlewareQueryException;
 }

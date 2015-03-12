@@ -101,12 +101,6 @@ public class DatabaseBroker {
 		return cvTermDao;
 	}
 
-    protected final PropertyDao getPropertyDao() {
-        PropertyDao propertyDao = new PropertyDao();
-        propertyDao.setSession(getActiveSession());
-        return propertyDao;
-    }
-    
     protected final StandardVariableDao getStandardVariableDao() {
     	return new StandardVariableDao(getActiveSession());
     }

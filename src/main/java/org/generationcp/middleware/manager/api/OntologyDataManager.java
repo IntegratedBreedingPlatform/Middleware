@@ -29,74 +29,7 @@ import java.util.Set;
  */
 public interface OntologyDataManager {
 
-    /**
-     * Returns List of Trait Classes*
-     * @return List<Term>
-     * @throws MiddlewareQueryException*
-     */
-    List<Term> getAllTraitClass() throws MiddlewareQueryException;
-
-    boolean isTermReferred(int termId) throws MiddlewareQueryException;
-    
-    /**
-     * Given the termId, retrieve the Property POJO.
-     *
-     * @param propertyId the term id
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property getPropertyById(int propertyId) throws MiddlewareQueryException;
-
-    /**
-     * Get all properties
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllProperties() throws MiddlewareQueryException;
-
-    /**
-     * Get all properties by className
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException;
-
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     *
-     * @param name the name
-     * @param definition the definition
-     * @param cropOntologyId the CropOntologyId
-     * @param classes the list of classes
-     * @return Term
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
-
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     * @param id of property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    void deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException;
-    
-    /**
-     * Adds a new property to the database.
-     * This is new method which ignores isA flat relationship to define single class per property
-     * @param id of property
-     * @param name of property
-     * @param definition of property
-     * @param cropOntologyId of property
-     * @param classes of property
-     * @return Term
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Property updateProperty(Integer id, String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException;
-    
-    
-    /**
+	/**
 	 * Retrieves a Term record given its id. This can also be used to retrieve traits, methods and scales.
 	 *
 	 * @param termId the term id
@@ -124,7 +57,7 @@ public interface OntologyDataManager {
     /**
      * Gets standard variable summaries for given a list of ids. Returns an empty list if no matches are found.
      *
-     * @param standardVariableIds the list of standard variable ids
+     * @param stdVariableIds the list of standard variable ids
      * @return the list of standard variable summaries
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -132,8 +65,8 @@ public interface OntologyDataManager {
     
     /**
      * Gets summary for a standard variable identified by given id. Returns {@code null} if no match is found.
-     * @param standardVariableId Standard Variable Id
-     * @return StandardVariableSummary
+     * @param standardVariableId
+     * @return
      * @throws MiddlewareQueryException
      */
     StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException;
@@ -174,7 +107,7 @@ public interface OntologyDataManager {
 	 * Must provide the property, method, scale, dataType, and storedIn info.
 	 * Otherwise, it will throw an exception.
 	 *
-	 * @param stdVariableList the std variable
+	 * @param stdVariable the std variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException;
@@ -353,47 +286,44 @@ public interface OntologyDataManager {
 	 * Adds a new property to the database that adds the property term and it's is a relationship)
 	 * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a
 	 * Returns the added term.
+	 *
 	 * @param name the name
 	 * @param definition the definition
 	 * @param isA the is a
 	 * @return Term
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-    @Deprecated
 	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
-
-   /**
+	
+	/**
 	 * Given the termId, retrieve the Property POJO.
-     * *
-     * @param termId the term id
+	 *
+	 * @param termId the term id
 	 * @return property
 	 * @throws MiddlewareQueryException the middleware query exception
-     * @deprecated
-     * Use getPropertyById as it loads Property based on new re-desinged approach.
-     */
-    @Deprecated
+	 */
 	Property getProperty(int termId) throws MiddlewareQueryException;
-
-
-    /**
-     * Given the name, retrieve the Property POJO.
-     * @param name the name
-     * @return property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    Property getProperty(String name) throws MiddlewareQueryException;
-
-    /**
+	
+	/**
+	 * Given the name, retrieve the Property POJO.
+	 *
+	 * @param name the name
+	 * @return property
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Property getProperty(String name) throws MiddlewareQueryException;
+	
+   /**
      * Retrieves ALL the trait classes containing the hierarchical structure of the trait classes.
-     * If includePropertiesAndVariables = true, it retrieves the properties and standard variables
+     * If includePropertiesAndVariables = true, it retrieves the properties and standard variables 
      * in a hierarchical structure as well:  Trait Group --> Properties --> Standard Variables.
-     *
+     * 
      * The list is returned in alphabetical order of the name.
      * @param includePropertiesAndVariables true if we want to load the property and standard variable, else false
      * @return the trait groups
      * @throws MiddlewareQueryException the middleware query exception
      */
+
     List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException;
 
     /**
@@ -624,8 +554,8 @@ public interface OntologyDataManager {
 	/**
 	 * validate if the enumeration is being used.
 	 * 
-	 * @param standardVariableId Standard Variable Id
-	 * @param enumerationId Enumeration Id
+	 * @param standardVariableId
+	 * @param enumerationId
 	 * @return true if valid
 	 * @throws MiddlewareQueryException
 	 */
@@ -638,6 +568,5 @@ public interface OntologyDataManager {
      * @return
      */
     List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
-    
 	
 }

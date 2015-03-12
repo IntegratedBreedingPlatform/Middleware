@@ -30,46 +30,6 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         super(sessionProvider);
     }
 
-    @Override
-    public boolean isTermReferred(int termId) throws MiddlewareQueryException {
-        return getOntologyDataManager().isTermReferred(termId);
-    }
-
-    @Override
-    public List<Term> getAllTraitClass() throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllTraitClass();
-    }
-
-    @Override
-    public Property getPropertyById(Integer propertyId) throws MiddlewareQueryException {
-        return getOntologyDataManager().getPropertyById(propertyId);
-    }
-
-    @Override
-    public List<Property> getAllPropertiesWithClassAndCropOntology() throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllProperties();
-    }
-
-    @Override
-    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllPropertiesWithClass(className);
-    }
-
-    @Override
-    public Property addProperty(String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
-        return getOntologyDataManager().addProperty(name, definition, cropOntologyId, classes);
-    }
-
-    @Override
-    public Property updateProperty(Integer id, String name, String definition, String cropOntologyId, List<String> classes) throws MiddlewareQueryException, MiddlewareException {
-        return getOntologyDataManager().updateProperty(id, name, definition, cropOntologyId, classes);
-    }
-
-    @Override
-    public void deleteProperty(Integer id) throws MiddlewareQueryException, MiddlewareException {
-        getOntologyDataManager().deleteProperty(id);
-    }
-
     /*======================= STANDARD VARIABLE ================================== */
 
     @Override
@@ -97,7 +57,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
     @Override
     public List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException {
-        List<StandardVariable> standardVariables = new ArrayList<>();
+        List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
         standardVariables.addAll(getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym));
         return standardVariables;
     }
@@ -195,7 +155,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
     @Override
     public List<Property> getAllProperties() throws MiddlewareQueryException {
-        List<Property> properties = new ArrayList<>();
+        List<Property> properties = new ArrayList<Property>();
         List<Term> propertyTerms = getOntologyDataManager().getAllTermsByCvId(CvId.PROPERTIES);
         
         for (Term term : propertyTerms){
@@ -208,22 +168,25 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException {
         return new Property(getOntologyDataManager().addProperty(name, definition, isA));
     }
+    
 
     @Override
     public Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException, MiddlewareException {
-        return new Property(getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES,  TermId.IS_A.getId(), isAId, cropOntologyId), getTermById(isAId));
+        return new Property(getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES,  TermId.IS_A.getId(), isAId, cropOntologyId),
+                            getTermById(isAId));
     }
     
     @Override
     public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException{
-        getOntologyDataManager().updateTermAndRelationship(property.getTerm(), TermId.IS_A.getId(), property.getIsA().getId());
+        getOntologyDataManager().updateTermAndRelationship(property.getTerm(),  TermId.IS_A.getId(), property.getIsA().getId());
     }
 
     @Override
     public void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException {
         getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.PROPERTIES, TermId.IS_A.getId(), isAId);
     }
-
+    
+    
     /*======================= SCALE ================================== */
 
     @Override
@@ -242,7 +205,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     
     @Override
     public List<Scale> getAllScales() throws MiddlewareQueryException {
-        List<Scale> scales = new ArrayList<>();
+        List<Scale> scales = new ArrayList<Scale>();
         List<Term> scaleTerms = getOntologyDataManager().getAllTermsByCvId(CvId.SCALES);
         
         for (Term term : scaleTerms){
@@ -289,7 +252,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     
     @Override
     public List<Method> getAllMethods() throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<>();
+        List<Method> methods = new ArrayList<Method>();
         List<Term> methodTerms = getOntologyDataManager().getAllTermsByCvId(CvId.METHODS);
         
         for (Term term : methodTerms){
@@ -332,7 +295,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
     @Override
     public List<Term> getAllRoles() throws MiddlewareQueryException{
-        List<Integer> roleIds = new ArrayList<>();
+        List<Integer> roleIds = new ArrayList<Integer>();
         roleIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
         roleIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
         roleIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
@@ -428,5 +391,4 @@ public class OntologyServiceImpl extends Service implements OntologyService {
             throws MiddlewareQueryException {
         return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
     }
-
 }

@@ -19,6 +19,8 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.*;
 
+import java.util.List;
+
 public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyMethodDataManager manager;
@@ -34,6 +36,13 @@ public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTes
         testMethod.setName(name);
         testMethod.setDefinition(definition);
         manager.addMethod(testMethod);
+    }
+
+    @Test
+    public void testGetAllMethods() throws Exception {
+        List<Method> methods = manager.getAllMethods();
+        Assert.assertTrue(methods.size() > 0);
+        Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Methods:  " + methods.size());
     }
 
     @Test
