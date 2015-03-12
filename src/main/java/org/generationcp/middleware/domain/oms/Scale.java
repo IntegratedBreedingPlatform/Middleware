@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
-import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.util.Debug;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Scale {
@@ -21,6 +21,9 @@ public class Scale {
     private Term term;
     private DataType dataType;
     private Map<String, String> categories;
+
+    private String minValue;
+    private String maxValue;
 
     public static enum DataType {
 
@@ -50,7 +53,8 @@ public class Scale {
     }
 
     public Scale() {
-
+        this.term = new Term();
+        this.term.setVocabularyId(CvId.SCALES.getId());
     }
 
     public Scale(Term term) {
@@ -97,20 +101,35 @@ public class Scale {
         this.dataType = dataType;
     }
 
-    private VariableConstraints constraints;
-
-    public VariableConstraints getConstraints() { return constraints; }
-
-    public void setConstraints(VariableConstraints constraints) {
-        this.constraints = constraints;
-    }
-
     public Map<String, String> getCategories() {
         return categories;
     }
 
     public void setCategories(Map<String, String> categories) {
         this.categories = categories;
+    }
+
+    public void addCategory(String name, String description){
+        if(this.categories == null){
+            this.categories = new HashMap<>();
+        }
+        this.categories.put(name, description);
+    }
+
+    public String getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(String minValue) {
+        this.minValue = minValue;
+    }
+
+    public String getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(String maxValue) {
+        this.maxValue = maxValue;
     }
 
     @Override
