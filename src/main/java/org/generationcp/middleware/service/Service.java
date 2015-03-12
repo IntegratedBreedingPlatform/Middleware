@@ -16,6 +16,8 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.*;
 import org.generationcp.middleware.manager.api.*;
+import org.generationcp.middleware.manager.ontology.OntologyConstantDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyConstantDataManager;
 import org.generationcp.middleware.operation.builder.*;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
@@ -63,6 +65,10 @@ public abstract class Service extends DatabaseBroker {
     
     protected final OntologyDataManager getOntologyDataManager() {
         return new OntologyDataManagerImpl(sessionProvider);
+    }
+
+    protected final OntologyConstantDataManager getOntologyConstantDataManager(){
+        return new OntologyConstantDataManagerImpl(sessionProvider);
     }
 
     protected final GermplasmDataManager getGermplasmDataManager() {
