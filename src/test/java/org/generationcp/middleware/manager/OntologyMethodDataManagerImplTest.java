@@ -17,11 +17,7 @@ import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.utils.test.Debug;
-import org.junit.Assert;
-
-import org.junit.BeforeClass;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.*;
 
 public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTest {
 
@@ -29,8 +25,8 @@ public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTes
 
     private static Method testMethod;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		manager = DataManagerIntegrationTest.managerFactory.getOntologyMethodDataManager();
         String name = getNewRandomName();
         String definition = "Test Definition";
@@ -56,8 +52,8 @@ public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTes
         Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + testMethod);
     }
 
-    @AfterClass
-    public static void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         manager.deleteMethod(testMethod.getId());
     }
 }
