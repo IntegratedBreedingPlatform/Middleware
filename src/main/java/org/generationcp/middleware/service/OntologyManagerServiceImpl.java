@@ -28,4 +28,9 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     public List<Term> getAllTraitClass() throws MiddlewareQueryException {
         return getOntologyConstantDataManager().getAllTraitClass();
     }
+
+    @Override
+    public List<Term> getDataTypes() throws MiddlewareQueryException {
+        return getOntologyConstantDataManager().getDataTypes();
+    }
 }

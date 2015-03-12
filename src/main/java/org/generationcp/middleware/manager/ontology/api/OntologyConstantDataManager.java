@@ -26,9 +26,15 @@ public interface OntologyConstantDataManager {
 
     /**
      * Return All Trait Classes
-     * * @return
+     * * @return List<Term>
      * @throws MiddlewareQueryException*
      */
     List<Term> getAllTraitClass() throws MiddlewareQueryException;
+
+    /**
+     * Returns all dataTypes used by Scale
+     */
+    List<Term> getDataTypes() throws MiddlewareQueryException;
+
 
 }

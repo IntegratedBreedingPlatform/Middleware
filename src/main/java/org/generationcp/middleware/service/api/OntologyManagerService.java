@@ -33,4 +33,9 @@ public interface OntologyManagerService {
      */
     List<Term> getAllTraitClass() throws MiddlewareQueryException;
 
+    /**
+     * Returns all dataTypes used by Scale
+     */
+    List<Term> getDataTypes() throws MiddlewareQueryException;
+
 }
