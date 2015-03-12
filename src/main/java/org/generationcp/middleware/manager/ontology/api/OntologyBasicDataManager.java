@@ -37,4 +37,5 @@ public interface OntologyBasicDataManager {
     List<Term> getDataTypes() throws MiddlewareQueryException;
 
 
+    Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException;
 }

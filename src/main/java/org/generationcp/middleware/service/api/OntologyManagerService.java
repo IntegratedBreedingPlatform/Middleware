@@ -40,6 +40,15 @@ public interface OntologyManagerService {
      */
     List<Term> getDataTypes() throws MiddlewareQueryException;
 
+    /*======================= TERM ================================== */
+
+    /**
+     * Return All Trait Classes
+     * * @return
+     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException*
+     */
+    Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException;
+
     /*======================= Methods ================================== */
     /**
      * Gets the method with the given id.

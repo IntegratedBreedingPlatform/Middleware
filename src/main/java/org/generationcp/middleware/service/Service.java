@@ -16,10 +16,12 @@ import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.*;
 import org.generationcp.middleware.manager.api.*;
-import org.generationcp.middleware.manager.ontology.OntologyConstantDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyBasicDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.api.OntologyConstantDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.operation.builder.*;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
@@ -69,12 +71,16 @@ public abstract class Service extends DatabaseBroker {
         return new OntologyDataManagerImpl(sessionProvider);
     }
 
-    protected final OntologyConstantDataManager getOntologyConstantDataManager(){
-        return new OntologyConstantDataManagerImpl(sessionProvider);
+    protected final OntologyBasicDataManager getOntologyBasicDataManager(){
+        return new OntologyBasicDataManagerImpl(sessionProvider);
     }
 
     protected final OntologyMethodDataManager getOntologyMethodDataManager(){
         return new OntologyMethodDataManagerImpl(sessionProvider);
+    }
+
+    protected final OntologyPropertyDataManager getOntologyPropertyDataManager(){
+        return new OntologyPropertyDataManagerImpl(sessionProvider);
     }
 
     protected final GermplasmDataManager getGermplasmDataManager() {

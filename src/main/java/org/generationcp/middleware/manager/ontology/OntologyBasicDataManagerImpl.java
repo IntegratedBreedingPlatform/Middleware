@@ -34,4 +34,9 @@ public class OntologyBasicDataManagerImpl extends DataManager implements Ontolog
 
         return getTermBuilder().getTermsByIds(dataTypeIds);
     }
+
+    @Override
+    public Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
+        return Term.fromCVTerm(getCvTermDao().getByNameAndCvId(name, cvId));
+    }
 }
