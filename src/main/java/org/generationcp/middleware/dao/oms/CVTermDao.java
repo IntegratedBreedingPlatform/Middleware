@@ -35,6 +35,8 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
+    public final String SHOULD_NOT_OBSOLETE = "is_obsolete = 0";
+
 	public CVTerm getByCvIdAndDefinition(Integer cvId, String definition)
 			throws MiddlewareQueryException {
 		CVTerm term = null;
