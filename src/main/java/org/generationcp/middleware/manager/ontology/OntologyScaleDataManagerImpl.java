@@ -25,6 +25,21 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     /**
+     * This will fetch all Properties*
+     * @return List<Scale>
+     * @throws MiddlewareQueryException
+     */
+    public List<Scale> getAllScales() throws MiddlewareQueryException {
+        try {
+            return getScales(true, null);
+        } catch (Exception e) {
+            logAndThrowException("Error at getAllScales" + e.getMessage(), e, LOG);
+        }
+        return new ArrayList<>();
+    }
+
+
+    /**
      * This will fetch list of properties by passing scaleIds
      * This method is private and consumed by other methods
      * @param fetchAll will tell weather query should get all properties or not.

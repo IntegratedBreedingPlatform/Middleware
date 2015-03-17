@@ -13,9 +13,17 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.utils.test.Debug;
+import org.junit.Assert;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
+
+import java.util.List;
 
 public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest {
 
@@ -26,7 +34,15 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
 		manager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
     }
 
+    @Test
+    public void testGetAllScales() throws Exception {
+        List<Scale> scales = manager.getAllScales();
+        Assert.assertTrue(scales.size() > 0);
+        Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Scales:  " + scales.size());
+    }
+
     @After
     public void tearDown() throws Exception {
+
     }
 }

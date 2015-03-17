@@ -12,11 +12,22 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+
+import java.util.List;
+
 /**
  * This is the API for retrieving ontology scale data.
  * 
  * 
  */
 public interface OntologyScaleDataManager {
+
+    /**
+     * Get all scales from db
+     * @throws MiddlewareQueryException
+     */
+    public List<Scale> getAllScales() throws MiddlewareQueryException;
 
 }
