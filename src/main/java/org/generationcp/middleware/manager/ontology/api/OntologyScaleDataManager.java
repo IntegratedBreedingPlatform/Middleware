@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.ontology.api;
 
 import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.List;
@@ -37,5 +38,14 @@ public interface OntologyScaleDataManager {
      * @throws MiddlewareQueryException
      */
     public List<Scale> getAllScales() throws MiddlewareQueryException;
+
+    /**
+     * Adding new scale
+     * @param scale scale to be added
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    void addScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
+
 
 }

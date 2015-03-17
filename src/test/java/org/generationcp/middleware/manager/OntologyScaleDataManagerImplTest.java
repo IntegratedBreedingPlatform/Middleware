@@ -29,9 +29,20 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
 
 	private static OntologyScaleDataManager manager;
 
+    private static Scale testScale;
+
 	@Before
 	public void setUp() throws Exception {
 		manager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
+        String name = getNewRandomName();
+        String definition = "Test Definition";
+        testScale = new Scale();
+        testScale.setName(name);
+        testScale.setDefinition(definition);
+        testScale.setDataType(Scale.DataType.NUMERIC_VARIABLE);
+        testScale.setMinValue("0");
+        testScale.setMaxValue("100");
+        manager.addScale(testScale);
     }
 
     @Test
@@ -41,8 +52,19 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
         Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Scales:  " + scales.size());
     }
 
+    @Test
+    public void testAddScale() throws Exception {
+        Assert.assertNotNull(testScale.getId());
+        Assert.assertTrue(testScale.getId() > 0);
+        Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + testScale);
+        Scale scaleFromDb = manager.getScaleById(testScale.getId());
+        Assert.assertEquals(testScale.getName(), scaleFromDb.getName());
+        Assert.assertEquals(testScale.getDataType(), scaleFromDb.getDataType());
+        Assert.assertEquals(testScale.getMinValue(), scaleFromDb.getMinValue());
+        Assert.assertEquals(testScale.getMaxValue(), scaleFromDb.getMaxValue());
+    }
+
     @After
     public void tearDown() throws Exception {
-
     }
 }

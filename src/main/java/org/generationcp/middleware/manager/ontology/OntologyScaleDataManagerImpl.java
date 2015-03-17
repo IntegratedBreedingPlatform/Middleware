@@ -1,9 +1,8 @@
 package org.generationcp.middleware.manager.ontology;
 
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
+import com.google.common.base.Strings;
+import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
@@ -11,12 +10,18 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class OntologyScaleDataManagerImpl extends DataManager implements OntologyScaleDataManager {
+
+    private static final String SCALE_EXIST_WITH_SAME_NAME = "Scale exist with same name";
+    private static final String SCALE_CATEGORIES_SHOULD_NOT_EMPTY = "Scale categories should not be empty for categorical data type";
+    private static final String SCALE_DATA_TYPE_SHOULD_NOT_EMPTY = "Scale data type should n ot be empty";
 
     private static final Logger LOG = LoggerFactory.getLogger(OntologyScaleDataManagerImpl.class);
 
@@ -45,6 +50,75 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             logAndThrowException("Error at getAllScales" + e.getMessage(), e, LOG);
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public void addScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
+
+        CVTerm term = getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
+
+        if (term != null) {
+            logAndThrowException(SCALE_EXIST_WITH_SAME_NAME);
+        }
+
+
+        if(scale.getDataType() == null) {
+            logAndThrowException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
+        }
+
+        if(scale.getDataType().getId() == Scale.DataType.CATEGORICAL_VARIABLE.getId() && scale.getCategories().isEmpty()) {
+            logAndThrowException(SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
+        }
+
+        //Constant CvId
+        scale.getTerm().setVocabularyId(CvId.SCALES.getId());
+
+        Session session = getActiveSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            //Saving term to database.
+            CVTerm savedTerm = getCvTermDao().save(scale.getName(), scale.getDefinition(), CvId.SCALES);
+            scale.setId(savedTerm.getCvTermId());
+
+            //Setting dataType to Scale and saving relationship
+            getCvTermRelationshipDao().save(scale.getId(), TermRelationship.HAS_TYPE.getId(), scale.getDataType().getId());
+
+            //Saving values if present
+            if (!Strings.isNullOrEmpty(scale.getMinValue())) {
+                getCvTermPropertyDao().save(scale.getId(), TermId.MIN_VALUE.getId(), String.valueOf(scale.getMinValue()), 0);
+            }
+
+            //Saving values if present
+            if (!Strings.isNullOrEmpty(scale.getMaxValue())) {
+                getCvTermPropertyDao().save(scale.getId(), TermId.MAX_VALUE.getId(), String.valueOf(scale.getMaxValue()), 0);
+            }
+
+            //Saving categorical values if dataType is CATEGORICAL_VARIABLE
+            if(scale.getDataType().getId() == Scale.DataType.CATEGORICAL_VARIABLE.getId()){
+                //Saving new CV
+                CV cv = new CV();
+                cv.setCvId(getCvDao().getNextId("cvId"));
+                cv.setName(String.valueOf(scale.getId()));
+                cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
+                getCvDao().save(cv);
+
+                //Saving Categorical data if present
+                for(String c : scale.getCategories().keySet()){
+                    CVTerm category = new CVTerm(getCvTermDao().getNextId("cvTermId"), cv.getCvId(), c, scale.getCategories().get(c), null, 0, 0);
+                    getCvTermDao().save(category);
+                    getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
+                }
+            }
+
+            transaction.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(transaction);
+            logAndThrowException("Error at addScale :" + e.getMessage(), e);
+        }
     }
 
 
