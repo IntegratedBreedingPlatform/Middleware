@@ -24,11 +24,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
         super(sessionProvider);
     }
 
-    /**
-     * This will fetch all Properties*
-     * @return List<Scale>
-     * @throws MiddlewareQueryException
-     */
+    @Override
     public List<Scale> getAllScales() throws MiddlewareQueryException {
         try {
             return getScales(true, null);
