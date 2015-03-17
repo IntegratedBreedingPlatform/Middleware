@@ -25,6 +25,19 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
+    public Scale getScaleById(int scaleId) throws MiddlewareQueryException {
+
+        try {
+            List<Scale> scales = getScales(false, new ArrayList<>(Arrays.asList(scaleId)));
+            if(scales.size() == 0) return null;
+            return scales.get(0);
+        } catch (Exception e) {
+            logAndThrowException("Error at getScaleById" + e.getMessage(), e, LOG);
+        }
+        return null;
+    }
+
+    @Override
     public List<Scale> getAllScales() throws MiddlewareQueryException {
         try {
             return getScales(true, null);

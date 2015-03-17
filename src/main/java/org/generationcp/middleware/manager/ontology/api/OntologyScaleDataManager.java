@@ -25,6 +25,14 @@ import java.util.List;
 public interface OntologyScaleDataManager {
 
     /**
+     * This will fetch Scale by scaleId*
+     * @param scaleId select method by scaleId
+     * @return Scale
+     * @throws MiddlewareQueryException
+     */
+    public Scale getScaleById(int scaleId) throws MiddlewareQueryException;
+
+    /**
      * Get all scales from db
      * @throws MiddlewareQueryException
      */
