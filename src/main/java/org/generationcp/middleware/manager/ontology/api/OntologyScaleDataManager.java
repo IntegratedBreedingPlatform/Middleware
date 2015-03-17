@@ -47,5 +47,12 @@ public interface OntologyScaleDataManager {
      */
     void addScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
 
+    /**
+     * Update scale
+     * @param scale scale to be added
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
 
 }
