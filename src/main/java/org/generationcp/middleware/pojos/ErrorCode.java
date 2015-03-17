@@ -16,6 +16,7 @@ public enum ErrorCode {
     , DATA_PROVIDER_FAILED("hibernate.query.execute.exception")
     , INVALID_METHOD_USAGE("middleware.invalid.method.usage")
     , SCALE_CATEGORIES_EMPTY("scale.categories.should.not.empty")
+    , SCALE_DATATYPE_EMPTY("scale.datatype.should.not.empty")
     ;
     private String code;
     
