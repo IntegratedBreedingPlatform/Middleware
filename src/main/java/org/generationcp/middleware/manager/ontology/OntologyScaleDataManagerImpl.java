@@ -367,4 +367,50 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
     }
 
+    @Override
+    public void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException {
+
+        CVTerm term = getCvTermDao().getById(scaleId);
+
+        if(term == null){
+            logAndThrowException(SCALE_DOES_NOT_EXIST, new MiddlewareException(String.valueOf(scaleId)), LOG);
+        }
+
+        assert term != null;
+
+        if (term.getCv() != CvId.SCALES.getId()) {
+            logAndThrowException(SCALE_DOES_NOT_EXIST, new MiddlewareException(String.valueOf(scaleId)), LOG);
+        }
+
+        if(getCvTermRelationshipDao().isTermReferred(scaleId)){
+            logAndThrowException(SCALE_IS_REFERRED_TO_VARIABLE);
+        }
+
+        Session session = getActiveSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            //Deleting existing relationships for property
+            List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(scaleId);
+            for(CVTermRelationship r : relationships){
+                getCvTermRelationshipDao().makeTransient(r);
+            }
+
+            //Deleting existing values for property
+            List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermId(scaleId);
+            for(CVTermProperty p : properties){
+                getCvTermPropertyDao().makeTransient(p);
+            }
+
+            getCvTermDao().makeTransient(term);
+            transaction.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(transaction);
+            logAndThrowException("Error at deleteProperty" + e.getMessage(), e, LOG);
+        }
+    }
+
 }

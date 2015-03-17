@@ -55,4 +55,12 @@ public interface OntologyScaleDataManager {
      */
     void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
 
+    /**
+     * Delete scale
+     * @param scaleId scale to be deleted
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException;
+
 }

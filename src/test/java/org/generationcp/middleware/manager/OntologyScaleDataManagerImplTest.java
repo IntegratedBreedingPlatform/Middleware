@@ -80,5 +80,6 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
 
     @After
     public void tearDown() throws Exception {
+        manager.deleteScale(testScale.getId());
     }
 }
