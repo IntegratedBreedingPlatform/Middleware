@@ -1506,6 +1506,23 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return terms;
     }
 
+    public List<CVTerm> getAllByCvId(Integer cvId) throws MiddlewareQueryException {
+
+        List<CVTerm> terms = new ArrayList<>();
+
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("cvId", cvId));
+            criteria.add(Restrictions.eq("isObsolete", 0));
+            terms = criteria.list();
+
+        } catch (HibernateException e) {
+            logAndThrowQueryException("Error at getAllByCvId=" + cvId + " query on CVTermDao", e);
+        }
+
+        return terms;
+    }
+
     public List<CVTerm> getAllByCvId(List<Integer> termIds, CvId cvId) throws MiddlewareQueryException {
 
         List<CVTerm> terms = new ArrayList<>();
@@ -1513,7 +1530,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
             criteria.add(Restrictions.in("cvTermId", termIds));
-            criteria.add(Restrictions.eq("cvId", cvId));
+            criteria.add(Restrictions.eq("cvId", cvId.getId()));
             criteria.add(Restrictions.eq("isObsolete", 0));
 
             terms = criteria.list();
