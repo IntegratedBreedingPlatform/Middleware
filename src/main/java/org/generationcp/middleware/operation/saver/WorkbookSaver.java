@@ -194,12 +194,18 @@ public class WorkbookSaver extends Saver {
         
         if(trialVariableTypeList!=null && !isDeleteObservations) {
         	//multi-location for data loader
-   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap, false);
+   			studyLocationId = createLocationsAndSetToObservations(
+   					locationIds,workbook,trialVariableTypeList,
+   					trialHeaders, trialVariatesMap, false, programUUID);
         } else if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) { 
         	//also a multi-location
-        	studyLocationId = createLocationsAndSetToObservations(locationIds,  workbook,  trialVariables, trialHeaders, trialVariatesMap, isDeleteTrialObservations);
+        	studyLocationId = createLocationsAndSetToObservations(
+        			locationIds,  workbook,  trialVariables, trialHeaders, 
+        			trialVariatesMap, isDeleteTrialObservations, programUUID);
         } else {
-        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations);
+        	studyLocationId = createLocationAndSetToObservations(
+        			workbook, trialMV, trialVariables, trialVariatesMap, 
+        			isDeleteTrialObservations,programUUID);
         }
 
         //GCP-6091 end
@@ -342,8 +348,10 @@ public class WorkbookSaver extends Saver {
         }
     }
 	
-	public int createLocationAndSetToObservations(Workbook workbook, List<MeasurementVariable> trialMV, 
-			VariableTypeList trialVariables, Map<Integer,VariableList> trialVariatesMap, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
+	public int createLocationAndSetToObservations(
+			Workbook workbook, List<MeasurementVariable> trialMV, 
+			VariableTypeList trialVariables, Map<Integer,VariableList> trialVariatesMap, 
+			boolean isDeleteTrialObservations, String programUUID) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("transform trial environment", LOG);
 		if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() == 1) {
@@ -367,7 +375,8 @@ public class WorkbookSaver extends Saver {
 
         watch.restart("save geolocation");
         Geolocation g = getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
-        		workbook.getStudyDetails().getStudyName(),geolocation, null, workbook.isNursery(), isDeleteTrialObservations);
+        		workbook.getStudyDetails().getStudyName(),geolocation, null, 
+        		workbook.isNursery(), isDeleteTrialObservations, programUUID);
         studyLocationId = g.getLocationId();
         if(g.getVariates()!=null && g.getVariates().size() > 0) {
         	VariableList trialVariates = new VariableList();
@@ -391,7 +400,11 @@ public class WorkbookSaver extends Saver {
     	return studyLocationId;
 	}
 	
-	public int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors, List<String> trialHeaders, Map<Integer,VariableList> trialVariatesMap, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
+	public int createLocationsAndSetToObservations(
+			List<Integer> locationIds, Workbook workbook, 
+			VariableTypeList trialFactors, List<String> trialHeaders, 
+			Map<Integer,VariableList> trialVariatesMap, 
+			boolean isDeleteTrialObservations, String programUUID) throws MiddlewareQueryException {
 		
 		Set<String> trialInstanceNumbers = new HashSet<String>();
 		Integer locationId = null;
@@ -425,8 +438,11 @@ public class WorkbookSaver extends Saver {
 		                if(trialInstanceNumbers.add(trialInstanceNumber)) {
 		                	//if new location (unique by trial instance number)
 				            watch.restart("save geolocation");
-				            Geolocation g = getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
-				            		workbook.getStudyDetails().getStudyName(), geolocation, row, workbook.isNursery(), isDeleteTrialObservations);
+				            Geolocation g = getGeolocationSaver().
+				            		saveGeolocationOrRetrieveIfExisting(
+					            		workbook.getStudyDetails().getStudyName(), 
+					            		geolocation, row, workbook.isNursery(), 
+					            		isDeleteTrialObservations, programUUID);
 				            locationId = g.getLocationId();
 				            locationIds.add(locationId);
 				            if(g.getVariates()!=null && g.getVariates().size() > 0) {
@@ -527,7 +543,7 @@ public class WorkbookSaver extends Saver {
 	
 		Integer studyId = null;
 		if (workbook.getStudyDetails() != null){
-		    studyId = getStudyId(workbook.getStudyDetails().getStudyName());
+		    studyId = getStudyId(workbook.getStudyDetails().getStudyName(),programUUID);
 		}
 
 		if (studyId == null) {
@@ -569,11 +585,18 @@ public class WorkbookSaver extends Saver {
  	            }
  	            if (trialDatasetId == null) {
      	           trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
-                   trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
+                   trialDatasetId = getDatasetId(trialName, 
+                		   generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),
+                				   workbook.getStudyDetails().getStudyType()),
+                				   programUUID);
  	            }
  	        } else {
  		       trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType());
- 		       trialDatasetId = getDatasetId(trialName, generateTrialDatasetName(workbook.getStudyDetails().getStudyName(),workbook.getStudyDetails().getStudyType()));
+ 		       trialDatasetId = getDatasetId(trialName, 
+ 		    		   generateTrialDatasetName(
+ 		    				   workbook.getStudyDetails().getStudyName(),
+ 		    				   workbook.getStudyDetails().getStudyType()),
+ 		    				   programUUID);
  	        }
  		}
  		if (trialDatasetId == null) {
@@ -625,11 +648,17 @@ public class WorkbookSaver extends Saver {
                 }
                 if (datasetId == null) {
                     datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
-                    datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
+                    datasetId = getDatasetId(datasetName, 
+                    		generateMeasurementEffectDatasetName(
+                    				workbook.getStudyDetails().getStudyName()),
+                    		programUUID);
                 }
             } else {
                 datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
-                datasetId = getDatasetId(datasetName, generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName()));
+                datasetId = getDatasetId(datasetName, 
+                		generateMeasurementEffectDatasetName(
+                				workbook.getStudyDetails().getStudyName()),
+                		programUUID);
             }
         }
 
@@ -789,20 +818,20 @@ public class WorkbookSaver extends Saver {
 		return newList;
 	}
 	
-	private Integer getStudyId(String name) throws MiddlewareQueryException {
-		return getProjectId(name, TermId.IS_STUDY);
+	private Integer getStudyId(String name, String programUUID) throws MiddlewareQueryException {
+		return getProjectId(name, programUUID, TermId.IS_STUDY);
 	}
 	
-	private Integer getDatasetId(String name, String generatedName) throws MiddlewareQueryException {
-		Integer id = getProjectId(name, TermId.BELONGS_TO_STUDY);
+	private Integer getDatasetId(String name, String generatedName, String programUUID) throws MiddlewareQueryException {
+		Integer id = getProjectId(name, programUUID, TermId.BELONGS_TO_STUDY);
 		if (id == null && !name.equals(generatedName)) {
-			id = getProjectId(generatedName, TermId.BELONGS_TO_STUDY);
+			id = getProjectId(generatedName, programUUID, TermId.BELONGS_TO_STUDY);
 		}
 		return id;
 	}
 	
-	private Integer getProjectId(String name, TermId relationship) throws MiddlewareQueryException {
-		return getDmsProjectDao().getProjectIdByName(name, relationship);
+	private Integer getProjectId(String name, String programUUID, TermId relationship) throws MiddlewareQueryException {
+		return getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
 	}
 	
 	private Integer getMeansDataset(Integer studyId) throws MiddlewareQueryException {
@@ -873,7 +902,7 @@ public class WorkbookSaver extends Saver {
      * @throws Exception
      */
 	@SuppressWarnings("unchecked")
-	public void saveProjectData(Workbook workbook) throws Exception {
+	public void saveProjectData(Workbook workbook, String programUUID) throws Exception {
 		
 		int studyId = workbook.getStudyId();
 		int trialDatasetId = workbook.getTrialDatasetId();
@@ -904,9 +933,12 @@ public class WorkbookSaver extends Saver {
         List<Integer> locationIds = new ArrayList<Integer>();
         Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
         if(trialVariableTypeList!=null) {//multi-location
-   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap, false);
+   			studyLocationId = createLocationsAndSetToObservations(
+   					locationIds,workbook,trialVariableTypeList,
+   					trialHeaders, trialVariatesMap, false, programUUID);
         } else {
-        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, false);
+        	studyLocationId = createLocationAndSetToObservations(
+        			workbook, trialMV, trialVariables, trialVariatesMap, false, programUUID);
         }
 		
         //create stock and stockprops and associate to observations

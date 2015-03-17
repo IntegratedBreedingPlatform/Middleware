@@ -79,8 +79,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException{
-    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
+    public List<StudyDetails> getAllLocalNurseryDetails(String programUUID) throws MiddlewareQueryException{
+    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(StudyType.N,programUUID);
     	List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
     		if(detail.hasRows()) {
@@ -91,8 +91,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override 
-    public List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException{
-    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
+    public List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) throws MiddlewareQueryException{
+    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(StudyType.T,programUUID);
         List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
     		if(detail.hasRows()) {
@@ -931,8 +931,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException {
-		return getStudyDataManager().getStudyDetails(database, studyType, studyId);
+	public StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException {
+		return getStudyDataManager().getStudyDetails(studyType, studyId);
 	}
 	
 	@Override
@@ -1018,8 +1018,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
-		return getDmsProjectDao().getProjectIdByName(name);
+	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException {
+		return getDmsProjectDao().getProjectIdByNameAndProgramUUID(name,programUUID);
 	}
 	
 	@Override

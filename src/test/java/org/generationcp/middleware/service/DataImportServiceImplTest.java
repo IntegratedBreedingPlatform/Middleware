@@ -39,9 +39,10 @@ public class DataImportServiceImplTest {
 
     @InjectMocks
     private DataImportServiceImpl dataImportService;
-
+    
     public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[]{"1234", "word@", "_+world=", "!!world!!", "&&&"};
     public static final String[] STRINGS_WITH_VALID_CHARACTERS = new String[]{"i_am_groot", "hello123world", "%%bangbang", "something_something", "zawaruldoisbig"};
+    private static final String PROGRAM_UUID = "123456789";
 
     @Test
     public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
@@ -58,7 +59,7 @@ public class DataImportServiceImplTest {
         when(workbook.getAllVariables()).thenReturn(initializeTestMeasurementVariables());
 
         try {
-            moleDataImportService.strictParseWorkbook(file, parser, workbook, ontology);
+            moleDataImportService.strictParseWorkbook(file, parser, workbook, ontology, PROGRAM_UUID);
             fail("We expects workbookParserException to be thrown");
         } catch (WorkbookParserException e) {
 

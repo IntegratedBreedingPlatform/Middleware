@@ -63,7 +63,7 @@ public class WorkbookBuilder extends Builder {
          *  iseditable (true for variates, else, false)
          */
 		
-		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
+		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(studyType, id);
 		
 		Study study = getStudyBuilder().createStudy(id);
 		
@@ -134,7 +134,7 @@ public class WorkbookBuilder extends Builder {
                         
                         String value = null;
                         if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-                        	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        	value = getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
                         } else if (!isTrial) { 
                         	//set trial env for nursery studies
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
@@ -186,7 +186,7 @@ public class WorkbookBuilder extends Builder {
                     		&& EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
                     	
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
-                        String value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        String value = getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
                         
                         Double minRange = null, maxRange = null;
                         if (stdVariable.getConstraints() != null) {
@@ -265,7 +265,7 @@ public class WorkbookBuilder extends Builder {
                 	if(!isNursery) {
                 		studyType = StudyType.T;
                 	}
-                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
+                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(studyType, id);
                     workbook.setStudyDetails(studyDetails);
                     for (DatasetReference datasetRef : datasetRefList) {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
@@ -332,7 +332,7 @@ public class WorkbookBuilder extends Builder {
                         
                         String value = null;
                         if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-                        	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        	value = getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
                         	if (value == null) {
                         		value = "";
                         	}

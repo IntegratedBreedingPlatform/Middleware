@@ -205,7 +205,8 @@ public class GeolocationSaver extends Saver {
 	}
 	
 	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, 
-			VariableList variableList, MeasurementRow row, boolean isNursery, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
+			VariableList variableList, MeasurementRow row, 
+			boolean isNursery, boolean isDeleteTrialObservations, String programUUID) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 		
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
@@ -222,7 +223,9 @@ public class GeolocationSaver extends Saver {
 				trialInstanceNumber = "1";
 			}
 			//check if existing
-			Integer locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+			Integer locationId = getGeolocationDao().
+					getLocationIdByProjectNameAndDescriptionAndProgramUUID(
+							studyName, trialInstanceNumber,programUUID);
 			if (isDeleteTrialObservations) {
 			    locationId = null;
 			}
