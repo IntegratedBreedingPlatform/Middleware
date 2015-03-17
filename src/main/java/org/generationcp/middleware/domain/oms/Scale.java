@@ -25,33 +25,6 @@ public class Scale {
     private String minValue;
     private String maxValue;
 
-    public static enum DataType {
-
-        NUMERIC_VARIABLE(1110)
-        , DATE_TIME_VARIABLE(1117)
-        , CHARACTER_VARIABLE(1120)
-        , CATEGORICAL_VARIABLE(1130);
-
-        private final int id;
-
-        private DataType(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return this.id;
-        }
-
-        public static DataType getById(int id) {
-            for (DataType term : values()) {
-                if (term.getId() == id) {
-                    return term;
-                }
-            }
-            return null;
-        }
-    }
-
     public Scale() {
         this.term = new Term();
         this.term.setVocabularyId(CvId.SCALES.getId());

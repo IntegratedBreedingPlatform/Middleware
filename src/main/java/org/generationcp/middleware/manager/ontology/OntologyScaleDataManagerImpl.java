@@ -76,7 +76,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             logAndThrowException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
         }
 
-        if(scale.getDataType().getId() == Scale.DataType.CATEGORICAL_VARIABLE.getId() && scale.getCategories().isEmpty()) {
+        if(scale.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId() && scale.getCategories().isEmpty()) {
             logAndThrowException(SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
         }
 
@@ -107,7 +107,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             }
 
             //Saving categorical values if dataType is CATEGORICAL_VARIABLE
-            if(scale.getDataType().getId() == Scale.DataType.CATEGORICAL_VARIABLE.getId()){
+            if(scale.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()){
                 //Saving new CV
                 CV cv = new CV();
                 cv.setCvId(getCvDao().getNextId("cvId"));
@@ -201,7 +201,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 }
 
                 if(Objects.equals(items[1], TermId.HAS_TYPE.getId())){
-                    scale.setDataType(Scale.DataType.getById((Integer) items[3]));
+                    scale.setDataType(DataType.getById((Integer) items[3]));
                 }else if(Objects.equals(items[1], TermId.HAS_VALUE.getId())){
                     scale.addCategory((String) items[4], (String) items[5]);
                 }
@@ -221,7 +221,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             logAndThrowException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
         }
 
-        if(Objects.equals(scale.getDataType(), Scale.DataType.CATEGORICAL_VARIABLE)){
+        if(Objects.equals(scale.getDataType(), DataType.CATEGORICAL_VARIABLE)){
             if(scale.getCategories().isEmpty()){
                 logAndThrowException(SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
             }
@@ -263,7 +263,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
         });
 
         CVTermRelationship dataRelation = optionalDataRelation.isPresent() ? optionalDataRelation.get() : null;
-        Scale.DataType oldDataType = dataRelation != null ? Scale.DataType.getById(dataRelation.getObjectId()) : null;
+        DataType oldDataType = dataRelation != null ? DataType.getById(dataRelation.getObjectId()) : null;
 
         //Check data type change when object is referred to variable
         if(getCvTermRelationshipDao().isTermReferred(scale.getId()) && !Objects.equals(oldDataType, scale.getDataType())){
@@ -340,7 +340,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 }
             }
 
-            if(scale.getDataType().equals(Scale.DataType.CATEGORICAL_VARIABLE)){
+            if(scale.getDataType().equals(DataType.CATEGORICAL_VARIABLE)){
                 if(cvId == 0){
                     cvId = getCvDao().getNextId("cvId");
                 }

@@ -1,6 +1,6 @@
 package org.generationcp.middleware.manager.ontology;
 
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -27,10 +27,10 @@ public class OntologyBasicDataManagerImpl extends DataManager implements Ontolog
 
     @Override
     public List<Term> getDataTypes() throws MiddlewareQueryException {
-        List<Integer> dataTypeIds = Arrays.asList(Scale.DataType.CATEGORICAL_VARIABLE.getId(),
-                Scale.DataType.NUMERIC_VARIABLE.getId(),
-                Scale.DataType.CHARACTER_VARIABLE.getId(),
-                Scale.DataType.DATE_TIME_VARIABLE.getId());
+        List<Integer> dataTypeIds = Arrays.asList(DataType.CATEGORICAL_VARIABLE.getId(),
+                DataType.NUMERIC_VARIABLE.getId(),
+                DataType.CHARACTER_VARIABLE.getId(),
+                DataType.DATE_TIME_VARIABLE.getId());
 
         return getTermBuilder().getTermsByIds(dataTypeIds);
     }

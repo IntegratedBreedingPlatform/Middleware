@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.utils.test.Debug;
@@ -39,7 +40,7 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
         testScale = new Scale();
         testScale.setName(name);
         testScale.setDefinition(definition);
-        testScale.setDataType(Scale.DataType.NUMERIC_VARIABLE);
+        testScale.setDataType(DataType.NUMERIC_VARIABLE);
         testScale.setMinValue("0");
         testScale.setMaxValue("100");
         manager.addScale(testScale);
@@ -67,7 +68,7 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
     @Test
     public void testUpdateScale() throws Exception {
         testScale.setDefinition("new definition");
-        testScale.setDataType(Scale.DataType.CATEGORICAL_VARIABLE);
+        testScale.setDataType(DataType.CATEGORICAL_VARIABLE);
         testScale.addCategory("1", "First");
         testScale.addCategory("2", "Second");
         testScale.setMinValue(null);
