@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
@@ -469,11 +470,16 @@ public abstract class DataManager extends DatabaseBroker{
         }
     }
 
+    /**
+     * Logs an error based on the given message using the given Logger parameter.
+     * TODO: Do not use this method. This method should raise Middleware exception as it refers to domain validation.
+     * @param message   The message to log and to set on the exception
+     * @throws MiddlewareQueryException
+     */
     protected void logAndThrowException(String message) throws MiddlewareQueryException {
         LOG.error(message);
         throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
     }
-
 
     /**
      * Logs an error based on the given message using the given Logger parameter.
@@ -487,6 +493,18 @@ public abstract class DataManager extends DatabaseBroker{
         throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
     }
 
+    /**
+     * Logs an error based on the given message using the given Logger parameter.     <br/>
+     * Throws a MiddlewarewareException that wraps the origin of the exception.     <br/>
+     *
+     * @param message   The message to log and to set on the exception
+     * @param log   The Logger to use
+     * @throws MiddlewareQueryException
+     */
+    protected void logAndThrowException(String message, Logger log) throws MiddlewareException {
+        log.error(message);
+        throw new MiddlewareException(message, ErrorCode.DATA_PROVIDER_FAILED);
+    }
 
     /**
      * Logs an error based on the given message using the given Logger parameter.     <br/> 
