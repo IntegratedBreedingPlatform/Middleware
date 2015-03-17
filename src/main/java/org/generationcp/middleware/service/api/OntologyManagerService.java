@@ -14,6 +14,7 @@ package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -149,6 +150,44 @@ public interface OntologyManagerService {
      */
     void deleteProperty(Integer propertyId) throws MiddlewareQueryException, MiddlewareException;
 
+    /*======================= Scales ================================== */
 
+    /**
+     * This will fetch Scale by scaleId*
+     * @param scaleId select method by scaleId
+     * @return Scale
+     * @throws MiddlewareQueryException
+     */
+    public Scale getScaleById(int scaleId) throws MiddlewareQueryException;
+
+    /**
+     * Get all scales from db
+     * @throws MiddlewareQueryException
+     */
+    public List<Scale> getAllScales() throws MiddlewareQueryException;
+
+    /**
+     * Adding new scale
+     * @param scale scale to be added
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    void addScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Update scale
+     * @param scale scale to be added
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Delete scale
+     * @param scaleId scale to be deleted
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException;
 
 }

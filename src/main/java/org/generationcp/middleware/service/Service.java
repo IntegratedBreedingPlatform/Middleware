@@ -19,9 +19,11 @@ import org.generationcp.middleware.manager.api.*;
 import org.generationcp.middleware.manager.ontology.OntologyBasicDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.operation.builder.*;
 import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
@@ -81,6 +83,10 @@ public abstract class Service extends DatabaseBroker {
 
     protected final OntologyPropertyDataManager getOntologyPropertyDataManager(){
         return new OntologyPropertyDataManagerImpl(sessionProvider);
+    }
+
+    protected final OntologyScaleDataManager getOntologyScaleDataManager(){
+        return new OntologyScaleDataManagerImpl(sessionProvider);
     }
 
     protected final GermplasmDataManager getGermplasmDataManager() {

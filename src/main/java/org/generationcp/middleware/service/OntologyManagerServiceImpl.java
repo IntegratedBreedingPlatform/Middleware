@@ -13,6 +13,7 @@ package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -21,6 +22,8 @@ import org.generationcp.middleware.service.api.OntologyManagerService;
 
 import java.util.List;
 
+//NOTE: @SuppressWarnings("unused") has been used because this service expose to BMSAPI
+@SuppressWarnings("unused")
 public class OntologyManagerServiceImpl extends Service implements OntologyManagerService {
 
     public OntologyManagerServiceImpl(HibernateSessionProvider sessionProvider) {
@@ -100,5 +103,30 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     @Override
     public void deleteProperty(Integer propertyId) throws MiddlewareQueryException, MiddlewareException {
         getOntologyPropertyDataManager().deleteProperty(propertyId);
+    }
+
+    @Override
+    public Scale getScaleById(int scaleId) throws MiddlewareQueryException {
+        return getOntologyScaleDataManager().getScaleById(scaleId);
+    }
+
+    @Override
+    public List<Scale> getAllScales() throws MiddlewareQueryException {
+        return getOntologyScaleDataManager().getAllScales();
+    }
+
+    @Override
+    public void addScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyScaleDataManager().addScale(scale);
+    }
+
+    @Override
+    public void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyScaleDataManager().updateScale(scale);
+    }
+
+    @Override
+    public void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyScaleDataManager().deleteScale(scaleId);
     }
 }
