@@ -113,7 +113,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			Query query = getSession().createSQLQuery(sql)
 								.setParameter("description", description);
 			List<Integer> ids = query.list();
-			if (ids.size() >= 1) {
+			if (!ids.isEmpty()) {
 				return getById(ids.get(0));
 			}
 						

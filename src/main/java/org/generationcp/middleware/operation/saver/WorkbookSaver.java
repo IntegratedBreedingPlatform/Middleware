@@ -369,7 +369,7 @@ public class WorkbookSaver extends Saver {
         Integer studyLocationId = null;
 
        	//GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
-        if (geolocation == null || geolocation.size() == 0) {
+        if (geolocation == null || geolocation.isEmpty()) {
         	geolocation = createDefaultGeolocationVariableList();
         }
 
@@ -378,7 +378,7 @@ public class WorkbookSaver extends Saver {
         		workbook.getStudyDetails().getStudyName(),geolocation, null, 
         		workbook.isNursery(), isDeleteTrialObservations, programUUID);
         studyLocationId = g.getLocationId();
-        if(g.getVariates()!=null && g.getVariates().size() > 0) {
+        if(g.getVariates()!=null && !g.getVariates().isEmpty()) {
         	VariableList trialVariates = new VariableList();
         	trialVariates.addAll(g.getVariates());
         	trialVariatesMap.put(studyLocationId, trialVariates);
@@ -430,7 +430,7 @@ public class WorkbookSaver extends Saver {
 				} else {
 					TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
 					VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
-					if (geolocation != null && geolocation.size() > 0) {
+					if (geolocation != null && !geolocation.isEmpty()) {
 						String trialInstanceNumber = getTrialInstanceNumber(geolocation);
 		                if (LOG.isDebugEnabled()){
 		                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
@@ -445,7 +445,7 @@ public class WorkbookSaver extends Saver {
 					            		isDeleteTrialObservations, programUUID);
 				            locationId = g.getLocationId();
 				            locationIds.add(locationId);
-				            if(g.getVariates()!=null && g.getVariates().size() > 0) {
+				            if(g.getVariates()!=null && !g.getVariates().isEmpty()) {
 				            	VariableList trialVariates = new VariableList();
 				            	trialVariates.addAll(g.getVariates());
 				            	trialVariatesMap.put(locationId,trialVariates);
@@ -739,6 +739,7 @@ public class WorkbookSaver extends Saver {
         			try {
         				experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
         			} catch(PhenotypeException e) {
+        				LOG.error(e.getMessage(),e);
         				if(exceptions==null) {
         					exceptions = e.getExceptions();
         				} else {
@@ -1092,6 +1093,7 @@ public class WorkbookSaver extends Saver {
         			try {
         				experimentModelSaver.addExperiment(datasetId, ExperimentType.AVERAGE, experimentValues);
         			} catch(PhenotypeException e) {
+        				LOG.error(e.getMessage(),e);
         				if(exceptions==null) {
         					exceptions = e.getExceptions();
         				} else {
