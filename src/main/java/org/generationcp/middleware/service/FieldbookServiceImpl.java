@@ -55,6 +55,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -73,7 +74,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public FieldbookServiceImpl() {
         super();
     }
-	
     public FieldbookServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
         super(sessionProvider, localDatabaseName);
     }
@@ -161,24 +161,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override           
     public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) 
             throws MiddlewareQueryException {
-    	Integer fieldLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-    	Integer blockLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
-    	
         List<Location> locationList = new ArrayList<Location>();
         
         for(int i = 0 ; i < locationIds.size() ; i++){
             Integer locationId = Integer.valueOf(locationIds.get(i).toString());
             Location location = getLocationDataManager().getLocationByID(locationId);
             
-            if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == location.getLtype().intValue())
-    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue())) {
-                continue;
-            }
-            
             locationList.add(location);
         }
-        
-    	
         return locationList;
     }
     
@@ -1219,7 +1209,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return false;
 	}
 	public boolean setOrderVariableByRank(Workbook workbook, Integer plotDatasetId) throws MiddlewareQueryException {
-		if(workbook != null){			
+		if(workbook != null){
 				List<Integer> storedInIds = new ArrayList<Integer>();
 				storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
 				storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());

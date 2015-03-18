@@ -1095,7 +1095,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     
     @Override
 	public Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId)
-		throws MiddlewareQueryException {
+			throws MiddlewareQueryException {
 		Integer ibdbUserId = null;
 		IbdbUserMap userMapEntry = this.getIbdbUserMap(workbenchUserId, projectId);
 		if (userMapEntry != null) {
@@ -1103,7 +1103,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 		return ibdbUserId;
 	}
-    
+
     @Override
     public IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException {
         Session session = getCurrentSession();

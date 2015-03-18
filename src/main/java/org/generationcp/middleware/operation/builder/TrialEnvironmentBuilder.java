@@ -18,22 +18,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.TrialEnvironment;
-import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
-import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
@@ -119,6 +108,51 @@ public class TrialEnvironmentBuilder extends Builder {
 		return environments;
 	}
 	
+	public TrialEnvironments buildTrialEnvironments(List<TrialEnvironment> trialEnvironments) throws MiddlewareQueryException {
+		TrialEnvironments environments = new TrialEnvironments();
+		List<TrialEnvironment> localEnvironments = new ArrayList<TrialEnvironment>();
+		
+		// collect local environments in separate list
+		for (TrialEnvironment envt : trialEnvironments){
+			if (envt.getId() < 0){
+				localEnvironments.add(envt);
+			} else {
+				environments.add(envt);
+			}
+		}
+		
+		buildLocalTrialEnvironment(environments, localEnvironments);
+		
+		return environments;
+	}
+
+	
+	// set location name, country name and province name to local environments from central db
+	private void buildLocalTrialEnvironment(TrialEnvironments environments,
+			List<TrialEnvironment> localEnvironments) throws MiddlewareQueryException {
+	
+		if (environments != null && localEnvironments != null && !localEnvironments.isEmpty()) {
+			Set<Integer> ids = new HashSet<Integer>();
+			for (TrialEnvironment environment : localEnvironments) {
+				if (environment.getLocation() != null && environment.getLocation().getId() != null 
+				&& environment.getLocation().getId().intValue() >= 0) {
+					ids.add(environment.getLocation().getId());
+				}
+			}
+			List<LocationDto> newLocations = getLocationDao().getLocationDtoByIds(ids);
+			for (TrialEnvironment environment : localEnvironments) {
+				if (environment.getLocation() != null && newLocations != null && newLocations.indexOf(environment.getLocation().getId()) > -1) {
+					LocationDto newLocation = newLocations.get(newLocations.indexOf(environment.getLocation().getId()));
+					environment.getLocation().setCountryName(newLocation.getCountryName());
+					environment.getLocation().setLocationName(newLocation.getLocationName());
+					environment.getLocation().setProvinceName(newLocation.getProvinceName());
+				}
+				environments.add(environment);
+			}
+		}
+		
+	}
+	
 	public long countAllTrialEnvironments() throws MiddlewareQueryException{
 		return getGeolocationDao().countAllTrialEnvironments();
 	}
@@ -138,7 +172,7 @@ public class TrialEnvironmentBuilder extends Builder {
         
         // Step 1: Get Trial Environments for each GID
         Map<Integer, Set<Integer>> germplasmEnvironments = getExperimentStockDao().getEnvironmentsOfGermplasms(allGids);
-
+        
         // Step 2: Get the trial environment details
         Set<Integer> localEnvironmentIds = getEnvironmentIdsFromMap(germplasmEnvironments);
         Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<TrialEnvironment>();

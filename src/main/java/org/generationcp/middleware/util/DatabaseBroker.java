@@ -100,15 +100,15 @@ public class DatabaseBroker {
     private GermplasmListDAO germplasmListDao;
 
     protected static final int JDBC_BATCH_SIZE = 50;
-  
+
    // PresetDataManager DAO
     private ProgramPresetDAO programPresetDAO;
-    
+
     //StudyDataManager DAO
     private ProjectPropertyDao projectPropertyDao;
 
     protected DatabaseBroker(){
-    	
+
     }
 
     protected DatabaseBroker(HibernateSessionProvider sessionProvider) {
@@ -123,7 +123,7 @@ public class DatabaseBroker {
     public HibernateSessionProvider getSessionProvider() {
         return sessionProvider;
     }
-    
+
     public void setSessionProvider(HibernateSessionProvider sessionProvider) {
     	this.sessionProvider = sessionProvider;
     }
@@ -131,7 +131,7 @@ public class DatabaseBroker {
     public Session getCurrentSession() {
         return getActiveSession();
     }
-    
+
     protected Session getActiveSession() {
     	if (sessionProvider != null) {
             return sessionProvider.getSession();
@@ -142,7 +142,7 @@ public class DatabaseBroker {
  
     /**
      * Rolls back a given transaction
-     * 
+     *
      * @param trans
      */
     public void rollbackTransaction(Transaction trans) {
