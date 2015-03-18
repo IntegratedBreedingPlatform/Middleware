@@ -539,12 +539,26 @@ public class DatabaseBroker {
     /**
      * Parse hibernate query result value to boolean with null check
      * @param val value
-     * @return
+     * @return boolean
      */
     protected boolean typeSafeObjectToBoolean(Object val){
         if(val == null) return false;
         if(val instanceof Integer) return (Integer) val != 0;
         if(val instanceof Boolean) return (Boolean) val;
         return false;
+    }
+
+    /**
+     * Parse hibernate query result value to Integer with null check
+     * @param val value
+     * @return boolean
+     */
+    protected Integer typeSafeObjectToInteger(Object val) {
+        if(val == null) return null;
+        try {
+            return Integer.valueOf((String) val);
+        } catch(NumberFormatException nfe) {
+            return null;
+        }
     }
 }
