@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.oms;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class TermSummary {
 
 	private final Integer id;
@@ -13,6 +15,14 @@ public class TermSummary {
 		this.name = name;
 		this.definition = definition;
 	}
+
+    public static TermSummary createNonEmpty(Integer id, String name, String definition){
+        if(id == null && StringUtils.isBlank(name) && StringUtils.isBlank(definition)) {
+            // Avoid creating an empty TermSummary
+            return null;
+        }
+        return new TermSummary(id, name, definition);
+    }
 
 	public Integer getId() {
 		return id;

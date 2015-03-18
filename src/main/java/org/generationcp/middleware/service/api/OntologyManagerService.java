@@ -12,10 +12,7 @@
 
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -199,4 +196,13 @@ public interface OntologyManagerService {
      */
     void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException;
 
+
+    /*======================= Variables ================================== */
+
+    /**
+     * Return All Variables
+     * * @return List<OntologyVariableSummary>
+     * @throws MiddlewareQueryException*
+     */
+    List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException;
 }

@@ -27,14 +27,8 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.manager.ontology.OntologyBasicDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.*;
+import org.generationcp.middleware.manager.ontology.api.*;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -125,6 +119,9 @@ public class ManagerFactory implements Serializable {
         return new OntologyScaleDataManagerImpl(sessionProvider);
     }
 
+    public OntologyVariableDataManager getOntologyVariableDataManager() {
+        return new OntologyVariableDataManagerImpl(sessionProvider);
+    }
 
     public PresetDataManager getPresetDataManager() {
         return new PresetDataManagerImpl(sessionProvider);

@@ -555,10 +555,8 @@ public class DatabaseBroker {
      */
     protected Integer typeSafeObjectToInteger(Object val) {
         if(val == null) return null;
-        try {
-            return Integer.valueOf((String) val);
-        } catch(NumberFormatException nfe) {
-            return null;
-        }
+        if(val instanceof Integer) return (Integer) val;
+        if(val instanceof String ) return Integer.valueOf((String) val);
+        throw new NumberFormatException("Can not cast " + val.getClass() + " to Integer for value: " + val);
     }
 }

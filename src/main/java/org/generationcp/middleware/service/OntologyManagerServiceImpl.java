@@ -11,10 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -133,5 +130,10 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     @Override
     public void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException {
         getOntologyScaleDataManager().deleteScale(scaleId);
+    }
+
+    @Override
+    public List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException {
+        return getOntologyVariableDataManager().getAllVariables();
     }
 }
