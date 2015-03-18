@@ -9,7 +9,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
-import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
