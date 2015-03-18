@@ -6,15 +6,11 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class OntologyBasicDataManagerImpl extends DataManager implements OntologyBasicDataManager {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OntologyBasicDataManagerImpl.class);
 
     public OntologyBasicDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
@@ -33,6 +29,11 @@ public class OntologyBasicDataManagerImpl extends DataManager implements Ontolog
                 DataType.DATE_TIME_VARIABLE.getId());
 
         return getTermBuilder().getTermsByIds(dataTypeIds);
+    }
+
+    @Override
+    public Term getTermById(Integer termId) throws MiddlewareQueryException {
+        return Term.fromCVTerm(getCvTermDao().getById(termId));
     }
 
     @Override

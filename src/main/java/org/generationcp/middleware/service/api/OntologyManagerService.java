@@ -45,6 +45,15 @@ public interface OntologyManagerService {
     /*======================= TERM ================================== */
 
     /**
+     * Retrieves a Term record given its id. This can also be used to retrieve traits, methods and scales.
+     *
+     * @param termId the term id
+     * @return the term by id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Term getTermById(Integer termId) throws MiddlewareQueryException;
+
+    /**
      * Return All Trait Classes
      * * @return
      * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException*

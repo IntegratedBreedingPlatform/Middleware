@@ -41,6 +41,11 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     }
 
     @Override
+    public Term getTermById(Integer termId) throws MiddlewareQueryException {
+        return getOntologyBasicDataManager().getTermById(termId);
+    }
+
+    @Override
     public Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
         return getOntologyBasicDataManager().getTermByNameAndCvId(name, cvId);
     }

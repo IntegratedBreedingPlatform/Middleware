@@ -36,8 +36,18 @@ public interface OntologyBasicDataManager {
      */
     List<Term> getDataTypes() throws MiddlewareQueryException;
 
+    /**
+     * Returns term by id
+     */
+    Term getTermById(Integer termId) throws MiddlewareQueryException;
 
+    /**
+     * Returns term by name and cvId
+     */
     Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException;
 
+    /**
+     * Checks if term is referred
+     */
     boolean isTermReferred(int termId) throws MiddlewareQueryException;
 }
