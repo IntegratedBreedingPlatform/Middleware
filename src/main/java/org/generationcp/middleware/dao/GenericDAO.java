@@ -12,7 +12,6 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.ErrorCode;
 import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
@@ -220,14 +219,10 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
 
+    //TODO: Should deprecate as this is considered as antipattern
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException{
         LOG.error(message, e);
         throw new MiddlewareQueryException(message, e);
-    }
-
-    protected void logAndThrowQueryException(String message, Throwable e) throws MiddlewareQueryException{
-        LOG.error(message, e);
-        throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
     }
 
     protected String getLogExceptionMessage(String methodName, String paramVar, String paramValue, String exceptionMessage, String className){

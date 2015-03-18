@@ -367,16 +367,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 dao.saveOrUpdate(newPref); 
             } else {
                 // throw exception if no Name record with specified value does not exist
-                logAndThrowException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
-                        + newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.", new Throwable(), LOG);
+                throw new MiddlewareQueryException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
+                        + newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.", new Throwable());
             }
 
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
-                    + newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
+                    + newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -438,8 +438,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error while saving Germplasm Name: GermplasmDataManager.addOrUpdateGermplasmName(names=" + names
-                    + ", operation=" + operation + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error while saving Germplasm Name: GermplasmDataManager.addOrUpdateGermplasmName(names=" + names
+                    + ", operation=" + operation + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -602,9 +602,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
-                    LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -633,9 +631,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
-                    LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -665,8 +661,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving a list of Methods: GermplasmDataManager.addMethod(methods=" + methods
-                    + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving a list of Methods: GermplasmDataManager.addMethod(methods=" + methods + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -684,9 +679,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method + "): " + e.getMessage(),
-                    e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -755,9 +748,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while saving Bibliographic Reference: GermplasmDataManager.addBibliographicReference(bibref="
-                            + bibref + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Bibliographic Reference: GermplasmDataManager.addBibliographicReference(bibref="
+                            + bibref + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -811,8 +803,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Attribute: GermplasmDataManager.addOrUpdateAttributes(attributes="
-                    + attributes + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Attribute: GermplasmDataManager.addOrUpdateAttributes(attributes="
+                    + attributes + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -831,15 +823,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         // check if the germplasm record identified by gid exists
         Germplasm child = getGermplasmByGID(gid);
         if (child == null) {
-            logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
-                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with gid: " + gid, new Throwable(), LOG);
+            throw new MiddlewareQueryException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
+                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with gid: " + gid, new Throwable());
         }
 
         // check if the germplasm record identified by progenitorId exists
         Germplasm parent = getGermplasmByGID(progenitorId);
         if (parent == null) {
-            logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
-                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with progenitorId: " + progenitorId, new Throwable(), LOG);
+            throw new MiddlewareQueryException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
+                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with progenitorId: " + progenitorId, new Throwable());
         }
 
         // check progenitor number
@@ -883,8 +875,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 }
             }
         } else {
-            logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
-                    + ", progenitorNumber=" + progenitorNumber + "): Invalid progenitor number: " + progenitorNumber, new Throwable(), LOG);
+            throw new MiddlewareQueryException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
+                    + ", progenitorNumber=" + progenitorNumber + "): Invalid progenitor number: " + progenitorNumber, new Throwable());
         }
 
         return progenitorId;
@@ -921,8 +913,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Germplasm: GermplasmDataManager.addOrUpdateGermplasms(germplasms="
-                    + germplasms + ", operation=" + operation + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Germplasm: GermplasmDataManager.addOrUpdateGermplasms(germplasms="
+                    + germplasms + ", operation=" + operation + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -946,8 +938,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Progenitor: GermplasmDataManager.addOrUpdateProgenitors(progenitors="
-                    + progenitors + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Progenitor: GermplasmDataManager.addOrUpdateProgenitors(progenitors="
+                    + progenitors + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1027,8 +1019,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Germplasm: GermplasmDataManager.addGermplasm(germplasmNameMap="
-                    + germplasmNameMap + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Germplasm: GermplasmDataManager.addGermplasm(germplasmNameMap="
+                    + germplasmNameMap + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1052,7 +1044,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1090,8 +1082,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields="
-                    + fields + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields=" + fields + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1118,8 +1109,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Attribute: GermplasmDataManager.addAttribute(addAttribute="
-                    + attr + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Attribute: GermplasmDataManager.addAttribute(addAttribute=" + attr + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1157,8 +1147,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addAttributes(attrs="
-                    + isAttrSaved + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving UserDefinedField: GermplasmDataManager.addAttributes(attrs=" + isAttrSaved + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1593,15 +1582,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
                         return cross;
                     } else {
-                        logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(), 
-                                new Throwable(), LOG);
+                        throw new MiddlewareQueryException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(), new Throwable());
                     }
                 }
             } else {
-                logAndThrowException("expandGermplasmCross was incorrectly called", new Throwable(), LOG);
+                throw new MiddlewareQueryException("expandGermplasmCross was incorrectly called", new Throwable());
             }
         }
-        return element;
     }
     
     /**
@@ -1862,8 +1849,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			trans.commit();
 		} catch (Exception e) {
 			rollbackTransaction(trans);
-			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list="
-					+ list + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list=" + list + "): " + e.getMessage(), e);
 		} finally {
 			session.flush();
 		}
@@ -1884,8 +1870,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			trans.commit();
 		} catch (Exception e) {
 			rollbackTransaction(trans);
-			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite="
-					+ favorite + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite=" + favorite + "): " + e.getMessage(), e);
 		} finally {
 			session.flush();
 		}
@@ -1918,8 +1903,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			trans.commit();
 		} catch (Exception e) {
 			rollbackTransaction(trans);
-			logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list="
-					+ list + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list=" + list + "): " + e.getMessage(), e);
 		} finally {
 			session.flush();
 		}
@@ -1939,8 +1923,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			trans.commit();
 		} catch (Exception e) {
 			rollbackTransaction(trans);
-			logAndThrowException("Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite="
-					+ favorite + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite=" + favorite + "): " + e.getMessage(), e);
 		} finally {
 			session.flush();
 		}
@@ -1982,8 +1965,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			trans.commit();
 		} catch (Exception e) {
 			rollbackTransaction(trans);
-			logAndThrowException("Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId="
-					+ programUUID + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId=" + programUUID + "): " + e.getMessage(), e);
 		} finally {
 			session.flush();
 		}

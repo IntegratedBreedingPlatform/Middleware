@@ -1074,8 +1074,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Qtl Details: GenotypicDataManager.addQtlDetails(qtlDetails="
-                    + qtlDetails + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Qtl Details: GenotypicDataManager.addQtlDetails(qtlDetails=" + qtlDetails + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1127,8 +1126,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with addAccMetadataSet(accMetadataSet=" + accMetadataSet + "): "
-                    + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered with addAccMetadataSet(accMetadataSet=" + accMetadataSet + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1154,8 +1152,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with addMarkerMetadataSet(markerMetadataSet="
-                    + markerMetadataSet + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered with addMarkerMetadataSet(markerMetadataSet=" + markerMetadataSet + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1182,7 +1179,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while adding Marker: " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while adding Marker: " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1327,8 +1324,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Marker: " + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while saving Marker: " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1362,8 +1358,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with setQTL(): " + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered with setQTL(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1406,8 +1401,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while setting DArT: setDart(): " + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while setting DArT: setDart(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1445,8 +1439,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while setting SSR: setSSR(): " + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while setting SSR: setSSR(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1483,8 +1476,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while setting SNP: setSNP(): " + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while setting SNP: setSNP(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1520,9 +1512,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while setting MappingABH: setMappingABH(): "
-                    + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while setting MappingABH: setMappingABH(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1563,10 +1553,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while setting MappingAllelicSNP: setMappingAllelicSNP(): " + e.getMessage(), e,
-                    LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while setting MappingAllelicSNP: setMappingAllelicSNP(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1614,10 +1601,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while setting MappingAllelicSSRDArT: setMappingAllelicSSRDArT(): "
-                            + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while setting MappingAllelicSSRDArT: setMappingAllelicSSRDArT(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -1678,11 +1662,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while updating DArT: updateDart(): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while updating DArT: updateDart(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
-        return false;
     }
 
     @Override
@@ -1735,11 +1718,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while updating SSR: updateSSR(): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while updating SSR: updateSSR(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
-        return false;
     }
 
     @Override
@@ -1791,11 +1773,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while updating SNP: updateSNP(): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while updating SNP: updateSNP(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
-        return false;
     }
 
     @Override
@@ -1848,11 +1829,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while updating MappingABH: updateMappingABH(): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while updating MappingABH: updateMappingABH(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
-        return false;
     }
 
     @Override
@@ -1912,12 +1892,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): "
-                    + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
-        return false;
     }
 
     @Override
@@ -1983,13 +1961,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while updating MappingAllelicSSRDArT updateMappingAllelicSSRDArT(): "
-                    + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while updating MappingAllelicSSRDArT updateMappingAllelicSSRDArT(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
-        return false;
-
     }
 
     private Integer saveMappingData(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop,
@@ -2037,8 +2012,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return true;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while setting Maps: setMaps(): " + e.getMessage(), e, LOG);
-            return false;
+            throw new MiddlewareQueryException("Error encountered while setting Maps: setMaps(): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -2374,7 +2348,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         Transaction trans = null;
 
         if (dataset == null) {
-            logAndThrowException("Dataset passed must not be null");
+            throw new MiddlewareQueryException("Dataset passed must not be null");
         }
 
         try {
@@ -2414,7 +2388,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             throws MiddlewareQueryException {
 
         if (dataset == null) {
-            logAndThrowException("Dataset passed must not be null");
+            throw new MiddlewareQueryException("Dataset passed must not be null");
         }
 
         Session session = getActiveSession();
@@ -2499,10 +2473,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public void addMtaMetadata(MtaMetadata mtaMetadata) throws MiddlewareQueryException {
 
         if (mtaMetadata == null) {
-            logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata must not be null.");
+            throw new MiddlewareQueryException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata must not be null.");
         }
         if (mtaMetadata.getDatasetID() == null) {
-            logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata.datasetID must not be null.");
+            throw new MiddlewareQueryException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata.datasetID must not be null.");
         }
 
         Session session = getActiveSession();
@@ -3443,16 +3417,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while updating MarkerInfo: updateMarkerInfo(marker="
+            throw new MiddlewareQueryException("Error encountered while updating MarkerInfo: updateMarkerInfo(marker="
                             + marker + ", markerAlias=" + markerAlias
                             + ", markerDetails=" + markerDetails
                             + ", markerUserInfo=" + markerUserInfo + "): "
-                            + e.getMessage(), e, LOG);
+                            + e.getMessage(), e);
         } finally {
             session.flush();
         }
-        return false;
     }
 
     @Override

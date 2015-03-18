@@ -188,8 +188,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         	throw e;
     	} catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots + ", operation="
-	                    + operation + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots + ", operation=" + operation + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -255,8 +254,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions="
-                    + transactions + ", operation=" + operation + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions=" + transactions + ", operation=" + operation + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }

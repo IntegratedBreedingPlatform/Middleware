@@ -81,7 +81,7 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     }
 
     @Override
-    public Property getProperty(int id) throws MiddlewareQueryException {
+    public Property getProperty(int id) throws MiddlewareQueryException, MiddlewareException {
         return getOntologyPropertyDataManager().getProperty(id);
     }
 

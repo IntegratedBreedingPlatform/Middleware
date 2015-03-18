@@ -72,8 +72,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e,
-                    LOG);
+            throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -92,8 +91,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e,
-                    LOG);
+            throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -117,8 +115,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(),
-                    e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -127,7 +124,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     @SuppressWarnings("unchecked")
     @Override
     public List<Person> getAllPersons() throws MiddlewareQueryException {
-        return (List<Person>) getPersonDao().getAll();
+        return getPersonDao().getAll();
     }
 
     //TODO BMS-148 Rename method. No loger reads from two DBs.
@@ -164,8 +161,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -188,9 +184,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e,
-                    LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }

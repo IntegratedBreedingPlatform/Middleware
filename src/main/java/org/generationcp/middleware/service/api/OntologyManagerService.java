@@ -118,7 +118,7 @@ public interface OntologyManagerService {
      * @return property
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Property getProperty(int id) throws MiddlewareQueryException;
+    Property getProperty(int id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * Get all properties

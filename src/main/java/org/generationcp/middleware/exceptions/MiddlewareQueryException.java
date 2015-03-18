@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.exceptions;
 
-import org.generationcp.middleware.pojos.ErrorCode;
-
 /**
  * Exceptions for database-related Middleware issues.
  *
@@ -23,10 +21,11 @@ public class MiddlewareQueryException extends Exception{
     
     private String code;
 
-    private ErrorCode errorCode;
-
-    private Object[] messageParams;
-
+    /**
+     * TODO: Should deprecate this. MiddlewareQueryExceptions should also consist cause attached to it.
+     * TODO: Use MiddlewareException because this method usage consist domain specific data conflict.
+     * @param message
+     */
     public MiddlewareQueryException(String message) {
         super(message);
     }
@@ -40,19 +39,7 @@ public class MiddlewareQueryException extends Exception{
         this.code = code;
     }
 
-    public MiddlewareQueryException(String logMessage, ErrorCode errorCode, Object... params) {
-        super(logMessage);
-        this.errorCode = errorCode;
-        this.messageParams = params;
-    }
-    
     public String getCode() {
         return this.code;
     }
-
-    public String getMessageKey() {
-        return this.errorCode.getCode();
-    }
-
-    public Object[] getMessageParameters(){ return this.messageParams; }
 }

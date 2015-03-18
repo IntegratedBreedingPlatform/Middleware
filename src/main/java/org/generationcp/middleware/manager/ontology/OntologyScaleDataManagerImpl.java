@@ -16,8 +16,6 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.Objects;
@@ -33,8 +31,6 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     private static final String SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "Min or Max values are should not supplied for non categorical data type";
     private static final String SCALE_IS_REFERRED_TO_VARIABLE = "Scale is referred to variable.";
 
-    private static final Logger LOG = LoggerFactory.getLogger(OntologyScaleDataManagerImpl.class);
-
     public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
     }
@@ -47,9 +43,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             if(scales.size() == 0) return null;
             return scales.get(0);
         } catch (Exception e) {
-            logAndThrowException("Error at getScaleById" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at getScaleById" + e.getMessage(), e);
         }
-        return null;
     }
 
     @Override
@@ -57,9 +52,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
         try {
             return getScales(true, null);
         } catch (Exception e) {
-            logAndThrowException("Error at getAllScales" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at getAllScales" + e.getMessage(), e);
         }
-        return new ArrayList<>();
     }
 
     @Override
@@ -68,16 +62,16 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
         CVTerm term = getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
 
         if (term != null) {
-            logAndThrowException(SCALE_EXIST_WITH_SAME_NAME);
+            throw new MiddlewareException(SCALE_EXIST_WITH_SAME_NAME);
         }
 
 
         if(scale.getDataType() == null) {
-            logAndThrowException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
+            throw new MiddlewareException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
         }
 
-        if(scale.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId() && scale.getCategories().isEmpty()) {
-            logAndThrowException(SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
+        if(Objects.equals(scale.getDataType().getId(), DataType.CATEGORICAL_VARIABLE.getId()) && scale.getCategories().isEmpty()) {
+            throw new MiddlewareException(SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
         }
 
         //Constant CvId
@@ -107,7 +101,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             }
 
             //Saving categorical values if dataType is CATEGORICAL_VARIABLE
-            if(scale.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()){
+            if(Objects.equals(scale.getDataType().getId(), DataType.CATEGORICAL_VARIABLE.getId())){
                 //Saving new CV
                 CV cv = new CV();
                 cv.setCvId(getCvDao().getNextId("cvId"));
@@ -127,7 +121,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            logAndThrowException("Error at addScale :" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at addScale :" + e.getMessage(), e);
         }
     }
 
@@ -208,7 +202,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             }
 
         } catch (Exception e) {
-            logAndThrowException("Error at getScales", e, LOG);
+            throw new MiddlewareQueryException("Error at getScales", e);
         }
 
         return new ArrayList<>(map.values());
@@ -218,25 +212,25 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     public void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
 
         if(Objects.equals(scale.getDataType(), null)){
-            logAndThrowException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
+            throw new MiddlewareException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
         }
 
         if(Objects.equals(scale.getDataType(), DataType.CATEGORICAL_VARIABLE)){
             if(scale.getCategories().isEmpty()){
-                logAndThrowException(SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
+                throw new MiddlewareException(SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
             }
 
             if(!Strings.isNullOrEmpty(scale.getMinValue()) || !Strings.isNullOrEmpty(scale.getMaxValue())){
-                logAndThrowException(SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE);
+                throw new MiddlewareException(SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE);
             }
 
         } else {
             if(!scale.getCategories().isEmpty()){
-                logAndThrowException(SCALE_CATEGORIES_SHOULD_NOT_SUPPLY_WITH_NON_CATEGORICAL_DATA_TYPE);
+                throw new MiddlewareException(SCALE_CATEGORIES_SHOULD_NOT_SUPPLY_WITH_NON_CATEGORICAL_DATA_TYPE);
             }
 
             if(Strings.isNullOrEmpty(scale.getMinValue()) || Strings.isNullOrEmpty(scale.getMaxValue())){
-                logAndThrowException(SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE);
+                throw new MiddlewareException(SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE);
             }
         }
 
@@ -244,13 +238,11 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
         CVTerm term = getCvTermDao().getById(scale.getId());
 
         if (term == null) {
-            logAndThrowException(SCALE_DOES_NOT_EXIST);
+            throw new MiddlewareException(SCALE_DOES_NOT_EXIST);
         }
 
-        assert term != null;
-
         if(term.getCv() != CvId.SCALES.getId()){
-            logAndThrowException(TERM_IS_NOT_SCALE);
+            throw new MiddlewareException(TERM_IS_NOT_SCALE);
         }
 
         //Fetch entire Scale variable from DB
@@ -267,7 +259,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         //Check data type change when object is referred to variable
         if(getCvTermRelationshipDao().isTermReferred(scale.getId()) && !Objects.equals(oldDataType, scale.getDataType())){
-              logAndThrowException(SCALE_IS_REFERRED_TO_VARIABLE);
+            throw new MiddlewareException(SCALE_IS_REFERRED_TO_VARIABLE);
         }
 
         List<Integer> valueIds = new ArrayList<>();
@@ -362,7 +354,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            logAndThrowException("Error at addScale :" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at addScale :" + e.getMessage(), e);
         }
 
     }
@@ -373,17 +365,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
         CVTerm term = getCvTermDao().getById(scaleId);
 
         if(term == null){
-            logAndThrowException(SCALE_DOES_NOT_EXIST, new MiddlewareException(String.valueOf(scaleId)), LOG);
+            throw new MiddlewareException(SCALE_DOES_NOT_EXIST);
         }
 
-        assert term != null;
-
         if (term.getCv() != CvId.SCALES.getId()) {
-            logAndThrowException(SCALE_DOES_NOT_EXIST, new MiddlewareException(String.valueOf(scaleId)), LOG);
+            throw new MiddlewareException(SCALE_DOES_NOT_EXIST);
         }
 
         if(getCvTermRelationshipDao().isTermReferred(scaleId)){
-            logAndThrowException(SCALE_IS_REFERRED_TO_VARIABLE);
+            throw new MiddlewareException(SCALE_IS_REFERRED_TO_VARIABLE);
         }
 
         Session session = getActiveSession();
@@ -409,8 +399,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            logAndThrowException("Error at deleteProperty" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at deleteProperty" + e.getMessage(), e);
         }
     }
-
 }

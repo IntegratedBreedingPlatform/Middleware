@@ -156,13 +156,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with addStudy(folderId="
+            throw new MiddlewareQueryException("Error encountered with addStudy(folderId="
                     + parentFolderId + ", variableTypeList=" + variableTypeList
-                    + ", studyValues=" + studyValues + "): " + e.getMessage(),
-                    e, LOG);
+                    + ", studyValues=" + studyValues + "): " + e.getMessage(), e);
         }
-
-        return null;
     }
 
 
@@ -583,8 +580,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
             } catch (Exception e) {
                 rollbackTransaction(trans);
-                logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " 
-                        + e.getMessage(), e, LOG);
+                throw new MiddlewareQueryException("Error encountered with saveOrUpdateFieldmapProperties(): " + e.getMessage(), e);
             }
         }
 
@@ -1159,7 +1155,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         	trans.commit();
         } catch (Exception e) {
              rollbackTransaction(trans);
-             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
+             throw new MiddlewareQueryException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e);
         }
 	}
 

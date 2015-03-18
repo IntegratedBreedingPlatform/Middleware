@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.generationcp.middleware.Work;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
@@ -58,7 +57,6 @@ import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
 import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
-import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -442,9 +440,7 @@ public abstract class DataManager extends DatabaseBroker{
             return recordSaved;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), 
-                    e, LOG);
-            return null;
+            throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -462,9 +458,7 @@ public abstract class DataManager extends DatabaseBroker{
             return recordSaved;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), 
-                    e, LOG);
-            return null;
+            throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -472,52 +466,15 @@ public abstract class DataManager extends DatabaseBroker{
 
     /**
      * Logs an error based on the given message using the given Logger parameter.
-     * TODO: Do not use this method. This method should raise Middleware exception as it refers to domain validation.
-     * @param message   The message to log and to set on the exception
-     * @throws MiddlewareQueryException
-     */
-    protected void logAndThrowException(String message) throws MiddlewareQueryException {
-        LOG.error(message);
-        throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
-    }
-
-    /**
-     * Logs an error based on the given message using the given Logger parameter.
-     * TODO: Do not use this method outside DataManager. Currently it has been referred to many places and need to clean this.
+     * TODO: Deprecate this method and do not use. It is referred as anti pattern.
+     * Reference: https://today.java.net/article/2006/04/04/exception-handling-antipatterns#logAndThrow
      * @param message   The message to log and to set on the exception
      * @param e     The origin of the exception
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
         LOG.error(e.getMessage(), e);
-        throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
-    }
-
-    /**
-     * Logs an error based on the given message using the given Logger parameter.     <br/>
-     * Throws a MiddlewarewareException that wraps the origin of the exception.     <br/>
-     *
-     * @param message   The message to log and to set on the exception
-     * @param log   The Logger to use
-     * @throws MiddlewareQueryException
-     */
-    protected void logAndThrowException(String message, Logger log) throws MiddlewareException {
-        log.error(message);
-        throw new MiddlewareException(message, ErrorCode.DATA_PROVIDER_FAILED);
-    }
-
-    /**
-     * Logs an error based on the given message using the given Logger parameter.     <br/> 
-     * Throws a MiddlewarewareQueryException that wraps the origin of the exception.     <br/>
-     * 
-     * @param message   The message to log and to set on the exception
-     * @param e     The origin of the exception
-     * @param log   The Logger to use
-     * @throws MiddlewareQueryException
-     */
-    protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
-        log.error(e.getMessage(), e);
-        throw new MiddlewareQueryException(message, ErrorCode.DATA_PROVIDER_FAILED);
+        throw new MiddlewareQueryException(message, e);
     }
 
     /**
@@ -545,7 +502,7 @@ public abstract class DataManager extends DatabaseBroker{
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with " + work.getName() + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered with " + work.getName() + e.getMessage(), e);
         } finally {
             session.flush();
         }

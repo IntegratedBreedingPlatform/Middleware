@@ -1500,7 +1500,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             terms = criteria.list();
 
         } catch (HibernateException e) {
-            logAndThrowQueryException("Error at getByCvId=" + cvId + " query on CVTermDao", e);
+            throw new MiddlewareQueryException("Error at getByCvId=" + cvId + " query on CVTermDao", e);
         }
         
         return terms;
@@ -1517,7 +1517,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             terms = criteria.list();
 
         } catch (HibernateException e) {
-            logAndThrowQueryException("Error at getAllByCvId=" + cvId + " query on CVTermDao", e);
+            throw new MiddlewareQueryException("Error at getAllByCvId=" + cvId + " query on CVTermDao", e);
         }
 
         return terms;
@@ -1536,7 +1536,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             terms = criteria.list();
 
         } catch (HibernateException e) {
-            logAndThrowQueryException("Error at getByCvId=" + cvId + " query on CVTermDao", e);
+            throw new MiddlewareQueryException("Error at getByCvId=" + cvId + " query on CVTermDao", e);
         }
 
         return terms;

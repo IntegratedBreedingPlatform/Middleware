@@ -284,9 +284,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             trans.commit();
         } catch (Exception e) {
         	rollbackTransaction(trans);
-        	logAndThrowException(
-                    "Error encountered while saving Germplasm List: GermplasmListManager.addOrUpdateGermplasmList(germplasmLists="
-                            + germplasmLists + ", operation-" + operation + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Germplasm List: GermplasmListManager.addOrUpdateGermplasmList(germplasmLists="
+                            + germplasmLists + ", operation-" + operation + "): " + e.getMessage(), e);
         } finally {
             sessionForLocal.flush();
         }
@@ -343,9 +342,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while deleting Germplasm List: GermplasmListManager.deleteGermplasmList(germplasmLists="
-                            + germplasmLists + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting Germplasm List: GermplasmListManager.deleteGermplasmList(germplasmLists="
+                            + germplasmLists + "): " + e.getMessage(), e);
         } finally {
             sessionForLocal.flush();
         }
@@ -425,9 +423,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(germplasmListDatas="
-                            + germplasmListDatas + ", operation=" + operation + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(germplasmListDatas="
+                            + germplasmListDatas + ", operation=" + operation + "): " + e.getMessage(), e);
         } finally {
             sessionForLocal.flush();
         }
@@ -455,9 +452,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
-                            + listId + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
+                            + listId + "): " + e.getMessage(), e);
         } finally {
             sessionForLocal.flush();
         }
@@ -513,9 +509,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListData(germplasmListDatas="
-                            + germplasmListDatas + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListData(germplasmListDatas="
+                            + germplasmListDatas + "): " + e.getMessage(), e);
         } finally {
             sessionForLocal.flush();
         }

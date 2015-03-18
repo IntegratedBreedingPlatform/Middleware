@@ -16,8 +16,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -26,14 +24,12 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
     private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
 
-    private static final Logger LOG = LoggerFactory.getLogger(OntologyPropertyDataManagerImpl.class);
-
     public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
     }
 
     @Override
-    public Property getProperty(int id) throws MiddlewareQueryException {
+    public Property getProperty(int id) throws MiddlewareQueryException, MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(id);
 
@@ -42,7 +38,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         }
 
         if (term.getCv() != CvId.PROPERTIES.getId()) {
-            logAndThrowException(TERM_IS_NOT_PROPERTY, new MiddlewareException("TERM:" + id), LOG);
+            throw new MiddlewareException(TERM_IS_NOT_PROPERTY);
         }
 
         try {
@@ -50,10 +46,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             if(properties.size() == 0) return null;
             return properties.get(0);
         } catch (HibernateException e) {
-            logAndThrowException("Error at getProperty :" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at getProperty :" + e.getMessage(), e);
         }
-
-        return null;
     }
 
     @Override
@@ -61,10 +55,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         try {
             return getProperties(true, null);
         } catch (HibernateException e) {
-            logAndThrowException("Error at getAllProperties :" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at getAllProperties :" + e.getMessage(), e);
         }
-
-        return new ArrayList<>();
     }
 
     @Override
@@ -84,9 +76,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             return getProperties(false, propertyIds);
 
         } catch (HibernateException e) {
-            logAndThrowException("Error at getAllPropertiesWithClass :" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
         }
-        return new ArrayList<>();
     }
 
     /**
@@ -167,7 +158,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             }
 
         } catch (HibernateException e) {
-            logAndThrowException("Error at getProperties :" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
         }
 
         return new ArrayList<>(map.values());
@@ -179,7 +170,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         CVTerm term = getCvTermDao().getByNameAndCvId(property.getName(), CvId.METHODS.getId());
 
         if (term != null) {
-            logAndThrowException("Method exist with same name");
+            throw new MiddlewareException("Method exist with same name");
         }
 
         //To avoid null pointer exception while looping for classes if classes does not set by caller
@@ -218,7 +209,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            logAndThrowException("Error at addProperty :" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at addProperty :" + e.getMessage(), e);
         }
     }
 
@@ -231,13 +222,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         CVTerm propertyTerm = getCvTermDao().getById(property.getId());
 
         if(propertyTerm == null){
-            logAndThrowException(PROPERTY_DOES_NOT_EXIST, new MiddlewareException(property.toString()), LOG);
+            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
         }
 
-        assert propertyTerm != null;
-
         if (propertyTerm.getCv() != CvId.PROPERTIES.getId()) {
-            logAndThrowException(PROPERTY_DOES_NOT_EXIST, new MiddlewareException(property.toString()), LOG);
+            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
         }
 
         List<Term> allClasses = getCvTermDao().getAllClasses();
@@ -294,7 +283,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            logAndThrowException("Error at updateProperty" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at updateProperty" + e.getMessage(), e);
         }
     }
 
@@ -304,13 +293,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         CVTerm term = getCvTermDao().getById(propertyId);
 
         if(term == null){
-            logAndThrowException(PROPERTY_DOES_NOT_EXIST, new MiddlewareException(String.valueOf(propertyId)), LOG);
+            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
         }
 
-        assert term != null;
-
         if (term.getCv() != CvId.PROPERTIES.getId()) {
-            logAndThrowException(PROPERTY_DOES_NOT_EXIST, new MiddlewareException(String.valueOf(propertyId)), LOG);
+            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
         }
 
         Session session = getActiveSession();
@@ -336,7 +323,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
         } catch (HibernateException e) {
             rollbackTransaction(transaction);
-            logAndThrowException("Error at deleteProperty" + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error at deleteProperty" + e.getMessage(), e);
         }
     }
 }

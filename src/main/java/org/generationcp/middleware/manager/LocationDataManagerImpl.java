@@ -21,8 +21,6 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -34,8 +32,6 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public class LocationDataManagerImpl extends DataManager implements LocationDataManager {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LocationDataManagerImpl.class);
 
     public LocationDataManagerImpl() {
     }
@@ -286,8 +282,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Location: LocationDataManager.addLocation(location=" + location + "): "
-                    + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Location: LocationDataManager.addLocation(location=" + location + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -318,8 +313,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations
-                    + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -352,8 +346,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving Location: addLocationAndLocdes(" +
-                    "location=" + location + ", locdes=" + locdes + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location + ", locdes=" + locdes + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -371,8 +364,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location
-                    + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
@@ -568,8 +560,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			trans.commit();
 		} catch (Exception e) {
 			rollbackTransaction(trans);
-			logAndThrowException("Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
-					+ programUUID + "): " + e.getMessage(), e, LOG);
+            throw new MiddlewareQueryException("Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId=" + programUUID + "): " + e.getMessage(), e);
 		} finally {
 			session.flush();
 		}

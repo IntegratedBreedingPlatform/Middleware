@@ -137,7 +137,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
             }
 
         } catch(HibernateException e) {
-            logAndThrowQueryException("Error with getBySubjectIdAndTypeId=" + subjectId + ", " + typeId, e);
+            throw new MiddlewareQueryException("Error with getBySubjectIdAndTypeId=" + subjectId + ", " + typeId, e);
 
         }
         return relationships;
