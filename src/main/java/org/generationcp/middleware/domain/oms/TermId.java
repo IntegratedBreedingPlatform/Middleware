@@ -33,6 +33,7 @@ public enum TermId {
 	, HAS_VALUE(1190)
 	, IS_A(1225)
 	, STORED_IN(1044)
+	, VARIABLE_TYPE(8585) //TODO Update ID as per final cvterm id assigned officially.
 	
 	//Ontology
 	, IBDB_CLASS(1001)

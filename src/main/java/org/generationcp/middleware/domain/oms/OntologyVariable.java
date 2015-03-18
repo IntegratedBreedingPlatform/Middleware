@@ -2,6 +2,7 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.domain.common.MinMaxValue;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -14,7 +15,13 @@ public class OntologyVariable {
 
     private String alias;
 
-    private Set<VariableType> variableTypes;
+	/**
+	 * Variable types are used to determin where in the system a variable is intended to be used. Variable types are used to restrict the variable's
+	 * display to only locations in the BMS that are relevant to that variable type. A variable may have multiple variable types, and if
+	 * there is no variable type selected, then the variable will show up in all locations where variables are used in the BMS. Variable
+	 * types replace the older concept of roles (the stored_in relationship).
+	 */
+    private final Set<VariableType> variableTypes = new HashSet<VariableType>();
 
     private Property property;
     private Method method;
@@ -47,10 +54,10 @@ public class OntologyVariable {
         return variableTypes;
     }
 
-    public void setVariableTypes(Set<VariableType> variableTypes) {
-        this.variableTypes = variableTypes;
-    }
-
+    public void addVariableType(VariableType type) {
+		this.variableTypes.add(type);
+	}
+    
     public Property getProperty() {
         return property;
     }

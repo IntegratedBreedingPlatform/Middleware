@@ -1,7 +1,7 @@
 package org.generationcp.middleware.domain.oms;
 
 /**
- * Variable Type of a Variable. Ontology variable will have multiple variable types associated to it.
+ * Variable Type of a Variable. Ontology variable can have zero or more variable types associated to it.
  */
 public enum VariableType {
     ANALYSIS,
