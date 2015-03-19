@@ -45,15 +45,15 @@ public class TrialEnvironmentBuilder extends Builder {
 	}
 
 	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareQueryException {
-		DmsProject project = getDataSetBuilder().getTrialDataset(studyId, datasetId);
-		DataSet dataSet = getDataSetBuilder().build(project.getProjectId());
-	    Study study = getStudyBuilder().createStudy(dataSet.getStudyId());
-	
-	    VariableTypeList trialEnvironmentVariableTypes = getTrialEnvironmentVariableTypes(study, dataSet);
-	    Set<Geolocation> locations = getGeoLocations(datasetId);
-	
-	    return buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
-	}
+			DmsProject project = getDataSetBuilder().getTrialDataset(studyId, datasetId);
+			DataSet dataSet = getDataSetBuilder().build(project.getProjectId());
+		    Study study = getStudyBuilder().createStudy(dataSet.getStudyId());
+		
+		    VariableTypeList trialEnvironmentVariableTypes = getTrialEnvironmentVariableTypes(study, dataSet);
+		    Set<Geolocation> locations = getGeoLocations(datasetId);
+		
+		    return buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
+		}
 
 	private VariableTypeList getTrialEnvironmentVariableTypes(Study study, DataSet dataSet) {
 		VariableTypeList trialEnvironmentVariableTypes = new VariableTypeList();
@@ -115,7 +115,7 @@ public class TrialEnvironmentBuilder extends Builder {
 	
 	public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
 		TrialEnvironments environments = new TrialEnvironments();
-		environments.addAll(getGeolocationDao().getAllTrialEnvironments());		
+			environments.addAll(getGeolocationDao().getAllTrialEnvironments());
 		return environments;
 	}
 	
@@ -125,17 +125,17 @@ public class TrialEnvironmentBuilder extends Builder {
 	
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
 		return  getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
-	}
+		}
 
     public List<GermplasmPair> getEnvironmentForGermplasmPairs(List<GermplasmPair> germplasmPairs) throws MiddlewareQueryException {
         List<TrialEnvironment> trialEnvironments = new ArrayList<TrialEnvironment>();
-
+        
         Set<Integer> allGids = new HashSet<Integer>();
         for (GermplasmPair pair : germplasmPairs){
             allGids.add(pair.getGid1());
             allGids.add(pair.getGid2());
-        }
-        
+            }
+
         // Step 1: Get Trial Environments for each GID
         Map<Integer, Set<Integer>> germplasmEnvironments = getExperimentStockDao().getEnvironmentsOfGermplasms(allGids);
 

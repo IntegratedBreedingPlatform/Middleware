@@ -40,6 +40,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	
 	/** The location name. */
 	String locationName;
+
+	String locationAbbr;
 	
 	/** The user id. */
 	Integer userId;
@@ -108,6 +110,18 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.scaleId = scaleId;
 		this.scaleName = scaleName;
 		this.comment = comment;
+	}
+
+	public InventoryDetails(Integer gid, String germplasmName, Integer locationId,
+			Integer userId, Double amount, Integer sourceId, Integer scaleId, Integer entryId) {
+		this.gid = gid;
+		this.germplasmName = germplasmName;
+		this.locationId = locationId;
+		this.userId = userId;
+		this.amount = amount;
+		this.sourceId = sourceId;
+		this.scaleId = scaleId;
+		this.entryId = entryId;
 	}
 
 	/**
@@ -376,7 +390,15 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void setSource(String source) {
 		this.source = source;
 	}
-	
+
+	public String getLocationAbbr() {
+		return locationAbbr;
+	}
+
+	public void setLocationAbbr(String locationAbbr) {
+		this.locationAbbr = locationAbbr;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
