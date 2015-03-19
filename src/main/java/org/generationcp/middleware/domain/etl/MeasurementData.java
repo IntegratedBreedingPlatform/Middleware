@@ -194,6 +194,9 @@ public class MeasurementData {
 		} else {
 			if(this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null && "N".equalsIgnoreCase(this.getMeasurementVariable().getDataTypeDisplay())){
 				if(this.value != null && !"".equalsIgnoreCase(this.value) && !"null".equalsIgnoreCase(this.value)) {
+					if(MISSING_VALUE.equalsIgnoreCase(this.value)){
+						return MISSING_VALUE;
+					}
 					int intVal = Double.valueOf(this.value).intValue();
 					double doubleVal = Double.valueOf(this.value);
 					if(intVal == doubleVal){
@@ -242,6 +245,9 @@ public class MeasurementData {
 	}
 	
 	public boolean isCategoricalDisplayAcceptedValidValues(){
+		return isDisplayAcceptedValidValues();
+	}
+	public boolean isDisplayAcceptedValidValues(){
 		if(getMeasurementVariable() != null && getMeasurementVariable().getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId() && getMeasurementVariable().getPossibleValues() != null){
 			String displayValue = getDisplayValue();
 			if(displayValue != null && !displayValue.equalsIgnoreCase("") && !MISSING_VALUE.equals(displayValue)){
@@ -251,6 +257,22 @@ public class MeasurementData {
 						}
 				}
 				return true;			
+			}
+		}else if(getMeasurementVariable() != null && getMeasurementVariable().getDataTypeId() == TermId.NUMERIC_VARIABLE.getId()){
+			String displayValue = getDisplayValue();
+			if(displayValue != null && !displayValue.equalsIgnoreCase("") && !MISSING_VALUE.equals(displayValue)){
+				if (getMeasurementVariable().getMinRange() != null && getMeasurementVariable().getMaxRange() != null) {
+					
+					if (!NumberUtils.isNumber(displayValue)) {
+						return false;
+					} else {
+						Double numericValue = Double.valueOf(displayValue);
+						return numericValue > getMeasurementVariable().getMaxRange() || numericValue < getMeasurementVariable().getMinRange();
+						
+					}
+					
+				}
+				return false;			
 			}
 		}
 		return false;
