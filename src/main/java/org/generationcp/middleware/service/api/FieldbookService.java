@@ -41,7 +41,7 @@ public interface FieldbookService {
      * @return all local nursery details
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException;
+    List<StudyDetails> getAllLocalNurseryDetails(String programUUID) throws MiddlewareQueryException;
     
     /**
      * Retrieves all the details of the trial studies stored in local database.
@@ -49,7 +49,7 @@ public interface FieldbookService {
      * @return  all local trial study details
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException;
+    List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) throws MiddlewareQueryException;
     
     /**
      * Gets the field map info (entries, reps, plots and counts) of the given trial.
@@ -589,13 +589,12 @@ public interface FieldbookService {
 	/**
 	 * Get study details.
 	 *
-	 * @param database the database
 	 * @param studyType the study type
 	 * @param studyId the study id
 	 * @return the study details
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException;
+	StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * Get the block id of a particular trial instance in a dataset.
@@ -712,10 +711,11 @@ public interface FieldbookService {
 	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
 	 *
 	 * @param name the name
+	 * @param programUUID the program UUID
 	 * @return the project id by name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getProjectIdByName(String name) throws MiddlewareQueryException;
+	Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the stanadard variale given the PSMR combination.

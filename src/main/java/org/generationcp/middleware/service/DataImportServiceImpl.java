@@ -157,16 +157,22 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     @Override
-    public Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException {
+    public Workbook strictParseWorkbook(File file, String programUUID) throws WorkbookParserException, MiddlewareQueryException {
         WorkbookParser parser = new WorkbookParser();
 
         OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProvider());
 
         // partially parse the file to parse the description sheet only at first
-        return strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology);
+        return strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology, programUUID);
     }
 
-    protected Workbook strictParseWorkbook(File file, WorkbookParser parser, Workbook workbook,OntologyDataManager ontology) throws MiddlewareQueryException, WorkbookParserException {
+    protected Workbook strictParseWorkbook(
+    		File file, 
+    		WorkbookParser parser, 
+    		Workbook workbook,
+    		OntologyDataManager ontology,
+    		String programUUID) throws MiddlewareQueryException, WorkbookParserException {
+    	
         // perform validations on the parsed data that require db access
         List<Message> messages = new LinkedList<Message>();
 
@@ -196,7 +202,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         messages.addAll(checkForEmptyRequiredVariables(workbook));
 
         //moved checking below as this needs to parse the contents of the observation sheet for multi-locations
-        checkForDuplicateStudyName(ontology, workbook, messages);
+        checkForDuplicateStudyName(ontology, workbook, messages, programUUID);
 
         //GCP-6253
         checkForDuplicateVariableNames(ontology, workbook, messages);
@@ -276,20 +282,22 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return returnVal;
     }
 
-    private void checkForDuplicateStudyName(OntologyDataManager ontology, Workbook workbook, List<Message> messages)
+    private void checkForDuplicateStudyName(OntologyDataManager ontology, 
+    		Workbook workbook, List<Message> messages, String programUUID)
             throws MiddlewareQueryException, WorkbookParserException {
 
         String studyName = workbook.getStudyDetails().getStudyName();
         String locationDescription = getLocationDescription(ontology, workbook);
-        Integer locationId = getLocationIdByProjectNameAndDescription(studyName, locationDescription);
+        Integer locationId = getLocationIdByProjectNameAndDescriptionAndProgramUUID(
+        		studyName, locationDescription, programUUID);
 
         //same location and study
         if (locationId != null) {
             messages.add(new Message(ERROR_DUPLICATE_STUDY_NAME));
         } else {
-            boolean isExisting = checkIfProjectNameIsExisting(studyName);
+            boolean isExisting = checkIfProjectNameIsExistingInProgram(studyName,programUUID);
             //existing and is not a valid study
-            if (isExisting && getStudyId(studyName) == null) {
+            if (isExisting && getStudyId(studyName,programUUID) == null) {
                 messages.add(new Message(ERROR_DUPLICATE_STUDY_NAME));
             }
             //else we will create a new study or append the data sets to the existing study
@@ -442,42 +450,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
     }
 
-    /**
-     * @deprecated
-     * @param workbook
-     * @return
-     * @throws WorkbookParserException
-     * @throws MiddlewareQueryException
-     */
-    @Override
-    @Deprecated
-    // Deprecated in favor of validateProjectOntology
-    public Workbook validateWorkbook(Workbook workbook) throws WorkbookParserException, MiddlewareQueryException {
-
-        // perform validations on the parsed data that require db access
-        List<Message> messages = new LinkedList<Message>();
-
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProvider());
-
-        if (!isEntryExists(ontology, workbook.getFactors()) && !isEntryExists(ontology, workbook.getConditions())) {
-            messages.add(new Message("error.entry.doesnt.exist.wizard"));
-        }
-
-        if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
-            messages.add(new Message(ERROR_MISSING_TRIAL_CONDITION));
-        }
-
-        if (!messages.isEmpty()) {
-            throw new WorkbookParserException(messages);
-        }
-
-        //moved checking below as this needs to parse the contents of the observation sheet for multi-locations
-        checkForDuplicateStudyName(ontology, workbook, messages);
-
-
-        return workbook;
-    }
-
     //for single location
     private String getLocationDescription(OntologyDataManager ontology, Workbook workbook) throws MiddlewareQueryException {
 
@@ -514,12 +486,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return null;
     }
 
-    private Integer getStudyId(String name) throws MiddlewareQueryException {
-        return getProjectId(name, TermId.IS_STUDY);
+    private Integer getStudyId(String name, String programUUID) throws MiddlewareQueryException {
+        return getProjectId(name, programUUID, TermId.IS_STUDY);
     }
 
-    private Integer getProjectId(String name, TermId relationship) throws MiddlewareQueryException {
-    	return getDmsProjectDao().getProjectIdByName(name, relationship);
+    private Integer getProjectId(String name, String programUUID, TermId relationship) throws MiddlewareQueryException {
+    	return getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
     }
 
     protected Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
@@ -573,13 +545,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     @Override
-    public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
-        return getDmsProjectDao().checkIfProjectNameIsExisting(name);
+    public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException {
+        return getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name,programUUID);
     }
 
     @Override
-    public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
-        return getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
+    public Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(
+    		String projectName, String locationDescription, String programUUID) throws MiddlewareQueryException {
+        return getGeolocationDao().
+        		getLocationIdByProjectNameAndDescriptionAndProgramUUID(projectName, locationDescription, programUUID);
     }
 
     @Override
@@ -642,7 +616,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     @Override
-    public int saveProjectData(Workbook workbook) throws MiddlewareQueryException {
+    public int saveProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
         TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)", LOG);
@@ -650,7 +624,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         try {
 
             trans = session.beginTransaction();
-            getWorkbookSaver().saveProjectData(workbook);
+            getWorkbookSaver().saveProjectData(workbook,programUUID);
             trans.commit();
 
         } catch (Exception e) {
@@ -665,10 +639,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     @Override
-    public Map<String, List<Message>> validateProjectData(Workbook workbook) throws MiddlewareQueryException {
+    public Map<String, List<Message>> validateProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException {
         Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
         OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProvider());
-        checkForExistingTrialInstance(ontology, workbook, errors);
+        checkForExistingTrialInstance(ontology, workbook, errors, programUUID);
 
         // the following code is a workaround versus the current state management in the ETL Wizard
         // to re-set the "required" fields to true for checking later on
@@ -689,14 +663,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     private void checkForExistingTrialInstance(
-            OntologyDataManager ontology, Workbook workbook, Map<String, List<Message>> errors)
+            OntologyDataManager ontology, 
+            Workbook workbook, 
+            Map<String, List<Message>> errors,
+            String programUUID)
             throws MiddlewareQueryException {
 
         String studyName = workbook.getStudyDetails().getStudyName();
         String trialInstanceNumber;
         if (workbook.isNursery()) {
             trialInstanceNumber = "1";
-            Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+            Integer locationId = getLocationIdByProjectNameAndDescriptionAndProgramUUID(
+            		studyName, trialInstanceNumber, programUUID);
             //same location and study
             if (locationId != null) {
                 initializeIfNull(errors, Constants.GLOBAL);
@@ -734,7 +712,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 MeasurementRow row = workbook.getObservations().get(i);
                 trialInstanceNumber = row.getMeasurementDataValue(trialInstanceHeader);
                 if (locationIds.add(trialInstanceNumber)) {
-                    Integer locationId = getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+                    Integer locationId = 
+                    		getLocationIdByProjectNameAndDescriptionAndProgramUUID(
+                    				studyName, trialInstanceNumber, programUUID);
                     //same location and study
                     if (locationId != null) {
                     	duplicateTrialInstances.add(trialInstanceNumber);

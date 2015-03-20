@@ -43,12 +43,12 @@ public class GeolocationSaver extends Saver {
 		Geolocation geolocation = createOrUpdate(variableList, row, locationId);
 		if (geolocation != null) {
 			if(isNursery && geolocation.getDescription()==null) {
-				geolocation.setDescription("1");//GCP-7340, GCP-7346 - OCC should have a default value of 1
+				//OCC should have a default value of 1
+				geolocation.setDescription("1");
 			}
 			if (isCreate) {
 				getGeolocationDao().save(geolocation);
-			}
-			else {
+			} else {
 				getGeolocationDao().saveOrUpdate(geolocation);
 			}
 			if (geolocation.getVariates() != null) {
@@ -70,7 +70,7 @@ public class GeolocationSaver extends Saver {
 	private Geolocation createOrUpdate(VariableList factors, MeasurementRow row, Integer locationId) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 		
-		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
+		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
 			int propertyIndex = getGeolocationPropertyDao().getNextId("geolocationPropertyId");
 			
 			for (Variable variable : factors.getVariables()) {
@@ -104,7 +104,8 @@ public class GeolocationSaver extends Saver {
 				
 				} else if (TermId.OBSERVATION_VARIATE.getId() == storedInId || TermId.CATEGORICAL_VARIATE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation, locationId);
-					if(row!=null) {//value is in observation sheet
+					//value is in observation sheet
+					if(row!=null) {
 						variable.setValue(row.getMeasurementDataValue(variable.getVariableType().getLocalName()));
 					}
 					addVariate(geolocation, variable);
@@ -119,16 +120,17 @@ public class GeolocationSaver extends Saver {
 	}
 	
 	private Geolocation getGeolocationObject(Geolocation geolocation, Integer locationId) throws MiddlewareQueryException {
-		if (geolocation == null) {
+		Geolocation finalGeolocation = geolocation;
+		if (finalGeolocation == null) {
 			if (locationId != null) {
-				geolocation = getGeolocationDao().getById(locationId);
+				finalGeolocation = getGeolocationDao().getById(locationId);
 			}
-			if (geolocation == null) {
-				geolocation = new Geolocation();
-				geolocation.setLocationId(getGeolocationDao().getNextId("locationId"));
+			if (finalGeolocation == null) {
+				finalGeolocation = new Geolocation();
+				finalGeolocation.setLocationId(getGeolocationDao().getNextId("locationId"));
 			}
 		}
-		return geolocation;
+		return finalGeolocation;
 	}
 	
 	private GeolocationProperty createOrUpdateProperty(int index, Variable variable, Geolocation geolocation) throws MiddlewareQueryException {
@@ -205,10 +207,12 @@ public class GeolocationSaver extends Saver {
 	}
 	
 	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, 
-			VariableList variableList, MeasurementRow row, boolean isNursery, boolean isDeleteTrialObservations) throws MiddlewareQueryException {
+			VariableList variableList, MeasurementRow row, 
+			boolean isNursery, boolean isDeleteTrialObservations, String programUUID) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 		
-		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+		if (variableList != null && variableList.getVariables() != null && 
+				!variableList.getVariables().isEmpty()) {
 			String trialInstanceNumber = null;
 			for (Variable variable : variableList.getVariables()) {
 				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
@@ -222,7 +226,9 @@ public class GeolocationSaver extends Saver {
 				trialInstanceNumber = "1";
 			}
 			//check if existing
-			Integer locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(studyName, trialInstanceNumber);
+			Integer locationId = getGeolocationDao().
+					getLocationIdByProjectNameAndDescriptionAndProgramUUID(
+							studyName, trialInstanceNumber,programUUID);
 			if (isDeleteTrialObservations) {
 			    locationId = null;
 			}

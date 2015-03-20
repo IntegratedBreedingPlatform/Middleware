@@ -62,7 +62,6 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,7 +88,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     }
 
     @Test
-    public void testGetStudyDetails() throws Exception {
+    public void testGetStudy() throws Exception {
         Study study = manager.getStudy(STUDY_ID);
         assertNotNull(study);
         Debug.println(INDENT, "ID: " + study.getId());
@@ -760,14 +759,16 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetAllStudyDetails() throws Exception {
-        List<StudyDetails> nurseryStudyDetails = manager.getAllStudyDetails(Database.LOCAL, StudyType.N);
-        Debug.println(INDENT, "testGetAllStudyDetails(Database.LOCAL, StudyType.N)");
+        List<StudyDetails> nurseryStudyDetails = manager.getAllStudyDetails(
+        		StudyType.N,commonTestProject.getUniqueID());
+        Debug.println(INDENT, "testGetAllStudyDetails(StudyType.N, "+commonTestProject.getUniqueID()+")");
         Debug.printFormattedObjects(INDENT, nurseryStudyDetails);
     }
 
     @Test
     public void testGetAllNurseryAndTrialStudyNodes() throws Exception {
-        List<StudyNode> studyNodes = manager.getAllNurseryAndTrialStudyNodes();
+        List<StudyNode> studyNodes = manager.getAllNurseryAndTrialStudyNodes(
+        		commonTestProject.getUniqueID());
         Debug.printFormattedObjects(INDENT, studyNodes);
     }
 
@@ -1044,12 +1045,14 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         Study study = manager.getStudy(10010);
         String name = study.getName();
         Debug.println(INDENT, "Name: " + name);
-        boolean isExisting = manager.checkIfProjectNameIsExisting(name);
+        boolean isExisting = manager.checkIfProjectNameIsExistingInProgram(name,
+        		commonTestProject.getUniqueID());
         assertTrue(isExisting);
 
         name = "SHOULDNOTEXISTSTUDY";
         Debug.println(INDENT, "Name: " + name);
-        isExisting = manager.checkIfProjectNameIsExisting(name);
+        isExisting = manager.checkIfProjectNameIsExistingInProgram(name,
+        		commonTestProject.getUniqueID());
         assertFalse(isExisting);
     }
 
@@ -1082,7 +1085,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         List<Integer> nurseryIdList = new ArrayList<Integer>();
         
         //REPLACED BY THIS TO MAKE THE JUNIT WORK - Get the first nursery from the db
-        List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails();
+        List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails(
+        		commonTestProject.getUniqueID());
         if (studyDetailsList != null && studyDetailsList.size() > 0) {
             for (StudyDetails study : studyDetailsList) {
                 if (study.getStudyType() == StudyType.N) {
@@ -1107,7 +1111,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetGeolocationPropValue() throws MiddlewareQueryException {
-        String value = manager.getGeolocationPropValue(Database.LOCAL, TermId.LOCATION_ID.getId(), -1);
+        String value = manager.getGeolocationPropValue(TermId.LOCATION_ID.getId(), -1);
         Debug.println(INDENT, value);
     }
     
@@ -1116,7 +1120,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         List<Integer> trialIdList = new ArrayList<Integer>();
 
         //REPLACED BY THIS TO MAKE THE JUNIT WORK
-        List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails();
+        List<StudyDetails> studyDetailsList = manager.getAllNurseryAndTrialStudyDetails(
+        		commonTestProject.getUniqueID());
         if (studyDetailsList != null && studyDetailsList.size() > 0){
             for (StudyDetails study : studyDetailsList){
                 if (study.getStudyType() == StudyType.T){
@@ -1132,34 +1137,39 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     }
     
     @Test
-    public void testGetStudyDetailsWithPaging() throws MiddlewareQueryException {
+    public void testGetAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
     	Debug.println(INDENT, "testGetStudyDetailsWithPaging");
         Debug.println(INDENT, "List ALL Trials and Nurseries");
-        List<StudyDetails> list = manager.getAllNurseryAndTrialStudyDetails();
+        List<StudyDetails> list = manager.getAllNurseryAndTrialStudyDetails(
+        		commonTestProject.getUniqueID());
         for (StudyDetails s : list) {
             Debug.println(INDENT, s.toString());
         }
-        Debug.println(INDENT, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
+        Debug.println(INDENT, String.valueOf(manager.countAllNurseryAndTrialStudyDetails(
+        		commonTestProject.getUniqueID())));
         Debug.println(INDENT, "List ALL Trials and Nurseries");
-        list = manager.getAllNurseryAndTrialStudyDetails();
+        list = manager.getAllNurseryAndTrialStudyDetails(commonTestProject.getUniqueID());
         for (StudyDetails s : list) {
             Debug.println(INDENT, s.toString());
         }
-        Debug.println(INDENT, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
+        Debug.println(INDENT, String.valueOf(manager.countAllNurseryAndTrialStudyDetails(
+        		commonTestProject.getUniqueID())));
         
         Debug.println(INDENT, "List ALL Trials");
-        list = manager.getAllStudyDetails(StudyType.T);
+        list = manager.getAllStudyDetails(StudyType.T,commonTestProject.getUniqueID());
         for (StudyDetails s : list) {
             Debug.println(INDENT, s.toString());
         }
-        Debug.println(INDENT, String.valueOf(manager.countAllStudyDetails(StudyType.T)));
+        Debug.println(INDENT, String.valueOf(manager.countAllStudyDetails(StudyType.T,
+        		commonTestProject.getUniqueID())));
         
         Debug.println(INDENT, "List ALL Nurseries");
-        list = manager.getAllStudyDetails(StudyType.T);
+        list = manager.getAllStudyDetails(StudyType.T,commonTestProject.getUniqueID());
         for (StudyDetails s : list) {
             Debug.println(INDENT, s.toString());
         }
-        Debug.println(INDENT, String.valueOf(manager.countAllStudyDetails(StudyType.N)));
+        Debug.println(INDENT, String.valueOf(manager.countAllStudyDetails(StudyType.N,
+        		commonTestProject.getUniqueID())));
         
     }
     
@@ -1340,5 +1350,19 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
     	
+    }
+    
+    @Test
+    public void testGetStudyDetails() throws MiddlewareQueryException {
+    	List<StudyDetails> studyDetailsList = manager.getStudyDetails(
+    			StudyType.N, commonTestProject.getUniqueID(), -1, -1);
+    	assertNotNull(studyDetailsList);
+    }
+    
+    @Test
+    public void testGetNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
+    	List<StudyDetails> studyDetailsList = manager.getNurseryAndTrialStudyDetails(
+    			commonTestProject.getUniqueID(), -1, -1);
+    	assertNotNull(studyDetailsList);
     }
 }

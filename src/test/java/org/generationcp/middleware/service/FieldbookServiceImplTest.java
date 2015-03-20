@@ -78,7 +78,8 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetAllLocalNurseryDetails() throws MiddlewareQueryException {
 
-        List<StudyDetails> nurseryStudyDetails = fieldbookService.getAllLocalNurseryDetails();
+        List<StudyDetails> nurseryStudyDetails = fieldbookService.getAllLocalNurseryDetails(
+        		commonTestProject.getUniqueID());
         for (StudyDetails study : nurseryStudyDetails){
             study.print(INDENT);
         }
@@ -89,7 +90,8 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetAllLocalTrialStudyDetails() throws MiddlewareQueryException {
-        List<StudyDetails> studyDetails = fieldbookService.getAllLocalTrialStudyDetails();
+        List<StudyDetails> studyDetails = fieldbookService.getAllLocalTrialStudyDetails(
+        		commonTestProject.getUniqueID());
         for (StudyDetails study : studyDetails){
             study.print(INDENT);
         }
@@ -151,7 +153,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetNurseryDataSet() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook, null);
+        int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
         workbook = fieldbookService.getNurseryDataSet(id);
         workbook.print(INDENT);
     }
@@ -161,7 +163,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
         workbook.print(INDENT);
                 
-        int id = dataImportService.saveDataset(workbook, null);
+        int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
         Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
         
         createdWorkbook = WorkbookTest.addEnvironmentAndConstantVariables(createdWorkbook);
@@ -202,7 +204,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testTrialSaveMeasurementRows_WithAcceptedAndMissingValues() throws MiddlewareQueryException {
     	WorkbookTest.setTestWorkbook(null);
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
-    	int id = dataImportService.saveDataset(workbook,null);
+    	int id = dataImportService.saveDataset(workbook,commonTestProject.getUniqueID());
     	Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
     	
         WorkbookTest.addVariatesAndObservations(createdWorkbook);
@@ -242,7 +244,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testNurserySaveMeasurementRows_WithAcceptedAndMissingValues() throws MiddlewareQueryException {
     	WorkbookTest.setTestWorkbook(null);
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
-    	int id = dataImportService.saveDataset(workbook, null);
+    	int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
     	Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
     	
         WorkbookTest.addVariatesAndObservations(createdWorkbook);
@@ -283,7 +285,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
         workbook.print(INDENT);
                 
-        int id = dataImportService.saveDataset(workbook, null);
+        int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
         Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
         
         createdWorkbook = WorkbookTest.addEnvironmentAndConstantVariables(createdWorkbook);
@@ -526,7 +528,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testCountPlotsWithPlantsSelectedofNursery() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook, null);
+        int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
         //Debug.println(INDENT, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
     }
     
@@ -534,7 +536,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetNurseryVariableSettings() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook, null);
+        int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
         workbook = fieldbookService.getStudyVariableSettings(id, true);
         workbook.print(INDENT);
     }
@@ -587,7 +589,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testCheckIfStudyHasMeasurementData() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook, null);
+        int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
         workbook = fieldbookService.getNurseryDataSet(id);
         List<Integer> variateIds =  new ArrayList<Integer>();
         variateIds.add(new Integer(21980));
@@ -601,7 +603,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testDeleteObservationsOfStudy() throws MiddlewareQueryException {
         Workbook workbook = WorkbookTest.getTestWorkbook();
         workbook.print(INDENT);
-        int id = dataImportService.saveDataset(workbook, null);
+        int id = dataImportService.saveDataset(workbook, commonTestProject.getUniqueID());
         workbook = fieldbookService.getNurseryDataSet(id);
         
         fieldbookService.deleteObservationsOfStudy(workbook.getMeasurementDatesetId());
@@ -611,7 +613,8 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetProjectIdByName() throws Exception {
     	String name = "ROOT STUDY";
-    	System.out.println("ID IS " + fieldbookService.getProjectIdByName(name));
+    	System.out.println("ID IS " + fieldbookService.getProjectIdByNameAndProgramUUID(
+    			name, commonTestProject.getUniqueID()));
     }
     
     @Test
@@ -718,6 +721,17 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     	assertFalse("Folder should no longer be found",folderExists);
     	assertFalse("Study should no longer be found",study1Exists);
     	assertFalse("Study should no longer be found",study2Exists);
+    }
+    
+    @Test
+    public void testGetFavoriteLocationByProjectId() throws MiddlewareQueryException{
+    	List<Long> locationIds = new ArrayList<Long>();
+    	locationIds.add(1L);
+    	locationIds.add(2L);
+    	
+    	List<Location> locations = fieldbookService.getFavoriteLocationByProjectId(locationIds);
+    	
+    	assertEquals("Expecting to return the same number of Location objects from the input of List of Ids",locationIds.size(), locations.size());
     }
     
 }

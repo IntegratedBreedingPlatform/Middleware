@@ -65,8 +65,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					                                     "  and pr.subject_project_id = ep.project_id " +
 					                                     "  and pr.object_project_id = p.project_id " +
 					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-					                         			 "  AND pp.project_id = ep.project_id AND pp.value = " +
-					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+					                         			 "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() +
+					                         			 "  ) ");
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
 		} catch(HibernateException e) {
@@ -88,8 +88,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 						                                     "  and pr.subject_project_id = ep.project_id "+
 						                                     "  and pr.object_project_id = p.project_id "+
 						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
-						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+						                         			 "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() +
+						                         			 "  ) ");
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 				

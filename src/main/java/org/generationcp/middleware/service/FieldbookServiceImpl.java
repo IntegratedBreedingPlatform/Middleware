@@ -73,14 +73,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public FieldbookServiceImpl() {
         super();
     }
-	
+
     public FieldbookServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
         super(sessionProvider, localDatabaseName);
     }
 
     @Override
-    public List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException{
-    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
+    public List<StudyDetails> getAllLocalNurseryDetails(String programUUID) throws MiddlewareQueryException{
+    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(StudyType.N,programUUID);
     	List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
     		if(detail.hasRows()) {
@@ -91,8 +91,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override 
-    public List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException{
-    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
+    public List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) throws MiddlewareQueryException{
+    	List<StudyDetails> studyDetailList =  getStudyDataManager().getAllStudyDetails(StudyType.T,programUUID);
         List<StudyDetails> newList = new ArrayList<StudyDetails>();
     	for(StudyDetails detail : studyDetailList){
     		if(detail.hasRows()) {
@@ -161,24 +161,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override           
     public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) 
             throws MiddlewareQueryException {
-    	Integer fieldLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-    	Integer blockLtypeFldId = getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
-    	
         List<Location> locationList = new ArrayList<Location>();
         
         for(int i = 0 ; i < locationIds.size() ; i++){
             Integer locationId = Integer.valueOf(locationIds.get(i).toString());
             Location location = getLocationDataManager().getLocationByID(locationId);
             
-            if((fieldLtypeFldId != null && fieldLtypeFldId.intValue() == location.getLtype().intValue())
-    				|| (blockLtypeFldId != null && blockLtypeFldId.intValue() == location.getLtype().intValue())) {
-                continue;
-            }
-            
             locationList.add(location);
         }
-        
-    	
         return locationList;
     }
     
@@ -931,8 +921,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException {
-		return getStudyDataManager().getStudyDetails(database, studyType, studyId);
+	public StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException {
+		return getStudyDataManager().getStudyDetails(studyType, studyId);
 	}
 	
 	@Override
@@ -1018,8 +1008,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
-		return getDmsProjectDao().getProjectIdByName(name);
+	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException {
+		return getDmsProjectDao().getProjectIdByNameAndProgramUUID(name,programUUID);
 	}
 	
 	@Override
