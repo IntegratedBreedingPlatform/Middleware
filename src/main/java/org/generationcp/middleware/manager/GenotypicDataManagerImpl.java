@@ -2157,11 +2157,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException {
     	
-    	if (datasetId >= 0){
-    		throw new MiddlewareQueryException("Cannot delete dataset from central database. Dataset Id = " + datasetId);
-    	}
-    	
-        Session session = getActiveSession();
+    	Session session = getActiveSession();
         Transaction trans = null;
 
         try {
