@@ -20,7 +20,7 @@ public class Scale {
 
     private Term term;
     private DataType dataType;
-    private Map<String, String> categories;
+    private final Map<String, String> categories = new HashMap<>();
 
     private String minValue;
     private String maxValue;
@@ -78,14 +78,7 @@ public class Scale {
         return categories;
     }
 
-    public void setCategories(Map<String, String> categories) {
-        this.categories = categories;
-    }
-
     public void addCategory(String name, String description){
-        if(this.categories == null){
-            this.categories = new HashMap<>();
-        }
         this.categories.put(name, description);
     }
 
