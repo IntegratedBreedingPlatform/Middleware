@@ -32,15 +32,22 @@ public class FolderReference extends Reference {
 	}
 
 	public FolderReference(Integer id, String name, String description) {
-		super.setId(id);
-		super.setName(name);
+		this(id,name);
 		super.setDescription(description);
 	}
 	
+	public FolderReference(Integer id, String name, String description, String programUUID) {
+		this(id,name,description);
+		super.setProgramUUID(programUUID);
+	}
+	
 	public FolderReference(Integer parentId, Integer id, String name, String description) {
-	    super.setId(id);
-	    super.setName(name);
-	    super.setDescription(description);
+		this(id,name,description);
+	    this.parentFolderId = parentId;
+	}
+	
+	public FolderReference(Integer parentId, Integer id, String name, String description, String programUUID) {
+		this(id,name,description,programUUID);
 	    this.parentFolderId = parentId;
 	}
 

@@ -125,7 +125,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					Integer id = (Integer)row[0]; //project.id
 					String name = (String) row [1]; //project.name
 					String description = (String) row [2]; //project.description
-					folderList.add(new FolderReference(DmsProject.SYSTEM_FOLDER_ID, id, name, description));
+					folderList.add(new FolderReference(DmsProject.SYSTEM_FOLDER_ID, id, name, description,programUUID));
 				}
 			}
 		} catch (HibernateException e) {
@@ -157,9 +157,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				Integer isStudy = ((Integer) row[3]).intValue(); 
 				
 				if (isStudy > 0){
-					childrenNodes.add(new StudyReference(id, name, description));
+					childrenNodes.add(new StudyReference(id, name, description, programUUID));
 				} else {
-					childrenNodes.add(new FolderReference(id, name, description));
+					childrenNodes.add(new FolderReference(id, name, description, programUUID));
 				}
 			}
 			
