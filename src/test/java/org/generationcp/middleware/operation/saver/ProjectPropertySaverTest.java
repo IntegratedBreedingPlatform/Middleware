@@ -31,8 +31,7 @@ public class ProjectPropertySaverTest {
 	@Before
 	public void setup(){
 		projectPropDao = Mockito.mock(ProjectPropertyDao.class);
-		projectPropSaver =new ProjectPropertySaver(Mockito.mock(HibernateSessionProvider.class), 
-				Mockito.mock(HibernateSessionProvider.class));
+		projectPropSaver = new ProjectPropertySaver(Mockito.mock(HibernateSessionProvider.class));
 		projectPropSaver.setProjectPropertyDao(projectPropDao);
 		
 		datasetId = -11;

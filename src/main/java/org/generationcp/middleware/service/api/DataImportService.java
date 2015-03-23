@@ -33,18 +33,21 @@ public interface DataImportService {
 	 * Saves a workbook as a local trial or nursery on the new CHADO schema
 	 * 
 	 * @param workbook
+	 * @param programUUID
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(Workbook workbook) throws MiddlewareQueryException;
+	int saveDataset(Workbook workbook, String programUUID) throws MiddlewareQueryException;
 	
     /**
      * Saves a workbook as a local trial or nursery on the new CHADO schema
      * 
      * @param workbook
      * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
+     * @param isDeleteObservations if true, values of the workbook observations will be removed
+     * @param programUUID the program UUID
      * @return id of created trial or nursery
      */
-    int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations) throws MiddlewareQueryException;
+    int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations, String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Given a file, parse the file to create a workbook object
@@ -57,41 +60,33 @@ public interface DataImportService {
 	/**
 	 * 
 	 * @param file
+	 * @param programUUID
 	 * @return the workbook
 	 * @throws WorkbookParserException
 	 * @throws MiddlewareQueryException
 	 */
-    Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException;
+    Workbook strictParseWorkbook(File file, String programUUID) throws WorkbookParserException, MiddlewareQueryException;
 
     /**
-     * 
-     * @param workbook
-     * @return the workbook
-     * @throws WorkbookParserException
-     * @throws MiddlewareQueryException
-     */
-    @Deprecated
-	Workbook validateWorkbook(Workbook workbook)
-			throws WorkbookParserException, MiddlewareQueryException;
-	
-	/**
      * Checks if the name specified is an already existing project name
      * 
      * @param name
+     * @param programUUID
      * @return true or false
      * @throws MiddlewareQueryException
      */
-    boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException;
+    boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Checks if the experiment is already existing given the project name and location description
      * 
      * @param projectName
      * @param locationDescription
+     * @param programUUID
      * @return nd_geolocation_id
      * @throws MiddlewareQueryException
      */
-    Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException;
+    Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(String projectName, String locationDescription, String programUUID) throws MiddlewareQueryException;
     
     /**
 	 * Validate the project ontology from the Workbook and return the list of errors
@@ -105,19 +100,21 @@ public interface DataImportService {
 	 * Saves the project ontology from the Workbook
 	 * Tables: project, project_relationship, project_properties
 	 * @param workbook
+	 * @param programUUID
 	 * @return id of created the study (Table.column = Project.project_id)
 	 */
-    int saveProjectOntology(Workbook workbook) throws MiddlewareQueryException;
+    int saveProjectOntology(Workbook workbook, String programUUID) throws MiddlewareQueryException;
     
     /**
 	 * Saves the project ontology from the Workbook
 	 * Tables: project, project_relationship, project_properties
 	 * @param workbook
+	 * @param programUUID
 	 * @return 1 = successful, 0 = failure
 	 */
-    int saveProjectData(Workbook workbook) throws MiddlewareQueryException;
+    int saveProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException;
 
-	Map<String, List<Message>> validateProjectData(Workbook importData) throws MiddlewareQueryException;
+	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareQueryException;
 	
 	
 }

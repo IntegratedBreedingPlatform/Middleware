@@ -13,9 +13,8 @@ import java.util.List;
 
 public class VariableTypeListTransformer extends Transformer {
 	
-    public VariableTypeListTransformer(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-				super(sessionProviderForLocal, sessionProviderForCentral);
+    public VariableTypeListTransformer(HibernateSessionProvider sessionProviderForLocal) {
+    	super(sessionProviderForLocal);
 	}
 	
 	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate) 

@@ -22,9 +22,8 @@ import java.util.List;
 
 public class StudyVariableBuilder extends Builder {
 
-	protected StudyVariableBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                  HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	protected StudyVariableBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public VariableList create(DmsProject project, Experiment experiment, VariableTypeList variableTypes) throws MiddlewareQueryException {

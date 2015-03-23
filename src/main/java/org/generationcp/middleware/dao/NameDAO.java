@@ -40,10 +40,12 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         try {
         	if (gid != null){
 	            StringBuilder queryString = new StringBuilder();
-	            queryString.append("SELECT {n.*} from NAMES n WHERE n.gid = :gid ");
+	            queryString.append("SELECT {n.*} from names n WHERE n.gid = :gid ");
 	
 	            if (status != null && status != 0) {
 	                queryString.append("AND n.nstat = :nstat ");
+	            } else {
+	            	queryString.append("AND n.nstat != 9 ");
 	            }
 	
 	            if (type != null) {
@@ -108,19 +110,6 @@ public class NameDAO extends GenericDAO<Name, Integer>{
                     + e.getMessage(), e);
         }
         return null;
-    }
-
-    public void validateId(Name name) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-    	if (name != null){
-	        Integer id = name.getNid();
-	        if (id != null && id.intValue() > 0) {
-	            logAndThrowException("Error with validateId(name=" + name + "): Cannot update a Central Database record. "
-	                    + "Name object to update must be a Local Record (ID must be negative)", new Throwable());
-	        }
-    	} else {
-            logAndThrowException("Error with validateId(name=" + name + "): name is null. ", new Throwable());
-    	}
     }
 
     @SuppressWarnings("unchecked")
@@ -225,7 +214,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             
             List<Object> results = query.list();
             for(Object result : results){
-                Object resultArray[] = (Object[]) result;
+                Object[] resultArray = (Object[]) result;
                 Integer gid = (Integer) resultArray[0];
                 String preferredId = (String) resultArray[1];
                 toreturn.put(gid, preferredId);
@@ -250,7 +239,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             
             List<Object> results = query.list();
             for(Object result : results){
-                Object resultArray[] = (Object[]) result;
+                Object[] resultArray = (Object[]) result;
                 Integer gid = (Integer) resultArray[0];
                 String preferredId = (String) resultArray[1];
                 toreturn.put(gid, preferredId);
@@ -308,15 +297,16 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 			criteria.add(Restrictions.in("germplasmId", gids));
 
 			List<Name> list = (List<Name>)  criteria.list();
-			if (list != null) {
-				for (Name name : list) {
-					List<Name> names = map.get(name.getGermplasmId());
-					if (names == null) {
-						names = new ArrayList<Name>();
-						map.put(name.getGermplasmId(), names);
-					}
-					names.add(name);
+			if (list == null) {
+				return map;
+			}
+			for (Name name : list) {
+				List<Name> names = map.get(name.getGermplasmId());
+				if (names == null) {
+					names = new ArrayList<Name>();
+					map.put(name.getGermplasmId(), names);
 				}
+				names.add(name);
 			}
 			
         } catch (HibernateException e) {
@@ -361,8 +351,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     		sql.append("SELECT COUNT(nid) FROM names ");
     		if (keyword == null) {
     			sql.append(" WHERE REPLACE(nval, ' ', '') IN ('").append(keyword1).append("', ").append("'").append(keyword2).append("')");
-    		} 
-    		else {
+    		} else {
     			sql.append(" WHERE REPLACE(nval, ' ', '') = '").append(keyword).append("'");
     		}
 

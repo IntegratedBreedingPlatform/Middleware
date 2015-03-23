@@ -33,11 +33,8 @@ public class InventoryServiceImpl extends Service implements InventoryService {
     
     private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
-    public InventoryServiceImpl(
-            HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral, 
-            String localDatabaseName, String centralDatabaseName) {
-        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+    public InventoryServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
+        super(sessionProvider, localDatabaseName);
     }
 
 	@Override
@@ -62,8 +59,6 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 	@Override
 	public LotsResult addAdvanceLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
 			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
-		
-		requireLocalDatabaseInstance();
 		
 		LotsResult result  = getLotBuilder().getGidsForUpdateAndAdd(gids);
 		List<Integer> newGids = result.getGidsAdded();

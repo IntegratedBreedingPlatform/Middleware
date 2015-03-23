@@ -54,19 +54,19 @@ import java.io.Serializable;
 @NamedNativeQueries({
         @NamedNativeQuery(name = "getGermplasmDescendants",
                 query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-                        + "WHERE g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid", resultClass = Germplasm.class),
+                        + "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) "
+                        + "AND g.gid != g.grplce and g.grplce = 0", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
                 + "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getProgenitor1",
-                query = "SELECT * FROM germplsm g1 WHERE g1.gid = (SELECT g.gpid1 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-                        + "WHERE g.gid = :gid)", resultClass = Germplasm.class),
+        		query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid " 
+        			+ "and g.gpid1 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getProgenitor2",
-                query = "SELECT * FROM germplsm g1 WHERE g1.gid = (SELECT g.gpid2 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-                        + "WHERE g.gid = :gid)", resultClass = Germplasm.class),
+        		query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid " 
+       				 + "and g.gpid2 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getProgenitor",
-                query = "SELECT * FROM germplsm g1 WHERE g1.gid = (SELECT p.pid FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-                        + "WHERE g.gid = :gid and p.pno=:pno)", resultClass = Germplasm.class)
-
+        		query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid " 
+          			 + "and p.gid = :gid and p.pno = :pno and g.gid != g.grplce and g.grplce = 0", resultClass = Germplasm.class)
 })
 @Entity
 @Table(name = "germplsm")
@@ -111,7 +111,8 @@ public class Germplasm implements Serializable{
     public static final String COUNT_DESCENDANTS = 
             "SELECT COUNT(DISTINCT g.gid) " +
             "FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid " +
-            "WHERE g.gpid1 = :gid OR g.gpid2 = :gid OR p.pid=:gid";
+            "WHERE (g.gpid1 = :gid OR g.gpid2 = :gid OR p.pid=:gid) " +
+            "AND g.gid != g.grplce and g.grplce = 0";
     public static final String GET_PROGENITOR1 = "getProgenitor1";
     public static final String GET_PROGENITOR2 = "getProgenitor2";
     public static final String GET_PROGENITOR = "getProgenitor";
@@ -119,39 +120,41 @@ public class Germplasm implements Serializable{
     public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME = 
             "SELECT {g.*}, {n.*} " +
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
-                            "JOIN progntrs p ON p.pid = g.gid " +
-            "WHERE p.gid = :gid";
+            "JOIN progntrs p ON p.pid = g.gid " +
+            "WHERE p.gid = :gid and g.gid != g.grplce and g.grplce = 0";
 
     public static final String GET_MANAGEMENT_NEIGHBORS = 
             "SELECT {g.*}, {n.*} " +
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
-            "WHERE g.mgid = :gid";
+            "WHERE g.mgid = :gid AND g.grplce != g.gid and g.grplce = 0 ORDER BY g.gid";
 
     public static final String COUNT_MANAGEMENT_NEIGHBORS = 
             "SELECT COUNT(g.gid) " +
-            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
-            "WHERE g.mgid = :gid";
+            "FROM germplsm g " +
+            "WHERE g.mgid = :gid AND g.grplce != g.gid and g.grplce = 0";
     public static final String GET_GROUP_RELATIVES = 
             "SELECT {g.*}, {n.*} " +
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
-                                    "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " +
-            "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
+            "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " +
+            "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid " + 
+            "AND g.gpid1 != 0 AND g.grplce != g.gid AND g.grplce = 0";
     public static final String COUNT_GROUP_RELATIVES = 
-        "SELECT COUNT(g.gid) " +
-        "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
-                                "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " +
-        "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
+	        "SELECT COUNT(g.gid) " +
+	        "FROM germplsm g " +
+	        "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " +
+	        "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid " + 
+	        "AND g.gpid1 != 0 AND g.grplce != g.gid AND g.grplce = 0";
 
     public static final String GET_DERIVATIVE_CHILDREN = 
             "SELECT {g.*}, {n.*} " +
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
-            "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
+            "WHERE g.gnpgs = -1 AND g.gpid2 = :gid and g.gid != g.grplce and g.grplce = 0";
 
     public static final String GET_MAINTENANCE_CHILDREN = 
             "SELECT {g.*}, {n.*} " +
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
             "JOIN methods m ON g.methn = m.mid AND m.mtype = 'MAN' " +
-            "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
+            "WHERE g.gnpgs = -1 AND g.gpid2 = :gid and g.gid != g.grplce and g.grplce = 0";
 
     public static final String GET_BY_NAME_USING_EQUAL =
             "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
@@ -170,19 +173,19 @@ public class Germplasm implements Serializable{
                     + "nval LIKE :name";       
     
     public static final String GET_BY_NAME_ALL_MODES_USING_EQUAL =
-            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND "
           + "( nval = :name OR nval = :noSpaceName OR nval = :standardizedName )";
     
     public static final String COUNT_BY_NAME_ALL_MODES_USING_EQUAL =
-            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND "
             + "( nval = :name OR nval = :noSpaceName OR nval = :standardizedName )";       
 
     public static final String GET_BY_NAME_ALL_MODES_USING_LIKE =
-            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND "
                     + "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";       
     
     public static final String COUNT_BY_NAME_ALL_MODES_USING_LIKE =
-            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND "
                     + "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";  
     
     public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
@@ -215,7 +218,7 @@ public class Germplasm implements Serializable{
     public static final String GET_BY_GID_WITH_METHOD_TYPE = 
             "SELECT {g.*}, {m.*} " +
             "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid " +
-            "WHERE g.gid = :gid";
+            "WHERE g.gid = :gid AND g.grplce != g.gid AND g.grplce = 0";
     
     /**
      * Used in germplasm data manager searchForGermplasm
@@ -223,24 +226,26 @@ public class Germplasm implements Serializable{
     public static final String SEARCH_GERMPLASM_BY_GID = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid=:gid AND length(gid) = :gidLength AND gid!=grplce";
+    		"WHERE gid=:gid AND length(gid) = :gidLength AND gid!=grplce AND grplce = 0";
     public static final String SEARCH_GERMPLASM_BY_GID_LIKE = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid LIKE :gid AND gid!=grplce";    
+    		"WHERE gid LIKE :gid AND gid!=grplce AND grplce = 0";    
     public static final String SEARCH_GERMPLASM_BY_GIDS = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid IN (:gids) AND gid!=grplce";
-    public static final String SEARCH_GID_BY_GERMPLASM_NAME = 
-    		"SELECT DISTINCT gid " +
-    		"FROM names " +
-    		"WHERE nstat != :deletedStatus AND (nval LIKE :q OR nval LIKE :qStandardized OR nval LIKE :qNoSpaces) " +
+    		"WHERE gid IN (:gids) AND gid!=grplce AND grplce = 0";
+    public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = 
+    		"SELECT DISTINCT g.* " +
+    		"FROM names n, germplsm g " +
+    		"WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 " +
+    		"AND n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) " +
     		"LIMIT 5000";
-    public static final String SEARCH_GID_BY_GERMPLASM_NAME_EQUAL = 
-    		"SELECT DISTINCT gid " +
-    		"FROM names " +
-    		"WHERE nstat != :deletedStatus AND (nval = :q OR nval = :qStandardized OR nval = :qNoSpaces) " +
+    public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_EQUAL = 
+    		"SELECT DISTINCT g.* " +
+    		"FROM names n, germplsm g " +
+    		"WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 " +
+    		"AND n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " +
     		"LIMIT 5000";
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
     		"SELECT listid " +

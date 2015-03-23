@@ -28,9 +28,9 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-    	session = managerFactory.getSessionProviderForCentral().getSession();
+    	session = managerFactory.getSessionProvider().getSession();
     }
-
+    
     @Test
     public void testAtributs() {
         Query query = session.createQuery("FROM Attribute");

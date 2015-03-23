@@ -41,7 +41,7 @@ public class GermplasmListDAOTest extends MiddlewareIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         dao = new GermplasmListDAO();
-        session = localSessionUtil.getCurrentSession();
+        session = sessionUtil.getCurrentSession();
         dao.setSession(session);
     }
 
@@ -85,8 +85,8 @@ public class GermplasmListDAOTest extends MiddlewareIntegrationTest {
     		String name, String description, long date, 
     		String type, int userId, int status) throws MiddlewareQueryException {
 		GermplasmList list = new GermplasmList();
-		Integer negativeId = dao.getNegativeId("id");
-		list.setId(negativeId);
+		Integer nextId = dao.getNextId("id");
+		list.setId(nextId);
 		list.setName(name);
 		list.setDescription(description);
 		list.setDate(date);

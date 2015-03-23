@@ -1,9 +1,9 @@
 package org.generationcp.middleware.manager.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
-
-import java.util.List;
 
 /**
  * Created by cyrus on 12/16/14.
@@ -18,36 +18,6 @@ public interface PresetDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	ProgramPreset getProgramPresetById(int id) throws MiddlewareQueryException;
-
-	/**
-	 * Returns all program preset given programUUID
-	 *
-	 * @param programId
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	List<ProgramPreset> getAllProgramPresetFromProgram(int programId)
-			throws MiddlewareQueryException;
-
-	/**
-	 * Returns all program preset given programUUID and toolID
-	 *
-	 * @param programId
-	 * @param toolId
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId)
-			throws MiddlewareQueryException;
-
-	List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId,
-			String toolSection)
-			throws MiddlewareQueryException;
-
-	List<ProgramPreset> getProgramPresetFromProgramAndToolByName(String presetName, int programId,
-			int toolId,
-			String toolSection)
-			throws MiddlewareQueryException;
 
 	/**
 	 * save or update a progam preset
@@ -66,4 +36,46 @@ public interface PresetDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	void deleteProgramPreset(int programPresetId) throws MiddlewareQueryException;
+
+	/**
+	 * 
+	 * @param presetName
+	 * @param programUUID
+	 * @param toolId
+	 * @param toolSection
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ProgramPreset> getProgramPresetFromProgramAndToolByName(
+			String presetName, String programUUID, int toolId, String toolSection)
+			throws MiddlewareQueryException;
+	/***
+	 * 
+	 * @param programUUID
+	 * @param toolId
+	 * @param toolSection
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ProgramPreset> getProgramPresetFromProgramAndTool(String programUUID,
+			int toolId, String toolSection) throws MiddlewareQueryException;
+
+	/***
+	 * 
+	 * @param programUUID
+	 * @param toolId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ProgramPreset> getProgramPresetFromProgramAndTool(String programUUID,
+			int toolId) throws MiddlewareQueryException;
+
+	/***
+	 * 
+	 * @param programUUID
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ProgramPreset> getAllProgramPresetFromProgram(String programUUID)
+			throws MiddlewareQueryException;
 }

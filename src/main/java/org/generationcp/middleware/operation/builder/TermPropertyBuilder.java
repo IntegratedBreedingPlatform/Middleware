@@ -11,27 +11,23 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.oms.TermProperty;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.oms.CVTermProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+
 public class TermPropertyBuilder extends Builder {
 
-	public TermPropertyBuilder(HibernateSessionProvider sessionProviderForLocal,
-			               HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public TermPropertyBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public TermProperty get(int termPropertyId) throws MiddlewareQueryException {
 	    TermProperty term = null;
-		if (setWorkingDatabase(termPropertyId)) {
-			term = create(getCvTermPropertyDao().getById(termPropertyId));
-		}
+		term = create(getCvTermPropertyDao().getById(termPropertyId));
 		return term;
 	}
 	
@@ -57,47 +53,14 @@ public class TermPropertyBuilder extends Builder {
 	}
 	
 	public List<CVTermProperty> findProperties(int cvTermId) throws MiddlewareQueryException {
-	    List<CVTermProperty> properties = new ArrayList<CVTermProperty>();
-	    
-	    Database database = getActiveDatabase();
-        setWorkingDatabase(Database.LOCAL);
-        properties.addAll(getCvTermPropertyDao().getByCvTermId(cvTermId));
-	    if (cvTermId > 0) {
-	        setWorkingDatabase(Database.CENTRAL);
-	        properties.addAll(getCvTermPropertyDao().getByCvTermId(cvTermId));
-	    }
-	    setWorkingDatabase(database);
-	    
-	    return properties;
+        return getCvTermPropertyDao().getByCvTermId(cvTermId);
 	}
 	
 	public List<CVTermProperty> findPropertiesByType(int cvTermId, int typeId) throws MiddlewareQueryException {
-	    List<CVTermProperty> properties = new ArrayList<CVTermProperty>();
-	    
-        Database database = getActiveDatabase();
-        setWorkingDatabase(Database.LOCAL);
-        properties.addAll(getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId));
-	    if (cvTermId > 0) {
-	        setWorkingDatabase(Database.CENTRAL);
-	        properties.addAll(getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId));
-	    }
-        setWorkingDatabase(database);
-        
-        return properties;
+        return getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
 	}
 	
 	public CVTermProperty findPropertyByType(int cvTermId, int typeId) throws MiddlewareQueryException {
-        CVTermProperty property = null;
-        
-        Database database = getActiveDatabase();
-        setWorkingDatabase(Database.LOCAL);
-        property = getCvTermPropertyDao().getOneByCvTermAndType(cvTermId, typeId);
-        if (cvTermId > 0 && property == null) {
-            setWorkingDatabase(Database.CENTRAL);
-            property = getCvTermPropertyDao().getOneByCvTermAndType(cvTermId, typeId);
-        }
-        setWorkingDatabase(database);
-        
-        return property;
+        return getCvTermPropertyDao().getOneByCvTermAndType(cvTermId, typeId);
     }
 }

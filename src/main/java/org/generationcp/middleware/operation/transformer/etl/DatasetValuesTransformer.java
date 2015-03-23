@@ -8,9 +8,9 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import java.util.List;
 
 public class DatasetValuesTransformer extends Transformer {
-	public DatasetValuesTransformer(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-				super(sessionProviderForLocal, sessionProviderForCentral);
+	
+	public DatasetValuesTransformer(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public DatasetValues transform(String name, String description, DataSetType type, List<MeasurementVariable> mvList, VariableTypeList varTypeList) throws MiddlewareQueryException {

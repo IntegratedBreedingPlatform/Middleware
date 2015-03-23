@@ -73,7 +73,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
 		} catch(HibernateException e) {
 			logAndThrowException("Error with getBySubject=" + subjectId + ") query from CVTermRelationship: " 
 					+ e.getMessage(), e);
-			return null;
+			return new ArrayList<CVTermRelationship>();
 		}
 	}
 	

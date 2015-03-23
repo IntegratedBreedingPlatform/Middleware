@@ -13,17 +13,13 @@ import java.util.List;
 
 public class ListDataProjectSaver extends Saver {
 
-	public ListDataProjectSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ListDataProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public int saveOrUpdateListDataProject(int projectId,
 			GermplasmListType type, Integer originalListId,
 			List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
-		
-		requireLocalDatabaseInstance();
 
 		boolean isAdvanced = (type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES); 
 		GermplasmList snapList = isAdvanced ? null : getGermplasmList(projectId, type);
@@ -59,7 +55,7 @@ public class ListDataProjectSaver extends Saver {
 	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type) throws MiddlewareQueryException {
 		GermplasmList snapList = new GermplasmList(); 
 		
-		snapList.setId(getGermplasmListDAO().getNegativeId("id"));
+		snapList.setId(getGermplasmListDAO().getNextId("id"));
 		snapList.setProjectId(projectId);
 		DateFormat format = new SimpleDateFormat("yyyyMMdd");
 		snapList.setDate(Long.valueOf(format.format(new Date())));
@@ -75,9 +71,7 @@ public class ListDataProjectSaver extends Saver {
 	}
 	
 	private void updateGermplasmListInfo(GermplasmList germplasmList, int originalListId, int userId) throws MiddlewareQueryException {
-		setWorkingDatabase(originalListId);
 		GermplasmList origList = getGermplasmListDAO().getById(originalListId);
-		requireLocalDatabaseInstance();
 		if (origList != null) {
 			germplasmList.setListLocation(origList.getListLocation());
 			germplasmList.setUserId(origList.getUserId());
@@ -95,9 +89,7 @@ public class ListDataProjectSaver extends Saver {
 	}
 	
 	public void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException{
-		setWorkingDatabase(crossesListId);
 		GermplasmList crossesList = getGermplasmListDAO().getById(crossesListId);
-		requireLocalDatabaseInstance();
 		if (crossesList != null) {
 			crossesList.setProjectId(studyId);		
 		}
@@ -114,10 +106,8 @@ public class ListDataProjectSaver extends Saver {
 	}
 	
 	private GermplasmList getGermplasmList(int projectId, GermplasmListType type) throws MiddlewareQueryException {
-		setWorkingDatabase(projectId);
 		GermplasmList gList = null;
 		List<GermplasmList> tempList = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
-		requireLocalDatabaseInstance();
 		if (tempList != null && !tempList.isEmpty()) {
 			gList = tempList.get(0);
 		}
@@ -125,7 +115,7 @@ public class ListDataProjectSaver extends Saver {
 	}
 	
 	private void prepareListDataProjectForSaving(ListDataProject listDataProject, GermplasmList snapList) throws MiddlewareQueryException {
-		listDataProject.setListDataProjectId(getListDataProjectDAO().getNegativeId("listDataProjectId"));
+		listDataProject.setListDataProjectId(getListDataProjectDAO().getNextId("listDataProjectId"));
 		listDataProject.setList(snapList);
 		if (listDataProject.getCheckType() == null) {
 			listDataProject.setCheckType(0);

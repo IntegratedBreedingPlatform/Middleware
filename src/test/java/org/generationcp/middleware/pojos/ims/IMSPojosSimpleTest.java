@@ -29,7 +29,7 @@ public class IMSPojosSimpleTest extends DataManagerIntegrationTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-    	session = managerFactory.getSessionProviderForLocal().getSession();
+    	session = managerFactory.getSessionProvider().getSession();
     }
 
     @Test

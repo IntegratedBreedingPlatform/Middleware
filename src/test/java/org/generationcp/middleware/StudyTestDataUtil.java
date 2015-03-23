@@ -13,9 +13,6 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -29,14 +26,8 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 	
 	private StudyTestDataUtil() {
-		studyDataManager = new StudyDataManagerImpl(
-				managerFactory.getSessionProviderForLocal(),
-				managerFactory.getSessionProviderForCentral(),
-				managerFactory.getLocalDatabaseName(),
-				managerFactory.getCentralDatabaseName());
-		ontologyManager = new OntologyDataManagerImpl(
-				managerFactory.getSessionProviderForLocal(),
-				managerFactory.getSessionProviderForCentral());
+		studyDataManager = managerFactory.getStudyDataManager();
+		ontologyManager = managerFactory.getOntologyDataManager();
 	}
 	
 	public static StudyTestDataUtil getInstance() {
@@ -46,48 +37,59 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 		return instance;
 	}
 	
-	public DmsProject createFolderTestData() throws MiddlewareQueryException {
+	public DmsProject createFolderTestData(String uniqueId) throws MiddlewareQueryException {
 		int randomInt = new Random().nextInt(10000);
-		int folderId = studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, 
-				TEST_FOLDER_NAME+randomInt, TEST_FOLDER_DESC+randomInt);
 		DmsProject dmsProject = new DmsProject();
+		dmsProject.setName(TEST_FOLDER_NAME+randomInt);
+		dmsProject.setDescription(TEST_FOLDER_DESC+randomInt);
+		dmsProject.setProgramUUID(uniqueId);
+		int folderId = studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, 
+				dmsProject.getName(), dmsProject.getDescription(), dmsProject.getProgramUUID());
 		dmsProject.setProjectId(folderId);
 		return dmsProject;
 	}
 	
-	public DmsProject createStudyTestData() throws MiddlewareQueryException {
+	public DmsProject createStudyTestData(String uniqueId) throws MiddlewareQueryException {
+		String name = "Study Name " + new Random().nextInt(10000);
+		String description = "Study Description";
+		
 		VariableTypeList typeList = new VariableTypeList();
         VariableList variableList = new VariableList();
-
-        Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + 
-        		new Random().nextInt(10000), 1);
+        
+        Variable variable = createVariable(TermId.STUDY_NAME.getId(), name, 1);
         typeList.add(variable.getVariableType());
         variableList.add(variable);
 
-        variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+        variable = createVariable(TermId.STUDY_TITLE.getId(), description, 2);
         typeList.add(variable.getVariableType());
         variableList.add(variable);
 
         StudyValues studyValues = new StudyValues();
         studyValues.setVariableList(variableList);
 
-        StudyReference studyReference = studyDataManager.addStudy(
-        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues);
         DmsProject dmsProject = new DmsProject();
-		dmsProject.setProjectId(studyReference.getId());
+		dmsProject.setName(name);
+		dmsProject.setDescription(description);
+		dmsProject.setProgramUUID(uniqueId);
+		
+        StudyReference studyReference = studyDataManager.addStudy(
+        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues, uniqueId);
+        dmsProject.setProjectId(studyReference.getId());
 		return dmsProject;
 	}
 	
-	public DmsProject createStudyTestDataWithActiveStatus() throws MiddlewareQueryException {
+	public DmsProject createStudyTestDataWithActiveStatus(String uniqueId) throws MiddlewareQueryException {
+		String name = "Study Name " + new Random().nextInt(10000);
+		String description = "Study Description";
+		
 		VariableTypeList typeList = new VariableTypeList();
         VariableList variableList = new VariableList();
 
-        Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + 
-        		new Random().nextInt(10000), 1);
+        Variable variable = createVariable(TermId.STUDY_NAME.getId(), name, 1);
         typeList.add(variable.getVariableType());
         variableList.add(variable);
 
-        variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+        variable = createVariable(TermId.STUDY_TITLE.getId(), description, 2);
         typeList.add(variable.getVariableType());
         variableList.add(variable);
         
@@ -99,10 +101,14 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
         StudyValues studyValues = new StudyValues();
         studyValues.setVariableList(variableList);
 
-        StudyReference studyReference = studyDataManager.addStudy(
-        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues);
         DmsProject dmsProject = new DmsProject();
-		dmsProject.setProjectId(studyReference.getId());
+		dmsProject.setName(name);
+		dmsProject.setDescription(description);
+		dmsProject.setProgramUUID(uniqueId);
+		
+        StudyReference studyReference = studyDataManager.addStudy(
+        		DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues, uniqueId);
+        dmsProject.setProjectId(studyReference.getId());
 		return dmsProject;
 	}
 	
@@ -119,11 +125,11 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
     }
 	
 	public void deleteTestData(int projectId) throws MiddlewareQueryException {
-		studyDataManager.deleteEmptyFolder(projectId);
+		studyDataManager.deleteEmptyFolder(projectId, null);
 	}
 	
-	public List<FolderReference> getLocalRootFolders() throws MiddlewareQueryException {
-		return studyDataManager.getRootFolders(Database.LOCAL);
+	public List<FolderReference> getLocalRootFolders(String uniqueId) throws MiddlewareQueryException {
+		return studyDataManager.getRootFolders(uniqueId);
     }
 	
 }

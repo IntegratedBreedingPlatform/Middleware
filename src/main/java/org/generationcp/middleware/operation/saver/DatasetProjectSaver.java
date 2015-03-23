@@ -15,7 +15,6 @@ import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
@@ -28,19 +27,16 @@ import java.util.Map;
 
 public class DatasetProjectSaver extends Saver {
 
-	public DatasetProjectSaver(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public DatasetProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
-	public DmsProject addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
+	public DmsProject addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID) throws MiddlewareQueryException {
 		DmsProject datasetProject = new DmsProject();
-		
-		datasetProject.setProjectId(getDmsProjectDao().getNegativeId("projectId"));
+		datasetProject.setProjectId(getDmsProjectDao().getNextId("projectId"));
 		datasetProject.setName(getName(datasetValues));
 		datasetProject.setDescription(getDescription(datasetValues));
+		datasetProject.setProgramUUID(programUUID);
 		
 		addNameVariableTypeIfNecessary(variableTypeList);
 		addDescriptionVariableTypeIfNecessary(variableTypeList);
@@ -50,11 +46,8 @@ public class DatasetProjectSaver extends Saver {
 		}
 	
 		datasetProject.setProperties(getProjectPropertySaver().create(datasetProject, variableTypeList));
-	
 		datasetProject.setRelatedTos(createProjectRelationship(studyId, datasetProject));
-
 		getDmsProjectDao().save(datasetProject);
-		
 		getProjectPropertySaver().saveProjectPropValues(datasetProject.getProjectId(), datasetValues.getVariables());
 	
 		return datasetProject;
@@ -111,11 +104,9 @@ public class DatasetProjectSaver extends Saver {
 	}
 
 	public void addDatasetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(datasetId)) {
-			DmsProject project = getDmsProjectDao().getById(datasetId);
-			if (project != null) {
-				getProjectPropertySaver().saveVariableType(project, variableType);
-			}
+		DmsProject project = getDmsProjectDao().getById(datasetId);
+		if (project != null) {
+			getProjectPropertySaver().saveVariableType(project, variableType);
 		}
 	}
 	
@@ -132,7 +123,7 @@ public class DatasetProjectSaver extends Saver {
 	private List<ProjectRelationship> createProjectRelationship(int studyId, DmsProject datasetProject) throws MiddlewareQueryException {
 		ProjectRelationship relationship = new ProjectRelationship();
 		
-		relationship.setProjectRelationshipId(getProjectRelationshipDao().getNegativeId("projectRelationshipId"));
+		relationship.setProjectRelationshipId(getProjectRelationshipDao().getNextId("projectRelationshipId"));
 		relationship.setSubjectProject(datasetProject);
 		relationship.setObjectProject(getDmsProjectDao().getById(studyId));
 		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
@@ -144,8 +135,6 @@ public class DatasetProjectSaver extends Saver {
 	}
 	
 	public void addPropertiesIfNotExisting(int datasetId, VariableTypeList variableTypeList) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		
 		DmsProject datasetProject = getDmsProjectDao().getById(datasetId);
 		Hibernate.initialize(datasetProject.getProperties());
 		Map<Integer, ProjectProperty> existingPropertiesMap = new HashMap<Integer, ProjectProperty>();

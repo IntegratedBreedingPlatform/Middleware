@@ -20,7 +20,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestEvent;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -68,26 +67,11 @@ import java.net.URISyntaxException;
  * @author Glenn Marintes
  */
 public class MiddlewareServletContextListener implements ServletContextListener {
-    public final static String ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY = "MIDDLEWARE_LOCAL_SESSION_FACTORY";
-    public final static String ATTR_MIDDLEWARE_CENTRAL_SESSION_FACTORY = "MIDDLEWARE_CENTRAL_SESSION_FACTORY";
     public static final String ATTR_WORKBENCH_SESSION_FACTORY = "WORKBENCH_SESSION_FACTORY";
 
-    private final static String PARAM_MIDDLEWARE_HIBERNATE_CONFIG = "middleware_hibernate_config_file";
-    private final static String PARAM_MIDDLEWARE_DATABASE_PROPERTY_FILE = "middleware_database_property_file";
-    private final static String PARAM_WORKBENCH_DATABASE_PROPERTY_FILE = "workbench_database_property_file";
-    private final static String PARAM_MIDDLEWARE_RESOURCE_FILES = "middleware_additional_resources";
+    public final static String PARAM_DATABASE_PROPERTY_FILE = "database_property_file";
 
-    private SessionFactory sessionFactoryForLocal;
-    private SessionFactory sessionFactoryForCentral;
     private SessionFactory sessionFactoryForWorkbench;
-
-    public static SessionFactory getLocalSessionFactoryForRequestEvent(ServletRequestEvent event) {
-        return (SessionFactory) event.getServletContext().getAttribute(ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY);
-    }
-
-    public static SessionFactory getCentralSessionFactoryForRequestEvent(ServletRequestEvent event) {
-        return (SessionFactory) event.getServletContext().getAttribute(ATTR_MIDDLEWARE_CENTRAL_SESSION_FACTORY);
-    }
 
     public static SessionFactory getWorkbenchSessionFactoryForRequestEvent(ServletRequestEvent event) {
         return (SessionFactory) event.getServletContext().getAttribute(ATTR_WORKBENCH_SESSION_FACTORY);
@@ -97,19 +81,7 @@ public class MiddlewareServletContextListener implements ServletContextListener 
     public void contextInitialized(ServletContextEvent event) {
         ServletContext context = event.getServletContext();
 
-        String hibernateConfigurationFilename = context.getInitParameter(PARAM_MIDDLEWARE_HIBERNATE_CONFIG);
-        String databasePropertyFilename = context.getInitParameter(PARAM_MIDDLEWARE_DATABASE_PROPERTY_FILE);
-        String workbenchPropertyFilename = context.getInitParameter(PARAM_WORKBENCH_DATABASE_PROPERTY_FILE);
-        String paramResourceFile = context.getInitParameter(PARAM_MIDDLEWARE_RESOURCE_FILES);
-
-        String[] additionalResourceFiles = null;
-        if (paramResourceFile != null && (! paramResourceFile.isEmpty()) ) {
-            additionalResourceFiles = paramResourceFile.split(",");
-        }
-
-        if (databasePropertyFilename == null) {
-            throw new RuntimeException("'middleware_database_property_file' context parameter not declared! It must be set to the filename of a middleware database property file.");
-        }
+        String workbenchPropertyFilename = context.getInitParameter(PARAM_DATABASE_PROPERTY_FILE);
 
         if (workbenchPropertyFilename == null) {
             throw new RuntimeException("'workbench_database_property_file' context parameter not declared! It must be set to the filename of a workbench database property file.");
@@ -117,51 +89,22 @@ public class MiddlewareServletContextListener implements ServletContextListener 
 
         Exception exception = null;
         try {
-            DatabaseConnectionParameters paramsForLocal = new DatabaseConnectionParameters(databasePropertyFilename, "local");
-            DatabaseConnectionParameters paramsForCentral = new DatabaseConnectionParameters(databasePropertyFilename, "central");
+            DatabaseConnectionParameters paramsForWorkbench = new DatabaseConnectionParameters(workbenchPropertyFilename, "workbench");
 
-            DatabaseConnectionParameters paramsForWorkbench = new DatabaseConnectionParameters(databasePropertyFilename, "workbench");
+            sessionFactoryForWorkbench = SessionFactoryUtil.openSessionFactory(paramsForWorkbench);
 
-            sessionFactoryForLocal = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForLocal, additionalResourceFiles);
-            sessionFactoryForCentral = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForCentral, additionalResourceFiles);
-            sessionFactoryForWorkbench = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForWorkbench, additionalResourceFiles);
-
-            context.setAttribute(ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY, sessionFactoryForLocal);
-            context.setAttribute(ATTR_MIDDLEWARE_CENTRAL_SESSION_FACTORY, sessionFactoryForCentral);
             context.setAttribute(ATTR_WORKBENCH_SESSION_FACTORY, sessionFactoryForWorkbench);
-        } catch (FileNotFoundException e) {
-            exception = e;
-        } catch (ConfigException e) {
-            exception = e;
-        } catch (URISyntaxException e) {
-            exception = e;
-        } catch (IOException e) {
+        } catch (ConfigException | URISyntaxException | IOException e) {
             exception = e;
         }
 
-        if (exception != null) {
+		if (exception != null) {
             throw new RuntimeException(MiddlewareServletContextListener.class.getName() + " is incorrectly configured.", exception);
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        if (sessionFactoryForLocal != null) {
-            try {
-                sessionFactoryForLocal.close();
-                sessionFactoryForLocal = null;
-            } finally {
-            }
-        }
-
-        if (sessionFactoryForCentral != null) {
-            try {
-                sessionFactoryForCentral.close();
-                sessionFactoryForCentral = null;
-            } finally {
-            }
-        }
-
         if (sessionFactoryForWorkbench != null) {
             try {
                 sessionFactoryForWorkbench.close();

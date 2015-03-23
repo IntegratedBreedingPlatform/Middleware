@@ -182,22 +182,7 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
-	
-	/**
-	 * Returns the list of Term entries based on the given CvId filtered by start and number of records. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
-	 * 
-	 * 
-	 * This can be used to get all scales, all traits, all trait methods, all properties, all methods and all variables.
-	 *
-	 * @param cvId the cv id
-	 * @param start the start
-	 * @param numOfRows the num of rows
-	 * @return the all terms by cv id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Term> getAllTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException;
-	
-	
+		
 	/**
 	 * Returns the count of entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
 	 * 
@@ -296,18 +281,7 @@ public interface OntologyDataManager {
 	 */
 	
 	long countIsAOfProperties() throws MiddlewareQueryException;
-	
-	/**
-	 * Returns the list of Term entries based on possible "is a" of properties.
-	 *
-	 * @param start the start
-	 * @param numOfRows the num of rows
-	 * @return list of is_a Term objects
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	
-	List<Term> getIsAOfProperties(int start, int numOfRows) throws MiddlewareQueryException;
-	
+		
 	/**
 	 * Adds a new property to the database that adds the property term and it's is a relationship)
 	 * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a

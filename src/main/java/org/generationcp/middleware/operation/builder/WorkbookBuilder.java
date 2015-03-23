@@ -20,7 +20,6 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -39,9 +38,8 @@ public class WorkbookBuilder extends Builder {
 			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(), 
 			TermId.NO_OF_CBLKS_LATINIZE.getId());
 	
-	public WorkbookBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                   HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public WorkbookBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	} 
 	
 	public Workbook create(int id) throws MiddlewareQueryException {
@@ -64,12 +62,7 @@ public class WorkbookBuilder extends Builder {
          *  iseditable (true for variates, else, false)
          */
 		
-		StudyDetails studyDetails = null;
-		if (id < 0) {
-		    studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, studyType, id);
-		} else {
-		    studyDetails = getStudyDataManager().getStudyDetails(Database.CENTRAL, studyType, id);
-		}
+		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(studyType, id);
 		
 		Study study = getStudyBuilder().createStudy(id);
 		
@@ -140,10 +133,9 @@ public class WorkbookBuilder extends Builder {
                         
                         String value = null;
                         if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-                        	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        	value = getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
                         } else if (!isTrial) { 
                         	//set trial env for nursery studies
-                        	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
                         		Integer locId = locIds.get(0);
@@ -193,7 +185,7 @@ public class WorkbookBuilder extends Builder {
                     		&& EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
                     	
                         String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
-                        String value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        String value = getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
                         
                         Double minRange = null, maxRange = null;
                         if (stdVariable.getConstraints() != null) {
@@ -272,8 +264,7 @@ public class WorkbookBuilder extends Builder {
                 	if(!isNursery) {
                 		studyType = StudyType.T;
                 	}
-                	Database database = id > 0 ? Database.CENTRAL : Database.LOCAL;
-                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(database, studyType, id);
+                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(studyType, id);
                     workbook.setStudyDetails(studyDetails);
                     for (DatasetReference datasetRef : datasetRefList) {
                         if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
@@ -340,7 +331,7 @@ public class WorkbookBuilder extends Builder {
                         
                         String value = null;
                         if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-                        	value = getStudyDataManager().getGeolocationPropValue(Database.LOCAL, stdVariable.getId(), id);
+                        	value = getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
                         	if (value == null) {
                         		value = "";
                         	}
@@ -367,7 +358,6 @@ public class WorkbookBuilder extends Builder {
                         	}
                         } else { 
                         	//set trial env for nursery studies
-                        	setWorkingDatabase(id);
                         	List<Integer> locIds = getExperimentDao().getLocationIdsOfStudy(id);
                         	if (locIds != null && !locIds.isEmpty()) {
                         		Integer locId = locIds.get(0);
@@ -952,7 +942,6 @@ public class WorkbookBuilder extends Builder {
 	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentVariables, int measurementDatasetId)
 			throws MiddlewareQueryException {
 		
-		setWorkingDatabase(measurementDatasetId);
 		for (TreatmentVariable treatmentVariable : treatmentVariables) {
 			List<String> values = getExperimentPropertyDao().getTreatmentFactorValues(
 					treatmentVariable.getLevelVariable().getTermId(), 

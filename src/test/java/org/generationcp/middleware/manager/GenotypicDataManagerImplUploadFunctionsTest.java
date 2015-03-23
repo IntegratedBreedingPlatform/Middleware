@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -56,9 +57,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputFormatter{
+public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory       factory;
     private static GenotypicDataManager manager;
 
     private static final String DATASET             = "Dataset";
@@ -76,24 +76,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local, central;
-		try {
-			local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-			        "localgroundnut");
-			central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-	                "centralgroundnut");
-	        factory = new ManagerFactory(local, central);
-	        manager = factory.getGenotypicDataManager();
-	        
-		} catch (FileNotFoundException e) {
-			Assert.fail(e.getMessage());
-		} catch (ConfigException e) {
-			Assert.fail(e.getMessage());
-		} catch (URISyntaxException e) {
-			Assert.fail(e.getMessage());
-		} catch (IOException e) {
-			Assert.fail(e.getMessage());
-		}    
+    	manager = managerFactory.getGenotypicDataManager();
 	}
 
     private Dataset createDataset() throws Exception {
@@ -275,7 +258,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
         List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
         List<DartValues> dartValueList = new ArrayList<DartValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
             
         	mappingRecords = createMappingRecords();
@@ -302,7 +285,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
             dartValues.setMarkerId(marker.getMarkerId());
             dartValueList.add(dartValues);
 
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setDart(dataset, datasetUser, markers, markerMetadataSets, 
@@ -345,7 +328,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
         List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
         List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
 
             mappingRecords = createMappingRecords();
@@ -369,7 +352,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
             alleleValues.setGid(accMetadataSet.getGermplasmId());
             alleleValueList.add(alleleValues);
             
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setSSR(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, alleleValueList);
@@ -411,7 +394,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
         List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
         List<CharValues> charValueList = new ArrayList<CharValues>();
 
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
         	
             mappingRecords = createMappingRecords();
@@ -435,7 +418,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
             charValues.setGid(accMetadataSet.getGermplasmId());
             charValueList.add(charValues);
 
-            id--;
+            id++;
         }
         
         Boolean addStatus = manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, charValueList);
@@ -493,7 +476,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
         List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
         List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
 
             mappingRecords = createMappingRecords();
@@ -517,7 +500,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
             mappingPopValues.setGid(accMetadataSet.getGermplasmId());
             mappingPopValueList.add(mappingPopValues);
 
-            id--;
+            id++;
         }
         
         Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, markers, 
@@ -562,7 +545,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
         List<MappingPopValues> mappingPopValueList = new ArrayList<MappingPopValues>();
         List<CharValues> charValueList = new ArrayList<CharValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
             
         	mappingRecords = createMappingRecords();
@@ -591,7 +574,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
             charValues.setGid(accMetadataSet.getGermplasmId());
             charValueList.add(charValues);
             
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, 
@@ -639,7 +622,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
         List<AlleleValues> alleleValueList = new ArrayList<AlleleValues>();
         List<DartValues> dartValueList = new ArrayList<DartValues>();
         
-        int id = -1;
+        int id = 1;
         for (int i=0; i<NUMBER_OF_ROWS; i++){
             
         	mappingRecords = createMappingRecords();
@@ -672,7 +655,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
             dartValues.setMarkerId(marker.getMarkerId());
             dartValueList.add(dartValues);
 
-            id--;
+            id++;
         }
 
         Boolean addStatus = manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, markers, 
@@ -1197,12 +1180,4 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends TestOutputForma
     	Debug.println("ROWS AFTER: ");
     	Debug.printObjects(INDENT, rowsAfter);
     }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-    	if(factory != null) {
-    		factory.close();
-    	}
-    }
-
 }

@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity @Table(name = "program_preset")
 public class ProgramPreset {
 	private int programPresetId;
-	private Integer programUuid;
+	private String programUuid;
 	private Integer toolId;
 	private String toolSection;
 	private String name;
@@ -28,11 +28,11 @@ public class ProgramPreset {
 	}
 
 	@Basic @Column(name = "program_uuid")
-	public Integer getProgramUuid() {
+	public String getProgramUuid() {
 		return programUuid;
 	}
 
-	public void setProgramUuid(Integer programUuid) {
+	public void setProgramUuid(String programUuid) {
 		this.programUuid = programUuid;
 	}
 

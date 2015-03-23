@@ -30,8 +30,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
     
     @BeforeClass
     public static void setUp() {
-    	workbookSaver = new WorkbookSaver(Mockito.mock(HibernateSessionProvider.class), 
-    			Mockito.mock(HibernateSessionProvider.class));
+    	workbookSaver = new WorkbookSaver(Mockito.mock(HibernateSessionProvider.class));
     }
         
     @Test

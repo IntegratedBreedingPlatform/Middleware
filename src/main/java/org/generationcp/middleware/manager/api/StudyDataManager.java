@@ -20,7 +20,6 @@ import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 
@@ -60,7 +59,7 @@ public interface StudyDataManager{
      * @return the study id by name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Integer getStudyIdByName(String studyName) throws MiddlewareQueryException;
+    Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns list of root or top-level folders from specified database.
@@ -69,18 +68,19 @@ public interface StudyDataManager{
      * @return List of Folder POJOs or empty list if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
+    List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns list of children of a folder given its ID. Retrieves from central
      * if the given ID is positive, otherwise retrieves from local.
      *
      * @param folderId The id of the folder to match
+     * @param programUUID the program UUID
      * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list
      * if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
+    List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns the list of DataSet references for a specific study. Retrieves
@@ -177,10 +177,11 @@ public interface StudyDataManager{
      * @param parentFolderId The ID of the parent folder
      * @param variableTypeList The conditions and constants of the Study
      * @param studyValues The values for the variables to insert
+     * @param programUUID the program UUID
      * @return StudyReference corresponding to the newly-created Study
      * @throws MiddlewareQueryException the middleware query exception
      */
-    StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues)
+    StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID)
             throws MiddlewareQueryException;
 
     /**
@@ -190,10 +191,11 @@ public interface StudyDataManager{
      * @param studyId the study id
      * @param variableTypeList the variable type list
      * @param datasetValues the dataset values
+     * @param programUUID the program UUID
      * @return DatasetReference corresponding to the newly-created DataSet
      * @throws MiddlewareQueryException the middleware query exception
      */
-    DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues)
+    DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID)
             throws MiddlewareQueryException;
 
     /**
@@ -392,47 +394,26 @@ public interface StudyDataManager{
             throws MiddlewareQueryException;
 
     /**
-     * Retrieves the study details of the given study type from the specified
-     * database.
-     *
-     * @param instance Can be CENTRAL or LOCAL
-     * @param studyType Can be any of the types defined in {@link StudyType}
-     * @return The list of study details having the given study type from the
-     * given database
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException;
-
-    /**
-     * Retrieves the details of nursery and trial studies from the specified
-     * database.
-     *
-     * @param instance Can be CENTRAL or LOCAL
-     * @return The list of study details having the given study type from the
-     * given database
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<StudyNode> getNurseryAndTrialStudyNodes(Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Retrieves the details of nursery and trial studies from central and local.
+     * Retrieves the details of nursery and trial studies from the currently selected program.
      * Returns the id, name, description, start date, start year, season and study type of a Nursery or Trial Study.
-     * Returns in sorted order of the following: Database(Local/Central), Year (Descending), Season (Dry/Wet/General),
+     * Returns in sorted order of the following: Year (Descending), Season (Dry/Wet/General),
      * Study Type(Nursery/Trial), Name(Ascending)
      *
+     * @param programUUID of the currently selected program
      * @return The list of study details having the given study type from local and central
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException;
+    List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) throws MiddlewareQueryException;
 
     /**
      * Checks if the name specified is an already existing project name.
      *
      * @param name the name
+     * @param programUUID the program UUID
      * @return true or false
      * @throws MiddlewareQueryException the middleware query exception
      */
-    boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException;
+    boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Count the number of projects the variable was used in the project.
@@ -512,29 +493,32 @@ public interface StudyDataManager{
 	 * @param parentFolderId the parent folder id
 	 * @param name the name
 	 * @param description the description
+	 * @param programUUID the program UUID
 	 * @return ID of the folder created
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-    int addSubFolder(int parentFolderId, String name, String description) throws MiddlewareQueryException;
+    int addSubFolder(int parentFolderId, String name, String description, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Rename sub folder.
      *
      * @param newFolderName the new folder name
      * @param folderId the folder id
+     * @param programUUID the program UUID
      * @return true, if successful
      * @throws MiddlewareQueryException the middleware query exception
      */
-    boolean renameSubFolder(String newFolderName, int folderId) throws MiddlewareQueryException;
+    boolean renameSubFolder(String newFolderName, int folderId, String programUUID) throws MiddlewareQueryException;
     
     
     /**
      * Logically delete a folder by updating the folder's name and deleting its project relationships.
      *
      * @param id the id
+     * @param programUUID the programUUID
      * @throws MiddlewareQueryException the middleware query exception
      */
-	void deleteEmptyFolder(int id) throws MiddlewareQueryException;
+	void deleteEmptyFolder(int id, String programUUID) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the parent folder of the project. Accepts a project id.
@@ -564,31 +548,18 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) throws MiddlewareQueryException;
-
-    /**
-     * Retrieves the study details of the given study type from both central and local in batches
-     * ordered by db instance then study name.
-     *
-     * @param studyType Can be any of the types defined in {@link StudyType}
-     * @param start The start index of the rows to retrieve
-     * @param numOfRows The number of items to retrieve
-     * @return The list of study details having the given study type
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Retrieves the study details of the given study type from from both selected DB instance
      * ordered by db instance then study name.
      *
-     * @param instance Database instance
      * @param studyType Can be any of the types defined in {@link StudyType}
      * @param start The start index of the rows to retrieve
      * @param numOfRows The number of items to retrieve
      * @return The list of study details having the given study type
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException;
+    List<StudyDetails> getStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Gets the study details.
@@ -599,85 +570,68 @@ public interface StudyDataManager{
      * @return the study details
      * @throws MiddlewareQueryException the middleware query exception
      */
-    StudyDetails getStudyDetails(Database instance, StudyType studyType, int id) throws MiddlewareQueryException;
-    
-    /**
-     * Retrieves the study details of the all nurseries and trials from both central and local in batches
-     * ordered by db instance then study name.
-     *
-     * @param start The start index of the rows to retrieve
-     * @param numOfRows The number of items to retrieve
-     * @return The list of study details of Nurseries and Trials
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException;
-    
+    StudyDetails getStudyDetails(StudyType studyType, int id) throws MiddlewareQueryException;
+        
     /**
      * Retrieves the study details of the all nurseries and trials from both selected DB instance
      * ordered by study name.
      *
-     * @param instance DB instance
+     * @param programUUID unique ID of the currently selected program
      * @param start The start index of the rows to retrieve
      * @param numOfRows The number of items to retrieve
      * @return The list of study details of Nurseries and Trials
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException;
+    List<StudyDetails> getNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Retrieves all the study details of the given study type from both central and local ordered by db instance then study name.
      *
      * @param studyType Can be any of the types defined in {@link StudyType}
+     * @param programUUID unique ID of the currenly selected program
      * @return The list of study details having the given study type
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException;
+    List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Count all studies of the given study type from selected DB instance.
      *
-     * @param instance DB instance
      * @param studyType Can be any of the types defined in {@link StudyType}
+     * @param programUUID unique ID of the currently selected program
      * @return The list of study details having the given study type
      * @throws MiddlewareQueryException the middleware query exception
      */
-    long countStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException;
+    long countStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Count all studies of the given study type from both central and local.
      *
      * @param studyType Can be any of the types defined in {@link StudyType}
+     * @param programUUID unique ID of the currently selected program
      * @return The list of study details having the given study type
      * @throws MiddlewareQueryException the middleware query exception
      */
-    long countAllStudyDetails(StudyType studyType) throws MiddlewareQueryException;
+    long countAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Retrieves the study details of the all nurseries and trials from both central and local
      * ordered by db instance then study name.
      *
+     * @param programUUID unique ID of the currently selected program
      * @return The list of study details of Nurseries and Trials
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException;
+    List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException;
     
     /**
-     * Count all nurseries and trials from selected DB instance.
+     * Count all nurseries and trials
      *
-     * @param instance DB instance
-     * @return The list of study details having the given study type
+     * @param programUUID unique ID of the currently selected program
+     * @return The list of study details from the currently selected program
      * @throws MiddlewareQueryException the middleware query exception
      */
-    long countNurseryAndTrialStudyDetails(Database instance) throws MiddlewareQueryException;
-    
-    
-    /**
-     * Count all nurseries and trials from both central and local.
-     *
-     * @return The list of study details having the given study type
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    long countAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException;
+    long countAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException;
 
     /**
      * Retrieves the folder tree.
@@ -706,7 +660,7 @@ public interface StudyDataManager{
      * @return the geolocation prop value
      * @throws MiddlewareQueryException the middleware query exception
      */
-    String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException;
+    String getGeolocationPropValue(int stdVarId, int studyId) throws MiddlewareQueryException;
     
     /**
      * Gets the all field maps in block by block id.
@@ -801,6 +755,13 @@ public interface StudyDataManager{
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
 	public StudyType getStudyType(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Soft-delete all program studies
+	 * @param programUUID Program UUID of the studies to be deleted
+	 * @throws MiddlewareQueryException if any error occurs during data access.
+	 */
+	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException;
 
 	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId,
 			int start, int numRows) throws MiddlewareQueryException;

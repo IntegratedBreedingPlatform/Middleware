@@ -21,16 +21,13 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 
 public class ProjectSaver extends Saver {
 
-	public ProjectSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public DmsProject save(DmsProject project) throws MiddlewareQueryException{
-		requireLocalDatabaseInstance();
         DmsProjectDao projectDao = getDmsProjectDao();
-        Integer generatedId = projectDao.getNegativeId("projectId");
+        Integer generatedId = projectDao.getNextId("projectId");
         project.setProjectId(generatedId);
         return projectDao.save(project);
 	}
@@ -79,9 +76,9 @@ public class ProjectSaver extends Saver {
 	/**
 	 * Saves a folder. Creates an entry in project and project_relationship
 	 */
-	public DmsProject saveFolder(int parentId, String name, String description) throws Exception{
-        requireLocalDatabaseInstance();
+	public DmsProject saveFolder(int parentId, String name, String description, String programUUID) throws Exception{
         DmsProject project = new DmsProject();
+        project.setProgramUUID(programUUID);
         mapStudytoProject(null, name, description, project);
         
         try {

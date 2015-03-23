@@ -29,12 +29,10 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		HibernateSessionProvider sessionProviderForLocal = new HibernateSessionPerThreadProvider(
-				localSessionUtil.getSessionFactory());
-		HibernateSessionProvider sessionProviderForCentral = new HibernateSessionPerThreadProvider(
-				centralSessionUtil.getSessionFactory());
-		transformer = new MeasurementVariableTransformer(sessionProviderForLocal,sessionProviderForCentral);
-		standardVariableBuilder = new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+		HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(
+				sessionUtil.getSessionFactory());
+		transformer = new MeasurementVariableTransformer(sessionProvider);
+		standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
 	}
 	
 	@Test

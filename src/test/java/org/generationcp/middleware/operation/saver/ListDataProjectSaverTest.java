@@ -13,9 +13,7 @@ import org.mockito.Mockito;
 public class ListDataProjectSaverTest {
 	@Test
 	public void testUpdateGermlasmListInfoStudy() throws MiddlewareQueryException{
-		ListDataProjectSaver dataSaver = Mockito.spy(new ListDataProjectSaver(Mockito.mock(HibernateSessionProvider.class), Mockito.mock(HibernateSessionProvider.class)));
-		dataSaver.setSessionForLocal(Mockito.mock(Session.class));
-		dataSaver.setSessionForCentral(Mockito.mock(Session.class));
+		ListDataProjectSaver dataSaver = Mockito.spy(new ListDataProjectSaver(Mockito.mock(HibernateSessionProvider.class)));
 		GermplasmList crossesList = new GermplasmList();
 		GermplasmListDAO germplasmListDao = Mockito.mock(GermplasmListDAO.class);
 		Integer crossesListId = 5;

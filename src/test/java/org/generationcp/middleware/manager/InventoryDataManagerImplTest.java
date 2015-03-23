@@ -483,14 +483,14 @@ public class InventoryDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetInventoryDetailsByGermplasmList() throws Exception{
-    	Integer listId = -39;
+    	Integer listId = 1;
     	List<InventoryDetails> result = manager.getInventoryDetailsByGermplasmList(listId);
     	Debug.printObjects(INDENT, result);
     }
     
     @Test
     public void testGetLotCountsForGermplasmList() throws MiddlewareQueryException{
-    	int listid = -543041; // wheat list
+    	int listid = 1;
 		List<GermplasmListData> listEntries = manager.getLotCountsForList(listid, 0, Integer.MAX_VALUE);
 		for (GermplasmListData entry : listEntries){
 			ListDataInventory inventory = entry.getInventoryInfo();
@@ -503,11 +503,11 @@ public class InventoryDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetLotCountsForGermplasmListEntries() throws MiddlewareQueryException{
-    	int listid = -543041; // wheat list
+    	int listid = 1;
     	List<Integer> entryIds = new ArrayList<Integer>();
-    	entryIds.add(-507029);
-    	entryIds.add(-507028);
-    	entryIds.add(-507027);
+    	entryIds.add(1);
+    	entryIds.add(2);
+    	entryIds.add(3);
 		List<GermplasmListData> listEntries = manager.getLotCountsForListEntries(listid, entryIds);
 		for (GermplasmListData entry : listEntries){
 			ListDataInventory inventory = entry.getInventoryInfo();

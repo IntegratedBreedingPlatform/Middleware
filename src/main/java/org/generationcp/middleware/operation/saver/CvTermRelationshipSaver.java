@@ -20,20 +20,16 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 
 public class CvTermRelationshipSaver extends Saver {
 
-	public CvTermRelationshipSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public CvTermRelationshipSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	// Returns the id
 	public Integer save(Integer subjectId, Integer typeId, Integer objectId)  throws MiddlewareException, MiddlewareQueryException{ 
-		requireLocalDatabaseInstance();
-
         CVTermRelationshipDao dao = getCvTermRelationshipDao();
         Integer generatedId;
 		try {
-			generatedId = dao.getNegativeId("cvTermRelationshipId");
+			generatedId = dao.getNextId("cvTermRelationshipId");
 		} catch (MiddlewareQueryException e) {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
@@ -53,7 +49,6 @@ public class CvTermRelationshipSaver extends Saver {
 	}
 	
 	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         CVTermRelationshipDao dao = getCvTermRelationshipDao();
         CVTermRelationship relationship = null;
         try {
@@ -65,12 +60,11 @@ public class CvTermRelationshipSaver extends Saver {
     }
 
 	public void deleteRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
-	    requireLocalDatabaseInstance();
-    	    CVTermRelationshipDao dao = getCvTermRelationshipDao();
-    	    try {
-    	        dao.makeTransient(cvTermRelationship);
-    	    } catch (MiddlewareQueryException e) {
-    	        throw new MiddlewareQueryException(e.getMessage(), e);
-    	    }
+	    CVTermRelationshipDao dao = getCvTermRelationshipDao();
+	    try {
+	        dao.makeTransient(cvTermRelationship);
+	    } catch (MiddlewareQueryException e) {
+	        throw new MiddlewareQueryException(e.getMessage(), e);
+	    }
 	}
 }

@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.Country;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 public class StudyResultSetByNameStartDateSeasonCountry extends Searcher implements StudyResultSet {
 
 	private String name;
@@ -48,12 +49,10 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private int bufIndex;
 	
 
-	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows,
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral)
+	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProviderForLocal)
 			throws MiddlewareQueryException {
 
-		super(sessionProviderForLocal, sessionProviderForCentral);
+		super(sessionProviderForLocal);
 		
 		this.name = filter.getName();
 		this.startDate = filter.getStartDate();
@@ -80,37 +79,32 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private List<Integer> getLocationIds(String countryName) throws MiddlewareQueryException {
 		List<Integer> locationIds = new ArrayList<Integer>();
 		if (countryName != null) {
-			if (this.setWorkingDatabase(Database.CENTRAL)) {
-				List<Country> countries = getCountryDao().getByIsoFull(countryName);
-				locationIds = getLocationSearchDao().getLocationIds(countries);
-			}
+			List<Country> countries = getCountryDao().getByIsoFull(countryName);
+			locationIds = getLocationSearchDao().getLocationIds(countries);
 		}
 		return locationIds;
 	}
 
 	private long countStudiesByName(Database database, String name) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database) && name != null) {
-			return this.getStudySearchDao().countStudiesByName(name);
-		}
-		return 0;
+		return this.getStudySearchDao().countStudiesByName(name);
 	}
 
 	private long countStudiesByStartDate(Database database, Integer startDate) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database) && startDate != null) {
+		if (startDate != null) {
 			return this.getStudySearchDao().countStudiesByStartDate(startDate);
 		}
 		return 0;
 	}
 	
 	private long countStudiesBySeason(Database database, Season season) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database) && season != null) {
+		if (season != null) {
 			return this.getStudySearchDao().countStudiesBySeason(season);
 		}
 		return 0;
 	}
 	
 	private long countStudiesByCountry(Database database) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database) && locationIds != null && locationIds.size() > 0) {
+		if (locationIds != null && locationIds.size() > 0) {
 			return this.getStudySearchDao().countStudiesByLocationIds(locationIds);
 		}
 		return 0;
@@ -187,31 +181,23 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 	
 	private void fillBufferByName(Database database, int start) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database)) {
-			buffer = this.getStudySearchDao().getStudiesByName(name, start, numOfRows);
-			bufIndex = 0;
-		}
+		buffer = this.getStudySearchDao().getStudiesByName(name, start, numOfRows);
+		bufIndex = 0;
 	}
 	
 	private void fillBufferByStartDate(Database database, int start) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database)) {
-			buffer = this.getStudySearchDao().getStudiesByStartDate(startDate, start, numOfRows);
-			bufIndex = 0;
-		}
+		buffer = this.getStudySearchDao().getStudiesByStartDate(startDate, start, numOfRows);
+		bufIndex = 0;
 	}
 	
 	private void fillBufferBySeason(Database database, int start) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database)) {
-			buffer = this.getStudySearchDao().getStudiesBySeason(season, start, numOfRows);
-			bufIndex = 0;
-		}
+		buffer = this.getStudySearchDao().getStudiesBySeason(season, start, numOfRows);
+		bufIndex = 0;
 	}
 	
 	private void fillBufferByCountry(Database database, int start) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database)) {
-			buffer = this.getStudySearchDao().getStudiesByLocationIds(locationIds, start, numOfRows);
-			bufIndex = 0;
-		}
+		buffer = this.getStudySearchDao().getStudiesByLocationIds(locationIds, start, numOfRows);
+		bufIndex = 0;
 	}
 
 	@Override

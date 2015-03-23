@@ -15,19 +15,12 @@ import java.util.List;
 
 public class StudyDestroyer extends Destroyer {
 
-	public StudyDestroyer(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudyDestroyer(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void deleteStudy(int studyId) throws MiddlewareQueryException {
-		if (studyId > 0) {
-			throw new MiddlewareQueryException("Can not delete central study");
-		}
-		
-		requireLocalDatabaseInstance();
 		DmsProject study = getDmsProjectDao().getById(studyId);
-		
 		renameStudyAndDatasets(study);
 
 		if (study.getProperties() != null && !study.getProperties().isEmpty()) {
@@ -67,7 +60,6 @@ public class StudyDestroyer extends Destroyer {
 	}
 	
 	protected void deleteRelationshipsIfNotAStudy(DmsProject study) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		boolean isAStudy = getProjectRelationshipDao().isSubjectTypeExisting(
 				study.getProjectId(), TermId.IS_STUDY.getId());
 		if(!isAStudy) {

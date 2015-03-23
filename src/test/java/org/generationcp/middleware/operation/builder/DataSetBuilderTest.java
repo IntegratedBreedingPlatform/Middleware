@@ -28,7 +28,7 @@ public class DataSetBuilderTest {
 	public void setUp() throws MiddlewareQueryException{
 		MockitoAnnotations.initMocks(this);
 		
-		dataSetBuilder = spy(new DataSetBuilder(hibernateSessionProvider, hibernateSessionProvider));
+		dataSetBuilder = spy(new DataSetBuilder(hibernateSessionProvider));
 		doReturn(generateDmsProject()).when(dataSetBuilder).getDmsProjectById(STUDY_ID);
 	}
 	

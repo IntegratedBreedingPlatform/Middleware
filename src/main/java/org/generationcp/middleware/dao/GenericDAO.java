@@ -19,6 +19,9 @@ import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
@@ -57,6 +60,18 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         LOG.error(message, e);
         throw new MiddlewareQueryException(message, e);
     }
+    
+    protected String getLogExceptionMessage(String methodName, String paramVar, String paramValue, String exceptionMessage, String className){
+    	String message = "Error with " + methodName + "(";
+    	
+    	if(paramVar.length()!=0){
+    		message += paramVar + "=" + paramValue;
+    	}
+    	
+    	message += ") query from " +className + ": " + exceptionMessage;
+    	
+    	return message;
+    }
 
     public T getById(ID id) throws MiddlewareQueryException {
     	return getById(id, false);
@@ -64,6 +79,9 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     
     @SuppressWarnings("unchecked")
     public T getById(ID id, boolean lock) throws MiddlewareQueryException {
+    	if (id == null) {
+    		return null;
+    	}
         try {
             T entity;
             if (lock) {
@@ -202,52 +220,22 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
     
-    public Integer getNegativeId(String idName) throws MiddlewareQueryException {
-        try {
-            Criteria crit = getSession().createCriteria(getPersistentClass());
-            crit.setProjection(Projections.min(idName));
-            Integer minId = (Integer) crit.uniqueResult();
-            if (minId != null) {
-                if (minId.intValue() >= 0) {
-                    minId = Integer.valueOf(-1);
-                } else {
-                    minId = Integer.valueOf(minId.intValue() - 1);
-                }
-            } else {
-                minId = Integer.valueOf(-1);
-            }
-
-            return minId;
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getNegativeId(idName=" + idName + "): " + e.getMessage(), e);
-        }
-    }
-    
-    public Integer getPositiveId(String idName) throws MiddlewareQueryException {
+    public Integer getNextId(String idName) throws MiddlewareQueryException {
         try {
             Criteria crit = getSession().createCriteria(getPersistentClass());
             crit.setProjection(Projections.max(idName));
             Integer maxId = (Integer) crit.uniqueResult();
-            if (maxId != null) {
-                if (maxId.intValue() <= 0) {
-                    maxId = Integer.valueOf(1);
-                } else {
-                    maxId = Integer.valueOf(maxId.intValue() + 1);
-                }
-            } else {
-                maxId = Integer.valueOf(1);
-            }
-
-            return maxId;
+            Integer nextId = maxId != null ? Integer.valueOf(maxId.intValue() + 1) : Integer.valueOf(1);
+            LOG.debug("Returning nextId " + nextId + " for entity " + getPersistentClass().getName());
+            return nextId;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getPositiveId(idName=" + idName + "): " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in getNextId(idName=" + idName + "): " + e.getMessage(), e);
         }
     }
     
     public static Integer getLastId(Session session, Database instance, String tableName, String idName) throws MiddlewareQueryException {
     	try {
-    		String selectCol = (instance == Database.LOCAL ? "MIN" : "MAX") + "(" + idName + ")";
-    		SQLQuery query = session.createSQLQuery("SELECT " + selectCol + " FROM " + tableName);
+    		SQLQuery query = session.createSQLQuery("SELECT MAX(" + idName + ") FROM " + tableName);
     		Integer result = (Integer) query.uniqueResult();
     		
     		return result != null ? result : 0;    		
@@ -256,7 +244,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     		throw new MiddlewareQueryException("Error in getMaxId(instance=" + instance + ", tableName=" + tableName + ", idName=" + idName + "): " + e.getMessage(), e);
     	}
     }
-
+    
     public void flush() {
         getSession().flush();
     }
@@ -285,38 +273,43 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             final Map<String,Object> params,
             final Class<Type> returnType) {
 
-        final String sql = buildSQLQuery(procedureName, params);
-        LOG.debug("sql = " + sql);
-        SQLQuery query = session.createSQLQuery(sql);
-        if (params != null && params.size() > 0) {
-        	for (Map.Entry<String,Object> entry : params.entrySet()) {
-                LOG.debug(entry.getKey() + " = " + entry.getValue());
-                query.setParameter(entry.getKey().toString(), entry.getValue());
-            }
-        }
-        if(returnType!=null && !isWrapperType(returnType)) {
-        	query.addEntity(returnType);
-        }
-        
-        Object object = query.uniqueResult();
-        if(object!=null && object instanceof BigInteger) {
-        	BigInteger b = (BigInteger) object;
-        	if(returnType.getName().equals(Integer.class.getName())) {
-        		return (Type)(Integer)b.intValue();
-        	} else if(returnType.getName().equals(Long.class.getName())) {
-        		return (Type)(Long)b.longValue();
-        	}
-        	return (Type) b;
-        } else if(object!=null && object instanceof BigDecimal) {
-        	BigDecimal b = (BigDecimal) object;
-        	if(returnType.getName().equals(Float.class.getName())) {
-        		return (Type)(Float)b.floatValue();
-        	} else if(returnType.getName().equals(Double.class.getName())) {
-        		return (Type)(Double)b.doubleValue();
-        	}
-        	return (Type) b;
-        } else {
-        	return (Type) object;
+    	Monitor monitor = MonitorFactory.start("callStoredProcedureForObject." + procedureName);
+        try {
+	    	final String sql = buildSQLQuery(procedureName, params);
+	        LOG.debug("sql = " + sql);
+	        SQLQuery query = session.createSQLQuery(sql);
+	        if (params != null && params.size() > 0) {
+	        	for (Map.Entry<String,Object> entry : params.entrySet()) {
+	                LOG.debug(entry.getKey() + " = " + entry.getValue());
+	                query.setParameter(entry.getKey().toString(), entry.getValue());
+	            }
+	        }
+	        if(returnType!=null && !isWrapperType(returnType)) {
+	        	query.addEntity(returnType);
+	        }
+	        
+	        Object object = query.uniqueResult();
+	        if(object!=null && object instanceof BigInteger) {
+	        	BigInteger b = (BigInteger) object;
+	        	if(returnType.getName().equals(Integer.class.getName())) {
+	        		return (Type)(Integer)b.intValue();
+	        	} else if(returnType.getName().equals(Long.class.getName())) {
+	        		return (Type)(Long)b.longValue();
+	        	}
+	        	return (Type) b;
+	        } else if(object!=null && object instanceof BigDecimal) {
+	        	BigDecimal b = (BigDecimal) object;
+	        	if(returnType.getName().equals(Float.class.getName())) {
+	        		return (Type)(Float)b.floatValue();
+	        	} else if(returnType.getName().equals(Double.class.getName())) {
+	        		return (Type)(Double)b.doubleValue();
+	        	}
+	        	return (Type) b;
+	        } else {
+	        	return (Type) object;
+	        }
+        } finally {
+        	LOG.debug("" + monitor.stop());
         }
     }
     
@@ -346,6 +339,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             final Map<String,Object> params,
             final Class<Type> returnType) {
 
+		Monitor monitor = MonitorFactory.start("callStoredProcedureForList." + procedureName);
         final String sql = buildSQLQuery(procedureName, params);
         LOG.debug("sql = " + sql);
         SQLQuery query = session.createSQLQuery(sql);
@@ -359,7 +353,10 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         	query.addEntity(returnType);
         }
 
-        return query.list();
+        @SuppressWarnings("rawtypes")
+		List result = query.list();
+        LOG.debug("" + monitor.stop());
+		return result;
     }
 
     private String buildSQLQuery(String procedureName, Map<String,Object> params) {

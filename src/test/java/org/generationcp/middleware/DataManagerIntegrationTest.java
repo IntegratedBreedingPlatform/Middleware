@@ -21,16 +21,12 @@ public class DataManagerIntegrationTest extends MiddlewareIntegrationTest {
 	
 	static {
 		
-		HibernateSessionProvider sessionProviderForLocal = new HibernateSessionPerThreadProvider(
-				localSessionUtil.getSessionFactory());
-		HibernateSessionProvider sessionProviderForCentral = new HibernateSessionPerThreadProvider(
-				centralSessionUtil.getSessionFactory());
+		HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(
+				sessionUtil.getSessionFactory());
 
 		managerFactory = new ManagerFactory();
-		managerFactory.setSessionProviderForCentral(sessionProviderForCentral);
-		managerFactory.setSessionProviderForLocal(sessionProviderForLocal);
-		managerFactory.setLocalDatabaseName(localConnectionParameters.getDbName());
-		managerFactory.setCentralDatabaseName(centralConnectionParams.getDbName());
+		managerFactory.setSessionProvider(sessionProvider);
+		managerFactory.setDatabaseName(connectionParameters.getDbName());
 	}
 	
 	@BeforeClass

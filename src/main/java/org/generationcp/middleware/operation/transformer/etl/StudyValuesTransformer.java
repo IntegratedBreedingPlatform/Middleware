@@ -10,9 +10,8 @@ import java.util.List;
 
 
 public class StudyValuesTransformer extends Transformer {
-	public StudyValuesTransformer(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-				super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudyValuesTransformer(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public StudyValues transform(Integer germplasmId, Integer locationId, StudyDetails studyDetails, 

@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,20 +44,6 @@ public class CrossStudyDataManagerImplTest extends DataManagerIntegrationTest {
 		TrialEnvironments environments = manager.getAllTrialEnvironments(false);
 		environments.print(INDENT);
 		Debug.println(INDENT, "#RECORDS: " + environments.size());
-	}
-	
-	@Test
-	public void testGetTrialEnvironments() throws Exception {
-		long count = manager.countAllTrialEnvironments();
-		Integer batchSizeInt = 1000;
-		int iterations = ((Double) Math.ceil(count / batchSizeInt.doubleValue())).intValue();
-		
-		for (int i = 0; i < iterations; i++){
-			int start = i * batchSizeInt;
-			TrialEnvironments environments = manager.getTrialEnvironments(start, batchSizeInt);
-			environments.print(INDENT);
-			Debug.println(INDENT, "start=" + start + ", size=" + environments.size());
-		}
 	}
 	
 	@Test
@@ -154,56 +138,6 @@ public class CrossStudyDataManagerImplTest extends DataManagerIntegrationTest {
         Debug.println(INDENT, "#RECORDS: " + result.size());
     }
   
-    @Test
-    public void testGetObservationsForTraits() throws Exception {
-        List<Integer> traitIds = Arrays.asList(22564, 22073, 21735, 20848, 18000);
-        List<Integer> environmentIds = Arrays.asList(5770, 10085, 5748, -1, -6);
-        
-        //new
-        List<Observation> result1 = new ArrayList<Observation>();
-        List<Observation> result = manager.getObservationsForTraits(traitIds, environmentIds,0,2);
-        Debug.println("new testGetObservationsForTraits(): " + result.size());
-        for (Observation observation : result) {
-            observation.print(INDENT);
-        }
-        result1.addAll(result);
-        
-        result = manager.getObservationsForTraits(traitIds, environmentIds,2,2);
-        Debug.println("new testGetObservationsForTraits(): " + result.size());
-        for (Observation observation : result) {
-            observation.print(INDENT);
-        }
-        result1.addAll(result);
-        
-        result = manager.getObservationsForTraits(traitIds, environmentIds,0,4);
-        Debug.println("new testGetObservationsForTraits(): " + result.size());
-        for (Observation observation : result) {
-            observation.print(INDENT);
-        }
-        //compare combination of first 2 and new 4 observations 
-        assertEquals(result1, result);
-        
-        result = manager.getObservationsForTraits(traitIds, environmentIds,299,2);
-        Debug.println("new testGetObservationsForTraits(): " + result.size());
-        // LOCAL DB empty
-        // FIX ME : perhaps we really should test against a couple of seeded studies .....
-        assertEquals(0, result.size());
-        for (Observation observation : result) {
-            observation.print(INDENT);
-        }
-        //compare with old
-        List<Observation> oldResult = manager.getObservationsForTraits(traitIds, environmentIds);
-        Debug.println(INDENT, "RESULT SIZE of old testGetObservationsForTraits(): " + oldResult.size());
-        //get last 2 (should be from local)
-        // FIX ME : local not seeded
-        //oldResult = oldResult.subList(oldResult.size()-2, oldResult.size());
-        //Debug.println(INDENT, "#RECORDS: " + oldResult.size());
-        //assertEquals(2, oldResult.size());
-        //for (Observation observation : oldResult) {
-        //    observation.print(INDENT);
-        //}
-    }
-
     @Test
     public void testGetObservationsForTrait() throws Exception {
         int traitId = 22574;

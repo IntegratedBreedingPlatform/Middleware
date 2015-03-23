@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -32,7 +31,7 @@ import java.util.List;
  * Implementation of the UserDataManager interface. To instantiate this
  * class, a Hibernate Session must be passed to its constructor.
  */ 
-public class UserDataManagerImpl extends DataManager implements UserDataManager{
+public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);
 
@@ -40,28 +39,22 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         super();
     }
 
-    public UserDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public UserDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
     }
 
-    public UserDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public List<User> getAllUsers() throws MiddlewareQueryException {
-        return (List<User>) getAllFromCentralAndLocal(getUserDao());
+        return (List<User>) getUserDao().getAll();
     }
 
     @Override
     public long countAllUsers() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getUserDao());
+        return countAll(getUserDao());
     }
 
     @Override
     public Integer addUser(User user) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -70,7 +63,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
             trans = session.beginTransaction();
             UserDAO dao = getUserDao();
 
-            Integer userId = dao.getNegativeId("userid");
+            Integer userId = dao.getNextId("userid");
             user.setUserid(userId);
 
             User recordSaved = dao.saveOrUpdate(user);
@@ -89,38 +82,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     }
     
     @Override
-    public Integer addUserToCentral(User user) throws MiddlewareQueryException {
-        requireCentralDatabaseInstance();
-        Session session = getActiveSession();
-        Transaction trans = null;
-
-        Integer idUserSaved = null;
-        try {
-            trans = session.beginTransaction();
-            UserDAO dao = getUserDao();
-            
-            Integer userId = GenericDAO.getLastId(getActiveSession(), Database.CENTRAL, "users", "userid");
-            user.setUserid(userId == null ? 1 : userId + 1);
-
-            User recordSaved = dao.saveOrUpdate(user);
-            idUserSaved = recordSaved.getUserid();
-
-            trans.commit();
-            
-            session.flush();
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException("Error encountered while saving User to central database: UserDataManager.addUserToCentral(user=" + user + "): " + e.getMessage(), e,
-                    LOG);
-        }
-
-        return idUserSaved;
-    }
-
-
-    @Override
     public Integer updateUser(User user) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -141,15 +103,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     @Override
     public User getUserById(int id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getUserDao().getById(id, false);
-        }
-        return null;
+        return getUserDao().getById(id, false);
     }
 
     @Override
     public void deleteUser(User user) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -169,40 +127,26 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     @SuppressWarnings("unchecked")
     @Override
     public List<Person> getAllPersons() throws MiddlewareQueryException {
-        return (List<Person>) getAllFromCentralAndLocal(getPersonDao());
+        return (List<Person>) getPersonDao().getAll();
     }
 
+    //TODO BMS-148 Rename method. No loger reads from two DBs.
     @Override
     public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
         List<Person> toReturn = new ArrayList<Person>();
         PersonDAO dao = getPersonDao();
-        if (setDaoSession(dao, getCurrentSessionForLocal())) {
-            List<Person> localPersons = dao.getAll();
-            Collections.sort(localPersons);
-            toReturn.addAll(localPersons);
-        }
-        if (setDaoSession(dao, getCurrentSessionForCentral())) {
-            List<Person> centralPersons = dao.getAll();
-            List<Person> centralPersonsNew = new ArrayList<Person>();
-            for(Person person : centralPersons){
-            	if(person != null && !"".equalsIgnoreCase(person.getDisplayName())){
-            		centralPersonsNew.add(person);
-            	}
-            }
-            Collections.sort(centralPersonsNew);
-            toReturn.addAll(centralPersonsNew);
-        }
+        List<Person> persons = dao.getAll();
+        Collections.sort(persons);
+        toReturn.addAll(persons);
         return toReturn;
     }
 
-
     public long countAllPersons() throws MiddlewareQueryException {
-        return countAllFromCentralAndLocal(getPersonDao());
+        return countAll(getPersonDao());
     }
 
     @Override
     public Integer addPerson(Person person) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -211,7 +155,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
             trans = session.beginTransaction();
             PersonDAO dao = getPersonDao();
 
-            Integer personId = dao.getNegativeId("id");
+            Integer personId = dao.getNextId("id");
             person.setId(personId);
 
             Person recordSaved = dao.saveOrUpdate(person);
@@ -229,46 +173,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     }
     
     @Override
-    public Integer addPersonToCentral(Person person) throws MiddlewareQueryException {
-        requireCentralDatabaseInstance();
-        
-        Session session = getActiveSession();
-        Transaction trans = null;
-
-        Integer idPersonSaved = null;
-        try {
-            trans = session.beginTransaction();
-            PersonDAO dao = getPersonDao();
-            
-            Integer personId = GenericDAO.getLastId(getActiveSession(), Database.CENTRAL, "persons", "personid");
-            person.setId(personId == null ? 1 : personId + 1);
-
-            Person recordSaved = dao.saveOrUpdate(person);
-            idPersonSaved = recordSaved.getId();
-
-            trans.commit();
-            
-            session.flush();
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while saving Person to central database: UserDataManager.addPersonToCentral(person=" + person + "): " + e.getMessage(), e, LOG);
-        }
-        
-        return idPersonSaved;
-    }
-
-    @Override
     public Person getPersonById(int id) throws MiddlewareQueryException {
-        if (setWorkingDatabase(id)) {
-            return getPersonDao().getById(id, false);
-        }
-        return null;
+        return getPersonDao().getById(id, false);
     }
 
     @Override
     public void deletePerson(Person person) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -288,50 +198,30 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     @Override
     public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
             return true;
-        }
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
-                return true;
-            }
         }
         return false;
     }
 
     @Override
     public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         if (getPersonDao().isPersonExists(firstName, lastName)) {
             return true;
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            if (getPersonDao().isPersonExists(firstName, lastName)) {
-                return true;
-            }
         }
         return false;
     }
 
     @Override
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         if (getUserDao().isUsernameExists(userName)) {
             return true;
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            if (getUserDao().isUsernameExists(userName)) {
-                return true;
-            }
         }
         return false;
     }
     
     @Override
     public User getUserByUserName(String userName) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         return getUserDao().getUserByUserName(userName);
     }
 }

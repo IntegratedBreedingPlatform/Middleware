@@ -1,6 +1,6 @@
 # PROJECT SPECIFIC IGNORES
-/src/main/resources/*.properties
-/src/test/resources/*.properties
+/src/main/resources/workbench.properties
+/src/test/resources/testDatabaseConfig.properties
 
 # Maven
 log/

@@ -59,17 +59,12 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
     
     @BeforeClass
 	public static void setUp() throws Exception {
-    	HibernateSessionProvider sessionProviderForLocal = 
-    			managerFactory.getSessionProviderForLocal();
-    	HibernateSessionProvider sessionProviderForCentral = 
-    			managerFactory.getSessionProviderForCentral();
-    	workbookBuilder = new WorkbookBuilder(sessionProviderForLocal, 
-    			sessionProviderForCentral);
+    	HibernateSessionProvider sessionProvider = managerFactory.getSessionProvider();
+    	workbookBuilder = new WorkbookBuilder(sessionProvider);
     	dataImportService = managerFactory.getDataImportService();
     	fieldbookService = managerFactory.getFieldbookMiddlewareService();
-    	measurementVariableTransformer = new MeasurementVariableTransformer(
-    			sessionProviderForLocal, sessionProviderForCentral);
-    	standardVariableBuilder = new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    	measurementVariableTransformer = new MeasurementVariableTransformer(sessionProvider);
+    	standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
     }
  
     @Test
@@ -100,7 +95,7 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
     	WorkbookTest.setTestWorkbook(null);
     	Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
     	
-    	int id = dataImportService.saveDataset(workbook);
+    	int id = dataImportService.saveDataset(workbook, null);
     	
     	Workbook createdWorkbook = fieldbookService.getNurseryDataSet(id);
     	
@@ -138,7 +133,7 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 		WorkbookTest.setTestWorkbook(null);
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
     	
-    	int id = dataImportService.saveDataset(workbook);
+    	int id = dataImportService.saveDataset(workbook, null);
     	
     	Workbook createdWorkbook = fieldbookService.getTrialDataSet(id);
     	

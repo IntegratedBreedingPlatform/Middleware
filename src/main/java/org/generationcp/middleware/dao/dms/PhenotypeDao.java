@@ -324,7 +324,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
             List<Object[]> list = new ArrayList<Object[]>();
 
-            if(!environmentIds.isEmpty()) {
+            if(!environmentIds.isEmpty() && !traitIds.isEmpty()) {
                 list = query.list();
             }
             

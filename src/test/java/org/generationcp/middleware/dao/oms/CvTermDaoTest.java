@@ -39,7 +39,7 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         dao = new CVTermDao();
-        dao.setSession(centralSessionUtil.getCurrentSession());
+        dao.setSession(sessionUtil.getCurrentSession());
     }
 
     @Test

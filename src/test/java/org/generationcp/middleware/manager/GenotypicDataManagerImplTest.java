@@ -11,55 +11,70 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.gdms.*;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
+import org.generationcp.middleware.pojos.gdms.AlleleValues;
+import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
+import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.pojos.gdms.DartValues;
+import org.generationcp.middleware.pojos.gdms.Dataset;
+import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.generationcp.middleware.pojos.gdms.DatasetUsers;
+import org.generationcp.middleware.pojos.gdms.ExtendedMarkerInfo;
+import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
+import org.generationcp.middleware.pojos.gdms.Map;
+import org.generationcp.middleware.pojos.gdms.MapDetailElement;
+import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MappingPop;
+import org.generationcp.middleware.pojos.gdms.MappingPopValues;
+import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerAlias;
+import org.generationcp.middleware.pojos.gdms.MarkerDetails;
+import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerInfo;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
+import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
+import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
+import org.generationcp.middleware.pojos.gdms.Mta;
+import org.generationcp.middleware.pojos.gdms.MtaMetadata;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
+import org.generationcp.middleware.pojos.gdms.Qtl;
+import org.generationcp.middleware.pojos.gdms.QtlDataElement;
+import org.generationcp.middleware.pojos.gdms.QtlDataRow;
+import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
+import org.generationcp.middleware.pojos.gdms.QtlDetails;
+import org.generationcp.middleware.pojos.gdms.TrackData;
+import org.generationcp.middleware.pojos.gdms.TrackMarker;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 // Test using Groundnut Database
-public class GenotypicDataManagerImplTest extends TestOutputFormatter{
+public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
-    private static ManagerFactory factory;
     private static GenotypicDataManager manager;
 
     @BeforeClass
     public static void setUp() {
-        DatabaseConnectionParameters local, central;
-		try {
-			local = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-			        "localgroundnut");
-			central = new DatabaseConnectionParameters("testDatabaseConfig.properties",
-	                "centralgroundnut");
-	        factory = new ManagerFactory(local, central);
-	        manager = factory.getGenotypicDataManager();
-	        
-		} catch (FileNotFoundException e) {
-			Assert.fail(e.getMessage());
-		} catch (ConfigException e) {
-			Assert.fail(e.getMessage());
-		} catch (URISyntaxException e) {
-			Assert.fail(e.getMessage());
-		} catch (IOException e) {
-			Assert.fail(e.getMessage());
-		}
+    	manager = managerFactory.getGenotypicDataManager();
     }
 
     @Test
@@ -2388,13 +2403,6 @@ public class GenotypicDataManagerImplTest extends TestOutputFormatter{
     	} else {
     		Debug.println(INDENT, "No marker data found in the database to update.");
     	}
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-        if(factory != null) {
-        	factory.close();
-        }
     }
 
     @Test

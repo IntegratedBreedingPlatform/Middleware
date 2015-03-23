@@ -26,9 +26,8 @@ public class LotBuilder extends Builder {
 	private static final int LOT_NOT_DERIVED_FROM_ANOTHER = 0;
 	
 
-	public LotBuilder(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public LotBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public List<Lot> build(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId, 
@@ -47,7 +46,6 @@ public class LotBuilder extends Builder {
 	public List<Lot> buildForSave(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
 			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
 		
-		requireLocalDatabaseInstance();
 		List<Integer> newGids = removeGidsWithExistingCombination(gids, locationId, scaleId); 
 		List<Lot> lots = createLotsForAdd(newGids, locationId, scaleId, comment, userId, amount, sourceId);
 		return lots;
@@ -91,7 +89,6 @@ public class LotBuilder extends Builder {
 	}
 	
 	private List<Lot> createLotsForUpdate(List<Integer> gids, Integer locationId, Integer scaleId, String comment) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 		List<Lot> existingLots = getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
 
         if (gids != null && !gids.isEmpty()) {
@@ -108,12 +105,9 @@ public class LotBuilder extends Builder {
 	
 	public LotsResult getGidsForUpdateAndAdd(List<Integer> gids) 
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 
 		List<Integer> newGids = new ArrayList<Integer>();
-		
 		List<Lot> existingLots = getLotDao().getByEntityTypeAndEntityIds(EntityType.GERMPLSM.name(), gids);
-
 		List<Integer> gidsWithExistingCombi = new ArrayList<Integer>();
 		if (existingLots != null && !existingLots.isEmpty()) {
 			for (Lot lot : existingLots) {

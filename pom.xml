@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-	<version>3.1.2.SNAPSHOT</version>
+	<version>4.0.2.SNAPSHOT</version>
 	<name>ibp middleware</name>
 
 	<distributionManagement>
@@ -149,6 +149,13 @@
 			<version>1.8.5</version>
 		</dependency>
 
+		<!--  JAMon performance monitoring. -->		
+        <dependency>
+            <groupId>com.jamonapi</groupId>
+            <artifactId>jamon</artifactId>
+            <version>2.80</version>
+        </dependency>
+
 	</dependencies>
 
 	<build>
@@ -267,6 +274,7 @@
 						<include>**/GermplasmDataManagerUtilTest.java</include>
 						<include>**/OntologyDataManagerImplTest.java</include>
 						<include>**/WorkbenchDataManagerImplTest.java</include>
+						<include>**/GermplasmDataManagerImplTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>
