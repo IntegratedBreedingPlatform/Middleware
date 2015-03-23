@@ -22,6 +22,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
+import com.google.common.base.Function;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -154,5 +156,39 @@ public class Util{
         Integer dateNowInt = Integer.valueOf(dateNowStr);
         return dateNowInt;
 
+    }
+
+    /**
+     * @param source source list
+     * @param projection projection function
+     * @param <Source> Source Type
+     * @param <Result> Result Type
+     * @return List<Result> Projected data
+     */
+    public static <Source, Result> List<Result> convertAll(List<Source> source, Function<Source, Result> projection)
+    {
+        ArrayList<Result> results = new ArrayList<>();
+        for (Source element : source)
+        {
+            results.add(projection.apply(element));
+        }
+        return results;
+    }
+
+    /**
+     * @param source source list
+     * @param projection projection function
+     * @param <Key> Key Type
+     * @param <Source> Source Type
+     * @return List<Result> Projected data
+     */
+    public static <Key, Source> Map<Key, Source> mapAll(List<Source> source, Function<Source, Key> projection)
+    {
+        Map<Key, Source> results = new HashMap<>();
+        for (Source element : source)
+        {
+            results.put(projection.apply(element), element);
+        }
+        return results;
     }
 }

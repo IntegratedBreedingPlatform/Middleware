@@ -13,6 +13,7 @@ import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -384,8 +385,26 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
             //Deleting existing relationships for property
             List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(scaleId);
+            List<Integer> termsToDelete = Util.convertAll(relationships, new Function<CVTermRelationship, Integer>()
+            {
+                public Integer apply(CVTermRelationship x)
+                {
+                    return x.getObjectId();
+                }
+            });
+
+            List<CVTerm> terms = getCvTermDao().getByIds(termsToDelete);
+
             for(CVTermRelationship r : relationships){
                 getCvTermRelationshipDao().makeTransient(r);
+            }
+
+            for(CVTerm c : terms){
+                getCvTermDao().makeTransient(c);
+            }
+
+            if(!terms.isEmpty()) {
+                getCvDao().makeTransient(getCvDao().getById(terms.get(0).getCv()));
             }
 
             //Deleting existing values for property
