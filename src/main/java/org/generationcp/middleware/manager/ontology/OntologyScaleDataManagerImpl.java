@@ -29,7 +29,9 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     private static final String SCALE_CATEGORIES_SHOULD_NOT_EMPTY = "Scale categories should not be empty for categorical data type";
     private static final String SCALE_DATA_TYPE_SHOULD_NOT_EMPTY = "Scale data type should not be empty";
     private static final String SCALE_CATEGORIES_SHOULD_NOT_SUPPLY_WITH_NON_CATEGORICAL_DATA_TYPE = "Categories supplied with non categorical data type";
-    private static final String SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "Min or Max values are should not supplied for non categorical data type";
+    private static final String SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE = "Min or Max values should not supplied for non categorical data type";
+    private static final String SCALE_MIN_VALUE_NOT_VALID = "Min value is not valid";
+    private static final String SCALE_MAX_VALUE_NOT_VALID = "Max value is not valid";
     private static final String SCALE_IS_REFERRED_TO_VARIABLE = "Scale is referred to variable.";
 
     public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
@@ -230,8 +232,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 throw new MiddlewareException(SCALE_CATEGORIES_SHOULD_NOT_SUPPLY_WITH_NON_CATEGORICAL_DATA_TYPE);
             }
 
-            if(Strings.isNullOrEmpty(scale.getMinValue()) || Strings.isNullOrEmpty(scale.getMaxValue())){
-                throw new MiddlewareException(SCALE_MIN_MAX_SHOULD_NOT_EMPTY_FOR_NON_CATEGORICAL_DATA_TYPE);
+            //Check supplied value as numeric if non null
+            if(Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE)) {
+                if(!Strings.isNullOrEmpty(scale.getMinValue()) && !Util.isNonNullValidNumericString(scale.getMinValue())){
+                    throw new MiddlewareException(SCALE_MIN_VALUE_NOT_VALID);
+                }
+
+                if(!Strings.isNullOrEmpty(scale.getMaxValue()) && !Util.isNonNullValidNumericString(scale.getMaxValue())){
+                    throw new MiddlewareException(SCALE_MAX_VALUE_NOT_VALID);
+                }
             }
         }
 
@@ -320,33 +329,38 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 }
             }
 
-            Integer cvId = categoricalValues.isEmpty() ? 0 : categoricalValues.get(0).getCv();
+            Integer cvId = categoricalValues.isEmpty() ? null : categoricalValues.get(0).getCv();
 
-            if(!categoricalValues.isEmpty()){
+            //Remove all categorical data if present
+            for(CVTermRelationship r : valueRelationships){
+                getCvTermRelationshipDao().makeTransient(r);
+            }
 
-                for(CVTermRelationship r : valueRelationships){
-                    getCvTermRelationshipDao().makeTransient(r);
-                }
+            for(CVTerm c : categoricalValues){
+                getCvTermDao().makeTransient(c);
+            }
 
-                for(CVTerm t : categoricalValues){
-                    getCvTermDao().makeTransient(t);
-                }
+            if(!Objects.equals(cvId, null)){
+                getCvDao().makeTransient(getCvDao().getById(cvId));
             }
 
             if(scale.getDataType().equals(DataType.CATEGORICAL_VARIABLE)){
-                if(cvId == 0){
+
+                if(Objects.equals(cvId, null)){
                     cvId = getCvDao().getNextId("cvId");
                 }
+
                 CV cv = new CV();
                 cv.setCvId(cvId);
                 cv.setName(String.valueOf(scale.getId()));
                 cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
-                getCvDao().merge(cv);
+                getCvDao().save(cv);
 
                 //Saving Categorical data if present
                 for(String c : scale.getCategories().keySet()){
-                    CVTerm category = new CVTerm(getCvTermDao().getNextId("cvTermId"), cv.getCvId(), c, scale.getCategories().get(c), null, 0, 0);
-                    getCvTermDao().merge(category);
+                    Integer nextId = getCvTermDao().getNextId("cvTermId");
+                    CVTerm category = new CVTerm(nextId, cv.getCvId(), c, scale.getCategories().get(c), null, 0, 0);
+                    getCvTermDao().save(category);
                     getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
                 }
             }

@@ -191,4 +191,8 @@ public class Util{
         }
         return results;
     }
+
+    public static boolean isNonNullValidNumericString(Object value) {
+        return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
+    }
 }
