@@ -85,6 +85,30 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
     }
 
     @Test
+    public void testUpdateCategoricalScale() throws Exception {
+        Scale scale = new Scale();
+        scale.setName(getNewRandomName());
+        scale.setDefinition("");
+        scale.setDataType(DataType.CATEGORICAL_VARIABLE);
+        scale.addCategory("1", "First");
+        scale.addCategory("2", "Second");
+        manager.addScale(scale);
+        Assert.assertNotNull(scale.getId());
+        Assert.assertTrue(scale.getId() > 0);
+
+        //Updating same scale with one more category
+        scale.addCategory("3", "Third");
+        manager.updateScale(scale);
+
+        Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + scale);
+        Scale scaleFromDb = manager.getScaleById(scale.getId());
+        Assert.assertEquals(scale.getName(), scaleFromDb.getName());
+        Assert.assertEquals(scale.getDataType(), scaleFromDb.getDataType());
+        Assert.assertEquals(scale.getMinValue(), scaleFromDb.getMinValue());
+        Assert.assertEquals(scale.getMaxValue(), scaleFromDb.getMaxValue());
+    }
+
+    @Test
     public void testUpdateScale() throws Exception {
         testScale.setDefinition("new definition");
         testScale.setDataType(DataType.CATEGORICAL_VARIABLE);

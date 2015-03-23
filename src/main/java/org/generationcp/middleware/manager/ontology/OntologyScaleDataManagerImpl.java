@@ -341,12 +341,12 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 cv.setCvId(cvId);
                 cv.setName(String.valueOf(scale.getId()));
                 cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
-                getCvDao().save(cv);
+                getCvDao().merge(cv);
 
                 //Saving Categorical data if present
                 for(String c : scale.getCategories().keySet()){
                     CVTerm category = new CVTerm(getCvTermDao().getNextId("cvTermId"), cv.getCvId(), c, scale.getCategories().get(c), null, 0, 0);
-                    getCvTermDao().save(category);
+                    getCvTermDao().merge(category);
                     getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
                 }
             }
