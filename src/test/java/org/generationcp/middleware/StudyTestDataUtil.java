@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -63,6 +64,11 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
         variable = createVariable(TermId.STUDY_TITLE.getId(), description, 2);
         typeList.add(variable.getVariableType());
         variableList.add(variable);
+        
+        variable = createVariable(TermId.STUDY_TYPE.getId(), 
+        		String.valueOf(StudyType.T.getId()), 3);
+        typeList.add(variable.getVariableType());
+        variableList.add(variable);
 
         StudyValues studyValues = new StudyValues();
         studyValues.setVariableList(variableList);
@@ -93,11 +99,17 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
         typeList.add(variable.getVariableType());
         variableList.add(variable);
         
+        variable = createVariable(TermId.STUDY_TYPE.getId(), 
+        		String.valueOf(StudyType.T.getId()), 3);
+        typeList.add(variable.getVariableType());
+        variableList.add(variable);
+        
         variable = createVariable(TermId.STUDY_STATUS.getId(), 
-        		String.valueOf(TermId.ACTIVE_STUDY.getId()), 3);
+        		String.valueOf(TermId.ACTIVE_STUDY.getId()), 4);
         typeList.add(variable.getVariableType());
         variableList.add(variable);
 
+        
         StudyValues studyValues = new StudyValues();
         studyValues.setVariableList(variableList);
 

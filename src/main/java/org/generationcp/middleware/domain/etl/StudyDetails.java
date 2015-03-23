@@ -25,6 +25,8 @@ public class StudyDetails implements Serializable{
 
 	private Integer id;
 	
+	private String programUUID;
+	
 	private String studyName;
 	
 	private String title;
@@ -282,6 +284,14 @@ public class StudyDetails implements Serializable{
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	public boolean hasRows() {
