@@ -389,6 +389,10 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             {
                 public Integer apply(CVTermRelationship x)
                 {
+                    if(Objects.equals(TermId.HAS_TYPE.getId(), x.getTypeId())) {
+                        return null;
+                    }
+
                     return x.getObjectId();
                 }
             });
