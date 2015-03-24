@@ -54,7 +54,8 @@ public enum TermId {
 	, END_DATE(8060)
 	, STUDY_UID(8020)
 	/*, STUDY_IP(8120)*/
-	, CREATION_DATE(8048)
+	, CREATION_DATE(8048) //NOTE: Used this field for assigning variable creation date to property
+    , LAST_UPDATION_DATE(8049) //TODO: Update ID as per final cvterm id assigned officially.
 	, STUDY_STATUS(8006)
 	, STUDY_UPDATE(8009)
 	
