@@ -30,11 +30,11 @@ public enum VariableType {
     }
 
 
-    private static final Map<Integer, DataType> byId = new HashMap<>();
-    private static final Map<String, DataType> byName = new HashMap<>();
+    private static final Map<Integer, VariableType> byId = new HashMap<>();
+    private static final Map<String, VariableType> byName = new HashMap<>();
 
     static {
-        for (DataType e : DataType.values()) {
+        for (VariableType e : VariableType.values()) {
             if (byId.put(e.getId(), e) != null) {
                 throw new IllegalArgumentException("duplicate id: " + e.getId());
             }
@@ -51,11 +51,11 @@ public enum VariableType {
 
     public String getName() { return this.name; }
 
-    public static DataType getById(Integer id) {
+    public static VariableType getById(Integer id) {
         return byId.get(id);
     }
 
-    public static DataType getByName(String name) { return byName.get(name); }
+    public static VariableType getByName(String name) { return byName.get(name); }
 
     public IdName toIdName(){
         return new IdName(getId(), getName());
