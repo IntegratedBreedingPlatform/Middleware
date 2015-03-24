@@ -1,9 +1,6 @@
 package org.generationcp.middleware.manager.ontology;
 
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
@@ -37,9 +34,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             for(Object row : queryResults) {
                 Object[] items = (Object[]) row;
                 OntologyVariableSummary variable = new OntologyVariableSummary(typeSafeObjectToInteger(items[0]), (String)items[1], (String) items[2]);
-                variable.setProperty(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
-                variable.setMethod(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
-                variable.setScale(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
+                variable.setPropertySummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
+                variable.setMethodSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
+                variable.setScaleSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
                 map.put(variable.getId(), variable);
             }
 
@@ -54,7 +51,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     continue;
                 }
 
-                if(Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())){
+                if(Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())){
+                    variableSummary.addVariableType(VariableType.getByName(property.getValue()));
+                } else if(Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())){
                     variableSummary.setMinValue(property.getValue());
                 } else if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
                     variableSummary.setMaxValue(property.getValue());

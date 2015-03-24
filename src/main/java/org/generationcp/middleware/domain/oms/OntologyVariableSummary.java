@@ -8,11 +8,11 @@ public class OntologyVariableSummary {
 
 	private final TermSummary term;
 
-	private TermSummary property;
+	private TermSummary propertySummary;
 
-	private TermSummary method;
+	private TermSummary methodSummary;
 
-	private TermSummary scale;
+	private TermSummary scaleSummary;
 
     private final Set<VariableType> variableTypes = new HashSet<>();
 
@@ -48,28 +48,28 @@ public class OntologyVariableSummary {
 		return term;
 	}
 
-	public TermSummary getProperty() {
-		return property;
+	public TermSummary getPropertySummary() {
+		return propertySummary;
 	}
 
-	public void setProperty(TermSummary property) {
-		this.property = property;
+	public void setPropertySummary(TermSummary property) {
+		this.propertySummary = property;
 	}
 
-	public TermSummary getMethod() {
-		return method;
+	public TermSummary getMethodSummary() {
+		return methodSummary;
 	}
 
-	public void setMethod(TermSummary method) {
-		this.method = method;
+	public void setMethodSummary(TermSummary methodSummary) {
+		this.methodSummary = methodSummary;
 	}
 
-	public TermSummary getScale() {
-		return scale;
+	public TermSummary getScaleSummary() {
+		return scaleSummary;
 	}
 
-	public void setScale(TermSummary scale) {
-		this.scale = scale;
+	public void setScaleSummary(TermSummary scaleSummary) {
+		this.scaleSummary = scaleSummary;
 	}
 
     public Set<VariableType> getVariableTypes() {
@@ -144,13 +144,5 @@ public class OntologyVariableSummary {
 		return getId().equals(other.getId());
 	}
 
-    @Override
-    public String toString() {
-        return "OntologyVariableSummary{" +
-                "term=" + term +
-                ", property=" + property +
-                ", method=" + method +
-                ", scale=" + scale +
-                '}';
-    }
+
 }
