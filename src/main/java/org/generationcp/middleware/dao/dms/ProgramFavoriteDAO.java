@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * DAO class for {@link ProgramFavoriteDao}.
+ * DAO class for {@link ProgramFavoriteDAO}.
  * 
  */
 @SuppressWarnings("unchecked")
@@ -72,6 +72,20 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     	
     	return 0;
     	
+    }
+
+    public List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type) throws MiddlewareQueryException{
+        try{
+
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("entityType", type.getName()));
+
+            List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();
+            return result;
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.getName() + ") in ProgramFavoriteDao: " + e.getMessage(), e);
+        }
     }
 
 	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max, String programUUID) throws MiddlewareQueryException{
