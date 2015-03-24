@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
+import org.generationcp.middleware.domain.oms.OntologyVariable;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -29,4 +30,11 @@ public interface OntologyVariableDataManager {
      * @throws MiddlewareQueryException*
      */
     List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException;
+
+    /**
+     * Return variable by Id
+     * * @return OntologyVariable
+     * @throws MiddlewareQueryException*
+     */
+    OntologyVariable getVariable(Integer id) throws MiddlewareQueryException;
 }

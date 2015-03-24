@@ -4,6 +4,9 @@ import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -18,8 +21,18 @@ import java.util.Objects;
 
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
-    public OntologyVariableDataManagerImpl(HibernateSessionProvider sessionProvider) {
+    private final OntologyMethodDataManager methodDataManager;
+    private final OntologyPropertyDataManager propertyDataManager;
+    private final OntologyScaleDataManager scaleDataManager;
+
+    public OntologyVariableDataManagerImpl(OntologyMethodDataManager methodDataManager,
+                                           OntologyPropertyDataManager propertyDataManager,
+                                           OntologyScaleDataManager scaleDataManager,
+                                           HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
+        this.methodDataManager = methodDataManager;
+        this.propertyDataManager = propertyDataManager;
+        this.scaleDataManager = scaleDataManager;
     }
 
 
@@ -84,5 +97,10 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         }
 
         return (List<OntologyVariableSummary>) map.values();
+    }
+
+    @Override
+    public OntologyVariable getVariable(Integer id) throws MiddlewareQueryException {
+        return null;
     }
 }

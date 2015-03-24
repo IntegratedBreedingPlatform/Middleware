@@ -84,7 +84,7 @@ public abstract class Service extends DatabaseBroker {
     }
 
     protected final OntologyVariableDataManager getOntologyVariableDataManager(){
-        return new OntologyVariableDataManagerImpl(sessionProvider);
+        return new OntologyVariableDataManagerImpl(getOntologyMethodDataManager(), getOntologyPropertyDataManager(), getOntologyScaleDataManager(), sessionProvider);
     }
 
     protected final GermplasmDataManager getGermplasmDataManager() {
