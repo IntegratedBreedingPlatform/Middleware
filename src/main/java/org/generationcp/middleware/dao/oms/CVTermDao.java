@@ -1525,7 +1525,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
     public List<CVTerm> getAllByCvId(List<Integer> termIds, CvId cvId) throws MiddlewareQueryException {
 
-        List<CVTerm> terms = new ArrayList<>();
+        List<CVTerm> terms;
 
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());

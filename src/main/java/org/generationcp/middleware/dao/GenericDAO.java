@@ -236,4 +236,35 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
         return message;
     }
+
+    private final static int PARAMETER_LIMIT = 999;
+
+    /**
+     * An utility method to build the Criterion Query IN clause if the number of parameter
+     * values passed has a size more than 1000. Oracle does not allow more than
+     * 1000 parameter values in a IN clause. maximum number of expressions in a list is 1000'.
+     * @param propertyName The name of property
+     * @param values List to be passed in clause
+     * @return Criterion
+     */
+    public static Criterion buildInCriterion(String propertyName, List values) {
+
+        Criterion criterion = null;
+
+        int listSize = values.size();
+        for (int i = 0; i < listSize; i += PARAMETER_LIMIT) {
+            List subList;
+            if (listSize > i + PARAMETER_LIMIT) {
+                subList = values.subList(i, (i + PARAMETER_LIMIT));
+            } else {
+                subList = values.subList(i, listSize);
+            }
+            if (criterion != null) {
+                criterion = Restrictions.or(criterion, Restrictions.in(propertyName, subList));
+            } else {
+                criterion = Restrictions.in(propertyName, subList);
+            }
+        }
+        return criterion;
+    }
 }

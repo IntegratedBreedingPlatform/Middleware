@@ -1,16 +1,23 @@
 package org.generationcp.middleware.manager.ontology;
 
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
@@ -21,7 +28,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
     @Override
     public List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException {
-        List<OntologyVariableSummary> result = new ArrayList<>();
+
+        Map<Integer, OntologyVariableSummary> map = new HashMap<>();
+
         try {
             SQLQuery query = getActiveSession().createSQLQuery("SELECT * FROM standard_variable_summary");
             List queryResults = query.list();
@@ -31,12 +40,50 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 variable.setProperty(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
                 variable.setMethod(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
                 variable.setScale(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
-                result.add(variable);
+                map.put(variable.getId(), variable);
             }
+
+            //Created, modified, min, max from CVTermProperty
+            List properties = getCvTermPropertyDao().getByCvId(CvId.VARIABLES.getId());
+            for(Object p : properties){
+                CVTermProperty property = (CVTermProperty) p;
+
+                OntologyVariableSummary variableSummary = map.get(property.getCvTermId());
+
+                if(variableSummary == null){
+                    continue;
+                }
+
+                if(Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())){
+                    variableSummary.setMinValue(property.getValue());
+                } else if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
+                    variableSummary.setMaxValue(property.getValue());
+                } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
+                    variableSummary.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+                } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATION_DATE.getId())){
+                    variableSummary.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+                }
+            }
+
+            //Get favorite from ProgramFavoriteDAO
+            List<ProgramFavorite> favorites = getProgramFavoriteDao().getProgramFavorites(ProgramFavorite.FavoriteType.VARIABLE);
+
+            for(ProgramFavorite f : favorites) {
+                OntologyVariableSummary variableSummary = map.get(f.getEntityId());
+
+                if(variableSummary == null){
+                    continue;
+                }
+
+                variableSummary.setIsFavorite(true);
+            }
+
+            //TODO: Need to figure out observations which seems to be costly operation.
+
         } catch(HibernateException e) {
             throw new MiddlewareQueryException("Error in getting standard variable summaries from standard_variable_summary view", e);
         }
 
-        return result;
+        return (List<OntologyVariableSummary>) map.values();
     }
 }

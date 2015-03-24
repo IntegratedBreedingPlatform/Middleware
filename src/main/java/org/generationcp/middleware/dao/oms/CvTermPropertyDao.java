@@ -16,6 +16,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
@@ -40,6 +41,30 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
             logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
         }
         return properties;
+    }
+
+    public List getByCvTermIds(List<Integer> cvTermIds) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass())
+                    .add(buildInCriterion("cvTermId", cvTermIds));
+            return criteria.list();
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error at getByCvTermIds query on CVTermDao", e);
+        }
+    }
+
+    public List getByCvId(Integer cvId) throws MiddlewareQueryException {
+        try {
+
+            Query query = getSession()
+                    .createSQLQuery("select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = " + cvId)
+                    .addEntity(CVTermProperty.class);
+
+            return query.list();
+
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error at getByCvId", e);
+        }
     }
 
     @SuppressWarnings("unchecked")
