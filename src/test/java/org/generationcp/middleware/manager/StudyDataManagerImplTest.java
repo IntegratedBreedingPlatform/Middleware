@@ -1365,4 +1365,19 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     			commonTestProject.getUniqueID(), -1, -1);
     	assertNotNull(studyDetailsList);
     }
+    
+    @Test
+    public void testGetStudyDetails_ByTypeAndId() throws MiddlewareQueryException {
+    	DmsProject study = StudyTestDataUtil.getInstance().createStudyTestDataWithActiveStatus(
+    			commonTestProject.getUniqueID());
+    	StudyDetails studyDetails = manager.getStudyDetails(
+    			StudyType.T, study.getProjectId());
+    	assertNotNull("Study should not be null", studyDetails);
+    	assertEquals("Study should have the id "+study.getProjectId(), 
+    			study.getProjectId(), studyDetails.getId());
+    	assertEquals("Study should have the programUUID "+commonTestProject.getUniqueID(), 
+    			commonTestProject.getUniqueID(), studyDetails.getProgramUUID());
+    	assertEquals("Study should be a trial", 
+    			StudyType.T, studyDetails.getStudyType());
+    }
 }
