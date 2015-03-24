@@ -2,6 +2,7 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.domain.common.MinMaxValue;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,12 +28,17 @@ public class OntologyVariable {
     private Method method;
     private Scale scale;
 
-    private boolean isFavorite;
+    private Boolean isFavorite;
 
-    /**
-     * Expected range tells you preferred values from scale
-     */
-    private MinMaxValue expectedRange;
+    private String minValue;
+
+    private String maxValue;
+
+    private Date dateCreated;
+
+    private Date dateLastModified;
+
+    private Integer observations;
 
     public Term getTerm() {
         return term;
@@ -82,19 +88,51 @@ public class OntologyVariable {
         this.scale = scale;
     }
 
-    public MinMaxValue getExpectedRange() {
-        return expectedRange;
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public void setExpectedRange(MinMaxValue expectedRange) {
-        this.expectedRange = expectedRange;
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
-    public boolean isFavorite() {
+    public Date getDateLastModified() {
+        return dateLastModified;
+    }
+
+    public void setDateLastModified(Date dateLastModified) {
+        this.dateLastModified = dateLastModified;
+    }
+
+    public Integer getObservations() {
+        return observations;
+    }
+
+    public void setObservations(Integer observations) {
+        this.observations = observations;
+    }
+
+    public String getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(String minValue) {
+        this.minValue = minValue;
+    }
+
+    public String getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(String maxValue) {
+        this.maxValue = maxValue;
+    }
+
+    public Boolean getIsFavorite() {
         return isFavorite;
     }
 
-    public void setFavorite(boolean isFavorite) {
+    public void setIsFavorite(Boolean isFavorite) {
         this.isFavorite = isFavorite;
     }
 }
