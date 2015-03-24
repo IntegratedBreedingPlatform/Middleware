@@ -8,7 +8,8 @@ public class ProgramFavorite {
 	
 	public enum FavoriteType {
 		LOCATION("LOCATION"),
-		METHOD("METHODS")
+		METHOD("METHODS"),
+        VARIABLE("VARIABLES")
 		;
 		
 		private final String name;
