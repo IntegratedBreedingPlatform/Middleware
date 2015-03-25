@@ -192,4 +192,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             throw new MiddlewareQueryException("Error in getting standard variable summaries from standard_variable_summary view", e);
         }
     }
+
+    @Override
+    public void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+
+    }
 }
