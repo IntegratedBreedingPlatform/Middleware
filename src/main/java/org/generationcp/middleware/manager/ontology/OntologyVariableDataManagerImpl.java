@@ -197,4 +197,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     public void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
 
     }
+
+    @Override
+    public void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+
+    }
+
+    @Override
+    public void deleteVariable(Integer id) throws MiddlewareQueryException, MiddlewareException {
+
+    }
 }

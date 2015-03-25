@@ -41,9 +41,20 @@ public interface OntologyVariableDataManager {
     OntologyVariable getVariable(Integer id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
-     * Return variable by Id
-     * * @return OntologyVariable
      * @throws MiddlewareQueryException*
+     * * @throws MiddlewareException*
      */
     void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * @throws MiddlewareQueryException*
+     * * @throws MiddlewareException*
+     */
+    void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * @throws MiddlewareQueryException*
+     * * @throws MiddlewareException*
+     */
+    void deleteVariable(Integer id) throws MiddlewareQueryException, MiddlewareException;
 }

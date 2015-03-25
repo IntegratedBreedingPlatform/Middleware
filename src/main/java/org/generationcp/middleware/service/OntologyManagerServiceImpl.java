@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 
@@ -135,5 +136,25 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     @Override
     public List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException {
         return getOntologyVariableDataManager().getAllVariables();
+    }
+
+    @Override
+    public OntologyVariable getVariable(Integer id) throws MiddlewareQueryException, MiddlewareException {
+        return getOntologyVariableDataManager().getVariable(id);
+    }
+
+    @Override
+    public void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyVariableDataManager().addVariable(variableInfo);
+    }
+
+    @Override
+    public void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyVariableDataManager().updateVariable(variableInfo);
+    }
+
+    @Override
+    public void deleteVariable(Integer id) throws MiddlewareQueryException, MiddlewareException {
+        getOntologyVariableDataManager().deleteVariable(id);
     }
 }

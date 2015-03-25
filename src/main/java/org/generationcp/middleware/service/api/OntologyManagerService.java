@@ -15,6 +15,7 @@ package org.generationcp.middleware.service.api;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.helper.VariableInfo;
 
 import java.util.List;
 
@@ -164,13 +165,13 @@ public interface OntologyManagerService {
      * @return Scale
      * @throws MiddlewareQueryException
      */
-    public Scale getScaleById(int scaleId) throws MiddlewareQueryException;
+    Scale getScaleById(int scaleId) throws MiddlewareQueryException;
 
     /**
      * Get all scales from db
      * @throws MiddlewareQueryException
      */
-    public List<Scale> getAllScales() throws MiddlewareQueryException;
+    List<Scale> getAllScales() throws MiddlewareQueryException;
 
     /**
      * Adding new scale
@@ -205,4 +206,29 @@ public interface OntologyManagerService {
      * @throws MiddlewareQueryException*
      */
     List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException;
+
+    /**
+     * Return variable by Id
+     * * @return OntologyVariable
+     * @throws MiddlewareQueryException*
+     */
+    OntologyVariable getVariable(Integer id) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * @throws MiddlewareQueryException*
+     * * @throws MiddlewareException*
+     */
+    void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * @throws MiddlewareQueryException*
+     * * @throws MiddlewareException*
+     */
+    void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * @throws MiddlewareQueryException*
+     * * @throws MiddlewareException*
+     */
+    void deleteVariable(Integer id) throws MiddlewareQueryException, MiddlewareException;
 }
