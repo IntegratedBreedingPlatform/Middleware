@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.domain.oms.OntologyVariable;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.utils.test.Debug;
@@ -35,10 +36,15 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
     }
 
     @Test
-    public void testGetAllScales() throws Exception {
+    public void testGetAllVariables() throws Exception {
         List<OntologyVariableSummary> variables = manager.getAllVariables();
         Assert.assertTrue(variables.size() > 0);
-        Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Scales:  " + variables.size());
+        Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
+    }
+
+    @Test
+    public void testGetVariable() throws Exception {
+        OntologyVariable variable = manager.getVariable(60042);
     }
 
     @After
