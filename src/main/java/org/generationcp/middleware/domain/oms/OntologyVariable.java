@@ -40,6 +40,14 @@ public class OntologyVariable {
 
     private Integer observations;
 
+    public OntologyVariable() {
+
+    }
+
+    public OntologyVariable(Term term) {
+        this.term = term;
+    }
+
     public Term getTerm() {
         return term;
     }
