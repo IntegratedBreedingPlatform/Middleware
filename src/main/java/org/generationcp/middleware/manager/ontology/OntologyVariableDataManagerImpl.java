@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager.ontology;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
@@ -181,6 +182,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 variable.setIsFavorite(getProgramFavoriteDao().isEntityFavorite(ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId()));
 
                 //TODO: Need to figure out observations which seems to be costly operation.
+                return variable;
 
             } catch(HibernateException e) {
                 throw new MiddlewareQueryException("Error in getVariable", e);
@@ -189,7 +191,5 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         } catch(HibernateException e) {
             throw new MiddlewareQueryException("Error in getting standard variable summaries from standard_variable_summary view", e);
         }
-
-        return null;
     }
 }
