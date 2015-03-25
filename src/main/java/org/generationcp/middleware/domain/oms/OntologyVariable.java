@@ -56,6 +56,30 @@ public class OntologyVariable {
         this.term = term;
     }
 
+    public int getId() {
+        return term.getId();
+    }
+
+    public void setId(int id) {
+        term.setId(id);
+    }
+
+    public String getName() {
+        return term.getName();
+    }
+
+    public void setName(String name) {
+        term.setName(name);
+    }
+
+    public String getDefinition() {
+        return term.getDefinition();
+    }
+
+    public void setDefinition(String definition) {
+        term.setDefinition(definition);
+    }
+
     public String getAlias() {
         return alias;
     }
