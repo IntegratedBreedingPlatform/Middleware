@@ -47,32 +47,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         Map<Integer, OntologyVariableSummary> map = new HashMap<>();
 
         try {
-            SQLQuery query = getActiveSession().createSQLQuery("SELECT cvt.cvterm_id AS id," +
-                    "        cvt.name AS name," +
-                    "        cvt.definition AS description," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1200), cvtr.object_id, NULL) SEPARATOR ',') AS property_id," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1200), prop.name, NULL) SEPARATOR ',') AS property_name," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1200), prop.definition, NULL) SEPARATOR ',') AS property_description," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1210), cvtr.object_id, NULL) SEPARATOR ',') AS method_id," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1210), method.name, NULL) SEPARATOR ',') AS method_name," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1210), method.definition, NULL) SEPARATOR ',') AS method_description," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1220), cvtr.object_id, NULL) SEPARATOR ',') AS scale_id," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1220), scale.name, NULL) SEPARATOR ',') AS scale_name," +
-                    "        GROUP_CONCAT(IF((cvtr.type_id = 1220), scale.definition, NULL) SEPARATOR ',') AS scale_description" +
-                    "    FROM ((((cvterm cvt" +
-                    "        LEFT JOIN cvterm_relationship cvtr ON ((cvtr.subject_id = cvt.cvterm_id)))" +
-                    "        LEFT JOIN cvterm prop ON ((prop.cvterm_id = cvtr.object_id)))" +
-                    "        LEFT JOIN cvterm method ON ((method.cvterm_id = cvtr.object_id)))" +
-                    "        LEFT JOIN cvterm scale ON ((scale.cvterm_id = cvtr.object_id)))" +
-                    "    WHERE (cvt.cv_id = 1040)" +
-                    "    GROUP BY cvt.cvterm_id , cvt.name" +
-                    "    ORDER BY id")
-                    .addScalar("id").addScalar("name").addScalar("description")
-                    .addScalar("property_id").addScalar("property_name").addScalar("property_description")
-                    .addScalar("method_id").addScalar("method_name").addScalar("method_description")
-                    .addScalar("scale_id").addScalar("scale_id").addScalar("scale_id");
+            SQLQuery query = getActiveSession().createSQLQuery("select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd from cvterm v " +
+                    "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id " +
+                    "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id " +
+                    "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id " +
+                    "    WHERE (v.cv_id = 1040) ORDER BY v.cvterm_id")
+                    .addScalar("vid").addScalar("vn").addScalar("vd")
+                    .addScalar("pid").addScalar("pn").addScalar("pd")
+                    .addScalar("mid").addScalar("mn").addScalar("md")
+                    .addScalar("sid").addScalar("sn").addScalar("sd");
 
-            List queryResults = query.addScalar("id").list();
+            List queryResults = query.list();
             for(Object row : queryResults) {
                 Object[] items = (Object[]) row;
                 OntologyVariableSummary variable = new OntologyVariableSummary(typeSafeObjectToInteger(items[0]), (String)items[1], (String) items[2]);
