@@ -206,6 +206,13 @@ public interface OntologyManagerService {
     List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException;
 
     /**
+     * Return All Variables
+     * * @return List<OntologyVariableSummary>
+     * @throws MiddlewareQueryException*
+     */
+    List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
+
+    /**
      * Return variable by Id
      * * @return OntologyVariable
      * @throws MiddlewareQueryException*
