@@ -3,7 +3,6 @@ package org.generationcp.middleware.manager.ontology;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
@@ -194,12 +193,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+
 
     }
 
     @Override
-    public void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
 
     }
 

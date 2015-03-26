@@ -9,19 +9,17 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 
 import java.util.List;
 
-//NOTE: @SuppressWarnings("unused") has been used because this service expose to BMSAPI
-@SuppressWarnings("unused")
 public class OntologyManagerServiceImpl extends Service implements OntologyManagerService {
 
     public OntologyManagerServiceImpl(HibernateSessionProvider sessionProvider) {
@@ -144,12 +142,12 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     }
 
     @Override
-    public void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
         getOntologyVariableDataManager().addVariable(variableInfo);
     }
 
     @Override
-    public void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
         getOntologyVariableDataManager().updateVariable(variableInfo);
     }
 

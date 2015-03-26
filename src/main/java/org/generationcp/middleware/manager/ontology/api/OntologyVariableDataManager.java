@@ -13,10 +13,10 @@
 package org.generationcp.middleware.manager.ontology.api;
 
 import org.generationcp.middleware.domain.oms.OntologyVariable;
+import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.helper.VariableInfo;
 
 import java.util.List;
 
@@ -44,13 +44,13 @@ public interface OntologyVariableDataManager {
      * @throws MiddlewareQueryException*
      * * @throws MiddlewareException*
      */
-    void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+    void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * @throws MiddlewareQueryException*
      * * @throws MiddlewareException*
      */
-    void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+    void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * @throws MiddlewareQueryException*

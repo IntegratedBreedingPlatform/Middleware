@@ -15,7 +15,6 @@ package org.generationcp.middleware.service.api;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.helper.VariableInfo;
 
 import java.util.List;
 
@@ -24,14 +23,13 @@ import java.util.List;
  * This is the API for Ontology Browser requirements.
  * 
  */
-@SuppressWarnings("unused")
 public interface OntologyManagerService {
 
     /*======================= Classes ================================== */
     /**
      * Return All Trait Classes
      * * @return
-     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException*
+     * @throws MiddlewareQueryException*
      */
     List<Term> getAllTraitClass() throws MiddlewareQueryException;
 
@@ -54,7 +52,7 @@ public interface OntologyManagerService {
     /**
      * Return All Trait Classes
      * * @return
-     * @throws org.generationcp.middleware.exceptions.MiddlewareQueryException*
+     * @throws MiddlewareQueryException*
      */
     Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException;
 
@@ -218,13 +216,13 @@ public interface OntologyManagerService {
      * @throws MiddlewareQueryException*
      * * @throws MiddlewareException*
      */
-    void addVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+    void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * @throws MiddlewareQueryException*
      * * @throws MiddlewareException*
      */
-    void updateVariable(VariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+    void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * @throws MiddlewareQueryException*
