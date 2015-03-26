@@ -12,18 +12,23 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
-
-import java.io.Serializable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StudyDetails implements Serializable{
     
 	private static final long serialVersionUID = 1L;
+	private static final Logger LOG = LoggerFactory.getLogger(StudyDetails.class);
 
 	private Integer id;
+	
+	private String programUUID;
 	
 	private String studyName;
 	
@@ -56,7 +61,8 @@ public class StudyDetails implements Serializable{
     //row count in both trial dataset and measurement dataset
     private Integer rowCount;
     
-    private String label;//used to display "Add to New Study"
+    //used to display "Add to New Study"
+    private String label;
 
 	public StudyDetails(){
 		
@@ -154,6 +160,7 @@ public class StudyDetails implements Serializable{
 	    	try {
 	    		return startDate.substring(0,4);
 	    	} catch(Exception e) {
+	    		LOG.error(e.getMessage(),e);
 	    		return null;
 	    	}
 	    }
@@ -282,6 +289,14 @@ public class StudyDetails implements Serializable{
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	public boolean hasRows() {
