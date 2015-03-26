@@ -33,6 +33,14 @@ public interface OntologyVariableDataManager {
      */
     List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException;
 
+    //TODO: Add filter for favorite based on program uuid
+    /**
+     * Return All Variables
+     * * @return List<OntologyVariableSummary>
+     * @throws MiddlewareQueryException*
+     */
+    List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
+
     /**
      * Return variable by Id
      * * @return OntologyVariable

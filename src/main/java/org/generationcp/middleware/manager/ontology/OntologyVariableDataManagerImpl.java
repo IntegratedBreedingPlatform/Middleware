@@ -43,6 +43,25 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
     @Override
     public List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException {
+        return getVariableMethodPropertyScale(null, null, null);
+    }
+
+    @Override
+    public List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
+
+        String filterClause = "";
+
+        if(!Objects.equals(methodId, null)) {
+            filterClause += " and vmr.mid = :methodId ";
+        }
+
+        if(!Objects.equals(propertyId, null)) {
+            filterClause += " and vpr.pid = :propertyId ";
+        }
+
+        if(!Objects.equals(scaleId, null)) {
+            filterClause += " and vsr.sid = :scaleId ";
+        }
 
         Map<Integer, OntologyVariableSummary> map = new HashMap<>();
 
@@ -51,13 +70,26 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id " +
                     "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id " +
                     "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id " +
-                    "    WHERE (v.cv_id = 1040) ORDER BY v.cvterm_id")
+                    "    WHERE (v.cv_id = 1040) " + filterClause + " ORDER BY v.cvterm_id")
                     .addScalar("vid").addScalar("vn").addScalar("vd")
                     .addScalar("pid").addScalar("pn").addScalar("pd")
                     .addScalar("mid").addScalar("mn").addScalar("md")
                     .addScalar("sid").addScalar("sn").addScalar("sd");
 
+            if(!Objects.equals(methodId, null)) {
+                query.setParameter("methodId", methodId);
+            }
+
+            if(!Objects.equals(propertyId, null)) {
+                query.setParameter("propertyId", propertyId);
+            }
+
+            if(!Objects.equals(scaleId, null)) {
+                query.setParameter("scaleId", scaleId);
+            }
+
             List queryResults = query.list();
+
             for(Object row : queryResults) {
                 Object[] items = (Object[]) row;
                 OntologyVariableSummary variable = new OntologyVariableSummary(typeSafeObjectToInteger(items[0]), (String)items[1], (String) items[2]);
