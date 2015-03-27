@@ -1,6 +1,5 @@
 package org.generationcp.middleware.domain.oms;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,6 +9,7 @@ import java.util.Set;
  */
 public class OntologyVariableInfo {
 
+    private Integer programId;
     private Integer id;
     private String name;
     private String description;
@@ -21,6 +21,14 @@ public class OntologyVariableInfo {
     private String minValue;
     private String maxValue;
     private Boolean isFavorite;
+
+    public Integer getProgramId() {
+        return programId;
+    }
+
+    public void setProgramId(Integer programId) {
+        this.programId = programId;
+    }
 
     public Integer getId() {
         return id;
