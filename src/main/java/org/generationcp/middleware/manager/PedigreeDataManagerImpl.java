@@ -22,7 +22,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
-
+import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 /**
  * Implementation of the PedigreeDataManager interface. To instantiate this
@@ -32,7 +32,9 @@ import org.generationcp.middleware.pojos.Method;
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
     private GermplasmDataManagerImpl germplasmDataManager;
-    
+    private final static ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
+    private final static ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
+
     public PedigreeDataManagerImpl() {
     }
 
@@ -47,12 +49,32 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
 
     @Override
+    public Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException,MaxPedigreeLevelReachedException {
+        return countPedigreeLevel(gid, includeDerivativeLine, false);
+    }
+
+    @Override
+    public Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine, boolean calculateFullPedigree)
+            throws MiddlewareQueryException,MaxPedigreeLevelReachedException {
+        try {
+            PEDIGREE_COUNTER.set(1);
+            CALCULATE_FULL.set(calculateFullPedigree);
+            return getPedigreeLevelCount(gid, includeDerivativeLine);
+        } finally {
+            PEDIGREE_COUNTER.remove();
+            CALCULATE_FULL.remove();
+        }
+    }
+
     public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException {
     	Integer maxPedigreeLevel = 0;
-    	if(gid==null || gid==0) {
+
+        if(gid==null || gid==0) {
         	return maxPedigreeLevel;
         }
+
     	Germplasm germplasm = getGermplasmDao().getById(gid);
+
     	if(germplasm.getGnpgs()==-1) {
     		if(!includeDerivativeLine) {
     			maxPedigreeLevel = getMaxPedigreeLevelFromParent(gid,1,includeDerivativeLine);
@@ -65,21 +87,43 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     			maxPedigreeLevel = getMaxPedigreeLevelFromProgenitor(gid,germplasm.getGnpgs(),includeDerivativeLine,maxPedigreeLevel);
     		}
     	}
+
     	return maxPedigreeLevel + 1;
     }
     
     private Integer getMaxPedigreeLevelFromProgenitor(
     		Integer gid, Integer gnpgs, boolean includeDerivativeLine, Integer maxPedigreeLevel) 
     		throws MiddlewareQueryException {
-    	Germplasm parentGermplasm = getParentByGIDAndProgenitorNumber(gid,gnpgs);
+    	Germplasm parentGermplasm = getParentByGIDAndProgenitorNumber(gid, gnpgs);
+
 		if(parentGermplasm!=null) {
+            incrementPedigreeLevelCounter();
 			Integer numOfPedigree = getPedigreeLevelCount(parentGermplasm.getGid(),includeDerivativeLine);
 			if(numOfPedigree>maxPedigreeLevel) {
 				return numOfPedigree;
 			}
 		}
+
 		return maxPedigreeLevel;
 	}
+
+    protected void incrementPedigreeLevelCounter() {
+        int currentCount = getCurrentCounterCount();
+        boolean calculateFull = getCalculateFullFlagValue();
+        if ((currentCount + 1) > MAX_PEDIGREE_LEVEL && !calculateFull) {
+            throw MaxPedigreeLevelReachedException.getInstance();
+        } else {
+            PEDIGREE_COUNTER.set(currentCount + 1);
+        }
+    }
+
+    protected int getCurrentCounterCount() {
+        return PEDIGREE_COUNTER.get();
+    }
+
+    protected boolean getCalculateFullFlagValue() {
+        return CALCULATE_FULL.get();
+    }
 
 	private Integer getMaxPedigreeLevelFromParent(
     		Integer gid, Integer parentNo, boolean includeDerivativeLine) throws MiddlewareQueryException {
@@ -87,6 +131,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     	if(!includeDerivativeLine && parentId!=null) {
     		return getMaxPedigreeLevelFromBothParents(parentId,includeDerivativeLine);
     	} else if(parentId!=null){
+            incrementPedigreeLevelCounter();
     		return getPedigreeLevelCount(parentId,includeDerivativeLine);
     	}
 		return 0;
@@ -94,11 +139,16 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     
     private Integer getMaxPedigreeLevelFromBothParents(
     		Integer gid, boolean includeDerivativeLine) throws MiddlewareQueryException {
+        int currentPedigreeCount = PEDIGREE_COUNTER.get();
+
     	Integer numOfPedigreeFromParent1 = getPedigreeLevel(gid,1,includeDerivativeLine);
+        PEDIGREE_COUNTER.set(currentPedigreeCount);
 		Integer numOfPedigreeFromParent2 = getPedigreeLevel(gid,2,includeDerivativeLine);
+
 		if(numOfPedigreeFromParent2>numOfPedigreeFromParent1) {
 			return numOfPedigreeFromParent2;
 		}
+
 		return numOfPedigreeFromParent1;
 	}
 
@@ -106,6 +156,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 			throws MiddlewareQueryException {
 		Integer parentId = getGermplasmProgenitorID(gid,parentNo);
 		if(parentId!=null) {
+            incrementPedigreeLevelCounter();
 			return getPedigreeLevelCount(parentId,includeDerivativeLine);
 		}
 		return 0;
@@ -116,7 +167,9 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		if(gid==null) {
 			return null;
 		}
+
 		Germplasm germplasm = getParentByGIDAndProgenitorNumber(gid,proNo);
+
 		if(germplasm!=null) {
 			return germplasm.getGid();
 		}
@@ -495,7 +548,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * Recursive function to get the list of all ancestor germplasm with DER method
      * type and the given the locationID
      * 
-     * @param germplasms
+     * @param germplasmsParam
      * @param currentGermplasm
      * @param locationID
      * @return the given Germplasm list with its parents added to it
@@ -550,7 +603,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 
     private GermplasmDataManagerImpl getGermplasmDataManager(){
-	return this.germplasmDataManager;
+	    return this.germplasmDataManager;
     }
     
     public void setGermplasmDataManager(
