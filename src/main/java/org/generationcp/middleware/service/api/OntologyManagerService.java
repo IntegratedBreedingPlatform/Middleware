@@ -203,21 +203,21 @@ public interface OntologyManagerService {
      * * @return List<OntologyVariableSummary>
      * @throws MiddlewareQueryException*
      */
-    List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException;
+    List<OntologyVariableSummary> getAllVariables(Integer programId) throws MiddlewareQueryException;
 
     /**
      * Return All Variables
      * * @return List<OntologyVariableSummary>
      * @throws MiddlewareQueryException*
      */
-    List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
+    List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer programId, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
 
     /**
      * Return variable by Id
      * * @return OntologyVariable
      * @throws MiddlewareQueryException*
      */
-    OntologyVariable getVariable(Integer id) throws MiddlewareQueryException, MiddlewareException;
+    OntologyVariable getVariable(Integer programId, Integer id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * @throws MiddlewareQueryException*

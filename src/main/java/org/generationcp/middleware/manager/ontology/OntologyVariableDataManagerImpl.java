@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -23,6 +24,7 @@ import java.util.*;
 
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
+    private static final String PROGRAM_DOES_NOT_EXIST = "Program does not exist";
     private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
     private static final String TERM_IS_NOT_VARIABLE = "Term is not Variable";
     private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
@@ -44,12 +46,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 
     @Override
-    public List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException {
-        return getVariableMethodPropertyScale(null, null, null);
+    public List<OntologyVariableSummary> getAllVariables(Integer programId) throws MiddlewareQueryException {
+        return getVariableMethodPropertyScale(programId, null, null, null);
     }
 
     @Override
-    public List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
+    public List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer programId, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
 
         String filterClause = "";
 
@@ -68,15 +70,19 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         Map<Integer, OntologyVariableSummary> map = new HashMap<>();
 
         try {
-            SQLQuery query = getActiveSession().createSQLQuery("select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd from cvterm v " +
+            SQLQuery query = getActiveSession().createSQLQuery("select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, pf.id fid from cvterm v " +
                     "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id " +
                     "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id " +
                     "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id " +
+                    "left join (select pf.id, pf.entity_id from program_favorites pf inner join project p on p.program_uuid = pf.program_uuid and p.project_id = :programId and pf.entity_type = 'VARIABLES') pf on pf.entity_id = v.cvterm_id " +
                     "    WHERE (v.cv_id = 1040) " + filterClause + " ORDER BY v.cvterm_id")
                     .addScalar("vid").addScalar("vn").addScalar("vd")
                     .addScalar("pid").addScalar("pn").addScalar("pd")
                     .addScalar("mid").addScalar("mn").addScalar("md")
-                    .addScalar("sid").addScalar("sn").addScalar("sd");
+                    .addScalar("sid").addScalar("sn").addScalar("sd")
+                    .addScalar("fid");
+
+            query.setParameter("programId", programId);
 
             if(!Objects.equals(methodId, null)) {
                 query.setParameter("methodId", methodId);
@@ -98,6 +104,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 variable.setPropertySummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
                 variable.setMethodSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
                 variable.setScaleSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
+                variable.setIsFavorite(items[12] != null);
                 map.put(variable.getId(), variable);
             }
 
@@ -125,19 +132,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 }
             }
 
-            //Get favorite from ProgramFavoriteDAO
-            List<ProgramFavorite> favorites = getProgramFavoriteDao().getProgramFavorites(ProgramFavorite.FavoriteType.VARIABLE);
-
-            for(ProgramFavorite f : favorites) {
-                OntologyVariableSummary variableSummary = map.get(f.getEntityId());
-
-                if(variableSummary == null){
-                    continue;
-                }
-
-                variableSummary.setIsFavorite(true);
-            }
-
         } catch(HibernateException e) {
             throw new MiddlewareQueryException("Error in getVariables", e);
         }
@@ -146,9 +140,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public OntologyVariable getVariable(Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public OntologyVariable getVariable(Integer programId, Integer id) throws MiddlewareQueryException, MiddlewareException {
 
         try {
+
+            DmsProject project = getDmsProjectDao().getById(programId);
+
+            if(project == null) {
+                throw new MiddlewareException(PROGRAM_DOES_NOT_EXIST);
+            }
 
             //Fetch full scale from db
             CVTerm term = getCvTermDao().getById(id);
@@ -197,7 +197,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 }
 
                 //Get favorite from ProgramFavoriteDAO
-                variable.setIsFavorite(getProgramFavoriteDao().isEntityFavorite(ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId()));
+                ProgramFavorite programFavorite = getProgramFavoriteDao().getProgramFavorite(project.getProgramUUID(), ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+                variable.setIsFavorite(programFavorite != null);
 
                 //TODO: Need to figure out observations which seems to be costly operation.
                 return variable;

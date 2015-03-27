@@ -132,18 +132,18 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     }
 
     @Override
-    public List<OntologyVariableSummary> getAllVariables() throws MiddlewareQueryException {
-        return getOntologyVariableDataManager().getAllVariables();
+    public List<OntologyVariableSummary> getAllVariables(Integer programId) throws MiddlewareQueryException {
+        return getOntologyVariableDataManager().getAllVariables(programId);
     }
 
     @Override
-    public List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
-        return getOntologyVariableDataManager().getVariableMethodPropertyScale(methodId, propertyId, scaleId);
+    public List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer programId, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
+        return getOntologyVariableDataManager().getVariableMethodPropertyScale(programId, methodId, propertyId, scaleId);
     }
 
     @Override
-    public OntologyVariable getVariable(Integer id) throws MiddlewareQueryException, MiddlewareException {
-        return getOntologyVariableDataManager().getVariable(id);
+    public OntologyVariable getVariable(Integer programId, Integer id) throws MiddlewareQueryException, MiddlewareException {
+        return getOntologyVariableDataManager().getVariable(programId, id);
     }
 
     @Override

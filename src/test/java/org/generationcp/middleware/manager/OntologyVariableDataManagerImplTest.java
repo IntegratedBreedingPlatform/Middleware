@@ -29,6 +29,7 @@ import org.junit.Assert;
 public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyVariableDataManager manager;
+    private static final Integer ProjectId = 1;
 
 	@Before
 	public void setUp() throws Exception {
@@ -37,21 +38,22 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
 
     @Test
     public void testGetAllVariables() throws Exception {
-        List<OntologyVariableSummary> variables = manager.getAllVariables();
+        List<OntologyVariableSummary> variables = manager.getAllVariables(ProjectId);
         Assert.assertTrue(variables.size() > 0);
         Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
     }
 
     @Test
     public void testGetVariablesByProperty() throws Exception {
-        List<OntologyVariableSummary> variables = manager.getVariableMethodPropertyScale(null, 2010, null);
+        List<OntologyVariableSummary> variables = manager.getVariableMethodPropertyScale(ProjectId, null, 2010, null);
         Assert.assertTrue(variables.size() < 10);
         Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
     }
 
     @Test
     public void testGetVariable() throws Exception {
-        OntologyVariable variable = manager.getVariable(60042);
+        OntologyVariable variable = manager.getVariable(ProjectId, 60042);
+        Assert.assertNotNull(variable);
     }
 
     @After
