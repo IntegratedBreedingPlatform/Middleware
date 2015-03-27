@@ -54,7 +54,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("uniqueID", programUUID));
 			criteria.add(Restrictions.eq("entityType", type.getName()));
-			criteria.add(Restrictions.eq("entity_id", entityId));
+			criteria.add(Restrictions.eq("entityId", entityId));
 
 			List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();
 			return result.size() > 0 ? result.get(0) : null;
