@@ -203,13 +203,6 @@ public interface OntologyManagerService {
      * * @return List<OntologyVariableSummary>
      * @throws MiddlewareQueryException*
      */
-    List<OntologyVariableSummary> getAllVariables(Integer programId) throws MiddlewareQueryException;
-
-    /**
-     * Return All Variables
-     * * @return List<OntologyVariableSummary>
-     * @throws MiddlewareQueryException*
-     */
     List<OntologyVariableSummary> getWithFilter(Integer programId, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
 
     /**

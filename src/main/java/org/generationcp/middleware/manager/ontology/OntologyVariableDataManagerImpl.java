@@ -46,11 +46,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 
     @Override
-    public List<OntologyVariableSummary> getAllVariables(Integer programId) throws MiddlewareQueryException {
-        return getWithFilter(programId, null, null, null, null);
-    }
-
-    @Override
     public List<OntologyVariableSummary> getWithFilter(Integer programId, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
 
         String filterClause = "";
