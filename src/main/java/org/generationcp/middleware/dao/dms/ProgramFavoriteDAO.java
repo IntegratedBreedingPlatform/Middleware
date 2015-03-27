@@ -19,9 +19,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
 /**
@@ -31,9 +28,6 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     
-    private static final Logger LOG = LoggerFactory.getLogger(ProgramFavoriteDAO.class);
-    
-    
     public List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String programUUID) throws MiddlewareQueryException{
     	
     	try{
@@ -42,8 +36,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     		criteria.add(Restrictions.eq("entityType", type.getName()));
     		criteria.add(Restrictions.eq("uniqueID", programUUID));
 
-    		List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();
-    		return result;
+			return (List<ProgramFavorite>) criteria.list();
     		
     	} catch (HibernateException e) {
             logAndThrowException(
@@ -53,6 +46,23 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     	return null;
     	
     }
+
+	public ProgramFavorite getProgramFavorite(String programUUID, ProgramFavorite.FavoriteType type, Integer entityId) throws MiddlewareQueryException{
+
+		try{
+
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("uniqueID", programUUID));
+			criteria.add(Restrictions.eq("entityType", type.getName()));
+			criteria.add(Restrictions.eq("entity_id", entityId));
+
+			List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();
+			return result.size() > 0 ? result.get(0) : null;
+
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.getName() + ") in ProgramFavoriteDao: " + e.getMessage(), e);
+		}
+	}
     
     public int countProgramFavorites(ProgramFavorite.FavoriteType type) throws MiddlewareQueryException{
     	
@@ -62,8 +72,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     		criteria.add(Restrictions.eq("entityType", type.getName()));
     		criteria.setProjection(Projections.rowCount());
 
-    		Integer result = (Integer) criteria.uniqueResult();
-    		return result.intValue();
+			return (Integer) criteria.uniqueResult();
     		
     	} catch (HibernateException e) {
             logAndThrowException(
@@ -74,34 +83,6 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     	
     }
 
-    public List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type) throws MiddlewareQueryException{
-        try{
-
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("entityType", type.getName()));
-
-            List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();
-            return result;
-
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.getName() + ") in ProgramFavoriteDao: " + e.getMessage(), e);
-        }
-    }
-
-	public boolean isEntityFavorite(ProgramFavorite.FavoriteType type, Integer entityId) throws MiddlewareQueryException{
-		try{
-
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.eq("entityType", type.getName()));
-			criteria.add(Restrictions.eq("entityId", entityId));
-
-			return criteria.list().size() > 0;
-
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.getName() + ") in ProgramFavoriteDao: " + e.getMessage(), e);
-		}
-	}
-
 	public List<ProgramFavorite> getProgramFavorites(FavoriteType type, int max, String programUUID) throws MiddlewareQueryException{
 		try{
     		
@@ -110,15 +91,11 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
     		criteria.add(Restrictions.eq("uniqueID", programUUID));
     		criteria.setMaxResults(max);
 
-    		List<ProgramFavorite> result = (List<ProgramFavorite>) criteria.list();
-    		return result;
+			return (List<ProgramFavorite>) criteria.list();
     		
     	} catch (HibernateException e) {
-            logAndThrowException(
-                    "Error in getProgramFavorites(" + type.getName() + "," + max + ") in ProgramFavoriteDao: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.getName() + "," + max + ") in ProgramFavoriteDao: " + e.getMessage(), e);
 		}
-    	
-    	return null;
 	}
      
 	
