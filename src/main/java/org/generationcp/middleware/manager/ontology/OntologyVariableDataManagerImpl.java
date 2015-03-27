@@ -47,11 +47,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
     @Override
     public List<OntologyVariableSummary> getAllVariables(Integer programId) throws MiddlewareQueryException {
-        return getVariableMethodPropertyScale(programId, null, null, null);
+        return getWithFilter(programId, null, null, null, null);
     }
 
     @Override
-    public List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer programId, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
+    public List<OntologyVariableSummary> getWithFilter(Integer programId, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
 
         String filterClause = "";
 
@@ -65,6 +65,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
         if(!Objects.equals(scaleId, null)) {
             filterClause += " and vsr.sid = :scaleId ";
+        }
+
+        if(!Objects.equals(favorites, null)){
+            if(favorites){
+                filterClause += "  and pf.id is not null ";
+            } else {
+                filterClause += "  and pf.id is null ";
+            }
         }
 
         Map<Integer, OntologyVariableSummary> map = new HashMap<>();

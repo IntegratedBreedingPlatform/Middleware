@@ -210,7 +210,7 @@ public interface OntologyManagerService {
      * * @return List<OntologyVariableSummary>
      * @throws MiddlewareQueryException*
      */
-    List<OntologyVariableSummary> getVariableMethodPropertyScale(Integer programId, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
+    List<OntologyVariableSummary> getWithFilter(Integer programId, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
 
     /**
      * Return variable by Id

@@ -45,7 +45,7 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
 
     @Test
     public void testGetVariablesByProperty() throws Exception {
-        List<OntologyVariableSummary> variables = manager.getVariableMethodPropertyScale(ProjectId, null, 2010, null);
+        List<OntologyVariableSummary> variables = manager.getWithFilter(ProjectId, null, null, 2010, null);
         Assert.assertTrue(variables.size() < 10);
         Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
     }
