@@ -16,6 +16,8 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.*;
 
@@ -212,7 +214,27 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     @Override
     public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
 
+        CVTerm term = getCvTermDao().getByNameAndCvId(variableInfo.getName(), CvId.VARIABLES.getId());
 
+        if (term != null) {
+            throw new MiddlewareException(VARIABLE_EXIST_WITH_SAME_NAME);
+        }
+
+        Session session = getActiveSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+            //Saving term to database.
+            CVTerm savedTerm = getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
+            variableInfo.setId(savedTerm.getCvTermId());
+
+            transaction.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(transaction);
+            throw new MiddlewareQueryException("Error at addScale :" + e.getMessage(), e);
+        }
     }
 
     @Override
