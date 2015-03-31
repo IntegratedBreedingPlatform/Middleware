@@ -130,7 +130,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     variableSummary.setMaxValue(property.getValue());
                 } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
                     variableSummary.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-                } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATION_DATE.getId())){
+                } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
                     variableSummary.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
                 }
             }
@@ -194,7 +194,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                         variable.setMaxValue(property.getValue());
                     } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
                         variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-                    } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATION_DATE.getId())){
+                    } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
                         variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
                     }
                 }
