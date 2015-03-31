@@ -21,7 +21,7 @@ public class WTags22 extends WTags04 {
 	}
 
 	@Override
-	protected String buildRecord(List<String> row, List<String> headers){
+	protected String buildRecord(List<String> row, List<String> headers, int rowSpan, int rowSize){
 		String study
 		,occ
 		,subProg
@@ -63,10 +63,10 @@ public class WTags22 extends WTags04 {
 		
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(StringUtil.stringOf(" ", 40))
+		sb.append(StringUtil.stringOf(" ", rowSpan))
 		  .append(StringUtil.format(study, 30, true)).append(" OCC: ")
 		  .append(StringUtil.format(occ, 4, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
 		  .append(StringUtil.format(subProg, 3, true)).append(" ")
 		  .append(StringUtil.format(type, 5, true)).append(" ")
 		  .append(StringUtil.format(season, 6, true))
@@ -74,16 +74,16 @@ public class WTags22 extends WTags04 {
 		  .append(StringUtil.format(entry, 6, false)).append(" ")
 		  .append(StringUtil.format("PLOT", 5, true))
 		  .append(StringUtil.format(plot, 6, false))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 25))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan-15))
 		  .append(StringUtil.format("CIMMYT", 6, false))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
-		  .append(StringUtil.format(pedigreeA, 40, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
-		  .append(StringUtil.format(pedigreeB, 40, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+		  .append(StringUtil.format(pedigreeA, rowSize, true))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+		  .append(StringUtil.format(pedigreeB, rowSize, true))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
 		  .append(StringUtil.format("", 4, true))
 		  .append(StringUtil.format(selHistA, 36, true))
-		  .append("\r\n").append(StringUtil.stringOf(" ", 40))
+		  .append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
 		  .append(StringUtil.format("", 4, true))
 		  .append(StringUtil.format(selHistB, 36, true)).append("\r\n\r\n");
 		return sb.toString();
