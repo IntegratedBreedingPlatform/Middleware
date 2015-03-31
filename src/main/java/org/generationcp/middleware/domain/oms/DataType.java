@@ -7,16 +7,16 @@ import java.util.Map;
 
 public enum DataType {
 
-    NUMERIC_VARIABLE(1110, "Numeric Variable")
-    , DATE_TIME_VARIABLE(1117, "Date Time Variable")
-    , CHARACTER_VARIABLE(1120, "Character Variable")
-    , CATEGORICAL_VARIABLE(1130, "Categorical Variable");
+
+    CATEGORICAL_VARIABLE(1048, "Categorical")
+    , NUMERIC_VARIABLE(1110, "Numeric")
+    , DATE_TIME_VARIABLE(1117, "Date")
+    , CHARACTER_VARIABLE(1120, "Character");
 
     private Integer id;
     private String name;
 
-
-    private DataType(Integer id, String name) {
+    DataType(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

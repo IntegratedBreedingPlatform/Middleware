@@ -44,16 +44,6 @@ public class OntologyBasicDataManagerImplTest extends DataManagerIntegrationTest
     }
 
     @Test
-    public void testGetAllScaleDataTypes() throws Exception {
-
-        List<Term> dataTypes = manager.getDataTypes();
-        Assert.assertTrue(dataTypes.size() > 0);
-        for(Term d : dataTypes){
-            d.print(MiddlewareIntegrationTest.INDENT);
-        }
-    }
-
-    @Test
     public void testGetTermByNameAndCvId() throws Exception {
         Term term = manager.getTermByNameAndCvId("Project", CvId.PROPERTIES.getId());
         Assert.assertNotNull(term);

@@ -32,11 +32,6 @@ public interface OntologyBasicDataManager {
     List<Term> getAllTraitClass() throws MiddlewareQueryException;
 
     /**
-     * Returns all dataTypes used by Scale
-     */
-    List<Term> getDataTypes() throws MiddlewareQueryException;
-
-    /**
      * Returns term by id
      */
     Term getTermById(Integer termId) throws MiddlewareQueryException;
