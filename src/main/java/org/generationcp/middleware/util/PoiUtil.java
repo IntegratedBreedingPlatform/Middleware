@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -35,6 +34,8 @@ import java.util.List;
 public class PoiUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(PoiUtil.class);
+
+    public static final SimpleDateFormat EXCEL_DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
 
     // WorkBook convenience methods
     public static void setRepeatingRows(Workbook workBook, int sheetIndex, int fromRow, int toRow) {
@@ -87,8 +88,7 @@ public class PoiUtil {
 
                 if (DateUtil.isCellDateFormatted(cell)) {
                     Date date = cell.getDateCellValue();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                    return sdf.format(date);
+                    return EXCEL_DATE_FORMATTER.format(date);
                 }
 
                 double doubleVal = cell.getNumericCellValue();

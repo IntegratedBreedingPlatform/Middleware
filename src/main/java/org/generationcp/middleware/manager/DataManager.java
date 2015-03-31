@@ -152,6 +152,7 @@ public abstract class DataManager extends DatabaseBroker{
     //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
     // Logic changed to simply invoke the getMethod by reflection and not do any cursor positioning using count methods.
     // Ideally this method is removed entirely but is referenced in may places - something for later..
+    @Deprecated
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters,
             Class[] parameterTypes) throws MiddlewareQueryException {
@@ -204,6 +205,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @return the List result
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List getAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
@@ -358,6 +360,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
+    @Deprecated
     public long countAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         long count = 0;

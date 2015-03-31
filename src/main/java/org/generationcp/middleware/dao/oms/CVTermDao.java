@@ -1433,7 +1433,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		List<Scale> list = new ArrayList<>();
 		try {
 			StringBuilder sql = new StringBuilder()
-					.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname ")
+					.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname, prs.name as name, prs.definition as definition ")
 					.append(" FROM cvterm_relationship pr ")
 					.append(" INNER JOIN cvterm_relationship mr ON mr.subject_id = pr.subject_id ")
 					.append("    AND mr.type_id = ").append(TermId.HAS_METHOD.getId())
@@ -1441,6 +1441,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					.append(" INNER JOIN cvterm_relationship sr ON sr.subject_id = pr.subject_id ")
 					.append("    AND sr.type_id = ").append(TermId.HAS_SCALE.getId())
 					.append(" INNER JOIN cvterm s ON s.cvterm_id = sr.object_id ")
+					.append(" INNER JOIN cvterm prs ON prs.cvterm_id = pr.subject_id ")
 					.append(" WHERE pr.type_id = ").append(TermId.HAS_PROPERTY.getId())
 					.append("    AND pr.object_id = ")
 					.append(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
@@ -1448,15 +1449,17 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			SQLQuery query = getSession().createSQLQuery(sql.toString())
 					.addScalar("id")
 					.addScalar("scalename")
-					.addScalar("methodname");
+					.addScalar("methodname")
+					.addScalar("name")
+					.addScalar("definition");
 			List<Object[]> result = query.list();
 			if (result != null && !result.isEmpty()) {
 				for (Object[] row : result) {
 					String displayName = row[1] + " - " + row[2];
 
-					// TODO : consider adding a separate field 'displayName' to Term or Scale, to avoid de-sync of POJO values and that of DB.
-					// With this implementation, the name and description in the DB is ignored in favor of the display name format provided in the specs
-					list.add(new Scale(new Term((Integer) row[0], displayName, displayName)));
+					Scale scale = new Scale(new Term((Integer) row[0], row[3].toString(), row[4].toString()));
+					scale.setDisplayName(displayName);
+					list.add(scale);
 				}
 			}
 

@@ -113,7 +113,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			Query query = getSession().createSQLQuery(sql)
 								.setParameter("description", description);
 			List<Integer> ids = query.list();
-			if (ids.size() >= 1) {
+			if (!ids.isEmpty()) {
 				return getById(ids.get(0));
 			}
 						
@@ -417,7 +417,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	}
     
     @SuppressWarnings("unchecked")
-	public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
+	public Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(String projectName, 
+			String locationDescription, String programUUID) throws MiddlewareQueryException {
 		try {
 			String sql = "SELECT DISTINCT e.nd_geolocation_id"
 					+ " FROM nd_experiment e, nd_experiment_project ep, project p, nd_geolocation g, project_relationship pr "
@@ -428,10 +429,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					+ "   and pr.object_project_id = p.project_id "
 					+ "   and e.nd_geolocation_id = g.nd_geolocation_id "
 					+ "   and p.name = :projectName"  
+					+ "   and p.program_uuid = :programUUID"  
 					+ "   and g.description = :locationDescription";
 			Query query = getSession().createSQLQuery(sql);
 			query.setParameter("projectName", projectName);
 			query.setParameter("locationDescription", locationDescription);
+			query.setParameter("programUUID", programUUID);
 			List<Integer> list = (List<Integer>) query.list();
 			if(list!=null && !list.isEmpty()) {
 				return list.get(0);

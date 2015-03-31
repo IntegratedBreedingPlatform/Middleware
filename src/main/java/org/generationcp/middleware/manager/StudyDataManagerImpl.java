@@ -86,19 +86,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-    public Integer getStudyIdByName(String studyName) throws MiddlewareQueryException {
-        return getDmsProjectDao().getProjectIdByName(studyName, TermId.IS_STUDY);
+    public Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID) throws MiddlewareQueryException {
+        return getDmsProjectDao().getProjectIdByNameAndProgramUUID(studyName, programUUID, TermId.IS_STUDY);
     }
 
     @Override
-    public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
-        return getDmsProjectDao().checkIfProjectNameIsExisting(name);
+    public boolean checkIfProjectNameIsExistingInProgram(String name,String programUUID) throws MiddlewareQueryException {
+        return getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name,programUUID);
     }
 
-    @Override
-    public List<FolderReference> getRootFolders(Database instance, String programUUID) throws MiddlewareQueryException {
-        return getRootFolders(programUUID);
-    }
     @Override
     public List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException {
         return getDmsProjectDao().getRootFolders(programUUID);
@@ -466,25 +462,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return null;
     }
 
-
     @Override
-    public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) 
-            throws MiddlewareQueryException {
-        List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType);
-        populateSiteAndPersonIfNecessary(details);
-        return details;
-    }
-
-    @Override
-    public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException {
-        List<StudyNode> studyNodes = new ArrayList<StudyNode>();
-        studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.LOCAL));
-        return studyNodes;
-    }
-
-    @Override
-    public List<StudyNode> getNurseryAndTrialStudyNodes(Database instance) throws MiddlewareQueryException {
-        return getDmsProjectDao().getAllNurseryAndTrialStudyNodes();
+    public List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) throws MiddlewareQueryException {
+    	return getDmsProjectDao().getAllNurseryAndTrialStudyNodes(programUUID);
     }
 
     @Override
@@ -673,10 +653,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getProjectRelationshipDao().isSubjectTypeExisting(id, TermId.STUDY_HAS_FOLDER.getId());
     }
 
-    public boolean renameSubFolder(String newFolderName, int folderId) throws MiddlewareQueryException {
+    public boolean renameSubFolder(String newFolderName, int folderId, String programUUID) throws MiddlewareQueryException {
 
         // check for existing folder name
-        boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(newFolderName);
+        boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExistingInProgram
+        		(newFolderName,programUUID);
         if (isExisting) {
             throw new MiddlewareQueryException("Folder name is not unique");
         }
@@ -708,7 +689,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         if (parentProject == null) {
             throw new MiddlewareQueryException("DMS Project is not existing");
         }
-        boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        boolean isExisting = getDmsProjectDao().
+        		checkIfProjectNameIsExistingInProgram(name,programUUID);
         if (isExisting) {
             throw new MiddlewareQueryException("Folder name is not unique");
         }
@@ -812,31 +794,31 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
-        List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType, start, numOfRows);
+    public List<StudyDetails> getStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows) throws MiddlewareQueryException {
+        List<StudyDetails> details = getDmsProjectDao().getAllStudyDetails(studyType, programUUID, start, numOfRows);
         populateSiteAndPersonIfNecessary(details);
         return details;
     }
     
     @Override
-    public StudyDetails getStudyDetails(Database instance, StudyType studyType, int studyId) throws MiddlewareQueryException {
+    public StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException {
         StudyDetails studyDetails = getDmsProjectDao().getStudyDetails(studyType, studyId);
         populateSiteAnPersonIfNecessary(studyDetails);
         return studyDetails;
     }
 
     @Override
-    public List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException {
-        List<StudyDetails> list = getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start, numOfRows);
+    public List<StudyDetails> getNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows) throws MiddlewareQueryException {
+        List<StudyDetails> list = getDmsProjectDao().getAllNurseryAndTrialStudyDetails(programUUID, start, numOfRows);
         populateSiteAndPersonIfNecessary(list);
         return list;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
+    public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException {
         List<StudyDetails> list = new ArrayList<StudyDetails>();
-        List localList = getDmsProjectDao().getAllStudyDetails(studyType);
+        List localList = getDmsProjectDao().getAllStudyDetails(studyType,programUUID);
         if (localList != null) {
             list.addAll(localList);
         }
@@ -845,26 +827,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public long countAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
+    public long countAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException {
         long count = 0;
-        count += getDmsProjectDao().countAllStudyDetails(studyType);
+        count += getDmsProjectDao().countAllStudyDetails(studyType,programUUID);
         return count;
     }
 
     @Override
-    public long countStudyDetails(Database instance, StudyType studyType)
+    public long countStudyDetails(StudyType studyType, String programUUID)
             throws MiddlewareQueryException {
         long count = 0;
-        count += getDmsProjectDao().countAllStudyDetails(studyType);
+        count += getDmsProjectDao().countAllStudyDetails(studyType,programUUID);
         return count;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public List<StudyDetails> getAllNurseryAndTrialStudyDetails()
+    public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID)
             throws MiddlewareQueryException {
         List<StudyDetails> list = new ArrayList<StudyDetails>();
-        List localList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+        List localList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails(programUUID);
         if (localList != null) {
             list.addAll(localList);
         }
@@ -873,17 +855,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public long countAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
+    public long countAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException {
         long count = 0;
-        count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
-        return count;
-    }
-
-    @Override
-    public long countNurseryAndTrialStudyDetails(Database instance)
-            throws MiddlewareQueryException {
-        long count = 0;
-        count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
+        count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails(programUUID);
         return count;
     }
 
@@ -898,7 +872,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public String getGeolocationPropValue(Database instance, int stdVarId, int studyId) throws MiddlewareQueryException {
+    public String getGeolocationPropValue(int stdVarId, int studyId) throws MiddlewareQueryException {
         return getGeolocationPropertyDao().getGeolocationPropValue(stdVarId, studyId);
     }
     

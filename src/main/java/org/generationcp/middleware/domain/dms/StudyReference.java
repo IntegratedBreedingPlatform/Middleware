@@ -31,15 +31,17 @@ public class StudyReference extends Reference {
 	}
 
 	public StudyReference(Integer id, String name, String description) {
-		super.setId(id);
-		super.setName(name);
+		this(id,name);
 		super.setDescription(description);
 	}
 	
+	public StudyReference(Integer id, String name, String description, String programUUID) {
+		this(id,name,description);
+		super.setProgramUUID(programUUID);
+	}
+	
 	public StudyReference(Integer id, String name, String description, Integer numberOfEnvironments) {
-		super.setId(id);
-		super.setName(name);
-		super.setDescription(description);
+		this(id,name,description);
 		this.setNumberOfEnvironments(numberOfEnvironments);
 	}
 	

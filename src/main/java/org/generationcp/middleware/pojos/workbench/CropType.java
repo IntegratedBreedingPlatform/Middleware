@@ -73,16 +73,16 @@ public class CropType implements Serializable{
     public void setCropName(String cropName) {
         this.cropName = cropName;
     }
-  
+
     public String getDbName() {
 		return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
-	}
+    }
 
 	public void setDbName(String dbName) {
 		this.dbName = dbName;
-	}
+    }
 
-	@Override
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

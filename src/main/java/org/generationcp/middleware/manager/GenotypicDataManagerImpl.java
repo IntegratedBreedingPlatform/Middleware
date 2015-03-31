@@ -63,27 +63,27 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return new ArrayList<>();
         }
 
-        List<String> methods = Arrays.asList("countMapIDsByQTLName", "getMapIDsByQTLName");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, new Object[]{qtlName},
-                new Class[]{String.class});
+
+        return new ArrayList<>(getQtlDao().getMapIDsByQTLName(qtlName, start, numOfRows));
     }
 
     @Override
     public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException {
-        return super.countAllByMethod(getQtlDao(), "countMapIDsByQTLName", new Object[]{qtlName},
-                new Class[]{String.class});
+
+        return getQtlDao().countMapIDsByQTLName(qtlName);
+
     }
 
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getAccMetadataSetDao(), "getNameIdsByGermplasmIds",
-                new Object[]{gIds}, new Class[]{List.class});
+
+        return getAccMetadataSetDao().getNameIdsByGermplasmIds(gIds);
+
     }
 
     @Override
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException {
-        return (List<Name>) super.getAllByMethod(getNameDao(), "getNamesByNameIds", new Object[]{nIds},
-                new Class[]{List.class});
+        return getNameDao().getNamesByNameIds(nIds);
     }
 
     @Override
@@ -98,8 +98,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Map> getAllMaps(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        return (List<Map>) super.getFromInstanceByMethod(getMapDao(), instance, "getAll", new Object[]{start, numOfRows}, new Class[]{
-                Integer.TYPE, Integer.TYPE});
+
+        return getMapDao().getAll();
+
     }
 
     @Override
@@ -155,25 +156,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     //GCP-8572
     @Override
     public List<MarkerOnMap> getMarkerOnMaps(List<Integer> mapIds, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException {
-        return super.getAllByMethod(getMarkerOnMapDao(), "getMarkersOnMap",
-                new Object[]{mapIds, linkageGroup, startPos, endPos},
-                new Class[]{List.class, String.class, Double.TYPE, Double.TYPE});
+        return getMarkerOnMapDao().getMarkersOnMap(mapIds, linkageGroup, startPos, endPos);
     }
 
     //GCP-8571
     @Override
-    public List<MarkerOnMap> getMarkersOnMapByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getMarkerOnMapDao(), "getMarkersOnMapByMarkerIds",
-                new Object[]{markerIds}, new Class[]{List.class});
+    public List<MarkerOnMap> getMarkersOnMapByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
+        return getMarkerOnMapDao().getMarkersOnMapByMarkerIds(markerIds);
     }
 
     //GCP-8573
     @Override
     public List<String> getAllMarkerNamesFromMarkersOnMap() throws MiddlewareQueryException {
-        List<Integer> markerIds = super.getAllByMethod(getMarkerOnMapDao(), "getAllMarkerIds",
-                new Object[]{}, new Class[]{});
-        return super.getAllByMethod(getMarkerDao(), "getMarkerNamesByIds",
-                new Object[]{markerIds}, new Class[]{List.class});
+        List<Integer> markerIds = getMarkerOnMapDao().getAllMarkerIds();
+
+        return getMarkerDao().getMarkerNamesByIds(markerIds);
+
     }
 
     @Override
@@ -188,34 +186,29 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        return (List<String>) super.getFromInstanceByMethod(getDatasetDao(), instance, "getDatasetNames",
-                new Object[]{start, numOfRows}, new Class[]{Integer.TYPE, Integer.TYPE});
+        return getDatasetDao().getDatasetNames(start, numOfRows);
     }
 
     @Override
     public List<String> getDatasetNamesByQtlId(Integer qtlId, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countDatasetNamesByQtlId", "getDatasetNamesByQtlId");
-        return (List<String>) super.getFromCentralAndLocalByMethod(getDatasetDao(), methods, start, numOfRows,
-                new Object[]{qtlId}, new Class[]{Integer.class});
+        return getDatasetDao().getDatasetNamesByQtlId(qtlId, start, numOfRows);
     }
 
     @Override
     public long countDatasetNamesByQtlId(Integer qtlId) throws MiddlewareQueryException {
-        return super.countAllByMethod(getDatasetDao(), "countDatasetNamesByQtlId",
-                new Object[]{qtlId}, new Class[]{Integer.class});
+        return getDatasetDao().countDatasetNamesByQtlId(qtlId);
+
     }
 
     @Override
     public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException {
-        return (List<DatasetElement>) super.getFromInstanceByMethod(getDatasetDao(), instance, "getDetailsByName",
-                new Object[]{datasetName}, new Class[]{String.class});
+        return getDatasetDao().getDetailsByName(datasetName);
     }
 
     @Override
     public List<Marker> getMarkersByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
             throws MiddlewareQueryException {
-        return (List<Marker>) super.getFromInstanceByMethod(getMarkerDao(), instance, "getByNames",
-                new Object[]{markerNames, start, numOfRows}, new Class[]{List.class, Integer.TYPE, Integer.TYPE});
+        return getMarkerDao().getByNames(markerNames, start, numOfRows);
     }
 
     @Override
@@ -229,43 +222,37 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Marker> getMarkersByPositionAndLinkageGroup(double startPos, double endPos, String linkageGroup)
             throws MiddlewareQueryException {
-        List<Integer> markerIds = super.getAllByMethod(getMarkerOnMapDao(), "getMarkerIdsByPositionAndLinkageGroup"
-                , new Object[]{startPos, endPos, linkageGroup}, new Class[]{Double.TYPE, Double.TYPE, String.class});
-        return super.getAllByMethod(getMarkerDao(), "getMarkersByIds",
-                new Object[]{markerIds}, new Class[]{List.class});
-    }
 
+        List<Integer> markerIds = getMarkerOnMapDao().getMarkerIdsByPositionAndLinkageGroup(startPos, endPos, linkageGroup);
+        return getMarkerDao().getMarkersByIds(markerIds);
+    }
 
     @Override
     public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
             throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition",
-                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
+        return  getMarkerDao().countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos);
     }
 
     @Override
     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId",
-                new Object[]{datasetId}, new Class[]{Integer.class});
+        return getMarkerMetadataSetDao().getMarkerIdByDatasetId(datasetId);
+
     }
 
     @Override
     public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        return (List<ParentElement>) super.getFromInstanceByIdAndMethod(getMappingPopDao(), datasetId, "getParentsByDatasetId",
-                new Object[]{datasetId}, new Class[]{Integer.class});
+        return getMappingPopDao().getParentsByDatasetId(datasetId);
     }
 
     @Override
     public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        return (List<String>) super.getAllByMethod(getMarkerDao(), "getMarkerTypeByMarkerIds",
-                new Object[]{markerIds}, new Class[]{List.class});
+        return getMarkerDao().getMarkerTypeByMarkerIds(markerIds);
     }
 
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
 
-        List<MarkerNameElement> dataValues = (List<MarkerNameElement>) super.getAllByMethod(getMarkerDao(),
-                "getMarkerNamesByGIds", new Object[]{gIds}, new Class[]{List.class});
+        List<MarkerNameElement> dataValues = getMarkerDao().getMarkerNamesByGIds(gIds);
 
         // Remove duplicates
         Set<MarkerNameElement> set = new HashSet<>();
@@ -279,8 +266,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance)
             throws MiddlewareQueryException {
-        return (List<GermplasmMarkerElement>) super.getFromInstanceByMethod(getMarkerDao(), instance,
-                "getGermplasmNamesByMarkerNames", new Object[]{markerNames}, new Class[]{List.class});
+        return getMarkerDao().getGermplasmNamesByMarkerNames(markerNames);
     }
 
     @Override
@@ -288,17 +274,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                                                                           int numOfRows) throws MiddlewareQueryException {
         List<MappingValueElement> mappingValueElementList;
 
-        List<Marker> markers = super.getAllByMethod(getMarkerDao(), "getByNames", new Object[]{
-                markerNames, start, numOfRows}, new Class[]{List.class, Integer.TYPE, Integer.TYPE});
+        List<Marker> markers = getMarkerDao().getByNames(markerNames, start, numOfRows);
 
         List<Integer> markerIds = new ArrayList<>();
         for (Marker marker : markers) {
             markerIds.add(marker.getMarkerId());
         }
 
-        mappingValueElementList = super.getAllByMethod(getMappingPopDao(),
-                "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class,
-                        List.class});
+        mappingValueElementList = getMappingPopDao().getMappingValuesByGidAndMarkerIds(gids, markerIds);
 
         for (MappingValueElement element : mappingValueElementList) {
             if (element != null && element.getMarkerId() != null) {
@@ -325,8 +308,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         java.util.Map<Integer, String> markerIdName = getMarkerDao().getFirstMarkerIdByMarkerName(markerNames, Database.LOCAL);
         List<Integer> markerIds = new ArrayList<>(markerIdName.keySet());
 
-        allelicValues.addAll(super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL,
-                "getAllelicValuesByGidsAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class}));
+        allelicValues.addAll(getMarkerDao().getAllelicValuesByGidsAndMarkerIds(gids, markerIds));
 
         for (AllelicValueElement allelicValue : allelicValues) {
             allelicValue.setMarkerName(markerIdName.get(allelicValue.getMarkerId()));
@@ -338,69 +320,55 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return (List<AllelicValueWithMarkerIdElement>) super.getFromInstanceByIdAndMethod(getCharValuesDao(), datasetId,
-                "getAllelicValuesByDatasetId", new Object[]{datasetId, start, numOfRows},
-                new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+        return getCharValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
     }
 
     @Override
     public long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getCharValuesDao(), datasetId, "countByDatasetId",
-                new Object[]{datasetId}, new Class[]{Integer.class});
+        return getCharValuesDao().countByDatasetId(datasetId);
     }
 
     @Override
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return (List<AllelicValueWithMarkerIdElement>) super.getFromInstanceByIdAndMethod(getAlleleValuesDao(), datasetId,
-                "getAllelicValuesByDatasetId", new Object[]{datasetId, start, numOfRows},
-                new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+        return getAlleleValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
     }
 
     @Override
     public long countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getAlleleValuesDao(), datasetId, "countByDatasetId",
-                new Object[]{datasetId}, new Class[]{Integer.class});
+        return getAlleleValuesDao().countByDatasetId(datasetId);
     }
 
     @Override
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(
             Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return (List<AllelicValueWithMarkerIdElement>) super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(), datasetId,
-                "getAllelicValuesByDatasetId", new Object[]{datasetId, start, numOfRows},
-                new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+        return getMappingPopValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
     }
 
     @Override
     public long countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getMappingPopValuesDao(), datasetId, "countByDatasetId",
-                new Object[]{datasetId}, new Class[]{Integer.class});
+        return getMappingPopValuesDao().countByDatasetId(datasetId);
     }
 
     @Override
     public List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countByMarkerName", "getByMarkerName");
-        return (List<MarkerInfo>) super.getFromCentralAndLocalByMethod(getMarkerInfoDao(), methods, start, numOfRows,
-                new Object[]{markerName}, new Class[]{String.class});
+        return getMarkerInfoDao().getByMarkerName(markerName, start, numOfRows);
     }
 
     @Override
     public List<ExtendedMarkerInfo> getMarkerInfoDataByMarkerType(String markerType) throws MiddlewareQueryException {
-        return (List<ExtendedMarkerInfo>) super.getAllByMethod(getExtendedMarkerInfoDao(), "getByMarkerType",
-                new Object[]{markerType}, new Class[]{String.class});
+        return getExtendedMarkerInfoDao().getByMarkerType(markerType);
     }
 
     @Override
     public List<ExtendedMarkerInfo> getMarkerInfoDataLikeMarkerName(String partialMarkerName) throws MiddlewareQueryException {
-        return (List<ExtendedMarkerInfo>) super.getAllByMethod(getExtendedMarkerInfoDao(), "getLikeMarkerName",
-                new Object[]{partialMarkerName}, new Class[]{String.class});
+        return getExtendedMarkerInfoDao().getLikeMarkerName(partialMarkerName);
     }
 
     @Override
     public List<ExtendedMarkerInfo> getMarkerInfoByMarkerNames(List<String> markerNames) throws MiddlewareQueryException {
-        return (List<ExtendedMarkerInfo>) super.getAllByMethod(getExtendedMarkerInfoDao(), "getByMarkerNames",
-                new Object[]{markerNames}, new Class[]{List.class});
+        return getExtendedMarkerInfoDao().getByMarkerNames(markerNames);
     }
 
     @Override
@@ -421,41 +389,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkerInfoByMarkerName(String markerName) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerInfoDao(), "countByMarkerName", new Object[]{markerName},
-                new Class[]{String.class});
+        return getMarkerInfoDao().countByMarkerName(markerName);
     }
 
     @Override
     public List<MarkerInfo> getMarkerInfoByGenotype(String genotype, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countByGenotype", "getByGenotype");
-        return (List<MarkerInfo>) super.getFromCentralAndLocalByMethod(getMarkerInfoDao(), methods, start, numOfRows,
-                new Object[]{genotype}, new Class[]{String.class});
+
+        return getMarkerInfoDao().getByGenotype(genotype, start, numOfRows);
     }
 
     @Override
     public long countMarkerInfoByGenotype(String genotype) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerInfoDao(), "countByGenotype",
-                new Object[]{genotype}, new Class[]{String.class});
+        return getMarkerInfoDao().countByGenotype(genotype);
     }
 
     @Override
-    public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows)
-            throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countByDbAccessionId", "getByDbAccessionId");
-        return (List<MarkerInfo>) super.getFromCentralAndLocalByMethod(getMarkerInfoDao(), methods, start, numOfRows,
-                new Object[]{dbAccessionId}, new Class[]{String.class});
+    public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws MiddlewareQueryException {
+        return getMarkerInfoDao().getByDbAccessionId(dbAccessionId, start, numOfRows);
     }
 
     @Override
     public long countMarkerInfoByDbAccessionId(String dbAccessionId) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerInfoDao(), "countByDbAccessionId",
-                new Object[]{dbAccessionId}, new Class[]{String.class});
+        return getMarkerInfoDao().countByDbAccessionId(dbAccessionId);
     }
 
     @Override
     public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        List<MarkerIdMarkerNameElement> markers = super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, "getNamesByIds",
-                new Object[]{markerIds}, new Class[]{List.class});
+        List<MarkerIdMarkerNameElement> markers = getMarkerDao().getNamesByIds(markerIds);
 
         // Sort based on the given input order
         List<MarkerIdMarkerNameElement> markersToReturn = new ArrayList<>();
@@ -477,8 +437,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAllMarkerTypes", "getAllMarkerTypes");
-        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows, new Object[]{}, new Class[]{});
+        return getMarkerDao().getAllMarkerTypes(start, numOfRows);
     }
 
     @Override
@@ -488,52 +447,42 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countMarkerNamesByMarkerType", "getMarkerNamesByMarkerType");
-        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows,
-                new Object[]{markerType}, new Class[]{String.class});
+        return getMarkerDao().getMarkerNamesByMarkerType(markerType, start, numOfRows);
     }
 
     @Override
     public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerDao(), "countMarkerNamesByMarkerType",
-                new Object[]{markerType}, new Class[]{String.class});
+        return getMarkerDao().countMarkerNamesByMarkerType(markerType);
     }
 
     @Override
     public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = new ArrayList<>(Arrays.asList("countGIDsByMarkerId", "getGIDsByMarkerId"));
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getCharValuesDao(), methods, start, numOfRows,
-                new Object[]{markerId}, new Class[]{Integer.class});
+        return getCharValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
     }
 
     @Override
     public long countGIDsFromCharValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        return super.countAllByMethod(getCharValuesDao(), "countGIDsByMarkerId", new Object[]{markerId},
-                new Class[]{Integer.class});
+        return getCharValuesDao().countGIDsByMarkerId(markerId);
     }
 
     @Override
     public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Integer>) super.getFromInstanceByIdAndMethod(getAlleleValuesDao(), markerId, "getGIDsByMarkerId", new Object[]{
-                markerId, start, numOfRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+        return getAlleleValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
     }
 
     @Override
     public long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getAlleleValuesDao(), markerId, "countGIDsByMarkerId", new Object[]{markerId},
-                new Class[]{Integer.class});
+        return getAlleleValuesDao().countGIDsByMarkerId(markerId);
     }
 
     @Override
     public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(), markerId, "getGIDsByMarkerId", new Object[]{
-                markerId, start, numOfRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+        return getMappingPopValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
     }
 
     @Override
     public long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getMappingPopValuesDao(), markerId, "countGIDsByMarkerId", new Object[]{markerId},
-                new Class[]{Integer.class});
+        return getMappingPopValuesDao().countGIDsByMarkerId(markerId);
     }
 
     @Override
@@ -555,20 +504,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getGidsByMarkersAndAlleleValues(List<Integer> markerIdList, List<String> alleleValueList)
             throws MiddlewareQueryException {
-        return super.getAllByMethod(getAlleleValuesDao(), "getGidsByMarkersAndAlleleValues",
-                new Object[]{markerIdList, alleleValueList}, new Class[]{List.class, List.class});
+        return getAlleleValuesDao().getGidsByMarkersAndAlleleValues(markerIdList, alleleValueList);
     }
 
     @Override
     public List<String> getAllDbAccessionIdsFromMarker(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAllDbAccessionIds", "getAllDbAccessionIds");
-        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows,
-                new Object[]{}, new Class[]{});
+
+        return getMarkerDao().getAllDbAccessionIds(start, numOfRows);
     }
 
     @Override
     public long countAllDbAccessionIdsFromMarker() throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerDao(), "countAllDbAccessionIds", new Object[]{}, new Class[]{});
+        return getMarkerDao().countAllDbAccessionIds();
     }
 
     @Override
@@ -581,8 +528,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<AccMetadataSet> getAccMetadatasetsByDatasetIdsAndNotGids(
             List<Integer> datasetIds, List<Integer> notGids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return (List<AccMetadataSet>) super.getAllByMethod(getAccMetadataSetDao(), "getByDatasetIdsAndNotInGids",
-                new Object[]{datasetIds, notGids, start, numOfRows}, new Class[]{List.class, List.class, Integer.TYPE, Integer.TYPE});
+        return getAccMetadataSetDao().getByDatasetIdsAndNotInGids(datasetIds, notGids, start, numOfRows);
     }
 
 
@@ -604,8 +550,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
             throws MiddlewareQueryException {
-        return (int) countAllByMethod(getAccMetadataSetDao(), "countNIdsByMarkerIdsAndDatasetIdsAndNotGIds",
-                new Object[]{datasetIds, markerIds, gIds}, new Class[]{List.class, List.class, List.class});
+        return (int)getAccMetadataSetDao().countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
     }
 
     private List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds)
@@ -630,126 +575,126 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countDatasetIdsForFingerPrinting", "getDatasetIdsForFingerPrinting");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getDatasetDao(), methods, start, numOfRows,
-                new Object[]{}, new Class[]{});
+
+        return getDatasetDao().getDatasetIdsForFingerPrinting(start, numOfRows);
     }
 
     @Override
     public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException {
-        return super.countAllByMethod(getDatasetDao(), "countDatasetIdsForFingerPrinting",
-                new Object[]{}, new Class[]{});
+        return getDatasetDao().countDatasetIdsForFingerPrinting();
     }
 
     @Override
     public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countDatasetIdsForMapping", "getDatasetIdsForMapping");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getDatasetDao(), methods, start, numOfRows,
-                new Object[]{}, new Class[]{});
+        return getDatasetDao().getDatasetIdsForMapping(start, numOfRows);
     }
 
     @Override
     public long countDatasetIdsForMapping() throws MiddlewareQueryException {
-        return super.countAllByMethod(getDatasetDao(), "countDatasetIdsForMapping",
-                new Object[]{}, new Class[]{});
+        return getDatasetDao().countDatasetIdsForMapping();
     }
 
     @Override
     public List<AccMetadataSet> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAccMetadataSetsByGids", "getAccMetadataSetsByGids");
-        return (List<AccMetadataSet>) super.getFromCentralAndLocalByMethod(getAccMetadataSetDao(),
-                methods, start, numOfRows, new Object[]{gids}, new Class[]{List.class});
+        return getAccMetadataSetDao().getAccMetadataSetsByGids(gids,start, numOfRows);
     }
 
     @Override
     public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllByMethod(getAccMetadataSetDao(), "countAccMetadataSetsByGids",
-                new Object[]{gids}, new Class[]{List.class});
+        return getAccMetadataSetDao().countAccMetadataSetsByGids(gids);
     }
 
     @Override
     public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countMarkersByGidAndDatasetIds", "getMarkersByGidAndDatasetIds");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getMarkerMetadataSetDao(), methods, start, numOfRows,
-                new Object[]{gid, datasetIds}, new Class[]{Integer.class, List.class});
+        return getMarkerMetadataSetDao().getMarkersByGidAndDatasetIds(gid, datasetIds, start, numOfRows);
     }
 
     @Override
     public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerMetadataSetDao(), "countMarkersByGidAndDatasetIds",
-                new Object[]{gid, datasetIds}, new Class[]{Integer.class, List.class});
+        return getMarkerMetadataSetDao().countMarkersByGidAndDatasetIds(gid, datasetIds);
     }
 
     @Override
     public List<Marker> getMarkersByMarkerIds(List<Integer> markerIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countMarkersByIds", "getMarkersByIds");
-        return (List<Marker>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows,
-                new Object[]{markerIds}, new Class[]{List.class});
+        return getMarkerDao().getMarkersByIds(markerIds,start, numOfRows);
     }
 
     @Override
     public long countMarkersByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerDao(), "countMarkersByIds",
-                new Object[]{markerIds}, new Class[]{List.class});
+        return getMarkerDao().countMarkersByIds(markerIds);
     }
 
     @Override
     public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllByMethod(getAlleleValuesDao(), "countAlleleValuesByGids",
-                new Object[]{gids}, new Class[]{List.class});
+        return getAlleleValuesDao().countAlleleValuesByGids(gids);
     }
 
     @Override
     public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllByMethod(getCharValuesDao(), "countCharValuesByGids",
-                new Object[]{gids}, new Class[]{List.class});
+        return getCharValuesDao().countCharValuesByGids(gids);
     }
 
     @Override
     public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return getForPolyMorphicMarkersRetrieval("getIntAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
+        List<AllelicValueElement> allelicValueElements =
+                getAlleleValuesDao().getIntAlleleValuesForPolymorphicMarkersRetrieval(gids,
+                        start, numOfRows);
+
+        //Sort by gid, markerName
+        Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
+        return allelicValueElements;
+
     }
 
     @Override
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllByMethod(getAlleleValuesDao(),
-                "countIntAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
+        return getAlleleValuesDao().countIntAlleleValuesForPolymorphicMarkersRetrieval(gids);
     }
 
     @Override
     public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return getForPolyMorphicMarkersRetrieval("getCharAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
+        List<AllelicValueElement> allelicValueElements =
+                getAlleleValuesDao()
+                        .getCharAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
+
+        //Sort by gid, markerName
+        Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
+        return allelicValueElements;
     }
 
     @Override
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllByMethod(getAlleleValuesDao(),
-                "countCharAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
+        return getAlleleValuesDao().countCharAlleleValuesForPolymorphicMarkersRetrieval(gids);
     }
 
     @Override
     public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return getForPolyMorphicMarkersRetrieval("getMappingAlleleValuesForPolymorphicMarkersRetrieval", gids, start, numOfRows);
+        List<AllelicValueElement> allelicValueElements =
+                getAlleleValuesDao().getMappingAlleleValuesForPolymorphicMarkersRetrieval(
+                        gids,
+                        start, numOfRows);
+
+        //Sort by gid, markerName
+        Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
+        return allelicValueElements;
+
     }
 
     @Override
     public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        return super.countAllByMethod(getAlleleValuesDao(),
-                "countMappingAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
+        return getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(gids);
     }
 
     private List<AllelicValueElement> getForPolyMorphicMarkersRetrieval(String getMethodName,
                                                                         List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
         List<AllelicValueElement> allelicValueElements =
-                (List<AllelicValueElement>) super.getAllByMethod(
-                        getAlleleValuesDao(), getMethodName, new Object[]{gids, start, numOfRows},
-                        new Class[]{List.class, Integer.TYPE, Integer.TYPE});
+                getAlleleValuesDao().getCharAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
 
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
@@ -772,9 +717,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return new ArrayList<>();
         }
 
-        List<String> methods = Arrays.asList("countQtlIdByName", "getQtlIdByName");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows,
-                new Object[]{name}, new Class[]{String.class});
+
+        return getQtlDao().getQtlIdByName(name, start, numOfRows);
     }
 
     @Override
@@ -782,10 +726,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-        return super.countAllByMethod(getQtlDao(), "countQtlIdByName", new Object[]{name}, new Class[]{String.class});
+        return getQtlDao().countQtlIdByName(name);
     }
 
-    //TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
+
     @Override
     public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
         List<QtlDetailElement> qtlDetailElements = new ArrayList<>();
@@ -793,28 +737,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return qtlDetailElements;
         }
 
-        // Get records from CENTRAL
-        qtlDetailElements.addAll(
-                (List<QtlDetailElement>) getFromInstanceByMethod(getQtlDao(), Database.CENTRAL, "getQtlAndQtlDetailsByName",
-                        new Object[]{name, start, numOfRows}, new Class[]{String.class, Integer.TYPE, Integer.TYPE}));
-
-        // Get records from LOCAL
-        // 1. Get gdms_qtl and gdms_qtl_details based on name from LOCAL
-        List<Qtl> qtlLocal = getFromInstanceByMethod(getQtlDao(), Database.LOCAL, "getQtlByName",
-                new Object[]{name}, new Class[]{String.class});
-
-        List<Integer> qtlIds = new ArrayList<>();
-        for (Qtl qtl : qtlLocal) {
-            qtlIds.add(qtl.getQtlId());
-        }
-
-        if (qtlIds.size() > 0) {
-            List<QtlDetails> qtlDetailsLocal = getFromInstanceByMethod(getQtlDetailsDao(), Database.LOCAL,
-                    "getQtlDetailsByQtlIds", new Object[]{qtlIds}, new Class[]{List.class});
-
-            qtlDetailElements.addAll(getQtlDetailElementsFromLocal(qtlDetailsLocal, qtlLocal));
-        }
-        return qtlDetailElements;
+        return getQtlDao().getQtlAndQtlDetailsByName(name, start, numOfRows);
 
     }
 
@@ -823,8 +746,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-        return super.countAllByMethod(getQtlDao(), "countQtlAndQtlDetailsByName"
-                , new Object[]{name}, new Class[]{String.class});
+        return getQtlDao().countQtlAndQtlDetailsByName(name);
     }
 
     @Override
@@ -843,21 +765,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return qtlDetailElements;
         }
 
-        // Get records from CENTRAL
-        qtlDetailElements.addAll(
-                (List<QtlDetailElement>) getFromInstanceByMethod(getQtlDao(), Database.CENTRAL, "getQtlAndQtlDetailsByQtlIds",
-                        new Object[]{qtlIds, start, numOfRows}, new Class[]{List.class, Integer.TYPE, Integer.TYPE}));
-
-        //Get records from LOCAL
-        // 1. Get gdms_qtl and gdms_qtl_details based on qtl_id from LOCAL
-        List<QtlDetails> qtlDetailsLocal = getFromInstanceByMethod(getQtlDetailsDao(), Database.LOCAL, "getQtlDetailsByQtlIds",
-                new Object[]{qtlIds}, new Class[]{List.class});
-        List<Qtl> qtlLocal = getFromInstanceByMethod(getQtlDao(), Database.LOCAL, "getQtlsByIds",
-                new Object[]{qtlIds}, new Class[]{List.class});
-
-        qtlDetailElements.addAll(getQtlDetailElementsFromLocal(qtlDetailsLocal, qtlLocal));
-
-        return qtlDetailElements;
+        return getQtlDao().getQtlAndQtlDetailsByQtlIds(qtlIds, start, numOfRows);
     }
 
 
@@ -877,22 +785,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         // 3. With retrieved gdms_qtl_details.map_id, get maps from gdms_map central and local 
         List<Map> maps = new ArrayList<>();
         if (mapIds.size() > 0) {
-            maps = super.getAllByMethod(getMapDao()
-                    , "getMapsByIds", new Object[]{mapIds}, new Class[]{List.class});
+            maps = getMapDao().getMapsByIds(mapIds);
         }
         // 4. With retrieved gdms_qtl_details.tid, retrieve from cvterm & cvtermprop - central and local 
 
         List<CVTerm> cvTerms = new ArrayList<>();
         List<CVTermProperty> cvTermProperties = new ArrayList<>();
         if (traitIds.size() > 0) {
-            cvTerms = super.getAllByMethod(super.getCvTermDao(), "getByIds"
-                    , new Object[]{traitIds}, new Class[]{List.class});
-            cvTermProperties = super.getAllByMethod(super.getCvTermPropertyDao()
-                    , "getByCvTermIds", new Object[]{traitIds}, new Class[]{List.class});
+            cvTerms = getCvTermDao().getByIds(traitIds);
+            cvTermProperties = getCvTermPropertyDao().getByCvTermIds(traitIds);
         }
 
-
-        // Construct qtlDetailsElement        
+        // Construct qtlDetailsElement
         // qtlDetailsLocal
         // inner join with qtlLocal - on qtlId
         // inner join with maps.mapId
@@ -906,7 +810,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 if (details.getQtlId().equals(qtl.getQtlId())) {
                     for (Map map : maps) {
                         if (details.getMapId().equals(map.getMapId())) {
-                            QtlDetailElement element = new QtlDetailElement(qtl.getQtlName(), map.getMapName(), details);
+                            QtlDetailElement element = new QtlDetailElement(qtl.getQtlName(),
+                                    map.getMapName(), details);
                             for (CVTerm term : cvTerms) {
                                 if (details.getTraitId().equals(term.getCvTermId())) {
                                     element.settRName(term.getName());
@@ -934,58 +839,48 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((qtlIds == null) || (qtlIds.isEmpty())) {
             return 0;
         }
-        return super.countAllByMethod(getQtlDao(), "countQtlAndQtlDetailsByQtlIds"
-                , new Object[]{qtlIds}, new Class[]{List.class});
+        return getQtlDao().countQtlAndQtlDetailsByQtlIds(qtlIds);
     }
 
     @Override
     public List<Integer> getQtlByTrait(Integer trait, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countQtlByTrait", "getQtlByTrait");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows,
-                new Object[]{trait}, new Class[]{Integer.class});
+
+        return getQtlDao().getQtlByTrait(trait, start, numOfRows);
     }
 
     @Override
     public long countQtlByTrait(Integer trait) throws MiddlewareQueryException {
-        return super.countAllByMethod(getQtlDao(), "countQtlByTrait", new Object[]{trait}, new Class[]{Integer.class});
+        return getQtlDao().countQtlByTrait(trait);
     }
 
     @Override
     public List<Integer> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Integer>) super.getFromInstanceByIdAndMethod(getQtlDetailsDao(), datasetId, "getQtlTraitsByDatasetId",
-                new Object[]{datasetId, start, numOfRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+        return getQtlDetailsDao().getQtlTraitsByDatasetId(datasetId, start, numOfRows);
     }
 
     @Override
     public long countQtlTraitsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        return super.countFromInstanceByIdAndMethod(getQtlDetailsDao(), datasetId, "countQtlTraitsByDatasetId",
-                new Object[]{datasetId}, new Class[]{Integer.class});
+        return getQtlDetailsDao().countQtlTraitsByDatasetId(datasetId);
     }
 
     @Override
     public List<ParentElement> getAllParentsFromMappingPopulation(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAllParentsFromMappingPopulation", "getAllParentsFromMappingPopulation");
-        return (List<ParentElement>) super.getFromCentralAndLocalByMethod(getMappingPopDao(), methods, start, numOfRows,
-                new Object[]{}, new Class[]{});
+        return getMappingPopDao().getAllParentsFromMappingPopulation(start, numOfRows);
     }
 
     @Override
     public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException {
-        return super.countAllByMethod(getMappingPopDao(), "countAllParentsFromMappingPopulation",
-                new Object[]{}, new Class[]{});
+        return getMappingPopDao().countAllParentsFromMappingPopulation();
     }
 
     @Override
     public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countMapDetailsByName", "getMapDetailsByName");
-        return (List<MapDetailElement>) super.getFromCentralAndLocalByMethod(getMapDao(), methods, start, numOfRows,
-                new Object[]{nameLike}, new Class[]{String.class});
+        return getMapDao().getMapDetailsByName(nameLike, start, numOfRows);
     }
 
     @Override
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMapDao(), "countMapDetailsByName",
-                new Object[]{nameLike}, new Class[]{String.class});
+        return getMapDao().countMapDetailsByName(nameLike);
     }
 
     @Override
@@ -1003,42 +898,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAllMapDetails", "getAllMapDetails");
-        return (List<MapDetailElement>) super.getFromCentralAndLocalByMethod(getMapDao(), methods, start, numOfRows,
-                new Object[]{}, new Class[]{});
+        return getMapDao().getAllMapDetails(start, numOfRows);
     }
 
     @Override
     public long countAllMapDetails() throws MiddlewareQueryException {
-        return super.countAllByMethod(getMapDao(), "countAllMapDetails", new Object[]{}, new Class[]{});
+        return getMapDao().countAllMapDetails();
     }
 
     @Override
     public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countMapIdsByQtlName", "getMapIdsByQtlName");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows,
-                new Object[]{qtlName}, new Class[]{String.class});
+        return getQtlDetailsDao().getMapIdsByQtlName(qtlName, start, numOfRows);
     }
 
     @Override
     public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException {
-        return super.countAllByMethod(getQtlDetailsDao(), "countMapIdsByQtlName",
-                new Object[]{qtlName}, new Class[]{String.class});
+        return getQtlDetailsDao().countMapIdsByQtlName(qtlName);
     }
 
     @Override
     public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, float min, float max, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countMarkerIdsByQtl", "getMarkerIdsByQtl");
-        return super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows,
-                new Object[]{qtlName, chromosome, min, max},
-                new Class[]{String.class, String.class, Float.TYPE, Float.TYPE});
+        return getQtlDetailsDao().getMarkerIdsByQtl(qtlName, chromosome, min, max, start, numOfRows);
     }
 
     @Override
     public long countMarkerIdsByQtl(String qtlName, String chromosome, float min, float max) throws MiddlewareQueryException {
-        return super.countAllByMethod(getQtlDetailsDao(), "countMarkerIdsByQtl",
-                new Object[]{qtlName, chromosome, min, max}, new Class[]{String.class, String.class, Float.TYPE, Float.TYPE});
+        return getQtlDetailsDao().countMarkerIdsByQtl(qtlName, chromosome, min, max);
     }
 
     @Override
@@ -1092,7 +978,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public Integer addMarkerDetails(MarkerDetails markerDetails) throws MiddlewareQueryException {
         MarkerDetailsDAO dao = getMarkerDetailsDao();
         MarkerDetails details = dao.getById(markerDetails.getMarkerId());
-        if (details == null) return ((MarkerDetails) super.save(dao, null)).getMarkerId();
+        if (details == null){
+            return ((MarkerDetails) super.save(dao, details)).getMarkerId();
+        }
 
         return details.getMarkerId();
     }
@@ -1566,7 +1454,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                                             List<AlleleValues> alleleValueList, List<DartValues> dartValueList)
             throws MiddlewareQueryException {
 
-
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -2029,41 +1916,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<QtlDataElement> getQtlDataByQtlTraits(List<Integer> qtlTraitIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countQtlDataByQtlTraits", "getQtlDataByQtlTraits");
-        return (List<QtlDataElement>) super.getFromCentralAndLocalByMethod(getQtlDetailsDao(),
-                methods, start, numOfRows, new Object[]{qtlTraitIds}, new Class[]{List.class});
+        return getQtlDetailsDao().getQtlDataByQtlTraits(qtlTraitIds, start, numOfRows);
     }
 
     @Override
     public long countQtlDataByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException {
-        return super.countAllByMethod(getQtlDetailsDao(), "countQtlDataByQtlTraits", new Object[]{qtlTraits},
-                new Class[]{List.class});
+        return getQtlDetailsDao().countQtlDataByQtlTraits(qtlTraits);
     }
 
     @Override
     public List<QtlDetailElement> getQtlDetailsByQtlTraits(List<Integer> qtlTraitIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countQtlDetailsByQtlTraits", "getQtlDetailsByQtlTraits");
-        return (List<QtlDetailElement>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows,
-                new Object[]{qtlTraitIds}, new Class[]{List.class});
+        return getQtlDao().getQtlDetailsByQtlTraits(qtlTraitIds,start, numOfRows);
     }
 
     @Override
     public long countQtlDetailsByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException {
-        return super.countAllByMethod(getQtlDao(), "countQtlDetailsByQtlTraits", new Object[]{qtlTraits},
-                new Class[]{List.class});
+        return getQtlDao().countQtlDetailsByQtlTraits(qtlTraits);
     }
 
     @Override
     public long countAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.countAllByMethod(getAccMetadataSetDao(), "countNidsByDatasetIds",
-                new Object[]{datasetIds}, new Class[]{List.class});
+        return getAccMetadataSetDao().countNidsByDatasetIds(datasetIds);
     }
 
     @Override
     public long countMarkersFromMarkerMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.countAllByMethod(getMarkerMetadataSetDao(), "countByDatasetIds",
-                new Object[]{datasetIds}, new Class[]{List.class});
+        return getMarkerMetadataSetDao().countByDatasetIds(datasetIds);
     }
 
     @Override
@@ -2073,22 +1952,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMappingPopValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.countAllByMethod(this.getMappingPopValuesDao(), "countByGids", new Object[]{gIds},
-                new Class[]{List.class});
+        return getMappingPopValuesDao().countByGids(gIds);
     }
 
     @Override
     public long countMappingAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.countAllByMethod(this.getAlleleValuesDao(), "countByGids", new Object[]{gIds},
-                new Class[]{List.class});
+        return getAlleleValuesDao().countByGids(gIds);
     }
 
     @Override
     public List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
-        return (List<MarkerMetadataSet>) super.getAllByMethod(
-                getMarkerMetadataSetDao(),
-                "getByMarkerIds", new Object[]{markerIds},
-                new Class[]{List.class});
+        return getMarkerMetadataSetDao().getByMarkerIds(markerIds);
     }
 
     @Override
@@ -2097,15 +1971,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public List<Dataset> getDatasetsByType(GdmsType type) throws MiddlewareQueryException {
-        return super.getAllByMethod(getDatasetDao(), "getDatasetsByType"
-                , new Object[]{type.getValue()}, new Class[]{String.class});
+    public List<Dataset> getDatasetsByType(GdmsType type) throws MiddlewareQueryException{
+        return getDatasetDao().getDatasetsByType(type.getValue());
     }
 
     @Override
-    public List<Dataset> getDatasetsByMappingTypeFromLocal(GdmsType type) throws MiddlewareQueryException {
-        return super.getFromInstanceByMethod(getDatasetDao(), Database.LOCAL, "getDatasetsByMappingType"
-                , new Object[]{type}, new Class[]{GdmsType.class});
+    public List<Dataset> getDatasetsByMappingTypeFromLocal(GdmsType type) throws MiddlewareQueryException{
+        return getDatasetDao().getDatasetsByMappingType(type);
     }
 
     @Override
@@ -2119,29 +1991,24 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Dataset> getDatasetDetailsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getDatasetDao(),
-                "getDatasetsByIds", new Object[]{datasetIds}, new Class[]{List.class});
+        return getDatasetDao().getDatasetsByIds(datasetIds);
 
     }
 
     @Override
     public List<Integer> getQTLIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getQtlDao(), "getQTLIdsByDatasetIds",
-                new Object[]{datasetIds}, new Class[]{List.class});
+        return getQtlDao().getQTLIdsByDatasetIds(datasetIds);
     }
 
     @Override
     public List<AccMetadataSet> getAllFromAccMetadataset(List<Integer> gIds,
                                                          Integer datasetId, SetOperation operation) throws MiddlewareQueryException {
-        return (List<AccMetadataSet>) super.getAllByMethod(
-                getAccMetadataSetDao(), "getAccMetadataSetByGidsAndDatasetId", new Object[]{gIds, datasetId, operation},
-                new Class[]{List.class, Integer.class, SetOperation.class});
+        return getAccMetadataSetDao().getAccMetadataSetByGidsAndDatasetId(gIds, datasetId, operation);
     }
 
     @Override
     public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getMapDao(), "getMapAndMarkerCountByMarkers",
-                new Object[]{markerIds}, new Class[]{List.class});
+        return getMapDao().getMapAndMarkerCountByMarkers(markerIds);
     }
 
     @Override
@@ -2151,13 +2018,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countAllMTAs() throws MiddlewareQueryException {
-        return super.countAllByMethod(getMtaDao(), "countAll", new Object[]{}, new Class[]{});
+        return getMtaDao().countAll();
     }
 
     @Override
     public List<Mta> getMTAsByTrait(Integer traitId) throws MiddlewareQueryException {
-        return super.getAllByMethod(getMtaDao(), "getMtasByTrait",
-                new Object[]{traitId}, new Class[]{Integer.class});
+        return getMtaDao().getMtasByTrait(traitId);
     }
 
     @Override
@@ -2252,10 +2118,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException {
 
-        if (datasetId >= 0) {
-            throw new MiddlewareQueryException("Cannot delete dataset from central database. Dataset Id = " + datasetId);
-        }
-
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -2289,14 +2151,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
-        return super.getAllByMethod(getQtlDetailsDao(), "getQtlDetailsByMapId"
-                , new Object[]{mapId}, new Class[]{Integer.class});
+        return getQtlDetailsDao().getQtlDetailsByMapId(mapId);
     }
 
     @Override
     public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
-        return countFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "countQtlDetailsByMapId",
-                new Object[]{mapId}, new Class[]{Integer.class});
+        return getQtlDetailsDao().countQtlDetailsByMapId(mapId);
     }
 
     @Override
@@ -2321,20 +2181,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<MarkerSampleId> getMarkerFromCharValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getCharValuesDao(), "getMarkerSampleIdsByGids",
-                new Object[]{gIds}, new Class[]{List.class});
+        return getCharValuesDao().getMarkerSampleIdsByGids(gIds);
     }
 
     @Override
     public List<MarkerSampleId> getMarkerFromAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getAlleleValuesDao(), "getMarkerSampleIdsByGids",
-                new Object[]{gIds}, new Class[]{List.class});
+        return getAlleleValuesDao().getMarkerSampleIdsByGids(gIds);
     }
 
     @Override
     public List<MarkerSampleId> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getMappingPopValuesDao(), "getMarkerSampleIdsByGids",
-                new Object[]{gIds}, new Class[]{List.class});
+        return getMappingPopValuesDao().getMarkerSampleIdsByGids(gIds);
     }
 
     @Override
@@ -2357,11 +2214,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             if (dataset.getDatasetId() == null) {
                 dataset.setDatasetId(getDatasetDao().getNextId("datasetId"));
             }
-            
+
             dataset.setDatasetType(TYPE_MTA);
             dataset.setUploadTemplateDate(new Date());
             //TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely, once confirmed.
-            if (dataset.getDatasetId() < 0) getDatasetDao().merge(dataset);
+            if (dataset.getDatasetId() < 0){
+                getDatasetDao().merge(dataset);
+            }
 
             users.setDatasetId(dataset.getDatasetId());
             getDatasetUsersDao().merge(users);
@@ -3068,18 +2927,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     //GCP-8568
     @Override
     public List<Marker> getMarkersByType(String type) throws MiddlewareQueryException {
-        return super.getAllByMethod(getMarkerDao(), "getMarkersByType",
-                new Object[]{type}, new Class[]{String.class});
+        return getMarkerDao().getMarkersByType(type);
     }
 
     // GCP-7874
     @Override
     public List<Marker> getSNPsByHaplotype(String haplotype) throws MiddlewareQueryException {
-        List<Integer> markerIds = getAllByMethod(getMarkerDao()
-                , "getMarkerIDsByHaplotype", new Object[]{haplotype}, new Class[]{String.class});
-        return getAllByMethod(getMarkerDao()
-                , "getMarkersByIdsAndType", new Object[]{markerIds, GdmsType.TYPE_SNP.getValue()}
-                , new Class[]{List.class, String.class});
+        List<Integer> markerIds =  getMarkerDao().getMarkerIDsByHaplotype(haplotype);
+        return getMarkerDao().getMarkersByIdsAndType(markerIds, GdmsType.TYPE_SNP.getValue());
     }
 
     // GCP-8566
@@ -3132,17 +2987,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<DartDataRow> toReturn = new ArrayList<>();
 
         // Get MarkerMetadataSets of the given datasetId
-        List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(),
-                datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MarkerMetadataSet> markerMetadataSets = getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
 
-        List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(),
-                datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AccMetadataSet> accMetadataSets = getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
 
-        List<AlleleValues> alleleValues = super.getFromInstanceByIdAndMethod(getAlleleValuesDao(),
-                datasetId, "getAlleleValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AlleleValues> alleleValues = getAlleleValuesDao().getAlleleValuesByDatasetId(datasetId);
 
-        List<DartValues> dartValues = super.getFromInstanceByIdAndMethod(getDartValuesDao(),
-                datasetId, "getDartValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<DartValues> dartValues = getDartValuesDao().getDartValuesByDatasetId(datasetId);
 
         for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 
@@ -3175,14 +3026,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<SNPDataRow> toReturn = new ArrayList<>();
 
         // Get MarkerMetadataSets of the given datasetId
-        List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(),
-                datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MarkerMetadataSet> markerMetadataSets = getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
 
-        List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(),
-                datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AccMetadataSet> accMetadataSets = getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
 
-        List<CharValues> charValues = super.getFromInstanceByIdAndMethod(getCharValuesDao(),
-                datasetId, "getCharValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<CharValues> charValues = getCharValuesDao().getCharValuesByDatasetId(datasetId);
 
         for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
             Integer markerId = markerMetadataSet.getMarkerId();
@@ -3208,14 +3056,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<SSRDataRow> toReturn = new ArrayList<>();
 
         // Get MarkerMetadataSets of the given datasetId
-        List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(),
-                datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MarkerMetadataSet> markerMetadataSets = getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
 
-        List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(),
-                datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AccMetadataSet> accMetadataSets = getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
 
-        List<AlleleValues> alleleValues = super.getFromInstanceByIdAndMethod(getAlleleValuesDao(),
-                datasetId, "getAlleleValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AlleleValues> alleleValues = getAlleleValuesDao().getAlleleValuesByDatasetId(datasetId);
 
         for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 
@@ -3241,24 +3086,21 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<MappingABHRow> getMappingABHRows(Integer datasetId) throws MiddlewareQueryException {
         List<MappingABHRow> toReturn = new ArrayList<>();
 
-        List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(),
-                datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MarkerMetadataSet> markerMetadataSets = getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
 
-        List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(),
-                datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AccMetadataSet> accMetadataSets = getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
 
-        List<MappingPopValues> mappingPopValues = super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(),
-                datasetId, "getMappingPopValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MappingPopValues> mappingPopValues = getMappingPopValuesDao().getMappingPopValuesByDatasetId(datasetId);
 
-        for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
+        for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
 
             Integer markerId = markerMetadataSet.getMarkerId();
-            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+            for (AccMetadataSet accMetadataSet : accMetadataSets){
                 Integer gid = accMetadataSet.getGermplasmId();
-                for (MappingPopValues mappingPopValue : mappingPopValues) {
+                for (MappingPopValues mappingPopValue : mappingPopValues){
                     if (mappingPopValue != null && mappingPopValue.getDatasetId().equals(datasetId)
-                            && mappingPopValue.getGid().equals(gid)
-                            && mappingPopValue.getMarkerId().equals(markerId)) {
+                            &&	mappingPopValue.getGid().equals(gid)
+                            && mappingPopValue.getMarkerId().equals(markerId)){
                         toReturn.add(new MappingABHRow(accMetadataSet, mappingPopValue));
                         break;
                     }
@@ -3273,28 +3115,24 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<MappingAllelicSNPRow> getMappingAllelicSNPRows(Integer datasetId) throws MiddlewareQueryException {
         List<MappingAllelicSNPRow> toReturn = new ArrayList<>();
 
-        List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(),
-                datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MarkerMetadataSet> markerMetadataSets = getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
 
-        List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(),
-                datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AccMetadataSet> accMetadataSets = getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
 
-        List<MappingPopValues> mappingPopValues = super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(),
-                datasetId, "getMappingPopValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MappingPopValues> mappingPopValues = getMappingPopValuesDao().getMappingPopValuesByDatasetId(datasetId);
 
-        List<CharValues> charValues = super.getFromInstanceByIdAndMethod(getCharValuesDao(),
-                datasetId, "getCharValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<CharValues> charValues = getCharValuesDao().getCharValuesByDatasetId(datasetId);
 
-        for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
+        for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
             Integer markerId = markerMetadataSet.getMarkerId();
             Marker marker = getMarkerDao().getById(markerId);
-            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+            for (AccMetadataSet accMetadataSet : accMetadataSets){
                 Integer gid = accMetadataSet.getGermplasmId();
                 MappingPopValues mappingPopValue = null;
-                for (MappingPopValues value : mappingPopValues) {
+                for (MappingPopValues value : mappingPopValues){
                     if (value.getDatasetId().equals(datasetId)
-                            && value.getGid().equals(gid)
-                            && value.getMarkerId().equals(markerId)) {
+                            &&	value.getGid().equals(gid)
+                            && value.getMarkerId().equals(markerId)){
 
                         mappingPopValue = value;
                         break;
@@ -3323,29 +3161,24 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<MappingAllelicSSRDArTRow> getMappingAllelicSSRDArTRows(Integer datasetId) throws MiddlewareQueryException {
         List<MappingAllelicSSRDArTRow> toReturn = new ArrayList<>();
 
-        List<MarkerMetadataSet> markerMetadataSets = super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(),
-                datasetId, "getMarkerMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MarkerMetadataSet> markerMetadataSets = getMarkerMetadataSetDao().getMarkerMetadataSetsByDatasetId(datasetId);
 
-        List<AccMetadataSet> accMetadataSets = super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(),
-                datasetId, "getAccMetadataSetsByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AccMetadataSet> accMetadataSets = getAccMetadataSetDao().getAccMetadataSetsByDatasetId(datasetId);
 
-        List<AlleleValues> alleleValues = super.getFromInstanceByIdAndMethod(getAlleleValuesDao(),
-                datasetId, "getAlleleValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<AlleleValues> alleleValues = getAlleleValuesDao().getAlleleValuesByDatasetId(datasetId);
 
-        List<DartValues> dartValues = super.getFromInstanceByIdAndMethod(getDartValuesDao(),
-                datasetId, "getDartValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<DartValues> dartValues = getDartValuesDao().getDartValuesByDatasetId(datasetId);
 
-        List<MappingPopValues> mappingPopValues = super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(),
-                datasetId, "getMappingPopValuesByDatasetId", new Object[]{datasetId}, new Class[]{Integer.class});
+        List<MappingPopValues> mappingPopValues = getMappingPopValuesDao().getMappingPopValuesByDatasetId(datasetId);
 
-        for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
+        for (MarkerMetadataSet markerMetadataSet : markerMetadataSets){
 
             Integer markerId = markerMetadataSet.getMarkerId();
-            for (AccMetadataSet accMetadataSet : accMetadataSets) {
+            for (AccMetadataSet accMetadataSet : accMetadataSets){
                 Integer gid = accMetadataSet.getGermplasmId();
                 MappingPopValues mappingPopValue = null;
-                for (MappingPopValues value : mappingPopValues) {
-                    if (value.getDatasetId().equals(datasetId) && value.getGid().equals(gid) && value.getMarkerId().equals(markerId)) {
+                for (MappingPopValues value : mappingPopValues){
+                    if (value.getDatasetId().equals(datasetId) &&	value.getGid().equals(gid) && value.getMarkerId().equals(markerId)){
                         mappingPopValue = value;
                         break;
                     }
@@ -3418,32 +3251,27 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         } catch (Exception e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("Error encountered while updating MarkerInfo: updateMarkerInfo(marker="
-                            + marker + ", markerAlias=" + markerAlias
-                            + ", markerDetails=" + markerDetails
-                            + ", markerUserInfo=" + markerUserInfo + "): "
-                            + e.getMessage(), e);
+                    + marker + ", markerAlias=" + markerAlias
+                    + ", markerDetails=" + markerDetails
+                    + ", markerUserInfo=" + markerUserInfo + "): "
+                    + e.getMessage(), e);
         } finally {
             session.flush();
         }
     }
 
     @Override
-    public List<DartValues> getDartMarkerDetails(List<Integer> markerIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getDartValuesDao(), "getDartValuesByMarkerIds"
-                , new Object[]{markerIds}, new Class[]{List.class});
+    public List<DartValues> getDartMarkerDetails(List<Integer> markerIds) throws MiddlewareQueryException{
+        return getDartValuesDao().getDartValuesByMarkerIds(markerIds);
     }
 
     @Override
-    public List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        return super.getAllByMethod(getMarkerMetadataSetDao(), "getMarkerMetadataSetByDatasetId"
-                , new Object[]{datasetId}, new Class[]{Integer.class});
+    public List<MarkerMetadataSet> getMarkerMetadataSetByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+        return getMarkerMetadataSetDao().getMarkerMetadataSetByDatasetId(datasetId);
     }
 
     @Override
-    public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        return super.getAllByMethod(getCharValuesDao(), "getCharValuesByMarkerIds"
-                , new Object[]{markerIds}, new Class[]{List.class});
+    public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
+        return getCharValuesDao().getCharValuesByMarkerIds(markerIds);
     }
-
-
 }

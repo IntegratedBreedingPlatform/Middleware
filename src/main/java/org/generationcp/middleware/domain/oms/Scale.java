@@ -25,6 +25,9 @@ public class Scale {
     private String minValue;
     private String maxValue;
 
+
+    private String displayName;
+    
     public Scale() {
         this.term = new Term();
         this.term.setVocabularyId(CvId.SCALES.getId());
@@ -40,6 +43,18 @@ public class Scale {
 
     public void setTerm(Term term) {
         this.term = term;
+    }
+
+    public String getDisplayName() {
+        if (displayName == null) {
+            return term.getName();
+        } else {
+            return displayName;
+        }
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public int getId() {

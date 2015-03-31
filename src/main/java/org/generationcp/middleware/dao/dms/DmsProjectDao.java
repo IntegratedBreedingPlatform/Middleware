@@ -125,7 +125,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					Integer id = (Integer)row[0]; //project.id
 					String name = (String) row [1]; //project.name
 					String description = (String) row [2]; //project.description
-					folderList.add(new FolderReference(DmsProject.SYSTEM_FOLDER_ID, id, name, description));
+					folderList.add(new FolderReference(DmsProject.SYSTEM_FOLDER_ID, id, name, description,programUUID));
 				}
 			}
 		} catch (HibernateException e) {
@@ -157,9 +157,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				Integer isStudy = ((Integer) row[3]).intValue(); 
 				
 				if (isStudy > 0){
-					childrenNodes.add(new StudyReference(id, name, description));
+					childrenNodes.add(new StudyReference(id, name, description, programUUID));
 				} else {
-					childrenNodes.add(new FolderReference(id, name, description));
+					childrenNodes.add(new FolderReference(id, name, description, programUUID));
 				}
 			}
 			
@@ -459,10 +459,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studies;
 	}
 	
-	public Integer getProjectIdByName(String name, TermId relationship) throws MiddlewareQueryException {
+	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID, 
+			TermId relationship) throws MiddlewareQueryException {
 		try {
 			String sql = "SELECT s.project_id FROM project s "
-					+ " WHERE name = :name "
+					+ " WHERE name = :name AND program_uuid = :program_uuid"
 					+ " AND EXISTS (SELECT 1 FROM project_relationship pr WHERE pr.subject_project_id = s.project_id "
 					+ "   AND pr.type_id = " + relationship.getId() + ") " 
 	                + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() 
@@ -471,7 +472,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    			+ " LIMIT 1";
 			
 			Query query = getSession().createSQLQuery(sql)
-							.setParameter("name", name);
+							.setParameter("name", name)
+							.setParameter(PROGRAM_UUID, programUUID);
 			return (Integer) query.uniqueResult();
 			
 		} catch(HibernateException e) {
@@ -480,11 +482,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return null;
 	}
 	
-    public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
-		return getAllStudyDetails(studyType, -1, -1);
+    public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException {
+		return getAllStudyDetails(studyType, programUUID, -1, -1);
 	}
 	
-    public List<StudyDetails> getAllStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows) throws MiddlewareQueryException {
 	    List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
             
         StringBuilder sqlString = new StringBuilder()
@@ -515,6 +517,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         .append("       LEFT JOIN nd_experiment_project de ON de.project_id = pr.subject_project_id ")
         .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ")
         .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ")
+        .append("   AND (p.").append(PROGRAM_UUID).append(" = :").append(PROGRAM_UUID).append(" ")
+        .append("   OR p.").append(PROGRAM_UUID).append(" IS NULL) ")
         .append("    GROUP BY p.name, p.description, ppObjective.value, ppStartDate.value, ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppPIid.value, ")
         .append("   gpSiteId.value ")
         .append("               ORDER BY p.name ");
@@ -533,7 +537,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     .addScalar("id")
                     .addScalar("piId")
                     .addScalar("siteId")
-                    .addScalar("rowCount");
+                    .addScalar("rowCount")
+                    .setParameter(PROGRAM_UUID, programUUID);
             setStartAndNumOfRows(query, start, numOfRows);
             list =  query.list();
         } catch(HibernateException e) {
@@ -593,7 +598,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	            StringBuilder sqlString = new StringBuilder()
 	            .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
 	            .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-	            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId, ppFolder.object_project_id AS folderId ")
+	            .append(                        ", ppPIid.value AS piId, gpSiteId.value AS siteId, ppFolder.object_project_id AS folderId, p.program_uuid AS programUUID ")
 	            .append("FROM project p ")
 	            .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
 	            .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -629,7 +634,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	                        .addScalar("piId")
 	                        .addScalar("siteId")
 	                        .addScalar("folderId")
-	                        ;
+	                        .addScalar("programUUID")
+	            			;
 	            
 	            List<Object[]> list =  query.list();
 	            
@@ -646,9 +652,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	                    String piId = (String) row[8];
 	                    String siteId = (String) row[9];
 	                    Integer folderId = (Integer) row[10];
+	                    String programUUID = (String) row[11];
 	                    
 	                    studyDetails = new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
 	                    studyDetails.setParentFolderId(Long.valueOf(folderId));
+	                    studyDetails.setProgramUUID(programUUID);
 	                }
 	            }
 
@@ -658,7 +666,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    return studyDetails;
 	}
 	
-	public long countAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
+	public long countAllStudyDetails(StudyType studyType, String programUUID) throws MiddlewareQueryException {
 	    try {
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT COUNT(1) ")
@@ -680,9 +688,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ") 
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ")
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ")    
+            .append("   AND (p.").append(PROGRAM_UUID).append(" = :").append(PROGRAM_UUID).append(" ")
+            .append("   OR p.").append(PROGRAM_UUID).append(" IS NULL) ")
             ;
             
-            Query query = getSession().createSQLQuery(sqlString.toString());
+            Query query = getSession().createSQLQuery(sqlString.toString())
+            		.setParameter(PROGRAM_UUID, programUUID);
 
             return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -693,11 +704,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    
 	}
 	
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
-		return getAllNurseryAndTrialStudyDetails(0, -1);
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException {
+		return getAllNurseryAndTrialStudyDetails(programUUID, 0, -1);
 	}
 	
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows) throws MiddlewareQueryException {
 		List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
 		try {
             
@@ -727,6 +738,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ") 
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990
+            .append("   AND (p.").append(PROGRAM_UUID).append(" = :").append(PROGRAM_UUID).append(" ")
+            .append("   OR p.").append(PROGRAM_UUID).append(" IS NULL) ")
             .append("               ORDER BY p.name ") 
             ;
         
@@ -742,6 +755,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                         .addScalar("studyType")
                         .addScalar("piId")
                         .addScalar("siteId")
+                        .setParameter(PROGRAM_UUID, programUUID)
                         ;
             setStartAndNumOfRows(query, start, numOfRows);
 
@@ -773,7 +787,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    
 	}
 	
-	public long countAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
+	public long countAllNurseryAndTrialStudyDetails(String programUUID) throws MiddlewareQueryException {
 	    try {
             
             StringBuilder sqlString = new StringBuilder()
@@ -796,9 +810,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ") // 8180 
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990
+            .append("   AND (p.").append(PROGRAM_UUID).append(" = :").append(PROGRAM_UUID).append(" ")
+            .append("   OR p.").append(PROGRAM_UUID).append(" IS NULL) ")
             ;
             
-            Query query = getSession().createSQLQuery(sqlString.toString());
+            Query query = getSession().createSQLQuery(sqlString.toString())
+            		.setParameter(PROGRAM_UUID, programUUID);
 
             return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -815,7 +832,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * @throws MiddlewareQueryException
 	 */
 	
-	public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException {
+	public List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) throws MiddlewareQueryException {
 	    List<StudyNode> studyNodes = new ArrayList<StudyNode>();
 	    
         StringBuilder sqlString = new StringBuilder()
@@ -837,8 +854,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         .append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")
         .append("           AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ")
         .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ")
-        .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ");
-    
+        .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ")
+        .append("   AND (p.").append(PROGRAM_UUID).append(" = :").append(PROGRAM_UUID).append(" ")
+        .append("   OR p.").append(PROGRAM_UUID).append(" IS NULL) ");
         List<Object[]> list = null;
         
         try {
@@ -848,7 +866,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     .addScalar("description")
                     .addScalar("startDate")
                     .addScalar("studyType")
-                    .addScalar("season");
+                    .addScalar("season")
+                    .setParameter(PROGRAM_UUID, programUUID);
             list =  query.list();
         } catch(HibernateException e) {
             logAndThrowException("Error in getAllStudyNodes() query in DmsProjectDao: " + e.getMessage(), e);
@@ -880,10 +899,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
+	public boolean checkIfProjectNameIsExistingInProgram(String name,String programUUID) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
+			criteria.add(Restrictions.eq("programUUID", programUUID));
 			
 			List list = criteria.list();
 			if(list!=null && !list.isEmpty()) {
@@ -974,10 +994,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 	
-	public Integer getProjectIdByName(String name) throws MiddlewareQueryException {
+	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException {
 		try {
-			String sql = "SELECT project_id FROM project WHERE name = :name ";
-			Query query = getSession().createSQLQuery(sql).setParameter("name", name);
+			String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid";
+			Query query = getSession().createSQLQuery(sql);
+			query.setParameter("name", name);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			List<Integer> list = query.list();
 			if (list != null && !list.isEmpty()) {
 				return (Integer) list.get(0);
