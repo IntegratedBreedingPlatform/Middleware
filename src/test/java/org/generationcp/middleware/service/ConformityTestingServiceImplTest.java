@@ -94,9 +94,9 @@ public class ConformityTestingServiceImplTest extends DataManagerIntegrationTest
 
             conformityTestingService = new ConformityTestingServiceImpl(genotypicDataManager, pedigreeDataManager);
 			dataSource = DriverManagerDataSourceFactory.create(
-					localConnectionParameters.getDriverName(), localConnectionParameters.getUrl(),
-					localConnectionParameters.getUsername(),
-					localConnectionParameters.getPassword());
+					connectionParameters.getDriverName(), connectionParameters.getUrl(),
+					connectionParameters.getUsername(),
+					connectionParameters.getPassword());
 
         } catch (Exception e) {
             fail(e.getMessage());

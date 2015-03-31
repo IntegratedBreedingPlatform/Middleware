@@ -23,9 +23,8 @@ import java.util.Set;
 
 public class VariableTypeBuilder extends Builder {
 
-	public VariableTypeBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                   HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public VariableTypeBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public VariableTypeList create(List<ProjectProperty> properties) throws MiddlewareQueryException {

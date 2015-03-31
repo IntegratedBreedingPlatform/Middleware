@@ -25,6 +25,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,16 @@ import java.util.List;
  */
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
-    private static final Integer STATUS_DELETED = 9;
+    public static final Integer STATUS_DELETED = 9;
+    protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList();
+    
+    static{
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+    	RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CROSSES.toString()));
+    }    
     
     @SuppressWarnings("unchecked")
     public List<GermplasmList> getAllExceptDeleted(int start, int numOfRows) throws MiddlewareQueryException {
@@ -43,10 +53,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             
-            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            hideSnapshotListTypes(criteria);
             
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
@@ -62,10 +69,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             
-            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            hideSnapshotListTypes(criteria);
             
             criteria.setProjection(Projections.rowCount());
             Long count = (Long) criteria.uniqueResult();
@@ -123,10 +127,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
 
-            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            hideSnapshotListTypes(criteria);
             
             if (operation == null || operation == Operation.EQUAL) {
                 criteria.add(Restrictions.eq("name", name));
@@ -150,10 +151,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setProjection(Projections.rowCount());
             
-            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            hideSnapshotListTypes(criteria);
             
             if (operation == null || operation == Operation.EQUAL) {
                 criteria.add(Restrictions.eq("name", name));
@@ -175,10 +173,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            criteria.add(Restrictions.eq("status", status));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
 	            
-	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            hideSnapshotListTypes(criteria);
 	            
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
@@ -198,10 +193,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            criteria.add(Restrictions.eq("status", status));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
 	            
-	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            hideSnapshotListTypes(criteria);
 	            
 	            criteria.setProjection(Projections.rowCount());
 	            return ((Long) criteria.uniqueResult()).longValue(); 
@@ -223,10 +215,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.add(Restrictions.or(topFolder, nullFolder));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             
-            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            hideSnapshotListTypes(criteria);
             
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
@@ -246,10 +235,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.add(Restrictions.or(topFolder, nullFolder));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             
-            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+            hideSnapshotListTypes(criteria);
             
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue();
@@ -257,21 +243,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             logAndThrowException("Error with countAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
         }
         return 0;
-    }
-
-    public void validateId(GermplasmList germplasmList) throws MiddlewareQueryException {
-        // Check if not a local record (has negative ID)
-    	if (germplasmList != null){
-            Integer id = germplasmList.getId();
-            if (id != null && id.intValue() > 0) {
-                logAndThrowException("Error with validateId(germplasmList=" + germplasmList
-                        + "): Cannot update a Central Database record. "
-                        + "GermplasmList object to update must be a Local Record (ID must be negative)", new Throwable());
-            }
-    	} else {
-            logAndThrowException("Error with validateId(germplasmList=" + germplasmList
-                    + "): GermplasmList is null", new Throwable());
-    	}
     }
 
     /**
@@ -291,10 +262,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
 	            
-	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            hideSnapshotListTypes(criteria);
 	            
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
@@ -322,10 +290,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
 	            
-	            criteria.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-	            criteria.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
+	            hideSnapshotListTypes(criteria);	            
 	            
 	            criteria.setProjection(Projections.rowCount());
 	            return ((Long) criteria.uniqueResult()).longValue(); 
@@ -335,6 +300,15 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
                     + e.getMessage(), e);
         }
         return 0;
+    }
+    
+    protected void hideSnapshotListTypes(Criteria criteria){
+    	for(SimpleExpression restriction : getRestrictedSnapshopTypes()){
+    		criteria.add(restriction);	
+    	}    	        
+    }
+    protected List<SimpleExpression> getRestrictedSnapshopTypes(){
+    	return RETRICTED_LIST;
     }
     
     /**
@@ -355,7 +329,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         } catch (HibernateException e) {
             logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(), e);
         }
-        return null;
+        return new ArrayList();
     }
     
     /**
@@ -376,7 +350,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         } catch (HibernateException e) {
             logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(), e);
         }    	
-        return null;
+        return new ArrayList();
     }    
     
     /**
@@ -387,9 +361,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      * @throws MiddlewareQueryException 
      */
     @SuppressWarnings("unchecked")
-    public List<GermplasmList> searchForGermplasmLists(String q, Operation o) throws MiddlewareQueryException{
-    	q = q.trim();
-    	if(q.equals("")){
+    public List<GermplasmList> searchForGermplasmLists(String searchedString, Operation o) throws MiddlewareQueryException{
+    	String q = searchedString.trim();
+    	if("".equals(q)){
     		return new ArrayList<GermplasmList>();
     	}
         try {
@@ -410,18 +384,16 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             	} else {
             		query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
             		query.setParameter("gidLength", q.length());
-                	query.setParameter("q", "%"+q+"%");
-                	query.setParameter("qNoSpaces", "%"+q.replace(" ", "")+"%");
-                	query.setParameter("qStandardized", "%"+GermplasmDataManagerUtil.standardizeName(q)+"%");
+                	query.setParameter("q", q+"%");
+                	query.setParameter("qNoSpaces", q.replace(" ", "")+"%");
+                	query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
             	}
 
             }
         	query.setParameter("gid", q);
         	
         	query.addEntity("listnms", GermplasmList.class);
-            List<GermplasmList> germplasmLists = query.list();
-
-            return germplasmLists;
+            return query.list();
 
         } catch (Exception e) {
                 logAndThrowException("Error with searchGermplasmLists(" + q + ") " + e.getMessage(), e);

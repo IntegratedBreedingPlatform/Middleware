@@ -29,9 +29,8 @@ public class TransactionBuilder  extends Builder {
 
 	private static final int COMMITMENT_DATE_INDEFINITE = 0;
 
-	public TransactionBuilder(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public TransactionBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public List<Transaction> buildForSave(List<Lot> lots, Double amount, Integer userId, String comment, Integer sourceId)
@@ -48,8 +47,6 @@ public class TransactionBuilder  extends Builder {
 	}
 	
 	public List<Transaction> buildForUpdate(List<Lot> lots, Double amount, String comment) throws MiddlewareQueryException {
-		
-		requireLocalDatabaseInstance();
 		
 		List<Integer> lotIds = new ArrayList<Integer>();
 		List<Integer> gids = new ArrayList<Integer>();
@@ -84,10 +81,7 @@ public class TransactionBuilder  extends Builder {
 	}
 	
 	private Integer getPersonId(Integer userId) throws MiddlewareQueryException{
-        // Get personId
-        setWorkingDatabase(userId);
         User user = getUserDao().getById(userId);
         return user.getPersonid();
-
 	}
 }

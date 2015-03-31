@@ -155,22 +155,4 @@ public interface UserDataManager {
      * @throws MiddlewareQueryException
      */
     User getUserByUserName(String userName) throws MiddlewareQueryException;
-
-    /**
-     * Adds the user to Central database.
-     *
-     * @param user the user
-     * @return Returns the id of the {@code User} record added
-     * @throws MiddlewareQueryException the MiddlewareQueryException
-     */
-    Integer addUserToCentral(User user) throws MiddlewareQueryException;
-	
-	 /**
-     * Adds the person to Central database.
-     *
-     * @param person the person
-     * @return Returns the id of the {@code Person} record added
-     * @throws MiddlewareQueryException the MiddlewareQueryException
-     */
-	Integer addPersonToCentral(Person person) throws MiddlewareQueryException;
 }

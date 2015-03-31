@@ -23,20 +23,17 @@ import java.util.List;
 
 public class CvTermSaver extends Saver {
 
-	public CvTermSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public CvTermSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public Term save(String name, String definition, CvId cvId)  throws MiddlewareException, MiddlewareQueryException{ 
-		requireLocalDatabaseInstance();
 		validateInputFields(name, definition);
         CVTermDao dao = getCvTermDao();
 
         Integer generatedId;
 		try {
-			generatedId = dao.getNegativeId("cvTermId");
+			generatedId = dao.getNextId("cvTermId");
 		} catch (MiddlewareQueryException e) {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
@@ -48,7 +45,6 @@ public class CvTermSaver extends Saver {
 	
 
     public Term saveOrUpdate(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         validateInputFields(name, definition);
         CVTermDao dao = getCvTermDao();
         
@@ -56,7 +52,7 @@ public class CvTermSaver extends Saver {
 
         CVTerm cvTerm = null; 
         if (termIds == null || termIds.isEmpty()){ // add
-            Integer generatedId = dao.getNegativeId("cvTermId");
+            Integer generatedId = dao.getNextId("cvTermId");
             cvTerm = create(generatedId, name, definition, cvId.getId(), false, false); 
         } else if (termIds.size() == 1){ // update
             cvTerm = create(termIds.get(0), name, definition, cvId.getId(), false, false); 
@@ -68,7 +64,6 @@ public class CvTermSaver extends Saver {
     }
     
     public Term update(Term term) throws MiddlewareException, MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         validateInputFields(term.getName(), term.getDefinition());
         CVTermDao dao = getCvTermDao();
 
@@ -109,13 +104,11 @@ public class CvTermSaver extends Saver {
 	}
 	
 	public void delete(CVTerm cvTerm, CvId cvId) throws MiddlewareQueryException {
-	    requireLocalDatabaseInstance();
-            CVTermDao dao = getCvTermDao();
-
-            try {
-                dao.makeTransient(cvTerm);
-            } catch (MiddlewareQueryException e) {
-                throw new MiddlewareQueryException(e.getMessage(), e);
-            }
+        CVTermDao dao = getCvTermDao();
+        try {
+            dao.makeTransient(cvTerm);
+        } catch (MiddlewareQueryException e) {
+            throw new MiddlewareQueryException(e.getMessage(), e);
+        }
 	} 
 }

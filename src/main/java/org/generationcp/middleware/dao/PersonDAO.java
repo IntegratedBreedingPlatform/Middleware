@@ -32,7 +32,7 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
     public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT COUNT(1) FROM PERSONS p ").append("WHERE UPPER(p.fname) = :firstName ")
+            sql.append("SELECT COUNT(1) FROM persons p ").append("WHERE UPPER(p.fname) = :firstName ")
                     .append("AND UPPER(p.lname) = :lastName");
 
             SQLQuery query = getSession().createSQLQuery(sql.toString());
@@ -52,7 +52,7 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
     public boolean isPersonWithEmailExists(String email) throws MiddlewareQueryException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT COUNT(1) FROM PERSONS p ").append("WHERE UPPER(p.pemail) = :email");
+            sql.append("SELECT COUNT(1) FROM persons p ").append("WHERE UPPER(p.pemail) = :email");
             SQLQuery query = getSession().createSQLQuery(sql.toString());
             query.setParameter("email", email);
 
@@ -63,6 +63,25 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
         } catch (HibernateException e) {
                 logAndThrowException("Error with isPersonWithEmailExists(email=" + email
                         + ") query from Person: " + e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    public boolean isPersonWithUsernameAndEmailExists(String username,String email) throws MiddlewareQueryException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT COUNT(1) FROM USERS users join PERSONS persons on users.personid = persons.personid ")
+                .append("WHERE users.uname = :username and persons.pemail = :email");
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+            query.setParameter("email",email);
+            query.setParameter("username",username);
+
+            return ((BigInteger)query.uniqueResult()).longValue() > 0;
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with isPersonWithEmailExists(email=" + email
+                    + ") query from Person: " + e.getMessage(), e);
         }
 
         return false;

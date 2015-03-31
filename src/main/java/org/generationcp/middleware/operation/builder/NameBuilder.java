@@ -13,20 +13,14 @@ import java.util.regex.Pattern;
 
 public class NameBuilder extends Builder {
 
-	public NameBuilder(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public NameBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public int getMaximumSequence(boolean isBulk, String prefix, String suffix, int count) throws MiddlewareQueryException {
 		Set<String> names = new HashSet<String>();
-		TimerWatch timer = new TimerWatch("Retrieve all matched names (local)");
-		setWorkingDatabase(Database.LOCAL);
+		TimerWatch timer = new TimerWatch("Retrieve all matched names");
 		names.addAll(getNameDao().getAllMatchingNames(prefix, suffix));
-		timer.restart("Retrieve all method names (central)");
-		setWorkingDatabase(Database.CENTRAL);
-		names.addAll(getNameDao().getAllMatchingNames(prefix, suffix));
-
 		timer.restart("get maximum sequence");
 		int max = getMaximumSequenceInNames(isBulk, names, prefix, suffix, count);
 		timer.stop();

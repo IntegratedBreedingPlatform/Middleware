@@ -15,10 +15,8 @@ import java.util.*;
 
 public class StudySearcherByNameStartSeasonCountry extends Searcher {
 
-	public StudySearcherByNameStartSeasonCountry(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) { 
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudySearcherByNameStartSeasonCountry(HibernateSessionProvider sessionProviderForLocal) { 
+		super(sessionProviderForLocal);
 	}
 
 	public List<DmsProject> searchByFilter(BrowseStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {
@@ -43,9 +41,6 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	private List<DmsProject> searchByStartDate(Integer startDate) throws MiddlewareQueryException {
 		List<DmsProject> studies = new ArrayList<DmsProject>();
 		if (startDate != null) {
-			setWorkingDatabase(Database.CENTRAL);
-			studies.addAll(getDmsProjectDao().getStudiesByStartDate(startDate));
-			setWorkingDatabase(Database.LOCAL);
 			studies.addAll(getDmsProjectDao().getStudiesByStartDate(startDate));
 		}
 		return studies;
@@ -54,9 +49,6 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	private List<DmsProject> searchByStudyName(String name) throws MiddlewareQueryException {
 		List<DmsProject> studies = new ArrayList<DmsProject>();
 		if (!StringUtil.isEmpty(name)) {
-			setWorkingDatabase(Database.CENTRAL);
-			studies.addAll(getDmsProjectDao().getStudiesByName(name));
-			setWorkingDatabase(Database.LOCAL);
 			studies.addAll(getDmsProjectDao().getStudiesByName(name));
 		}
 		return studies;
@@ -65,28 +57,14 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	private List<DmsProject> searchByCountry(String countryName) throws MiddlewareQueryException {
 		List<DmsProject> studies = new ArrayList<DmsProject>();
 		if (!StringUtil.isEmpty(countryName)) {
-			setWorkingDatabase(Database.CENTRAL);
 			List<Country> countries = getCountryDao().getByIsoFull(countryName);
-			setWorkingDatabase(Database.LOCAL);
-			if (countries != null){
-			    countries.addAll(getCountryDao().getByIsoFull(countryName));
-			}
-			
 			if (countries != null && countries.size() > 0) {
 				List<Integer> countryIds = new ArrayList<Integer>(); 
 				for (Country country : countries) {
 					countryIds.add(country.getCntryid());
-				}
-				
-				setWorkingDatabase(Database.CENTRAL);
-				List<Integer> userIds = getUserDao().getUserIdsByCountryIds(countryIds);
-				setWorkingDatabase(Database.LOCAL);
-				userIds.addAll(getUserDao().getUserIdsByCountryIds(countryIds));
-				
-				setWorkingDatabase(Database.CENTRAL);
+				}				
+				List<Integer> userIds = getUserDao().getUserIdsByCountryIds(countryIds);				
 				studies = getDmsProjectDao().getStudiesByUserIds(userIds);
-				setWorkingDatabase(Database.LOCAL);
-				studies.addAll(getDmsProjectDao().getStudiesByUserIds(userIds));
 			}
 		}
 		return studies;
@@ -154,69 +132,26 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 	}
 	
 	private List<Integer> getSeasonalFactors() throws MiddlewareQueryException {
-		setWorkingDatabase(Database.CENTRAL);
-		List<Integer> factors = getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), TermId.SEASON.getId());
-		setWorkingDatabase(Database.LOCAL);
-		factors.addAll(getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), TermId.SEASON.getId()));
-		
-		return factors;
+		return getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), TermId.SEASON.getId());
 	}
 
 	private CVTerm getDiscreteValueTerm(String name, String definition) throws MiddlewareQueryException {
 		CVTerm term = null;
 		Integer cvId = null;
-		if (setWorkingDatabase(Database.CENTRAL)) {
-			cvId = getCvDao().getIdByName(name);
-		}
-		if (cvId == null && setWorkingDatabase(Database.LOCAL)) {
-			cvId = getCvDao().getIdByName(name);
-		}
-		
-		if (setWorkingDatabase(Database.CENTRAL)) {
-			term = getCvTermDao().getByCvIdAndDefinition(cvId, definition);
-		}
-		if (term == null && setWorkingDatabase(Database.CENTRAL)) {
-			term = getCvTermDao().getByCvIdAndDefinition(cvId, definition);
-		}
+		cvId = getCvDao().getIdByName(name);
+		term = getCvTermDao().getByCvIdAndDefinition(cvId, definition);
 		return term;
 	}
 	
 	private List<Integer> getProjectIdsByExperiment(Collection<Integer> experimentIds) throws MiddlewareQueryException {
-		Set<Integer> projectIds = new HashSet<Integer>();
-		setWorkingDatabase(Database.CENTRAL);
-		projectIds.addAll(getExperimentProjectDao().getProjectIdsByExperimentIds(experimentIds));
-		setWorkingDatabase(Database.LOCAL);
-		projectIds.addAll(getExperimentProjectDao().getProjectIdsByExperimentIds(experimentIds));
-
-		return new ArrayList<Integer>(projectIds);
+		return getExperimentProjectDao().getProjectIdsByExperimentIds(experimentIds);
 	}
 	
 	private Set<DmsProject> getProjectsByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		Set<DmsProject> projects = new HashSet<DmsProject>();
 		if (ids != null && ids.size() > 0) {
-			List<Integer> positiveIds = new ArrayList<Integer>();
-			List<Integer> negativeIds = new ArrayList<Integer>();
-			
-			for (Integer id : ids) {
-				if (id > 0) {
-					positiveIds.add(id);
-				} else {
-					negativeIds.add(id);
-				}
-			}
-			
-			if (positiveIds.size() > 0) {
-				if (setWorkingDatabase(Database.CENTRAL)) {
-					projects.addAll(getDmsProjectDao().getByIds(positiveIds));
-				}
-			}
-			if (negativeIds.size() > 0) {
-				if (setWorkingDatabase(Database.LOCAL)) {
-					projects.addAll(getDmsProjectDao().getByIds(negativeIds));
-				}
-			}
+			projects.addAll(getDmsProjectDao().getByIds(ids));
 		}
-		
 		return projects;
 	}
 }

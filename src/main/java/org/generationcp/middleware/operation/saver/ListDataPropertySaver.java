@@ -13,17 +13,13 @@ import java.util.List;
 
 public class ListDataPropertySaver extends Saver {
 
-	public ListDataPropertySaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ListDataPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
-	
 	
 	public List<ListDataInfo> saveProperties(List<ListDataInfo> listDataCollection) throws MiddlewareQueryException {
 		
-    	requireLocalDatabaseInstance();
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Session sessionForLocal = getCurrentSession();
         sessionForLocal.flush();
 
         // initialize session & transaction
@@ -47,8 +43,8 @@ public class ListDataPropertySaver extends Saver {
     						// create if combination of listdata ID and column name doesn't exist yet
     						if (property == null){
     							property = new ListDataProperty(listData, column.getColumnName());
-    							Integer negativeId = getListDataPropertyDAO().getNegativeId("listDataPropertyId");
-								property.setListDataPropertyId(negativeId); //assign next negative ID
+    							Integer nextId = getListDataPropertyDAO().getNextId("listDataPropertyId");
+								property.setListDataPropertyId(nextId);
     						}
     						String value = column.getValue();
     						if (value != null){

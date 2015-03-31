@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.MockDataUtil;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -39,7 +40,7 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetGermplasmDescendants() throws Exception {
-        Integer gid = Integer.valueOf(47888);
+        Integer gid = Integer.valueOf(1);
         List<Object[]> germplsmList = pedigreeManager.getDescendants(gid, 0, 20);
 
         Debug.println(INDENT, "testGetGermplasmDescendants(" + gid + "): ");
@@ -51,7 +52,7 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 
     @Test
     public void testCountGermplasmDescendants() throws Exception {
-        Integer gid = Integer.valueOf(47888);
+        Integer gid = Integer.valueOf(1);
         long count = pedigreeManager.countDescendants(gid);
         Debug.println(INDENT, "testCountGermplasmDescendants(" + gid + "):" + count);
     }
@@ -75,11 +76,31 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
         }
     }
     
+    @Test
+    public void testGetPedigreeLevelCount() throws Exception {
+    	Integer gid = 1;
+    	boolean includeDerivativeLine = false;
+    	Integer pedigreeLevelCount = pedigreeManager.getPedigreeLevelCount(gid, includeDerivativeLine);
+    	Debug.println(Integer.toString(pedigreeLevelCount));
+    	Assert.assertNotNull("It should not be null",pedigreeLevelCount);
+    	Assert.assertEquals("It should be equal to 1",new Integer(1),pedigreeLevelCount);
+    	
+    }
+    
+    @Test
+    public void testGetPedigreeLevelCount_IncludeDerivative() throws Exception {
+    	Integer gid = 1;
+    	boolean includeDerivativeLine = true;
+    	Integer pedigreeLevelCount = pedigreeManager.getPedigreeLevelCount(gid, includeDerivativeLine);
+    	Debug.println(Integer.toString(pedigreeLevelCount));
+    	Assert.assertNotNull("It should not be null",pedigreeLevelCount);
+    	Assert.assertEquals("It should be equal to 1",new Integer(1),pedigreeLevelCount);
+    	
+    }
 
     @Test
     public void testGeneratePedigreeTree2() throws MiddlewareQueryException {
-        // Using the sample on the story description (rice)
-        int gid = 50533;
+        int gid = 1;
         int levels = 3;
         Boolean includeDerivativeLines = true;
         
@@ -103,7 +124,7 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetManagementNeighbors() throws Exception {
-        Integer gid = Integer.valueOf(2);
+        Integer gid = Integer.valueOf(1);
         int count = (int) pedigreeManager.countManagementNeighbors(gid);
         List<Germplasm> neighbors = pedigreeManager.getManagementNeighbors(gid, 0, count);
         assertNotNull(neighbors);
@@ -122,7 +143,6 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
         long count = pedigreeManager.countGroupRelatives(gid);
         List<Germplasm> neighbors = pedigreeManager.getGroupRelatives(gid, 0, (int) count);
         assertNotNull(neighbors);
-        assertFalse(neighbors.isEmpty());
 
         Debug.println(INDENT, "testGetGroupRelatives(" + gid + "):" + neighbors.size());
         for (Germplasm g : neighbors) {
@@ -287,7 +307,7 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
             
     @Test
     public void testGetParentByGIDAndProgenitorNumber() throws Exception {
-        Integer gid = Integer.valueOf(2);
+        Integer gid = Integer.valueOf(104);
         Integer progenitorNumber = Integer.valueOf(2);
         Germplasm result = pedigreeManager.getParentByGIDAndProgenitorNumber(gid, progenitorNumber);
         assertNotNull(result);

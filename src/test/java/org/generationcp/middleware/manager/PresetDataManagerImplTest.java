@@ -15,12 +15,12 @@ import static org.junit.Assert.*;
 public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 
 	static PresetDataManager manager;
+	private static final String DUMMY_PROGRAM_UUID = "12345678899";
 
 	@BeforeClass
 	public static void setUp() throws Exception {
 		manager = new PresetDataManagerImpl(
-				DataManagerIntegrationTest.managerFactory.getSessionProviderForLocal(),
-				DataManagerIntegrationTest.managerFactory.getSessionProviderForCentral());
+				DataManagerIntegrationTest.managerFactory.getSessionProvider());
 	}
 
 	@Test
@@ -30,7 +30,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		preset.setIsDefault(Boolean.TRUE);
 		preset.setName("configuration_01");
 		preset.setToolId(1);
-		preset.setProgramUuid(1);
+		preset.setProgramUuid(DUMMY_PROGRAM_UUID);
 
 		ProgramPreset results = manager.saveOrUpdateProgramPreset(preset);
 
@@ -55,11 +55,11 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		List<ProgramPreset> fullList = initializeProgramPresets();
 
 		for (int j = 1; j < 3; j++) {
-			List<ProgramPreset> presetsList = manager.getAllProgramPresetFromProgram(j);
+			List<ProgramPreset> presetsList = manager.getAllProgramPresetFromProgram(String.valueOf(j));
 
 			for (ProgramPreset p : presetsList) {
 				assertEquals("should only retrieve all standard presets with same program",
-						Integer.valueOf(j), p.getProgramUuid());
+						String.valueOf(j), p.getProgramUuid());
 			}
 		}
 
@@ -73,13 +73,13 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		List<ProgramPreset> fullList = initializeProgramPresets();
 
 		for (int j = 1; j < 3; j++) {
-			List<ProgramPreset> presetsList = manager.getProgramPresetFromProgramAndTool(j, j);
+			List<ProgramPreset> presetsList = manager.getProgramPresetFromProgramAndTool(String.valueOf(j), j);
 
 			for (ProgramPreset p : presetsList) {
 				assertEquals("should only retrieve all standard presets with same tool",
 						Integer.valueOf(j), p.getToolId());
 				assertEquals("should only retrieve all standard presets with same program",
-						Integer.valueOf(j), p.getProgramUuid());
+						String.valueOf(j), p.getProgramUuid());
 			}
 		}
 
@@ -94,13 +94,13 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 		List<ProgramPreset> fullList = initializeProgramPresets();
 
 		for (int j = 1; j < 3; j++) {
-			List<ProgramPreset> presetsList = manager.getProgramPresetFromProgramAndTool(j, j);
+			List<ProgramPreset> presetsList = manager.getProgramPresetFromProgramAndTool(String.valueOf(j), j);
 
 			for (ProgramPreset p : presetsList) {
 				assertEquals("should only retrieve all standard presets with same tool",
 						Integer.valueOf(j), p.getToolId());
 				assertEquals("should only retrieve all standard presets with same program",
-						Integer.valueOf(j), p.getProgramUuid());
+						String.valueOf(j), p.getProgramUuid());
 				assertEquals("should only retrieve all standard presets with same tool section",
 						"tool_section_" + j, p.getToolSection());
 
@@ -113,6 +113,22 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 
 	}
 
+	@Test
+	public void testGetProgramPresetFromProgramAndToolByName() throws Exception {
+		List<ProgramPreset> fullList = initializeProgramPresets();
+
+		// this should exists
+		List<ProgramPreset> result = manager.getProgramPresetFromProgramAndToolByName("configuration_1_1",String.valueOf(1),1,"tool_section_1");
+
+		assertTrue("result should not be empty", result.size() > 0);
+		assertEquals("Should return the same name","configuration_1_1",result.get(0).getName());
+
+		// cleanup
+		for (ProgramPreset p : fullList) {
+			manager.deleteProgramPreset(p.getProgramPresetId());
+		}
+	}
+
 	protected List<ProgramPreset> initializeProgramPresets() throws MiddlewareQueryException {
 		List<ProgramPreset> fullList = new ArrayList<ProgramPreset>();
 
@@ -123,7 +139,7 @@ public class PresetDataManagerImplTest extends DataManagerIntegrationTest {
 				preset.setName("configuration_" + j + "_" + i);
 				preset.setToolSection("tool_section_" + j);
 				preset.setToolId(j);
-				preset.setProgramUuid(j);
+				preset.setProgramUuid(String.valueOf(j));
 
 				fullList.add(manager.saveOrUpdateProgramPreset(preset));
 			}

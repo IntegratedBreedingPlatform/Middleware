@@ -22,23 +22,18 @@ import java.util.Set;
 
 public class StockBuilder extends Builder {
 
-	public StockBuilder(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StockBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(datasetId)) {
-		    DataSet dataSet = getDataSetBuilder().build(datasetId);
-		    Study study = getStudyBuilder().createStudy(dataSet.getStudyId());
-		
-		    VariableTypeList stockVariableTypes = getStockVariableTypes(study, dataSet);
-		    Set<StockModel> stockModels = getStockModels(datasetId);
-		
-		    return buildStocks(stockModels, stockVariableTypes);
-		}
-		return new Stocks();
+	    DataSet dataSet = getDataSetBuilder().build(datasetId);
+	    Study study = getStudyBuilder().createStudy(dataSet.getStudyId());
+	
+	    VariableTypeList stockVariableTypes = getStockVariableTypes(study, dataSet);
+	    Set<StockModel> stockModels = getStockModels(datasetId);
+	
+	    return buildStocks(stockModels, stockVariableTypes);
 	}
 
 	private VariableTypeList getStockVariableTypes(Study study, DataSet dataSet) {
@@ -100,7 +95,6 @@ public class StockBuilder extends Builder {
 	}
 	
 	public long countStocks(int datasetId) throws MiddlewareQueryException {
-		setWorkingDatabase(datasetId);
 		return getExperimentStockDao().countStocksByDatasetId(datasetId);
 	}
 }

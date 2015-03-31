@@ -87,7 +87,7 @@ public class GermplasmList implements Serializable{
     public static final String GET_GERMPLASM_LIST_TYPES = 
     		"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " +
     		"FROM udflds " +
-    		"WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED')";
+    		"WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES')";
 
     public static final String GET_GERMPLASM_NAME_TYPES = 
     		"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " +
@@ -99,7 +99,7 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+            "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
 		    "      OR desig LIKE :q OR listname LIKE :q " +
 		    "      OR desig LIKE :qNoSpaces " +
 		    "      OR desig LIKE :qStandardized " +
@@ -110,7 +110,7 @@ public class GermplasmList implements Serializable{
             "FROM listnms " +
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
-            "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED') AND liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid " +
+            "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid " +
             "      OR desig LIKE :q OR listname LIKE :q" +
             "      OR desig LIKE :qNoSpaces " +
             "      OR desig LIKE :qStandardized " +
@@ -122,7 +122,7 @@ public class GermplasmList implements Serializable{
             "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) " +
             "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
             "WHERE " + 
-            " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
+            " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) " +
             "      OR desig = :q OR listname = :q " +
             "      OR desig = :qNoSpaces " +
             "      OR desig = :qStandardized " +
@@ -422,6 +422,12 @@ public class GermplasmList implements Serializable{
     	return getParent()!=null?true:false;
     }
     
+    // TODO BMS-148 & BMS-150 check references and remove logic based on -ve/+ve ID.
+    /**
+     * No local/central lists or -ve vs. +ve IDs in merged DB world.
+     * @return
+     */
+    @Deprecated
     public boolean isLocalList() {
         return this.getId() < 0;
     }

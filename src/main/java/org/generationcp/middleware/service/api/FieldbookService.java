@@ -41,7 +41,7 @@ public interface FieldbookService {
      * @return all local nursery details
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException;
+    List<StudyDetails> getAllLocalNurseryDetails(String programUUID) throws MiddlewareQueryException;
     
     /**
      * Retrieves all the details of the trial studies stored in local database.
@@ -49,7 +49,7 @@ public interface FieldbookService {
      * @return  all local trial study details
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException;
+    List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) throws MiddlewareQueryException;
     
     /**
      * Gets the field map info (entries, reps, plots and counts) of the given trial.
@@ -175,14 +175,6 @@ public interface FieldbookService {
      */
     Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
     throws MiddlewareQueryException;
-    
-    /**
-     * Gets the next germplasm id.
-     *
-     * @return the next germplasm id
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    int getNextGermplasmId() throws MiddlewareQueryException;
     
     /**
      * Gets the germplasm id by name.
@@ -496,11 +488,11 @@ public interface FieldbookService {
     /**
      * Returns list of root or top-level folders from specified database.
      *
-     * @param instance Can be CENTRAL or LOCAL
+     * @param programUUID program's unique id
      * @return List of Folder POJOs or empty list if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
+    List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns list of children of a folder given its ID. Retrieves from central
@@ -511,7 +503,7 @@ public interface FieldbookService {
      * if none found
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
+    List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException;
     /**
      * Check if the given id is an existing study.
      *
@@ -597,13 +589,12 @@ public interface FieldbookService {
 	/**
 	 * Get study details.
 	 *
-	 * @param database the database
 	 * @param studyType the study type
 	 * @param studyId the study id
 	 * @return the study details
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StudyDetails getStudyDetails(Database database, StudyType studyType, int studyId) throws MiddlewareQueryException;
+	StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * Get the block id of a particular trial instance in a dataset.
@@ -720,10 +711,11 @@ public interface FieldbookService {
 	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
 	 *
 	 * @param name the name
+	 * @param programUUID the program UUID
 	 * @return the project id by name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getProjectIdByName(String name) throws MiddlewareQueryException;
+	Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the stanadard variale given the PSMR combination.
@@ -819,20 +811,20 @@ public interface FieldbookService {
 	 /**
      * Gets the favorite project location ids.
      *
-     * @param projectId the project id
+     * @param programUUID - unique id of program
      * @return the favorite project location ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Long> getFavoriteProjectLocationIds() throws MiddlewareQueryException;
+    List<Long> getFavoriteProjectLocationIds(String programUUID) throws MiddlewareQueryException;
     
     /**
      * Gets the favorite project methods.
      *
-     * @param projectId the project id
+     * @param programUUID - unique id of program
      * @return the favorite project methods
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Integer> getFavoriteProjectMethods() throws MiddlewareQueryException;
+    List<Integer> getFavoriteProjectMethods(String programUUID) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns germplasm lists by project id.
@@ -851,6 +843,7 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId) throws MiddlewareQueryException;
+	void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves a list data project
@@ -859,13 +852,31 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
-	
-	/** 
+
+    ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo) throws MiddlewareQueryException;
+
+    /**
 	 * Deletes a list data project given the project_id and the type.
 	 * @param projectId
 	 * @param type
 	 * @throws MiddlewareQueryException
 	 */
 	void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException;
+
+	/**
+     * Saves germplasm list crosses types.
+     * ListData items are always added to the database, before saving the germplasm list.
+     * 
+     * @param listDataItems the list data to add - the key of the Map is the germplasm 
+     *                                      associated to the germplasm list data value
+     * @param germplasmList the germplasm list to add
+     * 
+     * @return The id of the newly-created germplasm list
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	Integer saveCrossesGermplasmList(Map<Germplasm, GermplasmListData> listDataItems,
+			GermplasmList germplasmList) throws MiddlewareQueryException;
 	
+	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)  throws MiddlewareQueryException;
+	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException;
 }

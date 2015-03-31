@@ -26,8 +26,8 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public abstract class Destroyer extends DatabaseBroker {
 	
-	public Destroyer(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);		
+	public Destroyer(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);		
 	}
 
 	protected final DataSetDao getDataSetDao() {
@@ -37,7 +37,7 @@ public abstract class Destroyer extends DatabaseBroker {
 	}
 
     protected final ProjectPropertySaver getProjectPropertySaver() {
-    	return new ProjectPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    	return new ProjectPropertySaver(sessionProvider);
     }
 
 }

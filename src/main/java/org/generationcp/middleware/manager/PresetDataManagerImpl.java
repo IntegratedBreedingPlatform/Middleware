@@ -17,9 +17,8 @@ import java.util.List;
  */
 public class PresetDataManagerImpl extends DataManager implements PresetDataManager {
 	public PresetDataManagerImpl(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+			HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
 	}
 
 	public PresetDataManagerImpl() {
@@ -28,48 +27,23 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 
 	@Override
 	public ProgramPreset getProgramPresetById(int id) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
-
 		return this.getProgramPresetDAO().getById(id);
 	}
 
-	@SuppressWarnings("unchecked") @Override
-	public List<ProgramPreset> getAllProgramPresetFromProgram(int programId)
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ProgramPreset> getAllProgramPresetFromProgram(String programUUID)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
-
 		try {
-			Criteria criteria = getCurrentSessionForLocal().createCriteria(ProgramPreset.class);
+			Criteria criteria = getCurrentSession().createCriteria(ProgramPreset.class);
 
-			criteria.add(Restrictions.eq("programUuid", programId));
+			criteria.add(Restrictions.eq("programUuid", programUUID));
 
 			return criteria.list();
 		} catch (HibernateException e) {
 			logAndThrowException(
 					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId="
-							+ programId + "): "
-							+ e.getMessage(), e);
-		}
-
-		return new ArrayList<ProgramPreset>();
-	}
-
-	@SuppressWarnings("unchecked") @Override
-	public List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId)
-			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
-
-		try {
-			Criteria criteria = getCurrentSessionForLocal().createCriteria(ProgramPreset.class);
-
-			criteria.add(Restrictions.eq("programUuid", programId));
-			criteria.add(Restrictions.eq("toolId", toolId));
-
-			return criteria.list();
-		} catch (HibernateException e) {
-			logAndThrowException(
-					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId="
-							+ programId + "): "
+							+ programUUID + "): "
 							+ e.getMessage(), e);
 		}
 
@@ -77,15 +51,36 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	}
 
 	@Override
-	public List<ProgramPreset> getProgramPresetFromProgramAndTool(int programId, int toolId,
-			String toolSection)
+	@SuppressWarnings("unchecked")
+	public List<ProgramPreset> getProgramPresetFromProgramAndTool(String programUUID, int toolId)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 
 		try {
-			Criteria criteria = getCurrentSessionForLocal().createCriteria(ProgramPreset.class);
+			Criteria criteria = getCurrentSession().createCriteria(ProgramPreset.class);
 
-			criteria.add(Restrictions.eq("programUuid", programId));
+			criteria.add(Restrictions.eq("programUuid", programUUID));
+			criteria.add(Restrictions.eq("toolId", toolId));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId="
+							+ programUUID + "): "
+							+ e.getMessage(), e);
+		}
+
+		return new ArrayList<ProgramPreset>();
+	}
+
+	@Override
+	public List<ProgramPreset> getProgramPresetFromProgramAndTool(String programUUID, int toolId,
+			String toolSection)
+			throws MiddlewareQueryException {
+
+		try {
+			Criteria criteria = getCurrentSession().createCriteria(ProgramPreset.class);
+
+			criteria.add(Restrictions.eq("programUuid", programUUID));
 			criteria.add(Restrictions.eq("toolId", toolId));
 			criteria.add(Restrictions.eq("toolSection", toolSection));
 
@@ -93,7 +88,7 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 		} catch (HibernateException e) {
 			logAndThrowException(
 					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId="
-							+ programId + "): "
+							+ programUUID + "): "
 							+ e.getMessage(), e);
 		}
 
@@ -101,15 +96,14 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	}
 
 	@Override
-	public List<ProgramPreset> getProgramPresetFromProgramAndToolByName(String presetName,int programId, int toolId,
+	public List<ProgramPreset> getProgramPresetFromProgramAndToolByName(String presetName,String programUUID, int toolId,
 			String toolSection)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 
 		try {
-			Criteria criteria = getCurrentSessionForLocal().createCriteria(ProgramPreset.class);
+			Criteria criteria = getCurrentSession().createCriteria(ProgramPreset.class);
 
-			criteria.add(Restrictions.eq("programUuid", programId));
+			criteria.add(Restrictions.eq("programUuid", programUUID));
 			criteria.add(Restrictions.eq("toolId", toolId));
 			criteria.add(Restrictions.eq("toolSection", toolSection));
 			criteria.add(Restrictions.like("name",presetName));
@@ -118,7 +112,7 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 		} catch (HibernateException e) {
 			logAndThrowException(
 					"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId="
-							+ programId + "): "
+							+ programUUID + "): "
 							+ e.getMessage(), e);
 		}
 
@@ -129,9 +123,8 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	@Override
 	public ProgramPreset saveOrUpdateProgramPreset(ProgramPreset programPreset)
 			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
 
-		Transaction transaction = getCurrentSessionForLocal().beginTransaction();
+		Transaction transaction = getCurrentSession().beginTransaction();
 
 		try {
 			ProgramPreset result = this.getProgramPresetDAO().saveOrUpdate(programPreset);
@@ -147,7 +140,7 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 							+ programPreset.getName() + "): "
 							+ e.getMessage(), e);
 		} finally {
-			getCurrentSessionForLocal().flush();
+			getCurrentSession().flush();
 		}
 
 		return null;
@@ -155,14 +148,12 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 
 	@Override
 	public void deleteProgramPreset(int programPresetId) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
-
-		Transaction transaction = getCurrentSessionForLocal().beginTransaction();
+		Transaction transaction = getCurrentSession().beginTransaction();
 
 		try {
 
 			ProgramPreset preset = this.getProgramPresetDAO().getById(programPresetId);
-			getCurrentSessionForLocal().delete(preset);
+			getCurrentSession().delete(preset);
 			transaction.commit();
 
 		} catch (HibernateException e) {
@@ -172,7 +163,7 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 							+ programPresetId + "): "
 							+ e.getMessage(), e);
 		} finally {
-			getCurrentSessionForLocal().flush();
+			getCurrentSession().flush();
 		}
 	}
 }

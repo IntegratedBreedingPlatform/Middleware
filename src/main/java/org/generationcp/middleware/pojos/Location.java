@@ -13,6 +13,7 @@ package org.generationcp.middleware.pojos;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -46,6 +47,10 @@ public class Location implements Serializable, Comparable<Location>{
     @Column(name = "locid")
     @XmlElement(name = "locationId")
     private Integer locid;
+    
+    @Basic(optional = true)
+    @Column(name = "program_uuid")
+    private String uniqueID;
     
     @Basic(optional = false)
     @Column(name = "ltype")
@@ -94,7 +99,10 @@ public class Location implements Serializable, Comparable<Location>{
     @Transient
     private String parentLocationName;
 
-    public static final String GET_ALL_BREEDING_LOCATIONS = "SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt " +
+    @Transient
+    private String parentLocationAbbr;
+    
+    public static final String GET_ALL_BREEDING_LOCATIONS = "SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.program_uuid " +
     		"FROM location l left join georef g on l.locid = g.locid WHERE l.ltype IN (410, 411, 412) ORDER BY lname";
     public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
     public static final String GET_LOCATION_NAMES_BY_GIDS =
@@ -134,6 +142,14 @@ public class Location implements Serializable, Comparable<Location>{
     public void setLocid(Integer locid) {
         this.locid = locid;
     }
+    
+    public String getUniqueID() {
+		return uniqueID;
+	}
+
+	public void setUniqueID(String uniqueID) {
+		this.uniqueID = uniqueID;
+	}
 
     public Integer getLtype() {
         return ltype;
@@ -288,6 +304,14 @@ public class Location implements Serializable, Comparable<Location>{
 	 */
 	public void setParentLocationId(Integer parentLocationId) {
 		this.parentLocationId = parentLocationId;
+	}	
+	
+	public String getParentLocationAbbr() {
+		return parentLocationAbbr;
+	}
+
+	public void setParentLocationAbbr(String parentLocationAbbr) {
+		this.parentLocationAbbr = parentLocationAbbr;
 	}
 
 	@Override

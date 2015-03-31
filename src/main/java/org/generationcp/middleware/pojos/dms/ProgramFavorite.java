@@ -37,6 +37,10 @@ public class ProgramFavorite {
 	@Column(name = "id")
 	private Integer programFavoriteId;
 	
+    @Basic(optional = false)
+    @Column(name = "program_uuid")
+    private String uniqueID;
+	
 	@Basic(optional = false)
 	@Column(name = "entity_type")
 	private String entityType;
@@ -69,5 +73,12 @@ public class ProgramFavorite {
 		this.entityId = entityId;
 	}
 	
+    public String getUniqueID() {
+		return uniqueID;
+	}
+
+	public void setUniqueID(String uniqueID) {
+		this.uniqueID = uniqueID;
+	}
 	
 }

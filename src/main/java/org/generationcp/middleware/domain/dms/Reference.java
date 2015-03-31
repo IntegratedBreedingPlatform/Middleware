@@ -27,6 +27,8 @@ public abstract class Reference {
 	private String name;
 	
 	private String description;
+	
+	private String programUUID;
 
 	public Integer getId() {
 		return id;
@@ -50,6 +52,14 @@ public abstract class Reference {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	@Override
@@ -92,6 +102,8 @@ public abstract class Reference {
 		builder.append(name);
 		builder.append(", description=");
 		builder.append(description);
+		builder.append(", programUUID=");
+		builder.append(programUUID);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -101,6 +113,7 @@ public abstract class Reference {
         Debug.println(indent + 3, "Id: " + getId());
         Debug.println(indent + 3, "Name: " + getName());
         Debug.println(indent + 3, "Description: " + getDescription());
+        Debug.println(indent + 4, "ProgramUUID: " + getProgramUUID());
     }
 
 	/**

@@ -20,6 +20,8 @@ import java.util.List;
 
 public class MeasurementData {
 	
+	public static final String MISSING_VALUE = "missing";
+	
 	private String label;
 	
 	private String value;
@@ -242,7 +244,7 @@ public class MeasurementData {
 	public boolean isCategoricalDisplayAcceptedValidValues(){
 		if(getMeasurementVariable() != null && getMeasurementVariable().getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId() && getMeasurementVariable().getPossibleValues() != null){
 			String displayValue = getDisplayValue();
-			if(displayValue != null && !displayValue.equalsIgnoreCase("")){
+			if(displayValue != null && !displayValue.equalsIgnoreCase("") && !MISSING_VALUE.equals(displayValue)){
 				for(ValueReference valRef : getMeasurementVariable().getPossibleValues()){
 						if(valRef.getDescription().equalsIgnoreCase(displayValue)){
 							return false;

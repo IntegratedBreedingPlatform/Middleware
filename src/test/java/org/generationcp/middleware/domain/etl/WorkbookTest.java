@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import junit.framework.Assert;
+
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -25,6 +27,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
+import org.junit.Test;
 
 public class WorkbookTest {
 	
@@ -65,6 +68,9 @@ public class WorkbookTest {
 	private static final String NESTED_NUMBER = "NESTED NUMBER";
 	private static final String KG_HA = "kg/ha";
 	private static final String PH = "ph";
+	private static final String SCORE_1_5 = "Score (1-5)";
+	private static final String VISUAL_SCORING = "Visual scoring";
+	private static final String COMMON_RUST = "Common rust";
 
 	// METHODS
 	private static final String ASSIGNED = "ASSIGNED";
@@ -103,6 +109,8 @@ public class WorkbookTest {
 	// VARIATES
 	private static final String GYLD = "GYLD";
 	private static final int GYLD_ID = 18000;
+	private static final String CRUST = "CRUST";
+	public static final int CRUST_ID = 20310;
 
 	// CONDITIONS
 	private static final String PI_NAME = "PI Name";
@@ -126,6 +134,12 @@ public class WorkbookTest {
 	private static final Integer SNL1ID = 1;
 	private static final Integer CNTRYID = 1;
 	private static final Integer LRPLCE = 1;
+	
+	private static final String VALID_CRUST_VALUE = "1";
+	private static final String VALID_CRUST_CVALUE_ID = "50723";
+	private static final String INVALID_CRUST_VALUE_NUMERIC = "11";
+	private static final String INVALID_CRUST_VALUE_CHAR = "test";
+	private static final String INVALID_CRUST_VALUE_MISSING = "missing";
 	
 	private static final int DEFAULT_NO_OF_OBSERVATIONS = 10;
 
@@ -281,13 +295,28 @@ public class WorkbookTest {
 	private static void createVariates() {
 		//Create measurement variables and set its dataTypeId
 		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
-
-		variates.add(createMeasurementVariable(GYLD_ID,
+		MeasurementVariable measurementVariable = createMeasurementVariable(GYLD_ID,
 				GYLD, "Grain yield -dry and weigh (kg/ha)",
 				KG_HA, DRY_AND_WEIGH, YIELD,
-				NUMERIC, NUMERIC_VALUE, PLOT, TermId.NUMERIC_VARIABLE.getId()));
-
+				NUMERIC, NUMERIC_VALUE, PLOT, TermId.NUMERIC_VARIABLE.getId());
+		measurementVariable.setStoredIn(TermId.OBSERVATION_VARIATE.getId());
+		variates.add(measurementVariable);
+		
 		workbook.setVariates(variates);
+	}
+	
+	public static void addVariatesAndObservations(Workbook currentWorkbook) {
+		
+		List<MeasurementVariable> variates = currentWorkbook.getVariates();
+		MeasurementVariable measurementVariable = createMeasurementVariable(CRUST_ID,
+				CRUST, "Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
+				SCORE_1_5, VISUAL_SCORING, COMMON_RUST,
+				CHAR, null, PLOT, TermId.CHARACTER_VARIABLE.getId());
+		measurementVariable.setStoredIn(TermId.CATEGORICAL_VARIATE.getId());
+		measurementVariable.setOperation(Operation.ADD);
+		variates.add(measurementVariable);
+		
+		addObservations(currentWorkbook);
 	}
 
 	private static void createObservations(int noOfObservations) {
@@ -315,12 +344,40 @@ public class WorkbookTest {
 			dataList.add(createMeasurementData(REP, "", TermId.REP_NO.getId(), workbook.getFactors()));
 			dataList.add(createMeasurementData("DAY_OBS", randomizeValue(random, fmt, 5000), DAY_OBS, workbook.getFactors()));
 			dataList.add(createMeasurementData(GYLD, randomizeValue(random, fmt, 5000), GYLD_ID, workbook.getVariates()));
-
 			row.setDataList(dataList);
 			observations.add(row);
 		}
 
 		workbook.setObservations(observations);
+	}
+	
+	private static void addObservations(Workbook currentWorkbook) {
+		List<MeasurementRow> observations = currentWorkbook.getObservations();
+
+		MeasurementRow row;
+		List<MeasurementData> dataList;
+		Random random = new Random();
+		DecimalFormat fmt = new DecimalFormat("#.##");
+
+		//Create n number of observation rows
+		for (int i = 0; i < observations.size(); i++) {
+			row = observations.get(i);
+			dataList = row.getDataList();
+			
+			String crustValue = randomizeValue(random, fmt, 5000);
+			String crustCValueId = null;
+			switch(i) {
+				case 0: crustValue = ""; break;
+				case 1: crustValue = null; break;
+				case 2: crustValue = VALID_CRUST_VALUE; crustCValueId = VALID_CRUST_CVALUE_ID; break;
+				case 3: crustValue = INVALID_CRUST_VALUE_NUMERIC; break;
+				case 4: crustValue = INVALID_CRUST_VALUE_CHAR; break;
+				case 5: crustValue = INVALID_CRUST_VALUE_MISSING; break;
+			}
+			MeasurementData measurementData = createMeasurementData(CRUST, crustValue, CRUST_ID, workbook.getVariates());
+			measurementData.setcValueId(crustCValueId);
+			dataList.add(measurementData);
+		}
 	}
 
 	private static MeasurementData createMeasurementData(String label, String value, int termId, List<MeasurementVariable> variables) {
@@ -505,5 +562,59 @@ public class WorkbookTest {
 			}
 		}
 	}
-
+	
+	private MeasurementVariable createMeasurementVariable(Integer termId){
+		MeasurementVariable var = new MeasurementVariable();
+		var.setTermId(termId);
+		return var;
+	}
+	@Test
+	public void testArrangeMeasurementVariables(){
+		Workbook workbook = new Workbook();
+		List<MeasurementVariable> varList = new ArrayList<MeasurementVariable>();
+		varList.add(createMeasurementVariable(10));
+		varList.add(createMeasurementVariable(20));
+		varList.add(createMeasurementVariable(30));
+		List<Integer> columnOrderedList = new ArrayList<Integer>();
+		columnOrderedList.add(new Integer(20));
+		columnOrderedList.add(new Integer(30));
+		columnOrderedList.add(new Integer(10));
+		workbook.setColumnOrderedLists(columnOrderedList);
+		varList = workbook.arrangeMeasurementVariables(varList);
+		
+		Assert.assertEquals("1st element should have term id 20", 20, varList.get(0).getTermId());
+		Assert.assertEquals("2nd element should have term id 30", 30, varList.get(1).getTermId());
+		Assert.assertEquals("3rd element should have term id 10", 10, varList.get(2).getTermId());
+	}
+	
+	private MeasurementData createMeasurementData(int termId){
+		MeasurementData data = new MeasurementData();
+		MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(termId);
+		data.setMeasurementVariable(measurementVariable);
+		return data;
+	}
+	@Test
+	public void testArrangeMeasurementObservation(){
+		Workbook workbook = new Workbook();
+		List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		MeasurementRow row = new MeasurementRow();
+		List<MeasurementData> dataList = new ArrayList<MeasurementData>();		
+		dataList.add(createMeasurementData(10));
+		dataList.add(createMeasurementData(20));
+		dataList.add(createMeasurementData(30));
+		row.setDataList(dataList);
+		observations.add(row);
+		
+		List<Integer> columnOrderedList = new ArrayList<Integer>();
+		columnOrderedList.add(new Integer(20));
+		columnOrderedList.add(new Integer(30));
+		columnOrderedList.add(new Integer(10));
+		workbook.setColumnOrderedLists(columnOrderedList);
+		List<MeasurementRow> newObservations = workbook.arrangeMeasurementObservation(observations);
+		
+		Assert.assertEquals("1st element should have term id 20", 20, newObservations.get(0).getDataList().get(0).getMeasurementVariable().getTermId());
+		Assert.assertEquals("1st element should have term id 30", 30, newObservations.get(0).getDataList().get(1).getMeasurementVariable().getTermId());
+		Assert.assertEquals("1st element should have term id 10", 10, newObservations.get(0).getDataList().get(2).getMeasurementVariable().getTermId());
+	}
 }

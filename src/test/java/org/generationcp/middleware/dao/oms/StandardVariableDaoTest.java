@@ -28,7 +28,7 @@ public class StandardVariableDaoTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetStandardVariableSummaryCentral() throws MiddlewareQueryException {
 		
-		StandardVariableDao dao = new StandardVariableDao(managerFactory.getSessionProviderForCentral().getSession());
+		StandardVariableDao dao = new StandardVariableDao(managerFactory.getSessionProvider().getSession());
 		
 		//Load summary from the view
 		StandardVariableSummary summary = dao.getStandardVariableSummary(PLANT_HEIGHT_ID);	
@@ -88,7 +88,7 @@ public class StandardVariableDaoTest extends DataManagerIntegrationTest {
 		Assert.assertNotNull(details);
 		
 		//Load summary from the view
-		StandardVariableDao dao = new StandardVariableDao(managerFactory.getSessionProviderForLocal().getSession());
+		StandardVariableDao dao = new StandardVariableDao(managerFactory.getSessionProvider().getSession());
 		StandardVariableSummary summary = dao.getStandardVariableSummary(myOwnPlantHeight.getId());	
 		Assert.assertNotNull(summary);
 		
@@ -116,7 +116,7 @@ public class StandardVariableDaoTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetStarndardVariableSummaries() throws MiddlewareQueryException {
 		
-		StandardVariableDao dao = new StandardVariableDao(managerFactory.getSessionProviderForCentral().getSession());		
+		StandardVariableDao dao = new StandardVariableDao(managerFactory.getSessionProvider().getSession());		
 		List<StandardVariableSummary> starndardVariableSummaries = dao.getStarndardVariableSummaries(Arrays.asList(GRAIN_YIELD_ID, PLANT_HEIGHT_ID));		
 		Assert.assertEquals(2, starndardVariableSummaries.size());
 	}

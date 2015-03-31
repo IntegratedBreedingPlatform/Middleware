@@ -11,38 +11,32 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 
-import java.util.*;
-
 public class ValueReferenceBuilder extends Builder {
 
-	public ValueReferenceBuilder(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ValueReferenceBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
-		setWorkingDatabase(stdVarId);
 		List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(stdVarId);
 		Integer dataType = getRelationshipValue(relationships, TermId.HAS_TYPE.getId());
 		
 		if (dataType != null && dataType == TermId.CATEGORICAL_VARIABLE.getId()) {
-			setWorkingDatabase(stdVarId);
-			if (stdVarId > 0) {
-				setWorkingDatabase(Database.LOCAL);
-				relationships.addAll(getCvTermRelationshipDao().getBySubject(stdVarId));				
-			}
 			Set<ValueReference> set = getRelationshipValues(relationships, TermId.HAS_VALUE.getId());
 			for (ValueReference ref : set) {
-				setWorkingDatabase(ref.getId());
 				CVTerm term = getCvTermDao().getById(ref.getId());
 				if (term != null) {
 					ref.setKey(ref.getId().toString());
@@ -54,7 +48,6 @@ public class ValueReferenceBuilder extends Builder {
 			Collections.sort(list);
 			return list;
 		}
-		
 		return new ArrayList<ValueReference>();
 	}
 	

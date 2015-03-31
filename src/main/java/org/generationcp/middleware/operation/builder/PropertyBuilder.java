@@ -11,28 +11,20 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
-
-import java.util.List;
 
 
 public class PropertyBuilder extends Builder{
 
-    public PropertyBuilder(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-        super(sessionProviderForLocal, sessionProviderForCentral);
+    public PropertyBuilder(HibernateSessionProvider sessionProviderForLocal) {
+        super(sessionProviderForLocal);
     }
 
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
-        List<Property> properties = getCvTermDao().getAllPropertiesWithTraitClass();
-        
-        setWorkingDatabase(Database.LOCAL);
-        properties.addAll(getCvTermDao().getAllPropertiesWithTraitClass());
-        
-        return properties;
+        return getCvTermDao().getAllPropertiesWithTraitClass();
     }
 }

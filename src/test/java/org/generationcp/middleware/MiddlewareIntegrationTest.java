@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
  */
 public class MiddlewareIntegrationTest {
 
-	protected final Logger LOG = LoggerFactory.getLogger(getClass());
+	protected static final Logger LOG = LoggerFactory.getLogger(MiddlewareIntegrationTest.class);
 	protected static final int INDENT = 3;
 
-	protected static DatabaseConnectionParameters centralConnectionParams, localConnectionParameters, workbenchConnectionParameters;
-	protected static HibernateUtil centralSessionUtil, localSessionUtil, workbenchSessionUtil;
+	protected static DatabaseConnectionParameters connectionParameters, workbenchConnectionParameters;
+	protected static HibernateUtil sessionUtil, workbenchSessionUtil;
 
 	/**
 	 * We hold session factories in a static field and initialise them only once for all tests to use as opening a session factory is an
@@ -43,29 +43,27 @@ public class MiddlewareIntegrationTest {
 			if (config.getBoolean("drop.create.dbs")) {
 				DatabaseSetupUtil.setupTestDatabases();
 			}
-			localConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-			centralConnectionParams = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-			workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
 
-			centralSessionUtil = new HibernateUtil(centralConnectionParams);
-			localSessionUtil = new HibernateUtil(localConnectionParameters);
+			workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
+			connectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "crop");
+
+			sessionUtil = new HibernateUtil(connectionParameters);
 			workbenchSessionUtil = new HibernateUtil(workbenchConnectionParameters);
 
-		} catch (FileNotFoundException e) {
-			Assert.fail(e.getMessage());
-		} catch (ConfigException e) {
-			Assert.fail(e.getMessage());
-		} catch (URISyntaxException e) {
-			Assert.fail(e.getMessage());
-		} catch (IOException e) {
-			Assert.fail(e.getMessage());
-		} catch (ConfigurationException e) {
-			Assert.fail(e.getMessage());
 		} catch (ConversionException e) {
 			Assert.fail("Boolean config for drop.create.dbs in testDatabaseConfig.properties was not formed properly - needs to be true,t,false or f" + e.getMessage());		
 		} catch (Exception e) {
-			Assert.fail(e.getMessage());
+			logExceptionInfoAndFail(e);
 		} 
+	}
+	
+	static void logExceptionInfoAndFail(Exception e) {
+		String msg = "Exception " + e.getMessage();
+		if(e.getCause() != null) {
+			msg += " caused by: " + e.getCause().getMessage();
+		}
+		LOG.info(msg);
+		Assert.fail(msg);
 	}
 
 	@Rule

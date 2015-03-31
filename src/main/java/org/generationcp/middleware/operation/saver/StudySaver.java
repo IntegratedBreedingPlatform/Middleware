@@ -25,21 +25,19 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
  * @author Joyce Avestro
  * 
  */
-public class StudySaver extends Saver{
+public class StudySaver extends Saver {
 	
-	public StudySaver(HibernateSessionProvider sessionProviderForLocal,
-            HibernateSessionProvider sessionProviderForCentral) {
-				super(sessionProviderForLocal, sessionProviderForCentral);
+	public StudySaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	/**
 	 * Saves a study. Creates an entry in project, projectprop and project_relationship tables (default)
 	 * Creates an entry in nd_experiment and nd_experiment_project tables if saveStudyExperiment is true.
 	 */
-	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, boolean saveStudyExperiment) throws Exception{
-        requireLocalDatabaseInstance();
+	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, boolean saveStudyExperiment, String programUUID) throws Exception{
         DmsProject project = getProjectSaver().create(studyValues);
-        
+        project.setProgramUUID(programUUID);
         try {
             project = getProjectSaver().save(project);
             getProjectPropertySaver().saveProjectProperties(project, variableTypeList);

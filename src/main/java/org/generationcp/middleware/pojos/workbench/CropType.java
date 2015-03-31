@@ -27,17 +27,6 @@ public class CropType implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    // Initial pre-defined crops. Used mainly in testing
-    public final static String CHICKPEA = "Chickpea";
-    public final static String COWPEA = "Cowpea";
-    public final static String MAIZE = "Maize";
-    public final static String RICE = "Rice";
-    public final static String WHEAT = "Wheat";
-    public final static String CASSAVA = "Cassava";
-    public final static String GROUNDNUT = "Groundnut";
-    public final static String SORGHUM = "Sorghum";
-    public final static String PHASEOLUS = "Phaseolus";
-    
     public enum CropEnum {
     	CASSAVA,
     	CHICKPEA,
@@ -64,8 +53,8 @@ public class CropType implements Serializable{
     @Column(name = "crop_name")
     private String cropName;
 
-    @Column(name = "central_db_name")
-    private String centralDbName;
+    @Column(name = "db_name")
+    private String dbName;
 
     @Column(name = "schema_version")
     private String version;
@@ -85,20 +74,12 @@ public class CropType implements Serializable{
         this.cropName = cropName;
     }
 
-    public String getCentralDbName() {
-        return centralDbName;
+    public String getDbName() {
+		return String.format("ibdbv2_%s_merged", cropName.trim().toLowerCase().replaceAll("\\s+", "_"));
     }
 
-    public void setCentralDbName(String centralDbName) {
-        this.centralDbName = centralDbName;
-    }
-    
-    public String getLocalDatabaseNameWithProject(Project project) {
-        return getLocalDatabaseNameWithProjectId(project.getProjectId());
-    }
-    
-    public String getLocalDatabaseNameWithProjectId(Long projectId) {
-        return String.format("ibdbv2_%s_%s_local", cropName.trim().toLowerCase().replaceAll("\\s+", "_"), projectId);
+	public void setDbName(String dbName) {
+		this.dbName = dbName;
     }
 
     @Override
@@ -146,7 +127,7 @@ public class CropType implements Serializable{
         builder.append("CropType [cropName=");
         builder.append(cropName);
         builder.append(", centralDbName=");
-        builder.append(centralDbName);
+        builder.append(dbName);
         builder.append(", version=");
         builder.append(version);
         builder.append("]");

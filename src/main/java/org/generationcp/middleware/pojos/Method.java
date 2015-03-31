@@ -29,7 +29,7 @@ import java.util.List;
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "method")
-@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator", "prefix", "count", "suffix" })
+@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator", "prefix", "count", "suffix","program_uuid" })
 @XmlAccessorType(XmlAccessType.NONE)
 public class Method implements Serializable{
 
@@ -51,6 +51,10 @@ public class Method implements Serializable{
     @Column(name = "mid")
     @XmlElement(name = "methodId")
     private Integer mid;
+    
+    @Basic(optional = true)
+    @Column(name = "program_uuid")
+    private String uniqueID;
 
     @Basic(optional = false)
     @Column(name = "mtype")
@@ -145,7 +149,7 @@ public class Method implements Serializable{
     }
 
     public Method(Integer mid, String mtype, String mgrp, String mcode, String mname, String mdesc, Integer mref, Integer mprgn,
-            Integer mfprg, Integer mattr, Integer geneq, Integer muid, Integer lmid, Integer mdate) {
+            Integer mfprg, Integer mattr, Integer geneq, Integer muid, Integer lmid, Integer mdate, String uniqueID) {
         super();
         this.mid = mid;
         this.mtype = mtype;
@@ -161,6 +165,7 @@ public class Method implements Serializable{
         this.muid = muid;
         this.lmid = lmid;
         this.mdate = mdate;
+        this.uniqueID = uniqueID;
     }
 
     public Integer getMid() {
@@ -171,7 +176,15 @@ public class Method implements Serializable{
         this.mid = mid;
     }
 
-    public String getMtype() {
+    public String getUniqueID() {
+		return uniqueID;
+	}
+
+	public void setUniqueID(String uniqueID) {
+		this.uniqueID = uniqueID;
+	}
+
+	public String getMtype() {
         return mtype;
     }
 
@@ -274,6 +287,7 @@ public class Method implements Serializable{
     public void setUser(Integer muid) {
         this.muid = muid;
     }
+    
 
     @Override
     public int hashCode() {
@@ -333,6 +347,16 @@ public class Method implements Serializable{
         builder.append(lmid);
         builder.append(", mdate=");
         builder.append(mdate);
+        builder.append(", snametype=");
+        builder.append(snametype);
+        builder.append(", separator=");
+        builder.append(separator);
+        builder.append(", prefix=");
+        builder.append(prefix);
+        builder.append(", count=");
+        builder.append(count);
+        builder.append(", suffix=");
+        builder.append(suffix);
         builder.append("]");
         return builder.toString();
     }

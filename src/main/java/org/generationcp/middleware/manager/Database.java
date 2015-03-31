@@ -17,6 +17,8 @@ package org.generationcp.middleware.manager;
  * @author Kevin Manansala
  * 
  */
+@Deprecated
+//TODO Remove the enum and all its references. In merged DB world, there is not central/local.
 public enum Database {
     LOCAL, CENTRAL
 }

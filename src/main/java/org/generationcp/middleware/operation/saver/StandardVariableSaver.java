@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.*;
@@ -35,14 +34,11 @@ public class StandardVariableSaver extends Saver {
 
 	private static final int CV_VARIABLES = 1040;
 	
-	public StandardVariableSaver(HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public StandardVariableSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void delete(StandardVariable stdVar) throws MiddlewareQueryException, MiddlewareException {
-	    setWorkingDatabase(Database.LOCAL);
-	    
 	    deleteEnumerations(stdVar.getId(), stdVar.getEnumerations());
 	    
 	    if (stdVar.getCropOntologyId() != null) {
@@ -67,16 +63,13 @@ public class StandardVariableSaver extends Saver {
 	}
 
 	public void deleteConstraints(StandardVariable stdVar) throws MiddlewareQueryException{
-        setWorkingDatabase(Database.LOCAL);
         if (stdVar.getConstraints() != null) {
-               deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
-               deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
-           }
-
+        	deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
+        	deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+        }
 	}
 	
 	public Integer save(StandardVariable stdVar) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		CVTerm varTerm = createCvTerm(stdVar);
 		int varId = varTerm.getCvTermId();
 		stdVar.setId(varId);
@@ -100,8 +93,6 @@ public class StandardVariableSaver extends Saver {
 	}
 	
 	public void saveConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareQueryException{
-	    requireLocalDatabaseInstance();
-	     
 	    if (constraints.getMinValueId() == null){ // add
 	        Integer minId = saveConstraint(standardVariableId, TermId.MIN_VALUE.getId(), constraints.getMinValue());
 	        constraints.setMinValueId(minId);
@@ -121,8 +112,6 @@ public class StandardVariableSaver extends Saver {
     public void saveEnumeration(StandardVariable variable, Enumeration enumeration, Integer cvId) 
             throws MiddlewareException, MiddlewareQueryException{
 
-        requireLocalDatabaseInstance();
-        
         validateInputEnumeration(variable, enumeration);
         
         //Save cvterm entry of the new valid value
@@ -131,7 +120,6 @@ public class StandardVariableSaver extends Saver {
         
         // save cvterm relationship
         saveCvTermRelationship(variable.getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
-        
     }
     
     private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException{
@@ -171,7 +159,7 @@ public class StandardVariableSaver extends Saver {
 		if(cvTerm == null) {
 		
 			cvTerm = new CVTerm();
-			cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+			cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
 			cvTerm.setCv(CV_VARIABLES);
 			cvTerm.setName(stdVar.getName());
 			cvTerm.setDefinition(stdVar.getDescription());
@@ -186,7 +174,7 @@ public class StandardVariableSaver extends Saver {
 	
     private CVTerm createCvTerm(Enumeration enumeration, Integer cvId) throws MiddlewareQueryException {
         CVTerm cvTerm = new CVTerm();
-        cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+        cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
         cvTerm.setCv(cvId);
         cvTerm.setName(enumeration.getName());
         cvTerm.setDefinition(enumeration.getDescription());
@@ -197,9 +185,8 @@ public class StandardVariableSaver extends Saver {
     }
 
     public CV createCv(StandardVariable variable) throws MiddlewareQueryException{
-        requireLocalDatabaseInstance();
         CV cv = new CV();
-        cv.setCvId(getCvDao().getNegativeId("cvId"));
+        cv.setCvId(getCvDao().getNextId("cvId"));
         cv.setName(String.valueOf(variable.getId()));
         cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
         getCvDao().save(cv);
@@ -231,7 +218,7 @@ public class StandardVariableSaver extends Saver {
 		
 			CVTermRelationship relationship = new CVTermRelationship();
 			
-			relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNegativeId("cvTermRelationshipId"));
+			relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNextId("cvTermRelationshipId"));
 			relationship.setSubjectId(subjectId);
 			relationship.setTypeId(typeId);
 			relationship.setObjectId(objectId);
@@ -243,8 +230,8 @@ public class StandardVariableSaver extends Saver {
     private Integer saveConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
         if (constraintValue != null) {
             CVTermProperty property = new CVTermProperty();
-            int negativeId = getCvTermPropertyDao().getNegativeId("cvTermPropertyId");
-            property.setCvTermPropertyId(negativeId);
+            int nextId = getCvTermPropertyDao().getNextId("cvTermPropertyId");
+            property.setCvTermPropertyId(nextId);
             property.setTypeId(typeId);
             property.setValue(constraintValue.toString());
             property.setRank(0);
@@ -273,7 +260,7 @@ public class StandardVariableSaver extends Saver {
 				if (!StringUtil.isEmpty(nameSynonym.getName())) {
 					CVTermSynonym cvTermSynonym = new CVTermSynonym();
 					
-					cvTermSynonym.setCvTermSynonymId(getCvTermSynonymDao().getNegativeId("cvTermSynonymId"));
+					cvTermSynonym.setCvTermSynonymId(getCvTermSynonymDao().getNextId("cvTermSynonymId"));
 					cvTermSynonym.setSynonym(nameSynonym.getName());
 					cvTermSynonym.setTypeId(nameSynonym.getType().getId());
 					cvTermSynonym.setCvTermId(cvTermId);
@@ -293,7 +280,6 @@ public class StandardVariableSaver extends Saver {
 	}
 
     public void update(StandardVariable standardVariable) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
         CVTerm varTerm = getStandardVariableBuilder().getCvTerm(standardVariable.getName(), CvId.VARIABLES.getId());
         varTerm.setName(standardVariable.getName());
         varTerm.setDefinition(standardVariable.getDescription());
@@ -370,27 +356,21 @@ public class StandardVariableSaver extends Saver {
     }
 
     public void saveOrUpdateCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-        
+       
         CVTermProperty cropOntologyProperty = getCvTermPropertyDao().getOneByCvTermAndType(traitId, TermId.CROP_ONTOLOGY_ID.getId());
-        if (cropOntologyProperty == null) {
-            if (traitId > 0) {
-                setWorkingDatabase(traitId);
-                cropOntologyProperty = getCvTermPropertyDao().getOneByCvTermAndType(traitId, TermId.CROP_ONTOLOGY_ID.getId());
-                if (cropOntologyProperty != null && cropOntologyProperty.getValue() != null 
-                        && cropOntologyProperty.getValue().equalsIgnoreCase(cropOntologyId)) {
-                    //do nothing, no change
-                    return;
-                }
-            }
+        if (cropOntologyProperty != null && cropOntologyProperty.getValue() != null 
+                && cropOntologyProperty.getValue().equalsIgnoreCase(cropOntologyId)) {
+            //do nothing, no change
+            return;
         }
-        else {
-            if (cropOntologyId == null || "".equals(cropOntologyId)) {
-                getCvTermPropertyDao().makeTransient(cropOntologyProperty);
-                return;
-            }
+        
+        if (cropOntologyId == null || "".equals(cropOntologyId)) {
+        	if(cropOntologyProperty != null){
+        		getCvTermPropertyDao().makeTransient(cropOntologyProperty);
+        	}
+            return;
         }
-        setWorkingDatabase(Database.LOCAL);
+
         boolean isForCreate = true;
         if (cropOntologyProperty == null) {
             if (cropOntologyId == null || "".equals(cropOntologyId.trim())) {
@@ -401,7 +381,7 @@ public class StandardVariableSaver extends Saver {
                 cropOntologyProperty.setCvTermId(traitId);
                 cropOntologyProperty.setRank(0);
                 cropOntologyProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
-                cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
+                cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNextId("cvTermPropertyId"));
             }
         }
         if (isForCreate) {
@@ -412,7 +392,6 @@ public class StandardVariableSaver extends Saver {
     }
     
     public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException {
-        requireLocalDatabaseInstance();
         deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
         deleteCvTerm(getCvTermDao().getById(enumeration.getId()));
     }
@@ -429,11 +408,7 @@ public class StandardVariableSaver extends Saver {
         Term typeTerm = getTermBuilder().get(typeId);
         if (typeTerm != null) {
             CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
-            if(cvRelationship != null){ 
-                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
-                    throw new MiddlewareException("Error in deleteCvTermRelationship: Relationship found in central - cannot be deleted.");
-                }
-    
+            if(cvRelationship != null){     
                 CVTermRelationshipDao dao = getCvTermRelationshipDao();
                 try {
                     dao.makeTransient(cvRelationship);
@@ -445,18 +420,16 @@ public class StandardVariableSaver extends Saver {
     }
     
     public void deleteCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
-        if (traitId < 0) {
-            CVTerm trait = getCvTermDao().getById(traitId);
-            if (trait != null) { 
-                List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
-                if (traitProperties != null) {
-                    for (CVTermProperty traitProperty : traitProperties) {
-                        if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
-                            if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
-                                getCvTermPropertyDao().makeTransient(traitProperty);
-                            }
-                            break;
+        CVTerm trait = getCvTermDao().getById(traitId);
+        if (trait != null) { 
+            List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
+            if (traitProperties != null) {
+                for (CVTermProperty traitProperty : traitProperties) {
+                    if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
+                        if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
+                            getCvTermPropertyDao().makeTransient(traitProperty);
                         }
+                        break;
                     }
                 }
             }
@@ -493,7 +466,6 @@ public class StandardVariableSaver extends Saver {
     }
     
     public void deleteCvTerm(CVTerm cvTerm) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
         CVTermDao dao = getCvTermDao();
         try {
             dao.makeTransient(cvTerm);

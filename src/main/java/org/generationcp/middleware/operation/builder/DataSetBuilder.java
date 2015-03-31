@@ -32,31 +32,26 @@ public class DataSetBuilder extends Builder {
 	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(),
 			TermId.DATASET_TYPE.getId());
 
-	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                 HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public DataSet build(int dataSetId) throws MiddlewareQueryException {
 		DataSet dataSet = null;
-		if (setWorkingDatabase(dataSetId)) {
-			DmsProject project = getDmsProjectDao().getById(dataSetId);
-			if (project != null) {
-				dataSet = createDataSet(project);
-			}
+		DmsProject project = getDmsProjectDao().getById(dataSetId);
+		if (project != null) {
+			dataSet = createDataSet(project);
 		}
 		return dataSet;
 	}
 	
 	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareQueryException {
 		VariableTypeList variableTypeList = new VariableTypeList();
-		if (setWorkingDatabase(dataSetId)) {
-			DmsProject project = getDmsProjectDao().getById(dataSetId);
-			if (project != null) {
-				Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(project.getProperties());
-				for (VariableInfo variableInfo : variableInfoList) {
-					variableTypeList.add(getVariableTypeBuilder().create(variableInfo));
-				}
+		DmsProject project = getDmsProjectDao().getById(dataSetId);
+		if (project != null) {
+			Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(project.getProperties());
+			for (VariableInfo variableInfo : variableInfoList) {
+				variableTypeList.add(getVariableTypeBuilder().create(variableInfo));
 			}
 		}
 		return variableTypeList.sort();
@@ -103,36 +98,24 @@ public class DataSetBuilder extends Builder {
 	}
 
 	public DmsProject getTrialDataset(int studyId, int measurementDatasetId) throws MiddlewareQueryException {
-	    setWorkingDatabase(studyId);
 	    DmsProject trialDataset = null;
-	    DmsProject study = getDmsProjectDao().getById(studyId);
+	    DmsProject study = getDmsProjectById(studyId);
 	    List<ProjectRelationship> datasets = study.getRelatedBys();
 	    if (datasets != null) {
+	    	trialDataset = datasets.get(0).getSubjectProject();
+	    	int lowest = Math.abs(trialDataset.getProjectId());
 	        for (ProjectRelationship dataset : datasets) {
-	            String datasetType = null; 
-                for (ProjectProperty prop : dataset.getSubjectProject().getProperties()) {
-                    if (prop.getTypeId() == TermId.DATASET_TYPE.getId()) {
-                        datasetType = prop.getValue();
-                    }
-                }
-                if (datasetType != null) {
-    	            if (Integer.parseInt(datasetType) == DataSetType.SUMMARY_DATA.getId() 
-    	                    || (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId())
-    	                    && Integer.parseInt(datasetType) != DataSetType.MEANS_DATA.getId()
-    	                    && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId))) {
-    	                trialDataset = dataset.getSubjectProject();
-    	                break;
-    	            }
-                } else if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
-                        && !dataset.getSubjectProject().getProjectId().equals((Integer)measurementDatasetId)) {
+	        	Integer projectId = dataset.getSubjectProject().getProjectId();
+	        	int id = Math.abs(projectId);
+	        	if(id < lowest) {
+    				lowest = id;
                     trialDataset = dataset.getSubjectProject();
-                    break;
                 }
 	        }
 	    }
 	    return trialDataset;
 	}
-	
+
 	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
 		DataSet dataset = build(datasetId);
 		List<Integer> siblingVariables = getVariablesOfSiblingDatasets(datasetId);
@@ -140,15 +123,14 @@ public class DataSetBuilder extends Builder {
 		VariableTypeList variables = null;
 		if (isMeasurementDataset) {
 			variables = filterVariables(dataset.getVariableTypes(), siblingVariables);
-		}
-		else {
+		} else {
 			variables = dataset.getVariableTypes();
 		}
 		variables = filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
 		long expCount = getStudyDataManager().countExperiments(datasetId);
 		List<Experiment> experiments = getStudyDataManager().getExperiments(datasetId, 0, (int)expCount, variables);
 		List<MeasurementVariable> factorList = getMeasurementVariableTransformer().transform(variables.getFactors(), true);
-		List<MeasurementVariable> variateList = getMeasurementVariableTransformer().transform(variables.getVariates(), false);
+		List<MeasurementVariable> variateList = getMeasurementVariableTransformer().transform(variables.getVariates(), false, true);
 		Workbook workbook = new Workbook();
 		workbook.setObservations(getWorkbookBuilder().buildDatasetObservations(experiments, variables, factorList, variateList));
 		workbook.setFactors(factorList);
@@ -188,7 +170,6 @@ public class DataSetBuilder extends Builder {
 	}
 	
 	private List<Integer> getVariablesOfSiblingDatasets(int datasetId) throws MiddlewareQueryException {
-		setWorkingDatabase(datasetId);
 		return getProjectPropertyDao().getVariablesOfSiblingDatasets(datasetId);
 	}
 	
@@ -202,5 +183,9 @@ public class DataSetBuilder extends Builder {
 			}
 		}
 		return newList;
+	}
+	
+	protected DmsProject getDmsProjectById(int studyId) throws MiddlewareQueryException {
+		return getDmsProjectDao().getById(studyId);
 	}
 }

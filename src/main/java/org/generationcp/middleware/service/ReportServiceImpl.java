@@ -47,12 +47,11 @@ public class ReportServiceImpl extends Service implements ReportService{
 	private PedigreeDataManager pediMgr;
 
 	    public ReportServiceImpl(
-	            HibernateSessionProvider sessionProviderForLocal,
-	            HibernateSessionProvider sessionProviderForCentral, 
-	            String localDatabaseName, String centralDatabaseName) {
-	        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+	            HibernateSessionProvider sessionProvider,
+	            String databaseName) {
+	        super(sessionProvider, databaseName);
 	        
-	        pediMgr = new PedigreeDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
+	        pediMgr = new PedigreeDataManagerImpl(sessionProvider, databaseName);
 	    }
 	    
 	@Override

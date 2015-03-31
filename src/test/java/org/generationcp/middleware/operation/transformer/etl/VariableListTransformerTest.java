@@ -40,7 +40,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
-		transformer = new VariableListTransformer(Mockito.mock(HibernateSessionProvider.class), Mockito.mock(HibernateSessionProvider.class));
+		transformer = new VariableListTransformer(Mockito.mock(HibernateSessionProvider.class));
 	}
 	
 	@Test

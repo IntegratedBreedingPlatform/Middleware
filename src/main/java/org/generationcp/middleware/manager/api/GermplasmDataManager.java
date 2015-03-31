@@ -175,20 +175,6 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */    
     long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Please use LocationDataManager.getAllLocations().
-     * 
-     * Returns all Locations.
-     *
-     * @param start - the starting index of the sublist of results to be returned
-     * @param numOfRows - the number of rows to be included in the sublist of results
-     * to be returned
-     * @return All Locations based on the given start and numOfRows
-     * @throws MiddlewareQueryException the middleware query exception
-     */   
-    @Deprecated
-    List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Please use LocationDataManager.getAllLocations().
@@ -418,40 +404,6 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
-
-    
-    /**
-     * Counts all the Germplasm entries from the given database instance.
-     *
-     * @param instance - can be Database.CENTRAL or Database.LOCAL
-     * @return The number of germplasms from the given database instance
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    long countAllGermplasm(Database instance) throws MiddlewareQueryException;
-
-    
-    /**
-     * Retrieves all the Germplasm entries from the given database instance matching the given preferred name.
-     *
-     * @param name - the preferred name to match
-     * @param start - the starting index of the sublist of results to be returned
-     * @param numOfRows - the number of rows to be included in the sublist of results
-     * to be returned
-     * @param instance - can be Database.CENTRAL or Database.LOCAL
-     * @return All the germplasms from the database instance satisfying the given preferred name
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
-
-
-    /**
-     * Counts all the Germplasm entries from central and local database instances matching the given preferred name.
-     *
-     * @param name - the preferred name to match
-     * @return The number of germplasms from the satisfying the given preferred name
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    long countGermplasmByPrefName(String name) throws MiddlewareQueryException;
 
     
     /**
@@ -714,7 +666,27 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getAllMethods() throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the method records.
+     *
+     * @param programUUID - unique id of the current program
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getMethodsByUniqueID(String programUUID) throws MiddlewareQueryException;    
 
+    /**
+     * Returns the number of Methods with
+     * type matching the given parameter.
+     * Retrieves from both local and central databases.
+     *
+     * @param programUUID - unique id of the current program
+     * @return Number of Methods matching the given type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countMethodsByUniqueID(String programUUID) throws MiddlewareQueryException;
+    
     /**
      * Gets the all methods not generative.
      *
@@ -740,6 +712,29 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getMethodsByType(String type) throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the method records matching the given type.
+     * Retrieves from both local and central databases.
+     *
+     * @param type the type of the method
+     * @param programUUID - unique id of the current program
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getMethodsByType(String type, String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of Methods with
+     * type matching the given parameter.
+     * Retrieves from both local and central databases.
+     *
+     * @param type - search string for the methods
+     * @param programUUID - unique id of the current program
+     * @return Number of Methods matching the given type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countMethodsByType(String type, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns all the method records matching the given group and the methods having the 'G' group.
@@ -887,48 +882,6 @@ public interface GermplasmDataManager {
      */
     @Deprecated
     Location getLocationByID(Integer id) throws MiddlewareQueryException;
-
-    /**
-     * Please use LocationDataManager.addLocation().
-     * 
-     * Inserts a single {@code Location} object into the database.
-     *
-     * @param location - The {@code Location} object to be persisted to the database.
-     * Must be a valid {@code Location} object.
-     * @return Returns the id of the {@code Location} record inserted in the
-     * database.
-     * Returns the id of the newly-added Germplasm {@code Name}s.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    Integer addLocation(Location location) throws MiddlewareQueryException;
-    
-    /**
-     * Please use LocationDataManager.addLocation().
-     * 
-     * Inserts a single {@code Location} object into the database.
-     *
-     * @param locations - The {@code Location} object to be persisted to the database.
-     * Must be a valid {@code Location} object.
-     * @return Returns the ids of the {@code Location} records inserted in the
-     * database.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
-    
-    /**
-     * Please use LocationDataManager.deleteLocation().
-     * 
-     * Deletes a single {@code Location} object into the database.
-     *
-     * @param location - The {@code Location} object to be deleted from the database.
-     * Must be a valid {@code Location} object.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    void deleteLocation(Location location) throws MiddlewareQueryException;
-
 
     /**
      * Updates the {@code Method} object into the database.
@@ -1182,31 +1135,7 @@ public interface GermplasmDataManager {
      */
     @Deprecated
     List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
-    
-    /**
-     * Please use LocationDataManager.countAllBreedingLocations().
-     * 
-     * Count all breeding locations
-     * 
-     * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB.
-     *
-     * @return the long
-     * @throws MiddlewareQueryException the middleware query exception
-     */    
-    @Deprecated
-    Long countAllBreedingLocations() throws MiddlewareQueryException;
-    
-    /**
-     * Returns the String representation of next available sequence number for
-     * Germplasm Names with given prefix on specified database instance.
-     *
-     * @param prefix - String used as prefix for Germplasm Names querying
-     * @param instance - can be Database.LOCAL or Database.CENTRAL
-     * @return next available sequence number for a germplasm with given prefix.
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    String getNextSequenceNumberForCrossName(String prefix, Database instance) throws MiddlewareQueryException;
-    
+        
     /**
      * Returns the String representation of next available sequence number for
      * Germplasm Names with given prefix. Queries both Database.LOCAL and Database.CENTRAL
@@ -1285,6 +1214,22 @@ public interface GermplasmDataManager {
      */
     Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
 
+    
+    /**
+     * Search for germplasms given a search term Q.
+     *
+     * @param q - the search term to be used in retrieving the germplasm
+     * @param o - the operation to be used for the query (equal or like)
+     * @param includeParents - boolean flag to denote whether parents will be included in search results
+     * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
+     * Given a List of GIDs, return the list of gids mapped to their corresponding location
+     * Map<Integer, String>
+     * - map of gids to their corresponding location name
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents) throws MiddlewareQueryException;
+
+    
     /**
      * Search for germplasms given a search term Q.
      *
@@ -1298,6 +1243,7 @@ public interface GermplasmDataManager {
      * - map of gids to their corresponding location name
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData) throws MiddlewareQueryException;
 
     /**
@@ -1311,18 +1257,6 @@ public interface GermplasmDataManager {
      */
     @Deprecated
     List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
-
-    /**
-     * Please use LocationDataManager.getLocationDetailsByLocationIDs().
-     * 
-     * Gets the location details by location IDs.
-     *
-     * @param ids the Location IDs
-     * @return the location details corresponding to the given IDs
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
     /**
      * Gets the methods by IDs.
@@ -1350,14 +1284,16 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException;
-
+    
     /**
-     * Gets the next negative id.
+     * Gets the method by code.
      *
-     * @return the next negative id
+     * @param code the code
+     * @param programUUID - uniqueId of the current program 
+     * @return the method by code
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Integer getNextNegativeId() throws MiddlewareQueryException;
+    Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Gets the method by code.
@@ -1377,16 +1313,27 @@ public interface GermplasmDataManager {
      */
     Method getMethodByName(String name) throws MiddlewareQueryException;
     
+    /**
+     * Gets the method by name.
+     *
+     * @param code the code
+     * @param programUUID - uniqueID of the current program
+     * @return the method by name
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Method getMethodByName(String name, String programUUID) throws MiddlewareQueryException;
+    
     List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid) throws MiddlewareQueryException;
     
     /**
      * Gets the list of favorite methods/locations
      *
      * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
+     * @param programUUID - unique id of the program where the favorites location/method were created 
      * @return list of ProgramFavorite
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type) throws MiddlewareQueryException;
+    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String programUUID) throws MiddlewareQueryException;
     
     
     /**
@@ -1394,10 +1341,11 @@ public interface GermplasmDataManager {
      *
      * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
      * @param max - maximum number of records to return
+     * @param programUUID - unique id of the program where the favorites location/method were created
      * @return list of ProgramFavorite
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max) throws MiddlewareQueryException;
+    List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID) throws MiddlewareQueryException;
     
     /**
      * count favorite methods/locations
@@ -1467,11 +1415,25 @@ public interface GermplasmDataManager {
     boolean checkIfMatches(String name) throws MiddlewareQueryException;
     
     /**
-     * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes in <b>linkedNodes</b> atribute,
-     * being the first node the female and the second one the male parent. The information is ultimately stored in Germplasm beans, containing only gids and information about names.
-     * The key of the map is the gid. 
-     * @param studyId The identifier for the study which parents will be retuned.
-     * @return The parents for each germplasm in a study.
+     * get all method records filtered by programUUID
+     * @param programUUID
+     * @return list of mid
      */
-    Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
+    List<Method> getProgramMethods(String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * delete all method records filtered by programUUID
+     * @param programUUID
+     */
+    void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException;
+
+    /**
+    * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes in <b>linkedNodes</b> atribute,
+    * being the first node the female and the second one the male parent. The information is ultimately stored in Germplasm beans, containing only gids and information about names.
+    * The key of the map is the gid. 
+    * @param studyId The identifier for the study which parents will be retuned.
+    * @return The parents for each germplasm in a study.
+    */
+   Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
+
 }

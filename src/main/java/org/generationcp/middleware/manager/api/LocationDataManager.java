@@ -40,17 +40,6 @@ public interface LocationDataManager {
      */
     List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException;
-
-    /**
-     * Returns all Locations.
-     *
-     * @param start - the starting index of the sublist of results to be returned
-     * @param numOfRows - the number of rows to be included in the sublist of results
-     * to be returned
-     * @return All Locations based on the given start and numOfRows
-     * @throws MiddlewareQueryException the middleware query exception
-     */   
-    List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns all Location information from central and local databases.
@@ -85,6 +74,40 @@ public interface LocationDataManager {
      * Returns the Location records with
      * names matching the given parameter.
      *
+     * @param programUUID - unique ID of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the number of Locations with names matching the given parameter.
+     *
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
+     * @return Number of Locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countLocationsByUniqueID(String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Location records with
+     * names matching the given parameter.
+     *
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
+     * @param programUUID - uniqueID of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the Location records with
+     * names matching the given parameter.
+     *
      * @param name - search string for the name of the locations
      * @param op - can be EQUAL like LIKE
      * @return List of Location POJOs
@@ -92,6 +115,20 @@ public interface LocationDataManager {
      */
     List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
     
+    /**
+     * Returns the Location records with names matching the given parameter.
+     *
+     * @param name - search string for the name of the locations
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param op - can be EQUAL like LIKE
+     * @param programUUID - uniqueID of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op, String programUUID) 
+            throws MiddlewareQueryException;
 
     /**
      * Returns the Location records with names matching the given parameter.
@@ -106,14 +143,17 @@ public interface LocationDataManager {
      */
     List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) 
             throws MiddlewareQueryException;
-    
+
     /**
-     * Returns all country records.
+     * Returns the number of Locations with names matching the given parameter.
      *
-     * @return List of Location POJOs
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
+     * @param programUUID - uniqueID of the current program
+     * @return Number of Locations
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Country> getAllCountry() throws MiddlewareQueryException;
+    long countLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Returns the number of Locations with names matching the given parameter.
@@ -124,7 +164,14 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
-
+    
+    /**
+     * Returns all country records.
+     *
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Country> getAllCountry() throws MiddlewareQueryException;
 
     /**
      * Returns all the Location records with country matching the given parameter. 
@@ -195,6 +242,17 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Location records with type matching the given parameter. 
+     * The data is retrieved from both local and central databases.
+     *
+     * @param type - search string for the type of the locations
+     * @param programUUID - unique id of the current program
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException;
 
     /**
      * Returns the Location records with type matching the given parameter. 
@@ -219,6 +277,17 @@ public interface LocationDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countLocationsByType(Integer type) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of Locations with types matching the given parameter. 
+     * The data is retrieved from both local and central databases.
+     *
+     * @param type - search string for the type of the locations
+     * @param programUUID - unique id of the current program
+     * @return Number of Locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    long countLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException;
     
     /**
      * Returns the udfld record identified by the given id.
@@ -407,5 +476,18 @@ public interface LocationDataManager {
 
     List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException;
     List<Location> getAllProvinces() throws MiddlewareQueryException;
+    
+    /**
+     * get all location records filtered by programUUID
+     * @param programUUID
+     * @return list of locid
+     */
+    List<Location> getProgramLocations(String programUUID) throws MiddlewareQueryException;
+    
+    /**
+     * delete all location records filtered by programUUID
+     * @param programUUID
+     */
+    void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException;
     
 }

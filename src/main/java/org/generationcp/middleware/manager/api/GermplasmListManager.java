@@ -11,6 +11,8 @@ o * Copyright (c) 2012, All Rights Reserved.
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -19,8 +21,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
-
-import java.util.List;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -48,12 +48,28 @@ public interface GermplasmListManager{
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
+     * 
+     * @return List of GermplasmList POJOs
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> getAllGermplasmLists(int start, int numOfRows) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns all Germplasm list records.
+     * 
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * 
      * @return List of GermplasmList POJOs
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     /**
@@ -76,14 +92,43 @@ public interface GermplasmListManager{
      *            to be returned
      * @param operation
      *            - can be equal or like
+     * @return List of GermplasmList POJOs
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation)
+            throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the Germplasm List records with names matching the given
+     * parameter.
+     * 
+     * @param name
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param operation
+     *            - can be equal or like
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return List of GermplasmList POJOs
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
             throws MiddlewareQueryException;
 
+    /**
+     * Returns the number of Germplasm List records with names matching the given parameter.
+     * 
+     * @param name
+     * @param operation can be Operation.EQUAL or Operation.LIKE
+     * @return The count of Germplasm lists based on the given name and operation
+     */
+    long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException;
+    
+    
     /**
      * Returns the number of Germplasm List records with names matching the given parameter.
      * 
@@ -93,6 +138,7 @@ public interface GermplasmListManager{
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return The count of Germplasm lists based on the given name and operation
      */
+    @Deprecated
     long countGermplasmListByName(String name, Operation operation, Database database) throws MiddlewareQueryException;
 
     /**
@@ -249,11 +295,25 @@ public interface GermplasmListManager{
      * 
      * @param batchSize
      *            - the number of records to be retrieved per iteration
+     * @return - List of GermplasmList POJOs
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> getAllTopLevelListsBatched(int batchSize) throws MiddlewareQueryException;
+
+    /**
+     * Returns the Top Level Germplasm List Folders present in the specified database.
+     * Retrieval from the database is done by batch (as specified in batchSize) to reduce the load
+     * in instances where there is a large volume of top level folders to be retrieved. Though
+     * retrieval is by batch, this method still returns all of the top level folders as a single list.
+     * 
+     * @param batchSize
+     *            - the number of records to be retrieved per iteration
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return - List of GermplasmList POJOs
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException;
     
     /**
@@ -524,6 +584,15 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException
      */
     List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;    
+
+    /**
+     * Search for germplasm lists given a search term Q
+     * @param q string
+     * @param o operation 
+     * @return - List of germplasm lists
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException;
     
     /**
      * Search for germplasm lists given a search term Q
@@ -533,6 +602,7 @@ public interface GermplasmListManager{
      * @return - List of germplasm lists
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException;
     
     

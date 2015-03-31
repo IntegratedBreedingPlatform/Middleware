@@ -12,6 +12,9 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -19,12 +22,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
-import org.hibernate.Session;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -32,7 +29,6 @@ import java.util.Map;
  * class, a Hibernate Session must be passed to its constructor.
  * 
  */
-@SuppressWarnings("unchecked")
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
     private GermplasmDataManagerImpl germplasmDataManager;
@@ -40,20 +36,9 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     public PedigreeDataManagerImpl() {
     }
 
-    public PedigreeDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral, 
-    		String localDatabaseName, String centralDatabaseName) {
-        super(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral, localDatabaseName, centralDatabaseName);
-    }
-
-    public PedigreeDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
-    }
-    
-    public PedigreeDataManagerImpl(Session sessionForLocal, Session sessionForCentral,GermplasmDataManagerImpl germplasmDataManager) {
-        super(sessionForLocal, sessionForCentral);
-        this.germplasmDataManager =germplasmDataManager;
+    public PedigreeDataManagerImpl(HibernateSessionProvider sessionProvider, String databaseName) {
+        super(sessionProvider, databaseName);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider, databaseName);
     }
         
     @Override
@@ -63,17 +48,82 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
     @Override
     public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.LOCAL);
-        Map<String, Object> params = new LinkedHashMap<String, Object>();
-        params.put("central_db_name", centralDatabaseName);
-        params.put("v_gid", gid);
-        params.put("include_derivative", includeDerivativeLine);
-        return getGermplasmDao().
-                callStoredProcedureForObject("countMaxPedigreeLevel",
-                        params, Integer.class);
+    	Integer maxPedigreeLevel = 0;
+    	if(gid==null || gid==0) {
+        	return maxPedigreeLevel;
+        }
+    	Germplasm germplasm = getGermplasmDao().getById(gid);
+    	if(germplasm.getGnpgs()==-1) {
+    		if(!includeDerivativeLine) {
+    			maxPedigreeLevel = getMaxPedigreeLevelFromParent(gid,1,includeDerivativeLine);
+    		} else {
+    			maxPedigreeLevel = getMaxPedigreeLevelFromParent(gid,2,includeDerivativeLine);
+    		}
+    	} else if(germplasm.getGnpgs() >= 2) {
+    		maxPedigreeLevel = getMaxPedigreeLevelFromBothParents(gid,includeDerivativeLine);
+    		if(germplasm.getGnpgs() > 2) {
+    			maxPedigreeLevel = getMaxPedigreeLevelFromProgenitor(gid,germplasm.getGnpgs(),includeDerivativeLine,maxPedigreeLevel);
+    		}
+    	}
+    	return maxPedigreeLevel + 1;
     }
     
-    @Override
+    private Integer getMaxPedigreeLevelFromProgenitor(
+    		Integer gid, Integer gnpgs, boolean includeDerivativeLine, Integer maxPedigreeLevel) 
+    		throws MiddlewareQueryException {
+    	Germplasm parentGermplasm = getParentByGIDAndProgenitorNumber(gid,gnpgs);
+		if(parentGermplasm!=null) {
+			Integer numOfPedigree = getPedigreeLevelCount(parentGermplasm.getGid(),includeDerivativeLine);
+			if(numOfPedigree>maxPedigreeLevel) {
+				return numOfPedigree;
+			}
+		}
+		return maxPedigreeLevel;
+	}
+
+	private Integer getMaxPedigreeLevelFromParent(
+    		Integer gid, Integer parentNo, boolean includeDerivativeLine) throws MiddlewareQueryException {
+    	Integer parentId = getGermplasmProgenitorID(gid,parentNo);
+    	if(!includeDerivativeLine && parentId!=null) {
+    		return getMaxPedigreeLevelFromBothParents(parentId,includeDerivativeLine);
+    	} else if(parentId!=null){
+    		return getPedigreeLevelCount(parentId,includeDerivativeLine);
+    	}
+		return 0;
+	}
+    
+    private Integer getMaxPedigreeLevelFromBothParents(
+    		Integer gid, boolean includeDerivativeLine) throws MiddlewareQueryException {
+    	Integer numOfPedigreeFromParent1 = getPedigreeLevel(gid,1,includeDerivativeLine);
+		Integer numOfPedigreeFromParent2 = getPedigreeLevel(gid,2,includeDerivativeLine);
+		if(numOfPedigreeFromParent2>numOfPedigreeFromParent1) {
+			return numOfPedigreeFromParent2;
+		}
+		return numOfPedigreeFromParent1;
+	}
+
+	private Integer getPedigreeLevel(Integer gid, Integer parentNo, boolean includeDerivativeLine) 
+			throws MiddlewareQueryException {
+		Integer parentId = getGermplasmProgenitorID(gid,parentNo);
+		if(parentId!=null) {
+			return getPedigreeLevelCount(parentId,includeDerivativeLine);
+		}
+		return 0;
+	}
+
+	private Integer getGermplasmProgenitorID(Integer gid, Integer proNo) 
+			throws MiddlewareQueryException {
+		if(gid==null) {
+			return null;
+		}
+		Germplasm germplasm = getParentByGIDAndProgenitorNumber(gid,proNo);
+		if(germplasm!=null) {
+			return germplasm.getGid();
+		}
+		return null;
+	}
+
+	@Override
     public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException {
         GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
         // set root node
@@ -83,7 +133,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
             rootNode.setGermplasm(root);
             if (level > 1) {
-                if(includeDerivativeLines == true) {
+                if(includeDerivativeLines) {
                     rootNode = addParents(rootNode, level);
                 } else {
                     rootNode = addParentsExcludeDerivativeLines(rootNode, level);
@@ -139,8 +189,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
                 if (germplasmOfNode.getGnpgs() > 2) {
                     // if there are more parents, get and add each of them
-                    List<Germplasm> otherParents = germplasmDataManager.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                    if(otherParents!=null) {
+                	List<Germplasm> otherParents = germplasmDataManager.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
+                	if(otherParents!=null) {
 	                    for (Germplasm otherParent : otherParents) {
 	                        GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
 	                        nodeForOtherParent.setGermplasm(otherParent);
@@ -287,7 +337,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         Germplasm germplasm = germplasmDataManager.getGermplasmWithPrefName(gid);
         
         if (germplasm == null) {
-            return null;
+            return new Object[0];
         } else if (steps == 0 || germplasm.getGnpgs() != -1) {
             return new Object[] { germplasm, Integer.valueOf(steps) };
         } else {
@@ -343,37 +393,12 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 
     private List<Germplasm> getChildren(Integer gid, char methodType) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		params.put("v_method_type",methodType);
-		List<Germplasm> germplasms = getGermplasmDao().
-				callStoredProcedureForList("getChildren",
-						params,Germplasm.class);
-		if(germplasms!=null) {
-			for (Germplasm germplasm : germplasms) {
-				germplasm.setPreferredName(
-						germplasmDataManager.getPreferredNameByGID(germplasm.getGid()));
-			}
-		}
-		return germplasms;
+    	return getGermplasmDao().getChildren(gid, methodType);
 	}
 
 	@Override
     public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		params.put("v_pro_no",progenitorNumber);
-		List<Germplasm> germplasms = getGermplasmDao().
-				callStoredProcedureForList("getGermplasmProgenitors",
-						params,Germplasm.class);
-		if(germplasms!=null && !germplasms.isEmpty()) {
-			return germplasms.get(0);
-		}
-		return null;
+		return getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
     }
 
     @Override
@@ -381,110 +406,53 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         List<Object[]> result = new ArrayList<Object[]>();
         Object[] germplasmList;
 
-        if (setWorkingDatabase(gid)) {
-            List<Germplasm> germplasmDescendant = getGermplasmDescendantByGID(gid, start, numOfRows);
-            for (Germplasm g : germplasmDescendant) {
-                germplasmList = new Object[2];
-                if (g.getGpid1().equals(gid)) {
-                    germplasmList[0] = 1;
-                } else if (g.getGpid2().equals(gid)) {
-                    germplasmList[0] = 2;
-                } else {
-                    germplasmList[0] = 
-                    		getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgntrsPK().getPno().intValue();
-                }
-                germplasmList[1] = g;
-
-                result.add(germplasmList);
+        List<Germplasm> germplasmDescendant = getGermplasmDescendantByGID(gid, start, numOfRows);
+        for (Germplasm g : germplasmDescendant) {
+            germplasmList = new Object[2];
+            if (g.getGpid1().equals(gid)) {
+                germplasmList[0] = 1;
+            } else if (g.getGpid2().equals(gid)) {
+                germplasmList[0] = 2;
+            } else {
+                germplasmList[0] = 
+                		getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgntrsPK().getPno().intValue();
             }
+            germplasmList[1] = g;
+
+            result.add(germplasmList);
         }
+
         return result;
     }
 
     private List<Germplasm> getGermplasmDescendantByGID(Integer gid, int start,
-			int numOfRows) {
-    	setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		params.put("v_start",start);
-		params.put("v_num_of_rows",numOfRows);
-		List<Germplasm> germplasms = getGermplasmDao().
-				callStoredProcedureForList("getGermplasmDescendants",
-						params,Germplasm.class);
-		return germplasms;
+			int numOfRows) throws MiddlewareQueryException {
+    	return getGermplasmDao().getGermplasmDescendantByGID(gid, start, numOfRows);
 	}
 
 	@Override
     public long countDescendants(Integer gid) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		return getGermplasmDao().
-				callStoredProcedureForObject("countGermplasmDescendants",
-						params,Long.class);
+		 return getGermplasmDao().countGermplasmDescendantByGID(gid);
     }
 
     @Override
     public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		params.put("v_start",start);
-		params.put("v_num_of_rows",numOfRows);
-		List<Germplasm> germplasms = getGermplasmDao().
-				callStoredProcedureForList("getManagementNeighbors",
-						params,Germplasm.class);
-		if(germplasms!=null) {
-			for (Germplasm germplasm : germplasms) {
-				germplasm.setPreferredName(germplasmDataManager.getPreferredNameByGID(germplasm.getGid()));
-			}
-		}
-		return germplasms;
+    	return getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
     }
 
     @Override
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		return getGermplasmDao().
-				callStoredProcedureForObject("countManagementNeighbors",
-						params,Long.class);
+    	return getGermplasmDao().countManagementNeighbors(gid);
     }
 
     @Override
     public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		return getGermplasmDao().
-				callStoredProcedureForObject("countGroupRelatives",
-						params,Long.class);
-		
+    	return getGermplasmDao().countGroupRelatives(gid);
     }
 
     @Override
     public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
-    	setWorkingDatabase(Database.LOCAL);
-		Map<String,Object> params = new LinkedHashMap<String,Object>();
-		params.put("central_db_name", centralDatabaseName);
-		params.put("v_gid",gid);
-		params.put("v_start",start);
-		params.put("v_num_of_rows",numRows);
-		List<Germplasm> germplasms = getGermplasmDao().
-				callStoredProcedureForList("getGroupRelatives",
-						params,Germplasm.class);
-		if(germplasms!=null) {
-			for (Germplasm germplasm : germplasms) {
-				germplasm.setPreferredName(germplasmDataManager.getPreferredNameByGID(germplasm.getGid()));
-			}
-		}
-		return germplasms;
+    	return getGermplasmDao().getGroupRelatives(gid, start, numRows);
     }
 
     @Override
@@ -534,8 +502,9 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
      * @throws MiddlewareQueryException
      */
     @Deprecated
-    private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasms, Germplasm currentGermplasm, int locationID) throws MiddlewareQueryException {
-		// get parents of node
+    private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasmsParam, Germplasm currentGermplasm, int locationID) throws MiddlewareQueryException {
+    	List<Germplasm> germplasms = germplasmsParam;
+    	// get parents of node
         if (currentGermplasm.getGnpgs() == -1) {
             // get the source germplasm
             Germplasm parent = germplasmDataManager.getGermplasmWithMethodType(currentGermplasm.getGpid2());

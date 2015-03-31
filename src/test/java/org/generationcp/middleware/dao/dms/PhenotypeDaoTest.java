@@ -45,7 +45,7 @@ public class PhenotypeDaoTest extends DataManagerIntegrationTest {
     @BeforeClass
     public static void setUp() throws Exception {
         dao = new PhenotypeDao();
-        dao.setSession(localSessionUtil.getCurrentSession());
+        dao.setSession(sessionUtil.getCurrentSession());
         
         dataImportService = managerFactory.getDataImportService();
         studyDataManager = managerFactory.getNewStudyDataManager();
@@ -61,7 +61,7 @@ public class PhenotypeDaoTest extends DataManagerIntegrationTest {
         Workbook workbook = dataImportService.parseWorkbook(file);
         workbook.print(INDENT);
         
-    	int studyId = dataImportService.saveDataset(workbook);
+    	int studyId = dataImportService.saveDataset(workbook, null);
     	
     	List<DatasetReference> datasetRefences = studyDataManager.getDatasetReferences(studyId);
     	

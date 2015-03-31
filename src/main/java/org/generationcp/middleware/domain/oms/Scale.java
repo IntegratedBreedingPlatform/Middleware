@@ -16,7 +16,8 @@ import org.generationcp.middleware.util.Debug;
 public class Scale {
     
     private Term term;
-    
+
+    private String displayName;
     
     public Scale() {
     }
@@ -33,6 +34,18 @@ public class Scale {
     
     public void setTerm(Term term) {
         this.term = term;
+    }
+
+    public String getDisplayName() {
+        if (displayName == null) {
+            return term.getName();
+        } else {
+            return displayName;
+        }
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public int getId() {

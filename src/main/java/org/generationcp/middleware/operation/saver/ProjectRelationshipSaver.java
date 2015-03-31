@@ -25,14 +25,11 @@ import java.util.List;
 
 public class ProjectRelationshipSaver extends Saver {
 
-	public ProjectRelationshipSaver(
-			HibernateSessionProvider sessionProviderForLocal,
-			HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ProjectRelationshipSaver(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 
 	public void saveProjectParentRelationship(DmsProject project, int parentId, boolean isAStudy) throws MiddlewareQueryException, MiddlewareException{
-		requireLocalDatabaseInstance();
         DmsProjectDao projectDao = getDmsProjectDao();
         
         DmsProject parent = projectDao.getById(parentId); 
@@ -45,7 +42,7 @@ public class ProjectRelationshipSaver extends Saver {
         ProjectRelationshipDao projectRelationshipDao = getProjectRelationshipDao();
         int index = 0;
         for (ProjectRelationship relationship : relationships){
-        	Integer generatedId = projectRelationshipDao.getNegativeId("projectRelationshipId");
+        	Integer generatedId = projectRelationshipDao.getNextId("projectRelationshipId");
             relationship.setProjectRelationshipId(generatedId);
             relationship.setObjectProject(parent);
             relationship.setSubjectProject(project);
@@ -70,7 +67,6 @@ public class ProjectRelationshipSaver extends Saver {
 	}
 	
 	public void saveOrUpdateStudyToFolder(int studyId, int folderId) throws MiddlewareQueryException {
-		setWorkingDatabase(studyId);
 		ProjectRelationship relationship = getProjectRelationshipDao().getParentFolderRelationship(studyId);
 		if (relationship != null && relationship.getObjectProject().getProjectId() != null 
 				&& !relationship.getObjectProject().getProjectId().equals(folderId)) {

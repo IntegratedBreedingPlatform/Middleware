@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity @Table(name = "program_preset")
 public class ProgramPreset {
 	private int programPresetId;
-	private Integer programUuid;
+	private String programUuid;
 	private Integer toolId;
 	private String toolSection;
 	private String name;
@@ -28,11 +28,11 @@ public class ProgramPreset {
 	}
 
 	@Basic @Column(name = "program_uuid")
-	public Integer getProgramUuid() {
+	public String getProgramUuid() {
 		return programUuid;
 	}
 
-	public void setProgramUuid(Integer programUuid) {
+	public void setProgramUuid(String programUuid) {
 		this.programUuid = programUuid;
 	}
 
@@ -84,29 +84,38 @@ public class ProgramPreset {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 
 		ProgramPreset that = (ProgramPreset) o;
 
-		if (programPresetId != that.programPresetId)
+		if (programPresetId != that.programPresetId) {
 			return false;
+		}
 		if (configuration != null ?
 				!configuration.equals(that.configuration) :
-				that.configuration != null)
+				that.configuration != null) {
 			return false;
-		if (isDefault != null ? !isDefault.equals(that.isDefault) : that.isDefault != null)
+		}
+		if (isDefault != null ? !isDefault.equals(that.isDefault) : that.isDefault != null) {
 			return false;
-		if (name != null ? !name.equals(that.name) : that.name != null)
+		}
+		if (name != null ? !name.equals(that.name) : that.name != null) {
 			return false;
-		if (programUuid != null ? !programUuid.equals(that.programUuid) : that.programUuid != null)
+		}
+		if (programUuid != null ? !programUuid.equals(that.programUuid) : that.programUuid != null) {
 			return false;
-		if (toolId != null ? !toolId.equals(that.toolId) : that.toolId != null)
+		}
+		if (toolId != null ? !toolId.equals(that.toolId) : that.toolId != null) {
 			return false;
-		if (toolSection != null ? !toolSection.equals(that.toolSection) : that.toolSection != null)
+		}
+		if (toolSection != null ? !toolSection.equals(that.toolSection) : that.toolSection != null) {
 			return false;
+		}
 
 		return true;
 	}

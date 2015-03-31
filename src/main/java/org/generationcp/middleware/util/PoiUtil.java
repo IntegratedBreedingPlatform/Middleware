@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -36,6 +35,8 @@ public class PoiUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(PoiUtil.class);
 
+    public static final SimpleDateFormat EXCEL_DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
+
     // WorkBook convenience methods
     public static void setRepeatingRows(Workbook workBook, int sheetIndex, int fromRow, int toRow) {
         workBook.setRepeatingRowsAndColumns(sheetIndex, -1, -1, fromRow, toRow);
@@ -52,6 +53,17 @@ public class PoiUtil {
     public static Double getCellNumericValue(Cell cell) {
         return cell == null ? null : cell.getNumericCellValue();
     }
+
+    public static String getCellStringValue(Workbook wb,Integer sheetNumber, Integer rowNumber
+            , Integer columnNumber){
+
+        Sheet sheet = wb.getSheetAt(sheetNumber);
+        Row row = sheet.getRow(rowNumber);
+        Cell cell = row.getCell(columnNumber);
+        return getCellStringValue(cell);
+
+    }
+
 
     public static String getCellStringValue(Cell cell) {
         try {
@@ -76,8 +88,7 @@ public class PoiUtil {
 
                 if (DateUtil.isCellDateFormatted(cell)) {
                     Date date = cell.getDateCellValue();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                    return sdf.format(date);
+                    return EXCEL_DATE_FORMATTER.format(date);
                 }
 
                 double doubleVal = cell.getNumericCellValue();

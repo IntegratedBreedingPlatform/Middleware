@@ -11,18 +11,30 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.LocationDto;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-
-import java.math.BigInteger;
-import java.util.*;
 
 /**
  * DAO class for {@link Geolocation}.
@@ -101,7 +113,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			Query query = getSession().createSQLQuery(sql)
 								.setParameter("description", description);
 			List<Integer> ids = query.list();
-			if (ids.size() >= 1) {
+			if (!ids.isEmpty()) {
 				return getById(ids.get(0));
 			}
 						
@@ -144,11 +156,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.addScalar("description");
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
+				//otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5], (String) row[7])));
-				} //otherwise it's invalid data and should not be included
+				} 
 			}
 			
 		} catch(HibernateException e) {
@@ -173,11 +186,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			setStartAndNumOfRows(query, start, numOfRows);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
+				//otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5], (String) row[7])));
-				} //otherwise it's invalid data and should not be included
+				} 
 			}
 			
 		} catch(HibernateException e) {
@@ -260,7 +274,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
     public List<TrialEnvironment> getTrialEnvironmentDetails(Set<Integer> environmentIds) throws MiddlewareQueryException {
         List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
         
-        if (environmentIds.size() == 0){
+        if (environmentIds.isEmpty()){
             return environmentDetails;
         }
 
@@ -268,20 +282,29 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
             
         	// Get location name, study id and study name
         	String sql = 
-		        "SELECT DISTINCT e.nd_geolocation_id, l.lname, l.locid, p.project_id, p.name, p.description " 
+		        "SELECT DISTINCT e.nd_geolocation_id, l.lname, gp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr " 
         		+ "FROM nd_experiment e "
 		        + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id " 
         		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
         		+ " 					AND e.nd_geolocation_id IN (:locationIds) " 		
-		        + "	INNER JOIN location l ON l.locid = gp.value "
+		        + "	LEFT JOIN location l ON l.locid = gp.value "
+		        + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
+		        + "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
 		        + "	INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
 		        + "	INNER JOIN project_relationship pr ON pr.subject_project_id = ep.project_id AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() + " " 
 		        + "	INNER JOIN project p ON p.project_id = pr.object_project_id "
         		;
         	
-            Query query = getSession().createSQLQuery(sql)
-                    .setParameterList("locationIds", environmentIds);
-
+            SQLQuery query =  getSession().createSQLQuery(sql.toString());
+            query.setParameterList("locationIds", environmentIds);
+   			query.addScalar("nd_geolocation_id", Hibernate.INTEGER);
+   			query.addScalar("lname", Hibernate.STRING);
+   			query.addScalar("value", Hibernate.INTEGER);
+   			query.addScalar("project_id", Hibernate.INTEGER);
+   			query.addScalar("name", Hibernate.STRING);
+   			query.addScalar("description", Hibernate.STRING);
+   			query.addScalar("provinceName", Hibernate.STRING);
+   			query.addScalar("isoabbr", Hibernate.STRING);
             List<Integer> locIds = new ArrayList<Integer>();
             
             List<Object[]> result = query.list();
@@ -293,56 +316,62 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                 Integer studyId = (Integer) row[3];
                 String studyName = (String) row[4];
                 String studyDescription = (String) row[5];
+                String provinceName = (String) row[6];
+                String countryName = (String) row[7];
                 
                 environmentDetails.add(new TrialEnvironment(environmentId
-                                                , new LocationDto(locId, locationName)
+                                                , new LocationDto(locId, locationName, provinceName, countryName)
                                                 , new StudyReference(studyId, studyName, studyDescription)));
                 locIds.add(locId);
             }
             
-            if (locIds.size() > 0) {
-            	// Get province and country
-	        	sql =
-	        			"SELECT DISTINCT l.locid, prov.lname, c.isoabbr "             		
-    	        		+ "FROM nd_experiment e "
-    			        + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id " 
-    	        		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
-    	        		+ " 					AND e.nd_geolocation_id IN (:locationIds) " 		
-    			        + "	INNER JOIN location l ON l.locid = gp.value "
-	    		        + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
-	    		        + "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
-	    		        ;        
-	            query = getSession().createSQLQuery(sql)
-	                    .setParameterList("locationIds", environmentIds);
-	        	
-	            result = query.list();
-	            
-	
-	            for (Object[] row : result) {
-	                Integer locationId = (Integer) row[0];
-	                String provinceName = (String) row[1];
-	                String countryName = (String) row[2];
-	                
-	                for (int i = 0, size = environmentDetails.size(); i < size; i++){
-	                	TrialEnvironment env = environmentDetails.get(i);
-	                	LocationDto loc = env.getLocation();
-
-	                	if(loc.getId().intValue() == locationId.intValue()){
-	                		loc.setProvinceName(provinceName);
-	                    	loc.setCountryName(countryName);
-	                    	env.setLocation(loc);
-	                	}
-	                }
-	                
-	            }
-            }
-
         } catch(HibernateException e) {
             logAndThrowException("Error at getTrialEnvironmentDetails=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
         }
 
 
         return environmentDetails;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public void setLocationNameProvinceAndCountryForLocationsIds(List<TrialEnvironment> environments, List<Integer> locationIds) throws MiddlewareQueryException {
+    	
+    	// Get location name, province and country
+    	String sql =
+    			"SELECT DISTINCT l.locid, l.lname, prov.lname as provinceName, c.isoabbr "             			
+		        + "	FROM location l "
+		        + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
+		        + "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
+		        + " WHERE l.locid in (:locationIds)";
+        SQLQuery query = getSession().createSQLQuery(sql);
+        query.setParameterList("locationIds", locationIds);
+		query.addScalar("locid", Hibernate.INTEGER);
+		query.addScalar("lname", Hibernate.STRING);
+		query.addScalar("provinceName", Hibernate.STRING);
+		query.addScalar("isoabbr", Hibernate.STRING);
+    	
+        List<Object[]> result = query.list();
+        
+
+        for (Object[] row : result) {
+            Integer locationId = (Integer) row[0];
+            String locationName = (String) row[1];
+            String provinceName = (String) row[2];
+            String countryName = (String) row[3];
+            
+            for (int i = 0, size = environments.size(); i < size; i++){
+            	TrialEnvironment env = environments.get(i);
+            	LocationDto loc = env.getLocation();
+
+            	if(loc.getId().intValue() == locationId.intValue()){
+            		loc.setLocationName(locationName);
+            		loc.setProvinceName(provinceName);
+                	loc.setCountryName(countryName);
+                	env.setLocation(loc);
+            	}
+            }
+            
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -373,11 +402,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.setParameterList("traitIds", traitIds);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
+				//otherwise it's invalid data and should not be included
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5])));
-				} //otherwise it's invalid data and should not be included
+				} 
 			}
 			
 		} catch(HibernateException e) {
@@ -387,20 +417,24 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	}
     
     @SuppressWarnings("unchecked")
-	public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
+	public Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(String projectName, 
+			String locationDescription, String programUUID) throws MiddlewareQueryException {
 		try {
 			String sql = "SELECT DISTINCT e.nd_geolocation_id"
 					+ " FROM nd_experiment e, nd_experiment_project ep, project p, nd_geolocation g, project_relationship pr "
 					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id "
 					+ "   and ep.project_id = pr.subject_project_id "
 					+ "   and pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()  
-					+ "   and pr.object_project_id = p.project_id "//link to the dataset instead
+					//link to the dataset instead
+					+ "   and pr.object_project_id = p.project_id "
 					+ "   and e.nd_geolocation_id = g.nd_geolocation_id "
 					+ "   and p.name = :projectName"  
+					+ "   and p.program_uuid = :programUUID"  
 					+ "   and g.description = :locationDescription";
 			Query query = getSession().createSQLQuery(sql);
 			query.setParameter("projectName", projectName);
 			query.setParameter("locationDescription", locationDescription);
+			query.setParameter("programUUID", programUUID);
 			List<Integer> list = (List<Integer>) query.list();
 			if(list!=null && !list.isEmpty()) {
 				return list.get(0);

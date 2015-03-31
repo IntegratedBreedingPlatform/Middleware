@@ -21,37 +21,29 @@ import java.util.*;
 
 public class ExperimentBuilder extends Builder {
 
-	public ExperimentBuilder(HibernateSessionProvider sessionProviderForLocal,
-			                 HibernateSessionProvider sessionProviderForCentral) {
-		super(sessionProviderForLocal, sessionProviderForCentral);
+	public ExperimentBuilder(HibernateSessionProvider sessionProviderForLocal) {
+		super(sessionProviderForLocal);
 	}
 	
 	public long count(int dataSetId) throws MiddlewareQueryException {
-		if (setWorkingDatabase(dataSetId)) {
-			return getExperimentProjectDao().count(dataSetId);
-		}
-		return 0;
+		return getExperimentProjectDao().count(dataSetId);
 	}
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
-		if (setWorkingDatabase(projectId)) {
-			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);			
-			Map<Integer, StockModel> stockModelMap = getStockModelMap(experimentProjects);
-			for (ExperimentProject experimentProject : experimentProjects) {
-				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
-			}
+		List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);			
+		Map<Integer, StockModel> stockModelMap = getStockModelMap(experimentProjects);
+		for (ExperimentProject experimentProject : experimentProjects) {
+			experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
 		}
 		return experiments;
 	}
 	
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
-		if (setWorkingDatabase(projectId)) {
-			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
-			for (ExperimentProject experimentProject : experimentProjects) {
-				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
-			}
+		List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+		for (ExperimentProject experimentProject : experimentProjects) {
+			experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
 		}
 		return experiments;
 	}
@@ -72,18 +64,12 @@ public class ExperimentBuilder extends Builder {
 	
 	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
-		
-		if (setWorkingDatabase(projectId)) {
-			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
+		List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
+		//to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
+		Map<Integer, StockModel> stockModelMap = getStockModelMap(experimentProjects);
 
-			//daniel
-			//to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
-			Map<Integer, StockModel> stockModelMap = getStockModelMap(experimentProjects);
-
-			for (ExperimentProject experimentProject : experimentProjects) {
-				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
-			}
-
+		for (ExperimentProject experimentProject : experimentProjects) {
+			experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
 		}
 		return experiments;
 	}
@@ -358,17 +344,14 @@ public class ExperimentBuilder extends Builder {
 	}
 	
 	public ExperimentModel getExperimentModel(int experimentId) throws MiddlewareQueryException {
-        setWorkingDatabase(experimentId);
         return getExperimentDao().getById(experimentId);
 	}
 	
 	public boolean hasFieldmap(int datasetId) throws MiddlewareQueryException {
-		setWorkingDatabase(datasetId);
 		return getExperimentDao().hasFieldmap(datasetId);
 	}
 	
 	public boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException {
-		setWorkingDatabase(studyId);
 		List<Integer> geolocationIdsOfStudy = getExperimentDao().getLocationIdsOfStudy(studyId);
 		List<Integer> geolocationIdsOfStudyWithFieldmap = getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
 		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
