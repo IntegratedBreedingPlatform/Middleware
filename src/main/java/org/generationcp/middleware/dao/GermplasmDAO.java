@@ -870,6 +870,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             resultMap.put(gid, methodId);
         }
         return resultMap;
-    }   
+    }
+
+	public Germplasm getByLGid(Integer lgid) throws MiddlewareQueryException {
+	    try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT g.* FROM germplsm g WHERE gid!=grplce AND lgid=:lgid LIMIT 1");
+            
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("lgid", lgid);
+            query.addEntity("g", Germplasm.class);
+
+            return (Germplasm) query.uniqueResult();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByLGid(lgid=" + lgid + ") query from Germplasm: " + e.getMessage(), e);
+        }
+        return null;
+	}   
     
 }

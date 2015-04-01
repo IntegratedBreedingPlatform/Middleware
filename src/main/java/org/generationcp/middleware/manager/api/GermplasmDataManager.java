@@ -1426,4 +1426,10 @@ public interface GermplasmDataManager {
      * @param programUUID
      */
     void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException;
+
+    /**
+     * get the Germplasm from the crop database based on local gid reference 
+     * @param lgid
+     */
+	Germplasm getGermplasmByLocalGid(Integer lgid) throws MiddlewareQueryException;
 }

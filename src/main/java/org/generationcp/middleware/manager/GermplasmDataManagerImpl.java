@@ -1988,5 +1988,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			session.flush();
 		}
 	}
+
+	@Override
+	public Germplasm getGermplasmByLocalGid(Integer lgid)
+			throws MiddlewareQueryException {
+		return this.getGermplasmDao().getByLGid(lgid);
+	}
 	
 }
