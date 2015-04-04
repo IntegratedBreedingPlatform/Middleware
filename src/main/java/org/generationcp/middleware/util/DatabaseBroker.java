@@ -231,6 +231,12 @@ public class DatabaseBroker {
     	return cvTermPropertyDao;
     }
 
+    protected final CvTermAliasDao getCvTermAliasDao() {
+        CvTermAliasDao cvTermAliasDao = new CvTermAliasDao();
+        cvTermAliasDao.setSession(getActiveSession());
+        return cvTermAliasDao;
+    }
+
     protected final CvTermSynonymDao getCvTermSynonymDao() {
     	CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
     	cvTermSynonymDao.setSession(getActiveSession());

@@ -12,6 +12,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermAlias;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
@@ -73,7 +74,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         Map<Integer, OntologyVariableSummary> map = new HashMap<>();
 
         try {
-            SQLQuery query = getActiveSession().createSQLQuery("select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, pf.id fid from cvterm v " +
+            SQLQuery query = getActiveSession().createSQLQuery("select v.cvterm_id vid, v.name vn, v.definition vd, a.name va, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, pf.id fid from cvterm v " +
+                    "left join cvterm_alias a on a.cvterm_id = v.cvterm_id and a.program_id = :programId " +
                     "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id " +
                     "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id " +
                     "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id " +
@@ -83,7 +85,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     .addScalar("pid").addScalar("pn").addScalar("pd")
                     .addScalar("mid").addScalar("mn").addScalar("md")
                     .addScalar("sid").addScalar("sn").addScalar("sd")
-                    .addScalar("fid");
+                    .addScalar("va").addScalar("fid");
 
             query.setParameter("programId", programId);
 
@@ -107,7 +109,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 variable.setPropertySummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
                 variable.setMethodSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
                 variable.setScaleSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
-                variable.setIsFavorite(items[12] != null);
+                variable.setAlias((String) items[12]);
+                variable.setIsFavorite(items[13] != null);
                 map.put(variable.getId(), variable);
             }
 
@@ -197,6 +200,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
                         variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
                     }
+                }
+
+                //Get variable alias
+                CVTermAlias cvTermAlias = getCvTermAliasDao().getByCvTermAndProgram(id, programId);
+                if(cvTermAlias != null) {
+                    variable.setAlias(cvTermAlias.getName());
                 }
 
                 //Get favorite from ProgramFavoriteDAO

@@ -16,6 +16,8 @@ public class OntologyVariableSummary {
 
     private final Set<VariableType> variableTypes = new HashSet<>();
 
+    private String alias;
+
     private Boolean isFavorite;
 
     private Date dateCreated;
@@ -47,6 +49,14 @@ public class OntologyVariableSummary {
 	public TermSummary getTerm() {
 		return term;
 	}
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 
 	public TermSummary getPropertySummary() {
 		return propertySummary;
@@ -143,6 +153,4 @@ public class OntologyVariableSummary {
 		OntologyVariableSummary other = (OntologyVariableSummary) obj;
 		return getId().equals(other.getId());
 	}
-
-
 }
