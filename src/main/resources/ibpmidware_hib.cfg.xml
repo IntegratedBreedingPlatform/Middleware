@@ -83,6 +83,7 @@
         <mapping class="org.generationcp.middleware.pojos.oms.CVTermRelationship"/>
         <mapping class="org.generationcp.middleware.pojos.oms.CVTermSynonym"/>
         <mapping class="org.generationcp.middleware.pojos.oms.CVTermProperty"/>
+        <mapping class="org.generationcp.middleware.pojos.oms.CVTermAlias"/>
 
         <!-- Mapping classes for new DMS schema -->
         <mapping class="org.generationcp.middleware.pojos.dms.Geolocation"/>
