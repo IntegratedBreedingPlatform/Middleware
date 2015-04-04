@@ -21,6 +21,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
@@ -212,7 +213,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 ProgramFavorite programFavorite = getProgramFavoriteDao().getProgramFavorite(project.getProgramUUID(), ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
                 variable.setIsFavorite(programFavorite != null);
 
-                //TODO: Need to figure out observations which seems to be costly operation.
+                //TODO: Temporary implementation. Need to discuss this with actual use cases.
+                SQLQuery query = getActiveSession().createSQLQuery("select (select count(*) from projectprop where type_id = :variableId) + (select count(*) from phenotype where observable_id = :variableId)");
+                query.setParameter("variableId", id);
+
+                variable.setObservations(((BigInteger) query.uniqueResult()).intValue());
+
                 return variable;
 
             } catch(HibernateException e) {
