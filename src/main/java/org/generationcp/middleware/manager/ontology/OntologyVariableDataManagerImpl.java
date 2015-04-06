@@ -213,11 +213,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 ProgramFavorite programFavorite = getProgramFavoriteDao().getProgramFavorite(project.getProgramUUID(), ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
                 variable.setIsFavorite(programFavorite != null);
 
-                //TODO: Temporary implementation. Need to discuss this with actual use cases.
-                SQLQuery query = getActiveSession().createSQLQuery("select (select count(*) from projectprop where type_id = :variableId) + (select count(*) from phenotype where observable_id = :variableId)");
-                query.setParameter("variableId", id);
-
-                variable.setObservations(((BigInteger) query.uniqueResult()).intValue());
+                variable.setObservations(getVariableUsage(id));
 
                 return variable;
 
@@ -228,6 +224,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         } catch(HibernateException e) {
             throw new MiddlewareQueryException("Error in getting standard variable summaries from standard_variable_summary view", e);
         }
+    }
+
+    //TODO: Temporary implementation. Need to discuss this with actual use cases.
+    private Integer getVariableUsage(Integer variableId) {
+        SQLQuery query = getActiveSession().createSQLQuery("select (select count(*) from projectprop where type_id = :variableId) + (select count(*) from phenotype where observable_id = :variableId) c");
+        query.setParameter("variableId", variableId);
+        query.addScalar("c");
+        return ((BigInteger) query.uniqueResult()).intValue();
     }
 
     @Override
