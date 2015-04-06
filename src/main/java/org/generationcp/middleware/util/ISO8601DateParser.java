@@ -134,4 +134,18 @@ public class ISO8601DateParser {
 
     }
 
+    public static Long getCurrentTime(){
+        return new Date().getTime();
+    }
+
+    public static Date getDateFromTimeString(String milliSeconds) {
+        if(milliSeconds == null) return null;
+        try{
+            return new Date(Long.valueOf(milliSeconds));
+        } catch (Exception ignored) {
+
+        }
+        return null;
+    }
+
 }

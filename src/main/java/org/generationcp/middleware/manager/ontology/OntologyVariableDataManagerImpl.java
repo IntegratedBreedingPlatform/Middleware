@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager.ontology;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -197,9 +198,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     } else if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
                         variable.setMaxValue(property.getValue());
                     } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
-                        variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+                        variable.setDateCreated(ISO8601DateParser.getDateFromTimeString(property.getValue()));
                     } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
-                        variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+                        variable.setDateLastModified(ISO8601DateParser.getDateFromTimeString(property.getValue()));
                     }
                 }
 
@@ -251,6 +252,45 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             //Saving term to database.
             CVTerm savedTerm = getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
             variableInfo.setId(savedTerm.getCvTermId());
+
+            //Setting method to variable
+            if(variableInfo.getMethodId() != null){
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_METHOD.getId(), variableInfo.getMethodId());
+            }
+
+            //Setting property to variable
+            if(variableInfo.getPropertyId() != null){
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_PROPERTY.getId(), variableInfo.getPropertyId());
+            }
+
+            //Setting scale to variable
+            if(variableInfo.getMethodId() != null){
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_SCALE.getId(), variableInfo.getScaleId());
+            }
+
+            int rank = 0;
+            for(VariableType type : variableInfo.getVariableTypes()){
+                CVTermProperty property = new CVTermProperty();
+                property.setCvTermPropertyId(getCvTermPropertyDao().getNextId(CVTermProperty.ID_NAME));
+                property.setCvTermId(variableInfo.getId());
+                property.setTypeId(TermId.VARIABLE_TYPE.getId());
+                property.setValue(type.getName());
+                property.setRank(rank);
+                getCvTermPropertyDao().save(property);
+                rank++;
+            }
+
+            //Saving values if present
+            if (!Strings.isNullOrEmpty(variableInfo.getMinValue())) {
+                getCvTermPropertyDao().save(variableInfo.getId(), TermId.MIN_VALUE.getId(), String.valueOf(variableInfo.getMinValue()), 0);
+            }
+
+            //Saving values if present
+            if (!Strings.isNullOrEmpty(variableInfo.getMaxValue())) {
+                getCvTermPropertyDao().save(variableInfo.getId(), TermId.MAX_VALUE.getId(), String.valueOf(variableInfo.getMaxValue()), 0);
+            }
+
+            getCvTermPropertyDao().save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
 
             transaction.commit();
 

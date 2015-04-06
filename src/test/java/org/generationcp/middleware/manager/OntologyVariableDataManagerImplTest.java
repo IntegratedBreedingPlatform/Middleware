@@ -15,7 +15,9 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.OntologyVariable;
+import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;
@@ -54,6 +56,26 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
     public void testGetVariable() throws Exception {
         OntologyVariable variable = manager.getVariable(ProjectId, 60042);
         Assert.assertNotNull(variable);
+    }
+
+    @Test
+    public void testAddNewVariable() throws Exception {
+        OntologyVariableInfo info = new OntologyVariableInfo();
+        info.setName("My Variable " + getNewRandomName());
+        info.setDescription("Variable Description");
+        info.setMinValue("0");
+        info.setMaxValue("10");
+        info.setMethodId(4010);
+        info.setPropertyId(2140);
+        info.setScaleId(6040);
+        info.setProgramId(ProjectId);
+        info.addVariableType(VariableType.ANALYSIS);
+        info.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+        manager.addVariable(info);
+        Assert.assertNotNull(info.getId());
+        OntologyVariable variable = manager.getVariable(ProjectId, info.getId());
+        Assert.assertNotNull(variable);
+        Assert.assertEquals(variable.getVariableTypes().size(), 2);
     }
 
     @After
