@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.math.BigInteger;
@@ -1471,59 +1472,29 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     
     /*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
 
-    public CVTerm save(String name, String definition, CvId cvId)  throws MiddlewareQueryException{
-        
-        Integer generatedId;
-        
-        try {
-            generatedId = getNextId(CVTerm.ID_NAME);
-        } catch (MiddlewareQueryException e) {
-            throw new MiddlewareQueryException(e.getMessage(), e);
-        }
-        
-        CVTerm cvTerm = new CVTerm();
-        cvTerm.setCvTermId(generatedId);
-        cvTerm.setCv(cvId.getId());
-        cvTerm.setName(name);
-        cvTerm.setDefinition(definition);
-        cvTerm.setIsObsolete(false);
-        cvTerm.setIsRelationshipType(false);
-        return save(cvTerm);
-    }
-    
+
+
+	public List<CVTerm> getAllByCvId(Integer cvId) throws MiddlewareQueryException {
+
+		List<CVTerm> terms;
+
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("cvId", cvId));
+			criteria.add(Restrictions.eq("isObsolete", 0));
+			criteria.addOrder(Order.asc("name"));
+
+			terms = criteria.list();
+
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getAllByCvId=" + cvId + " query on CVTermDao", e);
+		}
+
+		return terms;
+	}
+
     public List<CVTerm> getAllByCvId(CvId cvId) throws MiddlewareQueryException {
-    
-        List<CVTerm> terms = new ArrayList<>();
-
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("cvId", cvId.getId()));
-            criteria.add(Restrictions.eq("isObsolete", 0));
-
-            terms = criteria.list();
-
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error at getByCvId=" + cvId + " query on CVTermDao", e);
-        }
-        
-        return terms;
-    }
-
-    public List<CVTerm> getAllByCvId(Integer cvId) throws MiddlewareQueryException {
-
-        List<CVTerm> terms = new ArrayList<>();
-
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("cvId", cvId));
-            criteria.add(Restrictions.eq("isObsolete", 0));
-            terms = criteria.list();
-
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error at getAllByCvId=" + cvId + " query on CVTermDao", e);
-        }
-
-        return terms;
+        return getAllByCvId(cvId.getId());
     }
 
     public List<CVTerm> getAllByCvId(List<Integer> termIds, CvId cvId) throws MiddlewareQueryException {
@@ -1535,6 +1506,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             criteria.add(Restrictions.in("cvTermId", termIds));
             criteria.add(Restrictions.eq("cvId", cvId.getId()));
             criteria.add(Restrictions.eq("isObsolete", 0));
+			criteria.addOrder(Order.asc("name"));
 
             terms = criteria.list();
 
@@ -1545,5 +1517,24 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return terms;
     }
 
+	public CVTerm save(String name, String definition, CvId cvId)  throws MiddlewareQueryException{
+
+		Integer generatedId;
+
+		try {
+			generatedId = getNextId(CVTerm.ID_NAME);
+		} catch (MiddlewareQueryException e) {
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+
+		CVTerm cvTerm = new CVTerm();
+		cvTerm.setCvTermId(generatedId);
+		cvTerm.setCv(cvId.getId());
+		cvTerm.setName(name);
+		cvTerm.setDefinition(definition);
+		cvTerm.setIsObsolete(false);
+		cvTerm.setIsRelationshipType(false);
+		return save(cvTerm);
+	}
 
 }
