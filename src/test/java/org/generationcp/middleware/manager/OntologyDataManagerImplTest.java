@@ -1030,13 +1030,13 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
 		Term newTerm = manager.addOrUpdateTermAndRelationship(name,
 				definition, CvId.PROPERTIES, TermId.IS_A.getId(),
-				OntologyDataManagerImplTestConstants.OBJECT_ID, null);
+				OntologyDataManagerImplTestConstants.OBJECT_ID);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Original:  " + origTerm);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Updated :  " + newTerm);
 
 		if (origTerm != null) { // if the operation is update, the ids must be
 								// same
-			Assert.assertSame(origTerm.getId(), newTerm.getId());
+			Assert.assertEquals(origTerm.getId(), newTerm.getId());
 		}
 	}
 
@@ -1048,7 +1048,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		if (origTerm == null) { // first run, add before update
 			origTerm = manager.addOrUpdateTermAndRelationship(name,
 					definition, CvId.PROPERTIES, TermId.IS_A.getId(),
-					OntologyDataManagerImplTestConstants.OBJECT_ID, null);
+					OntologyDataManagerImplTestConstants.OBJECT_ID);
 		}
 
 		manager.updateTermAndRelationship(new Term(origTerm.getId(),
@@ -1058,7 +1058,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Original:  " + origTerm);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Updated :  " + newTerm);
 
-		if (origTerm != null && newTerm != null) {
+		if (newTerm != null) {
 			Assert.assertTrue(newTerm.getDefinition().equals(definition));
 		}
 	}
@@ -1074,7 +1074,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Updated :  " + newTerm);
 
 		if (origTerm != null) { // if the operation is update, the ids must be same
-			Assert.assertSame(origTerm.getId(), newTerm.getId());
+			Assert.assertEquals(origTerm.getId(), newTerm.getId());
 		}
 	}
 
