@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -733,5 +734,26 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     	
     	assertEquals("Expecting to return the same number of Location objects from the input of List of Ids",locationIds.size(), locations.size());
     }
+    
+    @Test
+    public void testAddListDataProjectList() throws MiddlewareQueryException {
+    	List<ListDataProject> listDataProjectList = new ArrayList<ListDataProject>();
+    	listDataProjectList.add(createListDataProjectTest());
+		fieldbookService.addListDataProjectList(listDataProjectList);
+		assertNotNull("List 1 should have list data projects",fieldbookService.getListDataProject(1));
+    }
+
+	private ListDataProject createListDataProjectTest() {
+		ListDataProject listDataProject = new ListDataProject();
+		listDataProject.setList(new GermplasmList(1));
+		listDataProject.setGermplasmId(1);
+		listDataProject.setCheckType(10170);
+		listDataProject.setEntryId(1);
+		listDataProject.setEntryCode("1");
+		listDataProject.setSeedSource("Germplasm List Import_basic_2nd pedigree.xls:1");
+		listDataProject.setDesignation("IR 68815-25-PMI 3-UBN 6-B-B");
+		listDataProject.setGroupName("-");
+		return listDataProject;
+	}
     
 }

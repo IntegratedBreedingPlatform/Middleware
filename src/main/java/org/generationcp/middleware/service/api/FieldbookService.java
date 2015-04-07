@@ -879,4 +879,7 @@ public interface FieldbookService {
 	
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)  throws MiddlewareQueryException;
 	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException;
+
+	void addListDataProjectList(List<ListDataProject> listDataProjectList)
+			throws MiddlewareQueryException;
 }
