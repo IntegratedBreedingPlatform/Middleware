@@ -138,7 +138,16 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             throw new MiddlewareQueryException("Error at getScales", e);
         }
 
-        return new ArrayList<>(map.values());
+        List<Scale> scales = new ArrayList<>(map.values());
+
+        scales.sort(new Comparator<Scale>() {
+            @Override
+            public int compare(Scale l, Scale r) {
+                return  l.getName().compareTo(r.getName());
+            }
+        });
+
+        return scales;
     }
 
     @Override
