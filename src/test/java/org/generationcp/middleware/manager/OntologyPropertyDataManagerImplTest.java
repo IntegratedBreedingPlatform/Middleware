@@ -17,10 +17,10 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import org.junit.*;
-
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -39,7 +39,8 @@ public class OntologyPropertyDataManagerImplTest extends DataManagerIntegrationT
         testProperty.setName(getNewRandomName());
         testProperty.setDefinition("definition");
         testProperty.setCropOntologyId("CO_322:0000046");
-        testProperty.setClasses(Arrays.asList(traitClasses.get(0)));
+        testProperty.addClass(traitClasses.get(0).getName());
+        testProperty.addClass(getNewRandomName());
         Debug.println("adding test property " + testProperty);
         manager.addProperty(testProperty);
     }
@@ -75,13 +76,14 @@ public class OntologyPropertyDataManagerImplTest extends DataManagerIntegrationT
     public void testUpdateProperty() throws Exception {
         testProperty.setDefinition("new definition");
         testProperty.setCropOntologyId("CO_322:0000047");
-        testProperty.setClasses(Arrays.asList(traitClasses.get(1)));
+        testProperty.getClasses().clear();
+        testProperty.addClass(traitClasses.get(1).getName());
         manager.updateProperty(testProperty);
         Property updatedProperty = manager.getProperty(testProperty.getId());
         assertEquals(updatedProperty.getDefinition(), "new definition");
         assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
         assertEquals(updatedProperty.getClasses().size(), 1);
-        assertEquals(updatedProperty.getClasses().get(0).getName(), traitClasses.get(1).getName());
+        assertTrue(updatedProperty.getClasses().contains(traitClasses.get(1).getName()));
     }
 
     @After

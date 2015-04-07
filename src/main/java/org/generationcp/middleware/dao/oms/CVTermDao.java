@@ -916,8 +916,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             }
 
         } catch (HibernateException e) {
-            logAndThrowException(
-                    "Error at getAllTraitClasses() query on CVTermDao: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at getAllTraitClasses() query on CVTermDao: " + e.getMessage(), e);
         }
 
         return traitClasses;

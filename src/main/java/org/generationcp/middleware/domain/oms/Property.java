@@ -13,13 +13,12 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Property {
     
 	private Term term;
-    private List<Term> classes;
+    private final Set<String> classes = new HashSet<>();
     private String cropOntologyId;
 
     @Deprecated
@@ -28,28 +27,13 @@ public class Property {
      */
 	private Term isA;
 
-    public List<Term> getClasses() {
+    public Set<String> getClasses() {
         return classes;
     }
 
-    @SuppressWarnings("unused")
-    public List<String> getClassNames(){
-        List<String> classNames = new ArrayList<>();
-        if(classes == null) return classNames;
-        for(Term c : classes ){
-            classNames.add(c.getName());
-        }
-        return classNames;
-    }
-    
-    public void setClasses(List<Term> classes) {
-        this.classes = classes;
-    }
-    
-    public void addClass(Term t)
+    public void addClass(String className)
     {
-        if(this.classes == null) this.classes = new ArrayList<>();
-        this.classes.add(t);
+        this.classes.add(className);
     }
 
     public Property() {
@@ -114,16 +98,6 @@ public class Property {
         term.setDefinition(definition);
     }
 
-    @Deprecated
-    public int getIsAId() {
-        if(isA != null){
-            return isA.getId();
-        }else{
-            return -1;
-        }
-        
-    }
-   
     public void setCropOntologyId(String cropOntologyId) {
 		this.cropOntologyId = cropOntologyId;
 	}
@@ -140,7 +114,7 @@ public class Property {
             return "";
         }
 
-        return "Property [id=" + term.getId() + ", name=" + term.getName() + ", definition=" + term.getDefinition() + ", IsA=" + (isA == null ? "NULL" : isA) + ", Classes=" + (classes == null ? "NULL" : classes.toString()) + "]";
+        return "Property [id=" + term.getId() + ", name=" + term.getName() + ", definition=" + term.getDefinition() + ", IsA=" + (isA == null ? "NULL" : isA) + ", Classes=" + (classes == null ? "NULL" : Arrays.toString(classes.toArray())) + "]";
 	}
 
     public void print(int indent)
@@ -160,11 +134,7 @@ public class Property {
         }
         
         if(classes != null){
-            Debug.println(indent + 3, "Classes: ");
-            for(Term c : classes){
-                Debug.println(indent + 6, "Term: ");
-                c.print(indent + 9);
-            }
+            Debug.println(indent + 3, "Classes: " + Arrays.toString(classes.toArray()));
         }
     }
 }

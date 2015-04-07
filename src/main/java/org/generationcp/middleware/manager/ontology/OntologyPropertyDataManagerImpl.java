@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager.ontology;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
@@ -90,12 +91,12 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
      */
     private List<Property> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareQueryException {
 
-        Map<Integer, Property> map = new HashMap<>();
+        List<Property> properties = new ArrayList<>();
 
         if(propertyIds == null) propertyIds = new ArrayList<>();
 
         if(!fetchAll && propertyIds.size() == 0){
-            return new ArrayList<>(map.values());
+            return properties;
         }
 
         try {
@@ -108,24 +109,21 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             SQLQuery query = getActiveSession().createSQLQuery(
                     "select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete" +
                             ", tp.value cropOntologyId" +
-                            ", cs.cvterm_id cId, cs.name cName, cs.definition cDescription, cs.cv_id cVocabularyId, cs.is_obsolete cObsolete from cvterm p" +
+                            ", GROUP_CONCAT(cs.name SEPARATOR ' + ') AS classes" +
+                            "  from cvterm p" +
                             " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() +
                             " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete " +
                             " from cvTerm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = " + TermId.IS_A.getId() + ")" +
                             " cs on cs.PropertyId = p.cvterm_id" +
                             " where p.cv_id = " + CvId.PROPERTIES.getId() + " and p." + getCvTermDao().SHOULD_NOT_OBSOLETE +
-                            filterClause + " Order BY p.name")
+                            filterClause + " Group BY p.cvterm_id Order BY p.name ")
                     .addScalar("pId", new org.hibernate.type.IntegerType())
                     .addScalar("pName")
                     .addScalar("pDescription")
                     .addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
                     .addScalar("pObsolete", new org.hibernate.type.IntegerType())
                     .addScalar("cropOntologyId")
-                    .addScalar("cId", new org.hibernate.type.IntegerType())
-                    .addScalar("cName")
-                    .addScalar("cDescription")
-                    .addScalar("cVocabularyId", new org.hibernate.type.IntegerType())
-                    .addScalar("cObsolete", new org.hibernate.type.IntegerType());
+                    .addScalar("classes");
 
             if(propertyIds.size() > 0){
                 query.setParameterList("propertyIds", propertyIds);
@@ -133,42 +131,37 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
             List result = query.list();
 
-            Property p;
-
             for (Object row : result) {
                 Object[] items = (Object[]) row;
+
                 //Check is row does have objects to access
-                if(items.length == 0) continue;
+                if(items.length == 0) {
+                    continue;
+                }
 
                 //Check if Property term is already added to Map. We are iterating multiple classes for property
-                Integer propertyId = (Integer) items[0];
-                if (!map.containsKey(propertyId)) {
-                    p = new Property(new Term((Integer) items[0], (String)items[1], (String)items[2], (Integer) items[3], typeSafeObjectToBoolean(items[4])));
-                    map.put((Integer) items[0], p);
+                Property property = new Property(new Term((Integer) items[0], (String)items[1], (String)items[2], (Integer) items[3], typeSafeObjectToBoolean(items[4])));
 
-                    if(items[5] != null)
-                        p.setCropOntologyId((String) items[5]);
-                } else {
-                    p = map.get(propertyId);
+                if(items[5] != null) {
+                    property.setCropOntologyId((String) items[5]);
                 }
 
                 if(items[6] != null){
-                    p.addClass(new Term((Integer) items[6], (String)items[7], (String)items[8], (Integer) items[9], typeSafeObjectToBoolean(items[10])));
+                    String classes = (String) items[6];
+                    for(String c : classes.split(",")) {
+                        if(Strings.isNullOrEmpty(c)){
+                            continue;
+                        }
+                        property.addClass(c.trim());
+                    }
                 }
+
+                properties.add(property);
             }
 
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
         }
-
-        List<Property> properties = new ArrayList<>(map.values());
-
-        properties.sort(new Comparator<Property>() {
-            @Override
-            public int compare(Property l, Property r) {
-                return l.getName().compareTo(r.getName());
-            }
-        });
 
         return properties;
     }
@@ -180,11 +173,6 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
         if (term != null) {
             throw new MiddlewareException("Method exist with same name");
-        }
-
-        //To avoid null pointer exception while looping for classes if classes does not set by caller
-        if(property.getClasses() == null) {
-            property.setClasses(new ArrayList<Term>());
         }
 
         //Constant CvId
@@ -205,16 +193,27 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
                 getCvTermPropertyDao().save(property.getId(), TermId.CROP_ONTOLOGY_ID.getId(), property.getCropOntologyId(), 0);
             }
 
-            for (Term pClass : property.getClasses()) {
-                boolean found = false;
+            for (String c : property.getClasses()) {
+                Term classTerm = null;
                 for (Term tClass : allClasses) {
-                    if (pClass.getId() != tClass.getId()) continue;
-                    getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), tClass.getId());
-                    found = true;
+
+                    if (c.compareToIgnoreCase(tClass.getName()) != 0) {
+                        continue;
+                    }
+
+                    classTerm = tClass;
                     break;
                 }
-                if(!found) throw new MiddlewareException("Term Class:" + pClass.getName() + "not found");
+
+                //Add new term if does not exist
+                if(classTerm == null){
+                    CVTerm newClassToSave = getCvTermDao().save(c, "", CvId.IBDB_TERMS);
+                    classTerm = Term.fromCVTerm(newClassToSave);
+                }
+
+                getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
             }
+
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
@@ -224,9 +223,6 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
     @Override
     public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
-
-        //To avoid null pointer exception while looping for classes if classes does not set by caller
-        if(property.getClasses() == null) property.setClasses(new ArrayList<Term>());
 
         CVTerm propertyTerm = getCvTermDao().getById(property.getId());
 
@@ -265,28 +261,40 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
                 relationsToDelete.put(cl.getObjectId(), cl);
             }
 
-            for (Term pClass : property.getClasses()) {
-                boolean found = false;
+            for (String c : property.getClasses()) {
+
+                Term classTerm = null;
                 for (Term tClass : allClasses) {
-                    if (pClass.getId() != tClass.getId()){
+
+                    if (c.compareToIgnoreCase(tClass.getName()) != 0) {
                         continue;
                     }
-                    //If relation is marked for delete then do not delete and continue
-                    if(relationsToDelete.containsKey(tClass.getId())){
-                        relationsToDelete.remove(tClass.getId());
-                    } else {
-                        getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), tClass.getId());
-                    }
 
-                    found = true;
+                    classTerm = tClass;
                     break;
                 }
-                if(!found) throw new MiddlewareException("Term Class:" + pClass + "not found");
+
+                //Add new term if does not exist
+                if(classTerm == null){
+                    CVTerm newClassToSave = getCvTermDao().save(c, "", CvId.IBDB_TERMS);
+                    classTerm = Term.fromCVTerm(newClassToSave);
+                }
+
+                if(relationsToDelete.containsKey(classTerm.getId())){
+                    relationsToDelete.remove(classTerm.getId());
+                    continue;
+                }
+
+                getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
             }
 
             //Removing old classes which are not in used
             for (CVTermRelationship cl : relationsToDelete.values()){
                 getCvTermRelationshipDao().makeTransient(cl);
+                if (getCvTermRelationshipDao().getRelationshipByObjectId(cl.getObjectId()) == null) {
+                    CVTerm classTerm = getCvTermDao().getById(cl.getObjectId());
+                    getCvTermDao().makeTransient(classTerm);
+                }
             }
 
             transaction.commit();
@@ -319,6 +327,10 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(propertyId);
             for(CVTermRelationship r : relationships){
                 getCvTermRelationshipDao().makeTransient(r);
+                if (getCvTermRelationshipDao().getRelationshipByObjectId(r.getObjectId()) == null) {
+                    CVTerm classTerm = getCvTermDao().getById(r.getObjectId());
+                    getCvTermDao().makeTransient(classTerm);
+                }
             }
 
             //Deleting existing values for property
