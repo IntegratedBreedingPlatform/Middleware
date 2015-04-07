@@ -140,7 +140,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         List<Scale> scales = new ArrayList<>(map.values());
 
-        scales.sort(new Comparator<Scale>() {
+        Collections.sort(scales, new Comparator<Scale>() {
             @Override
             public int compare(Scale l, Scale r) {
                 return  l.getName().compareTo(r.getName());
