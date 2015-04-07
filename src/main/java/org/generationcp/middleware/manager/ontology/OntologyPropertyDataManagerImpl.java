@@ -42,7 +42,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         }
 
         try {
-            List<Property> properties = getProperties(false, new ArrayList<>(Arrays.asList(id)));
+            List<Property> properties = getProperties(false, new ArrayList<>(Collections.singletonList(id)));
             if(properties.size() == 0) return null;
             return properties.get(0);
         } catch (HibernateException e) {
@@ -161,7 +161,16 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
         }
 
-        return new ArrayList<>(map.values());
+        List<Property> properties = new ArrayList<>(map.values());
+
+        properties.sort(new Comparator<Property>() {
+            @Override
+            public int compare(Property l, Property r) {
+                return l.getName().compareTo(r.getName());
+            }
+        });
+
+        return properties;
     }
 
     @Override
