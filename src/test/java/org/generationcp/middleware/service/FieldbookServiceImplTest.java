@@ -66,7 +66,9 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     private static DataImportService dataImportService;
     private static Project commonTestProject;
     private static WorkbenchTestDataUtil workbenchTestDataUtil;
-
+    private static int LEVEL = 3;
+    private static int NAME_TYPE = 7;
+    
     @BeforeClass
     public static void setUp() throws Exception {
         fieldbookService = managerFactory.getFieldbookMiddlewareService();
@@ -103,7 +105,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         List<Integer> trialIds = new ArrayList<Integer>();
         trialIds.add(Integer.valueOf(1)); 
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds, LEVEL, NAME_TYPE);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
@@ -114,7 +116,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
         List<Integer> nurseryIds = new ArrayList<Integer>();
         nurseryIds.add(Integer.valueOf(5734)); 
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds, LEVEL, NAME_TYPE);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
@@ -123,7 +125,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetAllFieldMapsInBlockByTrialInstanceId() throws MiddlewareQueryException{
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1, LEVEL, NAME_TYPE);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }

@@ -443,7 +443,7 @@ public interface StudyDataManager{
      * @return the FieldMapCount object containing the counts
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType, int level, int nameType) throws MiddlewareQueryException;
     
     /**
      * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
@@ -474,7 +474,7 @@ public interface StudyDataManager{
      * @return the all field maps in block by trial instance id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, int level, int nameType) throws MiddlewareQueryException;
 
     /**
      * Check if the given id is an existing study.

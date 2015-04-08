@@ -58,7 +58,7 @@ public interface FieldbookService {
      * @return the FieldMapCount object containing the counts
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, int level, int nameType) throws MiddlewareQueryException;
     
     /**
      * Gets the field map info (entries, reps, plots and counts) of the given nursery.
@@ -67,7 +67,7 @@ public interface FieldbookService {
      * @return the FieldMapCount object containing the counts
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, int level, int nameType) throws MiddlewareQueryException;
     
     
     /**
@@ -134,7 +134,7 @@ public interface FieldbookService {
      * @return all field maps in block by trial instance id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, int level, int nameType) throws MiddlewareQueryException;
 
     /**
      * Gets the dataset references.

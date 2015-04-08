@@ -103,15 +103,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) 
+    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, int level, int nameType) 
             throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T);
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, level, nameType);
     }
     
     @Override 
-    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) 
+    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, int level, int nameType) 
             throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, level, nameType);
     }
 
     @Override 
@@ -173,9 +173,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) 
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, int level, int nameType) 
             throws MiddlewareQueryException {
-        return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
+        return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, level, nameType);
     }
 
     @Override

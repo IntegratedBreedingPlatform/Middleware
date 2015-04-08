@@ -77,6 +77,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     private static OntologyDataManager ontologyManager;
     private static Project commonTestProject;
     private static WorkbenchTestDataUtil workbenchTestDataUtil;
+    private static final int LEVEL = 1;
+    private static final int NAME_TYPE = 7;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -1060,7 +1062,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         List<Integer> trialIdList = new ArrayList<Integer>();
         trialIdList.addAll(Arrays.asList(Integer.valueOf(-4)));  
-        List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
+        List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, LEVEL, NAME_TYPE);
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             Debug.println(INDENT, fieldMapInfo.getFieldbookName());
             if (fieldMapInfo.getDatasets() != null){
@@ -1098,7 +1100,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         
         if (nurseryIdList.size() > 0) {
             
-            List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
+            List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, LEVEL, NAME_TYPE);
             for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
                 Debug.println(INDENT, fieldMapInfo.getFieldbookName());
                 if (fieldMapInfo.getDatasets() != null){
@@ -1131,7 +1133,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
             }
         }
          
-        List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
+        List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, LEVEL, NAME_TYPE);
 
         manager.saveOrUpdateFieldmapProperties(info, -1, false);
     }
