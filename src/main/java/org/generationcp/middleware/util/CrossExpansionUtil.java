@@ -84,4 +84,34 @@ public class CrossExpansionUtil {
        }
        return imax;
     }
+    
+    public static String GetNewDelimiter(String xPed) throws Exception {
+        String GetNewDelimiter = "";
+        int x = 0;
+        int MaxLevel = 0;
+        String cad = "";
+        for (x = 32; x >= 1; x--) {
+            cad = "/" + String.valueOf(x) + "/";
+            if (x == 2) {
+                cad = "//";
+            }
+            if (x == 1) {
+                cad = "/";
+            }
+            if (xPed.contains(cad)) {
+                MaxLevel = x;
+                x = 0;
+            }
+        }
+        // New level must be one higher than current one found
+        MaxLevel = MaxLevel + 1;
+        GetNewDelimiter = "/" + String.valueOf(MaxLevel) + "/";
+        if (MaxLevel == 1) {
+            GetNewDelimiter = "/";
+        }
+        if (MaxLevel == 2) {
+            GetNewDelimiter = "//";
+        }
+        return GetNewDelimiter;
+    }
 }
