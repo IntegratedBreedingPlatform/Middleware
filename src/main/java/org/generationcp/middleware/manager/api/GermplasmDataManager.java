@@ -1121,6 +1121,7 @@ public interface GermplasmDataManager {
      * @return The cross expansion based on the given gid and level
      * @throws MiddlewareQueryException the middleware query exception
      */
+    String getCrossExpansion(Integer gid, int level, int nameType) throws MiddlewareQueryException;
     String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
     
     /**
@@ -1432,4 +1433,6 @@ public interface GermplasmDataManager {
      * @param lgid
      */
 	Germplasm getGermplasmByLocalGid(Integer lgid) throws MiddlewareQueryException;
+	
+	String getCrossExpansionCimmytWheat(int gid, int level, int type) throws Exception;
 }

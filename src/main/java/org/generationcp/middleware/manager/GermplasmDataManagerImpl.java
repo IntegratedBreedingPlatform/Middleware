@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.oms.Term;
@@ -26,6 +27,7 @@ import org.generationcp.middleware.pojos.germplasm.BackcrossElement;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCross;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
 import org.generationcp.middleware.pojos.germplasm.SingleGermplasmCrossElement;
+import org.generationcp.middleware.util.CrossExpansionUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -1213,7 +1215,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Method> getMethodsByGroupIncludesGgroup(String group) throws MiddlewareQueryException {
         return (List<Method>) super.getAllByMethod(getMethodDao(), "getByGroupIncludesGgroup", new Object[] { group }, new Class[]{String.class});
     }
-
+    
+    @Deprecated
     @Override
     public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException {
         Germplasm germplasm = getGermplasmWithPrefName(gid);
@@ -1226,13 +1229,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return null;
         }
     }
-
+    
+    @Override
+    public String getCrossExpansion(Integer gid, int level, int nameType) throws MiddlewareQueryException {
+        Germplasm germplasm = getGermplasmWithPrefName(gid);
+        if (germplasm != null) {
+            SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
+            startElement.setGermplasm(germplasm);
+            GermplasmCrossElement cross = expandGermplasmCross(startElement, level, false);
+            return cross.toString();
+        } else {
+            return null;
+        }
+    }
+    
+    
     private GermplasmCrossElement expandGermplasmCross(GermplasmCrossElement element, int level, boolean forComplexCross) throws MiddlewareQueryException {
         if (level == 0) {
             //if the level is zero then there is no need to expand and the element
             //should be returned as is
             return element;
-        } else {
+        }else {
             if (element instanceof SingleGermplasmCrossElement) {
                 SingleGermplasmCrossElement singleGermplasm = (SingleGermplasmCrossElement) element;
                 Germplasm germplasmToExpand = singleGermplasm.getGermplasm();
@@ -1994,5 +2011,418 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			throws MiddlewareQueryException {
 		return this.getGermplasmDao().getByLGid(lgid);
 	}
+	
+	
+	private GermplasmNameType getGermplasmType(int ntype){
+		if(ntype == 17){
+			return GermplasmNameType.ALTERNATIVE_ABBREVIATION;
+		}
+		return GermplasmNameType.ABBREVIATED_CULTIVAR_NAME;
+	}
+	
+	public String getCrossExpansionCimmytWheat(int gid, int level, int type) throws Exception{
+		return arma_pedigree(gid, level, new Germplasm(), 0, 0, 0, 0, type);
+	}
+	/**
+     * Recursive procedure to generate the pedigree
+     *
+     * @param p_gid Input GID
+     * @param nivel default zero
+     * @param gpidinfClass empty class
+     * @param fback default zero
+     * @param mback default zero
+     * @param Resp1 default zero
+     * @param Resp2 default zero
+     * @return
+     * @throws Exception
+     */
+    public String arma_pedigree(int p_gid, int nivel, Germplasm gpidinfClass, int fback, int mback, int Resp1, int Resp2, int ntype) throws Exception {
+        
+        System.out.println("Armando pedigree con [p_gid] " + p_gid + " [nivel] " + nivel + " [fback] " + fback + " [mback] " + mback + " [Resp1] " + Resp1 + " [Resp2] " + Resp2);
+        //int xCurrent = 0;
+        //int xMax     = 0;        
+        String arma_pedigree = "";
+        String ped           = "";
+        String xPrefName     = "";
+        String Delimiter     = "";
+        String cut           = "";
+        String p1            = "";
+        String p2            = "";
+        String[] oldp1 = new String[1];
+        String[] oldp2 = new String[1];
+        Germplasm fGpidInfClass = new Germplasm();
+        Germplasm mGpidInfClass = new Germplasm();
+        fGpidInfClass.setGpid1(0);
+        fGpidInfClass.setGpid2(0);
+        mGpidInfClass.setGpid1(0);
+        mGpidInfClass.setGpid2(0);
+        
+        String LongStr;
+        String ShortStr;
+        boolean BackCrossFound = false;
+        //GermplsmRecord grTemp = new GermplsmRecord();
+        Germplasm grTemp = new Germplasm();
+        grTemp.setGid(0);
+        grTemp.setGpid1(0);
+        grTemp.setGpid2(0);
+        //boolean levelZeroFullName = true; 
+        List<Name> listNL = null;
+        int veces_rep = 0;
+        
+        try {
+            Germplasm temp = getGermplasmByGID(p_gid);
+            if(temp != null){
+            	grTemp = temp;
+            }
+            if (grTemp.getGid() == 0) {
+                return "";
+            }
+            //listNL = getNamesList(grTemp.getGid(), Arrays.asList(ntypeArray), Arrays.asList(nstatArray), Arrays.asList(nuidArray));
+            //since it should not be dependent on the status anymore
+            listNL = getNamesByGID(grTemp.getGid(), null, getGermplasmType(ntype)); 
+            // Determine if there was a Female or Male Backcross, that should be used in the pedigree, then the proper name of the
+            // line can't be used. For instance if the name is 27217-A-4-8 and the pedigree is also MT/BRT and we are
+            // called with mback representing BRT, then we must retrieve MT/BRT instead of 27217-A-4-8 to be able to reproduce
+            // the name MT/2*BRT as the final pedigree. See example with GID=1935, before it generated 27217-A-4-8/BRT, now it
+            // generates MT/2*BRT as expected.
+            BackCrossFound = false;
+            if ((grTemp.getGnpgs() == 2) && (grTemp.getGpid1() == fback) && (fback != 0)) {
+                BackCrossFound = true;
+            }
+            if ((grTemp.getGnpgs() == 2) && (grTemp.getGpid2() == mback) && (mback != 0)) {
+                BackCrossFound = true;
+            }
+            //' Also handle the CIMMYT retrocrosses A/B//A is A*2/B and B//A/B is A/2*B  JEN 2012-02-17
+            if (grTemp.getGnpgs() == 2 && grTemp.getGpid2() == fback && fback != 0) {
+                BackCrossFound = true;
+            }
+            if (grTemp.getGnpgs() == 2 && grTemp.getGpid1() == mback && mback != 0) {
+                BackCrossFound = true;
+            }
+        } catch (Exception e) {
+        }
+        
+        if ((!listNL.isEmpty()) && (grTemp.getGnpgs() == -1)) {
+            // Name found, but we can only use it if not a backcross
+            //GermplsmRecord rs_back = new GermplsmRecord();
+        	Germplasm rs_back = new Germplasm();
+            if (grTemp.getGpid1() != null && grTemp.getGpid1() != 0) {
+                //int ret = armainfoGID(grTemp.getGpid1(), rs_back);
+                Germplasm temp1 = getGermplasmByGID(grTemp.getGpid1());
+                if(temp1 != null){
+                	rs_back = temp1;
+                }
+                
+                if (rs_back.getGid() == null) {
+                    if (fback != 0 && (fback == rs_back.getGpid1())) {
+                        BackCrossFound = true;
+                    }
+                    if (mback != 0 && (mback == rs_back.getGpid2())) {
+                        BackCrossFound = true;
+                    }
+                    // New artificial backcrosses implemented 2 If's  JEN - 2012-02-13
+                    if (fback != 0 && fback == rs_back.getGpid2()) {
+                        BackCrossFound = true;
+                    }
+                    if (mback != 0 && mback == rs_back.getGpid1()) {
+                        BackCrossFound = true;
+                    }
+                }
+            }
+        }
+        // If the current GID is identical to one of the backcross GIDs that must be respected,
+        // cancel it as a backross and find a proper name
+        if ((Resp1 == p_gid) || (Resp2 == p_gid)) {
+            BackCrossFound = false;
+        }
+        if ((!listNL.isEmpty()) && !(BackCrossFound)) {
+            //xMax = 0;
+            /*
+            for (Name namesrecord : listNL) {
+                xCurrent = giveNameValue(namesrecord.getTypeId(), namesrecord.getNstat());
+                //Apply check if the LevelZeroFullName is true or not
+                //If that is the case and we are at level zero, add 200 to xCurrent if NSTAT=1
+                if ((nivel == 0) && levelZeroFullName && (namesrecord.getNstat() == 1)) {
+                    xCurrent = xCurrent + 200;
+                }
+                if (xCurrent > xMax) {
+                    xPrefName = namesrecord.getNval();
+                    xMax = xCurrent;
+                }
+            }
+            */
+            xPrefName = listNL.get(0).getNval();
+            ped = xPrefName;
+        } else {
+            if ((grTemp.getGpid1() == 0) && (grTemp.getGpid2() == 0)) {
+                ped = "Unknown";
+            } else {
+                if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid2() != 0)) {
+                    ped = arma_pedigree(grTemp.getGpid2(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype);
+                } else if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid1() != 0)) {
+                    ped = arma_pedigree(grTemp.getGpid1(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype);
+                } else {
+                    gpidinfClass.setGpid1(grTemp.getGpid1());
+                    gpidinfClass.setGpid2(grTemp.getGpid2());
+                    if (grTemp.getGpid1() == fback) {
+                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, Resp1, Resp2, ntype);
+                    } else {
+                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, grTemp.getGpid2(), Resp1, Resp2, ntype);
+                    }
+                    if (grTemp.getGpid2() == mback) {
+                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, Resp1, Resp2, ntype);
+                    } else {
+                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, grTemp.getGpid1(), 0, Resp1, Resp2, ntype);
+                    }
+                }
+//         ' Since female/male backcross is a bit meaningless when IWIS2 false backrosses are handled, then
+//         ' we just detect which part could be handled by length of p1 and p2, and if they are contained in
+//         ' first part or last part of the other
+                if (grTemp.getGpid1().intValue() == mGpidInfClass.getGpid1().intValue() || grTemp.getGpid2().intValue() == fGpidInfClass.getGpid1().intValue()  ||
+                		grTemp.getGpid2().intValue() == fGpidInfClass.getGpid2().intValue()  || grTemp.getGpid1().intValue() == mGpidInfClass.getGpid2().intValue() )//Handle Backcross
+                {
+                    veces_rep = 2;
+                    if ((!p1.equals("")) && (!p2.equals(""))) {
+                        if ((!p1.contains(p2)) && (!p2.contains(p1))) {
+                            ped = "Houston we have a problem";
+                            oldp1[0] = p1;
+                            oldp2[0] = p2;
+                            fGpidInfClass.setGpid1(0);
+                            fGpidInfClass.setGpid2(0);
+                            mGpidInfClass.setGpid1(0);
+                            mGpidInfClass.setGpid2(0);
+                            p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
+                            p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
+                            if ((!p1.contains(p2)) && (!p2.contains(p1))) {
+                                ped = "Houston we have a BIG problem";
+                                // Resolving situation of GID=29367 CID=22793 and GID=29456 CID=22881
+                                // Female : CMH75A.66/2*CNO79  Male CMH75A.66/3*CNO79  Result: CMH75A.66/2*CNO79*2//CNO79
+                                // Solution: convert p1 and p2 to the following
+                                // p1 : CMH75A.66/2*CNO79  p2: CMH75A.66/2*CNO79//CNO79
+                                //
+                                // A valid way to pass parameters by reference according to http://www.cs.utoronto.ca/~dianeh/tutorials/params/swap.html
+                               
+                                GetParentsDoubleRetroCrossNew(oldp1, oldp2);
+                                p1 = oldp1[0];
+                                p2 = oldp2[0];
+                            }
+                        }
+                        if (p1.length() > p2.length()) {
+                            LongStr = p1;
+                            ShortStr = p2;
+                        } else {
+                            LongStr = p2;
+                            ShortStr = p1;
+                        }
+                        if (LongStr.substring(0, ShortStr.length()).equals(ShortStr)) {
+                            //' Handle female type of backcross
+                            cut = LongStr.substring(ShortStr.length());
+                            if (cut.startsWith("/")) {
+                            } else if (cut.startsWith("*")) {
+                                if (cut.substring(2, 3).equals("/")) {
+                                    veces_rep = Integer.valueOf(cut.substring(1, 2)); //
+                                    cut = cut.substring(2);
+                                } else {
+                                    veces_rep = Integer.valueOf(cut.substring(1, 3));
+                                    cut = cut.substring(3);
+                                }
+                                veces_rep = veces_rep + 1;
+                            }
+                            ped = ShortStr + "*" + veces_rep + cut;
+                        }
+                        if (LongStr.substring(LongStr.length() - ShortStr.length()).equals(ShortStr)) {
+                            //' Handle male type of backcross
+                            cut = LongStr.substring(0, LongStr.length() - ShortStr.length());
+                            if (cut.endsWith("/")) {
+                            } else if (cut.endsWith("*")) {
+                                if (cut.substring(cut.length() - 3, cut.length() - 2).equals("/")) {
+                                    veces_rep = Integer.valueOf(cut.substring(cut.length() - 2, cut.length() - 1));
+                                    cut = cut.substring(0, (cut.length() - 2));
+                                } else {
+                                    veces_rep = Integer.valueOf(cut.substring(cut.length() - 3, cut.length() - 1));
+                                    cut = cut.substring(0, cut.length() - 3);
+                                }
+                                veces_rep = veces_rep + 1;
+                            }
+                            ped = cut + veces_rep + "*" + ShortStr;
+                        }
+                    }
+                }
+                if ((grTemp.getGpid1().intValue() != mGpidInfClass.getGpid1().intValue()) && (grTemp.getGpid1().intValue() != fGpidInfClass.getGpid1().intValue()) 
+                		&& (grTemp.getGpid2().intValue() != fGpidInfClass.getGpid2().intValue()) && (grTemp.getGpid2().intValue() != fGpidInfClass.getGpid2().intValue()) && (grTemp.getGpid2().intValue() != mGpidInfClass.getGpid2().intValue())) {
+                    if (((!p1.equals("")) || (!p2.equals(""))) && (ped.equals(""))) {
+                        if (p1.equals("")) {
+                            p1 = "Missing";
+                        }
+                        if (p2.equals("")) {
+                            p2 = "Missing";
+                        }
+                        Delimiter = CrossExpansionUtil.GetNewDelimiter(p1 + p2).toString();
+                        ped = p1 + Delimiter + p2;
+                    }
+                }
+            }
+        }
+//        System.out.println( nivel + " : " + p_gid + ":" + ped );
+        arma_pedigree = ped;
+        return arma_pedigree;
+    }
+    
+    private void GetParentsDoubleRetroCrossNew(String[] Mxp1, String[] Mxp2) { //24 agosto 2012, Medificaciones por Jesper
+        // Resolving situation of GID=29367 CID=22793 and GID=29456 CID=22881
+        // Female : CMH75A.66/2*CNO79  Male CMH75A.66/3*CNO79  Result: CMH75A.66/2*CNO79*2//CNO79
+        // Solution:
+        // p1 : CMH75A.66/2*CNO79  p2: CMH75A.66/2*CNO79//CNO79
+        // JEN  2012-07-16
+        String xp1 = Mxp1[0];
+        String xp2 = Mxp2[0];
+        String BeforeStr = "";
+        String AfterStr = "";
+        String Delimiter = "";
+        String CutStr = "";
+        String CleanBefore = "";
+        String CleanAfter = "";
+        int x = 0;
+        int y = 0;
+        int xx = 0;
+        int Lev1 = 0;
+        int Lev2 = 0;
+        String xDel = "";
+        String A = "";
+        String B = "";
+        // Default is true - 50% chance it is right
+        boolean SlashLeft = true;  //  /2*A is SlashLeft, and A*2/ is not SlashLeft
+        boolean Changed = false;   //
+        for (x = 1; x <= xp1.length(); x++) {
+            if (xp1.substring(x - 1, x).equals(xp2.substring(x - 1, x))) {
+                BeforeStr = BeforeStr + xp1.substring(x - 1, x);
+            } else {
+                Lev1 = 0;
+                xx = BeforeStr.length() + 1;
+                xDel = BeforeStr.substring(BeforeStr.length() - 1, BeforeStr.length());
+                if (BeforeStr.length() > 1) {
+                    if (NumberUtils.isNumber(BeforeStr.substring(BeforeStr.length() - 1, BeforeStr.length())) && BeforeStr.endsWith("*")) {
+                        Lev1 = Integer.valueOf(BeforeStr.substring(BeforeStr.length() - 1, BeforeStr.length()));
+                        xDel = "*";
+                    }
+                }
+                if (xp1.substring(xx - 1, xx).equals("*")) {
+                    xDel = "*";
+                    xx = xx + 1;
+                }
+                if (xDel.equals("*") || xDel.equals("/")) {
+                    for (y = xx; y < xp1.length(); y++) {
+                        if (!NumberUtils.isNumber(xp1.substring(y - 1, y))) {
+                            // Exit for
+                            break;
+                        }
+                        Lev1 = (Lev1 * 10) + Integer.valueOf(xp1.substring(y - 1, y));
+                        //  Take off leading offset in AfterStr if that has now been put in Lev2
+                        if ((xp1.length() - y) < AfterStr.length()) {
+                                AfterStr = AfterStr.substring(1, AfterStr.length());
+                        }
+                    }
+                    if (Lev1 == 0) {
+                        Lev1 = 1;
+                    }
+                }
+                // Exit for
+                break;
+            }
+        }
+        AfterStr = "";
+        if (xp1.length() < xp2.length()) {
+            CutStr = xp2.substring(xp2.length() - xp1.length());
+        } else {
+            CutStr = String.format("%" + xp1.length() + "s", xp2);
+        }
+        for (x = xp1.length(); x > 0; x--) {
+            if (xp1.substring(x - 1, x).equals(CutStr.substring(x - 1, x))) {
+                AfterStr = xp1.substring(x - 1, x) + AfterStr;
+            } else {
+                Lev2 = 0;
+                xx = BeforeStr.length() + 1;
+                if (BeforeStr.length() > 1) {
+                    // This criteria has problems 2012-07-17
+                    if (NumberUtils.isNumber(BeforeStr.substring(BeforeStr.length() - 1, BeforeStr.length())) && BeforeStr.endsWith("*")) {
+                        Lev2 = Integer.valueOf(BeforeStr.substring(BeforeStr.length() - 1, BeforeStr.length()));
+                        xDel = "*";
+                    }
+                }
+                if (xp2.substring(BeforeStr.length(), BeforeStr.length() + 1).equals("*")) {
+                    xDel = "*";
+                    xx = BeforeStr.length() + 2;
+                }
+                if (xDel.equals("*") || xDel.equals("/")) {
+                    for (y = xx; y < xp2.length(); y++) {
+                        // This criteria has problems 2012-07-17
+                        if (!NumberUtils.isNumber(xp2.substring(y - 1, y))) {
+                            // Exit for
+                            break;
+                        }
+                        Lev2 = (Lev2 * 10) + Integer.valueOf(xp2.substring(y - 1, y));
+                        //  Take off leading offset in AfterStr if that has now been put in Lev2
+                        if ((xp2.length() - y) < AfterStr.length()) {
+                            AfterStr = AfterStr.substring(1, AfterStr.length());
+                        }
+                    }
+                }
+                if (Lev2 == 0) {
+                    Lev2 = 1;
+                    Changed = true;
+                    while ((AfterStr.length() > 2) && Changed) {
+                        Changed = false;
+                        A = AfterStr.substring(0, 1);
+                        B = AfterStr.substring(1, 2);
+                        if ((A.equals("/") || (NumberUtils.isNumber(A))) && (B.equals("/") || (NumberUtils.isNumber(B)))) {
+                            AfterStr = AfterStr.substring(1, AfterStr.length());
+                            Changed = true;
+                        }
+                    }
+                }
+                // Exit for
+                break;
+            }
+        }
+        //if (AfterStr.substring(0,1).equals("/")) {
+        if (AfterStr.startsWith("/")) {
+            SlashLeft = false;
+        }
+        CleanAfter = AfterStr;
+        CleanBefore = BeforeStr;
+        // Fixing CleanAfter
+        // if (CleanAfter.substring(0,1).equals("*") || CleanAfter.substring(0,1).equals("/")) {
+        if (CleanAfter.startsWith("*") || CleanAfter.startsWith("/")) {
+            CleanAfter = CleanAfter.substring(1, CleanAfter.length());
+        }
+        // Fixing CleanBefore
+        if (CleanBefore.length() > 1) {
+            // This criteria has problems 2012-07-19
+            if (NumberUtils.isNumber(CleanBefore.substring(CleanBefore.length() - 1, CleanBefore.length())) && ((CleanBefore.substring(CleanBefore.length() - 2, CleanBefore.length() - 1).equals("/")) || (CleanBefore.substring(CleanBefore.length() - 1, CleanBefore.length()).equals("*")))) {
+                CleanBefore = CleanBefore.substring(0, CleanBefore.length() - 2);
+            }
+        }
+        try {
+            Delimiter = CrossExpansionUtil.GetNewDelimiter(xp1 + xp2);
+        } catch (Exception e) {
+            System.out.println("Error en GetNewDelimiter " + e);
+        }
+        if (Lev1 > Lev2) {
+            if (SlashLeft) {
+                xp1 = xp2 + Delimiter + CleanAfter;
+            } else {
+                xp1 = CleanBefore + Delimiter + xp2;
+            }
+        }
+        if (Lev2 > Lev1) {
+            if (SlashLeft) {
+                xp2 = xp1 + Delimiter + CleanAfter;
+            } else {
+                xp2 = CleanBefore + Delimiter + xp1;
+            }
+        }
+        Mxp1[0] = xp1;
+        Mxp2[0] = xp2;
+    }
 	
 }
