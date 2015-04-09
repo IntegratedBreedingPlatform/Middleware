@@ -115,7 +115,11 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 
     public CVTermProperty save(Integer cvTermId, Integer typeId, String value, Integer rank) throws MiddlewareQueryException{
         CVTermProperty property = getOneByCvTermAndType(cvTermId, typeId);
-        if(property == null) return save(new CVTermProperty(getNextId(CVTermProperty.ID_NAME), cvTermId, typeId, value, rank));
+
+        if(property == null) {
+            return save(new CVTermProperty(getNextId(CVTermProperty.ID_NAME), cvTermId, typeId, value, rank));
+        }
+
         property.setValue(value);
         property.setRank(rank);
         return merge(property);

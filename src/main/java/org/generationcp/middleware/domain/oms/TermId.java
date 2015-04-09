@@ -154,6 +154,7 @@ public enum TermId {
     	
 	// Other
     , ORDER(1420)
+    , ALIAS(1111)
 	, MIN_VALUE(1113)
 	, MAX_VALUE(1115)
 	, CROP_ONTOLOGY_ID(1226)
@@ -284,7 +285,7 @@ public enum TermId {
 	
 	private final int id;
 	
-	private TermId(int id) {
+	TermId(int id) {
 		this.id = id;
 	}
 	

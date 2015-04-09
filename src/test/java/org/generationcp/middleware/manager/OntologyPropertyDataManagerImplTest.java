@@ -77,13 +77,13 @@ public class OntologyPropertyDataManagerImplTest extends DataManagerIntegrationT
         testProperty.setDefinition("new definition");
         testProperty.setCropOntologyId("CO_322:0000047");
         testProperty.getClasses().clear();
-        testProperty.addClass(traitClasses.get(1).getName());
+        testProperty.addClass(getNewRandomName());
         manager.updateProperty(testProperty);
         Property updatedProperty = manager.getProperty(testProperty.getId());
         assertEquals(updatedProperty.getDefinition(), "new definition");
         assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
         assertEquals(updatedProperty.getClasses().size(), 1);
-        assertTrue(updatedProperty.getClasses().contains(traitClasses.get(1).getName()));
+        assertTrue(updatedProperty.getClasses().containsAll(testProperty.getClasses()));
     }
 
     @After
