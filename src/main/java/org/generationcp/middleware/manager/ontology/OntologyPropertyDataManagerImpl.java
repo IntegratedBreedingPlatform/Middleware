@@ -329,12 +329,10 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
             //Deleting existing relationships for property
             List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(propertyId);
-            for(CVTermRelationship r : relationships){
-                getCvTermRelationshipDao().makeTransient(r);
-                if (getCvTermRelationshipDao().getRelationshipByObjectId(r.getObjectId()) == null) {
-                    CVTerm classTerm = getCvTermDao().getById(r.getObjectId());
-                    getCvTermDao().makeTransient(classTerm);
-                }
+            for (CVTermRelationship cl : relationships){
+                getCvTermRelationshipDao().makeTransient(cl);
+                //Remove trait class if not in used
+                this.basicDataManager.removeTraitClass(cl.getObjectId());
             }
 
             //Deleting existing values for property
