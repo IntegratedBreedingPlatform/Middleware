@@ -9,6 +9,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -25,8 +26,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
     private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
 
-    public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
+    private final OntologyBasicDataManager basicDataManager;
+
+    public OntologyPropertyDataManagerImpl(OntologyBasicDataManager ontologyBasicDataManager, HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
+        this.basicDataManager = ontologyBasicDataManager;
     }
 
     @Override
@@ -67,7 +71,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             SQLQuery query = getActiveSession().createSQLQuery(
                     "SELECT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id" +
                             " inner join cvterm dt on dt.cvterm_id = cvtr.object_id" +
-                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p.is_obsolete = 0" +
+                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId()
+                            + " and p.is_obsolete = 0" +
                             " and dt.name = :className");
 
             query.setParameter("className", className);
@@ -207,8 +212,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
                 //Add new term if does not exist
                 if(classTerm == null){
-                    CVTerm newClassToSave = getCvTermDao().save(c, "", CvId.IBDB_TERMS);
-                    classTerm = Term.fromCVTerm(newClassToSave);
+                    classTerm = this.basicDataManager.addTraitClass(c, TermId.IBDB_CLASS.getId());
                 }
 
                 getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
@@ -220,6 +224,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             throw new MiddlewareQueryException("Error at addProperty :" + e.getMessage(), e);
         }
     }
+
+
 
     @Override
     public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
@@ -291,10 +297,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             //Removing old classes which are not in used
             for (CVTermRelationship cl : relationsToDelete.values()){
                 getCvTermRelationshipDao().makeTransient(cl);
-                if (getCvTermRelationshipDao().getRelationshipByObjectId(cl.getObjectId()) == null) {
-                    CVTerm classTerm = getCvTermDao().getById(cl.getObjectId());
-                    getCvTermDao().makeTransient(classTerm);
-                }
+                //Remove trait class if not in used
+                this.basicDataManager.removeTraitClass(cl.getObjectId());
             }
 
             transaction.commit();

@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.ontology.api;
 
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.List;
@@ -45,4 +46,16 @@ public interface OntologyBasicDataManager {
      * Checks if term is referred
      */
     boolean isTermReferred(int termId) throws MiddlewareQueryException;
+
+    /**
+     *
+     * @param childClassName class name to be added under
+     */
+    Term addTraitClass(String childClassName, Integer parentClassId) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     *
+     * @param termId to be deleted
+     */
+    void removeTraitClass(Integer termId) throws MiddlewareQueryException, MiddlewareException;
 }

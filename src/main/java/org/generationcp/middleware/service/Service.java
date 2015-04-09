@@ -76,7 +76,7 @@ public abstract class Service extends DatabaseBroker {
     }
 
     protected final OntologyPropertyDataManager getOntologyPropertyDataManager(){
-        return new OntologyPropertyDataManagerImpl(sessionProvider);
+        return new OntologyPropertyDataManagerImpl(getOntologyBasicDataManager(), sessionProvider);
     }
 
     protected final OntologyScaleDataManager getOntologyScaleDataManager(){
