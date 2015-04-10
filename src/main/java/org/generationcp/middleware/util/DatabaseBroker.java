@@ -231,8 +231,8 @@ public class DatabaseBroker {
     	return cvTermPropertyDao;
     }
 
-    protected final CvTermAliasDao getCvTermAliasDao() {
-        CvTermAliasDao cvTermAliasDao = new CvTermAliasDao();
+    protected final CvTermProgramPropertyDao getCvTermProgramPropertyDao() {
+        CvTermProgramPropertyDao cvTermAliasDao = new CvTermProgramPropertyDao();
         cvTermAliasDao.setSession(getActiveSession());
         return cvTermAliasDao;
     }

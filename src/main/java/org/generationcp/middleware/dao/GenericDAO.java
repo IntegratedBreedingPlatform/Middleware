@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class GenericDAO<T, ID extends Serializable> {
@@ -73,12 +74,12 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
     public List<T> filterByColumnValue(String columnName, Object value) throws MiddlewareQueryException {
         Criterion criterion = value == null ? Restrictions.isNull(columnName) : Restrictions.eq(columnName, value);
-        return getByCriteria(new ArrayList<>(Arrays.asList(criterion)));
+        return getByCriteria(new ArrayList<>(Collections.singletonList(criterion)));
     }
     
     public List<T> filterByColumnValues(String columnName, List<?> values) throws MiddlewareQueryException {
         if (values == null || values.isEmpty()) return new ArrayList<>();
-        return getByCriteria(new ArrayList<>(Arrays.asList(Restrictions.in(columnName, values))));
+        return getByCriteria(new ArrayList<>(Collections.singletonList(Restrictions.in(columnName, values))));
     }
 
     @SuppressWarnings("unchecked")

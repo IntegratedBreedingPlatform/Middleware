@@ -17,6 +17,7 @@ public class CvTermProgramPropertyDao extends GenericDAO<CVTermProgramProperty, 
 
     private static final String INVALID_TYPE_FOR_PROPERTY = "Invalid type for property";
 
+    @SuppressWarnings("unchecked")
     public List<CVTermProgramProperty> getByCvTermAndProgram(Integer cvTermId, String programUuid) throws MiddlewareQueryException {
 
         List properties;
@@ -24,7 +25,7 @@ public class CvTermProgramPropertyDao extends GenericDAO<CVTermProgramProperty, 
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
             criteria.add(Restrictions.eq("cvTermId", cvTermId));
-            criteria.add(Restrictions.eq("programId", programUuid));
+            criteria.add(Restrictions.eq("programUuid", programUuid));
             properties = criteria.list();
 
         } catch(HibernateException e) {
@@ -34,6 +35,7 @@ public class CvTermProgramPropertyDao extends GenericDAO<CVTermProgramProperty, 
         return properties;
     }
 
+    @SuppressWarnings("unchecked")
     public List<CVTermProgramProperty> getByCvTermTypeProgram(Integer cvTermId, Integer typeId, String programUuid) throws MiddlewareQueryException {
 
         List properties;

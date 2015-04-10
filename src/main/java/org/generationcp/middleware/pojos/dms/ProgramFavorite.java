@@ -5,7 +5,9 @@ import javax.persistence.*;
 @Entity
 @Table(	name = "program_favorites")
 public class ProgramFavorite {
-	
+
+	public static final String ID_NAME = "programFavoriteId";
+
 	public enum FavoriteType {
 		LOCATION("LOCATION"),
 		METHOD("METHODS"),
@@ -14,7 +16,7 @@ public class ProgramFavorite {
 		
 		private final String name;
 		
-		private FavoriteType(String name) {
+		FavoriteType(String name) {
 			this.name = name;
 		}
 		

@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class OntologyVariableInfo {
 
-    private Integer programId;
+    private String programUuid;
     private Integer id;
     private String name;
     private String description;
@@ -22,12 +22,12 @@ public class OntologyVariableInfo {
     private String maxValue;
     private Boolean isFavorite;
 
-    public Integer getProgramId() {
-        return programId;
+    public String getProgramUuid() {
+        return programUuid;
     }
 
-    public void setProgramId(Integer programId) {
-        this.programId = programId;
+    public void setProgramUuid(String programUuid) {
+        this.programUuid = programUuid;
     }
 
     public Integer getId() {

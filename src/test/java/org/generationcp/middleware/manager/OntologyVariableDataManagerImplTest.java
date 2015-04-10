@@ -25,13 +25,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Assert;
 
 public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyVariableDataManager manager;
-    private static final Integer ProjectId = 1;
+    private final String programId = UUID.randomUUID().toString();
 
 	@Before
 	public void setUp() throws Exception {
@@ -40,21 +41,21 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
 
     @Test
     public void testGetAllVariables() throws Exception {
-        List<OntologyVariableSummary> variables = manager.getWithFilter(ProjectId, null, null, null, null);
+        List<OntologyVariableSummary> variables = manager.getWithFilter(programId, null, null, null, null);
         Assert.assertTrue(variables.size() > 0);
         Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
     }
 
     @Test
     public void testGetVariablesByProperty() throws Exception {
-        List<OntologyVariableSummary> variables = manager.getWithFilter(ProjectId, null, null, 2010, null);
+        List<OntologyVariableSummary> variables = manager.getWithFilter(programId, null, null, 2010, null);
         Assert.assertTrue(variables.size() < 10);
         Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
     }
 
     @Test
     public void testGetVariable() throws Exception {
-        OntologyVariable variable = manager.getVariable(ProjectId, 60042);
+        OntologyVariable variable = manager.getVariable(programId, 18000);
         Assert.assertNotNull(variable);
     }
 
@@ -68,12 +69,12 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
         info.setMethodId(4010);
         info.setPropertyId(2140);
         info.setScaleId(6040);
-        info.setProgramId(ProjectId);
+        info.setProgramUuid(programId);
         info.addVariableType(VariableType.ANALYSIS);
         info.addVariableType(VariableType.ENVIRONMENT_DETAIL);
         manager.addVariable(info);
         Assert.assertNotNull(info.getId());
-        OntologyVariable variable = manager.getVariable(ProjectId, info.getId());
+        OntologyVariable variable = manager.getVariable(programId, info.getId());
         Assert.assertNotNull(variable);
         Assert.assertEquals(variable.getVariableTypes().size(), 2);
     }

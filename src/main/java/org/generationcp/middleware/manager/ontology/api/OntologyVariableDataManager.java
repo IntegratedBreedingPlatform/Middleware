@@ -31,14 +31,14 @@ public interface OntologyVariableDataManager {
      * * @return List<OntologyVariableSummary>
      * @throws MiddlewareQueryException*
      */
-    List<OntologyVariableSummary> getWithFilter(Integer programId, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
+    List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
 
     /**
      * Return variable by Id
      * * @return OntologyVariable
      * @throws MiddlewareQueryException*
      */
-    OntologyVariable getVariable(Integer programId, Integer id) throws MiddlewareQueryException, MiddlewareException;
+    OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareQueryException, MiddlewareException;
 
     /**
      * @throws MiddlewareQueryException*
