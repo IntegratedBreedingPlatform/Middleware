@@ -1005,4 +1005,17 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 		Assert.assertNotNull("It should not be null",germplasm);
 		Assert.assertEquals("It should be equals",gid,germplasm.getGid());
 	}
+	
+	@Test
+	public void testGetGermplasmByLocalGID() throws Exception {
+		Integer lgid = -1;
+		
+		Germplasm germplasm = manager.getGermplasmByLocalGid(lgid);
+		
+		Assert.assertNotNull("It should not be null",germplasm);
+		
+		if(germplasm != null){
+			Assert.assertEquals("It should be equals",lgid,germplasm.getLgid());
+		}
+	}
 }

@@ -77,10 +77,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation)
             throws MiddlewareQueryException {
-        
-    	return getFromInstanceByMethod(getGermplasmListDAO(), "getByName", 
-    				new Object[] {name, operation, start, numOfRows},
-    				new Class[] {String.class, Operation.class, Integer.TYPE, Integer.TYPE});
+        return getGermplasmListDAO().getByName(name,operation,start,numOfRows);
     }
 
     @Deprecated

@@ -57,7 +57,8 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
 
 	@Override
-	public LotsResult addAdvanceLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
+	public LotsResult addLotsForList(List<Integer> gids, Integer locationId, Integer scaleId,
+			String comment,
 			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
 		
 		LotsResult result  = getLotBuilder().getGidsForUpdateAndAdd(gids);

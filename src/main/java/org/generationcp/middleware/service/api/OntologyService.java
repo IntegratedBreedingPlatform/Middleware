@@ -162,7 +162,8 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
+    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws
+            MiddlewareException;
     
     /**
      * Delete standard variable.
@@ -181,7 +182,7 @@ public interface OntologyService{
      * @throws MiddlewareException the middleware exception
      */
     void addOrUpdateStandardVariableMinMaxConstraints(
-            int standardVariableId, VariableConstraints constraints) throws MiddlewareQueryException, MiddlewareException;
+            int standardVariableId, VariableConstraints constraints) throws MiddlewareException;
     
     /**
      * Deletes the given standard variable's min-max constraints.
@@ -202,7 +203,7 @@ public interface OntologyService{
      * @throws MiddlewareException the middleware exception
      */
     Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) 
-            throws MiddlewareQueryException, MiddlewareException;
+            throws MiddlewareException;
     
     /**
      * Deletes the given valid value from a standard variable.
@@ -221,7 +222,8 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException;
+    void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws
+            MiddlewareException;
     
     /*======================= PROPERTY ================================== */
    
@@ -280,7 +282,8 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException, MiddlewareException;
+    Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws
+            MiddlewareException;
 
     /**
      * Updates the given property. 
@@ -289,7 +292,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
+    void updateProperty(Property property) throws MiddlewareException;
 
     /**
      * Delete property.
@@ -352,7 +355,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Scale addOrUpdateScale(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
+    Scale addOrUpdateScale(String name, String definition) throws MiddlewareException;
     
     /**
      * Updates the given scale. 
@@ -361,7 +364,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
+    void updateScale(Scale scale) throws MiddlewareException;
 
     
     /**
@@ -424,7 +427,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Method addOrUpdateMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
+    Method addOrUpdateMethod(String name, String definition) throws MiddlewareException;
 
     /**
      * Updates the given method. 
@@ -433,7 +436,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException;
+    void updateMethod(Method method) throws MiddlewareException;
 
     /**
      * Delete method.
@@ -505,7 +508,7 @@ public interface OntologyService{
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareQueryException, MiddlewareException;
+    TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareException;
     
     /**
      * Delete trait class.

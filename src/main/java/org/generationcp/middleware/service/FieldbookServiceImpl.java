@@ -1221,4 +1221,27 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return false;
 	}
 	
+	@Override
+    public void addListDataProjectList(
+    		List<ListDataProject> listDataProjectList) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction(); 
+            for (ListDataProject listDataProject : listDataProjectList) {
+            	listDataProject.setListDataProjectId(
+            			getListDataProjectDAO().getNextId("listDataProjectId"));
+            	listDataProject.setList(getGermplasmListById(
+            			listDataProject.getList().getId()));
+            	getListDataProjectDAO().save(listDataProject);
+			}
+            trans.commit();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(),e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with addListDataProjectList(): " + e.getMessage(), e, LOG);
+        }
+    }
+	
 }

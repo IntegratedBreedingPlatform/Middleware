@@ -15,7 +15,7 @@ package org.generationcp.middleware.exceptions;
  * Exceptions for database-related Middleware issues.
  *
  */
-public class MiddlewareQueryException extends Exception{
+public class MiddlewareQueryException extends MiddlewareException{
 
     private static final long serialVersionUID = 1L;
     
