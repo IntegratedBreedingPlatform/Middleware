@@ -311,6 +311,15 @@ public interface WorkbenchDataManager {
 	Project getProjectByName(String projectName) throws MiddlewareQueryException;
 
 	/**
+	 * Gets a project by Uuid. Should return only one value.
+	 *
+	 * @param projectUuid - the project Uuid to match
+	 * @return the project matching the given Uuid
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Project getProjectByUuid(String projectUuid) throws MiddlewareQueryException;
+
+	/**
 	 * Updates all the project roles for a project.
 	 *
 	 * @param project - the project to use
