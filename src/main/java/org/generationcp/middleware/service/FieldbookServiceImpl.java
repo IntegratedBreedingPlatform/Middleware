@@ -60,10 +60,12 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.util.CrossExpansionRule;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Map.Entry;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -103,15 +105,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, int level, int nameType) 
+    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionRule crossExpansionRule) 
             throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, level, nameType);
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionRule);
     }
     
     @Override 
-    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, int level, int nameType) 
+    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionRule crossExpansionRule) 
             throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, level, nameType);
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, crossExpansionRule);
     }
 
     @Override 
@@ -173,9 +175,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, int level, int nameType) 
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, CrossExpansionRule crossExpansionRule) 
             throws MiddlewareQueryException {
-        return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, level, nameType);
+        return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, crossExpansionRule);
     }
 
     @Override

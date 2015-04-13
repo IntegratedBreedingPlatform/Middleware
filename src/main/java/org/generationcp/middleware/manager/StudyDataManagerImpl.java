@@ -38,6 +38,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.service.PedigreeServiceImpl;
+import org.generationcp.middleware.util.CrossExpansionRule;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
@@ -52,6 +54,7 @@ import java.util.*;
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
     private GermplasmDataManagerImpl germplasmDataManager;
+    private PedigreeServiceImpl pedigreeService;
     
     private LocationDataManager locationDataManager;
 
@@ -64,12 +67,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		super(sessionProvider, databaseName);
 		germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider, databaseName);
 		locationDataManager = new LocationDataManagerImpl(sessionProvider);
+		pedigreeService = new PedigreeServiceImpl(sessionProvider, databaseName);
 	}
 
     public StudyDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
         germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
         locationDataManager = new LocationDataManagerImpl(sessionProvider);
+        pedigreeService = new PedigreeServiceImpl(sessionProvider);
     }
 
     @Override
@@ -481,7 +486,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,  int level, int nameType) 
+    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType, CrossExpansionRule crossExpansionRule) 
             throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
 
@@ -502,7 +507,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             fieldMapInfo.setDatasets(fieldMapDatasetInfos);
             
             if (fieldMapDatasetInfos != null) {
-            	setPedigree(fieldMapDatasetInfos, level, nameType);
+            	setPedigree(fieldMapDatasetInfos, crossExpansionRule);
             }
             
             fieldMapInfos.add(fieldMapInfo);
@@ -513,7 +518,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return fieldMapInfos;
     }
 
-    private void setPedigree(List<FieldMapDatasetInfo> fieldMapDatasetInfos, int level, int nameType) {
+    private void setPedigree(List<FieldMapDatasetInfo> fieldMapDatasetInfos, CrossExpansionRule crossExpansionRule) {
     	for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
             List<FieldMapTrialInstanceInfo> trialInstances =
                     fieldMapDatasetInfo.getTrialInstances();
@@ -523,16 +528,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
                 List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
                 for (FieldMapLabel label : labels) {
-                    setPedigree(label, level, nameType);
+                    setPedigree(label, crossExpansionRule);
                 }
             }
         }
 	}
 
-	private void setPedigree(FieldMapLabel label, int level, int nameType) {
+	private void setPedigree(FieldMapLabel label, CrossExpansionRule crossExpansionRule) {
 		String pedigree = null;
         try {
-            pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), level, nameType);
+            pedigree = pedigreeService.getCrossExpansion(label.getGid(), crossExpansionRule);
         } catch (MiddlewareQueryException e) {
             LOG.error(e.getMessage(),e);
         }
@@ -614,7 +619,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, int level, int nameType)
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, CrossExpansionRule crossExpansionRule)
             throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
         
@@ -629,7 +634,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
             if (datasetInfoList != null){
-            	setPedigree(datasetInfoList, level, nameType);
+            	setPedigree(datasetInfoList, crossExpansionRule);
             }
         }
 
