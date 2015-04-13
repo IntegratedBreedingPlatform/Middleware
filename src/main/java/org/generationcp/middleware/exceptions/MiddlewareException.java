@@ -29,6 +29,10 @@ public class MiddlewareException extends Exception{
         super(message);
     }
 
+    public MiddlewareException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public MiddlewareException(String logMessage, ErrorCode errorCode, Object... params) {
         super(logMessage);
         this.errorCode = errorCode;
