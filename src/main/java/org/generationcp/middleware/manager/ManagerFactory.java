@@ -31,10 +31,12 @@ import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
+import org.generationcp.middleware.service.PedigreeServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,6 +149,10 @@ public class ManagerFactory implements Serializable {
 
     public MBDTDataManager getMbdtDataManager() {
         return new MBDTDataManagerImpl(sessionProvider);
+    }
+    
+    public PedigreeService getPedigreeService(){
+    	return new PedigreeServiceImpl(sessionProvider, databaseName);
     }
     
     /**

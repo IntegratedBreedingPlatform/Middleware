@@ -21,6 +21,7 @@ import org.generationcp.middleware.operation.destroyer.ExperimentDestroyer;
 import org.generationcp.middleware.operation.destroyer.StudyDestroyer;
 import org.generationcp.middleware.operation.saver.*;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 
@@ -143,6 +144,10 @@ public abstract class Service extends DatabaseBroker {
 
     protected final NameBuilder getNameBuilder() {
     	return new NameBuilder(sessionProvider);
+    }
+    
+    protected final PedigreeService getPedigreeService() {
+        return new PedigreeServiceImpl(sessionProvider, databaseName);
     }
     
 }
