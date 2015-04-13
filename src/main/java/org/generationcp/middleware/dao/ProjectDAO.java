@@ -40,18 +40,36 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 		return null;
 	}
+
+	public Project getByUuid(String projectUuid) throws MiddlewareQueryException {
+
+		try {
+			if (projectUuid != null) {
+				Criteria criteria = getSession().createCriteria(Project.class)
+						.add(Restrictions.eq("uniqueID", projectUuid))
+						.setMaxResults(1);
+				return (Project) criteria.uniqueResult();
+			}
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getByUuid(uniqueID=" + projectUuid + ") query from Project: " + e.getMessage(), e);
+		}
+		return null;
+	}
+
 	public void deleteProject(String projectName)
 	{
 		SQLQuery query = getSession().createSQLQuery("delete from workbench_project where project_name= '"+projectName+"';");
 		
 		query.executeUpdate();
 	}
+
 	public void deleteDatabase(String projectName)
 	{
 		SQLQuery query = getSession().createSQLQuery("drop schema `"+projectName+"`;");
 		
 		query.executeUpdate();
 	}
+
 	public Project getByName(String projectName)
 			throws MiddlewareQueryException {
 		try {

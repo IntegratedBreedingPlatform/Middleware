@@ -654,6 +654,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return getProjectDao().getByName(projectName);
     }
 
+    @Override
+    public Project getProjectByUuid(String projectUuid) throws MiddlewareQueryException {
+        return getProjectDao().getByUuid(projectUuid);
+    }
+
     public Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
