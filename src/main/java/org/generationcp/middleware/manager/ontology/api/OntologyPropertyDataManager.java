@@ -32,7 +32,7 @@ public interface OntologyPropertyDataManager {
      * @return property
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Property getProperty(int id) throws MiddlewareQueryException, MiddlewareException;
+    Property getProperty(int id) throws MiddlewareException;
 
     /**
      * Get all properties
@@ -55,7 +55,7 @@ public interface OntologyPropertyDataManager {
      * @param property to be added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void addProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
+    void addProperty(Property property) throws MiddlewareException;
 
     /**
      * Adds a new property to the database.
@@ -63,7 +63,7 @@ public interface OntologyPropertyDataManager {
      * @param property to be updated
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
+    void updateProperty(Property property) throws MiddlewareException;
 
     /**
      * Adds a new property to the database.
@@ -71,6 +71,6 @@ public interface OntologyPropertyDataManager {
      * @param propertyId of property
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void deleteProperty(Integer propertyId) throws MiddlewareQueryException, MiddlewareException;
+    void deleteProperty(Integer propertyId) throws MiddlewareException;
 
 }

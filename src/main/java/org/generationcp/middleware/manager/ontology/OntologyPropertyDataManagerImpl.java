@@ -34,7 +34,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public Property getProperty(int id) throws MiddlewareQueryException, MiddlewareException {
+    public Property getProperty(int id) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(id);
 
@@ -172,7 +172,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void addProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+    public void addProperty(Property property) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(property.getName(), CvId.METHODS.getId());
 
@@ -225,10 +225,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         }
     }
 
-
-
     @Override
-    public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+    public void updateProperty(Property property) throws MiddlewareException {
 
         CVTerm propertyTerm = getCvTermDao().getById(property.getId());
 
@@ -282,8 +280,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
                 //Add new term if does not exist
                 if(classTerm == null){
-                    CVTerm newClassToSave = getCvTermDao().save(c, "", CvId.IBDB_TERMS);
-                    classTerm = Term.fromCVTerm(newClassToSave);
+                    classTerm = this.basicDataManager.addTraitClass(c, CvId.IBDB_TERMS.getId());
                 }
 
                 if(relationsToDelete.containsKey(classTerm.getId())){
@@ -309,7 +306,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void deleteProperty(Integer propertyId) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteProperty(Integer propertyId) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(propertyId);
 
