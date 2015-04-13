@@ -10,6 +10,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableInfoDaoElements;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProgramProperty;
@@ -169,13 +170,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             //Fetch full scale from db
             CVTerm term = getCvTermDao().getById(id);
 
-            if (term == null) {
-                throw new MiddlewareException(VARIABLE_DOES_NOT_EXIST);
-            }
-
-            if(term.getCv() != CvId.VARIABLES.getId()){
-                throw new MiddlewareException(TERM_IS_NOT_VARIABLE);
-            }
+            checkTermIsVariable(term);
 
             try {
 
@@ -315,97 +310,24 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     @Override
     public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
 
-        //Fetch term from db
-        CVTerm term = getCvTermDao().getById(variableInfo.getId());
+        VariableInfoDaoElements elements = new VariableInfoDaoElements();
+        elements.setVariableInfo(variableInfo);
 
-        if (term == null) {
-            throw new MiddlewareException(VARIABLE_DOES_NOT_EXIST);
-        }
-
-        if(term.getCv() != CvId.VARIABLES.getId()){
-            throw new MiddlewareException(TERM_IS_NOT_VARIABLE);
-        }
-
-        //Name is required
-        checkAndThrowForNullObjects(variableInfo.getName(), variableInfo.getId(), variableInfo.getMethodId(), variableInfo.getProgramUuid(), variableInfo.getScaleId());
-
-        CVTermRelationship methodRelation = null;
-        CVTermRelationship propertyRelation = null;
-        CVTermRelationship scaleRelation = null;
-
-        //load scale, method and property data
-        List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(term.getCvTermId());
-        for(CVTermRelationship  r : relationships) {
-            if(Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())){
-                methodRelation = r;
-            } else if(Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())){
-                propertyRelation = r;
-            } else if(Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
-                scaleRelation = r;
-            }
-        }
-
-        CVTermProgramProperty aliasProperty = null;
-        CVTermProgramProperty minValueProperty = null;
-        CVTermProgramProperty maxValueProperty = null;
-
-        //Variable alias and expected range
-        List<CVTermProgramProperty> programProperties = getCvTermProgramPropertyDao().getByCvTermAndProgram(variableInfo.getId(), variableInfo.getProgramUuid());
-
-        for(CVTermProgramProperty property : programProperties) {
-
-            if(Objects.equals(property.getTypeId(), TermId.ALIAS.getId())){
-                aliasProperty = property;
-            }else if(Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())){
-                minValueProperty = property;
-            } else if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
-                maxValueProperty = property;
-            }
-        }
-
-        Integer observations = getVariableUsage(variableInfo.getId());
-
-        if(observations > 0){
-
-            //Name can not change
-            if(!Objects.equals(term.getName(), variableInfo.getName())) {
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //method can not change
-            if(methodRelation != null && !Objects.equals(methodRelation.getObjectId(), variableInfo.getMethodId())) {
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //property can not change
-            if(propertyRelation != null && !Objects.equals(propertyRelation.getObjectId(), variableInfo.getPropertyId())) {
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //scale can not change
-            if(scaleRelation != null && !Objects.equals(scaleRelation.getObjectId(), variableInfo.getScaleId())) {
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //Alias can not change but can be added.
-            if(aliasProperty != null && !Objects.equals(aliasProperty.getValue(), variableInfo.getAlias())){
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //Expected range can not change
-            if(minValueProperty != null && !Objects.equals(minValueProperty.getValue(), variableInfo.getMinValue())){
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            if(maxValueProperty != null && !Objects.equals(maxValueProperty.getValue(), variableInfo.getMaxValue())){
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-        }
+        fillDaoElementsAndCheckForUsage(elements);
 
         Session session = getActiveSession();
         Transaction transaction = null;
 
         try {
+            CVTerm term = elements.getVariableTerm();
+            CVTermRelationship methodRelation = elements.getMethodRelation();
+            CVTermRelationship propertyRelation = elements.getPropertyRelation();
+            CVTermRelationship scaleRelation = elements.getScaleRelation();
+            CVTermProgramProperty aliasProperty = elements.getAliasProperty();
+            CVTermProgramProperty minValueProperty = elements.getMinValueProperty();
+            CVTermProgramProperty maxValueProperty = elements.getMaxValueProperty();
+
+
             transaction = session.beginTransaction();
 
             //Updating term to database.
@@ -552,5 +474,111 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             if(o != null) continue;
             throw new MiddlewareException(INSUFFICIENT_DATA);
         }
+    }
+
+    private void checkTermIsVariable(CVTerm term) throws MiddlewareException {
+
+        if (term == null) {
+            throw new MiddlewareException(VARIABLE_DOES_NOT_EXIST);
+        }
+
+        if(term.getCv() != CvId.VARIABLES.getId()){
+            throw new MiddlewareException(TERM_IS_NOT_VARIABLE);
+        }
+    }
+
+    private void fillDaoElementsAndCheckForUsage(VariableInfoDaoElements elements) throws MiddlewareException {
+
+        OntologyVariableInfo variableInfo = elements.getVariableInfo();
+
+        //Fetch term from db
+        CVTerm variableTerm = getCvTermDao().getById(elements.getVariableInfo().getId());
+
+        checkTermIsVariable(variableTerm);
+
+        //Name is required
+        checkAndThrowForNullObjects(variableInfo.getName(), variableInfo.getId(), variableInfo.getMethodId(), variableInfo.getProgramUuid(), variableInfo.getScaleId());
+
+        CVTermRelationship methodRelation = null;
+        CVTermRelationship propertyRelation = null;
+        CVTermRelationship scaleRelation = null;
+
+        //load scale, method and property data
+        List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(variableTerm.getCvTermId());
+        for(CVTermRelationship  r : relationships) {
+            if(Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())){
+                methodRelation = r;
+            } else if(Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())){
+                propertyRelation = r;
+            } else if(Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
+                scaleRelation = r;
+            }
+        }
+
+        CVTermProgramProperty aliasProperty = null;
+        CVTermProgramProperty minValueProperty = null;
+        CVTermProgramProperty maxValueProperty = null;
+
+        //Variable alias and expected range
+        List<CVTermProgramProperty> programProperties = getCvTermProgramPropertyDao().getByCvTermAndProgram(variableInfo.getId(), variableInfo.getProgramUuid());
+
+        for(CVTermProgramProperty property : programProperties) {
+
+            if(Objects.equals(property.getTypeId(), TermId.ALIAS.getId())){
+                aliasProperty = property;
+            }else if(Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())){
+                minValueProperty = property;
+            } else if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
+                maxValueProperty = property;
+            }
+        }
+
+        Integer observations = getVariableUsage(elements.getVariableInfo().getId());
+
+        if(observations > 0){
+
+            //Name can not change
+            if(!Objects.equals(elements.getVariableTerm().getName(), elements.getVariableInfo().getName())){
+                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            }
+
+            //method can not change
+            if(methodRelation != null && !Objects.equals(methodRelation.getObjectId(), elements.getVariableInfo().getMethodId())) {
+                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            }
+
+            //property can not change
+            if(propertyRelation != null && !Objects.equals(propertyRelation.getObjectId(), elements.getVariableInfo().getPropertyId())) {
+                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            }
+
+            //scale can not change
+            if(scaleRelation != null && !Objects.equals(scaleRelation.getObjectId(), elements.getVariableInfo().getScaleId())) {
+                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            }
+
+            //Alias can not change but can be added.
+            if(aliasProperty != null && !Objects.equals(aliasProperty.getValue(), elements.getVariableInfo().getAlias())){
+                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            }
+
+            //Expected range can not change
+            if(minValueProperty != null && !Objects.equals(minValueProperty.getValue(), elements.getVariableInfo().getMinValue())){
+                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            }
+
+            if(maxValueProperty != null && !Objects.equals(maxValueProperty.getValue(), elements.getVariableInfo().getMaxValue())){
+                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            }
+        }
+
+        //Set to elements to send response back to caller.
+        elements.setVariableTerm(variableTerm);
+        elements.setMethodRelation(methodRelation);
+        elements.setPropertyRelation(propertyRelation);
+        elements.setScaleRelation(scaleRelation);
+        elements.setAliasProperty(aliasProperty);
+        elements.setMinValueProperty(minValueProperty);
+        elements.setMaxValueProperty(maxValueProperty);
     }
 }
