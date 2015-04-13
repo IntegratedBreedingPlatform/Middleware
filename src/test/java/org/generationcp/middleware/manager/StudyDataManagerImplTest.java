@@ -60,6 +60,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.util.CrossExpansionRule;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
@@ -79,6 +80,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     private static WorkbenchTestDataUtil workbenchTestDataUtil;
     private static final int LEVEL = 1;
     private static final int NAME_TYPE = 7;
+    private static CrossExpansionRule crossExpansionRule;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -87,6 +89,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
         workbenchTestDataUtil.setUpWorkbench();
         commonTestProject = workbenchTestDataUtil.getCommonTestProject();
+        crossExpansionRule = new CrossExpansionRule(false, LEVEL, NAME_TYPE);
     }
 
     @Test
@@ -1062,7 +1065,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         List<Integer> trialIdList = new ArrayList<Integer>();
         trialIdList.addAll(Arrays.asList(Integer.valueOf(-4)));  
-        List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, LEVEL, NAME_TYPE);
+        List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionRule);
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             Debug.println(INDENT, fieldMapInfo.getFieldbookName());
             if (fieldMapInfo.getDatasets() != null){
@@ -1100,7 +1103,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
         
         if (nurseryIdList.size() > 0) {
             
-            List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, LEVEL, NAME_TYPE);
+            List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, crossExpansionRule);
             for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
                 Debug.println(INDENT, fieldMapInfo.getFieldbookName());
                 if (fieldMapInfo.getDatasets() != null){
@@ -1133,7 +1136,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
             }
         }
          
-        List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, LEVEL, NAME_TYPE);
+        List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionRule);
 
         manager.saveOrUpdateFieldmapProperties(info, -1, false);
     }
