@@ -43,7 +43,7 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
         if (germplasm != null) {
             SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
             startElement.setGermplasm(germplasm);
-            GermplasmCrossElement cross = expandGermplasmCross(startElement, level, false);
+            GermplasmCrossElement cross = expandGermplasmCross(startElement, 1, false);
             return cross.toString();
         } else {
             return null;
@@ -55,7 +55,7 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
         Germplasm germplasm =  getGermplasmDataManager().getGermplasmWithPrefName(gid);
         if (germplasm != null) {
         	if(crossExpansionRule.isCimmytWheat()){
-        		return getCrossExpansionCimmytWheat(gid, crossExpansionRule.getStopLevel(), crossExpansionRule.getNameType());
+        		return getCrossExpansionCimmytWheat(gid, 0, 0);
         	}else{
 	            SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
 	            startElement.setGermplasm(germplasm);
@@ -520,7 +520,7 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
      * @return
      * @throws Exception
      */
-    public String arma_pedigree(int p_gid, int nivel, Germplasm gpidinfClass, int fback, int mback, int Resp1, int Resp2, int ntype) throws Exception {
+    public String arma_pedigree(int p_gid, int nivel, Germplasm gpidinfClass, int fback, int mback, int Resp1, int Resp2, int ntype, CimmytWheatNameUtil cimmytWheatNameUtil) throws Exception {
         
         System.out.println("Armando pedigree con [p_gid] " + p_gid + " [nivel] " + nivel + " [fback] " + fback + " [mback] " + mback + " [Resp1] " + Resp1 + " [Resp2] " + Resp2);
         int xCurrent = 0;
@@ -552,7 +552,7 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
         //boolean levelZeroFullName = true; 
         List<Name> listNL = null;
         int veces_rep = 0;
-        CimmytWheatNameUtil cimmytWheatNameUtil = new CimmytWheatNameUtil();
+        
         
         try {
             Germplasm temp = getGermplasmDataManager().getGermplasmByGID(p_gid);
@@ -645,21 +645,21 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
                 ped = "Unknown";
             } else {
                 if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid2() != 0)) {
-                    ped = arma_pedigree(grTemp.getGpid2(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype);
+                    ped = arma_pedigree(grTemp.getGpid2(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype, cimmytWheatNameUtil);
                 } else if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid1() != 0)) {
-                    ped = arma_pedigree(grTemp.getGpid1(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype);
+                    ped = arma_pedigree(grTemp.getGpid1(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype, cimmytWheatNameUtil);
                 } else {
                     gpidinfClass.setGpid1(grTemp.getGpid1());
                     gpidinfClass.setGpid2(grTemp.getGpid2());
                     if (grTemp.getGpid1() == fback) {
-                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, Resp1, Resp2, ntype);
+                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, Resp1, Resp2, ntype, cimmytWheatNameUtil);
                     } else {
-                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, grTemp.getGpid2(), Resp1, Resp2, ntype);
+                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, grTemp.getGpid2(), Resp1, Resp2, ntype, cimmytWheatNameUtil);
                     }
                     if (grTemp.getGpid2() == mback) {
-                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, Resp1, Resp2, ntype);
+                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, Resp1, Resp2, ntype, cimmytWheatNameUtil);
                     } else {
-                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, grTemp.getGpid1(), 0, Resp1, Resp2, ntype);
+                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, grTemp.getGpid1(), 0, Resp1, Resp2, ntype, cimmytWheatNameUtil);
                     }
                 }
 //         ' Since female/male backcross is a bit meaningless when IWIS2 false backrosses are handled, then
@@ -678,8 +678,8 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
                             fGpidInfClass.setGpid2(0);
                             mGpidInfClass.setGpid1(0);
                             mGpidInfClass.setGpid2(0);
-                            p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
-                            p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
+                            p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype, cimmytWheatNameUtil);
+                            p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype, cimmytWheatNameUtil);
                             if ((!p1.contains(p2)) && (!p2.contains(p1))) {
                                 ped = "Houston we have a BIG problem";
                                 // Resolving situation of GID=29367 CID=22793 and GID=29456 CID=22881
@@ -972,7 +972,8 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
     @Override
 	public String getCrossExpansionCimmytWheat(int gid, int level, int type) throws MiddlewareQueryException {
 		try{
-			return arma_pedigree(gid, level, new Germplasm(), 0, 0, 0, 0, type);
+			CimmytWheatNameUtil cimmytWheatNameUtil = new CimmytWheatNameUtil();
+			return arma_pedigree(gid, level, new Germplasm(), 0, 0, 0, 0, type, cimmytWheatNameUtil);
 		}catch(Exception e){
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
