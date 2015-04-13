@@ -41,6 +41,8 @@ public class Project implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
+    public static final String ID_NAME = "projectId";
+
     @Id
     @Basic(optional = false)
     @GeneratedValue
@@ -193,26 +195,17 @@ public class Project implements Serializable{
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Project [projectId=");
-        builder.append(projectId);
-        builder.append(", projectName=");
-        builder.append(projectName);
-        builder.append(", startDate=");
-        builder.append(startDate);
-        builder.append(", userId=");
-        builder.append(userId);
-        builder.append(", cropType=");
-        builder.append(cropType);
-        builder.append(", lastOpenDate=");
-        builder.append(lastOpenDate);
-        builder.append(", members=");
-        builder.append(members);
-        builder.append(", methods=");
-        builder.append(methods);
-        builder.append(", locations=");
-        builder.append(locations);
-        builder.append("]");
-        return builder.toString();
+        return "Project{" +
+                "projectId=" + projectId +
+                ", uniqueID='" + uniqueID + '\'' +
+                ", projectName='" + projectName + '\'' +
+                ", startDate=" + startDate +
+                ", userId=" + userId +
+                ", cropType=" + cropType +
+                ", lastOpenDate=" + lastOpenDate +
+                ", members=" + members +
+                ", methods=" + methods +
+                ", locations=" + locations +
+                '}';
     }
 }
