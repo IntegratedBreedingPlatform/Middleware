@@ -30,7 +30,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     private static final String TERM_IS_NOT_VARIABLE = "Term is not Variable";
     private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
     private static final String USED_VARIABLE_CAN_NOT_CHANGE = "Variable is already in use. You can not change properties other than favorite, description and variable types";
-    private static final String INSUFFICIENT_DATA = "One or more required fileds are missing.";
+    private static final String INSUFFICIENT_DATA = "One or more required fields are missing.";
 
 
     private final OntologyMethodDataManager methodDataManager;
@@ -162,7 +162,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareException {
 
         try {
 
@@ -249,7 +249,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(variableInfo.getName(), CvId.VARIABLES.getId());
 
@@ -313,7 +313,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
 
         //Fetch term from db
         CVTerm term = getCvTermDao().getById(variableInfo.getId());
@@ -513,7 +513,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 getCvTermProgramPropertyDao().makeTransient(minValueProperty);
             }
 
-            if(variableInfo.getAlias() != null) {
+            if(variableInfo.getMaxValue() != null) {
                 getCvTermProgramPropertyDao().save(variableInfo.getId(), TermId.MAX_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMaxValue());
             } else if(maxValueProperty != null) {
                 getCvTermProgramPropertyDao().makeTransient(maxValueProperty);
@@ -543,7 +543,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void deleteVariable(Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteVariable(Integer id) throws MiddlewareException {
 
     }
 
