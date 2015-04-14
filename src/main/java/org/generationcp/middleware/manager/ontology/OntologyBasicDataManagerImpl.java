@@ -4,13 +4,14 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.hibernate.SQLQuery;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public class OntologyBasicDataManagerImpl extends DataManager implements OntologyBasicDataManager {
@@ -22,27 +23,37 @@ public class OntologyBasicDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public List<Term> getAllTraitClass() throws MiddlewareQueryException {
+    public List<Term> getAllTraitClass() throws MiddlewareException {
         return getCvTermDao().getAllClasses();
     }
 
     @Override
-    public Term getTermById(Integer termId) throws MiddlewareQueryException {
+    public Term getTermById(Integer termId) throws MiddlewareException {
         return Term.fromCVTerm(getCvTermDao().getById(termId));
     }
 
     @Override
-    public Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
+    public Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareException {
         return Term.fromCVTerm(getCvTermDao().getByNameAndCvId(name, cvId));
     }
 
     @Override
-    public boolean isTermReferred(int termId) throws MiddlewareQueryException {
+    public boolean isTermReferred(int termId) throws MiddlewareException {
         return getCvTermRelationshipDao().isTermReferred(termId);
     }
 
+    //TODO: BMS-599
     @Override
-    public Term addTraitClass(String childClassName, Integer parentClassId) throws MiddlewareQueryException, MiddlewareException {
+    public Integer getVariableObservations(int variableId) throws MiddlewareException {
+        SQLQuery query = getActiveSession().createSQLQuery("select (select count(*) from projectprop where type_id = :variableId) " +
+                                                                "+ (select count(*) from phenotype where observable_id = :variableId) c");
+        query.setParameter("variableId", variableId);
+        query.addScalar("c");
+        return ((BigInteger) query.uniqueResult()).intValue();
+    }
+
+    @Override
+    public Term addTraitClass(String childClassName, Integer parentClassId) throws MiddlewareException {
         CVTerm parentClass = getCvTermDao().getById(parentClassId);
 
         //Validate parent class. Parent class should be from cvId as 1000
@@ -58,7 +69,7 @@ public class OntologyBasicDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public void removeTraitClass(Integer termId) throws MiddlewareQueryException, MiddlewareException {
+    public void removeTraitClass(Integer termId) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(termId);
 

@@ -28,34 +28,42 @@ public interface OntologyBasicDataManager {
     /**
      * Return All Trait Classes
      * * @return List<Term>
-     * @throws MiddlewareQueryException*
+     * @throws MiddlewareException*
      */
-    List<Term> getAllTraitClass() throws MiddlewareQueryException;
+    List<Term> getAllTraitClass() throws MiddlewareException;
 
     /**
      * Returns term by id
      */
-    Term getTermById(Integer termId) throws MiddlewareQueryException;
+    Term getTermById(Integer termId) throws MiddlewareException;
 
     /**
      * Returns term by name and cvId
      */
-    Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException;
+    Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareException;
 
     /**
-     * Checks if term is referred
+     * Checks if term has referred to other term.
      */
-    boolean isTermReferred(int termId) throws MiddlewareQueryException;
+    boolean isTermReferred(int termId) throws MiddlewareException;
+
+    /**
+     * This function defines total observations carried from this variable.
+     * @param variableId variable id to get observations
+     * @return Total observations
+     * @throws MiddlewareException
+     */
+    Integer getVariableObservations(int variableId) throws MiddlewareException;
 
     /**
      *
      * @param childClassName class name to be added under
      */
-    Term addTraitClass(String childClassName, Integer parentClassId) throws MiddlewareQueryException, MiddlewareException;
+    Term addTraitClass(String childClassName, Integer parentClassId) throws MiddlewareException;
 
     /**
      *
      * @param termId to be deleted
      */
-    void removeTraitClass(Integer termId) throws MiddlewareQueryException, MiddlewareException;
+    void removeTraitClass(Integer termId) throws MiddlewareException;
 }
