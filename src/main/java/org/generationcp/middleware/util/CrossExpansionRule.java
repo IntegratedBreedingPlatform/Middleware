@@ -4,14 +4,12 @@ public class CrossExpansionRule {
 	
 	private boolean isCimmytWheat;
 	private int stopLevel;
-	private int nameType;
 	
 	
-	public CrossExpansionRule(boolean isCimmytWheat, int stopLevel, int nameType) {
+	public CrossExpansionRule(boolean isCimmytWheat, int stopLevel) {
 		super();
 		this.isCimmytWheat = isCimmytWheat;
 		this.stopLevel = stopLevel;
-		this.nameType = nameType;
 	}
 	
 	public boolean isCimmytWheat() {
@@ -29,12 +27,4 @@ public class CrossExpansionRule {
 		this.stopLevel = stopLevel;
 	}
 
-	public int getNameType() {
-		return nameType;
-	}
-	public void setNameType(int nameType) {
-		this.nameType = nameType;
-	}
-	
-	
 }
