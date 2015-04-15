@@ -81,7 +81,8 @@ public class CvTermSaver extends Saver {
 	
 	public CVTerm create(int id, String name, String definition, int cvId,  boolean isObsolete, boolean isRelationshipType){
 		CVTerm cvTerm = new CVTerm();
-		cvTerm.setCvTermId(id);
+		//kim
+		//cvTerm.setCvTermId(id);
 		cvTerm.setName(name);
 		cvTerm.setDefinition(definition);
 		cvTerm.setCv(cvId);

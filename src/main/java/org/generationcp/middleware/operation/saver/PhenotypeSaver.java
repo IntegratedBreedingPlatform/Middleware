@@ -238,7 +238,8 @@ public class PhenotypeSaver extends Saver{
 		Phenotype phenotype = oldPhenotype;
 		if (phenotype == null) {
 			phenotype = new Phenotype();
-			phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
+			//kim
+			//phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
         }
         return phenotype;
     }
@@ -257,8 +258,8 @@ public class PhenotypeSaver extends Saver{
 
         if (experimentPhenotype == null || experimentPhenotype.getExperimentPhenotypeId() == null) {
             experimentPhenotype = new ExperimentPhenotype();
-            experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId(
-                    "experimentPhenotypeId"));
+            //kim
+            //experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId("experimentPhenotypeId"));
             experimentPhenotype.setExperiment(experimentId);
             experimentPhenotype.setPhenotype(phenotypeId);
         }
@@ -273,7 +274,8 @@ public class PhenotypeSaver extends Saver{
 			Phenotype phenotype = null;
 			if (phenotypeId == null) {
 				phenotype = new Phenotype();
-				phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
+				//kim
+				//phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 				phenotypeId = phenotype.getPhenotypeId();
 				phenotype.setObservableId(variableId);
 				phenotype.setUniqueName(phenotype.getPhenotypeId().toString());

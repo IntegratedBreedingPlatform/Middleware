@@ -127,7 +127,8 @@ public class GeolocationSaver extends Saver {
 			}
 			if (finalGeolocation == null) {
 				finalGeolocation = new Geolocation();
-				finalGeolocation.setLocationId(getGeolocationDao().getNextId("locationId"));
+				//kim
+				//finalGeolocation.setLocationId(getGeolocationDao().getNextId("locationId"));
 			}
 		}
 		return finalGeolocation;
@@ -138,7 +139,8 @@ public class GeolocationSaver extends Saver {
 		
 		if (property == null) {
 			property = new GeolocationProperty();
-			property.setGeolocationPropertyId(index);
+			//kim
+			//property.setGeolocationPropertyId(index);
 			property.setType(variable.getVariableType().getId());
 			property.setRank(variable.getVariableType().getRank());
 		}

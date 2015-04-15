@@ -41,9 +41,11 @@ public class CvTermRelationshipSaver extends Saver {
 	
 	public CVTermRelationship create(Integer relationshipId, Integer subjectId, Integer typeId, Integer objectId){
 		CVTermRelationship relationship = new CVTermRelationship();
-		relationship.setCvTermRelationshipId(relationshipId);
+		//kim
+		//relationship.setCvTermRelationshipId(relationshipId);
 		relationship.setSubjectId(subjectId);
 		relationship.setTypeId(typeId);
+		relationship.setObjectId(objectId);
 		relationship.setObjectId(objectId);
 		return relationship;
 	}

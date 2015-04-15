@@ -163,7 +163,8 @@ public class StandardVariableSaver extends Saver {
 		if(cvTerm == null) {
 		
 			cvTerm = new CVTerm();
-			cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
+			//kim
+			//cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
 			cvTerm.setCv(CV_VARIABLES);
 			cvTerm.setName(stdVar.getName());
 			cvTerm.setDefinition(stdVar.getDescription());
@@ -178,7 +179,8 @@ public class StandardVariableSaver extends Saver {
 	
     private CVTerm createCvTerm(Enumeration enumeration, Integer cvId) throws MiddlewareQueryException {
         CVTerm cvTerm = new CVTerm();
-        cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
+        //kim
+        //cvTerm.setCvTermId(getCvTermDao().getNextId("cvTermId"));
         cvTerm.setCv(cvId);
         cvTerm.setName(enumeration.getName());
         cvTerm.setDefinition(enumeration.getDescription());
@@ -190,7 +192,8 @@ public class StandardVariableSaver extends Saver {
 
     public CV createCv(StandardVariable variable) throws MiddlewareQueryException{
         CV cv = new CV();
-        cv.setCvId(getCvDao().getNextId("cvId"));
+        //kim
+        //cv.setCvId(getCvDao().getNextId("cvId"));
         cv.setName(String.valueOf(variable.getId()));
         cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
         getCvDao().save(cv);
@@ -220,8 +223,9 @@ public class StandardVariableSaver extends Saver {
 	private void saveCvTermRelationship(int subjectId, int typeId, int objectId) throws MiddlewareQueryException {
 		
 			CVTermRelationship relationship = new CVTermRelationship();
-			
-			relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNextId("cvTermRelationshipId"));
+
+            //kim
+			//relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNextId("cvTermRelationshipId"));
 			relationship.setSubjectId(subjectId);
 			relationship.setTypeId(typeId);
 			relationship.setObjectId(objectId);

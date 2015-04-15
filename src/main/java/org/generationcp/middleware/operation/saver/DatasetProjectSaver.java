@@ -33,7 +33,8 @@ public class DatasetProjectSaver extends Saver {
 
 	public DmsProject addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID) throws MiddlewareQueryException {
 		DmsProject datasetProject = new DmsProject();
-		datasetProject.setProjectId(getDmsProjectDao().getNextId("projectId"));
+		//kim
+		//datasetProject.setProjectId(getDmsProjectDao().getNextId("projectId"));
 		datasetProject.setName(getName(datasetValues));
 		datasetProject.setDescription(getDescription(datasetValues));
 		datasetProject.setProgramUUID(programUUID);
@@ -122,8 +123,8 @@ public class DatasetProjectSaver extends Saver {
 	
 	private List<ProjectRelationship> createProjectRelationship(int studyId, DmsProject datasetProject) throws MiddlewareQueryException {
 		ProjectRelationship relationship = new ProjectRelationship();
-		
-		relationship.setProjectRelationshipId(getProjectRelationshipDao().getNextId("projectRelationshipId"));
+		//kim
+		//relationship.setProjectRelationshipId(getProjectRelationshipDao().getNextId("projectRelationshipId"));
 		relationship.setSubjectProject(datasetProject);
 		relationship.setObjectProject(getDmsProjectDao().getById(studyId));
 		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());

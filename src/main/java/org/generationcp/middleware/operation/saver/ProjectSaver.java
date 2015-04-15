@@ -28,7 +28,8 @@ public class ProjectSaver extends Saver {
 	public DmsProject save(DmsProject project) throws MiddlewareQueryException{
         DmsProjectDao projectDao = getDmsProjectDao();
         Integer generatedId = projectDao.getNextId("projectId");
-        project.setProjectId(generatedId);
+        //kim
+        //project.setProjectId(generatedId);
         return projectDao.save(project);
 	}
 

@@ -422,8 +422,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             for (Name name : names) {
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new records
-                    Integer nextId = dao.getNextId("nid");
-                    name.setNid(nextId);
+                    //kim
+                    //Integer nextId = dao.getNextId("nid");
+                    //name.setNid(nextId);
                 }
                 Name recordAdded = dao.saveOrUpdate(name);
                 idNamesSaved.add(recordAdded.getNid());
@@ -593,8 +594,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             MethodDAO dao = getMethodDao();
 
             // Auto-assign IDs for new records
-            Integer nextId = dao.getNextId("mid");
-            method.setMid(nextId);
+            //kim
+            //Integer nextId = dao.getNextId("mid");
+            //method.setMid(nextId);
 
             Method recordSaved = dao.saveOrUpdate(method);
             methodId = recordSaved.getMid();
@@ -655,8 +657,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
             for (Method method : methods) {
                 // Auto-assign IDs for new DB records
-                Integer nextId = dao.getNextId("mid");
-                method.setMid(nextId);
+                //kim
+                //Integer nextId = dao.getNextId("mid");
+                //method.setMid(nextId);
 
                 Method recordSaved = dao.saveOrUpdate(method);
                 idMethodsSaved.add(recordSaved.getMid());
@@ -746,8 +749,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             BibrefDAO dao = getBibrefDao();
 
             // Auto-assign IDs for new DB records
-            Integer nextId = dao.getNextId("refid");
-            bibref.setRefid(nextId);
+            //kim Bibref has no use?
+            //Integer nextId = dao.getNextId("refid");
+            //bibref.setRefid(nextId);
 
             Bibref recordSaved = dao.saveOrUpdate(bibref);
             idBibrefSaved = recordSaved.getRefid();
@@ -802,8 +806,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             for (Attribute attribute : attributes) {
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new DB records
-                    Integer nextId = dao.getNextId("aid");
-                    attribute.setAid(nextId);
+                    //kim - Be carelful with the impact of this change
+                    //Integer nextId = dao.getNextId("aid");
+                    //attribute.setAid(nextId);
                 }
                 Attribute recordSaved = dao.saveOrUpdate(attribute);
                 idAttributesSaved.add(recordSaved.getAid());
@@ -903,6 +908,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             for (Germplasm germplasm : germplasms) {
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new DB records
+                    //kim - What is Gid and Lgid? #ChildIssue
                     Integer nextId = dao.getNextId("gid");
                     germplasm.setGid(nextId);
                     germplasm.setLgid(nextId);
@@ -1003,6 +1009,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 Name name = germplasmNameMap.get(germplasm);
 
                 // Auto-assign IDs for new DB records
+                //Kim - Investigate. Create and retrieve Germplasm ID the allocate to name.
+                //#ChildIssue
                 Integer nextId = dao.getNextId("gid");
                 germplasm.setGid(nextId);
                 germplasm.setLgid(Integer.valueOf(0));
@@ -1044,8 +1052,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             UserDefinedFieldDAO dao =  getUserDefinedFieldDao();
             
             // Auto-assign IDs for new DB records
-            Integer nextId = dao.getNextId("fldno");
-            field.setFldno(nextId);
+            //kim
+            //Integer nextId = dao.getNextId("fldno");
+            //field.setFldno(nextId);
             dao.save(field);
 
             // end transaction, commit to database
@@ -1073,8 +1082,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             for (UserDefinedField field : fields) {
 
                 // Auto-assign IDs for new DB records
-                Integer nextId = dao.getNextId("fldno");
-                field.setFldno(nextId);
+                //kim
+                //Integer nextId = dao.getNextId("fldno");
+                //field.setFldno(nextId);
                 
                 UserDefinedField udflds = dao.save(field);
                 isUdfldSaved.add(udflds.getFldno());
@@ -1109,8 +1119,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             AttributeDAO dao =  getAttributeDao();
             
             // Auto-assign IDs for new DB records
-            Integer nextId = dao.getNextId("aid");
-            attr.setAid(nextId);
+            //Integer nextId = dao.getNextId("aid");
+            //attr.setAid(nextId);
             dao.save(attr);
             isAttrSaved++;
 
@@ -1140,8 +1150,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             for (Attribute attr : attrs) {
 
                 // Auto-assign IDs for new DB records
-                Integer nextId = dao.getNextId("aid");
-                attr.setAid(nextId);
+                //kim
+                //Integer nextId = dao.getNextId("aid");
+                //attr.setAid(nextId);
                 
                 Attribute newAttr = dao.save(attr);
                 isAttrSaved.add(newAttr.getAid());
@@ -1847,8 +1858,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			for (ProgramFavorite favorite : list) {
 
-				Integer nextId = dao.getNextId("id");
-				favorite.setProgramFavoriteId(nextId);
+				//Integer nextId = dao.getNextId("id");
+				//favorite.setProgramFavoriteId(nextId);
 				dao.save(favorite);
 				favoriteSaved++;
 
@@ -1878,8 +1889,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		try {
 			trans = session.beginTransaction();
 			ProgramFavoriteDAO dao = getProgramFavoriteDao();
-			Integer nextId = dao.getNextId("id");
-			favorite.setProgramFavoriteId(nextId);
+            //kim
+			//Integer nextId = dao.getNextId("id");
+			//favorite.setProgramFavoriteId(nextId);
 			dao.save(favorite);
 			trans.commit();
 		} catch (Exception e) {

@@ -44,7 +44,8 @@ public class ListDataPropertySaver extends Saver {
     						if (property == null){
     							property = new ListDataProperty(listData, column.getColumnName());
     							Integer nextId = getListDataPropertyDAO().getNextId("listDataPropertyId");
-								property.setListDataPropertyId(nextId);
+								//kim - This section: If create
+								//property.setListDataPropertyId(nextId);
     						}
     						String value = column.getValue();
     						if (value != null){

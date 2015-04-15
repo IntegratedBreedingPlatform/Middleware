@@ -2729,7 +2729,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         MarkerOnMapDAO markerOnMapDao = getMarkerOnMapDao();
 
         Integer generatedId = markerOnMapDao.getNextId("markerOnMapId");
-        markerOnMap.setMarkerOnMapId(generatedId);
+        //kim
+        //markerOnMap.setMarkerOnMapId(generatedId);
         markerOnMap.setMarkerId(markerId);
         markerOnMap.setMapId(mapId);
 

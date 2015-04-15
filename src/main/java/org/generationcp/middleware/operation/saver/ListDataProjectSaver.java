@@ -54,8 +54,8 @@ public class ListDataProjectSaver extends Saver {
 	
 	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type) throws MiddlewareQueryException {
 		GermplasmList snapList = new GermplasmList(); 
-		
-		snapList.setId(getGermplasmListDAO().getNextId("id"));
+		//kim
+		//snapList.setId(getGermplasmListDAO().getNextId("id"));
 		snapList.setProjectId(projectId);
 		DateFormat format = new SimpleDateFormat("yyyyMMdd");
 		snapList.setDate(Long.valueOf(format.format(new Date())));
@@ -115,7 +115,9 @@ public class ListDataProjectSaver extends Saver {
 	}
 	
 	private void prepareListDataProjectForSaving(ListDataProject listDataProject, GermplasmList snapList) throws MiddlewareQueryException {
-		listDataProject.setListDataProjectId(getListDataProjectDAO().getNextId("listDataProjectId"));
+
+		//kim
+		//listDataProject.setListDataProjectId(getListDataProjectDAO().getNextId("listDataProjectId"));
 		listDataProject.setList(snapList);
 		if (listDataProject.getCheckType() == null) {
 			listDataProject.setCheckType(0);

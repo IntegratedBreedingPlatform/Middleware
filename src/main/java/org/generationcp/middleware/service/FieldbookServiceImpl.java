@@ -418,7 +418,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             // Save germplasm list
             listId = germplasmListDao.getNextId("id");
-            germplasmList.setId(listId);
+
+            //kim
+            //germplasmList.setId(listId);
             germplasmListDao.save(germplasmList);
 
             int i = 0;
@@ -519,7 +521,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             
             // Save germplasm list
             listId = germplasmListDao.getNextId("id");
-            germplasmList.setId(listId);
+
+            //Kim
+            //germplasmList.setId(listId);
             germplasmListDao.save(germplasmList);
 
             int i = 0;

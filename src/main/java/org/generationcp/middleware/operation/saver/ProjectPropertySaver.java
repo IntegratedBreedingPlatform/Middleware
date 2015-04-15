@@ -66,7 +66,8 @@ public class ProjectPropertySaver extends Saver {
 		ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
         for (ProjectProperty property : properties){
             generatedId = projectPropertyDao.getNextId(PROJECT_PROPERTY_ID);
-            property.setProjectPropertyId(generatedId);
+            //kim
+            //property.setProjectPropertyId(generatedId);
             property.setProject(project);
             projectPropertyDao.save(property);
         }
@@ -95,7 +96,8 @@ public class ProjectPropertySaver extends Saver {
 				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId
 				|| TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
 					ProjectProperty property = new ProjectProperty();
-					property.setProjectPropertyId(getProjectPropertyDao().getNextId(PROJECT_PROPERTY_ID));
+					//kim
+					//property.setProjectPropertyId(getProjectPropertyDao().getNextId(PROJECT_PROPERTY_ID));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
 					property.setValue(variable.getValue());
 					property.setRank(variable.getVariableType().getRank());
@@ -117,7 +119,8 @@ public class ProjectPropertySaver extends Saver {
 	
 	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
 		ProjectProperty property = new ProjectProperty();
-		property.setProjectPropertyId(getProjectPropertyDao().getNextId(PROJECT_PROPERTY_ID));
+		//kim
+		//property.setProjectPropertyId(getProjectPropertyDao().getNextId(PROJECT_PROPERTY_ID));
 		property.setTypeId(typeId);
 		property.setValue(value);
 		property.setRank(rank);

@@ -166,8 +166,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             for (Lot lot : lots) {
                 if (operation == Operation.ADD && lot.getId() == null){
                     // Auto-assign IDs for new local DB records
-            		Integer id = dao.getNextId("id");
-            		lot.setId(id);
+            		//kim
+            		//Integer id = dao.getNextId("id");
+            		//lot.setId(id);
                 }
                 Lot recordSaved = dao.saveOrUpdate(lot);
                 idLotsSaved.add(recordSaved.getId());
@@ -239,8 +240,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             for (org.generationcp.middleware.pojos.ims.Transaction transaction : transactions) {
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new local DB records
-                    Integer id = dao.getNextId("id");
-                    transaction.setId(id);
+                    //kim
+                    //Integer id = dao.getNextId("id");
+                    //transaction.setId(id);
                 }
                 org.generationcp.middleware.pojos.ims.Transaction recordSaved = dao.saveOrUpdate(transaction);
                 idTransactionsSaved.add(recordSaved.getId());
