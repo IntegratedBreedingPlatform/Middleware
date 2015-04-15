@@ -22,15 +22,20 @@ import org.slf4j.LoggerFactory;
 
 public class PedigreeServiceImpl extends Service implements PedigreeService{
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
-
+	private CimmytWheatNameUtil cimmytWheatNameUtil;
+	private static final int NSTAT_DELETED = 9;
+	
     public PedigreeServiceImpl() {
         super();
+        cimmytWheatNameUtil = new CimmytWheatNameUtil();
     }
     public PedigreeServiceImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
+        cimmytWheatNameUtil = new CimmytWheatNameUtil();
     }
     public PedigreeServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
         super(sessionProvider, localDatabaseName);
+        cimmytWheatNameUtil = new CimmytWheatNameUtil();
     }
 
 	
@@ -488,12 +493,11 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
 		List<Name> nameList  = getNameDao().getByGIDWithFilters(gid, null, null);
 		List<Name> returnNameList = new ArrayList<Name>();
 		for(Name name : nameList){						
-			if (name.getNstat() != 9) {
-                if (ntypeArray.contains(name.getTypeId()) 
-                		&& nstatArray.contains(name.getNstat()) 
-                		&& !nuiArray.contains(name.getUserId())) {
-                	returnNameList.add(name);
-                }
+			if (name.getNstat() != NSTAT_DELETED && 
+					ntypeArray.contains(name.getTypeId()) 
+            		&& nstatArray.contains(name.getNstat()) 
+            		&& !nuiArray.contains(name.getUserId())) {                
+                	returnNameList.add(name);                
             }
 		}
 		return returnNameList;
@@ -502,25 +506,25 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
 	/**
      * Recursive procedure to generate the pedigree
      *
-     * @param p_gid Input GID
-     * @param nivel default zero
-     * @param gpidinfClass empty class
-     * @param fback default zero
-     * @param mback default zero
-     * @param Resp1 default zero
-     * @param Resp2 default zero
+     * @param pGid Input GID
+	 * @param level default zero
+	 * @param parentGermplasmClass empty class
+	 * @param femaleBackcrossGid default zero
+	 * @param maleBackcrossGid default zero
+	 * @param Resp1 default zero
+	 * @param Resp2 default zero
      * @return
      * @throws Exception
      */
-    public String arma_pedigree(int p_gid, int nivel, Germplasm gpidinfClass, int fback, int mback, int Resp1, int Resp2, int ntype, CimmytWheatNameUtil cimmytWheatNameUtil) throws Exception {
+    public String getCimmytWheatPedigree(int pGid, int level, Germplasm parentGermplasmClass, int femaleBackcrossGid, int maleBackcrossGid, int Resp1, int Resp2, int ntype) throws Exception {
         
-        System.out.println("Armando pedigree con [p_gid] " + p_gid + " [nivel] " + nivel + " [fback] " + fback + " [mback] " + mback + " [Resp1] " + Resp1 + " [Resp2] " + Resp2);
+        LOG.debug("Armando pedigree con [p_gid] " + pGid + " [nivel] " + level + " [fback] " + femaleBackcrossGid + " [mback] " + maleBackcrossGid + " [Resp1] " + Resp1 + " [Resp2] " + Resp2);
         int xCurrent = 0;
         int xMax     = 0;        
-        String arma_pedigree = "";
+        String armaPedigree = "";
         String ped           = "";
         String xPrefName     = "";
-        String Delimiter     = "";
+        String delimiter     = "";
         String cut           = "";
         String p1            = "";
         String p2            = "";
@@ -533,21 +537,19 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
         mGpidInfClass.setGpid1(0);
         mGpidInfClass.setGpid2(0);
         
-        String LongStr;
-        String ShortStr;
-        boolean BackCrossFound = false;
-        //GermplsmRecord grTemp = new GermplsmRecord();
+        String longStr;
+        String shortStr;
+        boolean backCrossFound = false;
         Germplasm grTemp = new Germplasm();
         grTemp.setGid(0);
         grTemp.setGpid1(0);
         grTemp.setGpid2(0);
-        //boolean levelZeroFullName = true; 
         List<Name> listNL = null;
-        int veces_rep = 0;
+        int vecesRep = 0;
         
         
         try {
-            Germplasm temp = getGermplasmDataManager().getGermplasmByGID(p_gid);
+            Germplasm temp = getGermplasmDataManager().getGermplasmByGID(pGid);
             if(temp != null){
             	grTemp = temp;
             }
@@ -556,70 +558,66 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
             }
             listNL = getCimmytWheatWayNamesList(grTemp.getGid(), Arrays.asList(cimmytWheatNameUtil.getNtypeArray()), Arrays.asList(cimmytWheatNameUtil.getNstatArray()), Arrays.asList(cimmytWheatNameUtil.getNuidArray()));
             //since it should not be dependent on the status anymore
-            //listNL = getNamesByGID(grTemp.getGid(), null, getGermplasmType(ntype)); 
             // Determine if there was a Female or Male Backcross, that should be used in the pedigree, then the proper name of the
             // line can't be used. For instance if the name is 27217-A-4-8 and the pedigree is also MT/BRT and we are
             // called with mback representing BRT, then we must retrieve MT/BRT instead of 27217-A-4-8 to be able to reproduce
             // the name MT/2*BRT as the final pedigree. See example with GID=1935, before it generated 27217-A-4-8/BRT, now it
             // generates MT/2*BRT as expected.
-            BackCrossFound = false;
-            if ((grTemp.getGnpgs() == 2) && (grTemp.getGpid1() == fback) && (fback != 0)) {
-                BackCrossFound = true;
+            backCrossFound = false;
+            if ((grTemp.getGnpgs() == 2) && (grTemp.getGpid1() == femaleBackcrossGid) && (femaleBackcrossGid != 0)) {
+                backCrossFound = true;
             }
-            if ((grTemp.getGnpgs() == 2) && (grTemp.getGpid2() == mback) && (mback != 0)) {
-                BackCrossFound = true;
+            if ((grTemp.getGnpgs() == 2) && (grTemp.getGpid2() == maleBackcrossGid) && (maleBackcrossGid != 0)) {
+                backCrossFound = true;
             }
             //' Also handle the CIMMYT retrocrosses A/B//A is A*2/B and B//A/B is A/2*B  JEN 2012-02-17
-            if (grTemp.getGnpgs() == 2 && grTemp.getGpid2() == fback && fback != 0) {
-                BackCrossFound = true;
+            if (grTemp.getGnpgs() == 2 && grTemp.getGpid2() == femaleBackcrossGid && femaleBackcrossGid != 0) {
+                backCrossFound = true;
             }
-            if (grTemp.getGnpgs() == 2 && grTemp.getGpid1() == mback && mback != 0) {
-                BackCrossFound = true;
+            if (grTemp.getGnpgs() == 2 && grTemp.getGpid1() == maleBackcrossGid && maleBackcrossGid != 0) {
+                backCrossFound = true;
             }
         } catch (Exception e) {
+        	LOG.error(e.getMessage(), e);
         }
         
         if ((!listNL.isEmpty()) && (grTemp.getGnpgs() == -1)) {
             // Name found, but we can only use it if not a backcross
-            //GermplsmRecord rs_back = new GermplsmRecord();
-        	Germplasm rs_back = new Germplasm();
+        	Germplasm rsBack = new Germplasm();
             if (grTemp.getGpid1() != null && grTemp.getGpid1() != 0) {
-                //int ret = armainfoGID(grTemp.getGpid1(), rs_back);
                 Germplasm temp1 = getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid1());
                 if(temp1 != null){
-                	rs_back = temp1;
+                	rsBack = temp1;
                 }
                 
-                if (rs_back.getGid() == null) {
-                    if (fback != 0 && (fback == rs_back.getGpid1())) {
-                        BackCrossFound = true;
+                if (rsBack.getGid() == null) {
+                    if (femaleBackcrossGid != 0 && (femaleBackcrossGid == rsBack.getGpid1())) {
+                        backCrossFound = true;
                     }
-                    if (mback != 0 && (mback == rs_back.getGpid2())) {
-                        BackCrossFound = true;
+                    if (maleBackcrossGid != 0 && (maleBackcrossGid == rsBack.getGpid2())) {
+                        backCrossFound = true;
                     }
                     // New artificial backcrosses implemented 2 If's  JEN - 2012-02-13
-                    if (fback != 0 && fback == rs_back.getGpid2()) {
-                        BackCrossFound = true;
+                    if (femaleBackcrossGid != 0 && femaleBackcrossGid == rsBack.getGpid2()) {
+                        backCrossFound = true;
                     }
-                    if (mback != 0 && mback == rs_back.getGpid1()) {
-                        BackCrossFound = true;
+                    if (maleBackcrossGid != 0 && maleBackcrossGid == rsBack.getGpid1()) {
+                        backCrossFound = true;
                     }
                 }
             }
         }
         // If the current GID is identical to one of the backcross GIDs that must be respected,
         // cancel it as a backross and find a proper name
-        if ((Resp1 == p_gid) || (Resp2 == p_gid)) {
-            BackCrossFound = false;
+        if (Resp1 == pGid || Resp2 == pGid) {
+            backCrossFound = false;
         }
-        if ((!listNL.isEmpty()) && !(BackCrossFound)) {
-            //xMax = 0;
-            
+        if ((!listNL.isEmpty()) && !(backCrossFound)) {        	
             for (Name namesrecord : listNL) {
                 xCurrent = CrossExpansionUtil.giveNameValue(namesrecord.getTypeId(), namesrecord.getNstat(), cimmytWheatNameUtil);
                 //Apply check if the LevelZeroFullName is true or not
                 //If that is the case and we are at level zero, add 200 to xCurrent if NSTAT=1
-                if ((nivel == 0) && cimmytWheatNameUtil.isLevelZeroFullName() && (namesrecord.getNstat() == 1)) {
+                if ((level == 0) && cimmytWheatNameUtil.isLevelZeroFullName() && (namesrecord.getNstat() == 1)) {
                     xCurrent = xCurrent + 200;
                 }
                 if (xCurrent > xMax) {
@@ -627,9 +625,6 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
                     xMax = xCurrent;
                 }
             }
-            /*
-            xPrefName = listNL.get(0).getNval();
-            */
             ped = xPrefName;
             
         } else {
@@ -637,31 +632,31 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
                 ped = "Unknown";
             } else {
                 if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid2() != 0)) {
-                    ped = arma_pedigree(grTemp.getGpid2(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype, cimmytWheatNameUtil);
+                    ped = getCimmytWheatPedigree(grTemp.getGpid2(), level, parentGermplasmClass, femaleBackcrossGid, maleBackcrossGid, Resp1, Resp2, ntype);
                 } else if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid1() != 0)) {
-                    ped = arma_pedigree(grTemp.getGpid1(), nivel, gpidinfClass, fback, mback, Resp1, Resp2, ntype, cimmytWheatNameUtil);
+                    ped = getCimmytWheatPedigree(grTemp.getGpid1(), level, parentGermplasmClass, femaleBackcrossGid, maleBackcrossGid, Resp1, Resp2, ntype);
                 } else {
-                    gpidinfClass.setGpid1(grTemp.getGpid1());
-                    gpidinfClass.setGpid2(grTemp.getGpid2());
-                    if (grTemp.getGpid1() == fback) {
-                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, Resp1, Resp2, ntype, cimmytWheatNameUtil);
+                    parentGermplasmClass.setGpid1(grTemp.getGpid1());
+                    parentGermplasmClass.setGpid2(grTemp.getGpid2());
+                    if (grTemp.getGpid1() == femaleBackcrossGid) {
+                        p1 = getCimmytWheatPedigree(grTemp.getGpid1(), level + 1, fGpidInfClass, 0, 0, Resp1, Resp2, ntype);
                     } else {
-                        p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, grTemp.getGpid2(), Resp1, Resp2, ntype, cimmytWheatNameUtil);
+                        p1 = getCimmytWheatPedigree(grTemp.getGpid1(), level + 1, fGpidInfClass, 0, grTemp.getGpid2(), Resp1, Resp2, ntype);
                     }
-                    if (grTemp.getGpid2() == mback) {
-                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, Resp1, Resp2, ntype, cimmytWheatNameUtil);
+                    if (grTemp.getGpid2() == maleBackcrossGid) {
+                        p2 = getCimmytWheatPedigree(grTemp.getGpid2(), level + 1, mGpidInfClass, 0, 0, Resp1, Resp2, ntype);
                     } else {
-                        p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, grTemp.getGpid1(), 0, Resp1, Resp2, ntype, cimmytWheatNameUtil);
+                        p2 = getCimmytWheatPedigree(grTemp.getGpid2(), level + 1, mGpidInfClass, grTemp.getGpid1(), 0, Resp1, Resp2, ntype);
                     }
                 }
 //         ' Since female/male backcross is a bit meaningless when IWIS2 false backrosses are handled, then
 //         ' we just detect which part could be handled by length of p1 and p2, and if they are contained in
 //         ' first part or last part of the other
                 if (grTemp.getGpid1().intValue() == mGpidInfClass.getGpid1().intValue() || grTemp.getGpid2().intValue() == fGpidInfClass.getGpid1().intValue()  ||
-                		grTemp.getGpid2().intValue() == fGpidInfClass.getGpid2().intValue()  || grTemp.getGpid1().intValue() == mGpidInfClass.getGpid2().intValue() )//Handle Backcross
-                {
-                    veces_rep = 2;
-                    if ((!p1.equals("")) && (!p2.equals(""))) {
+                		grTemp.getGpid2().intValue() == fGpidInfClass.getGpid2().intValue()  || grTemp.getGpid1().intValue() == mGpidInfClass.getGpid2().intValue() ){
+                	//Handle Backcross                
+                    vecesRep = 2;
+                    if ((!"".equals(p1)) && (!"".equals(p2))) {
                         if ((!p1.contains(p2)) && (!p2.contains(p1))) {
                             ped = "Houston we have a problem";
                             oldp1[0] = p1;
@@ -670,8 +665,8 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
                             fGpidInfClass.setGpid2(0);
                             mGpidInfClass.setGpid1(0);
                             mGpidInfClass.setGpid2(0);
-                            p1 = arma_pedigree(grTemp.getGpid1(), nivel + 1, fGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype, cimmytWheatNameUtil);
-                            p2 = arma_pedigree(grTemp.getGpid2(), nivel + 1, mGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype, cimmytWheatNameUtil);
+                            p1 = getCimmytWheatPedigree(grTemp.getGpid1(), level + 1, fGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
+                            p2 = getCimmytWheatPedigree(grTemp.getGpid2(), level + 1, mGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
                             if ((!p1.contains(p2)) && (!p2.contains(p1))) {
                                 ped = "Houston we have a BIG problem";
                                 // Resolving situation of GID=29367 CID=22793 and GID=29456 CID=22881
@@ -681,78 +676,77 @@ public class PedigreeServiceImpl extends Service implements PedigreeService{
                                 //
                                 // A valid way to pass parameters by reference according to http://www.cs.utoronto.ca/~dianeh/tutorials/params/swap.html
                                
-                                CrossExpansionUtil.GetParentsDoubleRetroCrossNew(oldp1, oldp2);
+                                CrossExpansionUtil.getParentsDoubleRetroCrossNew(oldp1, oldp2);
                                 p1 = oldp1[0];
                                 p2 = oldp2[0];
                             }
                         }
                         if (p1.length() > p2.length()) {
-                            LongStr = p1;
-                            ShortStr = p2;
+                            longStr = p1;
+                            shortStr = p2;
                         } else {
-                            LongStr = p2;
-                            ShortStr = p1;
+                            longStr = p2;
+                            shortStr = p1;
                         }
-                        if (LongStr.substring(0, ShortStr.length()).equals(ShortStr)) {
+                        if (longStr.substring(0, shortStr.length()).equals(shortStr)) {
                             //' Handle female type of backcross
-                            cut = LongStr.substring(ShortStr.length());
+                            cut = longStr.substring(shortStr.length());
                             if (cut.startsWith("/")) {
+                            	//does not do anything for now
                             } else if (cut.startsWith("*")) {
-                                if (cut.substring(2, 3).equals("/")) {
-                                    veces_rep = Integer.valueOf(cut.substring(1, 2)); //
+                                if ("/".equals(cut.substring(2, 3))) {
+                                    vecesRep = Integer.valueOf(cut.substring(1, 2));
                                     cut = cut.substring(2);
                                 } else {
-                                    veces_rep = Integer.valueOf(cut.substring(1, 3));
+                                    vecesRep = Integer.valueOf(cut.substring(1, 3));
                                     cut = cut.substring(3);
                                 }
-                                veces_rep = veces_rep + 1;
+                                vecesRep = vecesRep + 1;
                             }
-                            ped = ShortStr + "*" + veces_rep + cut;
+                            ped = shortStr + "*" + vecesRep + cut;
                         }
-                        if (LongStr.substring(LongStr.length() - ShortStr.length()).equals(ShortStr)) {
+                        if (longStr.substring(longStr.length() - shortStr.length()).equals(shortStr)) {
                             //' Handle male type of backcross
-                            cut = LongStr.substring(0, LongStr.length() - ShortStr.length());
+                            cut = longStr.substring(0, longStr.length() - shortStr.length());
                             if (cut.endsWith("/")) {
+                            	//does not do anything for now
                             } else if (cut.endsWith("*")) {
                                 if (cut.substring(cut.length() - 3, cut.length() - 2).equals("/")) {
-                                    veces_rep = Integer.valueOf(cut.substring(cut.length() - 2, cut.length() - 1));
-                                    cut = cut.substring(0, (cut.length() - 2));
+                                    vecesRep = Integer.valueOf(cut.substring(cut.length() - 2, cut.length() - 1));
+                                    cut = cut.substring(0, cut.length() - 2);
                                 } else {
-                                    veces_rep = Integer.valueOf(cut.substring(cut.length() - 3, cut.length() - 1));
+                                    vecesRep = Integer.valueOf(cut.substring(cut.length() - 3, cut.length() - 1));
                                     cut = cut.substring(0, cut.length() - 3);
                                 }
-                                veces_rep = veces_rep + 1;
+                                vecesRep = vecesRep + 1;
                             }
-                            ped = cut + veces_rep + "*" + ShortStr;
+                            ped = cut + vecesRep + "*" + shortStr;
                         }
                     }
                 }
                 if ((grTemp.getGpid1().intValue() != mGpidInfClass.getGpid1().intValue()) && (grTemp.getGpid1().intValue() != fGpidInfClass.getGpid1().intValue()) 
-                		&& (grTemp.getGpid2().intValue() != fGpidInfClass.getGpid2().intValue()) && (grTemp.getGpid2().intValue() != fGpidInfClass.getGpid2().intValue()) && (grTemp.getGpid2().intValue() != mGpidInfClass.getGpid2().intValue())) {
-                    if (((!p1.equals("")) || (!p2.equals(""))) && (ped.equals(""))) {
-                        if (p1.equals("")) {
+                		&& (grTemp.getGpid2().intValue() != fGpidInfClass.getGpid2().intValue()) && (grTemp.getGpid2().intValue() != fGpidInfClass.getGpid2().intValue()) && (grTemp.getGpid2().intValue() != mGpidInfClass.getGpid2().intValue())
+            			&& (((!"".equals(p1)) || (!"".equals(p2))) && ("".equals(ped))) ) {                    
+                        if ("".equals(p1)) {
                             p1 = "Missing";
                         }
-                        if (p2.equals("")) {
+                        if ("".equals(p2)) {
                             p2 = "Missing";
                         }
-                        Delimiter = CrossExpansionUtil.GetNewDelimiter(p1 + p2).toString();
-                        ped = p1 + Delimiter + p2;
-                    }
+                        delimiter = CrossExpansionUtil.getNewDelimiter(p1 + p2).toString();
+                        ped = p1 + delimiter + p2;                    
                 }
             }
         }
-//        System.out.println( nivel + " : " + p_gid + ":" + ped );
-        arma_pedigree = ped;
-        return arma_pedigree;
+        armaPedigree = ped;
+        return armaPedigree;
     }
     
     
     @Override
 	public String getCrossExpansionCimmytWheat(int gid, int level, int type) throws MiddlewareQueryException {
-		try{
-			CimmytWheatNameUtil cimmytWheatNameUtil = new CimmytWheatNameUtil();
-			return arma_pedigree(gid, level, new Germplasm(), 0, 0, 0, 0, type, cimmytWheatNameUtil);
+		try{			
+			return getCimmytWheatPedigree(gid, level, new Germplasm(), 0, 0, 0, 0, type);
 		}catch(Exception e){
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
