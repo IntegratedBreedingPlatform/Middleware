@@ -42,13 +42,13 @@
 
 	<dependencies>
 
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
 
-        <dependency>
+		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>3.5.6-Final</version>
@@ -156,15 +156,20 @@
 			<version>1.8.5</version>
 		</dependency>
 
-		<!--  JAMon performance monitoring. -->		
-        <dependency>
-            <groupId>com.jamonapi</groupId>
-            <artifactId>jamon</artifactId>
-            <version>2.80</version>
-        </dependency>
+		<!-- JAMon performance monitoring. -->
+		<dependency>
+			<groupId>com.jamonapi</groupId>
+			<artifactId>jamon</artifactId>
+			<version>2.80</version>
+		</dependency>
 
 	</dependencies>
 
+	<scm>
+		<developerConnection>scm:git:https://github.com/IntegratedBreedingPlatform/Middleware</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+	
 	<build>
 		<testResources>
 			<testResource>
@@ -283,6 +288,34 @@
 						<include>**/WorkbenchDataManagerImplTest.java</include>
 						<include>**/GermplasmDataManagerImplTest.java</include>
 					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<git-SHA-1>${buildNumber}</git-SHA-1>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>

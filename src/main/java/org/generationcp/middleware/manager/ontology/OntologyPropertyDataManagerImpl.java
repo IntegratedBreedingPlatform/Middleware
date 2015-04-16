@@ -280,7 +280,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
                 //Add new term if does not exist
                 if(classTerm == null){
-                    classTerm = this.basicDataManager.addTraitClass(c, CvId.IBDB_TERMS.getId());
+                    classTerm = this.basicDataManager.addTraitClass(c, TermId.IBDB_CLASS.getId());
                 }
 
                 if(relationsToDelete.containsKey(classTerm.getId())){

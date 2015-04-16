@@ -9,10 +9,8 @@ import java.util.Set;
  */
 public class OntologyVariableInfo {
 
+    private Term term;
     private String programUuid;
-    private Integer id;
-    private String name;
-    private String description;
     private String alias;
     private final Set<VariableType> variableTypes = new HashSet<>();
     private Integer methodId;
@@ -22,6 +20,18 @@ public class OntologyVariableInfo {
     private String maxValue;
     private Boolean isFavorite;
 
+    public OntologyVariableInfo() {
+        this.term = new Term();
+    }
+
+    public Term getTerm() {
+        return term;
+    }
+
+    public void setTerm(Term term) {
+        this.term = term;
+    }
+
     public String getProgramUuid() {
         return programUuid;
     }
@@ -30,28 +40,29 @@ public class OntologyVariableInfo {
         this.programUuid = programUuid;
     }
 
-    public Integer getId() {
-        return id;
+    public int getId() {
+        return term.getId();
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setId(int id) {
+        term.setId(id);
     }
+
 
     public String getName() {
-        return name;
+        return term.getName();
     }
 
     public void setName(String name) {
-        this.name = name;
+        term.setName(name);
     }
 
     public String getDescription() {
-        return description;
+        return term.getDefinition();
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        term.setDefinition(description);
     }
 
     public String getAlias() {
