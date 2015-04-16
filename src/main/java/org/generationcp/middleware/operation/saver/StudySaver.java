@@ -41,7 +41,7 @@ public class StudySaver extends Saver {
         try {
             project = getProjectSaver().save(project);
             getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
-            getProjectPropertySaver().saveProjectPropValues(project.getProjectId(), studyValues.getVariableList());
+            getProjectPropertySaver().saveProjectPropValues(project, studyValues.getVariableList());
             getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
             if(saveStudyExperiment) {
             	saveStudyExperiment(project.getProjectId(), studyValues);      

@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Session;
 
 public class ProjectPropertySaver extends Saver {
@@ -61,7 +62,7 @@ public class ProjectPropertySaver extends Saver {
 	
 	public void saveProjectProperties(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = create(project, variableTypeList);
-		
+		List<ProjectProperty> updatedProperties = new ArrayList<ProjectProperty>();
 		Integer generatedId;
 		ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
         for (ProjectProperty property : properties){
@@ -69,7 +70,7 @@ public class ProjectPropertySaver extends Saver {
             //kim
             //property.setProjectPropertyId(generatedId);
             property.setProject(project);
-            projectPropertyDao.save(property);
+			updatedProperties.add(projectPropertyDao.save(property));
         }
         
 		project.setProperties(properties);
@@ -78,31 +79,32 @@ public class ProjectPropertySaver extends Saver {
 	private List<ProjectProperty> createVariableProperties(int startIndex, DmsProject project, VariableType variableType) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		int index = startIndex;
-		properties.add(new ProjectProperty(index++, project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
-		properties.add(new ProjectProperty(index++, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
-		properties.add(new ProjectProperty(index++, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
+		properties.add(new ProjectProperty(null, project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
+		properties.add(new ProjectProperty(null, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
+		properties.add(new ProjectProperty(null, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
 		
 		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
-			properties.add(new ProjectProperty(index++, project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType.getRank()));
+			properties.add(new ProjectProperty(null, project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType.getRank()));
 		}
 		
 		return properties;
 	}
 	
-	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
+	public void saveProjectPropValues(DmsProject project, VariableList variableList) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
 				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId
 				|| TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
 					ProjectProperty property = new ProjectProperty();
-					//kim #ChildIssues
+					//kim
 					//property.setProjectPropertyId(getProjectPropertyDao().getNextId(PROJECT_PROPERTY_ID));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
 					property.setValue(variable.getValue());
 					property.setRank(variable.getVariableType().getRank());
-					property.setProject(getDmsProjectDao().getById(projectId));
-					getProjectPropertyDao().save(property);
+					property.setProject(project);
+					property = getProjectPropertyDao().save(property);
+					project.getProperties().add(property);
 				}
 			}
 		}
@@ -217,7 +219,7 @@ public class ProjectPropertySaver extends Saver {
 			insertVariable(project, variable, rank);
 			VariableList variableList = new VariableList();
 			variableList.add(new Variable(createVariableType(variable, rank), variable.getValue()));
-			saveProjectPropValues(project.getProjectId(), variableList);
+			saveProjectPropValues(project, variableList);
 		}
 	}
 	private void insertVariable(DmsProject project, MeasurementVariable variable, int rank) throws MiddlewareQueryException {

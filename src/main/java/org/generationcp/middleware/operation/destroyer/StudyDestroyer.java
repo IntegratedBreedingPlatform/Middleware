@@ -52,7 +52,7 @@ public class StudyDestroyer extends Destroyer {
 				varList.add(var);
 				
 				getProjectPropertySaver().saveProjectProperties(study, typeList);
-				getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
+				getProjectPropertySaver().saveProjectPropValues(study, varList);
 			}
 		}
 		
