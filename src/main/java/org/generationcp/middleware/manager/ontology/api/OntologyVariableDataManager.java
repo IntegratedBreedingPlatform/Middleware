@@ -16,7 +16,6 @@ import org.generationcp.middleware.domain.oms.OntologyVariable;
 import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.List;
 
@@ -29,32 +28,29 @@ public interface OntologyVariableDataManager {
     /**
      * Return All Variables
      * * @return List<OntologyVariableSummary>
-     * @throws MiddlewareQueryException*
+     * @throws MiddlewareException*
      */
-    List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException;
+    List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareException;
 
     /**
      * Return variable by Id
      * * @return OntologyVariable
-     * @throws MiddlewareQueryException*
+     * @throws MiddlewareException*
      */
-    OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareQueryException, MiddlewareException;
+    OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareException;
 
     /**
-     * @throws MiddlewareQueryException*
-     * * @throws MiddlewareException*
+     * @throws MiddlewareException*
      */
-    void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+    void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareException;
 
     /**
-     * @throws MiddlewareQueryException*
-     * * @throws MiddlewareException*
+     * @throws MiddlewareException*
      */
-    void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException;
+    void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareException;
 
     /**
-     * @throws MiddlewareQueryException*
-     * * @throws MiddlewareException*
+     * @throws MiddlewareException*
      */
-    void deleteVariable(Integer id) throws MiddlewareQueryException, MiddlewareException;
+    void deleteVariable(Integer id) throws MiddlewareException;
 }
