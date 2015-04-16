@@ -29,38 +29,35 @@ public interface OntologyScaleDataManager {
      * This will fetch Scale by scaleId*
      * @param scaleId select method by scaleId
      * @return Scale
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
      */
-    public Scale getScaleById(int scaleId) throws MiddlewareQueryException;
+    public Scale getScaleById(int scaleId) throws MiddlewareException;
 
     /**
      * Get all scales from db
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
      */
-    public List<Scale> getAllScales() throws MiddlewareQueryException;
+    public List<Scale> getAllScales() throws MiddlewareException;
 
     /**
      * Adding new scale
      * @param scale scale to be added
-     * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    void addScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
+    void addScale(Scale scale) throws MiddlewareException;
 
     /**
      * Update scale
      * @param scale scale to be added
-     * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
+    void updateScale(Scale scale) throws MiddlewareException;
 
     /**
      * Delete scale
      * @param scaleId scale to be deleted
-     * @throws MiddlewareQueryException
      * @throws MiddlewareException
      */
-    void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException;
+    void deleteScale(int scaleId) throws MiddlewareException;
 
 }
