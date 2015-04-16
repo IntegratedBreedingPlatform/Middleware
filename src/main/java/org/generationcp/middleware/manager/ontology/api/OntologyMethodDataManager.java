@@ -30,41 +30,40 @@ public interface OntologyMethodDataManager {
      *
      * @param id the id to match
      * @return the matching method
-     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware query exception
      */
-    Method getMethod(int id) throws MiddlewareQueryException;
+    Method getMethod(int id) throws MiddlewareException;
 
 
     /**
      * Gets the all methods from Central and Local.
      *
      * @return All the methods
-     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware query exception
      */
-    List<Method> getAllMethods() throws MiddlewareQueryException;
+    List<Method> getAllMethods() throws MiddlewareException;
 
     /**
      * Adds a method. If the method is already found in the local database, it simply retrieves the record found.
      * @param method to be added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void addMethod(Method method) throws MiddlewareQueryException;
+    void addMethod(Method method) throws MiddlewareException;
 
     /**
      * Updates the given method.
      * This searches for the id. If it exists, the entry in the database is replaced with the new value.
      * @param method The Method to update
-     * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException;
+    void updateMethod(Method method) throws MiddlewareException;
 
     /**
      * Delete method.
      *
      * @param id the cv term id
-     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware query exception
      */
-    void deleteMethod(int id) throws MiddlewareQueryException;
+    void deleteMethod(int id) throws MiddlewareException;
 
 }

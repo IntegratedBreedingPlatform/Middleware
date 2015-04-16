@@ -19,13 +19,14 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
     private static final String METHOD_DOES_NOT_EXIST = "Method does not exist with that id";
     private static final String TERM_IS_NOT_METHOD = "That term is not a METHOD";
+    private static final String METHOD_IS_REFERRED_TO_VARIABLE = "Method is referred to variable.";
 
     public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
     }
 
     @Override
-    public Method getMethod(int id) throws MiddlewareQueryException {
+    public Method getMethod(int id) throws MiddlewareException {
         CVTerm term = getCvTermDao().getById(id);
 
         if(term == null){
@@ -40,7 +41,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public List<Method> getAllMethods() throws MiddlewareQueryException {
+    public List<Method> getAllMethods() throws MiddlewareException {
         List<Method> methods = new ArrayList<>();
 
         List<CVTerm> methodTerms = getCvTermDao().getAllByCvId(CvId.METHODS);
@@ -53,7 +54,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public void addMethod(Method method) throws MiddlewareQueryException {
+    public void addMethod(Method method) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(method.getName(), CvId.METHODS.getId());
 
@@ -79,7 +80,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException {
+    public void updateMethod(Method method) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(method.getId());
 
@@ -110,12 +111,20 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public void deleteMethod(int id) throws MiddlewareQueryException {
+    public void deleteMethod(int id) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(id);
 
-        if (term == null || term.getCv() != CvId.METHODS.getId()) {
-            throw new MiddlewareQueryException(METHOD_DOES_NOT_EXIST, new MiddlewareException("METHOD:" + id));
+        if(term == null){
+            throw new MiddlewareException(METHOD_DOES_NOT_EXIST);
+        }
+
+        if (term.getCv() != CvId.PROPERTIES.getId()) {
+            throw new MiddlewareException(METHOD_DOES_NOT_EXIST);
+        }
+
+        if(getCvTermRelationshipDao().isTermReferred(id)){
+            throw new MiddlewareException(METHOD_IS_REFERRED_TO_VARIABLE);
         }
 
         Session session = getCurrentSession();

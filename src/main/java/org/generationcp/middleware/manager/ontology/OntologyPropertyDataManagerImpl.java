@@ -25,6 +25,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
     private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
     private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
+    private static final String PROPERTY_IS_REFERRED_TO_VARIABLE = "Property is referred to variable.";
 
     private final OntologyBasicDataManager basicDataManager;
 
@@ -340,6 +341,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         if (term.getCv() != CvId.PROPERTIES.getId()) {
             throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
         }
+
+        if(getCvTermRelationshipDao().isTermReferred(propertyId)){
+            throw new MiddlewareException(PROPERTY_IS_REFERRED_TO_VARIABLE);
+        }
+
 
         Session session = getActiveSession();
         Transaction transaction = null;
