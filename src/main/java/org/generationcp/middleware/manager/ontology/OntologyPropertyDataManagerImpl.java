@@ -174,10 +174,10 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     @Override
     public void addProperty(Property property) throws MiddlewareException {
 
-        CVTerm term = getCvTermDao().getByNameAndCvId(property.getName(), CvId.METHODS.getId());
+        CVTerm term = getCvTermDao().getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 
         if (term != null) {
-            throw new MiddlewareException("Method exist with same name");
+            throw new MiddlewareException("Property exist with same name");
         }
 
         //Constant CvId
