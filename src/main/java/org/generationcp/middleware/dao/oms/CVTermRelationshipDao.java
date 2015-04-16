@@ -72,7 +72,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			return criteria.list();
 
 		} catch(HibernateException e) {
-			logAndThrowException("Error with getBySubject=" + subjectId + ") query from CVTermRelationship: " 
+			logAndThrowException("Error with getBySubject=" + subjectId + " query from CVTermRelationship: "
 					+ e.getMessage(), e);
 			return new ArrayList<>();
 		}
@@ -95,7 +95,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
             }
 
         } catch(HibernateException e) {
-            logAndThrowException("Error with getBySubject=" + subjectId + ") query from CVTermRelationship: " 
+            logAndThrowException("Error with getBySubject=" + subjectId + " query from CVTermRelationship: "
                     + e.getMessage(), e);
             return null;
         }
@@ -157,7 +157,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
             }
 
         } catch(HibernateException e) {
-            logAndThrowException("Error with getRelationshipByObjectId=" + objectId + ") query from CVTermRelationship: " 
+            logAndThrowException("Error with getRelationshipByObjectId=" + objectId + " query from CVTermRelationship: "
                     + e.getMessage(), e);
             return null;
         }
@@ -168,7 +168,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
             saveOrUpdate(cvTermRelationship);
 
         } catch(HibernateException e) {
-            logAndThrowException("Error with getBySubject=" + cvTermRelationship.getSubjectId() + ") query from CVTermRelationship: "
+            logAndThrowException("Error with getBySubject=" + cvTermRelationship.getSubjectId() + " query from CVTermRelationship: "
                     + e.getMessage(), e);
             return null;
         }
