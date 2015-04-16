@@ -199,6 +199,18 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             }
 
             for (String c : property.getClasses()) {
+
+                //Discarding empty or null strings
+                if(c == null) {
+                    continue;
+                }
+
+                c = c.trim();
+
+                if(Strings.isNullOrEmpty(c.trim())) {
+                    continue;
+                }
+
                 Term classTerm = null;
                 for (Term tClass : allClasses) {
 
@@ -266,8 +278,19 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             }
 
             for (String c : property.getClasses()) {
+                //Discarding empty or null strings
+                if(c == null) {
+                    continue;
+                }
+
+                c = c.trim();
+
+                if(Strings.isNullOrEmpty(c.trim())) {
+                    continue;
+                }
 
                 Term classTerm = null;
+
                 for (Term tClass : allClasses) {
 
                     if (c.compareToIgnoreCase(tClass.getName()) != 0) {
