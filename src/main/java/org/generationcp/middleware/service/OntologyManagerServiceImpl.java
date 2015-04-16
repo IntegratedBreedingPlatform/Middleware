@@ -14,7 +14,6 @@ package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.OntologyManagerService;
 
@@ -27,127 +26,127 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     }
 
     @Override
-    public List<Term> getAllTraitClass() throws MiddlewareQueryException {
+    public List<Term> getAllTraitClass() throws MiddlewareException {
         return getOntologyBasicDataManager().getAllTraitClass();
     }
 
     @Override
-    public Term getTermById(Integer termId) throws MiddlewareQueryException {
+    public Term getTermById(Integer termId) throws MiddlewareException {
         return getOntologyBasicDataManager().getTermById(termId);
     }
 
     @Override
-    public Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
+    public Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareException {
         return getOntologyBasicDataManager().getTermByNameAndCvId(name, cvId);
     }
 
     @Override
-    public boolean isTermReferred(int termId) throws MiddlewareQueryException {
+    public boolean isTermReferred(int termId) throws MiddlewareException {
         return getOntologyBasicDataManager().isTermReferred(termId);
     }
 
     @Override
-    public Method getMethod(int id) throws MiddlewareQueryException {
+    public Method getMethod(int id) throws MiddlewareException {
         return getOntologyMethodDataManager().getMethod(id);
     }
 
     @Override
-    public List<Method> getAllMethods() throws MiddlewareQueryException {
+    public List<Method> getAllMethods() throws MiddlewareException {
         return getOntologyMethodDataManager().getAllMethods();
     }
 
     @Override
-    public void addMethod(Method method) throws MiddlewareQueryException {
+    public void addMethod(Method method) throws MiddlewareException {
         getOntologyMethodDataManager().addMethod(method);
     }
 
     @Override
-    public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException {
+    public void updateMethod(Method method) throws MiddlewareException {
         getOntologyMethodDataManager().updateMethod(method);
     }
 
     @Override
-    public void deleteMethod(int id) throws MiddlewareQueryException {
+    public void deleteMethod(int id) throws MiddlewareException {
         getOntologyMethodDataManager().deleteMethod(id);
     }
 
     @Override
-    public Property getProperty(int id) throws MiddlewareQueryException, MiddlewareException {
+    public Property getProperty(int id) throws MiddlewareException {
         return getOntologyPropertyDataManager().getProperty(id);
     }
 
     @Override
-    public List<Property> getAllProperties() throws MiddlewareQueryException {
+    public List<Property> getAllProperties() throws MiddlewareException {
         return getOntologyPropertyDataManager().getAllProperties();
     }
 
     @Override
-    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
+    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException {
         return getOntologyPropertyDataManager().getAllPropertiesWithClass(className);
     }
 
     @Override
-    public void addProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+    public void addProperty(Property property) throws MiddlewareException {
         getOntologyPropertyDataManager().addProperty(property);
     }
 
     @Override
-    public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+    public void updateProperty(Property property) throws MiddlewareException {
         getOntologyPropertyDataManager().updateProperty(property);
     }
 
     @Override
-    public void deleteProperty(Integer propertyId) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteProperty(Integer propertyId) throws MiddlewareException {
         getOntologyPropertyDataManager().deleteProperty(propertyId);
     }
 
     @Override
-    public Scale getScaleById(int scaleId) throws MiddlewareQueryException {
+    public Scale getScaleById(int scaleId) throws MiddlewareException {
         return getOntologyScaleDataManager().getScaleById(scaleId);
     }
 
     @Override
-    public List<Scale> getAllScales() throws MiddlewareQueryException {
+    public List<Scale> getAllScales() throws MiddlewareException {
         return getOntologyScaleDataManager().getAllScales();
     }
 
     @Override
-    public void addScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
+    public void addScale(Scale scale) throws MiddlewareException {
         getOntologyScaleDataManager().addScale(scale);
     }
 
     @Override
-    public void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
+    public void updateScale(Scale scale) throws MiddlewareException {
         getOntologyScaleDataManager().updateScale(scale);
     }
 
     @Override
-    public void deleteScale(int scaleId) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteScale(int scaleId) throws MiddlewareException {
         getOntologyScaleDataManager().deleteScale(scaleId);
     }
 
     @Override
-    public List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareQueryException {
+    public List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareException {
         return getOntologyVariableDataManager().getWithFilter(programUuid, favorites, methodId, propertyId, scaleId);
     }
 
     @Override
-    public OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareException {
         return getOntologyVariableDataManager().getVariable(programUuid, id);
     }
 
     @Override
-    public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
         getOntologyVariableDataManager().addVariable(variableInfo);
     }
 
     @Override
-    public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException, MiddlewareException {
+    public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
         getOntologyVariableDataManager().updateVariable(variableInfo);
     }
 
     @Override
-    public void deleteVariable(Integer id) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteVariable(Integer id) throws MiddlewareException {
         getOntologyVariableDataManager().deleteVariable(id);
     }
 }
