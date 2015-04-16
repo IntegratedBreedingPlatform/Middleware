@@ -44,6 +44,21 @@ public class UserInfoDAO extends GenericDAO<UserInfo, Integer>{
         return q.executeUpdate() > 0;
     }
 
+    public UserInfo getUserInfoByToken(String token) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(UserInfo.class).add(Restrictions.eq("resetToken",token));
+
+            @SuppressWarnings("unchecked")
+            List<UserInfo> userInfoList = criteria.list();
+            return userInfoList.size() > 0 ? userInfoList.get(0) : null;
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getUserInfoByToken(token=" + token + ") query from User: " + e.getMessage(), e);
+        }
+
+        return null;
+    }
+
     public boolean insertOrUpdateUserInfo(UserInfo userInfo) {
     	if (userInfo != null){
 	        String queryString = "REPLACE INTO workbench_user_info (user_id, login_count) VALUES (:userId, :loginCount)";
