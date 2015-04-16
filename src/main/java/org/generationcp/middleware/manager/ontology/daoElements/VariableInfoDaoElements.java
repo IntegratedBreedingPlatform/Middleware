@@ -1,31 +1,43 @@
 package org.generationcp.middleware.manager.ontology.daoElements;
 
 
-import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProgramProperty;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+
+import java.util.List;
 
 /**
  * This class holds dao elements used for variableInfo. This is to reduce functional complexity
  */
 public class VariableInfoDaoElements {
 
-    private OntologyVariableInfo variableInfo;
+    private Integer variableId;
+    private String programUuid;
     private CVTerm variableTerm;
     private CVTermRelationship methodRelation;
     private CVTermRelationship propertyRelation;
     private CVTermRelationship scaleRelation;
+    private List<CVTermProperty> termProperties;
     private CVTermProgramProperty aliasProperty;
     private CVTermProgramProperty minValueProperty;
     private CVTermProgramProperty maxValueProperty;
 
-    public OntologyVariableInfo getVariableInfo() {
-        return variableInfo;
+    public Integer getVariableId() {
+        return variableId;
     }
 
-    public void setVariableInfo(OntologyVariableInfo variableInfo) {
-        this.variableInfo = variableInfo;
+    public void setVariableId(Integer variableId) {
+        this.variableId = variableId;
+    }
+
+    public String getProgramUuid() {
+        return programUuid;
+    }
+
+    public void setProgramUuid(String programUuid) {
+        this.programUuid = programUuid;
     }
 
     public CVTerm getVariableTerm() {
@@ -62,6 +74,14 @@ public class VariableInfoDaoElements {
 
     public CVTermProgramProperty getAliasProperty() {
         return aliasProperty;
+    }
+
+    public List<CVTermProperty> getTermProperties() {
+        return termProperties;
+    }
+
+    public void setTermProperties(List<CVTermProperty> termProperties) {
+        this.termProperties = termProperties;
     }
 
     public void setAliasProperty(CVTermProgramProperty aliasProperty) {

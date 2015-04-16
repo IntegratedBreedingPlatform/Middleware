@@ -6,10 +6,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.*;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableInfoDaoElements;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -17,12 +14,12 @@ import org.generationcp.middleware.pojos.oms.CVTermProgramProperty;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.math.BigInteger;
 import java.util.*;
 
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
@@ -30,19 +27,20 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
     private static final String TERM_IS_NOT_VARIABLE = "Term is not Variable";
     private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
-    private static final String USED_VARIABLE_CAN_NOT_CHANGE = "Variable is already in use. You can not change properties other than favorite, description and variable types";
-    private static final String INSUFFICIENT_DATA = "One or more required fields are missing.";
+    private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 
-
+    private final OntologyBasicDataManager basicDataManager;
     private final OntologyMethodDataManager methodDataManager;
     private final OntologyPropertyDataManager propertyDataManager;
     private final OntologyScaleDataManager scaleDataManager;
 
-    public OntologyVariableDataManagerImpl(OntologyMethodDataManager methodDataManager,
+    public OntologyVariableDataManagerImpl(OntologyBasicDataManager basicDataManager,
+                                           OntologyMethodDataManager methodDataManager,
                                            OntologyPropertyDataManager propertyDataManager,
                                            OntologyScaleDataManager scaleDataManager,
                                            HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
+        this.basicDataManager = basicDataManager;
         this.methodDataManager = methodDataManager;
         this.propertyDataManager = propertyDataManager;
         this.scaleDataManager = scaleDataManager;
@@ -129,9 +127,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 if(Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())){
                     variableSummary.addVariableType(VariableType.getByName(property.getValue()));
                 } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
-                    variableSummary.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+                    variableSummary.setDateCreated(ISO8601DateParser.getDateFromTimeString(property.getValue()));
                 } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
-                    variableSummary.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+                    variableSummary.setDateLastModified(ISO8601DateParser.getDateFromTimeString(property.getValue()));
                 }
             }
 
@@ -167,7 +165,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
         try {
 
-            //Fetch full scale from db
+            //Fetch term from db
             CVTerm term = getCvTermDao().getById(id);
 
             checkTermIsVariable(term);
@@ -221,7 +219,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 ProgramFavorite programFavorite = getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
                 variable.setIsFavorite(programFavorite != null);
 
-                variable.setObservations(getVariableUsage(id));
+                variable.setObservations(basicDataManager.getVariableObservations(id));
 
                 return variable;
 
@@ -232,15 +230,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         } catch(HibernateException e) {
             throw new MiddlewareQueryException("Error in getting standard variable summaries from standard_variable_summary view", e);
         }
-    }
-
-    //TODO: Temporary implementation. Need to discuss this with actual use cases.
-    //TODO: Move this implementation to OntologyBasicDataManager.isTermReferred
-    private Integer getVariableUsage(Integer variableId) {
-        SQLQuery query = getActiveSession().createSQLQuery("select (select count(*) from projectprop where type_id = :variableId) + (select count(*) from phenotype where observable_id = :variableId) c");
-        query.setParameter("variableId", variableId);
-        query.addScalar("c");
-        return ((BigInteger) query.uniqueResult()).intValue();
     }
 
     @Override
@@ -287,16 +276,26 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 getCvTermPropertyDao().save(property);
             }
 
-            //Saving values if present
-            if (!Strings.isNullOrEmpty(variableInfo.getMinValue())) {
-                getCvTermPropertyDao().save(variableInfo.getId(), TermId.MIN_VALUE.getId(), String.valueOf(variableInfo.getMinValue()), 0);
+            //Saving min max values
+            if(variableInfo.getMinValue() != null) {
+                getCvTermProgramPropertyDao().save(variableInfo.getId(), TermId.MIN_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMinValue());
             }
 
-            //Saving values if present
-            if (!Strings.isNullOrEmpty(variableInfo.getMaxValue())) {
-                getCvTermPropertyDao().save(variableInfo.getId(), TermId.MAX_VALUE.getId(), String.valueOf(variableInfo.getMaxValue()), 0);
+            if(variableInfo.getMaxValue() != null) {
+                getCvTermProgramPropertyDao().save(variableInfo.getId(), TermId.MAX_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMaxValue());
             }
 
+            //Saving favorite
+            if(variableInfo.isFavorite()) {
+                ProgramFavorite programFavorite = new ProgramFavorite();
+                programFavorite.setProgramFavoriteId(getProgramFavoriteDao().getNextId(ProgramFavorite.ID_NAME));
+                programFavorite.setEntityId(variableInfo.getId());
+                programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
+                programFavorite.setUniqueID(variableInfo.getProgramUuid());
+                getProgramFavoriteDao().save(programFavorite);
+            }
+
+            //Setting last update time.
             getCvTermPropertyDao().save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
 
             transaction.commit();
@@ -311,23 +310,27 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
 
         VariableInfoDaoElements elements = new VariableInfoDaoElements();
-        elements.setVariableInfo(variableInfo);
+        elements.setVariableId(variableInfo.getId());
+        elements.setProgramUuid(variableInfo.getProgramUuid());
 
         fillDaoElementsAndCheckForUsage(elements);
+
+        CVTerm term = elements.getVariableTerm();
+
+        checkTermIsVariable(term);
+
+        CVTermRelationship methodRelation = elements.getMethodRelation();
+        CVTermRelationship propertyRelation = elements.getPropertyRelation();
+        CVTermRelationship scaleRelation = elements.getScaleRelation();
+        List<CVTermProperty> termProperties = elements.getTermProperties();
+        CVTermProgramProperty aliasProperty = elements.getAliasProperty();
+        CVTermProgramProperty minValueProperty = elements.getMinValueProperty();
+        CVTermProgramProperty maxValueProperty = elements.getMaxValueProperty();
 
         Session session = getActiveSession();
         Transaction transaction = null;
 
         try {
-            CVTerm term = elements.getVariableTerm();
-            CVTermRelationship methodRelation = elements.getMethodRelation();
-            CVTermRelationship propertyRelation = elements.getPropertyRelation();
-            CVTermRelationship scaleRelation = elements.getScaleRelation();
-            CVTermProgramProperty aliasProperty = elements.getAliasProperty();
-            CVTermProgramProperty minValueProperty = elements.getMinValueProperty();
-            CVTermProgramProperty maxValueProperty = elements.getMaxValueProperty();
-
-
             transaction = session.beginTransaction();
 
             //Updating term to database.
@@ -385,9 +388,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             Set<VariableType> existingVariableTypes = new HashSet<>();
 
             //Variable Types from CVTermProperty
-            List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
-
-            for(CVTermProperty property : properties){
+            for(CVTermProperty property : termProperties){
                 if(Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())){
                     VariableType type = VariableType.getByName(property.getValue());
                     existingVariableTypes.add(type);
@@ -408,7 +409,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 property.setCvTermPropertyId(nextId);
                 property.setCvTermId(variableInfo.getId());
                 property.setTypeId(TermId.VARIABLE_TYPE.getId());
-                property.setValue(type.toString());
+                property.setValue(type.getName());
                 property.setRank(rank++);
                 getCvTermPropertyDao().save(property);
             }
@@ -422,21 +423,30 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             }
 
             //Updating alias
-            if(variableInfo.getAlias() != null) {
-                getCvTermProgramPropertyDao().save(variableInfo.getId(), TermId.ALIAS.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias());
+            if(aliasProperty == null && variableInfo.getAlias() != null) {
+                getCvTermProgramPropertyDao().save(term.getCvTermId(), TermId.ALIAS.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias());
+            } else if(aliasProperty != null && variableInfo.getAlias() != null){
+                aliasProperty.setValue(variableInfo.getAlias());
+                getCvTermProgramPropertyDao().merge(aliasProperty);
             } else if(aliasProperty != null) {
                 getCvTermProgramPropertyDao().makeTransient(aliasProperty);
             }
 
             //Updating min max values
-            if(variableInfo.getMinValue() != null) {
-                getCvTermProgramPropertyDao().save(variableInfo.getId(), TermId.MIN_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMinValue());
+            if(minValueProperty == null && variableInfo.getMinValue() != null) {
+                getCvTermProgramPropertyDao().save(term.getCvTermId(), TermId.MIN_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMinValue());
+            } else if(minValueProperty != null && variableInfo.getMinValue() != null){
+                minValueProperty.setValue(variableInfo.getMinValue());
+                getCvTermProgramPropertyDao().merge(minValueProperty);
             } else if(minValueProperty != null) {
                 getCvTermProgramPropertyDao().makeTransient(minValueProperty);
             }
 
-            if(variableInfo.getMaxValue() != null) {
-                getCvTermProgramPropertyDao().save(variableInfo.getId(), TermId.MAX_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMaxValue());
+            if(maxValueProperty == null && variableInfo.getMaxValue() != null) {
+                getCvTermProgramPropertyDao().save(term.getCvTermId(), TermId.MAX_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMaxValue());
+            } else if(maxValueProperty != null && variableInfo.getMaxValue() != null){
+                maxValueProperty.setValue(variableInfo.getMaxValue());
+                getCvTermProgramPropertyDao().merge(maxValueProperty);
             } else if(maxValueProperty != null) {
                 getCvTermProgramPropertyDao().makeTransient(maxValueProperty);
             }
@@ -445,7 +455,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             ProgramFavorite programFavorite = getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
             boolean isFavorite = variableInfo.isFavorite() || variableInfo.getAlias() != null;
 
-            if(isFavorite && programFavorite != null) {
+            if(isFavorite && programFavorite == null) {
                 programFavorite = new ProgramFavorite();
                 programFavorite.setProgramFavoriteId(getProgramFavoriteDao().getNextId(ProgramFavorite.ID_NAME));
                 programFavorite.setEntityId(variableInfo.getId());
@@ -467,12 +477,50 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     @Override
     public void deleteVariable(Integer id) throws MiddlewareException {
 
-    }
+        CVTerm term = getCvTermDao().getById(id);
 
-    private void checkAndThrowForNullObjects(Object ... objects) throws MiddlewareException {
-        for(Object o : objects) {
-            if(o != null) continue;
-            throw new MiddlewareException(INSUFFICIENT_DATA);
+        checkTermIsVariable(term);
+
+        //check usage
+        Integer usage = basicDataManager.getVariableObservations(id);
+
+        if(usage > 0) {
+            throw new MiddlewareException(CAN_NOT_DELETE_USED_VARIABLE);
+        }
+
+        Session session = getActiveSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            //Delete relationships
+            List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(id);
+            for(CVTermRelationship  relationship : relationships) {
+                getCvTermRelationshipDao().makeTransient(relationship);
+            }
+
+            //delete properties
+            List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
+            for(CVTermProperty property : properties){
+                getCvTermPropertyDao().makeTransient(property);
+            }
+
+            //delete Variable alias and expected range
+            List<CVTermProgramProperty> programProperties = getCvTermProgramPropertyDao().getByCvTerm(id);
+
+            for(CVTermProgramProperty programProperty : programProperties) {
+                getCvTermProgramPropertyDao().makeTransient(programProperty);
+            }
+
+            //delete main entity
+            getCvTermDao().makeTransient(term);
+
+            transaction.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(transaction);
+            throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);
         }
     }
 
@@ -489,15 +537,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
     private void fillDaoElementsAndCheckForUsage(VariableInfoDaoElements elements) throws MiddlewareException {
 
-        OntologyVariableInfo variableInfo = elements.getVariableInfo();
+        //check required elements
+        Util.checkAndThrowForNullObjects(elements.getVariableId());
 
         //Fetch term from db
-        CVTerm variableTerm = getCvTermDao().getById(elements.getVariableInfo().getId());
+        CVTerm variableTerm = getCvTermDao().getById(elements.getVariableId());
 
         checkTermIsVariable(variableTerm);
-
-        //Name is required
-        checkAndThrowForNullObjects(variableInfo.getName(), variableInfo.getId(), variableInfo.getMethodId(), variableInfo.getProgramUuid(), variableInfo.getScaleId());
 
         CVTermRelationship methodRelation = null;
         CVTermRelationship propertyRelation = null;
@@ -505,70 +551,34 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
         //load scale, method and property data
         List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(variableTerm.getCvTermId());
-        for(CVTermRelationship  r : relationships) {
-            if(Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())){
-                methodRelation = r;
-            } else if(Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())){
-                propertyRelation = r;
-            } else if(Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
-                scaleRelation = r;
+        for(CVTermRelationship  relationship : relationships) {
+            if(Objects.equals(relationship.getTypeId(), TermId.HAS_METHOD.getId())){
+                methodRelation = relationship;
+            } else if(Objects.equals(relationship.getTypeId(), TermId.HAS_PROPERTY.getId())){
+                propertyRelation = relationship;
+            } else if(Objects.equals(relationship.getTypeId(), TermId.HAS_SCALE.getId())) {
+                scaleRelation = relationship;
             }
         }
+
+        //Variable Types from CVTermProperty
+        List<CVTermProperty> termProperties = getCvTermPropertyDao().getByCvTermId(elements.getVariableId());
 
         CVTermProgramProperty aliasProperty = null;
         CVTermProgramProperty minValueProperty = null;
         CVTermProgramProperty maxValueProperty = null;
 
         //Variable alias and expected range
-        List<CVTermProgramProperty> programProperties = getCvTermProgramPropertyDao().getByCvTermAndProgram(variableInfo.getId(), variableInfo.getProgramUuid());
+        List<CVTermProgramProperty> programProperties = getCvTermProgramPropertyDao().getByCvTermAndProgram(elements.getVariableId(), elements.getProgramUuid());
 
-        for(CVTermProgramProperty property : programProperties) {
+        for(CVTermProgramProperty programProperty : programProperties) {
 
-            if(Objects.equals(property.getTypeId(), TermId.ALIAS.getId())){
-                aliasProperty = property;
-            }else if(Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())){
-                minValueProperty = property;
-            } else if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
-                maxValueProperty = property;
-            }
-        }
-
-        Integer observations = getVariableUsage(elements.getVariableInfo().getId());
-
-        if(observations > 0){
-
-            //Name can not change
-            if(!Objects.equals(elements.getVariableTerm().getName(), elements.getVariableInfo().getName())){
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //method can not change
-            if(methodRelation != null && !Objects.equals(methodRelation.getObjectId(), elements.getVariableInfo().getMethodId())) {
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //property can not change
-            if(propertyRelation != null && !Objects.equals(propertyRelation.getObjectId(), elements.getVariableInfo().getPropertyId())) {
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //scale can not change
-            if(scaleRelation != null && !Objects.equals(scaleRelation.getObjectId(), elements.getVariableInfo().getScaleId())) {
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //Alias can not change but can be added.
-            if(aliasProperty != null && !Objects.equals(aliasProperty.getValue(), elements.getVariableInfo().getAlias())){
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            //Expected range can not change
-            if(minValueProperty != null && !Objects.equals(minValueProperty.getValue(), elements.getVariableInfo().getMinValue())){
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
-            }
-
-            if(maxValueProperty != null && !Objects.equals(maxValueProperty.getValue(), elements.getVariableInfo().getMaxValue())){
-                throw new MiddlewareException(USED_VARIABLE_CAN_NOT_CHANGE);
+            if(Objects.equals(programProperty.getTypeId(), TermId.ALIAS.getId())){
+                aliasProperty = programProperty;
+            }else if(Objects.equals(programProperty.getTypeId(), TermId.MIN_VALUE.getId())){
+                minValueProperty = programProperty;
+            } else if(Objects.equals(programProperty.getTypeId(), TermId.MAX_VALUE.getId())){
+                maxValueProperty = programProperty;
             }
         }
 
@@ -577,6 +587,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         elements.setMethodRelation(methodRelation);
         elements.setPropertyRelation(propertyRelation);
         elements.setScaleRelation(scaleRelation);
+        elements.setTermProperties(termProperties);
         elements.setAliasProperty(aliasProperty);
         elements.setMinValueProperty(minValueProperty);
         elements.setMaxValueProperty(maxValueProperty);

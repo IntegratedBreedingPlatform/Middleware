@@ -120,7 +120,7 @@ public class ManagerFactory implements Serializable {
     }
 
     public OntologyVariableDataManager getOntologyVariableDataManager() {
-        return new OntologyVariableDataManagerImpl(getOntologyMethodDataManager(), getOntologyPropertyDataManager(), getOntologyScaleDataManager(), sessionProvider);
+        return new OntologyVariableDataManagerImpl(getOntologyBasicDataManager(), getOntologyMethodDataManager(), getOntologyPropertyDataManager(), getOntologyScaleDataManager(), sessionProvider);
     }
 
     public PresetDataManager getPresetDataManager() {

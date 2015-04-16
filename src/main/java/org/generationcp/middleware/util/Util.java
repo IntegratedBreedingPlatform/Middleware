@@ -23,6 +23,7 @@
 package org.generationcp.middleware.util;
 
 import com.google.common.base.Function;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -173,6 +174,14 @@ public class Util{
             results.add(projection.apply(element));
         }
         return results;
+    }
+
+    public static void checkAndThrowForNullObjects(Object ... objects) throws MiddlewareException {
+        final String insufficientData =  "One or more required fields are missing.";
+        for(Object o : objects) {
+            if(o != null) continue;
+            throw new MiddlewareException(insufficientData);
+        }
     }
 
     /**

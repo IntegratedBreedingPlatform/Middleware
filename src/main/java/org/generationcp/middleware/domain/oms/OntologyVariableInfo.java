@@ -18,7 +18,7 @@ public class OntologyVariableInfo {
     private Integer scaleId;
     private String minValue;
     private String maxValue;
-    private Boolean isFavorite;
+    private boolean isFavorite;
 
     public OntologyVariableInfo() {
         this.term = new Term();
@@ -121,11 +121,11 @@ public class OntologyVariableInfo {
         this.maxValue = maxValue;
     }
 
-    public Boolean isFavorite() {
+    public boolean isFavorite() {
         return isFavorite;
     }
 
-    public void setIsFavorite(Boolean isFavorite) {
+    public void setIsFavorite(boolean isFavorite) {
         this.isFavorite = isFavorite;
     }
 }

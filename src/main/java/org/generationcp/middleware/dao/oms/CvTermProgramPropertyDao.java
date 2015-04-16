@@ -18,6 +18,23 @@ public class CvTermProgramPropertyDao extends GenericDAO<CVTermProgramProperty, 
     private static final String INVALID_TYPE_FOR_PROPERTY = "Invalid type for property";
 
     @SuppressWarnings("unchecked")
+    public List<CVTermProgramProperty> getByCvTerm(Integer cvTermId) throws MiddlewareQueryException {
+
+        List properties;
+
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("cvTermId", cvTermId));
+            properties = criteria.list();
+
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error at getByCvTerm=" + cvTermId + " query on CvTermProgramPropertyDao: " + e.getMessage(), e);
+        }
+
+        return properties;
+    }
+
+    @SuppressWarnings("unchecked")
     public List<CVTermProgramProperty> getByCvTermAndProgram(Integer cvTermId, String programUuid) throws MiddlewareQueryException {
 
         List properties;
@@ -66,9 +83,9 @@ public class CvTermProgramPropertyDao extends GenericDAO<CVTermProgramProperty, 
      *             Rank should be zero and only single entry should be there.
      *             Rank is kept for its future usage where we have multiple property for same type.
      * @return created object
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
      */
-    public CVTermProgramProperty save(Integer cvTermId, Integer typeId, String programUuid, String value) throws MiddlewareQueryException, MiddlewareException {
+    public CVTermProgramProperty save(Integer cvTermId, Integer typeId, String programUuid, String value) throws MiddlewareException {
 
         List<CVTermProgramProperty> properties = getByCvTermTypeProgram(cvTermId, typeId, programUuid);
         //check for uniqueness
