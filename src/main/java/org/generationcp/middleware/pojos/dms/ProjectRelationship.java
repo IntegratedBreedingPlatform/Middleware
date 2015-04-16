@@ -30,6 +30,7 @@ public class ProjectRelationship implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "project_relationship_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer projectRelationshipId;
 	
 	/**

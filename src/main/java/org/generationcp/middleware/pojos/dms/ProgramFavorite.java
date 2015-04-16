@@ -35,6 +35,7 @@ public class ProgramFavorite {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer programFavoriteId;
 	
     @Basic(optional = false)

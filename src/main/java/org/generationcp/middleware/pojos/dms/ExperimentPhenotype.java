@@ -38,6 +38,7 @@ public class ExperimentPhenotype implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_phenotype_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer experimentPhenotypeId;
 
 	/**

@@ -39,6 +39,7 @@ public class DmsProject implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "project_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer projectId;
 	
 	/**

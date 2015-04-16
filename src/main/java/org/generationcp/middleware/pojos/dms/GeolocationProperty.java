@@ -36,6 +36,7 @@ public class GeolocationProperty implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "nd_geolocationprop_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer geolocationPropertyId;
 
     @ManyToOne(targetEntity = Geolocation.class)

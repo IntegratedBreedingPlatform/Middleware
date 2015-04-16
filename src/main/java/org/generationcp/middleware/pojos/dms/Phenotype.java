@@ -34,6 +34,7 @@ public class Phenotype implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "phenotype_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer phenotypeId;
 
 	@Basic(optional = false)

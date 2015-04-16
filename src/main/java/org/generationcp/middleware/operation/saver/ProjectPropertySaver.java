@@ -96,7 +96,7 @@ public class ProjectPropertySaver extends Saver {
 				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId
 				|| TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
 					ProjectProperty property = new ProjectProperty();
-					//kim
+					//kim #ChildIssues
 					//property.setProjectPropertyId(getProjectPropertyDao().getNextId(PROJECT_PROPERTY_ID));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
 					property.setValue(variable.getValue());

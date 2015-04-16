@@ -28,6 +28,7 @@ public class PhenotypeOutlier implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "phenotype_outlier_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer phenotypeOutlierId;
 
 	// References phenotype

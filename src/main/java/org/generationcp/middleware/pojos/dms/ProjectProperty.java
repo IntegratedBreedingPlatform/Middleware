@@ -24,6 +24,7 @@ public class ProjectProperty implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "projectprop_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer projectPropertyId;
 	
 	/**

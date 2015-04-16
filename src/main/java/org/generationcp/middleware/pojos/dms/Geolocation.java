@@ -34,6 +34,7 @@ public class Geolocation implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "nd_geolocation_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer locationId;
 	
     @Column(name = "description")

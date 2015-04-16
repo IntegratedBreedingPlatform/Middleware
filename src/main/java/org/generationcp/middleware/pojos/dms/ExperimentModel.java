@@ -40,6 +40,7 @@ public class ExperimentModel implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer ndExperimentId;
 
 	// Geolocation

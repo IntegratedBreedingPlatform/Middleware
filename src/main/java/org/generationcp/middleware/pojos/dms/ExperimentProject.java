@@ -36,6 +36,7 @@ public class ExperimentProject implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_project_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer experimentProjectId;
 	
 	/**

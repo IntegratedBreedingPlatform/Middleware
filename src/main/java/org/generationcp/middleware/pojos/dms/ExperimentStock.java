@@ -31,6 +31,7 @@ public class ExperimentStock implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_stock_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer experimentStockId;
 	
 	/**

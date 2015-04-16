@@ -31,7 +31,8 @@ public class ExperimentProperty implements Serializable {
 	
 	@Id
 	@Basic(optional = false)
-	@Column(name = "nd_experimentprop_id")	
+	@Column(name = "nd_experimentprop_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer ndExperimentpropId;
 	
 	@Basic(optional = false)

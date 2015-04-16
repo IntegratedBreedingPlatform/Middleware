@@ -38,6 +38,7 @@ public class StockProperty implements Serializable {
 	@Id
 	@Basic(optional = false)
 	@Column(name =  "stockprop_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer stockPropId;
 	
     @ManyToOne(targetEntity = StockModel.class)
