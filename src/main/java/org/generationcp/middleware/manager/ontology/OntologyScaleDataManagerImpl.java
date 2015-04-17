@@ -409,7 +409,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error at addScale :" + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at updateScale :" + e.getMessage(), e);
         }
 
     }
@@ -476,7 +476,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         } catch (Exception e) {
             rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error at deleteProperty" + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error at deleteScale" + e.getMessage(), e);
         }
     }
 }
