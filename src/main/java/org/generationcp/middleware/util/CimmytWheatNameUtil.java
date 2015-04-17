@@ -16,15 +16,17 @@ public class CimmytWheatNameUtil {
 	private boolean levelZeroFullName = true; 
 	private boolean useFullNameInPedigree;
 	
+	//Some sort of weight calculations
 	public CimmytWheatNameUtil(){
-		 nstatOrderedList = "2,1,0";
+		 
+			nstatOrderedList = "2,1,0";
 	     ntypeOrderedList = "2,5,7,6,17,4,1200,13";
 	     nuidExcludeList = "20,47,66,76,84,90";
 	     levelZeroFullName = true;
 	     initializePreferredNameRules();
 	}
     
-	public void initializePreferredNameRules() {
+	private void initializePreferredNameRules() {
     	
         
         int iTemp = 0;

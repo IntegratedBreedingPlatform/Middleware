@@ -48,7 +48,6 @@ public class DatabaseConnectionParameters{
         this.username = username;
         this.password = password;
     }
-
     public DatabaseConnectionParameters(String propertyFile, String key) throws FileNotFoundException, URISyntaxException, IOException,
             ConfigException {
         super();

@@ -420,6 +420,7 @@ public class Germplasm implements Serializable{
         this.gid = gid;
     }
 
+    // porjanior does this have
     public Integer getGnpgs() {
         return gnpgs;
     }
