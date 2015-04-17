@@ -43,11 +43,13 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.TimerWatch;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -61,9 +63,10 @@ import org.slf4j.LoggerFactory;
 public class WorkbookSaver extends Saver {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbookSaver.class);
-    
+    private PedigreeService pedigreeService;
     public WorkbookSaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
+		this.pedigreeService = ManagerFactory.getCurrentManagerFactoryThreadLocal().get().getPedigreeService();
 	}
     
     /**
