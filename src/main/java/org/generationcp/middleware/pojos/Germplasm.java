@@ -292,6 +292,7 @@ public class Germplasm implements Serializable{
     @Basic(optional = false)
     @Column(name = "gid")
     @XmlElement(name = "gid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer gid;
 
     @Basic(optional = false)

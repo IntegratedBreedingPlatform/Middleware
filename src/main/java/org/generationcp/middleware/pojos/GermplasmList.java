@@ -37,6 +37,7 @@ public class GermplasmList implements Serializable{
     @Id
     @Basic(optional = false)
     @Column(name = "listid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "listname")

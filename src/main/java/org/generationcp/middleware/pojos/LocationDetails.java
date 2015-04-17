@@ -47,6 +47,7 @@ public class LocationDetails implements Serializable,
     @Id
     @Basic(optional = false)
     @Column(name = "locid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer            locid;
 
     @Basic(optional = false)

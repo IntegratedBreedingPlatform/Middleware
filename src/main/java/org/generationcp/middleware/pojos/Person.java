@@ -33,6 +33,7 @@ public class Person implements  Comparable<Person>, Serializable{
     @Id
     @Basic(optional = false)
     @Column(name = "personid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "fname")

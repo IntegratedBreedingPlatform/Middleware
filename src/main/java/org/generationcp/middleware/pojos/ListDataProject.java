@@ -15,8 +15,9 @@ public class ListDataProject implements Serializable {
 	@Id
     @Basic(optional = false)
     @Column(name = "listdata_project_id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer listDataProjectId;
-	
+
     @ManyToOne(targetEntity = GermplasmList.class)
     @JoinColumn(name = "list_id", nullable = false)
     @NotFound(action = NotFoundAction.IGNORE)
@@ -25,7 +26,7 @@ public class ListDataProject implements Serializable {
     @Basic(optional = false)
     @Column(name = "germplasm_id")
     private Integer germplasmId;
-    
+
     @Basic(optional = false)
     @Column(name = "check_type")
     private Integer checkType;

@@ -109,17 +109,20 @@ public class PhenotypeSaver extends Saver{
         
         if (variable.getValue() != null && !"".equals(variable.getValue().trim())) {
 	        if (TermId.OBSERVATION_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-	            phenotype = getPhenotypeObject(phenotype);
+	            //kim
+	            //phenotype = getPhenotypeObject(phenotype);
 	            if (variable.getValue() != null) {
 	            	phenotype.setValue(variable.getValue().trim());
 	            } else {
 	            	phenotype.setValue(null);
 	            }
 	            phenotype.setObservableId(variable.getVariableType().getId());
-	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
+	            //kim - Unique Name is the same with Primary Key? What is the purpose of this field? This should be deleted.
+				//phenotype.setUniqueName(phenotype.getPhenotypeId().toString()); // Note: This field is no longer required.
 	            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
 	        } else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-	            phenotype = getPhenotypeObject(phenotype);
+	            //kim
+	            //phenotype = getPhenotypeObject(phenotype);
 	            if(variable.getValue()!=null && !"".equals(variable.getValue())) {
 	            	phenotype.setValue(variable.getValue());
 	            	Term dataType = variable.getVariableType().getStandardVariable().getDataType();
@@ -164,6 +167,7 @@ public class PhenotypeSaver extends Saver{
 	            	}
 	            }           
 	            phenotype.setObservableId(variable.getVariableType().getId());
+				//kim
 	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 	            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
 	        }
@@ -179,14 +183,15 @@ public class PhenotypeSaver extends Saver{
         }
     }
     
-    private Phenotype createPhenotype(Integer variableId, int storedIn, String value, Phenotype oldPhenotype, boolean isCustomCategoricalValue)
+    private Phenotype createPhenotype(Integer variableId, int storedIn, String value, Phenotype phenotype, boolean isCustomCategoricalValue)
             throws MiddlewareQueryException {
     	
-    	if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null) ){
+    	//if ((value == null || "".equals(value.trim())) && (phenotype == null || phenotype.getPhenotypeId() == null) ){
+		if ((value == null || "".equals(value.trim())) && (phenotype == null )){
     		return null;
     	}
-    	
-    	Phenotype phenotype = getPhenotypeObject(oldPhenotype);
+    	//kim
+    	//Phenotype phenotype = getPhenotypeObject(oldPhenotype);
 
         if (TermId.OBSERVATION_VARIATE.getId() == storedIn) {
             phenotype.setValue(value);
@@ -234,6 +239,7 @@ public class PhenotypeSaver extends Saver{
 		return possibleValuesMap;
 	}
 
+	/* kim
 	private Phenotype getPhenotypeObject(Phenotype oldPhenotype) throws MiddlewareQueryException {
 		Phenotype phenotype = oldPhenotype;
 		if (phenotype == null) {
@@ -243,6 +249,8 @@ public class PhenotypeSaver extends Saver{
         }
         return phenotype;
     }
+
+    */
 
     private void saveExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
         getExperimentPhenotypeDao().save(createExperimentPhenotype(experimentId, phenotypeId));

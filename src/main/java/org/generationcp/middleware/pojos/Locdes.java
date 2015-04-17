@@ -28,6 +28,7 @@ public class Locdes implements Serializable{
     @Id
     @Basic(optional = false)
     @Column(name = "ldid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer ldid;
 
     @Column(name = "locid")

@@ -52,6 +52,7 @@ public class Name implements Serializable{
     @Id
     @Basic(optional = false)
     @Column(name = "nid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer nid;
 
     @Basic(optional = false)

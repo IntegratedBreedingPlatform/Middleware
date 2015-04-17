@@ -46,6 +46,7 @@ public class Location implements Serializable, Comparable<Location>{
     @Basic(optional = false)
     @Column(name = "locid")
     @XmlElement(name = "locationId")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer locid;
     
     @Basic(optional = true)

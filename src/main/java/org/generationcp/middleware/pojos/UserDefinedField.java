@@ -38,6 +38,7 @@ public class UserDefinedField implements Serializable{
     @Basic(optional = false)
     @Column(name = "fldno")
     @XmlElement(name = "udfieldId")
+    //@GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer fldno;
 
     @Basic(optional = false)

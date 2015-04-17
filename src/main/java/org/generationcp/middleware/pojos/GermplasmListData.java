@@ -41,6 +41,7 @@ public class GermplasmListData implements Serializable{
     @Id
     @Basic(optional = false)
     @Column(name = "lrecid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(targetEntity = GermplasmList.class)

@@ -50,6 +50,7 @@ public class Method implements Serializable{
     @Basic(optional = false)
     @Column(name = "mid")
     @XmlElement(name = "methodId")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer mid;
     
     @Basic(optional = true)

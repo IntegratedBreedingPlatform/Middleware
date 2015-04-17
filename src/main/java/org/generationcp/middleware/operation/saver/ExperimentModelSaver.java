@@ -234,7 +234,8 @@ public class ExperimentModelSaver extends Saver {
 		}
 		
 		Phenotype phenotype = new Phenotype();
-		phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
+		//kim
+		//phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 		phenotype.setValue(value == null ? null : value.toString());
 		phenotype.setObservableId(stdVariable.getId());
 		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());

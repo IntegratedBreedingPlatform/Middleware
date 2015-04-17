@@ -37,7 +37,8 @@ public class Phenotype implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer phenotypeId;
 
-	@Basic(optional = false)
+	//kim
+	//@Basic(optional = false)
 	@Column(name = "uniquename")
 	private String uniqueName;
 	

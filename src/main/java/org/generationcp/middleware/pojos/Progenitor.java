@@ -30,6 +30,7 @@ public class Progenitor implements Serializable{
 
     @Basic(optional = false)
     @Column(name = "pid")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer pid;
 
     public Progenitor() {
