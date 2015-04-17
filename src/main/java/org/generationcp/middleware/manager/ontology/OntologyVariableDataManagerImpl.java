@@ -1,6 +1,5 @@
 package org.generationcp.middleware.manager.ontology;
 
-import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -343,15 +342,16 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             transaction = session.beginTransaction();
 
             //Updating term to database.
-            term.setName(variableInfo.getName());
-            term.setDefinition(variableInfo.getDescription());
-
-            getCvTermDao().merge(term);
+            if(!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))){
+                term.setName(variableInfo.getName());
+                term.setDefinition(variableInfo.getDescription());
+                getCvTermDao().merge(term);
+            }
 
             //Setting method to variable
             if(methodRelation == null) {
                 getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_METHOD.getId(), variableInfo.getMethodId());
-            } else {
+            } else if(!Objects.equals(methodRelation.getObjectId(), variableInfo.getMethodId())){
                 methodRelation.setObjectId(variableInfo.getMethodId());
                 getCvTermRelationshipDao().merge(methodRelation);
             }
@@ -359,7 +359,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             //Setting property to variable
             if(propertyRelation == null) {
                 getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_PROPERTY.getId(), variableInfo.getPropertyId());
-            } else {
+            } else if(!Objects.equals(propertyRelation.getObjectId(), variableInfo.getPropertyId())){
                 propertyRelation.setObjectId(variableInfo.getPropertyId());
                 getCvTermRelationshipDao().merge(propertyRelation);
             }
@@ -367,29 +367,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             //Setting scale to variable
             if(scaleRelation == null) {
                 getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_SCALE.getId(), variableInfo.getScaleId());
-            } else {
+            } else if(!Objects.equals(scaleRelation.getObjectId(), variableInfo.getScaleId())){
                 scaleRelation.setObjectId(variableInfo.getScaleId());
                 getCvTermRelationshipDao().merge(scaleRelation);
-            }
-
-            //Updating values if present
-            if (!Strings.isNullOrEmpty(variableInfo.getMinValue())) {
-                getCvTermPropertyDao().save(variableInfo.getId(), TermId.MIN_VALUE.getId(), String.valueOf(variableInfo.getMinValue()), 0);
-            } else{
-                CVTermProperty property = getCvTermPropertyDao().getOneByCvTermAndType(variableInfo.getId(), TermId.MIN_VALUE.getId());
-                if(property != null) {
-                    getCvTermPropertyDao().makeTransient(property);
-                }
-            }
-
-            //Updating values if present
-            if (!Strings.isNullOrEmpty(variableInfo.getMaxValue())) {
-                getCvTermPropertyDao().save(variableInfo.getId(), TermId.MAX_VALUE.getId(), String.valueOf(variableInfo.getMaxValue()), 0);
-            } else{
-                CVTermProperty property = getCvTermPropertyDao().getOneByCvTermAndType(variableInfo.getId(), TermId.MAX_VALUE.getId());
-                if(property != null) {
-                    getCvTermPropertyDao().makeTransient(property);
-                }
             }
 
             //Updating variable types
@@ -434,29 +414,29 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             //Updating alias
             if(aliasProperty == null && variableInfo.getAlias() != null) {
                 getCvTermProgramPropertyDao().save(term.getCvTermId(), TermId.ALIAS.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias());
-            } else if(aliasProperty != null && variableInfo.getAlias() != null){
+            } else if(aliasProperty != null && variableInfo.getAlias() != null && !Objects.equals(aliasProperty.getValue(), variableInfo.getAlias())){
                 aliasProperty.setValue(variableInfo.getAlias());
                 getCvTermProgramPropertyDao().merge(aliasProperty);
-            } else if(aliasProperty != null) {
+            } else if(aliasProperty != null && variableInfo.getAlias() == null) {
                 getCvTermProgramPropertyDao().makeTransient(aliasProperty);
             }
 
             //Updating min max values
             if(minValueProperty == null && variableInfo.getMinValue() != null) {
                 getCvTermProgramPropertyDao().save(term.getCvTermId(), TermId.MIN_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMinValue());
-            } else if(minValueProperty != null && variableInfo.getMinValue() != null){
+            } else if(minValueProperty != null && variableInfo.getMinValue() != null && !Objects.equals(minValueProperty.getValue(), variableInfo.getMinValue())){
                 minValueProperty.setValue(variableInfo.getMinValue());
                 getCvTermProgramPropertyDao().merge(minValueProperty);
-            } else if(minValueProperty != null) {
+            } else if(minValueProperty != null && variableInfo.getMinValue() == null) {
                 getCvTermProgramPropertyDao().makeTransient(minValueProperty);
             }
 
             if(maxValueProperty == null && variableInfo.getMaxValue() != null) {
                 getCvTermProgramPropertyDao().save(term.getCvTermId(), TermId.MAX_VALUE.getId(), variableInfo.getProgramUuid(), variableInfo.getMaxValue());
-            } else if(maxValueProperty != null && variableInfo.getMaxValue() != null){
+            } else if(maxValueProperty != null && variableInfo.getMaxValue() != null && !Objects.equals(maxValueProperty.getValue(), variableInfo.getMaxValue())){
                 maxValueProperty.setValue(variableInfo.getMaxValue());
                 getCvTermProgramPropertyDao().merge(maxValueProperty);
-            } else if(maxValueProperty != null) {
+            } else if(maxValueProperty != null && variableInfo.getMaxValue() == null) {
                 getCvTermProgramPropertyDao().makeTransient(maxValueProperty);
             }
 

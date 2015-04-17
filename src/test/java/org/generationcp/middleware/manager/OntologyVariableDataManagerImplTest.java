@@ -60,27 +60,12 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
         Assert.assertNotNull(variable);
     }
 
-    /*@Test
+    @Test
     public void testUpdateVariable() throws Exception {
-        OntologyVariable variable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
-
-        OntologyVariableInfo info = new OntologyVariableInfo();
-        info.setId(18000);
-        info.setName(variable.getName());
-        info.setDescription("Variable Description");
-        info.setAlias("my_var");
-        info.setMinValue("0");
-        info.setMaxValue("10");
-        info.setMethodId(variable.getMethod().getId());
-        info.setPropertyId(variable.getProperty().getId());
-        info.setScaleId(variable.getScale().getId());
-        info.setProgramUuid(testProject.getUniqueID());
-        info.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-        variableManager.updateVariable(info);
-
-        OntologyVariable updatedVariable = variableManager.getVariable(testProject.getUniqueID(), 18000);
+        variableManager.updateVariable(testVariableInfo);
+        OntologyVariable updatedVariable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
         Assert.assertNotNull(updatedVariable);
-    }*/
+    }
 
     /**
      * All test depend on add variable, scale, property, method
@@ -122,6 +107,11 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
         testVariableInfo.setMethodId(testMethod.getId());
         testVariableInfo.setPropertyId(testProperty.getId());
         testVariableInfo.setScaleId(testScale.getId());
+        testVariableInfo.setAlias("My alias");
+        testVariableInfo.setMinValue("0");
+        testVariableInfo.setMaxValue("100");
+        testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+        testVariableInfo.addVariableType(VariableType.ANALYSIS);
         testVariableInfo.setIsFavorite(true);
         variableManager.addVariable(testVariableInfo);
     }
