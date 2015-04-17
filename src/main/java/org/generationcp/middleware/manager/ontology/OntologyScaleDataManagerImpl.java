@@ -438,24 +438,17 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             transaction = session.beginTransaction();
 
             //Deleting existing relationships for property
+            List<Integer> categoricalTermIds = new ArrayList<>();
             List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(scaleId);
-            List<Integer> termsToDelete = Util.convertAll(relationships, new Function<CVTermRelationship, Integer>()
-            {
-                public Integer apply(CVTermRelationship x)
-                {
-                    if(Objects.equals(TermId.HAS_TYPE.getId(), x.getTypeId())) {
-                        return null;
-                    }
-
-                    return x.getObjectId();
-                }
-            });
-
-            List<CVTerm> terms = getCvTermDao().getByIds(termsToDelete);
 
             for(CVTermRelationship r : relationships){
+                if(r.getTypeId().equals(TermId.HAS_VALUE.getId())){
+                    categoricalTermIds.add(r.getObjectId());
+                }
                 getCvTermRelationshipDao().makeTransient(r);
             }
+
+            List<CVTerm> terms = getCvTermDao().getByIds(categoricalTermIds);
 
             for(CVTerm c : terms){
                 getCvTermDao().makeTransient(c);
