@@ -29,13 +29,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     public Method getMethod(int id) throws MiddlewareException {
         CVTerm term = getCvTermDao().getById(id);
 
-        if(term == null){
-            return null;
-        }
-
-        if (term.getCv() != CvId.METHODS.getId()) {
-            throw new MiddlewareQueryException(TERM_IS_NOT_METHOD, new MiddlewareException("TERM:" + id));
-        }
+        checkTermIsMethod(term);
 
         return new Method(Term.fromCVTerm(term));
     }
@@ -84,9 +78,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
         CVTerm term = getCvTermDao().getById(method.getId());
 
-        if (term == null) {
-            throw new MiddlewareQueryException("Method does not exist with that id");
-        }
+        checkTermIsMethod(term);
 
         //Constant CvId
         method.getTerm().setVocabularyId(CvId.METHODS.getId());
@@ -115,13 +107,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
         CVTerm term = getCvTermDao().getById(id);
 
-        if(term == null){
-            throw new MiddlewareException(METHOD_DOES_NOT_EXIST);
-        }
-
-        if (term.getCv() != CvId.PROPERTIES.getId()) {
-            throw new MiddlewareException(METHOD_DOES_NOT_EXIST);
-        }
+        checkTermIsMethod(term);
 
         if(getCvTermRelationshipDao().isTermReferred(id)){
             throw new MiddlewareException(METHOD_IS_REFERRED_TO_VARIABLE);
@@ -139,6 +125,17 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
         } catch (Exception e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("Error at deleteMethod" + e.getMessage(), e);
+        }
+    }
+
+    private void checkTermIsMethod(CVTerm term) throws MiddlewareException {
+
+        if(term == null){
+            throw new MiddlewareException(METHOD_DOES_NOT_EXIST);
+        }
+
+        if (term.getCv() != CvId.METHODS.getId()) {
+            throw new MiddlewareException(TERM_IS_NOT_METHOD);
         }
     }
 }
