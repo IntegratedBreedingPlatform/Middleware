@@ -39,13 +39,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
         CVTerm term = getCvTermDao().getById(id);
 
-        if(term == null){
-            return null;
-        }
-
-        if (term.getCv() != CvId.PROPERTIES.getId()) {
-            throw new MiddlewareException(TERM_IS_NOT_PROPERTY);
-        }
+       checkTermIsProperty(term);
 
         try {
             List<Property> properties = getProperties(false, new ArrayList<>(Collections.singletonList(id)));
@@ -241,15 +235,9 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     @Override
     public void updateProperty(Property property) throws MiddlewareException {
 
-        CVTerm propertyTerm = getCvTermDao().getById(property.getId());
+        CVTerm term = getCvTermDao().getById(property.getId());
 
-        if(propertyTerm == null){
-            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
-        }
-
-        if (propertyTerm.getCv() != CvId.PROPERTIES.getId()) {
-            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
-        }
+        checkTermIsProperty(term);
 
         List<Term> allClasses = getCvTermDao().getAllClasses();
 
@@ -259,7 +247,10 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         try {
             transaction = session.beginTransaction();
 
-            getCvTermDao().merge(property.getTerm().toCVTerm());
+            term.setName(property.getName());
+            term.setDefinition(property.getDefinition());
+
+            getCvTermDao().merge(term);
 
             //Save or update crop ontology
             if (property.getCropOntologyId() != null) {
@@ -334,18 +325,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
         CVTerm term = getCvTermDao().getById(propertyId);
 
-        if(term == null){
-            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
-        }
-
-        if (term.getCv() != CvId.PROPERTIES.getId()) {
-            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
-        }
+        checkTermIsProperty(term);
 
         if(getCvTermRelationshipDao().isTermReferred(propertyId)){
             throw new MiddlewareException(PROPERTY_IS_REFERRED_TO_VARIABLE);
         }
-
 
         Session session = getActiveSession();
         Transaction transaction = null;
@@ -373,6 +357,19 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         } catch (HibernateException e) {
             rollbackTransaction(transaction);
             throw new MiddlewareQueryException("Error at deleteProperty" + e.getMessage(), e);
+        }
+    }
+
+
+
+    private void checkTermIsProperty(CVTerm term) throws MiddlewareException {
+
+        if (term == null) {
+            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
+        }
+
+        if(term.getCv() != CvId.PROPERTIES.getId()){
+            throw new MiddlewareException(TERM_IS_NOT_PROPERTY);
         }
     }
 }
