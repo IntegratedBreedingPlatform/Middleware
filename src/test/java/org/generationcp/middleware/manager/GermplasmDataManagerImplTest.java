@@ -40,6 +40,7 @@ import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -692,7 +693,9 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetCrossExpansion() throws Exception {
-        Debug.println(pedigreeService.getCrossExpansion(Integer.valueOf(1), 2));
+    	CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
+    	crossExpansionProperties.setDefaultLevel(1);
+        Debug.println(pedigreeService.getCrossExpansion(Integer.valueOf(1), crossExpansionProperties));
     }
     
     @Test

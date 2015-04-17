@@ -53,7 +53,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.util.CrossExpansionRule;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -68,8 +68,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     private static Project commonTestProject;
     private static WorkbenchTestDataUtil workbenchTestDataUtil;
     private static int LEVEL = 3;
-    private static int NAME_TYPE = 7;
-    private static CrossExpansionRule crossExpansionRule;
+    private static CrossExpansionProperties crossExpansionProperties;
     
     @BeforeClass
     public static void setUp() throws Exception {
@@ -77,7 +76,8 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
         dataImportService = managerFactory.getDataImportService();
         workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
         commonTestProject = workbenchTestDataUtil.getCommonTestProject();
-        crossExpansionRule = new CrossExpansionRule(false, LEVEL, NAME_TYPE);
+        crossExpansionProperties = new CrossExpansionProperties();
+        crossExpansionProperties.setDefaultLevel(1);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         List<Integer> trialIds = new ArrayList<Integer>();
         trialIds.add(Integer.valueOf(1)); 
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds, crossExpansionRule);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds, crossExpansionProperties);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
@@ -119,7 +119,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
         List<Integer> nurseryIds = new ArrayList<Integer>();
         nurseryIds.add(Integer.valueOf(5734)); 
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds, crossExpansionRule);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds, crossExpansionProperties);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
@@ -128,7 +128,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetAllFieldMapsInBlockByTrialInstanceId() throws MiddlewareQueryException{
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1, crossExpansionRule);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1, crossExpansionProperties);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
