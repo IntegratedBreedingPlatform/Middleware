@@ -157,7 +157,16 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             throw new MiddlewareQueryException("Error in getVariables", e);
         }
 
-        return new ArrayList<>(map.values());
+        List<OntologyVariableSummary> variables = new ArrayList<>(map.values());
+
+        Collections.sort(variables, new Comparator<OntologyVariableSummary>() {
+            @Override
+            public int compare(OntologyVariableSummary l, OntologyVariableSummary r) {
+                return  l.getName().compareToIgnoreCase(r.getName());
+            }
+        });
+
+        return variables;
     }
 
     @Override
@@ -261,7 +270,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             }
 
             //Setting scale to variable
-            if(variableInfo.getMethodId() != null){
+            if(variableInfo.getScaleId() != null){
                 getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_SCALE.getId(), variableInfo.getScaleId());
             }
 
