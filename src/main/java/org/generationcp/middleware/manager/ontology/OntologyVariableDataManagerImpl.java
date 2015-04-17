@@ -541,11 +541,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         //load scale, method and property data
         List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(variableTerm.getCvTermId());
         for(CVTermRelationship  relationship : relationships) {
-            if(Objects.equals(relationship.getTypeId(), TermId.HAS_METHOD.getId())){
+            if(Objects.equals(relationship.getTypeId(), TermRelationship.HAS_METHOD.getId())){
                 methodRelation = relationship;
-            } else if(Objects.equals(relationship.getTypeId(), TermId.HAS_PROPERTY.getId())){
+            } else if(Objects.equals(relationship.getTypeId(), TermRelationship.HAS_PROPERTY.getId())){
                 propertyRelation = relationship;
-            } else if(Objects.equals(relationship.getTypeId(), TermId.HAS_SCALE.getId())) {
+            } else if(Objects.equals(relationship.getTypeId(), TermRelationship.HAS_SCALE.getId())) {
                 scaleRelation = relationship;
             }
         }
