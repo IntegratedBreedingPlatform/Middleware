@@ -217,7 +217,7 @@ public class Util{
      * Returns the date in the specified format as String
      * @return date in the specified format as String
      */
-    public static String getDateAsStringValue(Date date, String format){
+    public static String formatDateAsStringValue(Date date, String format){
     	return getSimpleDateFormat(format).format(date.getTime());
     }
     
@@ -226,7 +226,7 @@ public class Util{
      * @return date object
      * @throws ParseException 
      */
-    public static Date getDate(String date, String format) throws ParseException{
+    public static Date parseDate(String date, String format) throws ParseException{
     	SimpleDateFormat formatter = getSimpleDateFormat(format);
     	return formatter.parse(date);
     }
