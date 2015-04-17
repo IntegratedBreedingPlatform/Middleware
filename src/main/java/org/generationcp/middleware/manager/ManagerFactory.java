@@ -165,7 +165,7 @@ public class ManagerFactory implements Serializable {
     /*
      * This was exposed so that it can be access in the jUnit
      */
-    protected PedigreeService getPedigreeService(String profile, String crop){
+    public PedigreeService getPedigreeService(String profile, String crop){
     	return PedigreeFactory.getPedigreeService(sessionProvider, profile, crop);
     }
     
