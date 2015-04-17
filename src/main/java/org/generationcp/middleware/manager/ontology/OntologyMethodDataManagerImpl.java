@@ -13,6 +13,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class OntologyMethodDataManagerImpl extends DataManager implements OntologyMethodDataManager {
@@ -43,6 +45,13 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
         for (CVTerm mt : methodTerms){
             methods.add(new Method(Term.fromCVTerm(mt)));
         }
+
+        Collections.sort(methods, new Comparator<Method>() {
+            @Override
+            public int compare(Method l, Method r) {
+                return l.getName().compareToIgnoreCase(r.getName());
+            }
+        });
 
         return methods;
     }

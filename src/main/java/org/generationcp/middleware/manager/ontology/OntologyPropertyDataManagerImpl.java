@@ -1,10 +1,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import com.google.common.base.Strings;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -162,6 +159,13 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
         }
+
+        Collections.sort(properties, new Comparator<Property>() {
+            @Override
+            public int compare(Property l, Property r) {
+                return l.getName().compareToIgnoreCase(r.getName());
+            }
+        });
 
         return properties;
     }
