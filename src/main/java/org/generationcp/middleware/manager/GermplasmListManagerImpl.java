@@ -23,6 +23,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Session;
@@ -628,5 +629,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public GermplasmListNewColumnsInfo  getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException {
 		return getListDataPropertyDAO().getPropertiesForList(listId);
+	}
+
+	@Override
+	public List<ListDataProperty> saveListDataProperties(
+			List<ListDataProperty> listDataProps) throws MiddlewareQueryException {
+		return getListDataPropertySaver().saveListDataProperties(listDataProps);
 	}
 }

@@ -1005,7 +1005,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 // Auto-assign IDs for new DB records
                 Integer nextId = dao.getNextId("gid");
                 germplasm.setGid(nextId);
-                germplasm.setLgid(Integer.valueOf(0));
+                
+                if(germplasm.getLgid() > 0){
+                	germplasm.setLgid(Integer.valueOf(0));
+                }
 
                 Integer nameId = nameDao.getNextId("nid");
                 name.setNid(nameId);
