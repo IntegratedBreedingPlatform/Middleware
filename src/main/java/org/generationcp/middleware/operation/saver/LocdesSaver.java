@@ -1,10 +1,7 @@
 package org.generationcp.middleware.operation.saver;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +13,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.util.Util;
 
 public class LocdesSaver extends Saver {
 
@@ -128,8 +126,7 @@ public class LocdesSaver extends Saver {
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
-		DateFormat df = new SimpleDateFormat("yyyyMMdd");
-		locdes.setDdate(Integer.valueOf(df.format(new Date())));
+		locdes.setDdate(Util.getCurrentDateAsIntegerValue());
 		locdes.setReferenceId(0);
 		locdes.setUserId(userId);
 		return locdes;

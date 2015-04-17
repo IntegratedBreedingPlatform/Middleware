@@ -11,11 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,6 +58,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -997,8 +996,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException {
 		Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
-		Integer date = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date()));
-		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, date, name);
+		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, 
+				Util.getCurrentDateAsIntegerValue(), name);
 		return getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 	

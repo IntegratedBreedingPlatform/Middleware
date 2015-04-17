@@ -18,7 +18,6 @@ import org.generationcp.middleware.util.Util;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 
 /**
  * POJO for persons table.
@@ -174,11 +173,8 @@ public class Person implements  Comparable<Person>, Serializable{
     }
     
     public String getInitialsWithTimestamp() {
-        long currentTime = System.currentTimeMillis();
-        SimpleDateFormat timestampFormat = new SimpleDateFormat("yyMMddHHmmssSS");
-        String timestamp = timestampFormat.format(currentTime);
+        String timestamp = Util.getCurrentDateAsStringValue("yyMMddHHmmssSS");
         timestamp = timestamp.substring(0, 13);
-        
         return getInitials() + timestamp;
     }
     

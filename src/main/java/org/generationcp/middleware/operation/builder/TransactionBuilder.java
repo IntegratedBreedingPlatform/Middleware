@@ -18,11 +18,10 @@ import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.util.Util;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class TransactionBuilder  extends Builder {
@@ -71,8 +70,7 @@ public class TransactionBuilder  extends Builder {
 
 	private Integer getCurrentDate(){
 		// Get current date in ICIS date format YYYMMDD
-        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());        
-        return Integer.parseInt(date);
+        return Util.getCurrentDateAsIntegerValue();
 	}
 
 	private Double formatAmount(Double amount){

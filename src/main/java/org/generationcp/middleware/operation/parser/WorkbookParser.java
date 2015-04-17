@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.PoiUtil;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,8 +230,7 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.blank.study.title"));
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        dateFormat.setLenient(false);
+        SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
         Date startDate = null;
         Date endDate = null;
 
@@ -266,7 +266,7 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.date.startdate.required"));
         }
 
-        Date currentDate = Calendar.getInstance().getTime();
+        Date currentDate = Util.getCurrentDate();
         if (startDate != null && startDate.after(currentDate)) {
             errorMessages.add(new Message("error.start.is.after.current.date"));
         }

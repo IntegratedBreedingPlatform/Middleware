@@ -35,7 +35,8 @@ public class PoiUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(PoiUtil.class);
 
-    public static final SimpleDateFormat EXCEL_DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
+    public static final SimpleDateFormat EXCEL_DATE_FORMATTER = 
+    		Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 
     // WorkBook convenience methods
     public static void setRepeatingRows(Workbook workBook, int sheetIndex, int fromRow, int toRow) {

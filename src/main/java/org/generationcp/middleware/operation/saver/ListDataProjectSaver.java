@@ -5,10 +5,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.generationcp.middleware.util.Util;
 import java.util.List;
 
 public class ListDataProjectSaver extends Saver {
@@ -57,8 +54,7 @@ public class ListDataProjectSaver extends Saver {
 		
 		snapList.setId(getGermplasmListDAO().getNextId("id"));
 		snapList.setProjectId(projectId);
-		DateFormat format = new SimpleDateFormat("yyyyMMdd");
-		snapList.setDate(Long.valueOf(format.format(new Date())));
+		snapList.setDate(Util.getCurrentDateAsLongValue());
 		snapList.setStatus(1);
 		snapList.setType(type.name());
 		snapList.setParent(null);
