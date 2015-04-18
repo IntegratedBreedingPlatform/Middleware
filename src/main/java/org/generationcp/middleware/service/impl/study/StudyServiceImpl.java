@@ -3,11 +3,13 @@ package org.generationcp.middleware.service.impl.study;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.Service;
+import org.generationcp.middleware.service.api.study.Measurement;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.hibernate.HibernateException;
@@ -78,5 +80,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	        }
         }
         return studySummaries;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Measurement> listTrialData(final String projectBusinessIdentifier) {
+		final MeasurementQuery measurementQuery = new MeasurementQuery();
+		measurementQuery.generateQuery(projectUUID, traitNames);
 	}
 }

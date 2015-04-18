@@ -8,4 +8,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 public interface StudyService {
 
 	List<StudySummary> listAllStudies() throws MiddlewareQueryException;
+
+	List<Measurement> listTrialData(final String projectBusinessIdentifier);
 }
