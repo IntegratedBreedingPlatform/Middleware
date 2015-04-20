@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -38,7 +39,7 @@ public class StandardVariableSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public void delete(StandardVariable stdVar) throws MiddlewareQueryException, MiddlewareException {
+	public void delete(StandardVariable stdVar) throws MiddlewareException {
 	    deleteEnumerations(stdVar.getId(), stdVar.getEnumerations());
 	    
 	    if (stdVar.getCropOntologyId() != null) {
@@ -110,7 +111,7 @@ public class StandardVariableSaver extends Saver {
 	}
 	
     public void saveEnumeration(StandardVariable variable, Enumeration enumeration, Integer cvId) 
-            throws MiddlewareException, MiddlewareQueryException{
+            throws MiddlewareException {
 
         validateInputEnumeration(variable, enumeration);
         
@@ -125,14 +126,17 @@ public class StandardVariableSaver extends Saver {
     private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException{
         String name = enumeration.getName();
         String definition = enumeration.getDescription();
-        StringBuffer errorMessage = new StringBuffer("");
-        if (name == null || name.equals("")) {
+        StringBuilder errorMessage = new StringBuilder("");
+
+        if (StringUtils.isEmpty(name)) {
             errorMessage.append("\nname is null or empty");
         }
+
         if (variable.getEnumerationByName(name) != null){
             errorMessage.append("\nthe value with name = " + name + " already exists.");
         }
-        if (definition == null || definition.equals("")) {
+
+        if (StringUtils.isEmpty(definition)) {
             errorMessage.append("\ndefinition is null or empty");
         }
         if (variable.getEnumerationByDescription(definition) != null){
@@ -199,12 +203,11 @@ public class StandardVariableSaver extends Saver {
 			// see if this relationship already exists (this saves us from dealing with a Unique Constraint Exception)
 			boolean exists = false;
 			CVTermRelationship relationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
-			if(relationship != null) {
-				if(relationship.getObjectId().intValue() == object.getId()) {
-					// the relationship exists, as stipulated by unique constraint subject-type-object must be unique
-					exists = true;
-				}
-			}
+			if(relationship != null && relationship.getObjectId() == object.getId()) {
+
+                // the relationship exists, as stipulated by unique constraint subject-type-object must be unique
+                exists = true;
+            }
 			// save to DB if this relationship does not already exist
 			if(!exists) {
                 saveCvTermRelationship(subjectId, typeId, object.getId());
@@ -255,7 +258,7 @@ public class StandardVariableSaver extends Saver {
     }
     
 	private void saveSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
-		if (nameSynonyms != null && nameSynonyms.size() > 0) {
+		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
 			for (NameSynonym nameSynonym : nameSynonyms) {
 				if (!StringUtil.isEmpty(nameSynonym.getName())) {
 					CVTermSynonym cvTermSynonym = new CVTermSynonym();
@@ -272,7 +275,7 @@ public class StandardVariableSaver extends Saver {
 	}
 	
 	private void saveEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException {
-		if (enumerations != null && enumerations.size() > 0) {
+		if (enumerations != null && !enumerations.isEmpty()) {
 			for (Enumeration enumeration : enumerations) {
 				saveCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
 			}
@@ -290,33 +293,8 @@ public class StandardVariableSaver extends Saver {
         List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
         if (relationships != null && !relationships.isEmpty()) {
             for (CVTermRelationship relationship : relationships) {
-                Integer objectId = null;
+                Integer objectId = getRelevantObjectIdBasedOnType(relationship.getTypeId(), standardVariable);
                 //STORED_IN can not be updated.
-                if (relationship.getTypeId() == TermId.HAS_PROPERTY.getId()) {
-                    if (standardVariable.getProperty() != null) {
-                        objectId = standardVariable.getProperty().getId();
-                    }
-                } 
-                else if (relationship.getTypeId() == TermId.HAS_SCALE.getId()) {
-                    if (standardVariable.getScale() != null) {
-                        objectId = standardVariable.getScale().getId();
-                    }
-                }
-                else if (relationship.getTypeId() == TermId.HAS_METHOD.getId()) {
-                    if (standardVariable.getMethod() != null) {
-                        objectId = standardVariable.getMethod().getId();
-                    }
-                }
-                else if (relationship.getTypeId() == TermId.HAS_TYPE.getId()) {
-                    if (standardVariable.getDataType() != null) {
-                        objectId = standardVariable.getDataType().getId();
-                    }
-                }
-                else if (relationship.getTypeId() == TermId.STORED_IN.getId()) {
-                	if (standardVariable.getStoredIn() != null) {
-                		objectId = standardVariable.getStoredIn().getId();
-                	}
-                }
 
         		if (objectId != null && !objectId.equals(relationship.getObjectId())) {
                     relationship.setObjectId(objectId);
@@ -325,6 +303,34 @@ public class StandardVariableSaver extends Saver {
             }
         }
         
+    }
+
+    protected Integer getRelevantObjectIdBasedOnType(final Integer typeID, StandardVariable standardVariable) {
+        Integer objectId = null;
+
+        if (typeID == TermId.HAS_PROPERTY.getId()) {
+            if (standardVariable.getProperty() != null) {
+                objectId = standardVariable.getProperty().getId();
+            }
+        } else if (typeID == TermId.HAS_SCALE.getId()) {
+            if (standardVariable.getScale() != null) {
+                objectId = standardVariable.getScale().getId();
+            }
+        } else if (typeID == TermId.HAS_METHOD.getId()) {
+            if (standardVariable.getMethod() != null) {
+                objectId = standardVariable.getMethod().getId();
+            }
+        } else if (typeID == TermId.HAS_TYPE.getId()) {
+            if (standardVariable.getDataType() != null) {
+                objectId = standardVariable.getDataType().getId();
+            }
+        } else if (typeID == TermId.STORED_IN.getId()) {
+            if (standardVariable.getStoredIn() != null) {
+                objectId = standardVariable.getStoredIn().getId();
+            }
+        }
+
+        return objectId;
     }
     
     public String validate(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException {
@@ -375,8 +381,7 @@ public class StandardVariableSaver extends Saver {
         if (cropOntologyProperty == null) {
             if (cropOntologyId == null || "".equals(cropOntologyId.trim())) {
                 isForCreate = false;
-            }
-            else {
+            } else {
                 cropOntologyProperty = new CVTermProperty();
                 cropOntologyProperty.setCvTermId(traitId);
                 cropOntologyProperty.setRank(0);
@@ -391,20 +396,22 @@ public class StandardVariableSaver extends Saver {
         
     }
     
-    public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareException {
         deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
         deleteCvTerm(getCvTermDao().getById(enumeration.getId()));
     }
  
-    public void deleteEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException, MiddlewareException {
-        if (enumerations != null && enumerations.size() > 0) {
+    public void deleteEnumerations(int varId, List<Enumeration> enumerations) throws
+            MiddlewareException {
+        if (enumerations != null && !enumerations.isEmpty()) {
             for (Enumeration enumeration : enumerations) {
                 deleteEnumeration(varId, enumeration);
             }
         }
     }
 
-    private void deleteCvTermRelationship(int subjectId, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException {
+    private void deleteCvTermRelationship(int subjectId, int typeId, int objectId) throws
+            MiddlewareException {
         Term typeTerm = getTermBuilder().get(typeId);
         if (typeTerm != null) {
             CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
@@ -421,22 +428,25 @@ public class StandardVariableSaver extends Saver {
     
     public void deleteCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
         CVTerm trait = getCvTermDao().getById(traitId);
-        if (trait != null) { 
-            List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
-            if (traitProperties != null) {
-                for (CVTermProperty traitProperty : traitProperties) {
-                    if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
-                        if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
-                            getCvTermPropertyDao().makeTransient(traitProperty);
-                        }
-                        break;
-                    }
+        if (trait == null) {
+            throw new MiddlewareQueryException("Specified trait ID for deletion of crop ontology ID is not valid");
+        }
+
+        List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
+
+        for (CVTermProperty traitProperty : traitProperties) {
+            if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
+                if (traitProperty.getValue() != null && !traitProperty.getValue()
+                        .equals(cropOntologyId)) {
+                    getCvTermPropertyDao().makeTransient(traitProperty);
                 }
+                break;
             }
         }
     }
     
-    private void deleteRelationship(int subjectId, int typeId, Term object) throws MiddlewareQueryException, MiddlewareException {
+    private void deleteRelationship(int subjectId, int typeId, Term object) throws
+            MiddlewareException {
         if (object != null) {
             deleteCvTermRelationship(subjectId, typeId, object.getId());
         } else {

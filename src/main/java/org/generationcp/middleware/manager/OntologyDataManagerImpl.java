@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -200,7 +201,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId)
             throws MiddlewareQueryException {
-        return getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+        return getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId,
+                methodId);
     }
 
     @Override
@@ -298,7 +300,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
     
     @Override
-    public void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException{       
+    public void updateTerm(Term term) throws MiddlewareException {
         
         Session session = getCurrentSession();
         Transaction trans = null;
@@ -319,7 +321,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public List<Term> getDataTypes() throws MiddlewareQueryException {
-        List<Integer> dataTypeIds = Arrays.asList(TermId.CLASS.getId(), TermId.NUMERIC_VARIABLE.getId(),
+        List<Integer> dataTypeIds = Arrays.asList(TermId.CLASS.getId(),
+                TermId.NUMERIC_VARIABLE.getId(),
                 TermId.DATE_VARIABLE.getId(), TermId.NUMERIC_DBID_VARIABLE.getId(),
                 TermId.CHARACTER_DBID_VARIABLE.getId(), TermId.CHARACTER_VARIABLE.getId(),
                 TermId.TIMESTAMP_VARIABLE.getId(), TermId.CATEGORICAL_VARIABLE.getId());
@@ -406,52 +409,60 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
         
     @Override
-    public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
+    public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareException{
         Session session = getCurrentSession();
         Transaction trans = null;
         
-        Term term = findTermByName(name, cvId);
-        
         try {
             trans = session.beginTransaction();
-            term = saveOrUpdateCvTerm(name, definition, cvId);
+            Term term = saveOrUpdateCvTerm(name, definition, cvId);
             trans.commit();
+
+            return term;
         } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException(e.getCode(), e);
         }
 
-        return term;
-        
+    }
+
+    public void addOrUpdateCropOntologyID(Property property, String cropOntologyID)
+            throws MiddlewareQueryException {
+        assert !StringUtils.isEmpty(cropOntologyID);
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getStandardVariableSaver()
+                    .saveOrUpdateCropOntologyId(property.getTerm().getId(), cropOntologyID);
+            trans.commit();
+        } catch (MiddlewareQueryException e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException(e.getCode(), e);
+        }
     }
     
     @Override
-    public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId, String cropOntologyId) 
-            throws MiddlewareQueryException, MiddlewareException {
+    public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
+            throws MiddlewareException {
         Session session = getCurrentSession();
         Transaction trans = null;
 
-        Term term = findTermByName(name, cvId);        
-        
         try {
             trans = session.beginTransaction();
-            term = saveOrUpdateCvTerm(name, definition, cvId);
+            Term term = saveOrUpdateCvTerm(name, definition, cvId);
             saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
             
-            if (cropOntologyId != null) {
-                getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
-            }
-            
             trans.commit();
+            return term;
         } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException(e.getCode(), e);
         }
-
-        return term;
     }
 
-    public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException{        
+    public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareException{
         
         Session session = getCurrentSession();
         Transaction trans = null;
@@ -477,7 +488,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return updatedTerm;
     }
 
-	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
+	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareException{
         Term term = findTermByName(name, cvId);
 
 		// If term is not existing, add
@@ -490,7 +501,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return term;
 	}
 	
-	private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareQueryException, MiddlewareException{
+	private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareException{
         Term typeTerm = getTermById(typeId);
         if (typeTerm != null) {
             CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
@@ -514,7 +525,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		property.setTerm(getTermBuilder().getTermOfProperty(termId, CvId.PROPERTIES.getId()));
 		if(property.getTerm()!=null) {
 			property.setIsA(getTermBuilder().getTermOfClassOfProperty(termId, CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
-			property.setCropOntologyId(getStandardVariableBuilder().getCropOntologyId(property.getTerm()));
+			property.setCropOntologyId(
+                    getStandardVariableBuilder().getCropOntologyId(property.getTerm()));
 		}
 		return property;
 	}
@@ -525,8 +537,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		
 		property.setTerm(findTermByName(name, CvId.PROPERTIES));
 		if(property.getTerm()!=null) {
-			property.setIsA(getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(), 
-			        CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
+			property.setIsA(getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(),
+                    CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
 		}
 		
 		return property;
@@ -598,7 +610,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
         
         // For property, scale, method
-        List<Integer> standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
+        List<Integer> standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId,
+                propertyId, methodId, scaleId);
         for (Integer id : standardVariableIds) {
             standardVariables.add(getStandardVariable(id));
         }
@@ -615,7 +628,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             propertyIds.add(property.getId());
         }
         
-        Map<Integer, List<StandardVariableReference>> propertyVars = getCvTermDao().getStandardVariablesOfProperties(propertyIds);
+        Map<Integer, List<StandardVariableReference>> propertyVars = getCvTermDao().getStandardVariablesOfProperties(
+                propertyIds);
         
         for (Integer propId : propertyIds){
             List<StandardVariableReference> stdVarRefs = propertyVars.get(propId);
@@ -637,7 +651,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
     @Override
     public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) 
-            throws MiddlewareQueryException, MiddlewareException {
+            throws MiddlewareException {
 
         standardVariable.setProperty(getTermBuilder().findOrSaveTermByName(standardVariable.getProperty().getName(), CvId.PROPERTIES));
         standardVariable.setScale(getTermBuilder().findOrSaveTermByName(standardVariable.getScale().getName(), CvId.SCALES));
@@ -671,7 +685,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
-            throws MiddlewareException, MiddlewareQueryException{
+            throws MiddlewareException {
         
     	Session session = getCurrentSession();
         Transaction trans = null;
@@ -709,7 +723,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) 
-            throws MiddlewareQueryException, MiddlewareException{
+            throws MiddlewareException{
         
         if (variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
             throw new MiddlewareException(
@@ -735,7 +749,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration)  
-            throws MiddlewareQueryException, MiddlewareException{
+            throws MiddlewareException{
 
         if (enumeration.getId() == null && 
                 variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
@@ -828,15 +842,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         try {
             if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
-                if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
-                    if (getCvTermDao().getById(getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv().equals(CvId.PROPERTIES.getId())) {
-                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(), DELETE_TERM_ERROR_MESSAGE);
-                    } else {
-                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(), DELETE_TERM_ERROR_MESSAGE);
-                    }
-                } else {
-                    throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), DELETE_TERM_ERROR_MESSAGE);
-                }
+                validateTermRelationshipsForDeletion(cvTermId);
             }
             
             if (CvId.VARIABLES.getId() != cvId.getId()) {
@@ -855,8 +861,30 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException(e.getMessage(), e);
         }
     }
+
+    private void validateTermRelationshipsForDeletion(int cvTermId) throws MiddlewareQueryException {
+
+        if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId()
+                .equals(TermId.IS_A.getId())) {
+            if (getCvTermDao().getById(
+                    getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId)
+                            .getSubjectId()).getCv().equals(CvId.PROPERTIES.getId())) {
+                throw new MiddlewareQueryException(
+                        ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(),
+                        DELETE_TERM_ERROR_MESSAGE);
+            } else {
+                throw new MiddlewareQueryException(
+                        ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(),
+                        DELETE_TERM_ERROR_MESSAGE);
+            }
+        } else {
+            throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(),
+                    DELETE_TERM_ERROR_MESSAGE);
+        }
+
+    }
     
-    private void deleteCvTermRelationship(int subjectId, int typeId) throws MiddlewareQueryException, MiddlewareException {
+    private void deleteCvTermRelationship(int subjectId, int typeId) throws MiddlewareException {
         Term typeTerm = getTermById(typeId);
         if (typeTerm != null) {
             CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);

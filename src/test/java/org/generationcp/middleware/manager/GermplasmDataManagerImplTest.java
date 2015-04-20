@@ -1013,7 +1013,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 	
 	@Test
 	public void testGetGermplasmByLocalGID() throws Exception {
-		Integer lgid = -1;
+		Integer lgid = 0;
 		
 		Germplasm germplasm = manager.getGermplasmByLocalGid(lgid);
 		

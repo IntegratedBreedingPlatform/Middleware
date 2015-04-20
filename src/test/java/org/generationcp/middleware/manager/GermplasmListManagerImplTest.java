@@ -78,7 +78,7 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
     @Test
     public void testGetGermplasmListByName() throws Exception {
         String name = "2002%";     
-        List<GermplasmList> lists = manager.getGermplasmListByName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
+        List<GermplasmList> lists = manager.getGermplasmListByName(name, 0, 5, Operation.LIKE);
         Debug.println(INDENT, "testGetGermplasmListByName(" + name + "): ");
         Debug.printObjects(INDENT, lists);
         // Verify using: select * from listnms where liststatus <> 9 and listname like '2002%';
@@ -394,13 +394,13 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
         Debug.println(INDENT, "Test Case #1: test deleteGermplasmListByListId");
         GermplasmList germplasmList = manager.getGermplasmListByName("Test List #1", 0, 1, 
-                Operation.EQUAL, Database.LOCAL).get(0);
+                Operation.EQUAL).get(0);
         germplasmLists.add(germplasmList);
         listDataList.addAll(germplasmList.getListData());
         Debug.println(INDENT, "\tremoved " + manager.deleteGermplasmListByListId(germplasmList.getId()) + " record(s)");
 
         Debug.println(INDENT, "Test Case #2: test deleteGermplasmList(data)");
-        germplasmList = manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+        germplasmList = manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL).get(0);
         germplasmLists.add(germplasmList);
         listDataList.addAll(germplasmList.getListData());
         Debug.println(INDENT, "\tremoved " + manager.deleteGermplasmList(germplasmList) + " record(s)");
@@ -411,7 +411,7 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
         toBeDeleted.add(germplasmList);
         listDataList.addAll(germplasmList.getListData());
         */
-        germplasmList = manager.getGermplasmListByName("Test List #3", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+        germplasmList = manager.getGermplasmListByName("Test List #3", 0, 1, Operation.EQUAL).get(0);
         toBeDeleted.add(germplasmList);
         listDataList.addAll(germplasmList.getListData());
         germplasmLists.addAll(toBeDeleted);
