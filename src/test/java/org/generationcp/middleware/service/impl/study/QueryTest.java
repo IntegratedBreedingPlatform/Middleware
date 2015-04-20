@@ -137,18 +137,17 @@ public class QueryTest {
 				"            ON PH_cm.nd_experiment_id = nde.nd_experiment_id \n" + 
 				"    WHERE\n" + 
 				"p.project_id= (\n" + 
-				"Select\n" + 
-				"p.project_id\n" + 
-				"from\n" + 
-				"project_relationshippr\n" + 
-				"INNER JOIN\n" + 
+				"	Select\n" + 
+				"		p.project_id\n" + 
+				"	from\n" + 
+				"			project_relationshippr\n" + 
+				"	INNER JOIN\n" + 
 				"projectp\n" + 
-				"onp.project_id=pr.subject_project_id\n" + 
+				"on p.project_id=pr.subject_project_id\n" + 
 				"where\n" + 
-				"pr.object_project_id=?\n" + 
-				"andnameLIKE'%PLOTDATA'\n" + 
-				")" +
-				"        p.project_id = ? \n" + 
+				"pr.object_project_id = ?\n" + 
+				"and name LIKE '%PLOTDATA'\n" + 
+				")" + 
 				"    ORDER BY\n" + 
 				"        nde.nd_experiment_id;";
 	}

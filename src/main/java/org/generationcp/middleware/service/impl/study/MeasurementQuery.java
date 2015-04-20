@@ -10,7 +10,7 @@ public class MeasurementQuery {
      * @param projectUUID
      *            the project for which we should generate a query.
      */
-    public String generateQuery(final Integer project_id, final List<String> traitNames) {
+    public String generateQuery(final List<String> traitNames) {
         return "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n"
                 + "    (SELECT \n" + "            iispcvt.definition\n" + "        FROM\n"
                 + "            stockprop isp\n" + "                INNER JOIN\n"

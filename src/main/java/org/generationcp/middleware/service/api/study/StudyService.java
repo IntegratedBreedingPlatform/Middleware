@@ -9,5 +9,5 @@ public interface StudyService {
 
 	List<StudySummary> listAllStudies() throws MiddlewareQueryException;
 
-	List<Measurement> listTrialData(final String projectBusinessIdentifier);
+	List<Measurement> listTrialData(final int projectBusinessIdentifier);
 }
