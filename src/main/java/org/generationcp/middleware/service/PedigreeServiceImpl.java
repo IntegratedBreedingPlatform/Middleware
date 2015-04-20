@@ -629,9 +629,9 @@ public class PedigreeServiceImpl extends Service implements PedigreeService {
 			int Resp1, int Resp2, int ntype, CimmytWheatNameUtil cimmytWheatNameUtil)
 			throws Exception {
 
-		System.out.println("Armando pedigree con [p_gid] " + p_gid + " [nivel] " + nivel
-				+ " [fback] " + fback + " [mback] " + mback + " [Resp1] " + Resp1 + " [Resp2] "
-				+ Resp2);
+		//System.out.println("Armando pedigree con [p_gid] " + p_gid + " [nivel] " + nivel
+		//		+ " [fback] " + fback + " [mback] " + mback + " [Resp1] " + Resp1 + " [Resp2] "
+		//		+ Resp2);
 		int xCurrent = 0;
 		int xMax = 0;
 		String arma_pedigree = "";
