@@ -163,6 +163,7 @@ public enum TermId {
 	, CROSS (8377)
 	, DESIG (8250)
 	, CHECK (8255)
+	, STOCKID (60027)
 	
 	//Location 
     , TRIAL_LOCATION(8180)
