@@ -48,6 +48,19 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         return new ArrayList<Transaction>();
     }
 
+    public List<String> getInventoryIDsWithBreederIdentifier(String identifier)
+            throws MiddlewareQueryException {
+        try {
+            String queryString = Transaction.GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY.replace(":identifier", identifier);
+            Query query = getSession().createSQLQuery(queryString);
+            return (List<String>) query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with get query from Transaction: " + e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
+
     public long countAllReserve() throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Transaction.class);

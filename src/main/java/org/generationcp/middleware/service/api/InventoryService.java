@@ -80,5 +80,8 @@ public interface InventoryService {
 	LotsResult addLotsForList(List<Integer> gids, Integer locationId, Integer scaleId,
 			String comment, Integer userId,
 			Double amount, Integer sourceId) throws MiddlewareQueryException;
+
+	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier) throws
+				MiddlewareQueryException;
 	
 }
