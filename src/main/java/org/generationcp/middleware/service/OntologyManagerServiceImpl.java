@@ -41,6 +41,11 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     }
 
     @Override
+    public List<Term> getTermByCvId(int cvId) throws MiddlewareException {
+        return getOntologyBasicDataManager().getTermByCvId(cvId);
+    }
+
+    @Override
     public boolean isTermReferred(int termId) throws MiddlewareException {
         return getOntologyBasicDataManager().isTermReferred(termId);
     }
