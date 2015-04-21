@@ -52,6 +52,14 @@ public interface OntologyManagerService {
     Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareException;
 
     /**
+     * Get terms by given cv_id
+     * @param cvId cv id
+     * @return list of terms
+     * @throws MiddlewareException
+     */
+    List<Term> getTermByCvId(int cvId) throws MiddlewareException;
+
+    /**
      * @param termId TermId
      * @return true is term is referred
      * @throws MiddlewareException

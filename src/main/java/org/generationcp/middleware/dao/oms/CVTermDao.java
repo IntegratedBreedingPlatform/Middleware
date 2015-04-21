@@ -185,6 +185,47 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return term;
 	}
 
+	public List<Term> getTermByCvId(int cvId) throws MiddlewareQueryException {
+
+		List<Term> terms = new ArrayList<>();
+
+		try {
+
+			StringBuilder sqlString = new StringBuilder()
+					.append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					.append("FROM cvterm cvt ")
+					.append("WHERE cvt.cv_id = :cvId");
+
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+			query.setParameter("cvId", cvId);
+
+			List<Object[]> results = query.list();
+
+			if (! results.isEmpty()) {
+
+				for (Object[] row : results) {
+
+					Integer cvtermId = (Integer) row[0];
+					Integer cvtermCvId = (Integer) row[1];
+					String cvtermName = (String) row[2];
+					String cvtermDefinition = (String) row[3];
+
+					Term term = new Term();
+					term.setId(cvtermId);
+					term.setName(cvtermName);
+					term.setDefinition(cvtermDefinition);
+					term.setVocabularyId(cvtermCvId);
+					terms.add(term);
+				}
+			}
+
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getTermByCvId=" + cvId + " query on CVTermDao: " + e.getMessage(), e);
+		}
+
+		return terms;
+	}
+
 	public List<CVTerm> getByIds(List<Integer> ids) throws MiddlewareQueryException {
 		List<CVTerm> terms = new ArrayList<>();
 

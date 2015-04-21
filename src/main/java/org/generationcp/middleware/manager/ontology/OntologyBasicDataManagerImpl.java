@@ -38,6 +38,11 @@ public class OntologyBasicDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
+    public List<Term> getTermByCvId(int cvId) throws MiddlewareException {
+        return getCvTermDao().getTermByCvId(cvId);
+    }
+
+    @Override
     public boolean isTermReferred(int termId) throws MiddlewareException {
         return getCvTermRelationshipDao().isTermReferred(termId);
     }

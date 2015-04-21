@@ -43,6 +43,11 @@ public interface OntologyBasicDataManager {
     Term getTermByNameAndCvId(String name, int cvId) throws MiddlewareException;
 
     /**
+     * Returns term by cvId
+     */
+    List<Term> getTermByCvId(int cvId) throws MiddlewareException;
+
+    /**
      * Checks if term has referred to other term.
      */
     boolean isTermReferred(int termId) throws MiddlewareException;
