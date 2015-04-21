@@ -43,7 +43,7 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 					crossExpansionProperties.getDefaultLevel(), false);
 			return cross.toString();
 		} else {
-			return null;
+			return "";
 		}
 	}
 

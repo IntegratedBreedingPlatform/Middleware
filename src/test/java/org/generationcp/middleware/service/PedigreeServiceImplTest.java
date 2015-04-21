@@ -23,8 +23,11 @@ import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.junit.Before;
 import org.junit.Test;
+
 /**
- * Please note that this test requires a wheat database with a gid dump to actually run. 
+ * Please note that this test requires a wheat database with a gid dump to
+ * actually run.
+ * 
  * @author Akhil
  *
  */
@@ -37,7 +40,8 @@ public class PedigreeServiceImplTest extends DataManagerIntegrationTest {
 
 	@Before
 	public void setup() {
-		pedigreeCimmytWheatService = managerFactory.getPedigreeService(PedigreeFactory.PROFILE_CIMMYT, CropType.CropEnum.WHEAT.toString());
+		pedigreeCimmytWheatService = managerFactory.getPedigreeService(
+				PedigreeFactory.PROFILE_CIMMYT, CropType.CropEnum.WHEAT.toString());
 		crossExpansionProperties = new CrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
 		crossExpansionProperties.setWheatLevel(0);
@@ -80,8 +84,9 @@ public class PedigreeServiceImplTest extends DataManagerIntegrationTest {
 
 	private void testCSVFiles(final String folderName) throws IOException, FileNotFoundException,
 			UnsupportedEncodingException, MiddlewareQueryException {
-		
-		System.out.println("Please make sure that you have a wheat database with a historic dump of GID's");
+
+		System.out
+				.println("Please make sure that you have a wheat database with a historic dump of GID's");
 		final List<Results> failed = Collections.synchronizedList(new ArrayList<Results>());
 		final List<Results> passed = Collections.synchronizedList(new ArrayList<Results>());
 
@@ -91,43 +96,27 @@ public class PedigreeServiceImplTest extends DataManagerIntegrationTest {
 		final File failedFilePath = File.createTempFile(folderName + "Failed-"
 				+ timestampForTheFile + "-", ".csv");
 
-		System.out.println("Passed files will be recorded here" + passedFilePath.getAbsolutePath());
-		System.out.println("Falied files will be recorded here" + failedFilePath.getAbsolutePath());
+		System.out.println("Passed files will be recorded here:\n"
+				+ passedFilePath.getAbsolutePath());
+		System.out.println("Falied files will be recorded here:\n"
+				+ failedFilePath.getAbsolutePath());
 
 		final PrintWriter passWrite = new PrintWriter(passedFilePath, "UTF-8");
 		final PrintWriter failWriter = new PrintWriter(failedFilePath, "UTF-8");
 
 		final Map<String, String> testCases = pedigreeDataReader
 				.getAllTestDataFromFolder(folderName);
-		
-		final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 		for (final Entry<String, String> gidAndExpectedResultEntrySet : testCases.entrySet()) {
-			executor.execute(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						testOneEntry(failed, passed, passWrite, failWriter,
-								gidAndExpectedResultEntrySet);
-					} catch (MiddlewareQueryException e) {
-						throw new RuntimeException("Error executing test", e);
-
-					}
-
-				}
-			});
+			testOneEntry(failed, passed, passWrite, failWriter, gidAndExpectedResultEntrySet);
 		}
-		executor.shutdown();
-		// Wait until all threads are finish
-		while (!executor.isTerminated()) {
-		}
-		
-		final String assertMessage = String.format(
-				"Passed entries %s. Failed entries %s. There must be no failed entries. Please review %s for failed entries",
-				passed.size(), failed.size(), failedFilePath);
-		assertEquals(
-				assertMessage, 0, failed.size());
+
+		passWrite.close();
+		failWriter.close();
+		final String assertMessage = String
+				.format("Passed entries %s. Failed entries %s. There must be no failed entries. Please review %s for failed entries",
+						passed.size(), failed.size(), failedFilePath);
+		assertEquals(assertMessage, 0, failed.size());
 
 	}
 
@@ -141,7 +130,7 @@ public class PedigreeServiceImplTest extends DataManagerIntegrationTest {
 				Integer.parseInt(es.getKey()), crossExpansionProperties);
 		final Results comparisonResult = new Results(es.getKey(), es.getValue(),
 				calculatedPedigreeString);
-		if(calculatedPedigreeString == null) {
+		if (calculatedPedigreeString == null) {
 			System.out.println("pause");
 		}
 		if (calculatedPedigreeString.equals(es.getValue())) {

@@ -46,7 +46,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 				throw new MiddlewareQueryException(e.getMessage(), e);
 			}
         } else {
-            return null;
+            return "";
         }
     }      
     
