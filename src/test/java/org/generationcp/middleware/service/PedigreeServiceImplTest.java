@@ -1,8 +1,19 @@
 package org.generationcp.middleware.service;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -10,75 +21,175 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.generationcp.middleware.util.Debug;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-
+/**
+ * Please note that this test requires a wheat database with a gid dump to actually run. 
+ * @author Akhil
+ *
+ */
 public class PedigreeServiceImplTest extends DataManagerIntegrationTest {
-	
+
 	private PedigreeService pedigreeCimmytWheatService;
-	private PedigreeService pedigreeNonWheatService;
 	private CrossExpansionProperties crossExpansionProperties;
-	
+
+	private PedigreeDataReader pedigreeDataReader = new PedigreeDataReader();
+
 	@Before
-	public void setUp() {
+	public void setup() {
 		pedigreeCimmytWheatService = managerFactory.getPedigreeService(PedigreeFactory.PROFILE_CIMMYT, CropType.CropEnum.WHEAT.toString());
-		pedigreeNonWheatService = managerFactory.getPedigreeService(PedigreeFactory.PROFILE_DEFAULT, CropType.CropEnum.RICE.toString());
 		crossExpansionProperties = new CrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
 		crossExpansionProperties.setWheatLevel(0);
 	}
-	
-	/**
-	 * Temporary test harness to use for invoking the actual service and generate a pedigree strings with CIMMYT algorithm.
-	 */
-    @Test
-    public void getCrossExpansionCimmytWheat() throws Exception {
-    	
-    	String crossString1 = pedigreeCimmytWheatService.getCrossExpansion(342454, crossExpansionProperties);
-    	String crossString7 = pedigreeCimmytWheatService.getCrossExpansion(342454, crossExpansionProperties);
-    	String crossString17 = pedigreeCimmytWheatService.getCrossExpansion(342454, crossExpansionProperties);
-    	
-    	Debug.println(INDENT, "Cross string ntype = 1 [" +crossString1 + "]") ;
-    	Debug.println(INDENT, "Cross string ntype = 7 [" +crossString7 + "]") ;
-    	Debug.println(INDENT, "Cross string ntype = 17 [" +crossString17 + "]") ;
-    }
 
-    @Test
-    public void testCrossExpansionSwitchingLogicNonCimmyt() throws MiddlewareQueryException{
-    	Map<Integer, String> gidCrossMapping = new HashMap<Integer, String>();
-    	gidCrossMapping.put(new Integer(1935), "27217-A-4-8/BAART");
-    	gidCrossMapping.put(new Integer(14898), "THATCHER*6/RL 5406");
-    	gidCrossMapping.put(new Integer(5781802), "ND/VG9144//KAL/BB/3/YACO/VEERY #5");
-    	gidCrossMapping.put(new Integer(14790), "TC*4/AGENT");
-    	
-    	Iterator<Integer> gidKeys = gidCrossMapping.keySet().iterator();
-    	while(gidKeys.hasNext()){
-    		Integer gid = gidKeys.next();
-    		String crossString = pedigreeNonWheatService.getCrossExpansion(gid, crossExpansionProperties);
-    		String expected = gidCrossMapping.get(gid);
-    		Assert.assertEquals("Should have the same cross string using the current logic of non cimmyt wheat cross string generation", expected,  crossString);
-    	}
-    }
-    
-    @Test
-    public void testCrossExpansionSwitchingLogicCimmyt() throws MiddlewareQueryException{
-    	   
-    	Map<Integer, String> gidCrossMapping = new HashMap<Integer, String>();
-    	gidCrossMapping.put(new Integer(1935), "27217-A-4-8/BRT");
-    	gidCrossMapping.put(new Integer(14898), "RL6043");
-    	gidCrossMapping.put(new Integer(5781802), "CM85836-4Y-0M-0Y-8M-0Y-0IND");
-    	gidCrossMapping.put(new Integer(14790), "TC*4/AG");
-    	
-    	Iterator<Integer> gidKeys = gidCrossMapping.keySet().iterator();
-    	while(gidKeys.hasNext()){
-    		Integer gid = gidKeys.next();
-    		String crossString = pedigreeCimmytWheatService.getCrossExpansion(gid, crossExpansionProperties);
-    		String expected = gidCrossMapping.get(gid);
-    		Assert.assertEquals("Should have the same cross string using the current logic of cimmyt wheat cross string generation", expected,  crossString);
-    	}
-    }
+	@Test
+	public void wheatPedigreeMaleBackCross() throws Exception {
+
+		testCSVFiles("F1-F5MaleBackCross");
+
+	}
+
+	@Test
+	public void wheatPedigreeDoubleCross() throws Exception {
+
+		testCSVFiles("F1-F6DoubleCross");
+
+	}
+
+	@Test
+	public void wheatPedigreeFemaleBackCross() throws Exception {
+
+		testCSVFiles("F1-F6FemaleBackCross");
+
+	}
+
+	@Test
+	public void wheatPedigreeSingleCross() throws Exception {
+
+		testCSVFiles("F1-F6SingleCross");
+
+	}
+
+	@Test
+	public void wheatPedigreeTopCross() throws Exception {
+
+		testCSVFiles("F1-F6TopCross");
+
+	}
+
+	private void testCSVFiles(final String folderName) throws IOException, FileNotFoundException,
+			UnsupportedEncodingException, MiddlewareQueryException {
+		
+		System.out.println("Please make sure that you have a wheat database with a historic dump of GID's");
+		final List<Results> failed = Collections.synchronizedList(new ArrayList<Results>());
+		final List<Results> passed = Collections.synchronizedList(new ArrayList<Results>());
+
+		final long timestampForTheFile = System.currentTimeMillis();
+		final File passedFilePath = File.createTempFile(folderName + "Passed-"
+				+ timestampForTheFile + "-", ".csv");
+		final File failedFilePath = File.createTempFile(folderName + "Failed-"
+				+ timestampForTheFile + "-", ".csv");
+
+		System.out.println("Passed files will be recorded here" + passedFilePath.getAbsolutePath());
+		System.out.println("Falied files will be recorded here" + failedFilePath.getAbsolutePath());
+
+		final PrintWriter passWrite = new PrintWriter(passedFilePath, "UTF-8");
+		final PrintWriter failWriter = new PrintWriter(failedFilePath, "UTF-8");
+
+		final Map<String, String> testCases = pedigreeDataReader
+				.getAllTestDataFromFolder(folderName);
+		
+		final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+		for (final Entry<String, String> gidAndExpectedResultEntrySet : testCases.entrySet()) {
+			executor.execute(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						testOneEntry(failed, passed, passWrite, failWriter,
+								gidAndExpectedResultEntrySet);
+					} catch (MiddlewareQueryException e) {
+						throw new RuntimeException("Error executing test", e);
+
+					}
+
+				}
+			});
+		}
+		executor.shutdown();
+		// Wait until all threads are finish
+		while (!executor.isTerminated()) {
+		}
+		
+		final String assertMessage = String.format(
+				"Passed entries %s. Failed entries %s. There must be no failed entries. Please review %s for failed entries",
+				passed.size(), failed.size(), failedFilePath);
+		assertEquals(
+				assertMessage, 0, failed.size());
+
+	}
+
+	/**
+	 * Test one entry to see if it works.
+	 */
+	private void testOneEntry(final List<Results> failed, final List<Results> passed,
+			final PrintWriter passWrite, final PrintWriter failWriter, Entry<String, String> es)
+			throws MiddlewareQueryException {
+		final String calculatedPedigreeString = pedigreeCimmytWheatService.getCrossExpansion(
+				Integer.parseInt(es.getKey()), crossExpansionProperties);
+		final Results comparisonResult = new Results(es.getKey(), es.getValue(),
+				calculatedPedigreeString);
+		if(calculatedPedigreeString == null) {
+			System.out.println("pause");
+		}
+		if (calculatedPedigreeString.equals(es.getValue())) {
+			addToListAndFile(passed, passWrite, comparisonResult);
+		} else {
+			addToListAndFile(failed, failWriter, comparisonResult);
+		}
+
+	}
+
+	private void addToListAndFile(final List<Results> listToModify, final PrintWriter writer,
+			final Results comparisonResult) {
+		listToModify.add(comparisonResult);
+		writer.println("\"" + comparisonResult.getGid() + "\"" + "," + "\""
+				+ comparisonResult.getExpectedPedigree() + "\"" + "," + "\""
+				+ comparisonResult.getActualPedigree() + "\"");
+	}
+
+	/**
+	 * Class to hold the results of the wheat pedigree comparison.
+	 * 
+	 * 
+	 *
+	 */
+	private class Results {
+		private String gid;
+		private String expectedPedigree;
+		private String actualPedigree;
+
+		public Results(String gid, String expectedPedigree, String actualPedigree) {
+			super();
+			this.gid = gid;
+			this.expectedPedigree = expectedPedigree;
+			this.actualPedigree = actualPedigree;
+		}
+
+		public String getGid() {
+			return gid;
+		}
+
+		public String getExpectedPedigree() {
+			return expectedPedigree;
+		}
+
+		public String getActualPedigree() {
+			return actualPedigree;
+		}
+
+	}
 
 }
