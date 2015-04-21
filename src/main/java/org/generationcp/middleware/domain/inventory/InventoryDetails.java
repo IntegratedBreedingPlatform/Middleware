@@ -73,6 +73,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	
 	String source; // listdata.source
 
+	String inventoryID;
+
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -615,4 +617,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
         return 0;
 	}
 
+	public String getInventoryID() {
+		return inventoryID;
+	}
+
+	public void setInventoryID(String inventoryID) {
+		this.inventoryID = inventoryID;
+	}
 }
