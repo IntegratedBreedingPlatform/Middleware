@@ -106,7 +106,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             SQLQuery query = getActiveSession().createSQLQuery(
                     "select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete" +
                             ", tp.value cropOntologyId" +
-                            ", GROUP_CONCAT(cs.name SEPARATOR ' + ') AS classes" +
+                            ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes" +
                             "  from cvterm p" +
                             " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() +
                             " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete " +
