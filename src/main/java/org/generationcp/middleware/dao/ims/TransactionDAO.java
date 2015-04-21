@@ -252,7 +252,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         try {
         	Session session = getSession();
         	
-        	StringBuffer sql = new StringBuffer()
+        	StringBuilder sql = new StringBuilder()
         		.append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
         		.append("tran.sourceid, tran.trnqty, lot.comments ")
         		.append("FROM ims_lot lot ")
@@ -264,7 +264,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         	
 			List<Object[]> results = query.list();
 
-	        if (results.size() > 0){
+	        if (!results.isEmpty()){
 	        	for (Object[] row: results){
 		        	Integer lotId = (Integer) row[0];
 		        	Integer userId = (Integer) row[1];

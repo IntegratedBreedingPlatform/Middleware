@@ -22,41 +22,45 @@ public class StudyDestroyer extends Destroyer {
 		renameStudyAndDatasets(study);
 
 		if (study.getProperties() != null && !study.getProperties().isEmpty()) {
-			int maxRank = 0;
-			boolean found = false;
-			for (ProjectProperty property : study.getProperties()) {
-				if (property.getTypeId().equals(TermId.STUDY_STATUS.getId())) {
-					found = true;
-					if (property.getValue() == null || !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
-						property.setValue(String.valueOf(TermId.DELETED_STUDY.getId()));
-						getProjectPropertyDao().saveOrUpdate(property);
-					}
-					break;
-				}
-				if (property.getRank() != null && property.getRank() > maxRank) {
-					maxRank = property.getRank();
-				}
-			}
-			if (!found) {
-				//create a study status using the maxRank
-				VariableTypeList typeList = new VariableTypeList();
-				StandardVariable statusDeletedTerm = new StandardVariable();
-				statusDeletedTerm.setId(TermId.STUDY_STATUS.getId());
-				statusDeletedTerm.setStoredIn(new Term(TermId.STUDY_INFO_STORAGE.getId(), null, null));
-				VariableType type = new VariableType(TermId.STUDY_STATUS.name(), TermId.STUDY_STATUS.name(), statusDeletedTerm, maxRank + 1);
-				typeList.add(type);
-				VariableList varList = new VariableList();
-				Variable var = new Variable(type, TermId.DELETED_STUDY.getId());
-				varList.add(var);
-				
-				getProjectPropertySaver().saveProjectProperties(study, typeList);
-				getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
-			}
+			updateStudyStatusToDeleted(study);
 		}
 		
 		deleteRelationshipsIfNotAStudy(study);
 	}
 	
+	private void updateStudyStatusToDeleted(DmsProject study) throws MiddlewareQueryException {
+		int maxRank = 0;
+		boolean found = false;
+		for (ProjectProperty property : study.getProperties()) {
+			if (property.getTypeId().equals(TermId.STUDY_STATUS.getId())) {
+				found = true;
+				if (property.getValue() == null || !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
+					property.setValue(String.valueOf(TermId.DELETED_STUDY.getId()));
+					getProjectPropertyDao().saveOrUpdate(property);
+				}
+				break;
+			}
+			if (property.getRank() != null && property.getRank() > maxRank) {
+				maxRank = property.getRank();
+			}
+		}
+		if (!found) {
+			//create a study status using the maxRank
+			VariableTypeList typeList = new VariableTypeList();
+			StandardVariable statusDeletedTerm = new StandardVariable();
+			statusDeletedTerm.setId(TermId.STUDY_STATUS.getId());
+			statusDeletedTerm.setStoredIn(new Term(TermId.STUDY_INFO_STORAGE.getId(), null, null));
+			VariableType type = new VariableType(TermId.STUDY_STATUS.name(), TermId.STUDY_STATUS.name(), statusDeletedTerm, maxRank + 1);
+			typeList.add(type);
+			VariableList varList = new VariableList();
+			Variable var = new Variable(type, TermId.DELETED_STUDY.getId());
+			varList.add(var);
+			
+			getProjectPropertySaver().saveProjectProperties(study, typeList);
+			getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
+		}
+	}
+
 	protected void deleteRelationshipsIfNotAStudy(DmsProject study) throws MiddlewareQueryException {
 		boolean isAStudy = getProjectRelationshipDao().isSubjectTypeExisting(
 				study.getProjectId(), TermId.IS_STUDY.getId());

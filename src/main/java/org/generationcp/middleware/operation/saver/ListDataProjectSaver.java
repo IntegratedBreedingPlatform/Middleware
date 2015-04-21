@@ -18,7 +18,7 @@ public class ListDataProjectSaver extends Saver {
 			GermplasmListType type, Integer originalListId,
 			List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
 
-		boolean isAdvanced = (type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES); 
+		boolean isAdvanced = type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES; 
 		GermplasmList snapList = isAdvanced ? null : getGermplasmList(projectId, type);
 		boolean isCreate = snapList == null;
 		
@@ -28,14 +28,14 @@ public class ListDataProjectSaver extends Saver {
 		
 		if (originalListId != null) {
 			updateGermplasmListInfo(snapList, originalListId, userId);
-		}
-		else {
+		} else {
 			setDefaultGermplasmListInfo(snapList,userId);			
 		}
 		
 		getGermplasmListDAO().saveOrUpdate(snapList);
 		
-		if (!isCreate && !isAdvanced) {  //delete old list data projects
+		if (!isCreate && !isAdvanced) {  
+			//delete old list data projects
 			getListDataProjectDAO().deleteByListId(snapList.getId());
 		}
 		
@@ -78,8 +78,7 @@ public class ListDataProjectSaver extends Saver {
 			germplasmList.setUserId(origList.getUserId());
 			germplasmList.setDescription(origList.getDescription());
 			germplasmList.setListRef(originalListId);
-		}
-		else {
+		} else {
 			setDefaultGermplasmListInfo(germplasmList,userId);
 		}
 	}
@@ -94,7 +93,7 @@ public class ListDataProjectSaver extends Saver {
 
 	private void setDefaultGermplasmListInfo(GermplasmList snapList, int userId) {
 		snapList.setListLocation(null);
-		snapList.setUserId(userId); //database default
+		snapList.setUserId(userId);
 		snapList.setNotes(null);
 		snapList.setsDate(null);
 		snapList.seteDate(null);

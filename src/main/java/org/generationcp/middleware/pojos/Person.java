@@ -75,24 +75,6 @@ public class Person implements  Comparable<Person>, Serializable{
 
     public Person() {
     }
-
-    public Person(Integer id, String firstName, String lastName, String middleName, Integer instituteId, String title, String positionName,
-            Integer language, String phone, String extension, String fax, String email, String notes) {
-        super();
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.middleName = middleName;
-        this.instituteId = instituteId;
-        this.title = title;
-        this.positionName = positionName;
-        this.language = language;
-        this.phone = phone;
-        this.extension = extension;
-        this.fax = fax;
-        this.email = email;
-        this.notes = notes;
-    }
     
     public Person(String firstName, String middleName, String lastName){
     	this.firstName = firstName;
@@ -179,12 +161,11 @@ public class Person implements  Comparable<Person>, Serializable{
     }
     
     public String getDisplayName() {
-        String displayName = StringUtil.joinIgnoreEmpty(" "
-            ,firstName == null || Util.isOneOf(firstName, "-", "'-'") ? "" : firstName
-            ,middleName == null || Util.isOneOf(middleName, "-", "'-'") ? "" : middleName
-            ,lastName == null || Util.isOneOf(lastName, "-", "'-'") ? "" : lastName
-                        );
-        return displayName;
+    	String displayFirstName = firstName == null || Util.isOneOf(firstName, "-", "'-'") ? "" : firstName;
+    	String displayMiddleName = middleName == null || Util.isOneOf(middleName, "-", "'-'") ? "" : middleName;
+    	String displayLastName = lastName == null || Util.isOneOf(lastName, "-", "'-'") ? "" : lastName;
+    	return StringUtil.joinIgnoreEmpty(" ",
+        		displayFirstName,displayMiddleName,displayLastName);
     }
 
     public Integer getInstituteId() {

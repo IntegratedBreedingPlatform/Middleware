@@ -49,7 +49,6 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -578,7 +577,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override
     public GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException{
         List<GermplasmList> germplasmLists = getGermplasmListManager()
-                .getGermplasmListByName(name, 0, 1, Operation.EQUAL, Database.LOCAL);
+                .getGermplasmListByName(name, 0, 1, Operation.EQUAL);
         if (!germplasmLists.isEmpty()){
             return germplasmLists.get(0);
         } 
@@ -663,10 +662,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	List<CVTerm> variables = new ArrayList<CVTerm>();
     	Set<Integer> variableIds = new HashSet<Integer>();
     	
-    	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
+    	addAllVariableIdsInMode(variableIds, storedInIds);
     	if (propertyIds != null && !propertyIds.isEmpty()) {
     	        Set<Integer> propertyVariableList = new HashSet<Integer>(); 
-    	        createPropertyList(propertyVariableList, propertyIds, Database.LOCAL);
+    	        createPropertyList(propertyVariableList, propertyIds);
     	        filterByProperty(variableIds, propertyVariableList, isRemoveProperties);
     	}
     	
@@ -681,7 +680,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
 
     private void addAllVariableIdsInMode(Set<Integer> variableIds
-            , List<Integer> storedInIds, Database database) throws MiddlewareQueryException {
+            , List<Integer> storedInIds) throws MiddlewareQueryException {
     	for (Integer storedInId : storedInIds) {
     		variableIds.addAll(getCvTermRelationshipDao()
     		        .getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
@@ -689,7 +688,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     private void createPropertyList(Set<Integer> propertyVariableList
-            , List<Integer> propertyIds, Database database) throws MiddlewareQueryException{
+            , List<Integer> propertyIds) throws MiddlewareQueryException{
         for (Integer propertyId : propertyIds) {
             propertyVariableList.addAll(getCvTermRelationshipDao()
                         .getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));

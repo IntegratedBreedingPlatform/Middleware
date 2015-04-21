@@ -28,8 +28,6 @@ import java.util.List;
  * A convenience class for POI library.
  *
  * @author Glenn Marintes
- *         <p/>
- *         TODO : determine if it's possible to remove duplicate copy of class in IBPCommons
  */
 public class PoiUtil {
 
@@ -37,6 +35,10 @@ public class PoiUtil {
 
     public static final SimpleDateFormat EXCEL_DATE_FORMATTER = 
     		Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+    
+    private PoiUtil() {
+    	//make the constructor private to hide the implicit public one
+    }
 
     // WorkBook convenience methods
     public static void setRepeatingRows(Workbook workBook, int sheetIndex, int fromRow, int toRow) {
@@ -70,6 +72,7 @@ public class PoiUtil {
         try {
             return cell == null ? null : cell.getStringCellValue().trim();
         } catch (Exception e) {
+        	LOG.error(e.getMessage(),e);
             return String.format("%s", getCellValue(cell));
         }
     }
@@ -78,40 +81,15 @@ public class PoiUtil {
         if (cell == null) {
             return null;
         }
-
-
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_BOOLEAN:
                 return cell.getBooleanCellValue();
             case Cell.CELL_TYPE_STRING:
                 return cell.getStringCellValue();
             case Cell.CELL_TYPE_NUMERIC:
-
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    Date date = cell.getDateCellValue();
-                    return EXCEL_DATE_FORMATTER.format(date);
-                }
-
-                double doubleVal = cell.getNumericCellValue();
-                if ((doubleVal % 1) == 0) {
-                    return (int) doubleVal;
-                } else {
-                    return doubleVal;
-                }
+            	return getNumericValue(cell);
             case Cell.CELL_TYPE_FORMULA:
-
-                switch (cell.getCachedFormulaResultType()) {
-
-                    case Cell.CELL_TYPE_NUMERIC:
-                        return cell.getNumericCellValue();
-                    case Cell.CELL_TYPE_STRING:
-                        return cell.getRichStringCellValue();
-                    default:
-                        return cell.getCellFormula();
-
-                }
-
-
+            	return getFormulaValue(cell);
             default:
                 return null;
         }
@@ -119,7 +97,32 @@ public class PoiUtil {
 
     // setCellValue with cell name as parameter
 
-    public static void setCellValue(Sheet sheet, String cellName, String value) {
+    private static Object getFormulaValue(Cell cell) {
+    	switch (cell.getCachedFormulaResultType()) {
+	        case Cell.CELL_TYPE_NUMERIC:
+	            return cell.getNumericCellValue();
+	        case Cell.CELL_TYPE_STRING:
+	            return cell.getRichStringCellValue();
+	        default:
+	            return cell.getCellFormula();
+	    }
+	}
+
+	private static Object getNumericValue(Cell cell) {
+		if (DateUtil.isCellDateFormatted(cell)) {
+            Date date = cell.getDateCellValue();
+            return EXCEL_DATE_FORMATTER.format(date);
+        }
+
+        double doubleVal = cell.getNumericCellValue();
+        if ((doubleVal % 1) == 0) {
+            return (int) doubleVal;
+        } else {
+            return doubleVal;
+        }
+	}
+
+	public static void setCellValue(Sheet sheet, String cellName, String value) {
         Point cellIndex = getCellIndex(cellName);
         setCellValue(sheet, cellIndex.y, cellIndex.x, value);
     }
@@ -423,9 +426,8 @@ public class PoiUtil {
         try {
             Row row = sheet.getRow(index);
             while (row != null) {
-                if (getCellValue(row.getCell(columnIndex)) == null || getCellValue(row.getCell(columnIndex)).toString().equalsIgnoreCase("")) {
-                    //do nothing
-                } else {
+                if (getCellValue(row.getCell(columnIndex)) != null && 
+                		!"".equalsIgnoreCase(getCellValue(row.getCell(columnIndex)).toString())) {
                     b = false;
                     return false;
                 }
@@ -449,11 +451,10 @@ public class PoiUtil {
         try {
             Row row = sheet.getRow(index);
             while (row != null) {
-                if (getCellValue(row.getCell(columnIndex)) == null || getCellValue(row.getCell(columnIndex)).toString().equalsIgnoreCase("")) {
+                if (getCellValue(row.getCell(columnIndex)) == null || 
+                		"".equalsIgnoreCase(getCellValue(row.getCell(columnIndex)).toString())) {
                     b = true;
                     return true;
-                } else {
-                    //do nothing
                 }
                 index++;
                 row = sheet.getRow(index);
@@ -467,7 +468,8 @@ public class PoiUtil {
     public static Boolean isEmpty(Sheet sheet, int rowIndex, int columnIndex) {
         Row row = sheet.getRow(rowIndex);
 
-        return row == null || getCellValue(row.getCell(columnIndex)) == null || getCellValue(row.getCell(columnIndex)).toString().equalsIgnoreCase("");
+        return row == null || getCellValue(row.getCell(columnIndex)) == null || 
+        		"".equalsIgnoreCase(getCellValue(row.getCell(columnIndex)).toString());
     }
 
     /**
@@ -524,12 +526,13 @@ public class PoiUtil {
             try {
                 c = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
             } catch (Exception e) {
+            	LOG.error(e.getMessage(),e);
                 c = null;
             }
             if (c != null) {
 
                 Object cellValue = getCellValue(c);
-                if (cellValue != null && !String.valueOf(cellValue).equals("")) {
+                if (cellValue != null && !"".equals(String.valueOf(cellValue))) {
                     return false;
 
                 }
@@ -558,13 +561,14 @@ public class PoiUtil {
                 try {
                     c = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
                 } catch (Exception e) {
+                	LOG.error(e.getMessage(),e);
                     c = null;
                 }
                 if (c == null) {
                     hasEmpty = true;
                 } else {
                     Object cellValue = getCellValue(c);
-                    if (cellValue == null || String.valueOf(cellValue).equals("")) {
+                    if (cellValue == null || "".equals(String.valueOf(cellValue))) {
                         hasEmpty = true;
                     }
                 }
@@ -628,12 +632,13 @@ public class PoiUtil {
                 try {
                     Cell cell = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
                     if (cell != null) {
-                        cell.setCellType(Cell.CELL_TYPE_STRING);    // assures that the row we'll be getting is a string
-
+                    	// assures that the row we'll be getting is a string
+                    	cell.setCellType(Cell.CELL_TYPE_STRING);
                         values.add(cell.getStringCellValue());
 
                     }
                 } catch (Exception e) {
+                	LOG.error(e.getMessage(),e);
                     values.add("");
                 }
 
@@ -730,7 +735,8 @@ public class PoiUtil {
         try {
             new PoiEventUserModel().areSheetRowsOverMaxLimit(fileName, sheetIndex, maxLimit);
         } catch (Exception e) {
-            //Exception means parser has exeeded the set max limit
+        	LOG.error(e.getMessage(),e);
+        	//Exception means parser has exeeded the set max limit
             return true;
         }
 
@@ -744,6 +750,7 @@ public class PoiUtil {
         try {
             new PoiEventUserModel().isAnySheetRowsOverMaxLimit(fileName, maxLimit);
         } catch (Exception e) {
+        	LOG.error(e.getMessage(),e);
             //Exception means parser has exeeded the set max limit
             return true;
         }

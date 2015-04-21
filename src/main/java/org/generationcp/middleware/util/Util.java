@@ -36,9 +36,13 @@ public class Util{
 
 	public static final String DATE_AS_NUMBER_FORMAT = "yyyyMMdd";
 	public static final String FRONTEND_DATE_FORMAT = "yyyy-MM-dd";
-	//FIXME: BMS should only use one front end date format
+	//NOTE: Future Improvement: BMS should only use one front end date format
 	public static final String FRONTEND_DATE_FORMAT_2 = "MM/dd/yyyy";
 	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+	
+	private Util() {
+		//make a private constructor to hide the implicit public one
+	}
     /**
      * Get the boolean value of <code>value</code>.
      * 
