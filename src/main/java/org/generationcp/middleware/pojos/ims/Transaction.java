@@ -35,6 +35,8 @@ public class Transaction implements Serializable{
     private static final long serialVersionUID = 77866453513905521L;
     public static final String GET_EMPTY_LOT = "getEmptyLot";
     public static final String GET_LOT_WITH_MINIMUM_AMOUNT = "getLotWithMinimumAmount";
+    public static final String GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY = "select inventory_id FROM ims_transaction WHERE inventory_id "
+            + "RLIKE '^:identifier[0-9][0-9]*.*'";
 
     @Id
     @Basic(optional = false)
@@ -83,6 +85,9 @@ public class Transaction implements Serializable{
 
     @Column(name = "personid")
     private Integer personId;
+
+    @Column(name = "inventory_id")
+    private String inventoryID;
 
     public Transaction() {
     }
@@ -265,5 +270,13 @@ public class Transaction implements Serializable{
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(id).toHashCode();
+    }
+
+    public String getInventoryID() {
+        return inventoryID;
+    }
+
+    public void setInventoryID(String inventoryID) {
+        this.inventoryID = inventoryID;
     }
 }
