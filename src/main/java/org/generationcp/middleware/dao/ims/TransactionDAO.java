@@ -435,4 +435,28 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 			logAndThrowException("Error at cancelUnconfirmedTransactionsForLists=" + listIds + " at TransactionDAO: " + e.getMessage(), e);
 		}
     }
+
+	public Map<Integer, String> retrieveStockIds(List<Integer> lrecIds) {
+		
+		Map<Integer, String> lrecIdStockIdMap = new HashMap<>();
+		
+		String sql = "SELECT a.lrecid,group_concat(inventory_id, ', ')  " +
+		"FROM listdata a  " +
+		"inner join ims_lot b ON a.gid = b.eid  " +
+		"INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid " +
+		"WHERE a.lrecid in (:lrecids) GROUP BY a.lrecid";
+		
+		Query query = getSession().createSQLQuery(sql)
+    			.setParameterList("lrecids", lrecIds);
+
+		List<Object[]> result = query.list();
+		for (Object[] row : result) {
+			Integer lrecid = (Integer) row[0];
+			String stockIds = (String) row[1];
+			
+			lrecIdStockIdMap.put(lrecid, stockIds);
+		}
+		return lrecIdStockIdMap;
+	
+	}
 }
