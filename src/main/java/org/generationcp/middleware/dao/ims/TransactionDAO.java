@@ -454,6 +454,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 			Integer lrecid = (Integer) row[0];
 			String stockIds = (String) row[1];
 			
+			if(stockIds.trim().endsWith(",")){
+				stockIds = stockIds.substring(0, stockIds.lastIndexOf(","));
+			}
+			
 			lrecIdStockIdMap.put(lrecid, stockIds);
 		}
 		return lrecIdStockIdMap;
