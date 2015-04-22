@@ -86,4 +86,50 @@ public class ListDataPropertySaver extends Saver {
 		return listDataCollection;
 	}
 
+	public List<ListDataProperty> saveListDataProperties(
+			List<ListDataProperty> listDataProps)
+			throws MiddlewareQueryException {
+
+        Session sessionForLocal = getCurrentSession();
+        sessionForLocal.flush();
+
+        // initialize session & transaction
+        Session session = sessionForLocal;
+        Transaction trans = null;
+
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            Integer recordsSaved = 0;
+        	for (ListDataProperty listDataProperty : listDataProps){
+    			
+    			if (listDataProperty.getListData() != null){
+    				
+    				Integer nextId = getListDataPropertyDAO().getNextId("listDataPropertyId");
+    				listDataProperty.setListDataPropertyId(nextId);
+    				listDataProperty = getListDataPropertyDAO().saveOrUpdate(listDataProperty);
+    				
+    				if (recordsSaved % JDBC_BATCH_SIZE == 0) {
+	                    // flush a batch of inserts and release memory
+	                	getListDataPropertyDAO().flush();
+	                	getListDataPropertyDAO().clear();
+	                }
+    				
+    			} else {
+    				throw new MiddlewareQueryException("List Data ID cannot be null.");
+    			}
+    		}
+            trans.commit();
+        } catch (MiddlewareQueryException e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage(), e);
+            
+        } finally {
+            sessionForLocal.flush();
+        }
+		
+		return listDataProps;
+	}
+
 }
