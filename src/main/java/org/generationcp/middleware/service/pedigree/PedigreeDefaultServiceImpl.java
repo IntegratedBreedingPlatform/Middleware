@@ -35,12 +35,18 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 	@Override
 	public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties)
 			throws MiddlewareQueryException {
+		return this.getCrossExpansion(gid, null, crossExpansionProperties);
+	}
+	
+	@Override
+	public String getCrossExpansion(Integer gid, Integer level,
+			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
 		Germplasm germplasm = getGermplasmDataManager().getGermplasmWithPrefName(gid);
 		if (germplasm != null) {
 			SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
 			startElement.setGermplasm(germplasm);
 			GermplasmCrossElement cross = expandGermplasmCross(startElement,
-					crossExpansionProperties.getDefaultLevel(), false);
+					level == null ? crossExpansionProperties.getDefaultLevel() : level, false);
 			return cross.toString();
 		} else {
 			return "";

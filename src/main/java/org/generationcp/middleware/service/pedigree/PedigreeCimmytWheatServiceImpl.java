@@ -36,11 +36,17 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
     }
 	
     @Override
-    public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
-        Germplasm germplasm =  getGermplasmDataManager().getGermplasmWithPrefName(gid);
-        if (germplasm != null) {
+    public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {        
+        return this.getCrossExpansion(gid, null, crossExpansionProperties);
+    }      
+    
+	@Override
+	public String getCrossExpansion(Integer gid, Integer level,
+			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
+		Germplasm germplasm =  getGermplasmDataManager().getGermplasmWithPrefName(gid);
+		if (germplasm != null) {
     		try {
-				return getCimmytWheatPedigree(gid, crossExpansionProperties.getWheatLevel(), new Germplasm(), 0, 0, 0, 0, 0);
+				return getCimmytWheatPedigree(gid, level == null ? crossExpansionProperties.getWheatLevel() : level, new Germplasm(), 0, 0, 0, 0, 0);
 			} catch (Exception e) {
 				LOG.error(e.getMessage(), e);
 				throw new MiddlewareQueryException(e.getMessage(), e);
@@ -48,8 +54,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
         } else {
             return "";
         }
-    }      
-    
+	}
 	private List<Name> getCimmytWheatWayNamesList(int gid,List<Integer> ntypeArray, List<Integer> nstatArray, List<Integer> nuiArray) throws MiddlewareQueryException{		
 		
 		List<Name> nameList  = getNameDao().getByGIDWithFilters(gid, null, null);

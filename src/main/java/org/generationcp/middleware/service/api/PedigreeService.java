@@ -17,4 +17,5 @@ public interface PedigreeService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
+    String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
 }
