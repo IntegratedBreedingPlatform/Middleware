@@ -39,6 +39,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.PlotUtil;
@@ -65,13 +66,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyDataManagerImpl(HibernateSessionProvider sessionProvider, String databaseName) {
 		super(sessionProvider, databaseName);
 		locationDataManager = new LocationDataManagerImpl(sessionProvider);
-		this.pedigreeService = ManagerFactory.getCurrentManagerFactoryThreadLocal().get().getPedigreeService();
+		this.pedigreeService = this.getPedigreeService();
 	}
 
     public StudyDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
         locationDataManager = new LocationDataManagerImpl(sessionProvider);
-        this.pedigreeService = ManagerFactory.getCurrentManagerFactoryThreadLocal().get().getPedigreeService();
+        this.pedigreeService = this.getPedigreeService();
+    }
+    
+    private PedigreeService getPedigreeService(){
+    	if(ManagerFactory.getCurrentManagerFactoryThreadLocal().get() != null){
+    		return ManagerFactory.getCurrentManagerFactoryThreadLocal().get().getPedigreeService();
+    	}
+    	//we will just return default pedigree service
+    	return PedigreeFactory.getPedigreeService(sessionProvider, null, null);
     }
 
     @Override
