@@ -11,11 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,7 +49,6 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -60,6 +57,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -579,7 +577,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override
     public GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException{
         List<GermplasmList> germplasmLists = getGermplasmListManager()
-                .getGermplasmListByName(name, 0, 1, Operation.EQUAL, Database.LOCAL);
+                .getGermplasmListByName(name, 0, 1, Operation.EQUAL);
         if (!germplasmLists.isEmpty()){
             return germplasmLists.get(0);
         } 
@@ -664,10 +662,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	List<CVTerm> variables = new ArrayList<CVTerm>();
     	Set<Integer> variableIds = new HashSet<Integer>();
     	
-    	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
+    	addAllVariableIdsInMode(variableIds, storedInIds);
     	if (propertyIds != null && !propertyIds.isEmpty()) {
     	        Set<Integer> propertyVariableList = new HashSet<Integer>(); 
-    	        createPropertyList(propertyVariableList, propertyIds, Database.LOCAL);
+    	        createPropertyList(propertyVariableList, propertyIds);
     	        filterByProperty(variableIds, propertyVariableList, isRemoveProperties);
     	}
     	
@@ -682,7 +680,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
 
     private void addAllVariableIdsInMode(Set<Integer> variableIds
-            , List<Integer> storedInIds, Database database) throws MiddlewareQueryException {
+            , List<Integer> storedInIds) throws MiddlewareQueryException {
     	for (Integer storedInId : storedInIds) {
     		variableIds.addAll(getCvTermRelationshipDao()
     		        .getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
@@ -690,7 +688,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     private void createPropertyList(Set<Integer> propertyVariableList
-            , List<Integer> propertyIds, Database database) throws MiddlewareQueryException{
+            , List<Integer> propertyIds) throws MiddlewareQueryException{
         for (Integer propertyId : propertyIds) {
             propertyVariableList.addAll(getCvTermRelationshipDao()
                         .getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
@@ -997,8 +995,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException {
 		Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
-		Integer date = Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date()));
-		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, date, name);
+		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, 
+				Util.getCurrentDateAsIntegerValue(), name);
 		return getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 	

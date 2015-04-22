@@ -5,10 +5,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.generationcp.middleware.util.Util;
 import java.util.List;
 
 public class ListDataProjectSaver extends Saver {
@@ -21,7 +18,7 @@ public class ListDataProjectSaver extends Saver {
 			GermplasmListType type, Integer originalListId,
 			List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
 
-		boolean isAdvanced = (type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES); 
+		boolean isAdvanced = type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES; 
 		GermplasmList snapList = isAdvanced ? null : getGermplasmList(projectId, type);
 		boolean isCreate = snapList == null;
 		
@@ -31,14 +28,14 @@ public class ListDataProjectSaver extends Saver {
 		
 		if (originalListId != null) {
 			updateGermplasmListInfo(snapList, originalListId, userId);
-		}
-		else {
+		} else {
 			setDefaultGermplasmListInfo(snapList,userId);			
 		}
 		
 		getGermplasmListDAO().saveOrUpdate(snapList);
 		
-		if (!isCreate && !isAdvanced) {  //delete old list data projects
+		if (!isCreate && !isAdvanced) {  
+			//delete old list data projects
 			getListDataProjectDAO().deleteByListId(snapList.getId());
 		}
 		
@@ -57,8 +54,7 @@ public class ListDataProjectSaver extends Saver {
 		
 		snapList.setId(getGermplasmListDAO().getNextId("id"));
 		snapList.setProjectId(projectId);
-		DateFormat format = new SimpleDateFormat("yyyyMMdd");
-		snapList.setDate(Long.valueOf(format.format(new Date())));
+		snapList.setDate(Util.getCurrentDateAsLongValue());
 		snapList.setStatus(1);
 		snapList.setType(type.name());
 		snapList.setParent(null);
@@ -82,8 +78,7 @@ public class ListDataProjectSaver extends Saver {
 			germplasmList.setUserId(origList.getUserId());
 			germplasmList.setDescription(origList.getDescription());
 			germplasmList.setListRef(originalListId);
-		}
-		else {
+		} else {
 			setDefaultGermplasmListInfo(germplasmList,userId);
 		}
 	}
@@ -98,7 +93,7 @@ public class ListDataProjectSaver extends Saver {
 
 	private void setDefaultGermplasmListInfo(GermplasmList snapList, int userId) {
 		snapList.setListLocation(null);
-		snapList.setUserId(userId); //database default
+		snapList.setUserId(userId);
 		snapList.setNotes(null);
 		snapList.setsDate(null);
 		snapList.seteDate(null);

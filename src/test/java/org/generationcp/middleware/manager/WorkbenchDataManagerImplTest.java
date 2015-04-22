@@ -18,7 +18,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -49,6 +48,7 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -507,7 +507,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         ProjectBackup projectBackup = new ProjectBackup();    
         projectBackup.setProjectId(commonTestProject.getProjectId());
         projectBackup.setBackupPath("target/resource" + commonTestProject.getProjectId());
-        projectBackup.setBackupTime(Calendar.getInstance().getTime());
+        projectBackup.setBackupTime(Util.getCurrentDate());
 
         manager.saveOrUpdateProjectBackup(projectBackup);
         Assert.assertNotNull(projectBackup);

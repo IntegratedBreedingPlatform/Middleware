@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.PoiUtil;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +94,7 @@ public class WorkbookParser {
         try {
             wb = new HSSFWorkbook(inp);
         } catch (OfficeXmlFileException ee) {
-        	LOG.debug(ee.getMessage());
+        	LOG.debug(ee.getMessage(),ee);
             int maxLimit = 65000;
             Boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
             if (overLimit) {
@@ -169,7 +170,7 @@ public class WorkbookParser {
 		        errorMessages.add(new Message("error.missing.sheet.description"));
 		    }
 		} catch (IllegalArgumentException e) {
-			LOG.debug(e.getMessage());
+			LOG.debug(e.getMessage(),e);
 		    errorMessages.add(new Message("error.missing.sheet.description"));
 		} catch (Exception e) {
 		    throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
@@ -182,7 +183,7 @@ public class WorkbookParser {
 		        errorMessages.add(new Message("error.missing.sheet.observation"));
 		    }
 		} catch (IllegalArgumentException e) {
-			LOG.debug(e.getMessage());
+			LOG.debug(e.getMessage(),e);
 		    errorMessages.add(new Message("error.missing.sheet.observation"));
 		} catch (Exception e) {
 		    throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
@@ -229,8 +230,7 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.blank.study.title"));
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        dateFormat.setLenient(false);
+        SimpleDateFormat dateFormat = Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
         Date startDate = null;
         Date endDate = null;
 
@@ -266,7 +266,7 @@ public class WorkbookParser {
             errorMessages.add(new Message("error.date.startdate.required"));
         }
 
-        Date currentDate = Calendar.getInstance().getTime();
+        Date currentDate = Util.getCurrentDate();
         if (startDate != null && startDate.after(currentDate)) {
             errorMessages.add(new Message("error.start.is.after.current.date"));
         }
@@ -460,12 +460,7 @@ public class WorkbookParser {
                 List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 
                 for (int col = 0; col < factors.size() + variates.size(); col++) {
-                    // TODO verify usefulness / validity of next statement.
-                    if ("GYLD".equals(variables.get(col).getName())) {
-                        LOG.debug(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
-                    }
-
-                    MeasurementData data = new MeasurementData(variables.get(col).getName(),
+                	MeasurementData data = new MeasurementData(variables.get(col).getName(),
                             getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)
                     );
 
@@ -494,9 +489,11 @@ public class WorkbookParser {
             Cell cell = row.getCell(columnNumber);
             return PoiUtil.getCellStringValue(cell);
         } catch (IllegalStateException e) {
+        	LOG.error(e.getMessage(),e);
             return "";
 
         } catch (NullPointerException e) {
+        	LOG.error(e.getMessage(),e);
             return "";
         }
     }
