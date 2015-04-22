@@ -261,10 +261,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             for (GermplasmList germplasmList : germplasmLists) {
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new DB records
-                    //kim -- Investigate the purpose of the list. #ChildIssue
-                    Integer nextId = getGermplasmListDAO().getNextId("id");
-                    germplasmListIds.add(nextId);
-                    germplasmList.setId(nextId);
+                    //kim -- Investigate the purpose of the list. #ChildIssue -X1
+                    //Integer nextId = getGermplasmListDAO().getNextId("id");
+                    //germplasmListIds.add(nextId);
+                    //germplasmList.setId(nextId);
                     getGermplasmListDAO().saveOrUpdate(germplasmList);
                 } else if (operation == Operation.UPDATE) {
                     germplasmListIds.add(germplasmList.getId());
@@ -400,7 +400,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             for (GermplasmListData germplasmListData : germplasmListDatas) {
                 if (operation == Operation.ADD) {
                     // Auto-assign IDs for new DB records
-                    //kim
+                    //kim -X2
                     //Integer nextListId = getGermplasmListDataDAO().getNextId("id");
                     //germplasmListData.setId(nextListId);
                 }
