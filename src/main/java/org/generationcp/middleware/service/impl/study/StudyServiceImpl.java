@@ -89,62 +89,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<Measurement> listTrialData(final int projectBusinessIdentifier) {
 
-		final MeasurementQuery measurementQuery = new MeasurementQuery();
-		List<String> projectTraits = getTraits(projectBusinessIdentifier);
-		String generateQuery = measurementQuery.generateQuery(projectTraits);
-		System.out.println(generateQuery);
-		SQLQuery createSQLQuery = getCurrentSession().createSQLQuery(generateQuery)
-				.addScalar("nd_experiment_id").addScalar("TRIAL_INSTANCE").addScalar("ENTRY_TYPE")
-				.addScalar("GID").addScalar("DESIGNATION").addScalar("ENTRY_NO")
-				.addScalar("SEED_SOURCE").addScalar("REP_NO").addScalar("PLOT_NO");
-		for (final String trait : projectTraits) {
-			createSQLQuery.addScalar(trait);
-			createSQLQuery.addScalar(trait+"_PhenotypeId");
+		final TrialTraits trialTraits = new TrialTraits(getCurrentSession());
+		final List<String> projectTraits = trialTraits.getTraits(projectBusinessIdentifier);
 
-		}
-		int counter = 0;
-		for (final String trait : projectTraits) {
-			createSQLQuery.setParameter(counter++, trait);
-		}
-		createSQLQuery.setParameter(counter++, projectBusinessIdentifier);
-
-		List<Object[]> list = createSQLQuery.list();
-
-		final List<Measurement> traits = new ArrayList<Measurement>();
-
-		if (list != null && !list.isEmpty()) {
-			for (Object[] row : list) {
-
-				final List<Trait> stuff = new ArrayList<Trait>();
-				int counterTwo = 1;
-				for (final String trait : projectTraits) {
-					stuff.add(new Trait(trait, (Integer) row[(8 + counterTwo+1)], (String) row[(8 + counterTwo)]));
-					counterTwo+=2;
-				}
-				Measurement measurement = new Measurement((Integer) row[0], (String) row[1],
-						(String) row[2], (Integer) row[3], (String) row[4], (String) row[5],
-						(String) row[6], (String) row[7], (String) row[7], stuff);
-				traits.add(measurement);
-
-			}
-		}
-		return traits;
-
+		final TrialMeasurements trialMeasurements = new TrialMeasurements(getCurrentSession());
+		return trialMeasurements.getAllMeasurements(projectBusinessIdentifier, projectTraits);
 	}
 
-	private List<String> getTraits(final int projectBusinessIdentifier) {
-		final TraitNamesQuery traitQuery = new TraitNamesQuery();
-		final String traitsInProjectQuery = traitQuery.generateQuery();
-		final SQLQuery createSQLQuery = getCurrentSession().createSQLQuery(traitsInProjectQuery)
-				.addScalar("value");
-		createSQLQuery.setParameter(0, projectBusinessIdentifier);
-		final List<Object> list = createSQLQuery.list();
-		final List<String> traits = new ArrayList<String>();
-		if (list != null && !list.isEmpty()) {
-			for (Object row : list) {
-				traits.add((String) row);
-			}
-		}
-		return traits;
-	}
+
+
+
 }

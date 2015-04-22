@@ -94,7 +94,8 @@ public class QueryTest {
 				"        WHERE\n" + 
 				"            ndep.nd_experiment_id = ep.nd_experiment_id     \n" + 
 				"            AND ispcvt.name = 'PLOT_NO') PLOT_NO,\n" + 
-				"        PH_cm.PhenotypeValue  \n" + 
+				"        PH_cm.PhenotypeValue  AS PH_cm,\n" + 
+				"        PH_cm.phenotype_id AS PH_cm_PhenotypeId \n" + 
 				"    FROM\n" + 
 				"        Project p   \n" + 
 				"    INNER JOIN\n" + 
