@@ -34,7 +34,7 @@ public class MeasurementQuery {
                 + "                INNER JOIN\n"
                 + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
                 + "            ndep.nd_experiment_id = ep.nd_experiment_id\n"
-                + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO,\n"
+                + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO\n"
                 + getColumnNamesFromTraitNames(traitNames) +
 
                 "FROM\n" + "    Project p\n" + "        INNER JOIN\n"
@@ -59,9 +59,14 @@ public class MeasurementQuery {
         final StringBuffer columnNames = new StringBuffer();
         int size = traitNames.size();
         for (int i = 0; i < size; i++) {
-            columnNames.append(traitNames.get(0) + "." + "PhenotypeValue \n");
+        	if(i == 0) {
+        		columnNames.append(", \n");
+        	}
+            columnNames.append(traitNames.get(i) + "." + "PhenotypeValue AS " + traitNames.get(i) + ",\n");
+            columnNames.append(traitNames.get(i) + "." + "phenotype_id AS " + traitNames.get(i)+"_PhenotypeId" + "\n");
+
             if (!(i == (size - 1))) {
-                columnNames.append(",");
+                columnNames.append(" , ");
             }
         }
         return columnNames.toString();

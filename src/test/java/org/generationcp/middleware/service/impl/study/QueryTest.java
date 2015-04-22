@@ -33,7 +33,7 @@ public class QueryTest {
 		MeasurementQuery fixture = new MeasurementQuery();
 		final List<String> traitNames = new LinkedList<String>();
 		traitNames.add("PH_cm");
-		String result = fixture.generateQuery(1, traitNames);
+		String result = fixture.generateQuery(traitNames);
 		System.out.println(formatString(result));
 		assertEquals("The expected query must match our expected queyr",
 				formatString(expectedQueryForTheQueryGenerationTest()),

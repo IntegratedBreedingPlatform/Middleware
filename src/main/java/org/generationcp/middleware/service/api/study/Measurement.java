@@ -5,7 +5,7 @@ import java.util.List;
 public class Measurement {
 	private final Integer measurementId;
 	
-	private final Integer trialInstance;
+	private final String trialInstance;
 	
 	private final String entryType;
 	
@@ -19,13 +19,13 @@ public class Measurement {
 	
 	private final String repitionNumber;
 	
-	private final Integer plotNumber;
+	private final String plotNumber;
 	
 	private final List<Trait> traits;
 	
-	public Measurement(final Integer measurementId, final Integer trialInstance, final String entryType,
+	public Measurement(final Integer measurementId, final String trialInstance, final String entryType,
 			final Integer gid, final String designation, final String entryNo, final String seedSource,
-			final String repitionNumber, final Integer plotNumber, final List<Trait> traits) {
+			final String repitionNumber, final String plotNumber, final List<Trait> traits) {
 		this.measurementId = measurementId;
 		this.trialInstance = trialInstance;
 		this.entryType = entryType;
@@ -42,7 +42,7 @@ public class Measurement {
 		return measurementId;
 	}
 
-	public Integer getTrialInstance() {
+	public String getTrialInstance() {
 		return trialInstance;
 	}
 
@@ -70,7 +70,7 @@ public class Measurement {
 		return repitionNumber;
 	}
 
-	public Integer getPlotNumber() {
+	public String getPlotNumber() {
 		return plotNumber;
 	}
 

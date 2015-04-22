@@ -6,9 +6,12 @@ public class Trait {
 	
 	private final String triatValue;
 
+	private String traitName;
+
 	
-	public Trait(final Integer traitId, final String triatValue) {
+	public Trait(final String traitName, final Integer traitId, final String triatValue) {
 		super();
+		this.traitName = traitName;
 		this.traitId = traitId;
 		this.triatValue = triatValue;
 	}
@@ -20,5 +23,10 @@ public class Trait {
 	public String getTriatValue() {
 		return triatValue;
 	}
+
+	public String getTraitName() {
+		return traitName;
+	}
+	
 	
 }
