@@ -43,6 +43,7 @@ public class LotTransformer {
 					lotDetails.setActualLotBalance(aggregateData.getActualBalance());
 					lotDetails.setAvailableLotBalance(aggregateData.getAvailableBalance());
 					lotDetails.setReservedTotal(aggregateData.getReservedTotal());
+					lotDetails.setStockIds(aggregateData.getStockIds());
 
 					// get reserved amount for list entry and # reserved for other entries in list for specific lot
 					Map<Integer, Double> reservationMap = aggregateData.getReservationMap();
