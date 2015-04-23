@@ -3,20 +3,23 @@ package org.generationcp.middleware.service.impl.study;
 import java.util.Collections;
 import java.util.List;
 
+import org.generationcp.middleware.service.api.study.TraitService;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
-public class TrialTraits {
+public class TraitServiceImpl implements TraitService {
 	
 	private Session session;
 
-	public TrialTraits(final Session session) {
+	final TraitNamesQuery traitQuery = new TraitNamesQuery();
+
+	public TraitServiceImpl(final Session session) {
 		this.session = session;
-		
 	}
 	
-	List<String> getTraits(final int projectBusinessIdentifier) {
-		final List<String> list = getTraitListForTrail(projectBusinessIdentifier);
+	@Override
+	public List<String> getTraits(final int studyBusinessIdentifier) {
+		final List<String> list = getTraitListForTrail(studyBusinessIdentifier);
 		if (list != null && !list.isEmpty()) {
 			return Collections.unmodifiableList(list);
 		}
@@ -25,8 +28,7 @@ public class TrialTraits {
 
 	@SuppressWarnings("unchecked")
 	private List<String> getTraitListForTrail(final int projectBusinessIdentifier) {
-		final TraitNamesQuery traitQuery = new TraitNamesQuery();
-		final String traitsInProjectQuery = traitQuery.generateQuery();
+		final String traitsInProjectQuery = traitQuery.getTraitQuery();
 		final SQLQuery traitSqlQuery = this.session.createSQLQuery(traitsInProjectQuery);
 		traitSqlQuery.addScalar("value");
 		traitSqlQuery.setParameter(0, projectBusinessIdentifier);

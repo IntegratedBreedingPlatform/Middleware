@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api.study;
 import java.util.List;
 
 public class Measurement {
+
 	private final Integer measurementId;
 	
 	private final String trialInstance;
@@ -77,5 +78,9 @@ public class Measurement {
 	public List<Trait> getTraits() {
 		return traits;
 	}
+
+
+
+	
 		
 }

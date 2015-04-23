@@ -53,8 +53,8 @@ public class TrialMeasurementsTest {
 		int counter = 0;
 		for( final String testTrait : testTraits) {
 			verify(mockSqlQuery).setParameter(counter++, testTrait);
-
 		}
+
 		verify(mockSqlQuery).setParameter(counter++, projectBusinessIdentifier);
 
 		// add additional test code here

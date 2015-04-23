@@ -48,7 +48,7 @@ public class MeasurementQuery {
                 + "        INNER JOIN\n"
                 + "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n"
                 + "        INNER JOIN\n" + "    Stock s ON s.stock_id = es.stock_id\n"
-                + getLeftOuterJoin(traitNames) + "WHERE\n" + "    p.project_id = ("
+                + getTraitDeatilsJoin(traitNames) + "WHERE\n" + "    p.project_id = ("
                 		+ "Select p.project_id from project_relationship pr\n" + 
                 		"INNER JOIN project p on p.project_id = pr.subject_project_id\n" + 
                 		"where pr.object_project_id = ? and name LIKE '%PLOTDATA')" 
@@ -72,17 +72,18 @@ public class MeasurementQuery {
         return columnNames.toString();
     }
 
-    private String getLeftOuterJoin(final List<String> traitNames) {
+    private String getTraitDeatilsJoin(final List<String> traitNames) {
 
         final StringBuffer leftOuterJoinQuery = new StringBuffer();
         for (String traitName : traitNames) {
-            leftOuterJoinQuery.append(getLeftOuterJoinQuery(traitName));
+            leftOuterJoinQuery.append(getTraitDeatilsJoinQuery(traitName));
         }
         return leftOuterJoinQuery.toString();
 
     }
 
-    private String getLeftOuterJoinQuery(final String traitName) {
+    // use the id
+    private String getTraitDeatilsJoinQuery(final String traitName) {
         return "        LEFT OUTER JOIN\n"
                 + "    (SELECT \n"
                 + "        nep.nd_experiment_id,\n"

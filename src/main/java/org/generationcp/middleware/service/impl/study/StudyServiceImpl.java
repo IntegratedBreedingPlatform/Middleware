@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.impl.study;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -12,18 +11,30 @@ import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.Measurement;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
-import org.generationcp.middleware.service.api.study.Trait;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.repackage.cglib.asm.Type;
 
 public class StudyServiceImpl extends Service implements StudyService {
 
+	final TraitServiceImpl trialTraits;
+
+	final TrialMeasurements trialMeasurements;
+
 	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		trialTraits = new TraitServiceImpl(getCurrentSession());
+		trialMeasurements = new TrialMeasurements(getCurrentSession());
 	}
 
+	/**
+	 * Only used for tests.
+	 * @param trialTraits
+	 * @param trialMeasurements
+	 */
+	StudyServiceImpl(final TraitServiceImpl trialTraits, final TrialMeasurements trialMeasurements) {
+		this.trialTraits = trialTraits;
+		this.trialMeasurements = trialMeasurements;
+	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<StudySummary> listAllStudies() throws MiddlewareQueryException {
@@ -85,18 +96,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return studySummaries;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<Measurement> listTrialData(final int projectBusinessIdentifier) {
+	public List<Measurement> getMeasurements(final int studyIdentifier) {
 
-		final TrialTraits trialTraits = new TrialTraits(getCurrentSession());
-		final List<String> projectTraits = trialTraits.getTraits(projectBusinessIdentifier);
+		final List<String> traits = trialTraits.getTraits(studyIdentifier);
 
-		final TrialMeasurements trialMeasurements = new TrialMeasurements(getCurrentSession());
-		return trialMeasurements.getAllMeasurements(projectBusinessIdentifier, projectTraits);
+		return trialMeasurements.getAllMeasurements(studyIdentifier, traits);
 	}
-
-
-
 
 }

@@ -13,12 +13,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * The class <code>TrialTraitsTest</code> contains tests for the class <code>{@link TrialTraits}</code>.
+ * The class <code>TrialTraitsTest</code> contains tests for the class <code>{@link TraitServiceImpl}</code>.
  *
  */
 public class TrialTraitsTest {
 	/**
-	 * Run the {@link TrialTraits}.getTraits() method and makes sure the query returns appropriate values.
+	 * Run the {@link TraitServiceImpl}.getTraits() method and makes sure the query returns appropriate values.
 	 *
 	 */
 	@Test
@@ -26,10 +26,10 @@ public class TrialTraitsTest {
 		throws Exception {
 		final Session session = Mockito.mock(Session.class);
 
-		final TrialTraits trailTraits = new TrialTraits(session);
+		final TraitServiceImpl trailTraits = new TraitServiceImpl(session);
 		
 		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
-		when(session.createSQLQuery((new TraitNamesQuery()).generateQuery())).thenReturn(mockSqlQuery);
+		when(session.createSQLQuery((new TraitNamesQuery()).getTraitQuery())).thenReturn(mockSqlQuery);
 		final List<String> sampleTraits = Collections.<String>singletonList("TestTrait");
 		when(mockSqlQuery.list()).thenReturn(sampleTraits);
 
