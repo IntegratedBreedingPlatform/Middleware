@@ -455,6 +455,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 getProgramFavoriteDao().makeTransient(programFavorite);
             }
 
+            getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+
             transaction.commit();
 
         } catch (Exception e) {
