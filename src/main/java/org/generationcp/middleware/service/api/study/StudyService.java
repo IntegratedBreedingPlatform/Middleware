@@ -7,7 +7,13 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 public interface StudyService {
 
-	List<StudySummary> listAllStudies() throws MiddlewareQueryException;
+	/**
+	 * @param programUniqueId Optional parameter, if provided the results are filtered to only return studies that belong to the program
+	 *        identified by this unique id.
+	 * @return List of {@link StudySummary}ies. Omits deleted studies.
+	 * @throws MiddlewareQueryException
+	 */
+	List<StudySummary> listAllStudies(final String programUniqueId) throws MiddlewareQueryException;
 
 	List<Measurement> getMeasurements(final int studyIdentifier);
 }
