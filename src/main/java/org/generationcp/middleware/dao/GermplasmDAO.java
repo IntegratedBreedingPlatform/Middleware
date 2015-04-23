@@ -789,8 +789,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            p1Query.addEntity("germplsm", Germplasm.class);
 	
 	            result.addAll(p1Query.list());
-	            result.addAll(searchForGermplasmsByInventoryId(q,o));
             }
+            
+            result.addAll(searchForGermplasmsByInventoryId(q,o));
             
             //Second priority, get germplasms with nVal like q
             SQLQuery p2Query;
