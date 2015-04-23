@@ -265,7 +265,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         try {
         	Session session = getSession();
         	
-        	StringBuffer sql = new StringBuffer()
+        	StringBuilder sql = new StringBuilder()
         		.append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
         		.append("tran.sourceid, tran.trnqty, lot.comments ")
         		.append("FROM ims_lot lot ")
@@ -277,7 +277,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         	
 			List<Object[]> results = query.list();
 
-	        if (results.size() > 0){
+	        if (!results.isEmpty()){
 	        	for (Object[] row: results){
 		        	Integer lotId = (Integer) row[0];
 		        	Integer userId = (Integer) row[1];
@@ -375,7 +375,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     		"WHERE trnstat = 0 AND recordid IN (:entryIds) " +
     		"AND sourceType = 'LIST'";
     		Query query = getSession().createSQLQuery(sql)
-    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
     			.setParameterList("entryIds", listEntryIds);
     		query.executeUpdate();
 		} catch (Exception e) {
@@ -393,7 +393,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     		"AND trnqty < 0 " + 
     		"AND sourceType = 'LIST'";
     		Query query = getSession().createSQLQuery(sql)
-    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
     			.setParameter("lotId", lotId)
     			.setParameter("lrecId", lrecId);
     		query.executeUpdate();
@@ -412,7 +412,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     		"WHERE status = 0 AND etype = 'GERMPLSM' " +
     		"AND eid = (:gids))";
     		Query query = getSession().createSQLQuery(sql)
-    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
     			.setParameterList("gids", gids);
     		query.executeUpdate();
 		} catch (Exception e) {
@@ -428,7 +428,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     		"WHERE trnstat = 0 AND sourceId in (:listIds) " +
     		"AND sourceType = 'LIST'";
     		Query query = getSession().createSQLQuery(sql)
-    			.setParameter("currentDate", Util.getCurrentDate())
+    			.setParameter("currentDate", Util.getCurrentDateAsIntegerValue())
     			.setParameterList("listIds", listIds);
     		query.executeUpdate();
 		} catch (Exception e) {

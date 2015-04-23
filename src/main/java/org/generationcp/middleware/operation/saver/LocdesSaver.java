@@ -1,10 +1,7 @@
 package org.generationcp.middleware.operation.saver;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +13,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.util.Util;
 
 public class LocdesSaver extends Saver {
 
@@ -44,14 +42,13 @@ public class LocdesSaver extends Saver {
 	}
 	
 	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
-		Map<String, Integer> udfldMap = getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE", 
+		return getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE", 
 				Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode()
 						, LocdesType.RANGES_IN_BLOCK.getCode()
 						, LocdesType.ROWS_IN_PLOT.getCode()
 						, LocdesType.MACHINE_ROW_CAPACITY.getCode()
 						, LocdesType.PLANTING_ORDER.getCode()
 						, LocdesType.DELETED_PLOTS.getCode()));
-		return udfldMap;
 	}
 	
 	private int getId(Map<String, Integer> map, LocdesType type) throws MiddlewareQueryException {
@@ -128,8 +125,7 @@ public class LocdesSaver extends Saver {
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
-		DateFormat df = new SimpleDateFormat("yyyyMMdd");
-		locdes.setDdate(Integer.valueOf(df.format(new Date())));
+		locdes.setDdate(Util.getCurrentDateAsIntegerValue());
 		locdes.setReferenceId(0);
 		locdes.setUserId(userId);
 		return locdes;
@@ -141,22 +137,7 @@ public class LocdesSaver extends Saver {
 		for (FieldMapInfo info : infoList) {
 			for (FieldMapDatasetInfo dataset : info.getDatasets()) {
 				for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-					if (trial.getBlockId() != null) {
-						BlockInfo blockInfo = blockMap.get(trial.getBlockId());
-
-						if (blockInfo == null) {
-							blockInfo = new BlockInfo();
-							blockInfo.setBlockId(trial.getBlockId());
-							blockInfo.setMachineRowCapacity(trial.getMachineRowCapacity());
-							blockInfo.setNumberOfRowsInBlock(trial.getRowsInBlock());
-							blockInfo.setNumberOfRangesInBlock(trial.getRangesInBlock());
-							blockInfo.setNumberOfRowsPerPlot(trial.getRowsPerPlot());
-							blockInfo.setPlantingOrder(trial.getPlantingOrder());
-							blockInfo.setDeletedPlots(trial.getDeletedPlots());
-							
-							blockMap.put(trial.getBlockId(), blockInfo);
-						}
-					}
+					putAllBlockInformationToAMap(trial,blockMap);
 				}
 			}
 		}
@@ -164,6 +145,26 @@ public class LocdesSaver extends Saver {
 		return blockMap;
 	}
 	
+	private void putAllBlockInformationToAMap(FieldMapTrialInstanceInfo trial,
+			Map<Integer, BlockInfo> blockMap) {
+		if (trial.getBlockId() != null) {
+			BlockInfo blockInfo = blockMap.get(trial.getBlockId());
+
+			if (blockInfo == null) {
+				blockInfo = new BlockInfo();
+				blockInfo.setBlockId(trial.getBlockId());
+				blockInfo.setMachineRowCapacity(trial.getMachineRowCapacity());
+				blockInfo.setNumberOfRowsInBlock(trial.getRowsInBlock());
+				blockInfo.setNumberOfRangesInBlock(trial.getRangesInBlock());
+				blockInfo.setNumberOfRowsPerPlot(trial.getRowsPerPlot());
+				blockInfo.setPlantingOrder(trial.getPlantingOrder());
+				blockInfo.setDeletedPlots(trial.getDeletedPlots());
+				
+				blockMap.put(trial.getBlockId(), blockInfo);
+			}
+		}
+	}
+
 	private class BlockInfo {
 		private Integer blockId;
 		private Integer numberOfRowsInBlock;
