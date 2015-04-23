@@ -230,7 +230,15 @@ public class Germplasm implements Serializable{
     public static final String SEARCH_GERMPLASM_BY_GID_LIKE = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid LIKE :gid AND gid!=grplce AND grplce = 0";    
+    		"WHERE gid LIKE :gid AND gid!=grplce AND grplce = 0";
+    public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID =
+    		"SELECT g.* FROM germplsm g, ims_lot l, ims_transaction t " +
+    		"WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid " +
+    		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID";
+    public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE = 
+    		"SELECT g.* FROM germplsm g, ims_lot l, ims_transaction t " +
+    		"WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid " +
+    		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID";
     public static final String SEARCH_GERMPLASM_BY_GIDS = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +

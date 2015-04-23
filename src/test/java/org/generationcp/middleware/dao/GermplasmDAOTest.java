@@ -130,6 +130,19 @@ public class GermplasmDAOTest extends MiddlewareIntegrationTest {
         Assert.assertTrue(results.size() == 200);
         
     }
+    
+    @Test
+    public void testSearchForGermplasmsByInventoryId_ExactMatch() throws Exception {
+    	List<Germplasm> results = dao.searchForGermplasmsByInventoryId("2", Operation.EQUAL);
+        Assert.assertNotNull(results);
+        
+    }
+    
+    @Test
+    public void testSearchForGermplasmsByInventoryId_PartialMatch() throws Exception {
+    	List<Germplasm> results = dao.searchForGermplasmsByInventoryId("2", Operation.LIKE);
+        Assert.assertNotNull(results);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

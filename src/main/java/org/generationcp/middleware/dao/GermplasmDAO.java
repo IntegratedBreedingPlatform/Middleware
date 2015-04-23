@@ -26,8 +26,10 @@ import org.hibernate.Session;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -755,7 +757,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
      * @return List of Germplasms
      * @throws MiddlewareQueryException 
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
 	public List<Germplasm> searchForGermplasms(String searchedString, Operation o, boolean includeParents, boolean searchByNameInLocalDbAlso, Session localSession)
             throws MiddlewareQueryException{
         String q = searchedString.trim();
@@ -764,10 +766,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
         try {
 
-            List<Germplasm> result = new ArrayList<Germplasm>();
-            List<Germplasm> resultParents = new ArrayList<Germplasm>();
+            Set<Germplasm> result = new LinkedHashSet<Germplasm>();
+            Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
             
-            //First priority, germplasms with GID=q
+            //First priority, germplasms with GID=q and inventory_id=q
             
             if(q.matches("(\\d+)(%|_)?") || q.matches("(-\\d+)(%|_)?")) {
             	SQLQuery p1Query;
@@ -787,6 +789,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            p1Query.addEntity("germplsm", Germplasm.class);
 	
 	            result.addAll(p1Query.list());
+	            result.addAll(searchForGermplasmsByInventoryId(q,o));
             }
             
             //Second priority, get germplasms with nVal like q
@@ -812,6 +815,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             p2Query.addEntity("germplsm", Germplasm.class);
             result.addAll(p2Query.list());
             
+            
+            
             //Add parents to results if specified by "includeParents" flag
             if(includeParents){
                 for(Germplasm g: result){
@@ -832,14 +837,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     }
                 }
                 
-                for(Object g2 : resultParents){
-                    if(!result.contains(g2)) {
-                        result.add((Germplasm) g2);
-                    }
-                }
+                result.addAll(resultParents);
             }
             
-            return result;
+            return new ArrayList<Germplasm>(result);
 
         } catch (Exception e) {
                 logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
@@ -847,8 +848,33 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
-    
-    public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids){
+    /**
+     * @param q - inventory / stock id to be searched
+     * @param o - operation (like, equal)
+     * @return list of germplasms 
+     */
+    @SuppressWarnings("unchecked")
+	protected List<Germplasm> searchForGermplasmsByInventoryId(
+			String q, Operation o) {
+    	SQLQuery p1Query;
+        if(o.equals(Operation.LIKE) || q.endsWith("%")){
+        	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE);
+        	if(q.contains("%") || q.contains("_")){
+        		p1Query.setParameter("inventoryID", q);
+        	}else{
+        		p1Query.setParameter("inventoryID", q+"%");
+        	}
+        } else {
+        	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID);
+        	p1Query.setParameter("inventoryID", q);
+        }
+        
+        p1Query.addEntity("germplsm", Germplasm.class);
+
+        return p1Query.list();
+	}
+
+	public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids){
         Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();
         SQLQuery query = getSession().createSQLQuery(Germplasm.GET_GERMPLASM_DATES_BY_GIDS);
         query.setParameterList("gids", gids);
