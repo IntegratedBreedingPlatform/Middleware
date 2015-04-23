@@ -37,7 +37,8 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     						"  locid, scaleid, i.comments, " +
     						"  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, " +
     						"  SUM(trnqty) AS available_balance, " +
-    						"  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt " +
+    						"  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, " +
+    						"  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids " +
     						"FROM ims_lot i " +
     						"LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
     						"WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " +
@@ -401,6 +402,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 				Double actualBalance = (Double) row[5];
 				Double availableBalance = (Double) row[6];
 				Double reservedTotal = (Double) row[7];
+				String stockIds = (String) row[8];
 
 				lot = new Lot(lotId);
 				lot.setEntityId(entityId);
@@ -412,6 +414,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 				aggregateData.setActualBalance(actualBalance);
 				aggregateData.setAvailableBalance(availableBalance);
 				aggregateData.setReservedTotal(reservedTotal);
+				aggregateData.setStockIds(stockIds);
 				
 				reservationMap = new HashMap<Integer, Double>();
 				aggregateData.setReservationMap(reservationMap);

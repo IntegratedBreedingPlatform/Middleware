@@ -543,7 +543,7 @@ public class InventoryDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetLotsForGermplasm() throws MiddlewareQueryException{
-    	int gid = -644052;
+    	int gid = 89;
 		List<LotDetails> lots = manager.getLotDetailsForGermplasm(gid);
 		for (LotDetails lot : lots){
 			System.out.println(lot);
