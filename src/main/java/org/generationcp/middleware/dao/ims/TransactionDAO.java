@@ -440,7 +440,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		
 		Map<Integer, String> lrecIdStockIdMap = new HashMap<>();
 		
-		String sql = "SELECT a.lrecid,group_concat(inventory_id, ', ')  " +
+		String sql = "SELECT a.lrecid,group_concat(inventory_id SEPARATOR ', ')  " +
 		"FROM listdata a  " +
 		"inner join ims_lot b ON a.gid = b.eid  " +
 		"INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid " +
@@ -453,10 +453,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		for (Object[] row : result) {
 			Integer lrecid = (Integer) row[0];
 			String stockIds = (String) row[1];
-			
-			if(stockIds.trim().endsWith(",")){
-				stockIds = stockIds.substring(0, stockIds.lastIndexOf(","));
-			}
 			
 			lrecIdStockIdMap.put(lrecid, stockIds);
 		}
