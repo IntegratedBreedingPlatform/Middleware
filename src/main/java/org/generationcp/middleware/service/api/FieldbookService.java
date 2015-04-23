@@ -21,7 +21,6 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.*;
 
 import java.util.List;
@@ -852,6 +851,9 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException
 	 */
 	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
+
+    ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type,
+            int plotId) throws MiddlewareQueryException;
 
     ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo) throws MiddlewareQueryException;
 
