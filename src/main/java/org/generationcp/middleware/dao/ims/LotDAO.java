@@ -424,8 +424,8 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 			}
 			
 			if (withReservationMap){
-				Integer recordId = (Integer) row[8];
-				Double qty = (Double) row[9];
+				Integer recordId = (Integer) row[9];
+				Double qty = (Double) row[10];
 				if (recordId != null && qty != null){ // compute total reserved for entry
 					Double prevValue = reservationMap.get(recordId);
 					Double prevTotal = prevValue == null ? 0d : prevValue;
