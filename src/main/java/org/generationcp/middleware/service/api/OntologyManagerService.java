@@ -227,4 +227,12 @@ public interface OntologyManagerService {
      * @throws MiddlewareException*
      */
     void deleteVariable(Integer id) throws MiddlewareException;
+
+    /**
+     * Give observations by variable Id
+     * @param variableId Variable Id
+     * @return Number of Observations
+     * @throws MiddlewareException
+     */
+    int getObservationsByVariableId(Integer variableId) throws MiddlewareException;
 }

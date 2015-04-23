@@ -154,4 +154,9 @@ public class OntologyManagerServiceImpl extends Service implements OntologyManag
     public void deleteVariable(Integer id) throws MiddlewareException {
         getOntologyVariableDataManager().deleteVariable(id);
     }
+
+    @Override
+    public int getObservationsByVariableId(Integer variableId) throws MiddlewareException {
+        return getOntologyBasicDataManager().getVariableObservations(variableId);
+    }
 }
