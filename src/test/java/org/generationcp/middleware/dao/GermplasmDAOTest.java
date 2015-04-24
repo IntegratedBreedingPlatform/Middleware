@@ -110,7 +110,7 @@ public class GermplasmDAOTest extends MiddlewareIntegrationTest {
     @Test
     public void testSearchForGermplasmsExactMatchGermplasmNameWithWildCard() throws Exception {
 
-        List<Germplasm> results = dao.searchForGermplasms("CML%", Operation.EQUAL, false, false, sessionUtil.getCurrentSession());
+        List<Germplasm> results = dao.searchForGermplasms("(CML%", Operation.EQUAL, false, false, sessionUtil.getCurrentSession());
         Assert.assertTrue(results.size() == 200);
         
     }

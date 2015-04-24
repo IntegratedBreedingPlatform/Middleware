@@ -38,6 +38,7 @@ import java.util.Set;
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     private static final String STATUS_DELETED = "9";
+	private static final String STOCK_IDS = "stockIDs";
 
     @Override
     public Germplasm getById(Integer gid,  boolean lock) throws MiddlewareQueryException {
@@ -787,8 +788,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            }
 	            
 	            p1Query.addEntity("germplsm", Germplasm.class);
-	
-	            result.addAll(p1Query.list());
+	            p1Query.addScalar(STOCK_IDS);
+	            result.addAll(getSearchForGermplasmsResult(p1Query.list()));
             }
             
             result.addAll(searchForGermplasmsByInventoryId(q,o));
@@ -796,12 +797,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             //Second priority, get germplasms with nVal like q
             SQLQuery p2Query;
             if(o.equals(Operation.EQUAL)) {
-            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME);
+            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_EQUAL);
             	p2Query.setParameter("q", q);
             	p2Query.setParameter("qNoSpaces", q.replace(" ", ""));
             	p2Query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
             } else {
-            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME);
+            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE);
                 if(q.contains("%") || q.contains("_")){
                 	p2Query.setParameter("q", q);
                 	p2Query.setParameter("qNoSpaces", q.replace(" ", ""));
@@ -814,9 +815,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             }
             p2Query.setParameter("deletedStatus", STATUS_DELETED);
             p2Query.addEntity("germplsm", Germplasm.class);
-            result.addAll(p2Query.list());
-            
-            
+            p2Query.addScalar(STOCK_IDS);
+            result.addAll(getSearchForGermplasmsResult(p2Query.list()));
             
             //Add parents to results if specified by "includeParents" flag
             if(includeParents){
@@ -833,8 +833,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                         SQLQuery pQuery = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
                         pQuery.setParameterList("gids", parentGids);
                         pQuery.addEntity("germplsm", Germplasm.class);
-                    
-                        resultParents.addAll(pQuery.list());
+                        pQuery.addScalar(STOCK_IDS);
+                        resultParents.addAll(getSearchForGermplasmsResult(pQuery.list()));
                     }
                 }
                 
@@ -849,7 +849,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
-    /**
+    private List<Germplasm> getSearchForGermplasmsResult(
+    		List<Object[]> result) {
+    	List<Germplasm> germplasms = new ArrayList<Germplasm>();
+    	if(result!=null) {
+	    	for (Object[] row : result) {
+	    		Germplasm germplasm = (Germplasm)row[0];
+	    		germplasm.setStockIDs((String)row[1]);
+	    		germplasms.add(germplasm);
+	        }
+    	}
+    	return germplasms;
+	}
+
+	/**
      * @param q - inventory / stock id to be searched
      * @param o - operation (like, equal)
      * @return list of germplasms 
@@ -871,8 +884,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
         
         p1Query.addEntity("germplsm", Germplasm.class);
-
-        return p1Query.list();
+        p1Query.addScalar(STOCK_IDS);
+        return getSearchForGermplasmsResult(p1Query.list());
 	}
 
 	public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids){

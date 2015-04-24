@@ -224,36 +224,61 @@ public class Germplasm implements Serializable{
      * Used in germplasm data manager searchForGermplasm
      */
     public static final String SEARCH_GERMPLASM_BY_GID = 
-    		"SELECT germplsm.* " +
-    		"FROM germplsm " +
-    		"WHERE gid=:gid AND length(gid) = :gidLength AND gid!=grplce AND grplce = 0";
+    		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+			"FROM germplsm g " +
+    	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
+    	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
+    		"WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0 " + 
+    		"GROUP BY g.gid";
     public static final String SEARCH_GERMPLASM_BY_GID_LIKE = 
-    		"SELECT germplsm.* " +
-    		"FROM germplsm " +
-    		"WHERE gid LIKE :gid AND gid!=grplce AND grplce = 0";
+    		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+			"FROM germplsm g " +
+    	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
+    	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
+    		"WHERE g.gid LIKE :gid AND g.gid!=g.grplce AND g.grplce = 0 " + 
+    		"GROUP BY g.gid";
     public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID =
-    		"SELECT g.* FROM germplsm g, ims_lot l, ims_transaction t " +
+    		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+    	    "FROM germplsm g " +
+    	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
+    	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
+    	    ", ims_lot l, ims_transaction t " +
     		"WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid " +
-    		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID";
+    		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID " + 
+    		"GROUP BY g.gid";
     public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE = 
-    		"SELECT g.* FROM germplsm g, ims_lot l, ims_transaction t " +
-    		"WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid " +
-    		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID";
+    		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+			"FROM germplsm g " +
+    	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
+    	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
+    	    ", ims_lot l, ims_transaction t " +
+    	    "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid " +
+    		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID " + 
+    		"GROUP BY g.gid";
     public static final String SEARCH_GERMPLASM_BY_GIDS = 
-    		"SELECT germplsm.* " +
-    		"FROM germplsm " +
-    		"WHERE gid IN (:gids) AND gid!=grplce AND grplce = 0";
-    public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = 
-    		"SELECT DISTINCT g.* " +
-    		"FROM names n, germplsm g " +
+    		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+			"FROM germplsm g " +
+    	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
+    	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
+    		"WHERE g.gid IN (:gids) AND g.gid!=g.grplce AND g.grplce = 0 " +
+    		"GROUP BY g.gid";
+    public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE = 
+    		"SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+			"FROM names n, germplsm g " +
+    	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
+    	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
     		"WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 " +
-    		"AND n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) " +
+    		"AND n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) " + 
+    		"GROUP BY g.gid " +
     		"LIMIT 5000";
     public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_EQUAL = 
-    		"SELECT DISTINCT g.* " +
-    		"FROM names n, germplsm g " +
+    		"SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+			"FROM names n, germplsm g " +
+    	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
+    	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
     		"WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 " +
-    		"AND n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " +
+    		"AND n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + 
+    		"GROUP BY g.gid " +
     		"LIMIT 5000";
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
     		"SELECT listid " +
@@ -333,7 +358,7 @@ public class Germplasm implements Serializable{
     @Column(name = "glocn")
     private Integer locationId;
 
-    @Basic(optional = false)
+    @Basic(optional = false) 
     @Column(name = "gdate")
     @XmlElement(name = "creationDate")
     private Integer gdate;
@@ -382,6 +407,14 @@ public class Germplasm implements Serializable{
      */
     @Transient
     private Method method = null;
+    
+    /**
+     * This variable is populated only when the Germplasm POJO is retrieved by
+     * using GermplasmDataManager.searchForGermplasm(). Otherwise it is null
+     * always.
+     */
+    @Transient
+    private String stockIDs = null;
 
     public Germplasm() {
     }
@@ -597,9 +630,21 @@ public class Germplasm implements Serializable{
         builder.append(preferredAbbreviation);
         builder.append(", method=");
         builder.append(method);
+        builder.append(", stockIDs=");
+        builder.append(stockIDs);
         builder.append("]");
         return builder.toString();
     }
+
+	public String getStockIDs() {
+		return stockIDs;
+	}
+
+	public void setStockIDs(String stockIDs) {
+		this.stockIDs = stockIDs;
+	}
+    
+    
     
     
 
