@@ -277,10 +277,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
             LocationDAO dao = getLocationDao();
 
             // Auto-assign IDs for new DB records
+            //kim
+            /*
             Integer nextId = dao.getNextId("locid");
             location.setLocid(nextId);
+            */
 
-            Location recordSaved = dao.saveOrUpdate(location);
+            Location recordSaved = dao.save(location);
             idLocationSaved = recordSaved.getLocid();
 
             trans.commit();

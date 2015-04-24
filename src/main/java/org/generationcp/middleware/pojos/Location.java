@@ -43,6 +43,7 @@ public class Location implements Serializable, Comparable<Location>{
     public static final String GET_ALL_PROVINCES = "select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV' order by l.lname";
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "locid")
     @XmlElement(name = "locationId")
