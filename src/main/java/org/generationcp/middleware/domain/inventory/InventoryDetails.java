@@ -66,14 +66,21 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	
 	
 	String comment;
-	
-	String parentage; // listdata.grpname
-	
-	Integer entryId; // listdata.entryid
-	
-	String source; // listdata.source
+
+	// listdata.grpname
+	String parentage;
+
+	// listdata.entryid
+	Integer entryId;
+
+	// listdata.source
+	String source;
 
 	String inventoryID;
+
+	/** The ff. fields are from seed inventory import */
+	private String entryCode;
+	private String cross;
 
 	/**
 	 * Instantiates a new inventory details.
@@ -125,6 +132,24 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.scaleId = scaleId;
 		this.entryId = entryId;
 	}
+
+	public InventoryDetails(Integer entryId,String desig,Integer gid,String cross,String source,String entryCode,String stockId,Double seedQuantity) {
+		this.entryId = entryId;
+		this.germplasmName = desig;
+		this.gid = gid;
+		this.cross = cross;
+		this.source = source;
+		this.entryCode = entryCode;
+		this.inventoryID = stockId;
+		this.amount = seedQuantity;
+
+
+
+		this.entryId = entryId;
+	}
+
+
+
 
 	/**
 	 * Gets the gid.
@@ -623,5 +648,21 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setInventoryID(String inventoryID) {
 		this.inventoryID = inventoryID;
+	}
+
+	public String getEntryCode() {
+		return entryCode;
+	}
+
+	public void setEntryCode(String entryCode) {
+		this.entryCode = entryCode;
+	}
+
+	public String getCross() {
+		return cross;
+	}
+
+	public void setCross(String cross) {
+		this.cross = cross;
 	}
 }
