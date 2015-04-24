@@ -39,6 +39,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     private static final String STATUS_DELETED = "9";
 	private static final String STOCK_IDS = "stockIDs";
+	private static final String INVENTORY_ID = "inventoryID";
+	private static final String GERMPLSM = "germplsm";
+	private static final String Q_NO_SPACES = "qNoSpaces";
+	private static final String Q_STANDARDIZED = "qStandardized";
 
     @Override
     public Germplasm getById(Integer gid,  boolean lock) throws MiddlewareQueryException {
@@ -787,7 +791,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            	p1Query.setParameter("gid", q);
 	            }
 	            
-	            p1Query.addEntity("germplsm", Germplasm.class);
+	            p1Query.addEntity(GERMPLSM, Germplasm.class);
 	            p1Query.addScalar(STOCK_IDS);
 	            result.addAll(getSearchForGermplasmsResult(p1Query.list()));
             }
@@ -799,22 +803,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             if(o.equals(Operation.EQUAL)) {
             	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_EQUAL);
             	p2Query.setParameter("q", q);
-            	p2Query.setParameter("qNoSpaces", q.replace(" ", ""));
-            	p2Query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+            	p2Query.setParameter(Q_NO_SPACES, q.replace(" ", ""));
+            	p2Query.setParameter(Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
             } else {
             	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE);
                 if(q.contains("%") || q.contains("_")){
                 	p2Query.setParameter("q", q);
-                	p2Query.setParameter("qNoSpaces", q.replace(" ", ""));
-                	p2Query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+                	p2Query.setParameter(Q_NO_SPACES, q.replace(" ", ""));
+                	p2Query.setParameter(Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
                 } else {
                 	p2Query.setParameter("q", q+"%");
-                	p2Query.setParameter("qNoSpaces", q.replace(" ", "")+"%");
-                	p2Query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q)+"%");
+                	p2Query.setParameter(Q_NO_SPACES, q.replace(" ", "")+"%");
+                	p2Query.setParameter(Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q)+"%");
                 }
             }
             p2Query.setParameter("deletedStatus", STATUS_DELETED);
-            p2Query.addEntity("germplsm", Germplasm.class);
+            p2Query.addEntity(GERMPLSM, Germplasm.class);
             p2Query.addScalar(STOCK_IDS);
             result.addAll(getSearchForGermplasmsResult(p2Query.list()));
             
@@ -832,7 +836,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     if(!parentGids.isEmpty()){
                         SQLQuery pQuery = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
                         pQuery.setParameterList("gids", parentGids);
-                        pQuery.addEntity("germplsm", Germplasm.class);
+                        pQuery.addEntity(GERMPLSM, Germplasm.class);
                         pQuery.addScalar(STOCK_IDS);
                         resultParents.addAll(getSearchForGermplasmsResult(pQuery.list()));
                     }
@@ -874,16 +878,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         if(o.equals(Operation.LIKE) || q.endsWith("%")){
         	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE);
         	if(q.contains("%") || q.contains("_")){
-        		p1Query.setParameter("inventoryID", q);
+        		p1Query.setParameter(INVENTORY_ID, q);
         	}else{
-        		p1Query.setParameter("inventoryID", q+"%");
+        		p1Query.setParameter(INVENTORY_ID, q+"%");
         	}
         } else {
         	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID);
-        	p1Query.setParameter("inventoryID", q);
+        	p1Query.setParameter(INVENTORY_ID, q);
         }
         
-        p1Query.addEntity("germplsm", Germplasm.class);
+        p1Query.addEntity(GERMPLSM, Germplasm.class);
         p1Query.addScalar(STOCK_IDS);
         return getSearchForGermplasmsResult(p1Query.list());
 	}
