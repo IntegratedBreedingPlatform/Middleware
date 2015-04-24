@@ -53,6 +53,7 @@ public class User implements Serializable, BeanFormState {
     public static final String GET_ALL_USERS_SORTED = "getAllUsersSorted";
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "userid")
     private Integer userid;

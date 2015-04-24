@@ -592,6 +592,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             // begin save transaction
             trans = session.beginTransaction();
 
+            //kim
+            /*
             SQLQuery q = session.createSQLQuery("SELECT MAX(personid) FROM persons");
             Integer personId = (Integer) q.uniqueResult();
 
@@ -600,8 +602,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             } else {
                 person.setId(personId + 1);
             }
+            */
 
-            Person recordSaved = getPersonDao().saveOrUpdate(person);
+            Person recordSaved = getPersonDao().save(person);
             idPersonSaved = recordSaved.getId();
 
             trans.commit();
@@ -623,6 +626,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             // begin save transaction
             trans = session.beginTransaction();
 
+            //kim
+            /*
             SQLQuery q = session.createSQLQuery("SELECT MAX(userid) FROM users");
             Integer userId = (Integer) q.uniqueResult();
 
@@ -631,8 +636,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             } else {
                 user.setUserid(userId + 1);
             }
+            */
 
-            User recordSaved = getUserDao().saveOrUpdate(user);
+            User recordSaved = getUserDao().save(user);
             idUserSaved = recordSaved.getUserid();
 
             trans.commit();

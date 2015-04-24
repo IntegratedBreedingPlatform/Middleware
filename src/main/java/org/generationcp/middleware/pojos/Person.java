@@ -30,6 +30,7 @@ public class Person implements  Comparable<Person>, Serializable{
     private static final long serialVersionUID = -3159738927364282485L;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "personid")
     private Integer id;
