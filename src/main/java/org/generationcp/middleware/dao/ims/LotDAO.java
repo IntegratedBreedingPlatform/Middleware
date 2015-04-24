@@ -32,7 +32,9 @@ import java.util.*;
 public class LotDAO extends GenericDAO<Lot, Integer>{
 
     
-    private static final String GET_LOTS_FOR_GERMPLASM = 
+    private static final String GROUP_BY_I_LOTID = " GROUP BY i.lotid ";
+
+	private static final String GET_LOTS_FOR_GERMPLASM = 
     						"SELECT i.lotid, i.eid, " +
     						"  locid, scaleid, i.comments, " +
     						"  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, " +
@@ -41,28 +43,26 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     						"  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids " +
     						"FROM ims_lot i " +
     						"LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
-    						"WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " +
-    						"GROUP BY i.lotid ";
-    
-    private static final String GET_UNIQUE_LOT_FOR_LIST_ENTRIES = 
-							"SELECT i.lotid, i.eid, " +
-							"  locid, scaleid, i.comments, " +
-							"  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, " +
-							"  SUM(trnqty) AS available_balance, " +
-							"  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, " +
-							"  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids " +
-							"FROM ims_lot i " +
-							"LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
-							"WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) AND act.sourceid = :listId " +
-							"GROUP BY i.lotid ";
+    						"WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) ";
+
+    private static final String GET_LOTS_FOR_LIST_ENTRY = "SELECT lot.*, recordid, trnqty * -1 " +
+							"FROM " + 
+							"   (" + GET_LOTS_FOR_GERMPLASM + GROUP_BY_I_LOTID + "   ) lot " +
+							" LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " +
+							"  AND trnstat = 0 AND trnqty < 0 " +
+							"  AND sourceid = :listId AND sourcetype = 'LIST' ";
 	
+    private static final String GET_UNIQUE_LOT_FOR_LIST_ENTRIES = GET_LOTS_FOR_GERMPLASM 
+    						+ " AND act.sourceid = :listId " 
+    						+ GROUP_BY_I_LOTID;
+	    
     private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1 " +
 	    					"FROM " + 
 	    					"   (" + GET_UNIQUE_LOT_FOR_LIST_ENTRIES + "   ) lot " +
 	    					" LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " +
 	    					"  AND trnstat = 0 AND trnqty < 0 " +
 	    					"  AND sourceid = :listId AND sourcetype = 'LIST' ";
-
+    
 
 	@SuppressWarnings("unchecked")
     public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
@@ -338,7 +338,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     	List<Lot> lots = new ArrayList<Lot>();
     	
     	try {
-    		String sql = GET_LOTS_FOR_LIST_ENTRIES + "ORDER by lot.lotid ";
+    		String sql = GET_LOTS_FOR_LIST_ENTRY + " ORDER by lot.lotid ";
     		
     		Query query = getSession().createSQLQuery(sql);
     		query.setParameterList("gids", Collections.singletonList(gid));
@@ -359,7 +359,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     	List<Lot> lots = new ArrayList<Lot>();
     	
     	try {
-    		String sql = GET_LOTS_FOR_LIST_ENTRIES + "ORDER by lot.eid ";
+    		String sql = GET_LOTS_FOR_LIST_ENTRIES + " ORDER by lot.eid ";
     		
     		Query query = getSession().createSQLQuery(sql);
     		query.setParameterList("gids", gids);
@@ -379,7 +379,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     	List<Lot> lots = new ArrayList<Lot>();
     	
     	try {
-    		String sql = GET_LOTS_FOR_GERMPLASM + "ORDER by lotid ";
+    		String sql = GET_LOTS_FOR_GERMPLASM + GROUP_BY_I_LOTID + "ORDER by lotid ";
     		
     		Query query = getSession().createSQLQuery(sql);
     		query.setParameterList("gids", Collections.singleton(gid));
