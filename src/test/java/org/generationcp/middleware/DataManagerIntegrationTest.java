@@ -8,6 +8,9 @@ import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.CropType.CropEnum;
+import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -23,10 +26,12 @@ public class DataManagerIntegrationTest extends MiddlewareIntegrationTest {
 		
 		HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(
 				sessionUtil.getSessionFactory());
-
+		
 		managerFactory = new ManagerFactory();
 		managerFactory.setSessionProvider(sessionProvider);
 		managerFactory.setDatabaseName(connectionParameters.getDbName());
+		managerFactory.setCropName(CropEnum.RICE.toString());
+		managerFactory.setPedigreeProfile(PedigreeFactory.PROFILE_DEFAULT);
 	}
 	
 	@BeforeClass

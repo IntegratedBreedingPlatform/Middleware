@@ -11,17 +11,26 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
-
-import java.util.List;
-import java.util.Map;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -1112,16 +1121,7 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode) throws MiddlewareQueryException;
-
-    /**
-     * Gets the cross expansion.
-     *
-     * @param gid the gid
-     * @param level the level
-     * @return The cross expansion based on the given gid and level
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
+    
     
     /**
      * Please use LocationDataManager.getAllBreedingLocations().
@@ -1431,5 +1431,5 @@ public interface GermplasmDataManager {
      * get the Germplasm from the crop database based on local gid reference 
      * @param lgid
      */
-	Germplasm getGermplasmByLocalGid(Integer lgid) throws MiddlewareQueryException;
+	Germplasm getGermplasmByLocalGid(Integer lgid) throws MiddlewareQueryException;	
 }
