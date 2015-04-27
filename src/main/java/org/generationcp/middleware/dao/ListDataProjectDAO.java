@@ -83,8 +83,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 					+ " ON stock.dbxref_id = ldp.germplasm_id"
 					+ " INNER JOIN listnms nms"
 					+ " ON nms.listid = ldp.list_id"
-					+ " ON nms.liststatus != 9"
-					+ " WHERE nms.listtype = :LIST_TYPE"
+					+ " WHERE nms.liststatus != 9"
+					+ " AND nms.listtype = :LIST_TYPE"
 					+ " AND nms.projectid = :STUDY_ID"
 					+ " AND nep.type_id IN ( :PLOT_NO_TERM_IDS )"
 					+ " AND nep.value = :PLOT_NO";
