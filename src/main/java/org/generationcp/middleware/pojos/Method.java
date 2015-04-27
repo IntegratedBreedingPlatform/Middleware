@@ -47,6 +47,7 @@ public class Method implements Serializable{
     public static final String GET_ALL = "getAllMethods";
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "mid")
     @XmlElement(name = "methodId")

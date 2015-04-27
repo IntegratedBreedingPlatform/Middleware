@@ -612,10 +612,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             MethodDAO dao = getMethodDao();
 
             // Auto-assign IDs for new records
+            //kim
+            /*
             Integer nextId = dao.getNextId("mid");
             method.setMid(nextId);
+            */
 
-            Method recordSaved = dao.saveOrUpdate(method);
+            Method recordSaved = dao.save(method);
             methodId = recordSaved.getMid();
 
             trans.commit();
