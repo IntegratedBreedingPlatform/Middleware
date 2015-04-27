@@ -1,5 +1,7 @@
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
@@ -65,6 +67,48 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		}
 		return result;
 	}
+
+	@SuppressWarnings("unchecked")
+	public ListDataProject getByStudy(int studyId,GermplasmListType listType,int plotNo) throws MiddlewareQueryException {
+		try {
+
+			String queryStr = "SELECT DISTINCT {ldp.*} FROM nd_experimentprop nep"
+					+ " INNER JOIN nd_experiment ne"
+					+ " ON ne.nd_experiment_id = nep.nd_experiment_id"
+					+ " INNER JOIN nd_experiment_stock nes"
+					+ " ON ne.nd_experiment_id = nes.nd_experiment_id"
+					+ " INNER JOIN stock"
+					+ " ON stock.stock_id = nes.stock_id"
+					+ " INNER JOIN listdata_project ldp"
+					+ " ON stock.dbxref_id = ldp.germplasm_id"
+					+ " INNER JOIN listnms nms"
+					+ " ON nms.listid = ldp.list_id"
+					+ " WHERE nms.liststatus != 9"
+					+ " AND nms.listtype = :LIST_TYPE"
+					+ " AND nms.projectid = :STUDY_ID"
+					+ " AND nep.type_id IN ( :PLOT_NO_TERM_IDS )"
+					+ " AND nep.value = :PLOT_NO";
+
+
+			SQLQuery query = getSession().createSQLQuery(queryStr);
+			query.addEntity("ldp",ListDataProject.class);
+			query.setParameter("LIST_TYPE", listType.name());
+			query.setParameter("STUDY_ID", studyId);
+			query.setParameter("PLOT_NO",plotNo);
+			query.setParameterList("PLOT_NO_TERM_IDS",
+					new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+
+			return (ListDataProject) query.uniqueResult();
+
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
+		}
+
+		return null;
+
+	}
+
 
 	public void deleteByListIdWithList(int listId) throws MiddlewareQueryException {
 		try {

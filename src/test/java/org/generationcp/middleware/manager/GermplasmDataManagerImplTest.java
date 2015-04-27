@@ -39,6 +39,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -47,6 +49,7 @@ import org.junit.Test;
 
 public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 
+	private static PedigreeService pedigreeService;
     private static GermplasmDataManager manager;
     private static LocationDataManager locationManager;
     private static UserDataManager userDataManager;
@@ -61,7 +64,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
         locationManager = managerFactory.getLocationDataManager();
         userDataManager = managerFactory.getUserDataManager();
         germplasmTestDataGenerator = new GermplasmTestDataGenerator(manager);
-
+        pedigreeService = managerFactory.getPedigreeService();
         // make sure a seed User(1) is present in the db otherwise add one
         User user = userDataManager.getUserById(1);
         if(user == null) {
@@ -690,7 +693,9 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
     
     @Test
     public void testGetCrossExpansion() throws Exception {
-        Debug.println(manager.getCrossExpansion(Integer.valueOf(1), 2));
+    	CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
+    	crossExpansionProperties.setDefaultLevel(1);
+        Debug.println(pedigreeService.getCrossExpansion(Integer.valueOf(1), crossExpansionProperties));
     }
     
     @Test

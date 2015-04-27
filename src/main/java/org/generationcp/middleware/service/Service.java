@@ -143,6 +143,6 @@ public abstract class Service extends DatabaseBroker {
 
     protected final NameBuilder getNameBuilder() {
     	return new NameBuilder(sessionProvider);
-    }
+    }    
     
 }
