@@ -1265,7 +1265,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
         try {
             trans = session.beginTransaction();
-            getSecurityQuestionDao().saveOrUpdate(securityQuestion);
+            getSecurityQuestionDao().save(securityQuestion);
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);

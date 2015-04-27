@@ -31,7 +31,7 @@ public class SecurityQuestion implements Serializable{
     private static final long serialVersionUID = -7342162622987974268L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "security_question_id")
     private Integer securityQuestionId;
