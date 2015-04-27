@@ -142,10 +142,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.entryCode = entryCode;
 		this.inventoryID = stockId;
 		this.amount = seedQuantity;
-
-
-
-		this.entryId = entryId;
 	}
 
 
