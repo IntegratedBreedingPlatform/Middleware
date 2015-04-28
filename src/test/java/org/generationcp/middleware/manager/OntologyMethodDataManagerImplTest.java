@@ -46,6 +46,13 @@ public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTes
     }
 
     @Test
+    public void testGetMethodById() throws Exception{
+        Method method = manager.getMethod(4040);
+        Assert.assertNotNull(method);
+        Assert.assertEquals("Enumerated", method.getName());
+    }
+
+    @Test
     public void testAddMethod() throws Exception {
         Assert.assertNotNull(testMethod.getId());
         Assert.assertTrue(testMethod.getId() > 0);
