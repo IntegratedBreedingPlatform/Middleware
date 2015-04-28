@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -229,6 +230,9 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
                 getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
             }
 
+            //Save creation time
+            getCvTermPropertyDao().save(property.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+
             transaction.commit();
         } catch (Exception e) {
             rollbackTransaction(transaction);
@@ -316,6 +320,9 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
                 //Remove trait class if not in used
                 this.basicDataManager.removeTraitClass(cl.getObjectId());
             }
+
+            // Save last modified Time
+            getCvTermPropertyDao().save(property.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
 
             transaction.commit();
         } catch (Exception e) {
