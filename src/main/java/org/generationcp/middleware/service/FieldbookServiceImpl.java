@@ -35,13 +35,12 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -481,8 +480,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public Integer saveCrossesGermplasmList(Map<Germplasm, GermplasmListData> listDataItems
-                            , GermplasmList germplasmList)
+    public Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems
+            , GermplasmList germplasmList)
             throws MiddlewareQueryException {
         
         Session session = getCurrentSession();
@@ -536,7 +535,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             session.flush();
         }
 
-        LOG.debug("========== saveCrossesGermplasmList Duration (ms): " 
+        LOG.debug("========== saveGermplasmList Duration (ms): "
                     + ((System.currentTimeMillis() - startTime)/60));
 
         return listId;
