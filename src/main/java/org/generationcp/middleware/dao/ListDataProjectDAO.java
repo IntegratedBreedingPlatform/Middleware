@@ -87,7 +87,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 					+ "      AND pr.object_project_id = l.projectid"
 					+ "      AND l.listtype = :LIST_TYPE"
 					+ "      AND nep.VALUE = :PLOT_NO"
-					+ "      AND p.project_id = :STUDY_ID";
+					+ "      AND l.projectid = :STUDY_ID";
 
 
 			SQLQuery query = getSession().createSQLQuery(queryStr);
