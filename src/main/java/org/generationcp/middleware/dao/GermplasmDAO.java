@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -21,7 +22,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -43,6 +43,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
+	private static final String AVAIL_INV = "availInv";
+	private static final String SEED_RES = "seedRes";
 
     @Override
     public Germplasm getById(Integer gid,  boolean lock) throws MiddlewareQueryException {
@@ -754,16 +756,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     
 
     /**
-     * Get Germplasms with names like Q or germplasms part of list with names like Q
+     * Search for germplasms given a search term
+     * 
      * @param q - the search term to be used
      * @param o - like or equal
      * @param includeParents boolean flag to denote whether parents will be included in search results
-     * @param searchByNameInLocalDbAlso - set this to true if you are using Central session and also want to search germplasm by name for local db
+     * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
      * @return List of Germplasms
      * @throws MiddlewareQueryException 
      */
-    @SuppressWarnings({ "unchecked" })
-	public List<Germplasm> searchForGermplasms(String searchedString, Operation o, boolean includeParents, boolean searchByNameInLocalDbAlso, Session localSession)
+    public List<Germplasm> searchForGermplasms(String searchedString, Operation o, 
+    		boolean includeParents, boolean withInventoryOnly)
             throws MiddlewareQueryException{
         String q = searchedString.trim();
         if("".equals(q)){
@@ -774,62 +777,50 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             Set<Germplasm> result = new LinkedHashSet<Germplasm>();
             Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
             
-            //First priority, germplasms with GID=q and inventory_id=q
+            String additionalQuery = withInventoryOnly?Germplasm.WHERE_WITH_INVENTORY:"";
             
-            if(q.matches("(\\d+)(%|_)?") || q.matches("(-\\d+)(%|_)?")) {
+            //find germplasms with GID = or like q
+            if(q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
             	SQLQuery p1Query;
-	            if(o.equals(Operation.LIKE) || q.endsWith("%")){
-	            	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE);
-	            	if(q.contains("%") || q.contains("_")){
-	            		p1Query.setParameter("gid", q);
-	            	}else{
-	            		p1Query.setParameter("gid", q+"%");
-	            	}
+            	if(o.equals(Operation.LIKE)){
+	            	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE+additionalQuery);
+	            	p1Query.setParameter("gid", q);
 	            } else {
-	            	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
+	            	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID+additionalQuery);
 	            	p1Query.setParameter("gidLength", q.length());
 	            	p1Query.setParameter("gid", q);
 	            }
 	            
 	            p1Query.addEntity(GERMPLSM, Germplasm.class);
-	            p1Query.addScalar(STOCK_IDS);
+	            addInventoryInfo(p1Query);
 	            result.addAll(getSearchForGermplasmsResult(p1Query.list()));
             }
+            //find germplasms with inventory_id = or like q
+            result.addAll(searchForGermplasmsByInventoryId(q,o,additionalQuery));
             
-            result.addAll(searchForGermplasmsByInventoryId(q,o));
-            
-            //Second priority, get germplasms with nVal like q
+            //find germplasms with nVal = or like q
             SQLQuery p2Query;
-            if(o.equals(Operation.EQUAL)) {
-            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_EQUAL);
-            	p2Query.setParameter("q", q);
-            	p2Query.setParameter(Q_NO_SPACES, q.replace(" ", ""));
-            	p2Query.setParameter(Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
+            if(o.equals(Operation.LIKE)) {
+            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE+additionalQuery);
             } else {
-            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE);
-                if(q.contains("%") || q.contains("_")){
-                	p2Query.setParameter("q", q);
-                	p2Query.setParameter(Q_NO_SPACES, q.replace(" ", ""));
-                	p2Query.setParameter(Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
-                } else {
-                	p2Query.setParameter("q", q+"%");
-                	p2Query.setParameter(Q_NO_SPACES, q.replace(" ", "")+"%");
-                	p2Query.setParameter(Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q)+"%");
-                }
+            	p2Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME+additionalQuery);
             }
+            p2Query.setParameter("q", q);
+        	p2Query.setParameter(Q_NO_SPACES, q.replaceAll(" ", ""));
+        	p2Query.setParameter(Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
             p2Query.setParameter("deletedStatus", STATUS_DELETED);
             p2Query.addEntity(GERMPLSM, Germplasm.class);
-            p2Query.addScalar(STOCK_IDS);
+            addInventoryInfo(p2Query);
             result.addAll(getSearchForGermplasmsResult(p2Query.list()));
             
             //Add parents to results if specified by "includeParents" flag
             if(includeParents){
                 for(Germplasm g: result){
                     List<Integer> parentGids = new ArrayList<Integer>();
-                    if(g!=null && g.getGpid1()!=null && g.getGpid1()!=0) {
+                    if(g.getGpid1()!=null && g.getGpid1()!=0) {
                         parentGids.add(g.getGpid1());
                     }
-                    if(g!=null && g.getGpid2()!=null && g.getGpid2()!=0) {
+                    if(g.getGpid2()!=null && g.getGpid2()!=0) {
                         parentGids.add(g.getGpid2());
                     }
                     
@@ -837,7 +828,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                         SQLQuery pQuery = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
                         pQuery.setParameterList("gids", parentGids);
                         pQuery.addEntity(GERMPLSM, Germplasm.class);
-                        pQuery.addScalar(STOCK_IDS);
+                        addInventoryInfo(pQuery);
                         resultParents.addAll(getSearchForGermplasmsResult(pQuery.list()));
                     }
                 }
@@ -853,17 +844,31 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
-    private List<Germplasm> getSearchForGermplasmsResult(
+    private void addInventoryInfo(SQLQuery query) {
+    	query.addScalar(STOCK_IDS);
+    	query.addScalar(AVAIL_INV);
+    	query.addScalar(SEED_RES);
+	}
+
+	private List<Germplasm> getSearchForGermplasmsResult(
     		List<Object[]> result) {
     	List<Germplasm> germplasms = new ArrayList<Germplasm>();
     	if(result!=null) {
 	    	for (Object[] row : result) {
-	    		Germplasm germplasm = (Germplasm)row[0];
-	    		germplasm.setStockIDs((String)row[1]);
-	    		germplasms.add(germplasm);
+	    		germplasms.add(mapToGermplasm(row));
 	        }
     	}
     	return germplasms;
+	}
+
+	private Germplasm mapToGermplasm(Object[] row) {
+		Germplasm germplasm = (Germplasm)row[0];
+		GermplasmInventory inventoryInfo = new GermplasmInventory(germplasm.getGid());
+		inventoryInfo.setStockIDs((String)row[1]);
+		inventoryInfo.setActualInventoryLotCount(row[2]!=null?((BigInteger)row[2]).intValue():0);
+		inventoryInfo.setReservedLotCount(row[3]!=null?((BigInteger)row[3]).intValue():0);
+		germplasm.setInventoryInfo(inventoryInfo);
+		return germplasm;
 	}
 
 	/**
@@ -873,22 +878,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
      */
     @SuppressWarnings("unchecked")
 	protected List<Germplasm> searchForGermplasmsByInventoryId(
-			String q, Operation o) {
+			String q, Operation o, String additionalQuery) {
     	SQLQuery p1Query;
-        if(o.equals(Operation.LIKE) || q.endsWith("%")){
-        	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE);
-        	if(q.contains("%") || q.contains("_")){
-        		p1Query.setParameter(INVENTORY_ID, q);
-        	}else{
-        		p1Query.setParameter(INVENTORY_ID, q+"%");
-        	}
+        if(o.equals(Operation.LIKE)){
+        	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE+additionalQuery);
         } else {
-        	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID);
-        	p1Query.setParameter(INVENTORY_ID, q);
+        	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID+additionalQuery);
         }
-        
+        p1Query.setParameter(INVENTORY_ID, q);
         p1Query.addEntity(GERMPLSM, Germplasm.class);
-        p1Query.addScalar(STOCK_IDS);
+        addInventoryInfo(p1Query);
         return getSearchForGermplasmsResult(p1Query.list());
 	}
 
