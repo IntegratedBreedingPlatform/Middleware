@@ -54,6 +54,13 @@ public class OntologyScaleDataManagerImplTest extends DataManagerIntegrationTest
     }
 
     @Test
+    public void testGetScaleById() throws Exception {
+        Scale scale = manager.getScaleById(6025);
+        Assert.assertNotNull(scale);
+        Assert.assertEquals("CSSI", scale.getName());
+    }
+
+    @Test
     public void testAddScale() throws Exception {
         Assert.assertNotNull(testScale.getId());
         Assert.assertTrue(testScale.getId() > 0);
