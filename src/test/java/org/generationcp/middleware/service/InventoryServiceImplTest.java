@@ -24,6 +24,8 @@ public class InventoryServiceImplTest extends DataManagerIntegrationTest {
 
 	private static InventoryService inventoryService;
 
+	public static final String TEST_INVENTORY_ID = "TR1-123";
+
 	@BeforeClass
 	public static void setUp() throws Exception {
 		inventoryService = managerFactory.getInventoryMiddlewareService();
@@ -44,7 +46,7 @@ public class InventoryServiceImplTest extends DataManagerIntegrationTest {
 		double amount = 1.23456;
 		int listId = 1426;
 		LotsResult result = inventoryService.addLotsForList(gids, locationId, scaleId, comment,
-				userId, amount, listId);
+				userId, amount, listId, TEST_INVENTORY_ID);
 		if (result != null) {
 			Debug.printFormattedObject(INDENT, result);
 		}

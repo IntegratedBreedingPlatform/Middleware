@@ -63,7 +63,7 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 	@Override
 	public LotsResult addLotsForList(List<Integer> gids, Integer locationId, Integer scaleId,
 			String comment,
-			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
+			Integer userId, Double amount, Integer sourceId, String inventoryID) throws MiddlewareQueryException {
 
 		LotsResult result = getLotBuilder().getGidsForUpdateAndAdd(gids);
 		List<Integer> newGids = result.getGidsAdded();
@@ -106,7 +106,7 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
 		// Add new transactions - for non-existing gid/location/scale combination
 		List<Transaction> transactionsForAdd = getTransactionBuilder()
-				.buildForSave(lots, amount, userId, comment, sourceId);
+				.buildForSave(lots, amount, userId, comment, sourceId, inventoryID);
 		getInventoryDataManager().addTransactions(transactionsForAdd);
 
 		return result;
