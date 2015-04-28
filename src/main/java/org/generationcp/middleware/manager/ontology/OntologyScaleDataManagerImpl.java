@@ -13,6 +13,7 @@ import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -220,6 +221,9 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 }
             }
 
+            //Save creation time
+            getCvTermPropertyDao().save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+
             transaction.commit();
 
         } catch (Exception e) {
@@ -404,6 +408,9 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             if(!scale.getDataType().equals(DataType.CATEGORICAL_VARIABLE) && cvId != null) {
                 getCvDao().makeTransient(getCvDao().getById(cvId));
             }
+
+            // Save last modified Time
+            getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
 
             transaction.commit();
 
