@@ -3,12 +3,15 @@ package org.generationcp.middleware.manager.ontology;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -75,6 +78,10 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             trans = session.beginTransaction();
             term = getCvTermDao().save(method.getName(), method.getDefinition(), CvId.METHODS);
             method.setId(term.getCvTermId());
+
+            // Save creation time
+            getCvTermPropertyDao().save(method.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -103,6 +110,9 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
             getCvTermDao().merge(term);
 
+            // Save last modified Time
+            getCvTermPropertyDao().save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -127,6 +137,12 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
         try {
             trans = session.beginTransaction();
+
+            //delete properties
+            List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
+            for(CVTermProperty property : properties){
+                getCvTermPropertyDao().makeTransient(property);
+            }
 
             getCvTermDao().makeTransient(term);
 
