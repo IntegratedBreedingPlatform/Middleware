@@ -40,7 +40,7 @@ public class TransactionBuilder  extends Builder {
 				transactions.add(new Transaction(/*id*/ null, userId, lot, getCurrentDate(), TransactionStatus.ANTICIPATED.getIntValue(), 
 						/*quantity*/ formatAmount(amount), comment, COMMITMENT_DATE_INDEFINITE, 
 						/*sourceType: LIST for now */ EntityType.LIST.name(),
-						sourceId, /*sourceRecordId*/ lot.getEntityId(), /*prevAmount*/ 0d, getPersonId(userId)));
+						sourceId, /*sourceRecordId*/ lot.getEntityId(), /*prevAmount*/ 0d, getPersonId(userId), null));
 		}
 		return transactions;
 	}

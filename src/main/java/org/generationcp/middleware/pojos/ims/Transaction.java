@@ -99,7 +99,7 @@ public class Transaction implements Serializable{
 
     public Transaction(Integer id, Integer userId, Lot lot, Integer transactionDate, Integer status, 
     		Double quantity, String comments, Integer commitmentDate, String sourceType, Integer sourceId, 
-    		Integer sourceRecordId, Double previousAmount, Integer personId) {
+    		Integer sourceRecordId, Double previousAmount, Integer personId, String inventoryID) {
         super();
         this.id = id;
         this.userId = userId;
@@ -114,6 +114,7 @@ public class Transaction implements Serializable{
         this.sourceRecordId = sourceRecordId;
         this.previousAmount = previousAmount;
         this.personId = personId;
+        this.inventoryID = inventoryID;
     }
 
     public Integer getId() {
