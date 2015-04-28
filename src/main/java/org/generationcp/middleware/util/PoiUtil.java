@@ -70,7 +70,7 @@ public class PoiUtil {
 
     public static String getCellStringValue(Cell cell) {
         try {
-            return cell == null ? null : cell.getStringCellValue().trim();
+            return cell == null ? null : getCellValue(cell).toString().trim();
         } catch (Exception e) {
         	LOG.error(e.getMessage(),e);
             return String.format("%s", getCellValue(cell));
