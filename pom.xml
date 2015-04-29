@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-	<version>4.0.2.RELEASE</version>
+	<version>4.0.0.M2</version>
 	<name>ibp middleware</name>
 
 	<distributionManagement>
