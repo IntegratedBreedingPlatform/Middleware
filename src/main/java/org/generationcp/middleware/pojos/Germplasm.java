@@ -13,6 +13,7 @@ package org.generationcp.middleware.pojos;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
@@ -223,21 +224,45 @@ public class Germplasm implements Serializable{
     /**
      * Used in germplasm data manager searchForGermplasm
      */
-    public static final String SEARCH_GERMPLASM_BY_GID = 
-    		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
-			"FROM germplsm g " +
+    public static final String GENERAL_SELECT_FROM = "SELECT * FROM ";
+    public static final String GERMPLASM_ALIAS = "AS germplasm ";
+    public static final String INVENTORY_ALIAS = "AS inventory ";
+    public static final String JOIN_ON_GERMPLASM_AND_INVENTORY = "ON germplasm.gid = inventory.entity_id ";
+    public static final String SEARCH_GERMPLASM_WITH_INVENTORY = 
+    		"SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) as availInv, Count(DISTINCT lotid) as seedRes " +
+			"FROM ( SELECT i.lotid, i.eid AS entity_id, " +
+				"SUM(trnqty) AS avail_bal " +
+				"FROM ims_lot i " +
+				"LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 " +
+				"WHERE i.status = 0 AND i.etype = 'GERMPLSM' " +
+				"GROUP BY i.lotid " +
+				"HAVING avail_bal > -1) inv " +
+			"GROUP BY entity_id";
+    public static final String WHERE_WITH_INVENTORY = "WHERE availInv > 0 ";
+    public static final String SEARCH_GERMPLASM_BY_GID =
+    		GENERAL_SELECT_FROM + "(" + 
+			"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
+    		"FROM germplsm g " +
     	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
     	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
     		"WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0 " + 
-    		"GROUP BY g.gid";
+    		"GROUP BY g.gid" +
+    		") " + GERMPLASM_ALIAS + 
+    		"LEFT JOIN (" + SEARCH_GERMPLASM_WITH_INVENTORY + ")" + INVENTORY_ALIAS +
+    		JOIN_ON_GERMPLASM_AND_INVENTORY;
     public static final String SEARCH_GERMPLASM_BY_GID_LIKE = 
+    		GENERAL_SELECT_FROM + "(" + 
     		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
 			"FROM germplsm g " +
     	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
     	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
     		"WHERE g.gid LIKE :gid AND g.gid!=g.grplce AND g.grplce = 0 " + 
-    		"GROUP BY g.gid";
+    		"GROUP BY g.gid" +
+	   		") " + GERMPLASM_ALIAS + 
+	   		"LEFT JOIN (" + SEARCH_GERMPLASM_WITH_INVENTORY + ")" + INVENTORY_ALIAS +
+	   		JOIN_ON_GERMPLASM_AND_INVENTORY;
     public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID =
+    		GENERAL_SELECT_FROM + "(" + 
     		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
     	    "FROM germplsm g " +
     	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
@@ -245,8 +270,12 @@ public class Germplasm implements Serializable{
     	    ", ims_lot l, ims_transaction t " +
     		"WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid " +
     		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID " + 
-    		"GROUP BY g.gid";
+    		"GROUP BY g.gid" +
+	   		") " + GERMPLASM_ALIAS + 
+	   		"LEFT JOIN (" + SEARCH_GERMPLASM_WITH_INVENTORY + ")" + INVENTORY_ALIAS +
+	   		JOIN_ON_GERMPLASM_AND_INVENTORY;
     public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE = 
+    		GENERAL_SELECT_FROM + "(" + 
     		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
 			"FROM germplsm g " +
     	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
@@ -254,15 +283,23 @@ public class Germplasm implements Serializable{
     	    ", ims_lot l, ims_transaction t " +
     	    "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid " +
     		"AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID " + 
-    		"GROUP BY g.gid";
+    		"GROUP BY g.gid" +
+	   		") " + GERMPLASM_ALIAS + 
+	   		"LEFT JOIN (" + SEARCH_GERMPLASM_WITH_INVENTORY + ")" + INVENTORY_ALIAS +
+	   		JOIN_ON_GERMPLASM_AND_INVENTORY;
     public static final String SEARCH_GERMPLASM_BY_GIDS = 
+    		GENERAL_SELECT_FROM + "(" + 
     		"SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
 			"FROM germplsm g " +
     	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
     	    "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "+
     		"WHERE g.gid IN (:gids) AND g.gid!=g.grplce AND g.grplce = 0 " +
-    		"GROUP BY g.gid";
+    		"GROUP BY g.gid" +
+	   		") " + GERMPLASM_ALIAS + 
+	   		"LEFT JOIN (" + SEARCH_GERMPLASM_WITH_INVENTORY + ")" + INVENTORY_ALIAS +
+	   		JOIN_ON_GERMPLASM_AND_INVENTORY;
     public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE = 
+    		GENERAL_SELECT_FROM + "(" + 
     		"SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
 			"FROM names n, germplsm g " +
     	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
@@ -270,8 +307,12 @@ public class Germplasm implements Serializable{
     		"WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 " +
     		"AND n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) " + 
     		"GROUP BY g.gid " +
-    		"LIMIT 5000";
-    public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_EQUAL = 
+    		"LIMIT 5000" +
+	   		") " + GERMPLASM_ALIAS + 
+	   		"LEFT JOIN (" + SEARCH_GERMPLASM_WITH_INVENTORY + ")" + INVENTORY_ALIAS +
+	   		JOIN_ON_GERMPLASM_AND_INVENTORY;
+    public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = 
+    		GENERAL_SELECT_FROM + "(" + 
     		"SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " +
 			"FROM names n, germplsm g " +
     	    "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "+
@@ -279,7 +320,10 @@ public class Germplasm implements Serializable{
     		"WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 " +
     		"AND n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + 
     		"GROUP BY g.gid " +
-    		"LIMIT 5000";
+    		"LIMIT 5000" +
+    		 ") " + GERMPLASM_ALIAS + 
+    		 "LEFT JOIN (" + SEARCH_GERMPLASM_WITH_INVENTORY + ")" + INVENTORY_ALIAS +
+    		 JOIN_ON_GERMPLASM_AND_INVENTORY;
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
     		"SELECT listid " +
     		"FROM ( " +
@@ -414,7 +458,7 @@ public class Germplasm implements Serializable{
      * always.
      */
     @Transient
-    private String stockIDs = null;
+    private GermplasmInventory inventoryInfo;
 
     public Germplasm() {
     }
@@ -646,22 +690,18 @@ public class Germplasm implements Serializable{
         builder.append(preferredAbbreviation);
         builder.append(", method=");
         builder.append(method);
-        builder.append(", stockIDs=");
-        builder.append(stockIDs);
+        builder.append(", inventoryInfo=");
+        builder.append(inventoryInfo);
         builder.append("]");
         return builder.toString();
     }
 
-	public String getStockIDs() {
-		return stockIDs;
+	public GermplasmInventory getInventoryInfo() {
+		return inventoryInfo;
 	}
 
-	public void setStockIDs(String stockIDs) {
-		this.stockIDs = stockIDs;
+	public void setInventoryInfo(GermplasmInventory inventoryInfo) {
+		this.inventoryInfo = inventoryInfo;
 	}
-    
-    
-    
-    
 
 }

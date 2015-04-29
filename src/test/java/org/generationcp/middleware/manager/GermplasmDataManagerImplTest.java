@@ -838,8 +838,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
   @Test
   public void testSearchGermplasm() throws MiddlewareQueryException{
       String q = "CML";
-      boolean includeParents = true;
-      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, includeParents);
+      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, true, false);
       Debug.println(INDENT, "searchForGermplasm(" + q + "): " + results.size() + " matches found.");
   }         
   
