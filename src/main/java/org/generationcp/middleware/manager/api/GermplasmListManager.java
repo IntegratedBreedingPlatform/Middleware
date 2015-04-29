@@ -639,5 +639,19 @@ public interface GermplasmListManager{
      */
     List<ListDataProperty> saveListDataProperties(List<ListDataProperty> listDataProps) throws MiddlewareQueryException;
 
+    /**
+     * 
+     * @param listID
+     * @return
+     * @throws MiddlewareQueryException
+     */
     List<ListDataProject> retrieveSnapshotListData(Integer listID) throws MiddlewareQueryException;
+    
+    /**
+     * 
+     * @param listID
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID) throws MiddlewareQueryException;
 }

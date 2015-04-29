@@ -23,6 +23,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hibernate.Query;
@@ -608,6 +609,22 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
     	Assert.assertNotNull("It should not be null",data);
     	Assert.assertEquals("It should be equal", listId, data.getList().getId());
     	Assert.assertEquals("It should be equal", lrecId, data.getId());
+	}
+    
+    @Test
+	public void testRetrieveSnapshotListData() throws Exception {
+    	Integer listId = 1;
+    	
+    	List<ListDataProject> listData = manager.retrieveSnapshotListData(listId);
+    	Assert.assertNotNull("It should not be null",listData);
+	}
+    
+    @Test
+	public void testRetrieveSnapshotListDataWithParents() throws Exception {
+    	Integer listId = 1;
+    	
+    	List<ListDataProject> listData = manager.retrieveSnapshotListDataWithParents(listId);
+    	Assert.assertNotNull("It should not be null",listData);
 	}
 
 }
