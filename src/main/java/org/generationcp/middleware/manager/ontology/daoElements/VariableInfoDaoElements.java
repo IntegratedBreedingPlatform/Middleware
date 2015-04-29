@@ -2,9 +2,9 @@ package org.generationcp.middleware.manager.ontology.daoElements;
 
 
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermProgramProperty;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.pojos.oms.VariableProgramOverrides;
 
 import java.util.List;
 
@@ -20,9 +20,7 @@ public class VariableInfoDaoElements {
     private CVTermRelationship propertyRelation;
     private CVTermRelationship scaleRelation;
     private List<CVTermProperty> termProperties;
-    private CVTermProgramProperty aliasProperty;
-    private CVTermProgramProperty minValueProperty;
-    private CVTermProgramProperty maxValueProperty;
+    private VariableProgramOverrides variableProgramOverrides;
 
     public Integer getVariableId() {
         return variableId;
@@ -72,10 +70,6 @@ public class VariableInfoDaoElements {
         this.scaleRelation = scaleRelation;
     }
 
-    public CVTermProgramProperty getAliasProperty() {
-        return aliasProperty;
-    }
-
     public List<CVTermProperty> getTermProperties() {
         return termProperties;
     }
@@ -84,23 +78,11 @@ public class VariableInfoDaoElements {
         this.termProperties = termProperties;
     }
 
-    public void setAliasProperty(CVTermProgramProperty aliasProperty) {
-        this.aliasProperty = aliasProperty;
+    public VariableProgramOverrides getVariableProgramOverrides() {
+        return variableProgramOverrides;
     }
 
-    public CVTermProgramProperty getMinValueProperty() {
-        return minValueProperty;
-    }
-
-    public void setMinValueProperty(CVTermProgramProperty minValueProperty) {
-        this.minValueProperty = minValueProperty;
-    }
-
-    public CVTermProgramProperty getMaxValueProperty() {
-        return maxValueProperty;
-    }
-
-    public void setMaxValueProperty(CVTermProgramProperty maxValueProperty) {
-        this.maxValueProperty = maxValueProperty;
+    public void setVariableProgramOverrides(VariableProgramOverrides variableProgramOverrides) {
+        this.variableProgramOverrides = variableProgramOverrides;
     }
 }

@@ -38,9 +38,6 @@ public class DatabaseBroker {
 
     protected static final int JDBC_BATCH_SIZE = 50;
   
-   // PresetDataManager DAO
-    private ProgramPresetDAO programPresetDAO;
-    
     //StudyDataManager DAO
     private ProjectPropertyDao projectPropertyDao;
 
@@ -231,10 +228,10 @@ public class DatabaseBroker {
     	return cvTermPropertyDao;
     }
 
-    protected final CvTermProgramPropertyDao getCvTermProgramPropertyDao() {
-        CvTermProgramPropertyDao cvTermAliasDao = new CvTermProgramPropertyDao();
-        cvTermAliasDao.setSession(getActiveSession());
-        return cvTermAliasDao;
+    protected final VariableProgramOverridesDao getVariableProgramOverridesDao() {
+        VariableProgramOverridesDao variableProgramOverridesDao = new VariableProgramOverridesDao();
+        variableProgramOverridesDao.setSession(getActiveSession());
+        return variableProgramOverridesDao;
     }
 
     protected final CvTermSynonymDao getCvTermSynonymDao() {
