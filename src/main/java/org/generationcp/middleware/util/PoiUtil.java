@@ -69,12 +69,13 @@ public class PoiUtil {
 
 
     public static String getCellStringValue(Cell cell) {
-        try {
-            return cell == null ? null : cell.getStringCellValue().trim();
-        } catch (Exception e) {
-        	LOG.error(e.getMessage(),e);
-            return String.format("%s", getCellValue(cell));
+        Object out = getCellValue(cell);
+
+        if (out != null) {
+            return out.toString().trim();
         }
+
+        return null;
     }
 
     public static Object getCellValue(Cell cell) {
@@ -526,7 +527,7 @@ public class PoiUtil {
             try {
                 c = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
             } catch (Exception e) {
-            	LOG.error(e.getMessage(),e);
+            	LOG.error(e.getMessage(), e);
                 c = null;
             }
             if (c != null) {

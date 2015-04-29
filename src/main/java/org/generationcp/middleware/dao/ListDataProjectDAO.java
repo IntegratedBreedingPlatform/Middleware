@@ -72,22 +72,22 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 	public ListDataProject getByStudy(int studyId,GermplasmListType listType,int plotNo) throws MiddlewareQueryException {
 		try {
 
-			String queryStr = "SELECT DISTINCT {ldp.*} FROM nd_experimentprop nep"
-					+ " INNER JOIN nd_experiment ne"
-					+ " ON ne.nd_experiment_id = nep.nd_experiment_id"
-					+ " INNER JOIN nd_experiment_stock nes"
-					+ " ON ne.nd_experiment_id = nes.nd_experiment_id"
-					+ " INNER JOIN stock"
-					+ " ON stock.stock_id = nes.stock_id"
-					+ " INNER JOIN listdata_project ldp"
-					+ " ON stock.dbxref_id = ldp.germplasm_id"
-					+ " INNER JOIN listnms nms"
-					+ " ON nms.listid = ldp.list_id"
-					+ " WHERE nms.liststatus != 9"
-					+ " AND nms.listtype = :LIST_TYPE"
-					+ " AND nms.projectid = :STUDY_ID"
-					+ " AND nep.type_id IN ( :PLOT_NO_TERM_IDS )"
-					+ " AND nep.value = :PLOT_NO";
+			String queryStr = "SELECT ldp.*"
+					+ " FROM nd_experimentprop nep,"
+					+ "  nd_experiment_stock nes, stock s, listdata_project ldp,"
+					+ "  listnms l, nd_experiment_project p, project_relationship pr"
+					+ " WHERE nep.type_id IN (:PLOT_NO_TERM_IDS)"
+					+ "      AND nep.nd_experiment_id = nes.nd_experiment_id"
+					+ "      AND nes.stock_id = s.stock_id"
+					+ "      AND s.uniquename = ldp.entry_id"
+					+ "      AND s.dbxref_id = ldp.germplasm_id"
+					+ "      AND l.listid = ldp.list_id"
+					+ "      AND nep.nd_experiment_id = p.nd_experiment_id"
+					+ "      AND p.project_id = pr.subject_project_id"
+					+ "      AND pr.object_project_id = l.projectid"
+					+ "      AND l.listtype = :LIST_TYPE"
+					+ "      AND nep.VALUE = :PLOT_NO"
+					+ "      AND l.projectid = :STUDY_ID";
 
 
 			SQLQuery query = getSession().createSQLQuery(queryStr);
@@ -98,8 +98,10 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.setParameterList("PLOT_NO_TERM_IDS",
 					new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
 
-			return (ListDataProject) query.uniqueResult();
-
+			List resultList = query.list();
+			if (!resultList.isEmpty()) {
+				return (ListDataProject) resultList.get(0);
+			}
 
 		} catch(HibernateException e) {
 			logAndThrowException("Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
