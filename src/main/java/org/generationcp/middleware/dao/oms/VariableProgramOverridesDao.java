@@ -1,22 +1,17 @@
 package org.generationcp.middleware.dao.oms;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.oms.CVTermProgramProperty;
 import org.generationcp.middleware.pojos.oms.VariableProgramOverrides;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.Arrays;
 import java.util.List;
 
 
 public class VariableProgramOverridesDao extends GenericDAO<VariableProgramOverrides, Integer> {
-
-    private static final String INVALID_TYPE_FOR_PROPERTY = "Invalid type for property";
 
     @SuppressWarnings("unchecked")
     public List<VariableProgramOverrides> getByVariableId(Integer variableId) throws MiddlewareException {
