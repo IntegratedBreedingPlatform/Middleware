@@ -11,11 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.workbench;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * POJO for workbench_user_info table.
@@ -33,6 +34,13 @@ public class UserInfo implements Serializable {
 
     @Column(name = "login_count")
     private Integer loginCount;
+
+    @Column (name="reset_expiry_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date resetExpiryDate;
+
+    @Column (name="reset_token")
+    private String resetToken;
 
     public UserInfo() {
     }
@@ -59,24 +67,33 @@ public class UserInfo implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(userId).hashCode();
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof UserInfo)) {
+            return false;
+        }
+
+        UserInfo userInfo = (UserInfo) o;
+
+        return new EqualsBuilder()
+                .append(userId, userInfo.userId)
+                .append(loginCount, userInfo.loginCount)
+                .append(resetExpiryDate, userInfo.resetExpiryDate)
+                .append(resetToken, userInfo.resetToken)
+                .isEquals();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!UserInfo.class.isInstance(obj)) {
-            return false;
-        }
-
-        UserInfo otherObj = (UserInfo) obj;
-        return new EqualsBuilder().append(userId, otherObj.userId).isEquals();
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(userId)
+                .append(loginCount)
+                .append(resetExpiryDate)
+                .append(resetToken)
+                .toHashCode();
     }
 
     @Override
@@ -88,5 +105,21 @@ public class UserInfo implements Serializable {
         builder.append(loginCount);
         builder.append("]");
         return builder.toString();
+    }
+
+    public Date getResetExpiryDate() {
+        return resetExpiryDate;
+    }
+
+    public void setResetExpiryDate(Date resetExpiryDate) {
+        this.resetExpiryDate = resetExpiryDate;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
     }
 }

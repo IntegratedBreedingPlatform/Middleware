@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
 /**
@@ -631,4 +632,13 @@ public interface GermplasmListManager{
     GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException;
 
     long countListDataProjectGermplasmListDataByListId(Integer id) throws MiddlewareQueryException;
+    
+    /**
+     * Save list data properties 
+     * 
+     * @param listDataProps
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<ListDataProperty> saveListDataProperties(List<ListDataProperty> listDataProps) throws MiddlewareQueryException;
 }

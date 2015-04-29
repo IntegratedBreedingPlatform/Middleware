@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.SystemUtils;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
@@ -27,19 +28,20 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import org.tmatesoft.svn.core.wc2.SvnCheckout;
 import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
 import org.tmatesoft.svn.core.wc2.SvnTarget;
-
 import org.junit.Test;
+
+import com.hazelcast.util.StringUtil;
 
 public class DatabaseSetupUtil{
 
 	protected static final Logger LOG = LoggerFactory.getLogger(DatabaseSetupUtil.class);
 
 	private static final String TEST_DATABASE_CONFIG_PROPERTIES = "testDatabaseConfig.properties";
-	private static final String prefixDirectory = "./updatedIbdbScripts";
-    private static String WORKBENCH_SCRIPT = "/workbench";
+	private static final String prefixDirectory = getResourcePath("updatedIbdbScripts");
+	private static String SQL_SCRIPTS_FOLDER = "./sql";
+	private static String WORKBENCH_SCRIPT = "/workbench";
 	private static String CROP_SCRIPT = "/merged";
     private static String TEST_DB_REQUIRED_PREFIX = "test_";
-    private static String SQL_SCRIPTS_FOLDER = "./sql";
     
 	private static final String DEFAULT_IBDB_GIT_URL = "https://github.com/IntegratedBreedingPlatform/IBDBScripts/trunk";
 
@@ -47,7 +49,9 @@ public class DatabaseSetupUtil{
 
 	private static String MYSQL_PATH = "";
 
-    private static String gitUrl;
+	private static String gitUrl;
+	private static String gitUserName;
+	private static String gitPassword;
 
 
 	@Test
@@ -127,11 +131,16 @@ public class DatabaseSetupUtil{
 		prop.load(in);
 
 		String ibdbScriptsGitUrl = prop.getProperty("test.ibdb.scripts.git.url", null);
+		String ibdbScriptsGitUserName = prop.getProperty("test.ibdb.scripts.git.username", null);
+		String ibdbScriptsGitPassword = prop.getProperty("test.ibdb.scripts.git.password", null);
+		
 		if(ibdbScriptsGitUrl == null) {
 			//we use the default url
 			gitUrl = DEFAULT_IBDB_GIT_URL;
 		} else {
 			gitUrl = ibdbScriptsGitUrl;
+			gitUserName = ibdbScriptsGitUserName;
+			gitPassword = ibdbScriptsGitPassword;
 		}
 	}
 
@@ -140,9 +149,12 @@ public class DatabaseSetupUtil{
 		File scriptsDir = new File(checkoutURL);
 		
 		SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
-        ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager();
-        svnOperationFactory.setAuthenticationManager(authManager);
-
+		
+		if (!StringUtil.isNullOrEmpty(gitUserName) && !StringUtil.isNullOrEmpty(gitPassword)){
+			ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(gitUserName, gitPassword);
+			svnOperationFactory.setAuthenticationManager(authManager);
+		}
+		
 		try {
 
 			SvnCheckout checkout = svnOperationFactory.createCheckout();
@@ -160,8 +172,7 @@ public class DatabaseSetupUtil{
 		LOG.debug("  >>> Checkout from " + gitUrl + " successful.");
 
 		File[] files = scriptsDir.listFiles();
-        assert files != null;
-        Arrays.sort(files, new Comparator<File>() {
+		Arrays.sort(files, new Comparator<File>() {
 			public int compare(File a, File b) {
 				return a.getName().compareTo(b.getName());
 			}
@@ -294,7 +305,13 @@ public class DatabaseSetupUtil{
 
 	private static boolean runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
 		ProcessBuilder pb;
-		String mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
+		
+		String mysqlAbsolutePath = "";
+		if (SystemUtils.IS_OS_WINDOWS){
+			mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
+		}else{
+			mysqlAbsolutePath = "mysql";
+		}
 		
 		LOG.info("Executing script: " + sqlFile.getName());
 
@@ -387,5 +404,9 @@ public class DatabaseSetupUtil{
 		}
 		errorReader.close();
 		return errorOut.toString();
+	}
+	
+	private static String getResourcePath(String name){
+		return System.getProperty("user.dir") + File.separator + name;
 	}
 }

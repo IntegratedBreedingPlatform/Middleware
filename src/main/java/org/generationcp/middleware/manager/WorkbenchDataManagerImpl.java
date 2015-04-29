@@ -579,7 +579,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     
     @Override
 	public boolean isPersonWithUsernameAndEmailExists(String username, String email) throws MiddlewareQueryException {
-		return getPersonDao().isPersonWithUsernameAndEmailExists(username,email);
+		return getPersonDao().isPersonWithUsernameAndEmailExists(username, email);
 	}
 
     @Override
@@ -1418,10 +1418,47 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         catch (Exception e) {
             logAndThrowException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
         }
-        finally {
+
+        return new UserInfo();
+    }
+
+
+
+    @Override
+    public UserInfo getUserInfoByUsername(String username) throws MiddlewareQueryException {
+        User user = getUserByName(username,0,1,Operation.EQUAL).get(0);
+
+        return getUserInfo(user.getUserid());
+    }
+
+    @Override
+    public UserInfo getUserInfoByResetToken(String token) throws MiddlewareQueryException {
+        return getUserInfoDao().getUserInfoByToken(token);
+    }
+
+    @Override
+    public UserInfo updateUserInfo(UserInfo userInfo) throws MiddlewareQueryException {
+        Transaction trans = null;
+        Session session = getCurrentSession();
+
+        try {
+            trans = session.beginTransaction();
+
+            getUserInfoDao().update(userInfo);
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+
+            logAndThrowException("Cannot update userInfo =" + userInfo.getUserId() + "): "
+                    + e.getMessage(), e);
+
         }
-        
-        return null;
+        finally {
+            session.flush();
+        }
+
+        return userInfo;
     }
 
     @Override

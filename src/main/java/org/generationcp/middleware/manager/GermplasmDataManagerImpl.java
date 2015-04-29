@@ -12,26 +12,45 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.ProgenitorPK;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
-import org.generationcp.middleware.pojos.germplasm.BackcrossElement;
-import org.generationcp.middleware.pojos.germplasm.GermplasmCross;
-import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
-import org.generationcp.middleware.pojos.germplasm.SingleGermplasmCrossElement;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this
@@ -997,7 +1016,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 // Auto-assign IDs for new DB records
                 Integer nextId = dao.getNextId("gid");
                 germplasm.setGid(nextId);
-                germplasm.setLgid(Integer.valueOf(0));
+                
+                if(germplasm.getLgid() > 0){
+                	germplasm.setLgid(Integer.valueOf(0));
+                }
 
                 Integer nameId = nameDao.getNextId("nid");
                 name.setNid(nameId);
@@ -1975,6 +1997,5 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Germplasm getGermplasmByLocalGid(Integer lgid)
 			throws MiddlewareQueryException {
 		return this.getGermplasmDao().getByLGid(lgid);
-	}
-	
+	}			
 }

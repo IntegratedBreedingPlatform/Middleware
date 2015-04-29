@@ -22,6 +22,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
+import java.text.ParseException;
 import com.google.common.base.Function;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 
@@ -37,6 +38,14 @@ import java.util.*;
 public class Util{
 
 	public static final String DATE_AS_NUMBER_FORMAT = "yyyyMMdd";
+	public static final String FRONTEND_DATE_FORMAT = "yyyy-MM-dd";
+	//NOTE: Future Improvement: BMS should only use one front end date format
+	public static final String FRONTEND_DATE_FORMAT_2 = "MM/dd/yyyy";
+	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+	
+	private Util() {
+		//make a private constructor to hide the implicit public one
+	}
     /**
      * Get the boolean value of <code>value</code>.
      * 
@@ -150,7 +159,7 @@ public class Util{
         return Arrays.asList(objects);
     }
     
-    public static Integer getCurrentDate(){
+    public static Integer getCurrentDateAsInteger(){
         Calendar now = Calendar.getInstance();
         SimpleDateFormat formatter = new SimpleDateFormat(DATE_AS_NUMBER_FORMAT);
         String dateNowStr = formatter.format(now.getTime());
@@ -203,5 +212,85 @@ public class Util{
 
     public static boolean isNonNullValidNumericString(Object value) {
         return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
+    /**
+     * Returns the current date in format "yyyyMMdd" as Integer
+     * @return current date as Integer
+     */
+    public static Integer getCurrentDateAsIntegerValue(){
+    	return Integer.valueOf(getCurrentDateAsStringValue());
+    }
+    
+    /**
+     * Returns the current date in format "yyyyMMdd" as Long
+     * @return current date as Long
+     */
+    public static Long getCurrentDateAsLongValue(){
+    	return Long.valueOf(getCurrentDateAsStringValue());
+    }
+    
+    /**
+     * Returns the current date in format "yyyyMMdd" as String
+     * @return current date as String
+     */
+    public static String getCurrentDateAsStringValue(){
+    	return getSimpleDateFormat(DATE_AS_NUMBER_FORMAT).format(getCurrentDate().getTime());
+    }
+    
+    /**
+     * Returns the current date
+     * @return current date as Date
+     */
+    public static Date getCurrentDate(){
+    	return getCalendarInstance().getTime();
+    }
+    
+    /**
+     * Returns the calendar instance
+     * @return calendar instance
+     */
+    public static Calendar getCalendarInstance(){
+    	Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
+        return Calendar.getInstance(currentLocale);
+    }
+    
+    
+    /**
+     * Returns the current date in the specified format as String
+     * @return current date as String
+     */
+    public static String getCurrentDateAsStringValue(String format){
+    	return getSimpleDateFormat(format).format(getCurrentDate().getTime());
+    }
+    
+    /**
+     * Returns the SimpleDateFormat of the current display locale
+     * @return SimpleDateFormat
+     */
+    public static SimpleDateFormat getSimpleDateFormat(String format){
+    	Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
+    	SimpleDateFormat formatter = new SimpleDateFormat(format,currentLocale);
+    	formatter.setLenient(false);
+        return formatter;
+    }
+    
+    /**
+     * Returns the date in the specified format as String
+     * @return date in the specified format as String
+     */
+    public static String formatDateAsStringValue(Date date, String format){
+    	return getSimpleDateFormat(format).format(date.getTime());
+    }
+    
+    /**
+     * Returns the date object from the specified format
+     * @return date object
+     * @throws ParseException 
+     */
+    public static Date parseDate(String date, String format) throws ParseException{
+    	SimpleDateFormat formatter = getSimpleDateFormat(format);
+    	return formatter.parse(date);
     }
 }
+
+
+
