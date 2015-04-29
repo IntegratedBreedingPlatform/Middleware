@@ -306,7 +306,7 @@ public class DatabaseSetupUtil{
 	private static boolean runScriptFromFile(File sqlFile, DatabaseConnectionParameters connectionParams) throws IOException, InterruptedException {
 		ProcessBuilder pb;
 		
-		String mysqlAbsolutePath = "";
+		String mysqlAbsolutePath;
 		if (SystemUtils.IS_OS_WINDOWS){
 			mysqlAbsolutePath = new File(MYSQL_PATH).getAbsolutePath();
 		}else{

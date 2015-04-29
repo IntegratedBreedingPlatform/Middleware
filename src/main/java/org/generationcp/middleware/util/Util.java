@@ -212,6 +212,7 @@ public class Util{
 
     public static boolean isNonNullValidNumericString(Object value) {
         return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
+    }
     /**
      * Returns the current date in format "yyyyMMdd" as Integer
      * @return current date as Integer

@@ -1307,7 +1307,7 @@ public interface GermplasmDataManager {
     /**
      * Gets the method by name.
      *
-     * @param code the code
+     * @param name the code
      * @return the method by name
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -1316,7 +1316,7 @@ public interface GermplasmDataManager {
     /**
      * Gets the method by name.
      *
-     * @param code the code
+     * @param name the code
      * @param programUUID - uniqueID of the current program
      * @return the method by name
      * @throws MiddlewareQueryException the middleware query exception
@@ -1369,7 +1369,7 @@ public interface GermplasmDataManager {
     /**
      * Saves a favorite method/location
      *
-     * @param ProgramFavorite to be saved
+     * @param favorite to be saved
      * @return none
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -1388,7 +1388,7 @@ public interface GermplasmDataManager {
     /**
      * Deletes a favorite method/location
      *
-     * @param code the code
+     * @param favorite record
      * @return none
      * @throws MiddlewareQueryException the middleware query exception
      */

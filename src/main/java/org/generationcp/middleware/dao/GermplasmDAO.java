@@ -748,7 +748,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     /**
      * Get Germplasms with names like Q or germplasms part of list with names like Q
-     * @param q - the search term to be used
+     * @param searchedString - the search term to be used
      * @param o - like or equal
      * @param includeParents boolean flag to denote whether parents will be included in search results
      * @param searchByNameInLocalDbAlso - set this to true if you are using Central session and also want to search germplasm by name for local db

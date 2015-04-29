@@ -1,18 +1,16 @@
 package org.generationcp.middleware;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.CropType.CropEnum;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * Base class with some common functionality required for Middleware data manager integration
@@ -35,7 +33,7 @@ public class DataManagerIntegrationTest extends MiddlewareIntegrationTest {
 	}
 	
 	@BeforeClass
-	public static void setUpSuper() throws FileNotFoundException, ConfigException, URISyntaxException, IOException {
+	public static void setUpSuper() throws ConfigException, URISyntaxException, IOException {
 		//common superclass setUp
 	}
 	
