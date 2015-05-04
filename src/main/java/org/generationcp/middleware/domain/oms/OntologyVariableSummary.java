@@ -24,8 +24,6 @@ public class OntologyVariableSummary {
 
     private Date dateLastModified;
 
-    private Integer observations;
-
     private String minValue;
 
     private String maxValue;
@@ -112,14 +110,6 @@ public class OntologyVariableSummary {
 
     public void setDateLastModified(Date dateLastModified) {
         this.dateLastModified = dateLastModified;
-    }
-
-    public Integer getObservations() {
-        return observations;
-    }
-
-    public void setObservations(Integer observations) {
-        this.observations = observations;
     }
 
     public String getMinValue() {
