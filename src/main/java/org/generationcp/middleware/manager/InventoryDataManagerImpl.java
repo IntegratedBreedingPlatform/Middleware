@@ -97,7 +97,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public List<Lot> getLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        return getLotDao().getByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, start, numOfRows);
+        return getLotDao().getByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId,
+                start, numOfRows);
     }
     
     @Override
@@ -488,7 +489,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minAmount, int start, int numOfRows)
             throws MiddlewareQueryException {
         List<Lot> lotsWithMinimunAmount = new ArrayList<Lot>();
-        for (org.generationcp.middleware.pojos.ims.Transaction t : getTransactionDao().getLotWithMinimumAmount(minAmount, start, numOfRows)) {
+        for (org.generationcp.middleware.pojos.ims.Transaction t : getTransactionDao().getLotWithMinimumAmount(
+                minAmount, start, numOfRows)) {
             lotsWithMinimunAmount.add(t.getLot());
         }
         return generateLotReportRows(lotsWithMinimunAmount);
@@ -770,7 +772,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	@Override
 	public List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = getGermplasmListDataByListId(listId, start, numOfRows);
-		return getListInventoryBuilder().retrieveInventoryLotsForList(listId, start, numOfRows, listEntries);
+		return getListInventoryBuilder().retrieveInventoryLotsForList(listId, start, numOfRows,
+                listEntries);
 	}
 	
     @Override
@@ -805,4 +808,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			getTransactionDao().cancelReservationsForLotEntryAndLrecId(lotId,lrecId);
 		}
 	}
+
+    @Override
+    public boolean isStockIdExists(List<String> stockIDs) throws MiddlewareQueryException {
+        return getTransactionDao().isStockIdExists(stockIDs);
+    }
+
+    @Override
+    public List<String> getSimilarStockIds(List<String> stockIDs) throws MiddlewareQueryException {
+        return getTransactionDao().getSimilarStockIds(stockIDs);
+    }
 }

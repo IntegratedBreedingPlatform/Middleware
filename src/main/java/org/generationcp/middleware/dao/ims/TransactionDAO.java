@@ -51,7 +51,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public List<String> getInventoryIDsWithBreederIdentifier(String identifier)
             throws MiddlewareQueryException {
         try {
-            String queryString = Transaction.GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY.replace(":identifier", identifier);
+            String queryString = Transaction.GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY.replace(
+                    ":identifier", identifier);
             Query query = getSession().createSQLQuery(queryString);
             return (List<String>) query.list();
         } catch (HibernateException e) {
@@ -459,4 +460,34 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		return lrecIdStockIdMap;
 	
 	}
+
+    public Boolean isStockIdExists(List<String> stockIds) throws MiddlewareQueryException {
+        try {
+            List<String> result = getSimilarStockIds(stockIds);
+            if (null != result && !result.isEmpty()) {
+                return true;
+            }
+
+        } catch (Exception e) {
+            logAndThrowException("Error at isStockIdExists= at TransactionDAO: " + e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    public List<String> getSimilarStockIds(List<String> stockIds) throws MiddlewareQueryException {
+        try {
+            String sql = "SELECT inventory_id"
+                    + " FROM ims_transaction"
+                    + " WHERE inventory_id IN (:STOCK_ID_LIST)";
+
+            Query query = getSession().createSQLQuery(sql).setParameterList("STOCK_ID_LIST",stockIds);
+            return query.list();
+        } catch (Exception e) {
+            logAndThrowException("Error at isStockIdExists= at TransactionDAO: " + e.getMessage(), e);
+        }
+
+        return new ArrayList<>();
+
+    }
 }

@@ -666,6 +666,9 @@ public interface InventoryDataManager{
      * @return
      * @throws MiddlewareQueryException
      */
-    void cancelReservedInventory(List<org.generationcp.middleware.pojos.ims.ReservedInventoryKey> lotEntries) throws MiddlewareQueryException; 
+    void cancelReservedInventory(List<org.generationcp.middleware.pojos.ims.ReservedInventoryKey> lotEntries) throws MiddlewareQueryException;
 
+    boolean isStockIdExists(List<String> stockIDs) throws MiddlewareQueryException;
+
+    List<String> getSimilarStockIds(List<String> stockIDs) throws MiddlewareQueryException;
 }
