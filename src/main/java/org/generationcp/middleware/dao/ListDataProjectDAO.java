@@ -76,10 +76,12 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String queryStr =
 					"select ldp.* FROM nd_experiment_project neproj,"
 					+ " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
-					+ " listdata_project ldp, project_relationship pr, projectprop pp"
+					+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms"
 					+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
+					+ " AND nms.projectid = pr.object_project_id"
+					+ " AND nms.listid = ldp.list_id"
 					+ " AND pp.project_id = pr.subject_project_id"
-					+ " AND pr.object_project_id = :STUDY_ID"
+					+ " AND nms.projectid = :STUDY_ID"
 					+ " AND pp.value = :DATASET_TYPE"
 					+ " AND neproj.project_id = pr.subject_project_id"
 					+ " AND neproj.nd_experiment_id = nd_ep.nd_experiment_id"
@@ -100,7 +102,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 					+ " SELECT 1 FROM listnms nl"
 					+ " WHERE nl.listid = ldp.list_id"
 					+ " AND nl.listtype = :LIST_TYPE"
-					+ " ));";
+					+ " ))";
 
 
 			SQLQuery query = getSession().createSQLQuery(queryStr);
