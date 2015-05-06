@@ -12,15 +12,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.OntologyMethod;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.List;
 
 /**
- * This is the API for retrieving ontology scale data.
- * 
+ * This is the API for retrieving {@link OntologyMethod}
  * 
  */
 public interface OntologyMethodDataManager {
@@ -32,7 +31,7 @@ public interface OntologyMethodDataManager {
      * @return the matching method
      * @throws MiddlewareException the middleware query exception
      */
-    Method getMethod(int id) throws MiddlewareException;
+    OntologyMethod getMethod(int id) throws MiddlewareException;
 
 
     /**
@@ -41,14 +40,14 @@ public interface OntologyMethodDataManager {
      * @return All the methods
      * @throws MiddlewareException the middleware query exception
      */
-    List<Method> getAllMethods() throws MiddlewareException;
+    List<OntologyMethod> getAllMethods() throws MiddlewareException;
 
     /**
      * Adds a method. If the method is already found in the local database, it simply retrieves the record found.
      * @param method to be added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void addMethod(Method method) throws MiddlewareException;
+    void addMethod(OntologyMethod method) throws MiddlewareException;
 
     /**
      * Updates the given method.
@@ -56,7 +55,7 @@ public interface OntologyMethodDataManager {
      * @param method The Method to update
      * @throws MiddlewareException the middleware exception
      */
-    void updateMethod(Method method) throws MiddlewareException;
+    void updateMethod(OntologyMethod method) throws MiddlewareException;
 
     /**
      * Delete method.

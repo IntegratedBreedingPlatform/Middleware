@@ -13,48 +13,27 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Scale {
 
     private Term term;
-    private DataType dataType;
-    private final Map<String, String> categories = new HashMap<>();
-
-    private String minValue;
-    private String maxValue;
-
-
     private String displayName;
-    
+
+
     public Scale() {
-        this.term = new Term();
-        this.term.setVocabularyId(CvId.SCALES.getId());
     }
 
     public Scale(Term term) {
         this.term = term;
     }
 
+
     public Term getTerm() {
         return term;
     }
 
+
     public void setTerm(Term term) {
         this.term = term;
-    }
-
-    public String getDisplayName() {
-        if (displayName == null) {
-            return term.getName();
-        } else {
-            return displayName;
-        }
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public int getId() {
@@ -64,6 +43,7 @@ public class Scale {
     public void setId(int id) {
         term.setId(id);
     }
+
 
     public String getName() {
         return term.getName();
@@ -81,36 +61,12 @@ public class Scale {
         term.setDefinition(definition);
     }
 
-    public DataType getDataType() {
-        return dataType;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
-
-    public Map<String, String> getCategories() {
-        return categories;
-    }
-
-    public void addCategory(String name, String description){
-        this.categories.put(name, description);
-    }
-
-    public String getMinValue() {
-        return minValue;
-    }
-
-    public void setMinValue(String minValue) {
-        this.minValue = minValue;
-    }
-
-    public String getMaxValue() {
-        return maxValue;
-    }
-
-    public void setMaxValue(String maxValue) {
-        this.maxValue = maxValue;
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override
@@ -120,7 +76,15 @@ public class Scale {
             return "";
         }
 
-        return "Scale [id=" + term.getId() + ", name=" + term.getName() + ", definition=" + term.getDefinition() + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Scale [id=");
+        builder.append(term.getId());
+        builder.append(", name=");
+        builder.append(term.getName());
+        builder.append(", definition=");
+        builder.append(term.getDefinition());
+        builder.append("]");
+        return builder.toString();
     }
 
     public void print(int indent) {
@@ -131,5 +95,4 @@ public class Scale {
             Debug.println(indent + 3, "null");
         }
     }
-
 }

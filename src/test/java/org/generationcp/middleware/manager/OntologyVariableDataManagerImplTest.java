@@ -29,6 +29,9 @@ import org.junit.Test;
 
 import java.util.List;
 
+/**
+ * Extends {@link DataManagerIntegrationTest}
+ */
 public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyVariableDataManager variableManager;
@@ -36,9 +39,9 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
     private static OntologyPropertyDataManager propertyManager;
     private static OntologyScaleDataManager scaleManager;
     private static Project testProject;
-    private static Method testMethod;
-    private static Property testProperty;
-    private static Scale testScale;
+    private static OntologyMethod testMethod;
+    private static OntologyProperty testProperty;
+    private static OntologyScale testScale;
     private static OntologyVariableInfo testVariableInfo;
 
     @Test
@@ -80,19 +83,19 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
         propertyManager = DataManagerIntegrationTest.managerFactory.getOntologyPropertyDataManager();
         scaleManager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
 
-        testMethod = new Method();
+        testMethod = new OntologyMethod();
         testMethod.setName(getNewRandomName());
         testMethod.setDefinition("Test Method");
         methodManager.addMethod(testMethod);
 
-        testProperty = new Property();
+        testProperty = new OntologyProperty();
         testProperty.setName(getNewRandomName());
         testProperty.setDefinition("Test Property");
         testProperty.setCropOntologyId("CO:0000001");
         testProperty.addClass("My New Class");
         propertyManager.addProperty(testProperty);
 
-        testScale = new Scale();
+        testScale = new OntologyScale();
         testScale.setName(getNewRandomName());
         testScale.setDefinition("Test Scale");
         testScale.setDataType(DataType.NUMERIC_VARIABLE);

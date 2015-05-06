@@ -1,7 +1,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.OntologyMethod;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -12,14 +12,15 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
+/**
+ * Implements {@link OntologyMethodDataManager}
+ */
 public class OntologyMethodDataManagerImpl extends DataManager implements OntologyMethodDataManager {
 
     private static final String METHOD_DOES_NOT_EXIST = "Method does not exist with that id";
@@ -31,27 +32,85 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public Method getMethod(int id) throws MiddlewareException {
+    public OntologyMethod getMethod(int id) throws MiddlewareException {
         CVTerm term = getCvTermDao().getById(id);
-
         checkTermIsMethod(term);
 
-        return new Method(Term.fromCVTerm(term));
+        try {
+            List<OntologyMethod> methods = getMethods(false, new ArrayList<>(Collections.singletonList(id)));
+
+            if(methods.isEmpty()){
+                return null;
+            }
+
+            return methods.get(0);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error at getMethod :" + e.getMessage(), e);
+        }
     }
 
     @Override
-    public List<Method> getAllMethods() throws MiddlewareException {
-        List<Method> methods = new ArrayList<>();
+    public List<OntologyMethod> getAllMethods() throws MiddlewareException {
+        try {
+            return getMethods(true, null);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error at getAllMethods :" + e.getMessage(), e);
+        }
+    }
 
-        List<CVTerm> methodTerms = getCvTermDao().getAllByCvId(CvId.METHODS);
+    /**
+     * This will fetch list of methods by passing methodIds
+     * @param fetchAll will tell wheather query should get all methods or not.
+     * @param methodIds will tell wheather methodIds should be pass to filter result. Combination of these two will give flexible usage.
+     * @return List<OntologyMethod>
+     * @throws MiddlewareException
+     */
+    private List<OntologyMethod> getMethods(Boolean fetchAll, List<Integer> methodIds) throws MiddlewareException {
 
-        for (CVTerm mt : methodTerms){
-            methods.add(new Method(Term.fromCVTerm(mt)));
+        Map<Integer, OntologyMethod> map = new HashMap<>();
+        if(methodIds == null) methodIds = new ArrayList<>();
+
+        if(!fetchAll && methodIds.size() == 0){
+            return new ArrayList<>();
         }
 
-        Collections.sort(methods, new Comparator<Method>() {
+        try {
+
+            List<CVTerm> terms = fetchAll ? getCvTermDao().getAllByCvId(CvId.METHODS):getCvTermDao().getAllByCvId(methodIds, CvId.METHODS);
+
+            for(CVTerm m : terms){
+                OntologyMethod ontologyMethod = new OntologyMethod(Term.fromCVTerm(m));
+                map.put(ontologyMethod.getId(), ontologyMethod);
+            }
+
+            //Created, modified from CVTermProperty
+            List termProperties = getCvTermPropertyDao().getByCvTermIds(new ArrayList<>(map.keySet()));
+
+            for(Object p : termProperties){
+                CVTermProperty property = (CVTermProperty) p;
+
+                OntologyMethod ontologyMethod = map.get(property.getCvTermId());
+
+                if(ontologyMethod == null){
+                    continue;
+                }
+
+                if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
+                    ontologyMethod.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+                } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
+                    ontologyMethod.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+                }
+            }
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
+        }
+
+        ArrayList<OntologyMethod> methods = new ArrayList<>(map.values());
+
+        Collections.sort(methods, new Comparator<OntologyMethod>() {
             @Override
-            public int compare(Method l, Method r) {
+            public int compare(OntologyMethod l, OntologyMethod r) {
                 return l.getName().compareToIgnoreCase(r.getName());
             }
         });
@@ -59,8 +118,9 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
         return methods;
     }
 
+
     @Override
-    public void addMethod(Method method) throws MiddlewareException {
+    public void addMethod(OntologyMethod method) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(method.getName(), CvId.METHODS.getId());
 
@@ -69,7 +129,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
         }
 
         //Constant CvId
-        method.getTerm().setVocabularyId(CvId.METHODS.getId());
+        method.setVocabularyId(CvId.METHODS.getId());
 
         Session session = getCurrentSession();
         Transaction trans = null;
@@ -80,7 +140,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             method.setId(term.getCvTermId());
 
             // Save creation time
-            getCvTermPropertyDao().save(method.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(method.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             trans.commit();
         } catch (Exception e) {
@@ -90,14 +150,14 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public void updateMethod(Method method) throws MiddlewareException {
+    public void updateMethod(OntologyMethod method) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(method.getId());
 
         checkTermIsMethod(term);
 
         //Constant CvId
-        method.getTerm().setVocabularyId(CvId.METHODS.getId());
+        method.setVocabularyId(CvId.METHODS.getId());
 
         Session session = getCurrentSession();
         Transaction trans = null;
@@ -111,7 +171,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             getCvTermDao().merge(term);
 
             // Save last modified Time
-            getCvTermPropertyDao().save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             trans.commit();
         } catch (Exception e) {

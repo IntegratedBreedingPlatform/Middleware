@@ -21,6 +21,10 @@ import org.hibernate.Transaction;
 
 import java.util.*;
 
+/**
+ * Implements {@link OntologyVariableDataManagerImpl}
+ */
+
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
     private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
@@ -118,7 +122,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             }
 
             //Variable Types, Created, modified from CVTermProperty
-            List properties = getCvTermPropertyDao().getByCvId(CvId.VARIABLES.getId());
+            List properties = getCvTermPropertyDao().getByCvTermIds(new ArrayList<>(map.keySet()));
             for(Object p : properties){
                 CVTermProperty property = (CVTermProperty) p;
 
@@ -131,9 +135,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 if(Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())){
                     variableSummary.addVariableType(VariableType.getByName(property.getValue()));
                 } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
-                    variableSummary.setDateCreated(ISO8601DateParser.getDateFromTimeString(property.getValue()));
+                    variableSummary.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
                 } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
-                    variableSummary.setDateLastModified(ISO8601DateParser.getDateFromTimeString(property.getValue()));
+                    variableSummary.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
                 }
             }
 
@@ -188,9 +192,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     if(Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())){
                         variable.addVariableType(VariableType.getByName(property.getValue()));
                     } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
-                        variable.setDateCreated(ISO8601DateParser.getDateFromTimeString(property.getValue()));
+                        variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
                     } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
-                        variable.setDateLastModified(ISO8601DateParser.getDateFromTimeString(property.getValue()));
+                        variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
                     }
                 }
 
@@ -280,7 +284,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             }
 
             //Setting last update time.
-            getCvTermPropertyDao().save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             transaction.commit();
 
@@ -407,7 +411,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 getProgramFavoriteDao().makeTransient(programFavorite);
             }
 
-            getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             transaction.commit();
 

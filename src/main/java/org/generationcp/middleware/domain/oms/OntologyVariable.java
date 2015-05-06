@@ -1,18 +1,15 @@
 package org.generationcp.middleware.domain.oms;
 
-import org.generationcp.middleware.domain.common.MinMaxValue;
+import org.generationcp.middleware.util.Debug;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The Variable with term, property, scale, method.
+ * Extends {@link OntologyTerm} The Variable with term, property, scale, method.
  *
  */
-public class OntologyVariable {
-
-    private Term term;
+public class OntologyVariable extends OntologyTerm {
 
     private String alias;
 
@@ -24,9 +21,9 @@ public class OntologyVariable {
 	 */
     private final Set<VariableType> variableTypes = new HashSet<>();
 
-    private Property property;
-    private Method method;
-    private Scale scale;
+    private OntologyMethod method;
+    private OntologyProperty property;
+    private OntologyScale scale;
 
     private Boolean isFavorite;
 
@@ -34,50 +31,17 @@ public class OntologyVariable {
 
     private String maxValue;
 
-    private Date dateCreated;
-
-    private Date dateLastModified;
-
     private Integer observations;
 
-    public OntologyVariable() {
+    private Integer studies;
 
+    public OntologyVariable() {
+        this.setVocabularyId(CvId.VARIABLES.getId());
     }
 
     public OntologyVariable(Term term) {
-        this.term = term;
-    }
-
-    public Term getTerm() {
-        return term;
-    }
-
-    public void setTerm(Term term) {
-        this.term = term;
-    }
-
-    public int getId() {
-        return term.getId();
-    }
-
-    public void setId(int id) {
-        term.setId(id);
-    }
-
-    public String getName() {
-        return term.getName();
-    }
-
-    public void setName(String name) {
-        term.setName(name);
-    }
-
-    public String getDefinition() {
-        return term.getDefinition();
-    }
-
-    public void setDefinition(String definition) {
-        term.setDefinition(definition);
+        super(term);
+        this.setVocabularyId(CvId.VARIABLES.getId());
     }
 
     public String getAlias() {
@@ -95,45 +59,29 @@ public class OntologyVariable {
     public void addVariableType(VariableType type) {
 		this.variableTypes.add(type);
 	}
-    
-    public Property getProperty() {
-        return property;
-    }
 
-    public void setProperty(Property property) {
-        this.property = property;
-    }
-
-    public Method getMethod() {
+    public OntologyMethod getMethod() {
         return method;
     }
 
-    public void setMethod(Method method) {
+    public void setMethod(OntologyMethod method) {
         this.method = method;
     }
 
-    public Scale getScale() {
+    public OntologyProperty getProperty() {
+        return property;
+    }
+
+    public void setProperty(OntologyProperty property) {
+        this.property = property;
+    }
+
+    public OntologyScale getScale() {
         return scale;
     }
 
-    public void setScale(Scale scale) {
+    public void setScale(OntologyScale scale) {
         this.scale = scale;
-    }
-
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    public Date getDateLastModified() {
-        return dateLastModified;
-    }
-
-    public void setDateLastModified(Date dateLastModified) {
-        this.dateLastModified = dateLastModified;
     }
 
     public Integer getObservations() {
@@ -166,5 +114,71 @@ public class OntologyVariable {
 
     public void setIsFavorite(Boolean isFavorite) {
         this.isFavorite = isFavorite;
+    }
+
+    public Integer getStudies() {
+        return studies;
+    }
+
+    public void setStudies(Integer studies) {
+        this.studies = studies;
+    }
+
+    @Override
+    public String toString() {
+        return "OntologyVariable{" +
+                "alias='" + alias + '\'' +
+                ", variableTypes=" + variableTypes +
+                ", property=" + property +
+                ", method=" + method +
+                ", scale=" + scale +
+                ", isFavorite=" + isFavorite +
+                ", minValue='" + minValue + '\'' +
+                ", maxValue='" + maxValue + '\'' +
+                ", observations=" + observations +
+                ", studies=" + studies +
+                "} " + super.toString();
+    }
+
+    @Override
+    public void print(int indent) {
+        Debug.println(indent, "Variable: ");
+        super.print(indent + 3);
+
+        if(alias != null){
+            Debug.println(indent + 3, "alias:" + alias);
+        }
+
+        if(variableTypes != null){
+            Debug.println(indent + 3, "Variable Types:" + variableTypes);
+        }
+
+        if(property != null){
+            Debug.println(indent + 3, "property:" + property);
+        }
+
+        if(method != null){
+            Debug.println(indent + 3, "method:" + method);
+        }
+
+        if(scale != null){
+            Debug.println(indent + 3, "scale:" + scale);
+        }
+
+        if(isFavorite != null){
+            Debug.println(indent + 3, "isFavorite:" + isFavorite);
+        }
+
+        if(minValue != null){
+            Debug.println(indent + 3, "minValue:" + minValue);
+        }
+
+        if(maxValue != null){
+            Debug.println(indent + 3, "Variable Types:" + maxValue);
+        }
+
+        if(observations != null){
+            Debug.println(indent + 3, "observations:" + observations);
+        }
     }
 }

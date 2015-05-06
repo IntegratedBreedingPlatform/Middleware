@@ -38,11 +38,12 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public Scale getScaleById(int scaleId) throws MiddlewareException {
+    public OntologyScale getScaleById(int scaleId) throws MiddlewareException {
 
         try {
-            List<Scale> scales = getScales(false, new ArrayList<>(Collections.singletonList(scaleId)));
-            if(scales.size() == 0) return null;
+            List<OntologyScale> scales = getScales(false, new ArrayList<>(Collections.singletonList(scaleId)));
+            if(scales.isEmpty())
+                return null;
             return scales.get(0);
         } catch (Exception e) {
             throw new MiddlewareQueryException("Error at getScaleById" + e.getMessage(), e);
@@ -50,7 +51,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public List<Scale> getAllScales() throws MiddlewareException {
+    public List<OntologyScale> getAllScales() throws MiddlewareException {
         try {
             return getScales(true, null);
         } catch (Exception e) {
@@ -59,15 +60,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     /**
-     * This will fetch list of properties by passing scaleIds
+     * This will fetch list of Scales by passing scaleIds
      * This method is private and consumed by other methods
-     * @param fetchAll will tell weather query should get all properties or not.
+     * @param fetchAll will tell weather query should get all scales or not.
      * @param scaleIds will tell weather scaleIds should be pass to filter result. Combination of these two will give flexible usage.
      * @return List<Scale>
      * @throws MiddlewareException
      */
-    private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds) throws MiddlewareException {
-        Map<Integer, Scale> map = new HashMap<>();
+    private List<OntologyScale> getScales(Boolean fetchAll, List<Integer> scaleIds) throws MiddlewareException {
+        Map<Integer, OntologyScale> map = new HashMap<>();
 
         if(scaleIds == null) scaleIds = new ArrayList<>();
 
@@ -82,7 +83,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 if(fetchAll) {
                     scaleIds.add(s.getCvTermId());
                 }
-                map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
+                map.put(s.getCvTermId(), new OntologyScale(Term.fromCVTerm(s)));
             }
 
             Query query = getActiveSession()
@@ -93,7 +94,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
             for(Object p : properties){
                 CVTermProperty property = (CVTermProperty) p;
-                Scale scale = map.get(property.getCvTermId());
+                OntologyScale scale = map.get(property.getCvTermId());
 
                 if(scale == null){
                     continue;
@@ -101,10 +102,12 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
                 if(Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())){
                     scale.setMinValue(property.getValue());
-                }
-
-                if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
+                } else if(Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())){
                     scale.setMaxValue(property.getValue());
+                } else if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
+                    scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+                } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
+                    scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
                 }
             }
 
@@ -120,7 +123,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
                 Integer scaleId = (Integer) items[0];
 
-                Scale scale = map.get(scaleId);
+                OntologyScale scale = map.get(scaleId);
 
                 if(scale == null){
                     continue;
@@ -128,7 +131,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
                 if(Objects.equals(items[1], TermId.HAS_TYPE.getId())){
                     scale.setDataType(DataType.getById((Integer) items[3]));
-                }else if(Objects.equals(items[1], TermId.HAS_VALUE.getId())){
+                }  else if(Objects.equals(items[1], TermId.HAS_VALUE.getId())){
                     scale.addCategory((String) items[4], (String) items[5]);
                 }
             }
@@ -137,11 +140,11 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             throw new MiddlewareQueryException("Error at getScales", e);
         }
 
-        List<Scale> scales = new ArrayList<>(map.values());
+        List<OntologyScale> scales = new ArrayList<>(map.values());
 
-        Collections.sort(scales, new Comparator<Scale>() {
+        Collections.sort(scales, new Comparator<OntologyScale>() {
             @Override
-            public int compare(Scale l, Scale r) {
+            public int compare(OntologyScale l, OntologyScale r) {
                 return  l.getName().compareToIgnoreCase(r.getName());
             }
         });
@@ -150,7 +153,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public void addScale(Scale scale) throws MiddlewareException {
+    public void addScale(OntologyScale scale) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
 
@@ -179,7 +182,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
         }
 
         //Constant CvId
-        scale.getTerm().setVocabularyId(CvId.SCALES.getId());
+        scale.setVocabularyId(CvId.SCALES.getId());
 
         Session session = getActiveSession();
         Transaction transaction = null;
@@ -222,7 +225,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             }
 
             //Save creation time
-            getCvTermPropertyDao().save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             transaction.commit();
 
@@ -234,7 +237,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 
     @Override
-    public void updateScale(Scale scale) throws MiddlewareException {
+    public void updateScale(OntologyScale scale) throws MiddlewareException {
 
         if(Objects.equals(scale.getDataType(), null)){
             throw new MiddlewareException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
@@ -315,7 +318,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             transaction = session.beginTransaction();
 
             //Constant CvId
-            scale.getTerm().setVocabularyId(CvId.SCALES.getId());
+            scale.setVocabularyId(CvId.SCALES.getId());
 
             //Updating term to database.
             term.setName(scale.getName());
@@ -410,7 +413,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             }
 
             // Save last modified Time
-            getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             transaction.commit();
 

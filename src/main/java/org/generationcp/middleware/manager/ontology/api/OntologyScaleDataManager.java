@@ -12,9 +12,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.OntologyScale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.List;
 
@@ -27,36 +26,40 @@ public interface OntologyScaleDataManager {
 
     /**
      * This will fetch Scale by scaleId*
-     * @param scaleId select method by scaleId
-     * @return Scale
+     * @param scaleId select scale by scaleId
+     * @return @link OntologyScale
      * @throws MiddlewareException
      */
-    public Scale getScaleById(int scaleId) throws MiddlewareException;
+    OntologyScale getScaleById(int scaleId) throws MiddlewareException;
 
     /**
      * Get all scales from db
-     * @throws MiddlewareException
+     *
+     * @return All the scales
+     * @throws MiddlewareException the middleware exception
      */
-    public List<Scale> getAllScales() throws MiddlewareException;
+    List<OntologyScale> getAllScales() throws MiddlewareException;
 
     /**
-     * Adding new scale
-     * @param scale scale to be added
-     * @throws MiddlewareException
+     * Adds a Scale. If the scale is already found in the local database, it simply retrieves the record found.
+     * @param scale to be added
+     * @throws MiddlewareException the middleware exception
      */
-    void addScale(Scale scale) throws MiddlewareException;
+    void addScale(OntologyScale scale) throws MiddlewareException;
 
     /**
-     * Update scale
-     * @param scale scale to be added
-     * @throws MiddlewareException
-     */
-    void updateScale(Scale scale) throws MiddlewareException;
+    * Updates the given scale.
+    * This searches for the id. If it exists, the entry in the database is replaced with the new value.
+    * @param scale The Scale to update
+    * @throws MiddlewareException the middleware exception
+    */
+    void updateScale(OntologyScale scale) throws MiddlewareException;
 
     /**
-     * Delete scale
-     * @param scaleId scale to be deleted
-     * @throws MiddlewareException
+     * Delete method.
+     *
+     * @param scaleId the cv term id
+     * @throws MiddlewareException the middleware query exception
      */
     void deleteScale(int scaleId) throws MiddlewareException;
 

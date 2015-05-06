@@ -14,24 +14,22 @@ package org.generationcp.middleware.domain.oms;
 import org.generationcp.middleware.util.Debug;
 
 public class Method {
-    
+
     private Term term;
-    
+
     public Method() {
-        this.term = new Term();
-        this.term.setVocabularyId(CvId.METHODS.getId());
     }
 
     public Method(Term term) {
         this.term = term;
     }
-    
+
 
     public Term getTerm() {
         return term;
     }
 
-    
+
     public void setTerm(Term term) {
         this.term = term;
     }
@@ -43,7 +41,7 @@ public class Method {
     public void setId(int id) {
         term.setId(id);
     }
-    
+
 
     public String getName() {
         return term.getName();
@@ -54,27 +52,35 @@ public class Method {
     }
 
     public String getDefinition() {
-       return term.getDefinition();
+        return term.getDefinition();
     }
 
     public void setDefinition(String definition) {
         term.setDefinition(definition);
     }
-    
 
-	@Override
-	public String toString() {
-	    
+
+    @Override
+    public String toString() {
+
         if (term == null) {
             return "";
         }
 
-        return "Method [id=" + term.getId() + ", name=" + term.getName() + ", definition=" + term.getDefinition() + "]";
-	}
+        StringBuilder builder = new StringBuilder();
+        builder.append("Method [id=");
+        builder.append(term.getId());
+        builder.append(", name=");
+        builder.append(term.getName());
+        builder.append(", definition=");
+        builder.append(term.getDefinition());
+        builder.append("]");
+        return builder.toString();
+    }
 
     public void print(int indent) {
         Debug.println(indent, "Method: ");
         term.print(indent + 3);
     }
-	
+
 }

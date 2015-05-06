@@ -44,6 +44,9 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
     }
 
     public List getByCvTermIds(List<Integer> cvTermIds) throws MiddlewareQueryException {
+        if(cvTermIds.isEmpty()){
+            return new ArrayList();
+        }
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass())
                     .add(buildInCriterion("cvTermId", cvTermIds));

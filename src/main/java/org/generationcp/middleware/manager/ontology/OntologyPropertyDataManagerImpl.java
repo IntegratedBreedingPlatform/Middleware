@@ -19,6 +19,10 @@ import org.hibernate.Transaction;
 
 import java.util.*;
 
+/**
+ * Implements {@link OntologyPropertyDataManagerImpl}
+ */
+
 public class OntologyPropertyDataManagerImpl extends DataManager implements OntologyPropertyDataManager {
 
     private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
@@ -33,14 +37,14 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public Property getProperty(int id) throws MiddlewareException {
+    public OntologyProperty getProperty(int id) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(id);
 
        checkTermIsProperty(term);
 
         try {
-            List<Property> properties = getProperties(false, new ArrayList<>(Collections.singletonList(id)));
+            List<OntologyProperty> properties = getProperties(false, new ArrayList<>(Collections.singletonList(id)));
             if(properties.size() == 0) return null;
             return properties.get(0);
         } catch (HibernateException e) {
@@ -49,7 +53,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public List<Property> getAllProperties() throws MiddlewareQueryException {
+    public List<OntologyProperty> getAllProperties() throws MiddlewareException {
         try {
             return getProperties(true, null);
         } catch (HibernateException e) {
@@ -58,7 +62,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareQueryException {
+    public List<OntologyProperty> getAllPropertiesWithClass(String className) throws MiddlewareException {
         try{
 
             SQLQuery query = getActiveSession().createSQLQuery(
@@ -84,17 +88,17 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
      * This method is private and consumed by other methods
      * @param fetchAll will tell weather query should get all properties or not.
      * @param propertyIds will tell weather propertyIds should be pass to filter result. Combination of these two will give flexible usage.
-     * @return List<Property>
-     * @throws MiddlewareQueryException
+     * @return List<OntologyProperty>
+     * @throws MiddlewareException
      */
-    private List<Property> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareQueryException {
+    private List<OntologyProperty> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareException {
 
-        List<Property> properties = new ArrayList<>();
+        Map<Integer, OntologyProperty> map = new HashMap<>();
 
         if(propertyIds == null) propertyIds = new ArrayList<>();
 
         if(!fetchAll && propertyIds.size() == 0){
-            return properties;
+            return new ArrayList<>();
         }
 
         try {
@@ -137,8 +141,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
                     continue;
                 }
 
-                //Check if Property term is already added to Map. We are iterating multiple classes for property
-                Property property = new Property(new Term((Integer) items[0], (String)items[1], (String)items[2], (Integer) items[3], typeSafeObjectToBoolean(items[4])));
+                //Check if OntologyProperty term is already added to Map. We are iterating multiple classes for property
+                OntologyProperty property = new OntologyProperty(new Term((Integer) items[0], (String)items[1], (String)items[2], (Integer) items[3], typeSafeObjectToBoolean(items[4])));
 
                 if(items[5] != null) {
                     property.setCropOntologyId((String) items[5]);
@@ -154,16 +158,37 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
                     }
                 }
 
-                properties.add(property);
+                map.put(property.getId(), property);
             }
+
+            //Created, modified from CVTermProperty
+            List propertyProp = getCvTermPropertyDao().getByCvId(CvId.PROPERTIES.getId());
+            for(Object p : propertyProp){
+                CVTermProperty property = (CVTermProperty) p;
+
+                OntologyProperty ontologyProperty = map.get(property.getCvTermId());
+
+                if(ontologyProperty == null){
+                    continue;
+                }
+
+                if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
+                    ontologyProperty.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+                } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
+                    ontologyProperty.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+                }
+            }
+
 
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
         }
 
-        Collections.sort(properties, new Comparator<Property>() {
+        ArrayList<OntologyProperty> properties = new ArrayList<>(map.values());
+
+        Collections.sort(properties, new Comparator<OntologyProperty>() {
             @Override
-            public int compare(Property l, Property r) {
+            public int compare(OntologyProperty l, OntologyProperty r) {
                 return l.getName().compareToIgnoreCase(r.getName());
             }
         });
@@ -172,7 +197,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void addProperty(Property property) throws MiddlewareException {
+    public void addProperty(OntologyProperty property) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 
@@ -181,7 +206,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         }
 
         //Constant CvId
-        property.getTerm().setVocabularyId(CvId.PROPERTIES.getId());
+        property.setVocabularyId(CvId.PROPERTIES.getId());
 
         List<Term> allClasses = getCvTermDao().getAllClasses();
 
@@ -231,7 +256,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             }
 
             //Save creation time
-            getCvTermPropertyDao().save(property.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(property.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             transaction.commit();
         } catch (Exception e) {
@@ -241,7 +266,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public void updateProperty(Property property) throws MiddlewareException {
+    public void updateProperty(OntologyProperty property) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(property.getId());
 
@@ -322,7 +347,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             }
 
             // Save last modified Time
-            getCvTermPropertyDao().save(property.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.getCurrentTime().toString(), 0);
+            getCvTermPropertyDao().save(property.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
             transaction.commit();
         } catch (Exception e) {
