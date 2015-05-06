@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.dms.*;
 import org.generationcp.middleware.dao.gdms.*;
 import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.*;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -506,6 +507,12 @@ public class DatabaseBroker {
         transactionDao.setSession(getActiveSession());
         return transactionDao;
     }
+
+     public StockTransactionDAO getStockTransactionDAO() {
+         StockTransactionDAO stockTransactionDAO = new StockTransactionDAO();
+         stockTransactionDAO.setSession(getActiveSession());
+         return stockTransactionDAO;
+     }
     
     protected TermPropertyBuilder getTermPropertyBuilder() {
         return new TermPropertyBuilder(sessionProvider);
