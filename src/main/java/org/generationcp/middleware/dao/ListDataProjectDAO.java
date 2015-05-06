@@ -149,17 +149,17 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		try {
 
 			String queryStr = "select "+ 
-							" lp.listdata_project_id, "+
-							" lp.entry_id, "+ 
-							" lp.designation, "+ 
-							" lp.group_name, "+
-							" fn.nval, "+
-							" fp.gid, "+
-							" mn.nval, "+
-							" mp.gid, "+
-							" g.gid, "+
-							" lp.seed_source, "+
-							" lp.duplicate_notes "+
+							" lp.listdata_project_id as listdata_project_id, "+
+							" lp.entry_id as entry_id, "+ 
+							" lp.designation as designation, "+ 
+							" lp.group_name as group_name, "+
+							" fn.nval as fnval, "+
+							" fp.gid as fpgid, "+
+							" mn.nval as mnval, "+
+							" mp.gid as mpgid, "+
+							" g.gid as gid, "+
+							" lp.seed_source as seed_source, "+
+							" lp.duplicate_notes as duplicate_notes "+
 						" from listdata_project lp "+
 						" inner join germplsm g on lp.germplasm_id = g.gid "+
 						" inner join germplsm mp on g.gpid2 = mp.gid "+
@@ -172,6 +172,17 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			SQLQuery query = getSession().createSQLQuery(queryStr);
 			query.setParameter("listId", listID);
+			query.addScalar("listdata_project_id");
+			query.addScalar("entry_id");
+			query.addScalar("designation");
+			query.addScalar("group_name");
+			query.addScalar("fnval");
+			query.addScalar("fpgid");
+			query.addScalar("mnval");
+			query.addScalar("mpgid");
+			query.addScalar("gid");
+			query.addScalar("seed_source");
+			query.addScalar("duplicate_notes");
 			
 			createListDataProjectRows(listDataProjects,query);
 
