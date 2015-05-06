@@ -16,9 +16,9 @@ package org.generationcp.middleware.service;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.LotsResult;
-import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.ims.*;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -60,6 +60,7 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		return getInventoryDataManager().getInventoryDetailsByGermplasmList(studyId);
 	}
 
+	@Deprecated
 	@Override
 	public LotsResult addLotsForList(List<Integer> gids, Integer locationId, Integer scaleId,
 			String comment,
@@ -153,4 +154,22 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		return currentMax;
 	}
 
+	@Override
+	public void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject) throws MiddlewareQueryException {
+		Lot existingLot = getInventoryDataManager().getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(EntityType.GERMPLSM.name(), details.getGid(), details.getLocationId(), details.getScaleId());
+
+		if (existingLot != null) {
+			throw new MiddlewareQueryException("A lot with the same entity id, location id, and scale id already exists");
+		}
+
+		Lot lot = getLotBuilder().createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId());
+		getInventoryDataManager().addLot(lot);
+
+		Transaction transaction = getTransactionBuilder().buildForAdd(lot, listData.getId(),
+				details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(), details.getInventoryID());
+		getInventoryDataManager().addTransaction(transaction);
+
+		StockTransaction stockTransaction = new StockTransaction(null, listDataProject, transaction);
+		getInventoryDataManager().addStockTransaction(stockTransaction);
+	}
 }

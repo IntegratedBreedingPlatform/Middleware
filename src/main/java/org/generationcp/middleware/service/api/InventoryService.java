@@ -14,6 +14,8 @@ package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.LotsResult;
 
 import java.util.List;
@@ -83,5 +85,9 @@ public interface InventoryService {
 
 	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier) throws
 				MiddlewareQueryException;
+
+	void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject)
+			throws MiddlewareQueryException;
+
 	
 }
