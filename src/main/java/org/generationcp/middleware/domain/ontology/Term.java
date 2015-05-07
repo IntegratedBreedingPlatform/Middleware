@@ -11,20 +11,19 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.ontology;
 
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.util.Debug;
 import java.util.Date;
 
 /**
- * Extends {@link Term} to store additional DateCreated and DateLastModified data.
+ * Extends {@link org.generationcp.middleware.domain.oms.Term} to store additional DateCreated and DateLastModified data.
  */
-public abstract class OntologyTerm extends Term {
+public abstract class Term extends org.generationcp.middleware.domain.oms.Term {
 
-    protected OntologyTerm() {
+    protected Term() {
 
     }
 
-    protected OntologyTerm(Term term) {
+    protected Term(org.generationcp.middleware.domain.oms.Term term) {
         this.setId(term.getId());
         this.setName(term.getName());
         this.setDefinition(term.getDefinition());
@@ -53,7 +52,7 @@ public abstract class OntologyTerm extends Term {
 
     @Override
     public String toString() {
-        return "OntologyTerm{" +
+        return "Term{" +
                 "dateCreated=" + dateCreated +
                 ", dateLastModified=" + dateLastModified +
                 "} " + super.toString();

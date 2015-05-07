@@ -13,7 +13,7 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.domain.ontology.OntologyProperty;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;
@@ -27,15 +27,15 @@ import static org.junit.Assert.*;
 /**
  * Implements {@link DataManagerIntegrationTest}
  */
-public class OntologyPropertyDataManagerImplTest extends DataManagerIntegrationTest {
+public class PropertyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyPropertyDataManager propertyDataManager;
-    private static OntologyProperty testProperty;
+    private static Property testProperty;
 
 	@Before
 	public void setUp() throws Exception {
 		propertyDataManager = DataManagerIntegrationTest.managerFactory.getOntologyPropertyDataManager();
-        testProperty = new OntologyProperty();
+        testProperty = new Property();
         testProperty.setName(getNewRandomName());
         testProperty.setDefinition("definition");
         testProperty.setCropOntologyId("CO_322:0000046");
@@ -47,15 +47,15 @@ public class OntologyPropertyDataManagerImplTest extends DataManagerIntegrationT
 
     @Test
     public void testGetPropertyById() throws Exception {
-        OntologyProperty property = propertyDataManager.getProperty(testProperty.getId());
+        Property property = propertyDataManager.getProperty(testProperty.getId());
         assertNotNull(property);
         property.print(2);
     }
 
     @Test
     public void testGetAllPropertiesByClassName() throws Exception {
-        List<OntologyProperty> properties = propertyDataManager.getAllPropertiesWithClass("agronomic");
-        for(OntologyProperty p : properties){
+        List<Property> properties = propertyDataManager.getAllPropertiesWithClass("agronomic");
+        for(Property p : properties){
             p.print(2);
         }
         Debug.println("Properties: " + properties.size());
@@ -64,8 +64,8 @@ public class OntologyPropertyDataManagerImplTest extends DataManagerIntegrationT
 
     @Test
     public void testGetAllProperties() throws Exception {
-        List<OntologyProperty> properties = propertyDataManager.getAllProperties();
-        for(OntologyProperty p : properties){
+        List<Property> properties = propertyDataManager.getAllProperties();
+        for(Property p : properties){
             p.print(2);
         }
         Debug.println("Properties: " + properties.size());
@@ -79,7 +79,7 @@ public class OntologyPropertyDataManagerImplTest extends DataManagerIntegrationT
         testProperty.getClasses().clear();
         testProperty.addClass(getNewRandomName());
         propertyDataManager.updateProperty(testProperty);
-        OntologyProperty updatedProperty = propertyDataManager.getProperty(testProperty.getId());
+        Property updatedProperty = propertyDataManager.getProperty(testProperty.getId());
         assertEquals(updatedProperty.getDefinition(), "new definition");
         assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
         assertEquals(updatedProperty.getClasses().size(), 1);

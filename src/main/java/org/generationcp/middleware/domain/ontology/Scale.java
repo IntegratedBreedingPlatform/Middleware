@@ -13,15 +13,14 @@ package org.generationcp.middleware.domain.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.util.Debug;
 import java.util.HashMap;
 import java.util.Map;
 /**
- * Extends {@link OntologyTerm}
+ * Extends {@link Term}
  */
 
-public class OntologyScale extends OntologyTerm {
+public class Scale extends Term {
 
     private DataType dataType;
     private final Map<String, String> categories = new HashMap<>();
@@ -29,11 +28,11 @@ public class OntologyScale extends OntologyTerm {
     private String minValue;
     private String maxValue;
 
-    public OntologyScale() {
+    public Scale() {
         this.setVocabularyId(CvId.SCALES.getId());
     }
 
-    public OntologyScale(Term term) {
+    public Scale(org.generationcp.middleware.domain.oms.Term term) {
         super(term);
         this.setVocabularyId(CvId.SCALES.getId());
     }
@@ -72,7 +71,7 @@ public class OntologyScale extends OntologyTerm {
 
     @Override
     public String toString() {
-        return "OntologyScale{" +
+        return "Scale{" +
                 "dataType=" + dataType +
                 ", categories=" + categories +
                 ", minValue='" + minValue + '\'' +

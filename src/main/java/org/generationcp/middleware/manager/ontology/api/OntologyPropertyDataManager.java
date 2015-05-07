@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.ontology.OntologyProperty;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -29,23 +29,23 @@ public interface OntologyPropertyDataManager {
      * Given the termId, retrieve the Property POJO.
      *
      * @param id the term id having cvId = Property
-     * @return {@link OntologyProperty}
+     * @return {@link Property}
      * @throws MiddlewareQueryException the middleware query exception
      */
-    OntologyProperty getProperty(int id) throws MiddlewareException;
+    Property getProperty(int id) throws MiddlewareException;
 
     /**
      * Get all properties
      * @throws MiddlewareException the middleware query exception
      */
-    List<OntologyProperty> getAllProperties() throws MiddlewareException;
+    List<Property> getAllProperties() throws MiddlewareException;
 
     /**
      * Get all properties by className
      * @return property
      * @throws MiddlewareException the middleware query exception
      */
-    List<OntologyProperty> getAllPropertiesWithClass(String className) throws MiddlewareException;
+    List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException;
 
     /**
      * Adds a new property to the database.
@@ -54,7 +54,7 @@ public interface OntologyPropertyDataManager {
      * @param property to be added
      * @throws MiddlewareException the middleware query exception
      */
-    void addProperty(OntologyProperty property) throws MiddlewareException;
+    void addProperty(Property property) throws MiddlewareException;
 
     /**
      * Updates the given property.
@@ -62,7 +62,7 @@ public interface OntologyPropertyDataManager {
      * @param property The Method to update
      * @throws MiddlewareException the middleware exception
      */
-    void updateProperty(OntologyProperty property) throws MiddlewareException;
+    void updateProperty(Property property) throws MiddlewareException;
 
     /**
      * Delete method.

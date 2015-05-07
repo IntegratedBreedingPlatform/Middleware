@@ -1,7 +1,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.ontology.OntologyMethod;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -32,12 +32,12 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public OntologyMethod getMethod(int id) throws MiddlewareException {
+    public Method getMethod(int id) throws MiddlewareException {
         CVTerm term = getCvTermDao().getById(id);
         checkTermIsMethod(term);
 
         try {
-            List<OntologyMethod> methods = getMethods(false, new ArrayList<>(Collections.singletonList(id)));
+            List<Method> methods = getMethods(false, new ArrayList<>(Collections.singletonList(id)));
 
             if(methods.isEmpty()){
                 return null;
@@ -50,7 +50,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public List<OntologyMethod> getAllMethods() throws MiddlewareException {
+    public List<Method> getAllMethods() throws MiddlewareException {
         try {
             return getMethods(true, null);
         } catch (HibernateException e) {
@@ -62,12 +62,12 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
      * This will fetch list of methods by passing methodIds
      * @param fetchAll will tell wheather query should get all methods or not.
      * @param methodIds will tell wheather methodIds should be pass to filter result. Combination of these two will give flexible usage.
-     * @return List<OntologyMethod>
+     * @return List<Method>
      * @throws MiddlewareException
      */
-    private List<OntologyMethod> getMethods(Boolean fetchAll, List<Integer> methodIds) throws MiddlewareException {
+    private List<Method> getMethods(Boolean fetchAll, List<Integer> methodIds) throws MiddlewareException {
 
-        Map<Integer, OntologyMethod> map = new HashMap<>();
+        Map<Integer, Method> map = new HashMap<>();
         if(methodIds == null) methodIds = new ArrayList<>();
 
         if(!fetchAll && methodIds.size() == 0){
@@ -79,8 +79,8 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             List<CVTerm> terms = fetchAll ? getCvTermDao().getAllByCvId(CvId.METHODS):getCvTermDao().getAllByCvId(methodIds, CvId.METHODS);
 
             for(CVTerm m : terms){
-                OntologyMethod ontologyMethod = new OntologyMethod(Term.fromCVTerm(m));
-                map.put(ontologyMethod.getId(), ontologyMethod);
+                Method method = new Method(Term.fromCVTerm(m));
+                map.put(method.getId(), method);
             }
 
             //Created, modified from CVTermProperty
@@ -89,16 +89,16 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             for(Object p : termProperties){
                 CVTermProperty property = (CVTermProperty) p;
 
-                OntologyMethod ontologyMethod = map.get(property.getCvTermId());
+                Method method = map.get(property.getCvTermId());
 
-                if(ontologyMethod == null){
+                if(method == null){
                     continue;
                 }
 
                 if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
-                    ontologyMethod.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+                    method.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
                 } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
-                    ontologyMethod.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+                    method.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
                 }
             }
 
@@ -106,11 +106,11 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
             throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
         }
 
-        ArrayList<OntologyMethod> methods = new ArrayList<>(map.values());
+        ArrayList<Method> methods = new ArrayList<>(map.values());
 
-        Collections.sort(methods, new Comparator<OntologyMethod>() {
+        Collections.sort(methods, new Comparator<Method>() {
             @Override
-            public int compare(OntologyMethod l, OntologyMethod r) {
+            public int compare(Method l, Method r) {
                 return l.getName().compareToIgnoreCase(r.getName());
             }
         });
@@ -120,7 +120,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
 
     @Override
-    public void addMethod(OntologyMethod method) throws MiddlewareException {
+    public void addMethod(Method method) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(method.getName(), CvId.METHODS.getId());
 
@@ -150,7 +150,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
     }
 
     @Override
-    public void updateMethod(OntologyMethod method) throws MiddlewareException {
+    public void updateMethod(Method method) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getById(method.getId());
 

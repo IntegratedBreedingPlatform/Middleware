@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.ontology.OntologyScale;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 
 import java.util.List;
@@ -27,10 +27,10 @@ public interface OntologyScaleDataManager {
     /**
      * This will fetch Scale by scaleId*
      * @param scaleId select scale by scaleId
-     * @return @link OntologyScale
+     * @return @link Scale
      * @throws MiddlewareException
      */
-    OntologyScale getScaleById(int scaleId) throws MiddlewareException;
+    Scale getScaleById(int scaleId) throws MiddlewareException;
 
     /**
      * Get all scales from db
@@ -38,14 +38,14 @@ public interface OntologyScaleDataManager {
      * @return All the scales
      * @throws MiddlewareException the middleware exception
      */
-    List<OntologyScale> getAllScales() throws MiddlewareException;
+    List<Scale> getAllScales() throws MiddlewareException;
 
     /**
      * Adds a Scale. If the scale is already found in the local database, it simply retrieves the record found.
      * @param scale to be added
      * @throws MiddlewareException the middleware exception
      */
-    void addScale(OntologyScale scale) throws MiddlewareException;
+    void addScale(Scale scale) throws MiddlewareException;
 
     /**
     * Updates the given scale.
@@ -53,7 +53,7 @@ public interface OntologyScaleDataManager {
     * @param scale The Scale to update
     * @throws MiddlewareException the middleware exception
     */
-    void updateScale(OntologyScale scale) throws MiddlewareException;
+    void updateScale(Scale scale) throws MiddlewareException;
 
     /**
      * Delete method.

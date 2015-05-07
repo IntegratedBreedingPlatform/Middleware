@@ -1,7 +1,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import org.generationcp.middleware.domain.oms.*;
-import org.generationcp.middleware.domain.ontology.OntologyVariable;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -159,7 +159,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     }
 
     @Override
-    public OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareException {
+    public Variable getVariable(String programUuid, Integer id) throws MiddlewareException {
 
         try {
 
@@ -170,7 +170,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
             try {
 
-                OntologyVariable variable = new OntologyVariable(Term.fromCVTerm(term));
+                Variable variable = new Variable(Term.fromCVTerm(term));
 
                 //load scale, method and property data
                 List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(term.getCvTermId());

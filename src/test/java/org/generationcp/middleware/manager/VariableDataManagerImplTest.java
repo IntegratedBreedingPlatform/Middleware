@@ -16,10 +16,10 @@ import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.oms.*;
-import org.generationcp.middleware.domain.ontology.OntologyMethod;
-import org.generationcp.middleware.domain.ontology.OntologyProperty;
-import org.generationcp.middleware.domain.ontology.OntologyScale;
-import org.generationcp.middleware.domain.ontology.OntologyVariable;
+import org.generationcp.middleware.domain.ontology.*;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -36,16 +36,16 @@ import java.util.List;
 /**
  * Extends {@link DataManagerIntegrationTest}
  */
-public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationTest {
+public class VariableDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyVariableDataManager variableManager;
     private static OntologyMethodDataManager methodManager;
     private static OntologyPropertyDataManager propertyManager;
     private static OntologyScaleDataManager scaleManager;
     private static Project testProject;
-    private static OntologyMethod testMethod;
-    private static OntologyProperty testProperty;
-    private static OntologyScale testScale;
+    private static Method testMethod;
+    private static Property testProperty;
+    private static Scale testScale;
     private static OntologyVariableInfo testVariableInfo;
 
     @Test
@@ -63,14 +63,14 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
 
     @Test
     public void testGetVariable() throws Exception {
-        OntologyVariable variable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
+        Variable variable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
         Assert.assertNotNull(variable);
     }
 
     @Test
     public void testUpdateVariable() throws Exception {
         variableManager.updateVariable(testVariableInfo);
-        OntologyVariable updatedVariable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
+        Variable updatedVariable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
         Assert.assertNotNull(updatedVariable);
     }
 
@@ -87,19 +87,19 @@ public class OntologyVariableDataManagerImplTest extends DataManagerIntegrationT
         propertyManager = DataManagerIntegrationTest.managerFactory.getOntologyPropertyDataManager();
         scaleManager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
 
-        testMethod = new OntologyMethod();
+        testMethod = new org.generationcp.middleware.domain.ontology.Method();
         testMethod.setName(getNewRandomName());
         testMethod.setDefinition("Test Method");
         methodManager.addMethod(testMethod);
 
-        testProperty = new OntologyProperty();
+        testProperty = new Property();
         testProperty.setName(getNewRandomName());
         testProperty.setDefinition("Test Property");
         testProperty.setCropOntologyId("CO:0000001");
         testProperty.addClass("My New Class");
         propertyManager.addProperty(testProperty);
 
-        testScale = new OntologyScale();
+        testScale = new Scale();
         testScale.setName(getNewRandomName());
         testScale.setDefinition("Test Scale");
         testScale.setDataType(DataType.NUMERIC_VARIABLE);

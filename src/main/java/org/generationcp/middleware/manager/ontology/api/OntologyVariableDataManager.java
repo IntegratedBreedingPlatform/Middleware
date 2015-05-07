@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.ontology.OntologyVariable;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -34,10 +34,10 @@ public interface OntologyVariableDataManager {
 
     /**
      * Return variable by Id
-     * * @return OntologyVariable
+     * * @return Variable
      * @throws MiddlewareException*
      */
-    OntologyVariable getVariable(String programUuid, Integer id) throws MiddlewareException;
+    Variable getVariable(String programUuid, Integer id) throws MiddlewareException;
 
     /**
      * @throws MiddlewareException*

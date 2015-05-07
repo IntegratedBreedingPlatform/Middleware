@@ -12,26 +12,25 @@
 package org.generationcp.middleware.domain.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.util.Debug;
 
 /**
- * Extends {@link OntologyTerm} to store Method object for ontology
+ * Extends {@link Term} to store Method object for ontology
  */
-public class OntologyMethod extends OntologyTerm {
+public class Method extends Term {
 
-    public OntologyMethod() {
+    public Method() {
         this.setVocabularyId(CvId.METHODS.getId());
     }
 
-    public OntologyMethod(Term term){
+    public Method(org.generationcp.middleware.domain.oms.Term term){
         super(term);
         this.setVocabularyId(CvId.METHODS.getId());
     }
 
     @Override
     public String toString() {
-        return "OntologyMethod{} " + super.toString();
+        return "Method{} " + super.toString();
     }
 
     @Override

@@ -14,7 +14,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
-import org.generationcp.middleware.domain.ontology.OntologyMethod;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;
@@ -27,18 +27,18 @@ import java.util.List;
 /**
  * Implements {@link DataManagerIntegrationTest}
  */
-public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTest {
+public class MethodDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyMethodDataManager manager;
 
-    private static OntologyMethod testMethod;
+    private static Method testMethod;
 
 	@Before
 	public void setUp() throws Exception {
 		manager = DataManagerIntegrationTest.managerFactory.getOntologyMethodDataManager();
         String name = getNewRandomName();
         String definition = "Test Definition";
-        testMethod = new OntologyMethod();
+        testMethod = new Method();
         testMethod.setName(name);
         testMethod.setDefinition(definition);
         manager.addMethod(testMethod);
@@ -46,14 +46,14 @@ public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTes
 
     @Test
     public void testGetAllMethods() throws Exception {
-        List<OntologyMethod> methods = manager.getAllMethods();
+        List<Method> methods = manager.getAllMethods();
         Assert.assertTrue(methods.size() > 0);
         Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Methods:  " + methods.size());
     }
 
     @Test
     public void testGetMethodById() throws Exception{
-        OntologyMethod method = manager.getMethod(4040);
+        Method method = manager.getMethod(4040);
         Assert.assertNotNull(method);
         Assert.assertEquals("Enumerated", method.getName());
     }
@@ -69,7 +69,7 @@ public class OntologyMethodDataManagerImplTest extends DataManagerIntegrationTes
     public void testUpdateMethod() throws Exception {
         testMethod.setDefinition("new definition");
         manager.updateMethod(testMethod);
-        OntologyMethod updatedMethod = manager.getMethod(testMethod.getId());
+        Method updatedMethod = manager.getMethod(testMethod.getId());
         Assert.assertEquals(updatedMethod.getDefinition(), testMethod.getDefinition());
         Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + testMethod);
     }

@@ -4,7 +4,8 @@ import com.google.common.base.*;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import org.generationcp.middleware.domain.oms.*;
-import org.generationcp.middleware.domain.ontology.OntologyScale;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -39,10 +40,10 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public OntologyScale getScaleById(int scaleId) throws MiddlewareException {
+    public Scale getScaleById(int scaleId) throws MiddlewareException {
 
         try {
-            List<OntologyScale> scales = getScales(false, new ArrayList<>(Collections.singletonList(scaleId)));
+            List<Scale> scales = getScales(false, new ArrayList<>(Collections.singletonList(scaleId)));
             if(scales.isEmpty())
                 return null;
             return scales.get(0);
@@ -52,7 +53,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public List<OntologyScale> getAllScales() throws MiddlewareException {
+    public List<Scale> getAllScales() throws MiddlewareException {
         try {
             return getScales(true, null);
         } catch (Exception e) {
@@ -68,8 +69,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
      * @return List<Scale>
      * @throws MiddlewareException
      */
-    private List<OntologyScale> getScales(Boolean fetchAll, List<Integer> scaleIds) throws MiddlewareException {
-        Map<Integer, OntologyScale> map = new HashMap<>();
+    private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds) throws MiddlewareException {
+        Map<Integer, org.generationcp.middleware.domain.ontology.Scale> map = new HashMap<>();
 
         if(scaleIds == null) scaleIds = new ArrayList<>();
 
@@ -84,7 +85,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
                 if(fetchAll) {
                     scaleIds.add(s.getCvTermId());
                 }
-                map.put(s.getCvTermId(), new OntologyScale(Term.fromCVTerm(s)));
+                map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
             }
 
             Query query = getActiveSession()
@@ -95,7 +96,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
             for(Object p : properties){
                 CVTermProperty property = (CVTermProperty) p;
-                OntologyScale scale = map.get(property.getCvTermId());
+                Scale scale = map.get(property.getCvTermId());
 
                 if(scale == null){
                     continue;
@@ -124,7 +125,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
                 Integer scaleId = (Integer) items[0];
 
-                OntologyScale scale = map.get(scaleId);
+                Scale scale = map.get(scaleId);
 
                 if(scale == null){
                     continue;
@@ -141,11 +142,11 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             throw new MiddlewareQueryException("Error at getScales", e);
         }
 
-        List<OntologyScale> scales = new ArrayList<>(map.values());
+        List<Scale> scales = new ArrayList<>(map.values());
 
-        Collections.sort(scales, new Comparator<OntologyScale>() {
+        Collections.sort(scales, new Comparator<Scale>() {
             @Override
-            public int compare(OntologyScale l, OntologyScale r) {
+            public int compare(Scale l, Scale r) {
                 return  l.getName().compareToIgnoreCase(r.getName());
             }
         });
@@ -154,7 +155,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
     }
 
     @Override
-    public void addScale(OntologyScale scale) throws MiddlewareException {
+    public void addScale(Scale scale) throws MiddlewareException {
 
         CVTerm term = getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
 
@@ -238,7 +239,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 
     @Override
-    public void updateScale(OntologyScale scale) throws MiddlewareException {
+    public void updateScale(Scale scale) throws MiddlewareException {
 
         if(Objects.equals(scale.getDataType(), null)){
             throw new MiddlewareException(SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);

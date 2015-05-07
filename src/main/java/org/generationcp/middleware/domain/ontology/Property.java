@@ -12,24 +12,23 @@
 package org.generationcp.middleware.domain.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.util.Debug;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 /**
- * Extends {@link OntologyTerm} to store Property object for ontology
+ * Extends {@link Term} to store Property object for ontology
  */
-public class OntologyProperty extends OntologyTerm {
+public class Property extends Term {
 
     private final Set<String> classes = new HashSet<>();
     private String cropOntologyId;
 
-    public OntologyProperty() {
+    public Property() {
         this.setVocabularyId(CvId.PROPERTIES.getId());
     }
 
-    public OntologyProperty(Term term) {
+    public Property(org.generationcp.middleware.domain.oms.Term term) {
         super(term);
         this.setVocabularyId(CvId.PROPERTIES.getId());
     }
@@ -54,7 +53,7 @@ public class OntologyProperty extends OntologyTerm {
 
     @Override
     public String toString() {
-        return "OntologyProperty{" +
+        return "Property{" +
                 "classes=" + classes +
                 ", cropOntologyId='" + cropOntologyId + '\'' +
                 "} " + super.toString();

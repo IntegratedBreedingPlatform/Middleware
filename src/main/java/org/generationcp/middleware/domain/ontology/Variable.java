@@ -1,7 +1,6 @@
 package org.generationcp.middleware.domain.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.util.Debug;
 
@@ -9,10 +8,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Extends {@link OntologyTerm} The Variable with term, property, scale, method.
+ * Extends {@link Term} The Variable with term, property, scale, method.
  *
  */
-public class OntologyVariable extends OntologyTerm {
+public class Variable extends Term {
 
     private String alias;
 
@@ -24,9 +23,9 @@ public class OntologyVariable extends OntologyTerm {
 	 */
     private final Set<VariableType> variableTypes = new HashSet<>();
 
-    private OntologyMethod method;
-    private OntologyProperty property;
-    private OntologyScale scale;
+    private Method method;
+    private Property property;
+    private Scale scale;
 
     private Boolean isFavorite;
 
@@ -38,11 +37,11 @@ public class OntologyVariable extends OntologyTerm {
 
     private Integer studies;
 
-    public OntologyVariable() {
+    public Variable() {
         this.setVocabularyId(CvId.VARIABLES.getId());
     }
 
-    public OntologyVariable(Term term) {
+    public Variable(org.generationcp.middleware.domain.oms.Term term) {
         super(term);
         this.setVocabularyId(CvId.VARIABLES.getId());
     }
@@ -63,27 +62,27 @@ public class OntologyVariable extends OntologyTerm {
 		this.variableTypes.add(type);
 	}
 
-    public OntologyMethod getMethod() {
+    public Method getMethod() {
         return method;
     }
 
-    public void setMethod(OntologyMethod method) {
+    public void setMethod(Method method) {
         this.method = method;
     }
 
-    public OntologyProperty getProperty() {
+    public Property getProperty() {
         return property;
     }
 
-    public void setProperty(OntologyProperty property) {
+    public void setProperty(Property property) {
         this.property = property;
     }
 
-    public OntologyScale getScale() {
+    public Scale getScale() {
         return scale;
     }
 
-    public void setScale(OntologyScale scale) {
+    public void setScale(Scale scale) {
         this.scale = scale;
     }
 
@@ -129,7 +128,7 @@ public class OntologyVariable extends OntologyTerm {
 
     @Override
     public String toString() {
-        return "OntologyVariable{" +
+        return "Variable{" +
                 "alias='" + alias + '\'' +
                 ", variableTypes=" + variableTypes +
                 ", property=" + property +
