@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.oms.OntologyProperty;
+import org.generationcp.middleware.domain.ontology.OntologyProperty;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -29,7 +29,7 @@ public interface OntologyPropertyDataManager {
      * Given the termId, retrieve the Property POJO.
      *
      * @param id the term id having cvId = Property
-     * @return {@link org.generationcp.middleware.domain.oms.OntologyProperty}
+     * @return {@link OntologyProperty}
      * @throws MiddlewareQueryException the middleware query exception
      */
     OntologyProperty getProperty(int id) throws MiddlewareException;

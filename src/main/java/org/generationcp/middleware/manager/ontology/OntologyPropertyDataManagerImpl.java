@@ -2,6 +2,7 @@ package org.generationcp.middleware.manager.ontology;
 
 import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.ontology.OntologyProperty;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;

@@ -15,7 +15,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.OntologyScale;
+import org.generationcp.middleware.domain.ontology.OntologyScale;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;

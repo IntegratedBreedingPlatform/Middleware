@@ -4,6 +4,7 @@ import com.google.common.base.*;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.ontology.OntologyScale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;

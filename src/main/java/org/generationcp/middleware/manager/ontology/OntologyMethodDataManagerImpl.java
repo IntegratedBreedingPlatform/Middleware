@@ -1,7 +1,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.OntologyMethod;
+import org.generationcp.middleware.domain.ontology.OntologyMethod;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;

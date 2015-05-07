@@ -9,8 +9,9 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
-package org.generationcp.middleware.domain.oms;
+package org.generationcp.middleware.domain.ontology;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.util.Debug;
 import java.util.Date;
 

@@ -1,6 +1,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.ontology.OntologyVariable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;

@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.oms.OntologyMethod;
+import org.generationcp.middleware.domain.ontology.OntologyMethod;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 

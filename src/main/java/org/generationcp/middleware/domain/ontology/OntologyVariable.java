@@ -1,5 +1,8 @@
-package org.generationcp.middleware.domain.oms;
+package org.generationcp.middleware.domain.ontology;
 
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.util.Debug;
 
 import java.util.HashSet;

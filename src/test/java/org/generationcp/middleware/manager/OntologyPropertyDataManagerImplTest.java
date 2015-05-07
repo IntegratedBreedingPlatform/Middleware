@@ -13,7 +13,7 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.domain.oms.OntologyProperty;
+import org.generationcp.middleware.domain.ontology.OntologyProperty;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;

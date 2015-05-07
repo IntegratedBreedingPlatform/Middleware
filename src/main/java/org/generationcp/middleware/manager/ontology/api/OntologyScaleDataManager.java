@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.domain.oms.OntologyScale;
+import org.generationcp.middleware.domain.ontology.OntologyScale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 
 import java.util.List;
