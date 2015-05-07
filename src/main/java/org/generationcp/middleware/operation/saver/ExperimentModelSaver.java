@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -232,15 +233,12 @@ public class ExperimentModelSaver extends Saver {
 		}
 		
 		Phenotype phenotype = new Phenotype();
-		phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 		phenotype.setValue(value == null ? null : value.toString());
 		phenotype.setObservableId(stdVariable.getId());
-		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 		phenotype.setName(String.valueOf(stdVariable.getId()));
 		getPhenotypeDao().save(phenotype);
 		
         ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
-		experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId("experimentPhenotypeId"));
 		experimentPhenotype.setExperiment(experimentModel.getNdExperimentId());
 		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
 		getExperimentPhenotypeDao().save(experimentPhenotype);
@@ -254,15 +252,12 @@ public class ExperimentModelSaver extends Saver {
 		}
 		
 		Phenotype phenotype = new Phenotype();
-		phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 		phenotype.setcValue(value == null ? null : Integer.valueOf(value.toString()));
 		phenotype.setObservableId(stdVariable.getId());
-		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 		phenotype.setName(String.valueOf(stdVariable.getId()));
 		getPhenotypeDao().save(phenotype);
 		
         ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
-		experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId("experimentPhenotypeId"));
 		experimentPhenotype.setExperiment(experimentModel.getNdExperimentId());
 		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
 		getExperimentPhenotypeDao().save(experimentPhenotype);
