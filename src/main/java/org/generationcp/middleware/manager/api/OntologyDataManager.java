@@ -57,7 +57,7 @@ public interface OntologyDataManager {
     /**
      * Gets standard variable summaries for given a list of ids. Returns an empty list if no matches are found.
      *
-     * @param stdVariableIds the list of standard variable ids
+     * @param standardVariableIds the list of standard variable ids
      * @return the list of standard variable summaries
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -107,7 +107,7 @@ public interface OntologyDataManager {
 	 * Must provide the property, method, scale, dataType, and storedIn info.
 	 * Otherwise, it will throw an exception.
 	 *
-	 * @param stdVariable the std variable
+	 * @param stdVariableList the std variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException;
@@ -227,7 +227,7 @@ public interface OntologyDataManager {
      * @throws MiddlewareException the middleware exception
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException;
+    void updateTerm(Term term) throws MiddlewareException;
     
 	/**
 	 * Returns the list of Term entries based on possible data types.
@@ -369,7 +369,14 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId) throws MiddlewareQueryException;
-    
+
+	/**
+	 *
+	 * @param property the specific Property Term element to which the crop ontology ID will be saved
+	 * @param cropOntologyID the crop ontology ID to be saved
+	 * @throws MiddlewareQueryException
+	 */
+	void addOrUpdateCropOntologyID(Property property, String cropOntologyID) throws MiddlewareQueryException;
 
     /**
      * Adds or updates the term and relationship.
@@ -379,13 +386,12 @@ public interface OntologyDataManager {
      * @param cvId the cv id
      * @param typeId the type id
      * @param objectId the object id
-     * @param cropOntologyId the crop ontology id
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId, String cropOntologyId)
-            throws MiddlewareQueryException, MiddlewareException;
+    Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
+            throws MiddlewareException;
 
     /**
      * Updates the given term and its associated entry in the cvterm_relationship table.
@@ -398,7 +404,7 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException;
+    Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareException;
     
     /**
      * Adds or updates the term.
@@ -410,7 +416,7 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException;
+    Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareException;
     
     /**
      * Gets the standard variable id by term id.
@@ -430,7 +436,8 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
+    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws
+			MiddlewareException;
 
     /**
      * Adds or updates standard variable constraints.
@@ -441,7 +448,7 @@ public interface OntologyDataManager {
      * @throws MiddlewareException the middleware exception
      */
     void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
-            throws MiddlewareQueryException, MiddlewareException;
+            throws MiddlewareException;
 
     /**
      * Deletes standard variable constraints.
@@ -461,7 +468,7 @@ public interface OntologyDataManager {
      * @throws MiddlewareException the middleware exception
      */
     Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) 
-            throws MiddlewareQueryException, MiddlewareException;
+            throws MiddlewareException;
     
     /**
      * - Save or update standard variable enumeration. 
@@ -477,7 +484,7 @@ public interface OntologyDataManager {
      * @throws MiddlewareException the middleware exception
      */
     void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration)  
-            throws MiddlewareQueryException, MiddlewareException;
+            throws MiddlewareException;
 
     
     /**
@@ -559,7 +566,7 @@ public interface OntologyDataManager {
 	 * @return true if valid
 	 * @throws MiddlewareQueryException
 	 */
-    public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
+    boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
     
     /**
      * Returns synonyms (if any) of given term (not limited to standard variable)

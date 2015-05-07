@@ -225,7 +225,20 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     UserInfo getUserInfo(int userId) throws MiddlewareQueryException;
-    
+
+    /**
+     * Get the user info record given the username, not that the username must exist else we'll have null
+     * exceptions
+     * @param username
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    UserInfo getUserInfoByUsername(String username) throws MiddlewareQueryException;
+
+    UserInfo getUserInfoByResetToken(String token) throws MiddlewareQueryException;
+
+    UserInfo updateUserInfo(UserInfo userInfo) throws MiddlewareQueryException;
+
     /**
      * Increments the log in count.
      *

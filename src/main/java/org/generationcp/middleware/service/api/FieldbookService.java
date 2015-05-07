@@ -21,8 +21,8 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +58,7 @@ public interface FieldbookService {
      * @return the FieldMapCount object containing the counts
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
     
     /**
      * Gets the field map info (entries, reps, plots and counts) of the given nursery.
@@ -67,7 +67,7 @@ public interface FieldbookService {
      * @return the FieldMapCount object containing the counts
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
     
     
     /**
@@ -134,7 +134,7 @@ public interface FieldbookService {
      * @return all field maps in block by trial instance id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
 
     /**
      * Gets the dataset references.
@@ -853,6 +853,9 @@ public interface FieldbookService {
 	 */
 	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
 
+    ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type,
+            int plotId) throws MiddlewareQueryException;
+
     ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo) throws MiddlewareQueryException;
 
     /**
@@ -879,4 +882,7 @@ public interface FieldbookService {
 	
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)  throws MiddlewareQueryException;
 	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException;
+
+	void addListDataProjectList(List<ListDataProject> listDataProjectList)
+			throws MiddlewareQueryException;
 }

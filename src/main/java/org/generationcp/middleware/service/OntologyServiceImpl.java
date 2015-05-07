@@ -172,8 +172,12 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
     @Override
     public Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException, MiddlewareException {
-        return new Property(getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES,  TermId.IS_A.getId(), isAId, cropOntologyId),
+
+        Property property = new Property(getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES,  TermId.IS_A.getId(), isAId),
                             getTermById(isAId));
+        getOntologyDataManager().addOrUpdateCropOntologyID(property, cropOntologyId);
+
+        return property;
     }
     
     @Override
@@ -192,9 +196,9 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     @Override
     public Scale getScale(int id) throws MiddlewareQueryException {
         Term scaleTerm = getOntologyDataManager().getTermById(id);
-        return (scaleTerm != null && scaleTerm.getVocabularyId() == CvId.SCALES.getId()
+        return (scaleTerm != null && scaleTerm.getVocabularyId() == CvId.SCALES.getId())
                 ? new Scale(scaleTerm)
-                : null);
+                : null;
     }
 
     @Override
@@ -326,7 +330,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     
     @Override
     public TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException, MiddlewareException {
-        Term term =  getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), parentTraitClassId, null);
+        Term term =  getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), parentTraitClassId);
         Term isA = getOntologyDataManager().getTermById(parentTraitClassId);
         return new TraitClass(term, isA);
     }

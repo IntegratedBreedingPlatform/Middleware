@@ -769,15 +769,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             
             //First priority, germplasms with GID=q
             
-            if(q.matches("\\d+") || q.matches("-\\d+")) {
+            if(q.matches("(\\d+)(%|_)?") || q.matches("(-\\d+)(%|_)?")) {
             	SQLQuery p1Query;
-	            if((q.contains("%") || q.contains("_")) && o.equals(Operation.LIKE)){
+	            if(o.equals(Operation.LIKE) || q.endsWith("%")){
 	            	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE);
+	            	if(q.contains("%") || q.contains("_")){
+	            		p1Query.setParameter("gid", q);
+	            	}else{
+	            		p1Query.setParameter("gid", q+"%");
+	            	}
 	            } else {
 	            	p1Query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
 	            	p1Query.setParameter("gidLength", q.length());
+	            	p1Query.setParameter("gid", q);
 	            }
-	            p1Query.setParameter("gid", q);
+	            
 	            p1Query.addEntity("germplsm", Germplasm.class);
 	
 	            result.addAll(p1Query.list());
@@ -871,7 +877,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
         return resultMap;
     }
-    
     /**
      * Returns a Map with the names of parental germplasm for a given study. These names are returned in a Map, where the key is the germplasm identifier
      * (gid) and the value is a list with all the names ({@link Name}) for such germplasm. This method optimizes data returned, because in a study is common that many entries
@@ -942,5 +947,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return germplasms;    	
     }
 
+	public Germplasm getByLGid(Integer lgid) throws MiddlewareQueryException {
+	    try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT g.* FROM germplsm g WHERE gid!=grplce AND lgid=:lgid LIMIT 1");
+            
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("lgid", lgid);
+            query.addEntity("g", Germplasm.class);
+
+            return (Germplasm) query.uniqueResult();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByLGid(lgid=" + lgid + ") query from Germplasm: " + e.getMessage(), e);
+        }
+        return null;
+	}   
     
 }

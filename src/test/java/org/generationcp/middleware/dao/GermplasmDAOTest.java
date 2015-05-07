@@ -15,6 +15,7 @@ package org.generationcp.middleware.dao;
 import java.util.List;
 
 import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
@@ -80,6 +81,54 @@ public class GermplasmDAOTest extends MiddlewareIntegrationTest {
         for (Germplasm g : results) {
             Debug.println(0, "  " + g.getGid() + " : " + g.getPreferredName().getNval());
         }
+    }
+    
+    @Test
+    public void testSearchForGermplasmsExactMatchGID() throws Exception {
+
+        List<Germplasm> results = dao.searchForGermplasms("1", Operation.EQUAL, false, false, sessionUtil.getCurrentSession());
+        Assert.assertTrue(results.size() == 1);
+        
+    }
+    
+    @Test
+    public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {
+
+        List<Germplasm> results = dao.searchForGermplasms("CML0", Operation.EQUAL, false, false, sessionUtil.getCurrentSession());
+        Assert.assertTrue(results.size() == 1);
+        
+    }
+    
+    @Test
+    public void testSearchForGermplasmsExactMatchGIDWithWildCard() throws Exception {
+
+        List<Germplasm> results = dao.searchForGermplasms("1%", Operation.EQUAL, false, false, sessionUtil.getCurrentSession());
+        Assert.assertTrue(results.size() == 111);
+        
+    }
+    
+    @Test
+    public void testSearchForGermplasmsExactMatchGermplasmNameWithWildCard() throws Exception {
+
+        List<Germplasm> results = dao.searchForGermplasms("CML%", Operation.EQUAL, false, false, sessionUtil.getCurrentSession());
+        Assert.assertTrue(results.size() == 200);
+        
+    }
+    
+    @Test
+    public void testSearchForGermplasmsPartialMatchGID() throws Exception {
+
+        List<Germplasm> results = dao.searchForGermplasms("1", Operation.LIKE, false, false, sessionUtil.getCurrentSession());
+        Assert.assertTrue(results.size() == 111);
+        
+    }
+    
+    @Test
+    public void testSearchForGermplasmsPartialMatchGermplasmName() throws Exception {
+
+        List<Germplasm> results = dao.searchForGermplasms("CML", Operation.LIKE, false, false, sessionUtil.getCurrentSession());
+        Assert.assertTrue(results.size() == 200);
+        
     }
 
     @AfterClass

@@ -15,11 +15,14 @@ package org.generationcp.middleware.manager.api;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 import java.util.List;
 
 
 public interface PedigreeDataManager{
+
+    public static final int MAX_PEDIGREE_LEVEL = 5;
 
     /**
      * Creates a pedigree tree for the Germplasm identified by the given gid.
@@ -95,7 +98,11 @@ public interface PedigreeDataManager{
      * @return
      * @throws MiddlewareQueryException
      */
-    public Integer getPedigreeLevelCount(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException;
+    Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException
+            ,MaxPedigreeLevelReachedException;
+
+    Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine, boolean calculateFullPedigree)
+                throws MiddlewareQueryException,MaxPedigreeLevelReachedException;
 
     /**
      * Returns the GermplasmPedigreeTree object which represents the derivative

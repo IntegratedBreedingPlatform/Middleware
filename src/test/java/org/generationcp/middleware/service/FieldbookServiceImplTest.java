@@ -11,14 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.text.SimpleDateFormat;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +48,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -66,13 +63,17 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     private static DataImportService dataImportService;
     private static Project commonTestProject;
     private static WorkbenchTestDataUtil workbenchTestDataUtil;
-
+    private static int LEVEL = 3;
+    private static CrossExpansionProperties crossExpansionProperties;
+    
     @BeforeClass
     public static void setUp() throws Exception {
         fieldbookService = managerFactory.getFieldbookMiddlewareService();
         dataImportService = managerFactory.getDataImportService();
         workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
         commonTestProject = workbenchTestDataUtil.getCommonTestProject();
+        crossExpansionProperties = new CrossExpansionProperties();
+        crossExpansionProperties.setDefaultLevel(1);
     }
 
     @Test
@@ -103,7 +104,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         List<Integer> trialIds = new ArrayList<Integer>();
         trialIds.add(Integer.valueOf(1)); 
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds, crossExpansionProperties);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
@@ -114,7 +115,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
         List<Integer> nurseryIds = new ArrayList<Integer>();
         nurseryIds.add(Integer.valueOf(5734)); 
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds, crossExpansionProperties);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
@@ -123,7 +124,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
     @Test
     public void testGetAllFieldMapsInBlockByTrialInstanceId() throws MiddlewareQueryException{
-        List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1);
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1, crossExpansionProperties);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(INDENT);
         }
@@ -480,7 +481,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     
     private Germplasm createGermplasm(){
         Germplasm g = new Germplasm();
-        g.setGdate(Integer.valueOf(Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date()))));
+        g.setGdate(Util.getCurrentDateAsIntegerValue());
         g.setGnpgs(Integer.valueOf(0));
         g.setGpid1(Integer.valueOf(0));
         g.setGpid2(Integer.valueOf(0));
@@ -496,7 +497,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     private Name createGermplasmName(int i){
         Name n = new Name();
         n.setLocationId(Integer.valueOf(9000));
-        n.setNdate(Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date())));
+        n.setNdate(Util.getCurrentDateAsIntegerValue());
         n.setNval("Germplasm_" + i + "_" + (int) (Math.random()*100));
         n.setReferenceId(Integer.valueOf(1));
         n.setTypeId(Integer.valueOf(1));
@@ -733,5 +734,26 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
     	
     	assertEquals("Expecting to return the same number of Location objects from the input of List of Ids",locationIds.size(), locations.size());
     }
+    
+    @Test
+    public void testAddListDataProjectList() throws MiddlewareQueryException {
+    	List<ListDataProject> listDataProjectList = new ArrayList<ListDataProject>();
+    	listDataProjectList.add(createListDataProjectTest());
+		fieldbookService.addListDataProjectList(listDataProjectList);
+		assertNotNull("List 1 should have list data projects",fieldbookService.getListDataProject(1));
+    }
+
+	private ListDataProject createListDataProjectTest() {
+		ListDataProject listDataProject = new ListDataProject();
+		listDataProject.setList(new GermplasmList(1));
+		listDataProject.setGermplasmId(1);
+		listDataProject.setCheckType(10170);
+		listDataProject.setEntryId(1);
+		listDataProject.setEntryCode("1");
+		listDataProject.setSeedSource("Germplasm List Import_basic_2nd pedigree.xls:1");
+		listDataProject.setDesignation("IR 68815-25-PMI 3-UBN 6-B-B");
+		listDataProject.setGroupName("-");
+		return listDataProject;
+	}
     
 }

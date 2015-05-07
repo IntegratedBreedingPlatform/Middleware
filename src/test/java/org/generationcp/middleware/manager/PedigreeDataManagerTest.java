@@ -80,18 +80,18 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
     public void testGetPedigreeLevelCount() throws Exception {
     	Integer gid = 1;
     	boolean includeDerivativeLine = false;
-    	Integer pedigreeLevelCount = pedigreeManager.getPedigreeLevelCount(gid, includeDerivativeLine);
+    	Integer pedigreeLevelCount = pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
     	Debug.println(Integer.toString(pedigreeLevelCount));
     	Assert.assertNotNull("It should not be null",pedigreeLevelCount);
     	Assert.assertEquals("It should be equal to 1",new Integer(1),pedigreeLevelCount);
     	
     }
-    
+
     @Test
     public void testGetPedigreeLevelCount_IncludeDerivative() throws Exception {
     	Integer gid = 1;
     	boolean includeDerivativeLine = true;
-    	Integer pedigreeLevelCount = pedigreeManager.getPedigreeLevelCount(gid, includeDerivativeLine);
+    	Integer pedigreeLevelCount = pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
     	Debug.println(Integer.toString(pedigreeLevelCount));
     	Assert.assertNotNull("It should not be null",pedigreeLevelCount);
     	Assert.assertEquals("It should be equal to 1",new Integer(1),pedigreeLevelCount);

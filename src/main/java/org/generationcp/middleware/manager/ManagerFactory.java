@@ -39,6 +39,8 @@ import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +57,22 @@ import org.slf4j.LoggerFactory;
 public class ManagerFactory implements Serializable {
     private static final long serialVersionUID = -2846462010022009403L;
     
-    private final static Logger LOG = LoggerFactory.getLogger(ManagerFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ManagerFactory.class);
 
     private SessionFactory sessionFactory;
     private HibernateSessionProvider sessionProvider;
     
     private String databaseName;
+    private String cropName;
+    private String pedigreeProfile;
+    private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal();
     
     public ManagerFactory() {
+    	currentManagerFactory.set(this);
+    }
+    
+    public static ThreadLocal<ManagerFactory> getCurrentManagerFactoryThreadLocal() {
+    	return currentManagerFactory;
     }
     
     public SessionFactory getsessionFactory() {
@@ -156,6 +166,16 @@ public class ManagerFactory implements Serializable {
     public ReportService getReportService() throws ConfigException {
         return new ReportServiceImpl(sessionProvider,databaseName);
     }
+    
+    public PedigreeService getPedigreeService(){
+    	return PedigreeFactory.getPedigreeService(sessionProvider, pedigreeProfile, cropName);
+    }
+    /*
+     * This was exposed so that it can be access in the jUnit
+     */
+    public PedigreeService getPedigreeService(String profile, String crop){
+    	return PedigreeFactory.getPedigreeService(sessionProvider, profile, crop);
+    }
     /**
      * Closes the db connection by shutting down the HibernateUtil object
      */
@@ -169,7 +189,7 @@ public class ManagerFactory implements Serializable {
         if (sessionFactory != null && !sessionFactory.isClosed()) {
             sessionFactory.close();
         }
-        
+        currentManagerFactory.remove();
         LOG.trace("Closing ManagerFactory...Done.");
     }
 
@@ -179,5 +199,22 @@ public class ManagerFactory implements Serializable {
 
 	public void setDatabaseName(String localDatabaseName) {
 		this.databaseName = localDatabaseName;
+	}	
+
+	public String getCropName() {
+		return cropName;
 	}
+
+	public void setCropName(String cropName) {
+		this.cropName = cropName;
+	}
+
+	public String getPedigreeProfile() {
+		return pedigreeProfile;
+	}
+
+	public void setPedigreeProfile(String pedigreeProfile) {
+		this.pedigreeProfile = pedigreeProfile;
+	}
+	
 }

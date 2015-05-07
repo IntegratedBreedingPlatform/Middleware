@@ -83,11 +83,9 @@ public class StandardVariableBuilder extends Builder {
 	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
 		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
 		if(standardVariableIds != null && !standardVariableIds.isEmpty()) {
-			if(!standardVariableIds.isEmpty()) {
-				List<StandardVariableSummary> localVariables = getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
-				specialProcessing(localVariables);
-				result.addAll(localVariables);
-			}
+			List<StandardVariableSummary> localVariables = getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
+			specialProcessing(localVariables);
+			result.addAll(localVariables);
 		}
 		return result;
 	}
@@ -147,8 +145,7 @@ public class StandardVariableBuilder extends Builder {
 
 					if (existingMatch == null) {
 					    enumerations.add(newValue);
-					}
-					else {
+					} else {
 						overridenEnumerations.put(newValue.getId(), existingMatch.getId());
 					}
 				}
@@ -183,7 +180,7 @@ public class StandardVariableBuilder extends Builder {
 	public String getCropOntologyId(Term term) throws MiddlewareQueryException {
 	    String cropOntologyId = null;
 	    List<TermProperty> termProperties = createTermProperties(term.getId());
-	    if (termProperties != null && termProperties.size() > 0) {
+	    if (termProperties != null && !termProperties.isEmpty()) {
 	        for (TermProperty termProperty : termProperties) {
 	            if (TermId.CROP_ONTOLOGY_ID.getId() == termProperty.getTypeId()) {
 	                cropOntologyId = termProperty.getValue();
@@ -240,7 +237,8 @@ public class StandardVariableBuilder extends Builder {
 
 	private Term createTerm(List<CVTermRelationship> cvTermRelationships, TermId relationship) throws MiddlewareQueryException {
 		Integer id = findTermId(cvTermRelationships, relationship);
-		if(id!=null) { //add to handle missing cvterm_relationship (i.e. is_a)
+		if(id!=null) {
+			//add to handle missing cvterm_relationship (i.e. is_a)
 			return createTerm(id);
 		}
 		return null;
@@ -278,7 +276,7 @@ public class StandardVariableBuilder extends Builder {
 	
 	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, 
 			String methodName, PhenotypicType role, String dataTypeString) 
-			throws MiddlewareQueryException, MiddlewareException {
+			throws MiddlewareException {
 		
         Term property = getTermBuilder().findOrSaveTermByName(propertyName, CvId.PROPERTIES);
         Term scale = getTermBuilder().findOrSaveTermByName(scaleName, CvId.SCALES);
@@ -316,7 +314,7 @@ public class StandardVariableBuilder extends Builder {
 	private Term getStorageTypeTermByPhenotypicType(PhenotypicType phenotypicType) throws MiddlewareQueryException {
 		Term storedIn = null;
 		if (phenotypicType != null) {
-			Integer storedInId = null;
+			Integer storedInId;
 			switch (phenotypicType) {
 				case STUDY : storedInId = TermId.STUDY_INFO_STORAGE.getId();
 					break;
@@ -330,6 +328,8 @@ public class StandardVariableBuilder extends Builder {
 					break;
 				case VARIATE: storedInId = TermId.OBSERVATION_VARIATE.getId();
 				    break;
+				default:
+					storedInId = null;
 			}
 			if (storedInId != null){
 				storedIn = getTermBuilder().get(storedInId);
@@ -382,7 +382,7 @@ public class StandardVariableBuilder extends Builder {
 		names = new ArrayList<String>();
 		for (String name : headers){
 			Set<Integer> varIds = standardVariableIdsInProjects.get(name.toUpperCase());
-			if (varIds == null || varIds.size() == 0){
+			if (varIds == null || varIds.isEmpty()){
 				names.add(name);
 			}			
 		}
@@ -395,7 +395,7 @@ public class StandardVariableBuilder extends Builder {
 		names = new ArrayList<String>();
 		for (String name : headers){
 			Set<Integer> varIds = standardVariableIdsInProjects.get(name.toUpperCase());
-			if (varIds == null || varIds.size() == 0){
+			if (varIds == null || varIds.isEmpty()){
 				names.add(name);
 			}			
 		}
@@ -453,20 +453,15 @@ public class StandardVariableBuilder extends Builder {
     	String value = String.valueOf(enumerationId);
     	if (storedInId == TermId.STUDY_INFO_STORAGE.getId() || storedInId == TermId.DATASET_INFO_STORAGE.getId()) {
     		return !isExistsPropertyByTypeAndValue(standardVariableId, value);
-    	}
-    	else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+    	} else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
     		return !isExistsStocksByTypeAndValue(standardVariableId, value);
-    	}
-    	else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+    	} else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
     		return !isExistsGeolocationByTypeAndValue(standardVariableId, value);
-    	}
-    	else if (storedInId == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+    	} else if (storedInId == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
     		return !isExistsExperimentsByTypeAndValue(standardVariableId, value);
-    	}
-    	else if (storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
+    	} else if (storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
     		return !isExistsPhenotypeByTypeAndValue(standardVariableId, value, true);
-    	}
-    	else {
+    	} else {
     		throw new MiddlewareQueryException("Not a valid categorical variable - " + standardVariableId);
     	}
     }

@@ -1,5 +1,7 @@
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
@@ -65,6 +67,50 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		}
 		return result;
 	}
+
+	@SuppressWarnings("unchecked")
+	public ListDataProject getByStudy(int studyId,GermplasmListType listType,int plotNo) throws MiddlewareQueryException {
+		try {
+
+			String queryStr = "SELECT ldp.*"
+					+ " FROM nd_experimentprop nep,"
+					+ "  nd_experiment_stock nes, stock s, listdata_project ldp,"
+					+ "  listnms l, nd_experiment_project p, project_relationship pr"
+					+ " WHERE nep.type_id IN (:PLOT_NO_TERM_IDS)"
+					+ "      AND nep.nd_experiment_id = nes.nd_experiment_id"
+					+ "      AND nes.stock_id = s.stock_id"
+					+ "      AND s.uniquename = ldp.entry_id"
+					+ "      AND s.dbxref_id = ldp.germplasm_id"
+					+ "      AND l.listid = ldp.list_id"
+					+ "      AND nep.nd_experiment_id = p.nd_experiment_id"
+					+ "      AND p.project_id = pr.subject_project_id"
+					+ "      AND pr.object_project_id = l.projectid"
+					+ "      AND l.listtype = :LIST_TYPE"
+					+ "      AND nep.VALUE = :PLOT_NO"
+					+ "      AND l.projectid = :STUDY_ID";
+
+
+			SQLQuery query = getSession().createSQLQuery(queryStr);
+			query.addEntity("ldp",ListDataProject.class);
+			query.setParameter("LIST_TYPE", listType.name());
+			query.setParameter("STUDY_ID", studyId);
+			query.setParameter("PLOT_NO",plotNo);
+			query.setParameterList("PLOT_NO_TERM_IDS",
+					new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+
+			List resultList = query.list();
+			if (!resultList.isEmpty()) {
+				return (ListDataProject) resultList.get(0);
+			}
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
+		}
+
+		return null;
+
+	}
+
 
 	public void deleteByListIdWithList(int listId) throws MiddlewareQueryException {
 		try {

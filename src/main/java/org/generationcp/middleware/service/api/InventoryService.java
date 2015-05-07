@@ -55,6 +55,8 @@ public interface InventoryService {
 	 * Gets the inventory details by study. Inventory details to retrieve are based on nd_experiment_id of the study 
 	 * matching ims_transaction.source_rec_id 
 	 *
+	 *
+	 *
 	 * @param studyId the study id
 	 * @return the inventory details by study
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -75,7 +77,8 @@ public interface InventoryService {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	LotsResult addAdvanceLots(List<Integer> gids, Integer locationId, Integer scaleId, String comment, Integer userId, 
+	LotsResult addLotsForList(List<Integer> gids, Integer locationId, Integer scaleId,
+			String comment, Integer userId,
 			Double amount, Integer sourceId) throws MiddlewareQueryException;
 	
 }
