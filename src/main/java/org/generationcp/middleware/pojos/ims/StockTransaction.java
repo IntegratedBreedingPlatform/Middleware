@@ -14,15 +14,6 @@ import java.io.Serializable;
 public class StockTransaction implements Serializable{
     private static final long serialVersionUID = 77866453513905445L;
 
-    public StockTransaction() {
-    }
-
-    public StockTransaction(Integer id, ListDataProject listDataProject, Transaction transaction) {
-        this.id = id;
-        this.listDataProject = listDataProject;
-        this.transaction = transaction;
-    }
-
     @Id
     @Basic(optional = false)
     @Column(name = "id")
@@ -35,6 +26,15 @@ public class StockTransaction implements Serializable{
     @OneToOne(targetEntity = Transaction.class)
     @JoinColumn(name = "trnid", nullable = false, updatable = false)
     private Transaction transaction;
+
+    public StockTransaction() {
+    }
+
+    public StockTransaction(Integer id, ListDataProject listDataProject, Transaction transaction) {
+        this.id = id;
+        this.listDataProject = listDataProject;
+        this.transaction = transaction;
+    }
 
     public Integer getId() {
         return id;
