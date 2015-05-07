@@ -61,58 +61,6 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		return getInventoryDataManager().getInventoryDetailsByGermplasmList(studyId);
 	}
 
-	@Deprecated
-	@Override
-	public LotsResult addLotsForList(List<Integer> gids, Integer locationId, Integer scaleId,
-			String comment,
-			Integer userId, Double amount, Integer sourceId, String inventoryID) throws MiddlewareQueryException {
-
-		LotsResult result = getLotBuilder().getGidsForUpdateAndAdd(gids);
-		List<Integer> newGids = result.getGidsAdded();
-		List<Integer> existingGids = result.getGidsUpdated();
-
-		// Save lots
-		List<Lot> lots = getLotBuilder()
-				.build(newGids, locationId, scaleId, comment, userId, amount, sourceId);
-		List<Integer> lotIdsAdded = new ArrayList<Integer>();
-		try {
-			lotIdsAdded = getInventoryDataManager().addLots(lots);
-		} catch (MiddlewareQueryException e) {
-			if (e.getCause() != null && e.getCause() instanceof ConstraintViolationException) {
-				lotIdsAdded = getInventoryDataManager().addLots(lots);
-			} else {
-				logAndThrowException(e.getMessage(), e, LOG);
-			}
-		}
-		result.setLotIdsAdded(lotIdsAdded);
-
-		// Update existing lots
-		List<Lot> existingLots = getLotBuilder()
-				.buildForUpdate(existingGids, locationId, scaleId, comment);
-		List<Integer> lotIdsUpdated = new ArrayList<Integer>();
-		try {
-			lotIdsUpdated = getInventoryDataManager().updateLots(existingLots);
-		} catch (MiddlewareQueryException e) {
-			if (e.getCause() != null && e.getCause() instanceof ConstraintViolationException) {
-				lotIdsUpdated = getInventoryDataManager().updateLots(lots);
-			} else {
-				logAndThrowException(e.getMessage(), e, LOG);
-			}
-		}
-		result.setLotIdsUpdated(lotIdsUpdated);
-
-		// Update existing transactions - for existing gids
-		List<Transaction> transactionsForUpdate = getTransactionBuilder()
-				.buildForUpdate(existingLots, amount, comment);
-		getInventoryDataManager().updateTransactions(transactionsForUpdate);
-
-		// Add new transactions - for non-existing gid/location/scale combination
-		List<Transaction> transactionsForAdd = getTransactionBuilder()
-				.buildForSave(lots, amount, userId, comment, sourceId, inventoryID);
-		getInventoryDataManager().addTransactions(transactionsForAdd);
-
-		return result;
-	}
 
 	@Override
 	public List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId,

@@ -32,28 +32,6 @@ public class InventoryServiceImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testAddLot() throws Exception {
-		List<Integer> gids = new ArrayList<Integer>();
-		int maxGids = 10;
-		for (int i = 0; i < maxGids; i++) {
-			gids.add(i + ((int) (Math.random() * 1000)));
-		}
-
-		int locationId = 1 + ((int) (Math.random() * 1000));
-		int scaleId = 6090;
-		String comment = "No Comment";
-		int userId = 1;
-		double amount = 1.23456;
-		int listId = 1426;
-		LotsResult result = inventoryService.addLotsForList(gids, locationId, scaleId, comment,
-				userId, amount, listId, TEST_INVENTORY_ID);
-		if (result != null) {
-			Debug.printFormattedObject(INDENT, result);
-		}
-
-	}
-
-	@Test
 	public void testGetCurrentNotificationNumber() throws MiddlewareException {
 		Integer currentNotificationNumber = inventoryService.getCurrentNotationNumberForBreederIdentifier("TR");
 		assertEquals(2, currentNotificationNumber.intValue());
