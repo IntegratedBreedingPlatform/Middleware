@@ -25,7 +25,8 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
 
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException(e.getMessage());
+            logAndThrowException("Error with getTransactionsForListDataProjectIDs() query from StockTransactionDAO: " + e.getMessage(), e);
+            return new ArrayList<StockTransaction>();
         }
     }
 
