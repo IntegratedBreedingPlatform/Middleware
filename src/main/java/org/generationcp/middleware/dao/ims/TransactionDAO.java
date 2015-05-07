@@ -490,7 +490,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Transaction.class);
             criteria.add(Restrictions.eq("sourceId", dataListId));
-            criteria.add(Restrictions.eq("sourceType", EntityType.LIST));
+            criteria.add(Restrictions.eq("sourceType", EntityType.LIST.name()));
             criteria.setProjection(Projections.rowCount());
 
             Number number = (Number) criteria.uniqueResult();
