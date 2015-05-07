@@ -39,9 +39,6 @@ public class DatabaseBroker {
 
     protected static final int JDBC_BATCH_SIZE = 50;
   
-   // PresetDataManager DAO
-    private ProgramPresetDAO programPresetDAO;
-    
     //StudyDataManager DAO
     private ProjectPropertyDao projectPropertyDao;
 
