@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.inventory;
 
+import org.generationcp.middleware.pojos.GermplasmListData;
+
 import java.io.Serializable;
 
 /**
@@ -660,5 +662,13 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setCross(String cross) {
 		this.cross = cross;
+	}
+
+	public void copyFromGermplasmListData(GermplasmListData datum){
+		this.gid = datum.getGid();
+		this.setGermplasmName(datum.getDesignation());
+		this.setEntryId(datum.getEntryId());
+		this.setParentage(datum.getGroupName());
+		this.setSource(datum.getSeedSource());
 	}
 }
