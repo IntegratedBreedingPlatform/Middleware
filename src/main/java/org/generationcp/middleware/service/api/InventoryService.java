@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -89,5 +90,5 @@ public interface InventoryService {
 	void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject)
 			throws MiddlewareQueryException;
 
-	
+	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type)  throws MiddlewareQueryException;
 }

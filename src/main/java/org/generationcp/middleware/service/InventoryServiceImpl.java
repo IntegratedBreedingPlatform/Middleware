@@ -13,6 +13,7 @@
  */
 package org.generationcp.middleware.service;
 
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -171,5 +172,10 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
 		StockTransaction stockTransaction = new StockTransaction(null, listDataProject, transaction);
 		getInventoryDataManager().addStockTransaction(stockTransaction);
+	}
+
+	@Override
+	public List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type) throws MiddlewareQueryException {
+		return getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId, type);
 	}
 }
