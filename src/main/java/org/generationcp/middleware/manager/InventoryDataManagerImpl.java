@@ -680,8 +680,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
     public boolean transactionsExistForListProjectDataListID(Integer listDataProjectListID) throws MiddlewareQueryException {
-        Integer dataListID = getGermplasmListDAO().getListDataListIDFromListDataProjectListID(listDataProjectListID);
-        return getTransactionDao().transactionsExistForListData(dataListID);
+
+        return getStockTransactionDAO().listDataProjectListHasStockTransactions(listDataProjectListID);
     }
 
     protected void fillInventoryDetailList(List<InventoryDetails> detailList, List<GermplasmListData> dataList) {
