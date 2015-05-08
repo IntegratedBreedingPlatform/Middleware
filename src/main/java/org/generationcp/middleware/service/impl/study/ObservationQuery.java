@@ -2,15 +2,16 @@ package org.generationcp.middleware.service.impl.study;
 
 import java.util.List;
 
-public class MeasurementQuery {
+import org.generationcp.middleware.service.api.study.TraitDto;
 
-    /**
-     * The query needs to be generated dynamically.
-     * 
-     * @param projectUUID
-     *            the project for which we should generate a query.
-     */
-    public String generateQuery(final List<String> traitNames) {
+class ObservationQuery {
+
+	/**
+	 * Constructs a query that will enable us to retrieve study measurement data.
+	 * @param traitNames list of traits that we need to construct a query for.
+	 * @return A query that can be used to retrieve study measurements data including traits
+	 */
+	String getObservationQuery(final List<TraitDto> traits) {
         return "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n"
                 + "    (SELECT \n" + "            iispcvt.definition\n" + "        FROM\n"
                 + "            stockprop isp\n" + "                INNER JOIN\n"
@@ -35,7 +36,7 @@ public class MeasurementQuery {
                 + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
                 + "            ndep.nd_experiment_id = ep.nd_experiment_id\n"
                 + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO\n"
-                + getColumnNamesFromTraitNames(traitNames) +
+                + getColumnNamesFromTraitNames(traits) +
 
                 "FROM\n" + "    Project p\n" + "        INNER JOIN\n"
                 + "    project_relationship pr ON p.project_id = pr.subject_project_id\n"
@@ -48,22 +49,27 @@ public class MeasurementQuery {
                 + "        INNER JOIN\n"
                 + "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n"
                 + "        INNER JOIN\n" + "    Stock s ON s.stock_id = es.stock_id\n"
-                + getTraitDeatilsJoin(traitNames) + "WHERE\n" + "    p.project_id = ("
+                + getTraitDeatilsJoin(traits) + "WHERE\n" + "    p.project_id = ("
                 		+ "Select p.project_id from project_relationship pr\n" + 
                 		"INNER JOIN project p on p.project_id = pr.subject_project_id\n" + 
-                		"where pr.object_project_id = ? and name LIKE '%PLOTDATA')" 
-                + "\n" + "ORDER BY nde.nd_experiment_id;";
+                		"where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))";
     }
+	
+	String getSingleObservationQuery(final List<TraitDto> traits) {
+		 return getObservationQuery(traits) + "AND nde.nd_experiment_id = ?";
+		
+	}
+	
 
-    private String getColumnNamesFromTraitNames(List<String> traitNames) {
+    private String getColumnNamesFromTraitNames(final List<TraitDto> traits) {
         final StringBuffer columnNames = new StringBuffer();
-        int size = traitNames.size();
+        int size = traits.size();
         for (int i = 0; i < size; i++) {
         	if(i == 0) {
         		columnNames.append(", \n");
         	}
-            columnNames.append(traitNames.get(i) + "." + "PhenotypeValue AS " + traitNames.get(i) + ",\n");
-            columnNames.append(traitNames.get(i) + "." + "phenotype_id AS " + traitNames.get(i)+"_PhenotypeId" + "\n");
+            columnNames.append(traits.get(i).getTraitName() + "." + "PhenotypeValue AS " + traits.get(i).getTraitName() + ",\n");
+            columnNames.append(traits.get(i).getTraitName() + "." + "phenotype_id AS " + traits.get(i).getTraitName()+"_PhenotypeId" + "\n");
 
             if (!(i == (size - 1))) {
                 columnNames.append(" , ");
@@ -72,18 +78,18 @@ public class MeasurementQuery {
         return columnNames.toString();
     }
 
-    private String getTraitDeatilsJoin(final List<String> traitNames) {
+    private String getTraitDeatilsJoin(final List<TraitDto> traits) {
 
         final StringBuffer leftOuterJoinQuery = new StringBuffer();
-        for (String traitName : traitNames) {
-            leftOuterJoinQuery.append(getTraitDeatilsJoinQuery(traitName));
+        for (TraitDto trait : traits) {
+            leftOuterJoinQuery.append(getTraitDeatilsJoinQuery(trait));
         }
         return leftOuterJoinQuery.toString();
 
     }
 
     // use the id
-    private String getTraitDeatilsJoinQuery(final String traitName) {
+    private String getTraitDeatilsJoinQuery(final TraitDto trait) {
         return "        LEFT OUTER JOIN\n"
                 + "    (SELECT \n"
                 + "        nep.nd_experiment_id,\n"
@@ -93,7 +99,8 @@ public class MeasurementQuery {
                 + "        phenotype pt\n"
                 + "    INNER JOIN cvterm svdo ON svdo.cvterm_id = pt.observable_id\n"
                 + "    INNER JOIN nd_experiment_phenotype nep ON nep.phenotype_id = pt.phenotype_id\n"
-                + "    WHERE\n" + "        svdo.name = ? ) " + traitName + " ON "
-                + traitName + ".nd_experiment_id = nde.nd_experiment_id\n";
+                + "    WHERE\n" + "        svdo.name = ? ) " + trait.getTraitName() + " ON "
+                + trait.getTraitName() + ".nd_experiment_id = nde.nd_experiment_id\n";
     }
+
 }

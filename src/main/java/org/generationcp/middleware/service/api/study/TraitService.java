@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface TraitService {
 	
-	List<String> getTraits(final int studyBusinessIdentifier);
+	List<TraitDto> getTraits(final int studyBusinessIdentifier);
 }

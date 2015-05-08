@@ -1,17 +1,17 @@
 package org.generationcp.middleware.service.impl.study;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
+import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.jdbc.util.BasicFormatterImpl;
-import org.junit.*;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * The class <code>QueryTest</code> contains tests for the class
- * <code>{@link MeasurementQuery}</code>.
+ * <code>{@link ObservationQuery}</code>.
  *
  * @generatedBy CodePro at 17/04/15 3:08 PM
  * @author Akhil
@@ -30,10 +30,10 @@ public class QueryTest {
 	 */
 	@Test
 	public void testMeasurementQueryGeneration() throws Exception {
-		MeasurementQuery fixture = new MeasurementQuery();
-		final List<String> traitNames = new LinkedList<String>();
-		traitNames.add("PH_cm");
-		String result = fixture.generateQuery(traitNames);
+		ObservationQuery fixture = new ObservationQuery();
+		final List<TraitDto> traitNames = new LinkedList<TraitDto>();
+		traitNames.add(new TraitDto(1,"PH_cm"));
+		String result = fixture.getObservationQuery(traitNames);
 		System.out.println(formatString(result));
 		assertEquals("The expected query must match our expected queyr",
 				formatString(expectedQueryForTheQueryGenerationTest()),
@@ -146,11 +146,10 @@ public class QueryTest {
 				"projectp\n" + 
 				"on p.project_id=pr.subject_project_id\n" + 
 				"where\n" + 
+				"(\n" +
 				"pr.object_project_id = ?\n" + 
 				"and name LIKE '%PLOTDATA'\n" + 
-				")" + 
-				"    ORDER BY\n" + 
-				"        nde.nd_experiment_id;";
+				")\n)";
 	}
 
 }

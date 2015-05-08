@@ -15,5 +15,11 @@ public interface StudyService {
 	 */
 	List<StudySummary> listAllStudies(final String programUniqueId) throws MiddlewareQueryException;
 
-	List<Measurement> getMeasurements(final int studyIdentifier);
+	List<ObservationDto> getObservations(final int studyIdentifier);
+
+	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
+
+	ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement);
+	
+
 }

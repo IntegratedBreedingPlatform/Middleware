@@ -14,9 +14,11 @@ public class TraitNamesQuery {
     public String getTraitQuery() {
     	
     	return "SELECT \n" + 
-    			"    value\n" + 
+    			"    cvterm_id, name\n" + 
     			"FROM\n" + 
-    			"    projectprop\n" + 
+    			"    projectprop pp\n" + 
+    			"        INNER JOIN\n" + 
+    			"    cvterm cvt ON cvt.name = pp.value " + 
     			"WHERE\n" + 
     			"    type_id = " + TermId.OBSERVATION_VARIATE.getId() + "\n" + 
     			"        AND project_id = (SELECT \n" + 
@@ -24,9 +26,9 @@ public class TraitNamesQuery {
     			"        FROM\n" + 
     			"            project_relationship pr\n" + 
     			"                INNER JOIN\n" + 
-    			"            project p ON p.project_id = pr.subject_project_id\n" + 
-    			"        WHERE\n" + 
+    			"            project p ON p.project_id = pr.subject_project_id \n" + 
+    			"        WHERE \n" + 
     			"            pr.object_project_id = ?\n" + 
-    			"                AND name LIKE '%PLOTDATA');";
+    			"                AND name LIKE '%PLOTDATA')";
     }
 }

@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Test;
@@ -17,6 +19,9 @@ import org.mockito.Mockito;
  *
  */
 public class TrialTraitsTest {
+	private static final int TEST_TRAIT_ID = 2019;
+	private static final String TEST_TRAIT = "TestTrait";
+
 	/**
 	 * Run the {@link TraitServiceImpl}.getTraits() method and makes sure the query returns appropriate values.
 	 *
@@ -30,15 +35,16 @@ public class TrialTraitsTest {
 		
 		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
 		when(session.createSQLQuery((new TraitNamesQuery()).getTraitQuery())).thenReturn(mockSqlQuery);
-		final List<String> sampleTraits = Collections.<String>singletonList("TestTrait");
-		when(mockSqlQuery.list()).thenReturn(sampleTraits);
-
-		int traitId = 2019;
-		List<String> returnedTraits = trailTraits.getTraits(traitId);
 		
-		verify(mockSqlQuery).setParameter(0, traitId);
+		final Object[] sampleTraits = new Object[] {2019,TEST_TRAIT};
+
+		when(mockSqlQuery.list()).thenReturn(Arrays.<Object[]>asList(sampleTraits));
+
+		List<TraitDto> returnedTraits = trailTraits.getTraits(TEST_TRAIT_ID);
+		
+		verify(mockSqlQuery).setParameter(0, TEST_TRAIT_ID);
 		// add additional test code here
-		assertEquals("Make sure that the traits returned are equal", returnedTraits, sampleTraits);
+		assertEquals("Make sure that the traits returned are equal", returnedTraits, Collections.<TraitDto>singletonList(new TraitDto(TEST_TRAIT_ID, TEST_TRAIT)));
 	}
 
 

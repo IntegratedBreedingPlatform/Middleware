@@ -2,7 +2,7 @@ package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
 
-public class Measurement {
+public class ObservationDto {
 
 	private final Integer measurementId;
 	
@@ -22,11 +22,11 @@ public class Measurement {
 	
 	private final String plotNumber;
 	
-	private final List<Trait> traits;
+	private final List<MeasurementDto> traitMeasurements;
 	
-	public Measurement(final Integer measurementId, final String trialInstance, final String entryType,
+	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType,
 			final Integer gid, final String designation, final String entryNo, final String seedSource,
-			final String repitionNumber, final String plotNumber, final List<Trait> traits) {
+			final String repitionNumber, final String plotNumber, final List<MeasurementDto> traitMeasurements) {
 		this.measurementId = measurementId;
 		this.trialInstance = trialInstance;
 		this.entryType = entryType;
@@ -36,7 +36,7 @@ public class Measurement {
 		this.seedSource = seedSource;
 		this.repitionNumber = repitionNumber;
 		this.plotNumber = plotNumber;
-		this.traits = traits;
+		this.traitMeasurements = traitMeasurements;
 	}
 
 	public Integer getMeasurementId() {
@@ -75,8 +75,8 @@ public class Measurement {
 		return plotNumber;
 	}
 
-	public List<Trait> getTraits() {
-		return traits;
+	public List<MeasurementDto> getTraitMeasurements() {
+		return traitMeasurements;
 	}
 
 
