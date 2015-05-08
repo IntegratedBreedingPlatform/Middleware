@@ -88,6 +88,12 @@ public class Transaction implements Serializable{
 
     @Column(name = "inventory_id")
     private String inventoryID;
+    
+    @Column(name = "bulk_with")
+    private String bulkWith;
+    
+    @Column(name = "bulk_compl")
+    private String bulkCompl;
 
     public Transaction() {
     }
@@ -280,4 +286,22 @@ public class Transaction implements Serializable{
     public void setInventoryID(String inventoryID) {
         this.inventoryID = inventoryID;
     }
+
+	public String getBulkWith() {
+		return bulkWith;
+	}
+
+	public void setBulkWith(String bulkWith) {
+		this.bulkWith = bulkWith;
+	}
+
+	public String getBulkCompl() {
+		return bulkCompl;
+	}
+
+	public void setBulkCompl(String bulkCompl) {
+		this.bulkCompl = bulkCompl;
+	}
+    
+    
 }

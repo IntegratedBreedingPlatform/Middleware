@@ -56,7 +56,8 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
 
         String sql = "select lot.lotid, lot.locid, lot.scaleid, lot.userid, " +
                 "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, " +
-                "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid " +
+                "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid, " +
+                "d.duplicate_notes, tran.bulk_with, tran.bulk_compl " +
                 "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id " +
                 "INNER JOIN listnms ON d.list_id = listnms.listid " +
                 "INNER JOIN ims_transaction tran ON tran.trnid = ist.trnid INNER JOIN ims_lot lot ON lot.lotid = tran.lotid " +
@@ -87,6 +88,9 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                     String comments = (String) row[13];
                     String inventoryID = (String) row[14];
                     Integer sourceId = (Integer) row[15];
+                    String duplicate = (String) row[16];
+    	        	String bulkWith = (String) row[17];
+    	        	String bulkCompl = (String) row[18];
 
                     InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
                             userId, amount, sourceId, null, scaleId, scaleName, comments);
@@ -95,6 +99,9 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                     details.setEntryId(entryId);
                     details.setSource(seedSource);
                     details.setParentage(groupName);
+                    details.setDuplicate(duplicate);
+                    details.setBulkWith(bulkWith);
+                    details.setBulkCompl(bulkCompl);
                     detailsList.add(details);
 
                 }

@@ -278,6 +278,11 @@ public enum TermId {
     , AMOUNT_INVENTORY (60022)
     
     , ENTRY_TYPE(8255)
+    
+    //added headers of Export Inventory Template for stock list
+    , DUPLICATE(60028)
+    , BULK_WITH(60029)
+    , BULK_COMPL(60030)
 
 ;
 	

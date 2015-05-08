@@ -83,6 +83,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The ff. fields are from seed inventory import */
 	private String entryCode;
 	private String cross;
+	
+	/** The ff. fields are used for export inventory template for stock list */
+	private String duplicate;
+	private String bulkWith;
+	private String bulkCompl;
 
 	/**
 	 * Instantiates a new inventory details.
@@ -663,7 +668,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void setCross(String cross) {
 		this.cross = cross;
 	}
-
+	
+	
 	public void copyFromGermplasmListData(GermplasmListData datum){
 		this.gid = datum.getGid();
 		this.setGermplasmName(datum.getDesignation());
@@ -671,4 +677,29 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.setParentage(datum.getGroupName());
 		this.setSource(datum.getSeedSource());
 	}
+	
+	public String getDuplicate() {
+		return duplicate;
+	}
+
+	public void setDuplicate(String duplicate) {
+		this.duplicate = duplicate;
+	}
+
+	public String getBulkWith() {
+		return bulkWith;
+	}
+
+	public void setBulkWith(String bulkWith) {
+		this.bulkWith = bulkWith;
+	}
+
+	public String getBulkCompl() {
+		return bulkCompl;
+	}
+
+	public void setBulkCompl(String bulkCompl) {
+		this.bulkCompl = bulkCompl;
+	}
+	
 }
