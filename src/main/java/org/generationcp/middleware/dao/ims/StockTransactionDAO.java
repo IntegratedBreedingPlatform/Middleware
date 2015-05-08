@@ -90,7 +90,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                     Integer sourceId = (Integer) row[15];
                     String duplicate = (String) row[16];
     	        	String bulkWith = (String) row[17];
-    	        	String bulkCompl = (String) row[18];
+    	        	Character bulkCompl = (Character) row[18];
 
                     InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
                             userId, amount, sourceId, null, scaleId, scaleName, comments);
@@ -101,7 +101,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                     details.setParentage(groupName);
                     details.setDuplicate(duplicate);
                     details.setBulkWith(bulkWith);
-                    details.setBulkCompl(bulkCompl);
+                    details.setBulkCompl(bulkCompl!=null?bulkCompl.toString():null);
                     detailsList.add(details);
 
                 }
