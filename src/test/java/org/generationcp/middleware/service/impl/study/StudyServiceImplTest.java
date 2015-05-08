@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.service.impl.study;
 
 import static org.junit.Assert.assertEquals;
@@ -10,9 +11,10 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.service.api.study.Measurement;
+import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudySummary;
-import org.generationcp.middleware.service.api.study.Trait;
+import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -20,35 +22,35 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * The class <code>StudyServiceImplTest</code> contains tests for the class
- * <code>{@link StudyServiceImpl}</code>.
+ * The class <code>StudyServiceImplTest</code> contains tests for the class <code>{@link StudyServiceImpl}</code>.
  *
  * @author Akhil
  */
 public class StudyServiceImplTest {
+
 	/**
 	 * Run the StudyServiceImpl(HibernateSessionProvider) constructor test.
 	 *
 	 */
 	@Test
-	public void listTrialData() throws Exception {
+	public void listMeasurementData() throws Exception {
 		TraitServiceImpl mockTrialTraits = Mockito.mock(TraitServiceImpl.class);
-		TrialMeasurements mockTrailMeasurements = Mockito.mock(TrialMeasurements.class);
+		StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
 		StudyServiceImpl result = new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements);
 
-		List<String> projectTraits = Arrays.<String> asList("Trait1", "Trait2");
+		List<TraitDto> projectTraits = Arrays.<TraitDto>asList(new TraitDto(1, "Trait1"), new TraitDto(1, "Trait2"));
 		when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);
-		final List<Trait> traits = new ArrayList<Trait>();
-		traits.add(new Trait("traitName", 1, "triatValue"));
-		final Measurement measurement = new Measurement(1, "trialInstance", "entryType", 1234,
-				"designation", "entryNo", "seedSource", "repitionNumber", "plotNumber", traits);
-		final List<Measurement> testMeasurements = Collections.<Measurement> singletonList(measurement);
-		when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits)).thenReturn(
-				testMeasurements);
-		result.getMeasurements(1234);
+		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
+		traits.add(new MeasurementDto(new TraitDto(1, "traitName"), 9999, "triatValue"));
+		final ObservationDto measurement =
+				new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource", "repitionNumber",
+						"plotNumber", traits);
+		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
+		when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits)).thenReturn(testMeasurements);
+		result.getObservations(1234);
 
-		final List<Measurement> allMeasurements = mockTrailMeasurements.getAllMeasurements(1234, projectTraits);
-		assertEquals(allMeasurements,testMeasurements);
+		final List<ObservationDto> allMeasurements = mockTrailMeasurements.getAllMeasurements(1234, projectTraits);
+		assertEquals(allMeasurements, testMeasurements);
 	}
 	
 	@Test
@@ -85,3 +87,4 @@ public class StudyServiceImplTest {
 		
 	}
 }
+

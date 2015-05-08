@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.service.impl.study;
 
 import java.util.ArrayList;
@@ -9,33 +10,38 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.Service;
-import org.generationcp.middleware.service.api.study.Measurement;
+import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
+import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class StudyServiceImpl extends Service implements StudyService {
 
 	final TraitServiceImpl trialTraits;
 
-	final TrialMeasurements trialMeasurements;
+	final StudyMeasurements studyMeasurements;
 
 	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		trialTraits = new TraitServiceImpl(getCurrentSession());
-		trialMeasurements = new TrialMeasurements(getCurrentSession());
+		studyMeasurements = new StudyMeasurements(getCurrentSession());
 	}
 
 	/**
 	 * Only used for tests.
+	 * 
 	 * @param trialTraits
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final TraitServiceImpl trialTraits, final TrialMeasurements trialMeasurements) {
+	StudyServiceImpl(final TraitServiceImpl trialTraits, final StudyMeasurements trialMeasurements) {
 		this.trialTraits = trialTraits;
-		this.trialMeasurements = trialMeasurements;
+		this.studyMeasurements = trialMeasurements;
 	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) throws MiddlewareQueryException {
@@ -79,8 +85,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					.addScalar("endDate");
 			list = query.list();
 		} catch (HibernateException e) {
-			throw new MiddlewareQueryException(
-					"Error in listAllStudies() query in StudyServiceImpl: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in listAllStudies() query in StudyServiceImpl: " + e.getMessage(), e);
 		}
 
 		if (list != null && !list.isEmpty()) {
@@ -101,13 +106,40 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 		return studySummaries;
 	}
-
+	
 	@Override
-	public List<Measurement> getMeasurements(final int studyIdentifier) {
+	public List<ObservationDto> getObservations(final int studyIdentifier) {
 
-		final List<String> traits = trialTraits.getTraits(studyIdentifier);
+		final List<TraitDto> traits = trialTraits.getTraits(studyIdentifier);
 
-		return trialMeasurements.getAllMeasurements(studyIdentifier, traits);
+		return studyMeasurements.getAllMeasurements(studyIdentifier, traits);
 	}
 
+	@Override
+	public List<ObservationDto> getSingleObservation(final int studyIdentifier, int measurementIdentifier) {
+
+		final List<TraitDto> traits = trialTraits.getTraits(studyIdentifier);
+
+		return studyMeasurements.getMeasurement(studyIdentifier, traits, measurementIdentifier);
+
+	}
+
+	@Override
+	public ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
+
+		final Session currentSession = getCurrentSession();
+		final Observations observations = new Observations(currentSession);
+		Transaction tx = null;
+		try {
+			tx = currentSession.beginTransaction();
+			ObservationDto updatedMeasurement = observations.updataObsevationTraits(middlewareMeasurement);
+			tx.commit();
+			return updatedMeasurement;
+		} catch (RuntimeException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			throw e; // or display error message
+		}
+	}
 }
