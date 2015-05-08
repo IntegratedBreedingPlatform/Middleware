@@ -11,24 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import static org.junit.Assert.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
@@ -36,25 +25,22 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
@@ -378,7 +364,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
         Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
         GermplasmList germplasmList = createGermplasmsCimmytWheat(germplasms, listData);
         
-        Integer listId = fieldbookService.saveCrossesGermplasmList(listData, germplasmList);
+        Integer listId = fieldbookService.saveGermplasmList(listData, germplasmList);
 
         assertTrue(listId != null && listId < 0);
         

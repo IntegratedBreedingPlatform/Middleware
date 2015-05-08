@@ -57,11 +57,9 @@ public class Lot implements Serializable{
     @Column(name = "eid")
     private Integer entityId;
 
-    @Basic(optional = false)
     @Column(name = "locid")
     private Integer locationId;
 
-    @Basic(optional = false)
     @Column(name = "scaleid")
     private Integer scaleId;
 

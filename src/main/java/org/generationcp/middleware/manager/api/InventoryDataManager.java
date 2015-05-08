@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
@@ -557,6 +558,14 @@ public interface InventoryDataManager{
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId, String germplasmType) throws MiddlewareQueryException;
+
+    /**
+     *
+     * @param listDataProjectListID
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    boolean transactionsExistForListProjectDataListID(Integer listDataProjectListID) throws MiddlewareQueryException;
 	
 	/**
 	 * Gets the inventory details by germplasm list.
@@ -627,7 +636,7 @@ public interface InventoryDataManager{
 	 * 
 	 * @param gid
 	 * @return
-	 * @throws MiddlewareQueryException.List<GermplasmListData>
+	 * @throws MiddlewareQueryException
 	 */
 	List<LotDetails> getLotDetailsForGermplasm(Integer gid) throws MiddlewareQueryException;
 	
@@ -658,14 +667,17 @@ public interface InventoryDataManager{
      */
     List<GermplasmListData> getLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException;
     
-    
+
     /**
      * Cancels all the reserved inventories given the Map of LrecId and LotId of specific list
-     * 
-     * @param Map<lotId,lrecId>
-     * @return
+     *
+     * @param lotEntries
      * @throws MiddlewareQueryException
      */
-    void cancelReservedInventory(List<org.generationcp.middleware.pojos.ims.ReservedInventoryKey> lotEntries) throws MiddlewareQueryException; 
+    void cancelReservedInventory(List<org.generationcp.middleware.pojos.ims.ReservedInventoryKey> lotEntries) throws MiddlewareQueryException;
 
+    Integer addStockTransaction(StockTransaction stockTransaction) throws MiddlewareQueryException;
+    boolean isStockIdExists(List<String> stockIDs) throws MiddlewareQueryException;
+
+    List<String> getSimilarStockIds(List<String> stockIDs) throws MiddlewareQueryException;
 }

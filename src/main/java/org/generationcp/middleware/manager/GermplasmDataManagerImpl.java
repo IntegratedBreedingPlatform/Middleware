@@ -1322,18 +1322,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     @Override
-    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents)
+    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly)
             throws MiddlewareQueryException{
-    	return getGermplasmDao().searchForGermplasms(q, o, includeParents, true, null);
+    	return getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly);
     }
-
-    @Deprecated
-    @Override
-    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData)
-            throws MiddlewareQueryException{
-    	return searchForGermplasm(q,o,includeParents);
-    }
-   
     
     public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids) throws MiddlewareQueryException {
         return getGermplasmDao().getGermplasmDatesByGids(gids);

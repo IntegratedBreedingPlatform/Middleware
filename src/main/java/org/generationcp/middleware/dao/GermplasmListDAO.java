@@ -418,4 +418,20 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         }
         return list;    	
     }
+
+    public Integer getListDataListIDFromListDataProjectListID(Integer listDataProjectListID) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(GermplasmList.class);
+            criteria.add(Restrictions.eq("id", listDataProjectListID));
+            criteria.setProjection(Projections.property("listRef"));
+
+            return (Integer) criteria.uniqueResult();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getListDataListIDFromListDataProjectListID(listDataProjectListID="
+                    + listDataProjectListID+ ") query from GermplasmList: "
+                    + e.getMessage(), e);
+        }
+
+        return 0;
+    }
 }

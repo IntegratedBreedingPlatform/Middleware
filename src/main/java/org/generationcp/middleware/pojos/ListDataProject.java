@@ -4,6 +4,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 
 @Entity
@@ -47,6 +48,26 @@ public class ListDataProject implements Serializable {
 
     @Column(name = "group_name")
     private String groupName;
+    
+    @Column(name = "duplicate_notes")
+    private String duplicate;
+   
+    
+    /***
+     * The following will only be field when getListDataProjectWithParents() is called,
+     * otherwise, it will always be null
+     */
+    @Transient
+    private String femaleParent = null;
+    
+    @Transient
+    private Integer fgid = null;
+    
+    @Transient
+    private String maleParent = null;
+    
+    @Transient
+    private Integer mgid = null;
 
 	/**
 	 * @return the listDataProjectId
@@ -173,6 +194,46 @@ public class ListDataProject implements Serializable {
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
+ 
+	public String getDuplicate() {
+		return duplicate;
+	}
+
+	public void setDuplicate(String duplicate) {
+		this.duplicate = duplicate;
+	}
+
+	public String getFemaleParent() {
+		return femaleParent;
+	}
+
+	public void setFemaleParent(String femaleParent) {
+		this.femaleParent = femaleParent;
+	}
+
+	public Integer getFgid() {
+		return fgid;
+	}
+
+	public void setFgid(Integer fgid) {
+		this.fgid = fgid;
+	}
+
+	public String getMaleParent() {
+		return maleParent;
+	}
+
+	public void setMaleParent(String maleParent) {
+		this.maleParent = maleParent;
+	}
+
+	public Integer getMgid() {
+		return mgid;
+	}
+
+	public void setMgid(Integer mgid) {
+		this.mgid = mgid;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -184,7 +245,7 @@ public class ListDataProject implements Serializable {
 				+ ", checkType=" + checkType + ", entryId=" + entryId
 				+ ", entryCode=" + entryCode + ", seedSource=" + seedSource
 				+ ", designation=" + designation + ", groupName=" + groupName
-				+ "]";
+				+ ", duplicate=" + duplicate + "]";
 	}
 
 }

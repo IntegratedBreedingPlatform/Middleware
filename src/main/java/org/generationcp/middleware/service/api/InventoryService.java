@@ -12,8 +12,11 @@
 
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.LotsResult;
 
 import java.util.List;
@@ -61,24 +64,13 @@ public interface InventoryService {
 	 * @return the inventory details by study
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException; 
+	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException;
 
-	/**
-	 * Used for creating Lot record(s) in Fieldbook / Seed Storage Magement / Advancing. 
-	 * Updates the lots if the gids are already existing. Otherwise, new lot entries are added.
-	 * 
-	 * @param gids
-	 * @param locationId
-	 * @param scaleId
-	 * @param comment
-	 * @param userId
-	 * @param amount - The quantity
-	 * @param sourceId - List Id or Study Id (supports List Id for now)
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	LotsResult addLotsForList(List<Integer> gids, Integer locationId, Integer scaleId,
-			String comment, Integer userId,
-			Double amount, Integer sourceId) throws MiddlewareQueryException;
-	
+	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier) throws
+				MiddlewareQueryException;
+
+	void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject)
+			throws MiddlewareQueryException;
+
+	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type)  throws MiddlewareQueryException;
 }
