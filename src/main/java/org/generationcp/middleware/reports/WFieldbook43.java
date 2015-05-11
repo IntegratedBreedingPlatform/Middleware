@@ -1,15 +1,7 @@
+
 package org.generationcp.middleware.reports;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.generationcp.middleware.pojos.report.GermplasmEntry;
-import org.generationcp.middleware.pojos.report.Occurrence;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
-public class WFieldbook43 extends AbstractWheatTrialReporter{
+public class WFieldbook43 extends AbstractWheatTrialReporter {
 
 	@Override
 	public Reporter createReporter() {
@@ -27,7 +19,6 @@ public class WFieldbook43 extends AbstractWheatTrialReporter{
 	public String getTemplateName() {
 		return "WFb43_header.jasper";
 	}
-	
-	//ad intrid to datasource
-}
 
+	// TODO : add intrid to datasource
+}

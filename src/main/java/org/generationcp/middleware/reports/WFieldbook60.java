@@ -1,14 +1,5 @@
 package org.generationcp.middleware.reports;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.generationcp.middleware.pojos.report.GermplasmEntry;
-import org.generationcp.middleware.pojos.report.Occurrence;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
 public class WFieldbook60 extends AbstractWheatTrialReporter{
 
 	@Override
@@ -29,5 +20,5 @@ public class WFieldbook60 extends AbstractWheatTrialReporter{
 	}
 	
 	
-	//needs replication_no and subblock (entryNum and plot already provided)
+	//TODO : needs replication_no and subblock (entryNum and plot already provided)
 }

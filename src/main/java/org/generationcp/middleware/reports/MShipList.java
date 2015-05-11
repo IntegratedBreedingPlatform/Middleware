@@ -1,19 +1,9 @@
 package org.generationcp.middleware.reports;
 
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
-import net.sf.jasperreports.export.SimpleExporterInput;
-import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
 public class MShipList extends AbstractDynamicReporter{
 
@@ -38,7 +28,8 @@ public class MShipList extends AbstractDynamicReporter{
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
 		Map<String, Object> params = super.buildJRParams(args);
 		
-		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>)args.get("studyConditions");
+		@SuppressWarnings("unchecked")
+		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get("studyConditions");
 		
 		for(MeasurementVariable var : studyConditions){
 			switch(var.getName()){

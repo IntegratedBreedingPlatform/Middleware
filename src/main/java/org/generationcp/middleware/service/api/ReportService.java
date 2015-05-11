@@ -1,13 +1,11 @@
 package org.generationcp.middleware.service.api;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.Set;
 
-import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperPrint;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;

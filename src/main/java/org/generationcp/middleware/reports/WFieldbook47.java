@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.pojos.report.GermplasmEntry;
 import org.generationcp.middleware.pojos.report.Occurrence;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 public class WFieldbook47 extends AbstractWheatTrialReporter{
 
@@ -41,6 +40,7 @@ public class WFieldbook47 extends AbstractWheatTrialReporter{
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public JRDataSource buildJRDataSource(Collection<?> args){
 		
@@ -89,8 +89,7 @@ public class WFieldbook47 extends AbstractWheatTrialReporter{
 					default : entry.setRep1(0);
 							  entry.setRep2(0);
 							  entry.setRep3(0);
-							  entry.setRep4(0);
-					
+							  entry.setRep4(0);					
 				}
 			}
 

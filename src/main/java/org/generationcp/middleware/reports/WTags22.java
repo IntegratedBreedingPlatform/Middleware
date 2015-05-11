@@ -37,7 +37,7 @@ public class WTags22 extends WTags04 {
 		study = studyMeta.get("STUDY_NAME");
 		occ = studyMeta.get("TRIAL_INSTANCE");
 		subProg = studyMeta.get("BreedingProgram");
-		type = studyMeta.get("STUDY_TYPE"); //a type for nal,int, etc
+		type = studyMeta.get("STUDY_TYPE"); // a type for nal,int, etc
 		season = studyMeta.get("CROP_SEASON");
 		
 		for(int i = 0; i < headers.size(); i++){
@@ -59,8 +59,7 @@ public class WTags22 extends WTags04 {
 			}
 		}
 		
-		//now format
-		
+		//now format		
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(StringUtil.stringOf(" ", rowSpan))
