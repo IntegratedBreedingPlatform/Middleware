@@ -1,14 +1,14 @@
 package org.generationcp.middleware.manager.ontology;
 
 import com.google.common.base.Strings;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyBasicDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -27,15 +27,13 @@ import java.util.*;
 
 public class OntologyPropertyDataManagerImpl extends DataManager implements OntologyPropertyDataManager {
 
+    private static final String SHOULD_VALID_TRAIT_CLASS = "Term should be of valid TRAIT_CLASS";
     private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
     private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
     private static final String PROPERTY_IS_REFERRED_TO_VARIABLE = "Property is referred to variable.";
 
-    private final OntologyBasicDataManager basicDataManager;
-
-    public OntologyPropertyDataManagerImpl(OntologyBasicDataManager ontologyBasicDataManager, HibernateSessionProvider sessionProvider) {
+    public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
-        this.basicDataManager = ontologyBasicDataManager;
     }
 
     @Override
@@ -251,7 +249,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
                 //Add new term if does not exist
                 if(classTerm == null){
-                    classTerm = this.basicDataManager.addTraitClass(c, TermId.IBDB_CLASS.getId());
+                    classTerm = this.addTraitClass(c);
                 }
 
                 getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
@@ -330,7 +328,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
                 //Add new term if does not exist
                 if(classTerm == null){
-                    classTerm = this.basicDataManager.addTraitClass(c, TermId.IBDB_CLASS.getId());
+                    classTerm = this.addTraitClass(c);
                 }
 
                 if(relationsToDelete.containsKey(classTerm.getId())){
@@ -345,7 +343,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             for (CVTermRelationship cl : relationsToDelete.values()){
                 getCvTermRelationshipDao().makeTransient(cl);
                 //Remove trait class if not in used
-                this.basicDataManager.removeTraitClass(cl.getObjectId());
+                this.removeTraitClass(cl.getObjectId());
             }
 
             // Save last modified Time
@@ -380,7 +378,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
             for (CVTermRelationship cl : relationships){
                 getCvTermRelationshipDao().makeTransient(cl);
                 //Remove trait class if not in used
-                this.basicDataManager.removeTraitClass(cl.getObjectId());
+                this.removeTraitClass(cl.getObjectId());
             }
 
             //Deleting existing values for property
@@ -398,8 +396,6 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         }
     }
 
-
-
     private void checkTermIsProperty(CVTerm term) throws MiddlewareException {
 
         if (term == null) {
@@ -409,5 +405,41 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         if(term.getCv() != CvId.PROPERTIES.getId()){
             throw new MiddlewareException(TERM_IS_NOT_PROPERTY);
         }
+    }
+
+    private Term addTraitClass(String className) throws MiddlewareException {
+
+        //Check weather class term exist with CV 1011.
+        CVTerm classTerm = getCvTermDao().getByNameAndCvId(className, CvId.TRAIT_CLASS.getId());
+
+        //If exist then don't add.
+        if(classTerm == null) {
+            classTerm = getCvTermDao().save(className, null, CvId.TRAIT_CLASS);
+        }
+
+        return Term.fromCVTerm(classTerm);
+    }
+
+    private void removeTraitClass(Integer termId) throws MiddlewareException {
+
+        CVTerm term = getCvTermDao().getById(termId);
+
+        //Validate parent class. Parent class should be from cvId as 1000
+        if(term.getCv() != CvId.TRAIT_CLASS.getId()) {
+            throw new MiddlewareException(SHOULD_VALID_TRAIT_CLASS);
+        }
+
+        //Check weather term is referred
+        if (getCvTermRelationshipDao().getRelationshipByObjectId(termId) != null) {
+            return;
+        }
+
+        List<CVTermRelationship> termRelationships = getCvTermRelationshipDao().getBySubject(termId);
+
+        for(CVTermRelationship r : termRelationships) {
+            getCvTermRelationshipDao().makeTransient(r);
+        }
+
+        getCvTermDao().makeTransient(term);
     }
 }
