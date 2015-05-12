@@ -17,8 +17,6 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
-import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.reports.BuildReportException;
@@ -29,15 +27,20 @@ import org.generationcp.middleware.service.api.ReportService;
 public class ReportServiceImpl extends Service implements ReportService{
 
 	private ReporterFactory factory = ReporterFactory.instance();
-	private PedigreeDataManager pediMgr;
 
-	    public ReportServiceImpl(
+	public ReportServiceImpl() {
+		super();
+	}
+
+	public ReportServiceImpl(HibernateSessionProvider sessionProvider) {
+        super(sessionProvider);
+    }
+	public ReportServiceImpl(
 	            HibernateSessionProvider sessionProvider,
 	            String databaseName) {
-	        super(sessionProvider, databaseName);
-	        
-	        setPediMgr(new PedigreeDataManagerImpl(sessionProvider, databaseName));
-	    }
+	        super(sessionProvider, databaseName);	        
+
+	}
 	    
 	@Override
 	public JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, MiddlewareQueryException, 
@@ -127,18 +130,6 @@ public class ReportServiceImpl extends Service implements ReportService{
 				row.getDataList().add(new MeasurementData("m_ent", "-99")); // put source trial entry
 				row.getDataList().add(new MeasurementData("m_lid", "-99")); // put source location id
 			}
-		}
-		
-		
+		}				
 	}
-
-	public PedigreeDataManager getPediMgr() {
-		return pediMgr;
-	}
-
-	private void setPediMgr(PedigreeDataManager pediMgr) {
-		this.pediMgr = pediMgr;
-	}
-	
-	
 }
