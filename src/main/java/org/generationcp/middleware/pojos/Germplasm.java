@@ -285,13 +285,13 @@ public class Germplasm implements Serializable{
     		"WHERE gid IN (:gids)";
     public static final String GET_PARENT_NAMES_BY_STUDY_ID =
     		"select N.gid, N.ntype, N.nval, N.nid, N.nstat"+
-			" from ibdbv2_maize_central.names N"+
+			" from names N"+
 			" inner join ("+
 			"	select distinct G.gpid1 gid"+
-			"	from ibdbv2_maize_1_local.listnms LNAMES"+
-			"	inner join ibdbv2_maize_1_local.listdata_project LDATAPROJ on"+
+			"	from listnms LNAMES"+
+			"	inner join listdata_project LDATAPROJ on"+
 			"		LNAMES.listid = LDATAPROJ.list_id"+
-			"	inner join ibdbv2_maize_1_local.germplsm G on"+
+			"	inner join germplsm G on"+
 			"		G.gid = LDATAPROJ.germplasm_id and"+
 			"		G.gnpgs >= 0"+
 			"	where LNAMES.projectid = :projId"+
@@ -299,10 +299,10 @@ public class Germplasm implements Serializable{
 			"    union"+
 			
 			"	select distinct G.gpid2"+
-			"	from ibdbv2_maize_1_local.listnms LNAMES"+
-			"	inner join ibdbv2_maize_1_local.listdata_project LDATAPROJ on"+
+			"	from listnms LNAMES"+
+			"	inner join listdata_project LDATAPROJ on"+
 			"		LNAMES.listid = LDATAPROJ.list_id"+
-			"	inner join ibdbv2_maize_1_local.germplsm G on"+
+			"	inner join germplsm G on"+
 			"		G.gid = LDATAPROJ.germplasm_id and"+
 			"		G.gnpgs >= 0"+
 			"	where LNAMES.projectid = :projId"+
@@ -311,10 +311,10 @@ public class Germplasm implements Serializable{
 
     public static final String GET_PARENT_GIDS_BY_STUDY_ID =
 	    "select distinct g.gid, G.gpid1, G.gpid2, G.grplce"+
-		" from ibdbv2_maize_1_local.listnms LNAMES"+
-		" inner join ibdbv2_maize_1_local.listdata_project LDATAPROJ on"+
+		" from listnms LNAMES"+
+		" inner join listdata_project LDATAPROJ on"+
 		"	LNAMES.listid = LDATAPROJ.list_id"+
-		" inner join ibdbv2_maize_1_local.germplsm G on"+
+		" inner join germplsm G on"+
 		"	G.gid = LDATAPROJ.germplasm_id and"+
 		"	G.gnpgs >= 0"+
 		" where LNAMES.projectid = :projId";
