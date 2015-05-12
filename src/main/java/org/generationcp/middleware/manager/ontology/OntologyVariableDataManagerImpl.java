@@ -20,6 +20,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -33,23 +34,19 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
     private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 
-    private final OntologyBasicDataManager basicDataManager;
     private final OntologyMethodDataManager methodDataManager;
     private final OntologyPropertyDataManager propertyDataManager;
     private final OntologyScaleDataManager scaleDataManager;
 
-    public OntologyVariableDataManagerImpl(OntologyBasicDataManager basicDataManager,
-                                           OntologyMethodDataManager methodDataManager,
+    public OntologyVariableDataManagerImpl(OntologyMethodDataManager methodDataManager,
                                            OntologyPropertyDataManager propertyDataManager,
                                            OntologyScaleDataManager scaleDataManager,
                                            HibernateSessionProvider sessionProvider) {
         super(sessionProvider);
-        this.basicDataManager = basicDataManager;
         this.methodDataManager = methodDataManager;
         this.propertyDataManager = propertyDataManager;
         this.scaleDataManager = scaleDataManager;
     }
-
 
     @Override
     public List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId) throws MiddlewareException {
@@ -212,7 +209,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 ProgramFavorite programFavorite = getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
                 variable.setIsFavorite(programFavorite != null);
 
-                variable.setObservations(basicDataManager.getVariableObservations(id));
+                variable.setObservations(getVariableObservations(id));
 
                 return variable;
 
@@ -430,7 +427,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         checkTermIsVariable(term);
 
         //check usage
-        Integer usage = basicDataManager.getVariableObservations(id);
+        Integer usage = getVariableObservations(id);
 
         if(usage > 0) {
             throw new MiddlewareException(CAN_NOT_DELETE_USED_VARIABLE);
@@ -470,6 +467,22 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
             rollbackTransaction(transaction);
             throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);
         }
+    }
+
+    //TODO: Follow DmsProjectDao query COUNT_PROJECTS_WITH_VARIABLE.
+    @Override
+    public Integer getVariableObservations(int variableId) throws MiddlewareException {
+        SQLQuery query = getActiveSession().createSQLQuery("select (select count(*) from projectprop where type_id = :variableId) " +
+                "+ (select count(*) from phenotype where observable_id = :variableId) c");
+        query.setParameter("variableId", variableId);
+        query.addScalar("c");
+        return ((BigInteger) query.uniqueResult()).intValue();
+    }
+
+    //TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
+    @Override
+    public Integer getVariableStudies(int variableId) throws MiddlewareException {
+        return null;
     }
 
     private void checkTermIsVariable(CVTerm term) throws MiddlewareException {

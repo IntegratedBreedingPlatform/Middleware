@@ -53,4 +53,20 @@ public interface OntologyVariableDataManager {
      * @throws MiddlewareException*
      */
     void deleteVariable(Integer id) throws MiddlewareException;
+
+    /**
+     * This function defines total observations carried from this variable.
+     * @param variableId variable id to get observations
+     * @return Total observations
+     * @throws MiddlewareException
+     */
+    Integer getVariableObservations(int variableId) throws MiddlewareException;
+
+    /**
+     * This function defines total studies taken from this variable.
+     * @param variableId variable id to get observations
+     * @return Total studies
+     * @throws MiddlewareException
+     */
+    Integer getVariableStudies(int variableId) throws MiddlewareException;
 }
