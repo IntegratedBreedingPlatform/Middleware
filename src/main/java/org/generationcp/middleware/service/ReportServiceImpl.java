@@ -2,44 +2,29 @@ package org.generationcp.middleware.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperPrint;
 
-import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.reports.BuildReportException;
 import org.generationcp.middleware.reports.Reporter;
 import org.generationcp.middleware.reports.ReporterFactory;
 import org.generationcp.middleware.service.api.ReportService;
-import org.hibernate.Session;
-import org.hibernate.Query;
 
 public class ReportServiceImpl extends Service implements ReportService{
 
@@ -51,7 +36,7 @@ public class ReportServiceImpl extends Service implements ReportService{
 	            String databaseName) {
 	        super(sessionProvider, databaseName);
 	        
-	        pediMgr = new PedigreeDataManagerImpl(sessionProvider, databaseName);
+	        setPediMgr(new PedigreeDataManagerImpl(sessionProvider, databaseName));
 	    }
 	    
 	@Override
@@ -145,6 +130,14 @@ public class ReportServiceImpl extends Service implements ReportService{
 		}
 		
 		
+	}
+
+	public PedigreeDataManager getPediMgr() {
+		return pediMgr;
+	}
+
+	private void setPediMgr(PedigreeDataManager pediMgr) {
+		this.pediMgr = pediMgr;
 	}
 	
 	

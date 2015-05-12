@@ -1,6 +1,5 @@
-package org.generationcp.middleware.reports;
 
-import org.generationcp.middleware.exceptions.MiddlewareException;
+package org.generationcp.middleware.reports;
 
 public class BuildReportException extends Exception {
 
@@ -9,9 +8,9 @@ public class BuildReportException extends Exception {
 
 	@Override
 	public String getMessage() {
-		return "Datasource for report with key ["+key+"] has not been set or report is not built yet.";
+		return "Datasource for report with key [" + key + "] has not been set or report is not built yet.";
 	}
-	
+
 	public BuildReportException(String key) {
 		this.key = key;
 	}
