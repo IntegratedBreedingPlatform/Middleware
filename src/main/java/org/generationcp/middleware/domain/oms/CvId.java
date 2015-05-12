@@ -20,6 +20,7 @@ public enum CvId {
 	//Ontology
 	IBDB_TERMS(1000)
 	,PROPERTIES(1010)
+	,TRAIT_CLASS(1011)
 	,METHODS(1020)
 	,SCALES(1030)
 	,VARIABLES(1040)
@@ -28,7 +29,7 @@ public enum CvId {
 	
 	private final int id;
 	
-	private CvId(int id) {
+	CvId(int id) {
 		this.id = id;
 	}
 	
