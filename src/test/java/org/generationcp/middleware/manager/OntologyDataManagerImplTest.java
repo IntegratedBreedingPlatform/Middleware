@@ -33,13 +33,13 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class OntologyDataManagerImplTest extends DataManagerIntegrationTest implements
@@ -957,6 +957,11 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Debug.println(MiddlewareIntegrationTest.INDENT, "count: " + standardVariables.size());
 	}
 
+	/**
+	 * @Deprecated Variable does not hold is_a relationship directly in new OntologyManager Redesign.
+	 * @throws MiddlewareQueryException
+	 */
+	@Ignore
 	@Test
 	public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
 		List<StandardVariable> vars = manager.getStandardVariables(
