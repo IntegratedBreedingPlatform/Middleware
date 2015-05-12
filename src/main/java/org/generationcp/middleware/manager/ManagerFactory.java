@@ -113,8 +113,8 @@ public class ManagerFactory implements Serializable {
         return new OntologyDataManagerImpl(sessionProvider);
     }
 
-    public OntologyBasicDataManager getOntologyBasicDataManager() {
-        return new OntologyBasicDataManagerImpl(sessionProvider);
+    public TermDataManager getTermDataManager() {
+        return new TermDataManagerImpl(sessionProvider);
     }
 
     public OntologyMethodDataManager getOntologyMethodDataManager() {
@@ -122,7 +122,7 @@ public class ManagerFactory implements Serializable {
     }
 
     public OntologyPropertyDataManager getOntologyPropertyDataManager() {
-        return new OntologyPropertyDataManagerImpl(getOntologyBasicDataManager(), sessionProvider);
+        return new OntologyPropertyDataManagerImpl(sessionProvider);
     }
 
     public OntologyScaleDataManager getOntologyScaleDataManager() {
@@ -130,7 +130,7 @@ public class ManagerFactory implements Serializable {
     }
 
     public OntologyVariableDataManager getOntologyVariableDataManager() {
-        return new OntologyVariableDataManagerImpl(getOntologyBasicDataManager(), getOntologyMethodDataManager(), getOntologyPropertyDataManager(), getOntologyScaleDataManager(), sessionProvider);
+        return new OntologyVariableDataManagerImpl(getOntologyMethodDataManager(), getOntologyPropertyDataManager(), getOntologyScaleDataManager(), sessionProvider);
     }
 
     public PresetDataManager getPresetDataManager() {

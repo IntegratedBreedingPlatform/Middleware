@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager.ontology.api;
 
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.List;
 
@@ -23,14 +22,7 @@ import java.util.List;
  * 
  * 
  */
-public interface OntologyBasicDataManager {
-
-    /**
-     * Return All Trait Classes
-     * * @return List<Term>
-     * @throws MiddlewareException*
-     */
-    List<Term> getAllTraitClass() throws MiddlewareException;
+public interface TermDataManager {
 
     /**
      * Returns term by id
@@ -51,24 +43,4 @@ public interface OntologyBasicDataManager {
      * Checks if term has referred to other term.
      */
     boolean isTermReferred(int termId) throws MiddlewareException;
-
-    /**
-     * This function defines total observations carried from this variable.
-     * @param variableId variable id to get observations
-     * @return Total observations
-     * @throws MiddlewareException
-     */
-    Integer getVariableObservations(int variableId) throws MiddlewareException;
-
-    /**
-     *
-     * @param childClassName class name to be added under
-     */
-    Term addTraitClass(String childClassName, Integer parentClassId) throws MiddlewareException;
-
-    /**
-     *
-     * @param termId to be deleted
-     */
-    void removeTraitClass(Integer termId) throws MiddlewareException;
 }

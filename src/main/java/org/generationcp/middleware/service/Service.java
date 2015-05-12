@@ -67,8 +67,8 @@ public abstract class Service extends DatabaseBroker {
         return new OntologyDataManagerImpl(sessionProvider);
     }
 
-    protected final OntologyBasicDataManager getOntologyBasicDataManager(){
-        return new OntologyBasicDataManagerImpl(sessionProvider);
+    protected final TermDataManager getTermDataManager(){
+        return new TermDataManagerImpl(sessionProvider);
     }
 
     protected final OntologyMethodDataManager getOntologyMethodDataManager(){
@@ -76,7 +76,7 @@ public abstract class Service extends DatabaseBroker {
     }
 
     protected final OntologyPropertyDataManager getOntologyPropertyDataManager(){
-        return new OntologyPropertyDataManagerImpl(getOntologyBasicDataManager(), sessionProvider);
+        return new OntologyPropertyDataManagerImpl(sessionProvider);
     }
 
     protected final OntologyScaleDataManager getOntologyScaleDataManager(){
@@ -84,7 +84,7 @@ public abstract class Service extends DatabaseBroker {
     }
 
     protected final OntologyVariableDataManager getOntologyVariableDataManager(){
-        return new OntologyVariableDataManagerImpl(getOntologyBasicDataManager(), getOntologyMethodDataManager(), getOntologyPropertyDataManager(), getOntologyScaleDataManager(), sessionProvider);
+        return new OntologyVariableDataManagerImpl(getOntologyMethodDataManager(), getOntologyPropertyDataManager(), getOntologyScaleDataManager(), sessionProvider);
     }
 
     protected final GermplasmDataManager getGermplasmDataManager() {
