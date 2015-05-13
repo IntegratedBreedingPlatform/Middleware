@@ -6,7 +6,11 @@
 	<packaging>jar</packaging>
 	<version>4.0.0.SNAPSHOT</version>
 	<name>ibp middleware</name>
-
+	
+	<properties>
+		<envConfig>release</envConfig>
+	</properties>
+	
 	<distributionManagement>
 		<repository>
 			<id>efficio-nexus</id>
@@ -27,18 +31,6 @@
 			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
 		</repository>
 	</repositories>
-
-	<profiles>
-		<profile>
-			<id>default</id>
-			<properties>
-				<envConfig>ci</envConfig>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-		</profile>
-	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -149,53 +141,70 @@
 			<version>1.8.5</version>
 		</dependency>
 
-		<!--  JAMon performance monitoring. -->		
-        <dependency>
-            <groupId>com.jamonapi</groupId>
-            <artifactId>jamon</artifactId>
-            <version>2.80</version>
-        </dependency>
+		<!-- JAMon performance monitoring. -->
+		<dependency>
+			<groupId>com.jamonapi</groupId>
+			<artifactId>jamon</artifactId>
+			<version>2.80</version>
+		</dependency>
 
 	</dependencies>
 
 	<build>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
+		<filters>
+			<filter>../BMSConfig/${envConfig}/application.properties</filter>
+			<filter>../BMSConfig/${envConfig}/test.properties</filter>
+		</filters>
+		<resources>
+			<resource>
 				<filtering>false</filtering>
+				<directory>src/main/java</directory>
 				<includes>
 					<include>**</include>
 				</includes>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<filtering>true</filtering>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<filtering>false</filtering>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
 			</testResource>
 		</testResources>
 
 		<plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<phase>generate-resources</phase>
-						<configuration>
-							<tasks>
-								<copy todir="src/main/resources" overwrite="true">
-									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
-										<include name="workbench.properties" />
-									</fileset>
-								</copy>
-								<copy todir="src/test/resources" overwrite="true">
-									<fileset dir="pipeline/config/${envConfig}" id="fromDir">
-										<include name="testDatabaseConfig.properties" />
-									</fileset>
-								</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
