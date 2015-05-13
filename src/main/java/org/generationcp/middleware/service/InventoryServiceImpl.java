@@ -114,7 +114,7 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		Lot lot = getLotBuilder().createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId());
 		getInventoryDataManager().addLot(lot);
 
-		Transaction transaction = getTransactionBuilder().buildForAdd(lot, listData.getId(),
+		Transaction transaction = getTransactionBuilder().buildForAdd(lot, listData == null ? 0 : listData.getId(),
 				details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(), details.getInventoryID());
 		getInventoryDataManager().addTransaction(transaction);
 
