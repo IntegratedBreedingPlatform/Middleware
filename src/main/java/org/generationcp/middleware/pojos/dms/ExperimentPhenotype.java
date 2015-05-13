@@ -13,6 +13,7 @@
 package org.generationcp.middleware.pojos.dms;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 
 /**
@@ -36,6 +37,7 @@ public class ExperimentPhenotype implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_phenotype_id")
 	private Integer experimentPhenotypeId;
