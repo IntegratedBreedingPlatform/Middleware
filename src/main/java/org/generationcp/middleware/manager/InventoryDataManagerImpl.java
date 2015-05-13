@@ -705,6 +705,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         for (GermplasmListData data : forFill) {
             InventoryDetails detail = new InventoryDetails();
             detail.copyFromGermplasmListData(data);
+            detailList.add(detail);
         }
     }
 
