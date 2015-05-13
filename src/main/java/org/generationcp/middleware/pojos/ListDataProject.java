@@ -248,4 +248,32 @@ public class ListDataProject implements Serializable {
 				+ ", duplicate=" + duplicate + "]";
 	}
 
+	public Boolean isPedigreeDupe() {
+		if(duplicate != null){
+			return duplicate.contains("Pedigree Dupe");
+		}
+		return false;
+	}
+
+	public Boolean isPlotDupe() {
+		if(duplicate != null){
+			return duplicate.contains("Plot Dupe");
+		}
+		return false;
+	}
+
+	public Boolean isPedigreeRecip() {
+		if(duplicate != null){
+			return duplicate.contains("Pedigree Recip");
+		}
+		return false;
+	}
+
+	public Boolean isPlotRecip() {
+		if(duplicate != null){
+			return duplicate.contains("Plot Recip");
+		}
+		return false;
+	}
+
 }
