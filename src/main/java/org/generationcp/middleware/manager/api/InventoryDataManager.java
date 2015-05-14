@@ -680,4 +680,8 @@ public interface InventoryDataManager{
     boolean isStockIdExists(List<String> stockIDs) throws MiddlewareQueryException;
 
     List<String> getSimilarStockIds(List<String> stockIDs) throws MiddlewareQueryException;
+    
+    List<String> getStockIdsByListDataProjectListId(Integer listId) throws MiddlewareQueryException;
+
+	void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailListFromDB) throws MiddlewareQueryException;
 }

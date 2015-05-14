@@ -554,4 +554,20 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         return new ArrayList<>();
 
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<String> getStockIdsByListDataProjectListId(Integer listId) throws MiddlewareQueryException {
+        try {
+            String sql = "SELECT tran.inventory_id"
+            		+ " FROM ims_transaction tran, listnms l"
+            		+ " WHERE l.listId = :listId "
+                    + " AND sourceId = l.listref AND sourceType = 'LIST'"
+                    + " AND inventory_id IS NOT NULL";
+            Query query = getSession().createSQLQuery(sql).setParameter("listId",listId);
+            return query.list();
+        } catch (Exception e) {
+            logAndThrowException("Error at getStockIdsByListId("+listId+") at TransactionDAO: " + e.getMessage(), e);
+        }
+        return new ArrayList<String>();
+    }
 }

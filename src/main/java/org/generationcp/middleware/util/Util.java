@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * A utility class used to get primitive values of wrapper classes, check for
  * null values, and list functions such as getting the max, existence of a
@@ -233,6 +235,20 @@ public class Util{
     public static Date parseDate(String date, String format) throws ParseException{
     	SimpleDateFormat formatter = getSimpleDateFormat(format);
     	return formatter.parse(date);
+    }
+    
+    public static String nullIfEmpty(String value) {
+    	if(StringUtils.isEmpty(value)) {
+    		return null;
+    	}
+    	return value;
+    }
+    
+    public static Double zeroIfNull(Double value) {
+    	if(value==null) {
+    		return 0.0;
+    	}
+    	return value;
     }
 }
 

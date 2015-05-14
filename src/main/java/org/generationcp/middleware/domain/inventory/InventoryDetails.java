@@ -88,7 +88,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	private String duplicate;
 	private String bulkWith;
 	private String bulkCompl;
-
+	
+	/** The ff. fields are used for importing inventory for stock list */
+	private Integer listDataProjectId;
+	private Integer trnId;
+	
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -700,6 +704,22 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setBulkCompl(String bulkCompl) {
 		this.bulkCompl = bulkCompl;
+	}
+
+	public Integer getListDataProjectId() {
+		return listDataProjectId;
+	}
+
+	public void setListDataProjectId(Integer listDataProjectId) {
+		this.listDataProjectId = listDataProjectId;
+	}
+
+	public Integer getTrnId() {
+		return trnId;
+	}
+
+	public void setTrnId(Integer trnId) {
+		this.trnId = trnId;
 	}
 	
 }

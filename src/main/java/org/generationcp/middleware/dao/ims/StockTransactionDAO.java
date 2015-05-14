@@ -57,7 +57,8 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
         String sql = "select lot.lotid, lot.locid, lot.scaleid, lot.userid, " +
                 "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, " +
                 "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid, " +
-                "d.duplicate_notes, tran.bulk_with, tran.bulk_compl " +
+                "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, " +
+                "ist.listdata_project_id, ist.trnid " +
                 "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id " +
                 "INNER JOIN listnms ON d.list_id = listnms.listid " +
                 "INNER JOIN ims_transaction tran ON tran.trnid = ist.trnid INNER JOIN ims_lot lot ON lot.lotid = tran.lotid " +
@@ -91,6 +92,8 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                     String duplicate = (String) row[16];
     	        	String bulkWith = (String) row[17];
     	        	Character bulkCompl = (Character) row[18];
+    	        	Integer listDataProjectId = (Integer) row[19];
+    	        	Integer trnId = (Integer) row[20];
 
                     InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
                             userId, amount, sourceId, null, scaleId, scaleName, comments);
@@ -102,6 +105,8 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                     details.setDuplicate(duplicate);
                     details.setBulkWith(bulkWith);
                     details.setBulkCompl(bulkCompl!=null?bulkCompl.toString():null);
+                    details.setListDataProjectId(listDataProjectId);
+                    details.setTrnId(trnId);
                     detailsList.add(details);
 
                 }

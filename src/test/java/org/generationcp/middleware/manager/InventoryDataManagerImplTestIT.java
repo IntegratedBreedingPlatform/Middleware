@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
@@ -34,6 +36,7 @@ import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -41,11 +44,31 @@ import org.junit.Test;
 
 public class InventoryDataManagerImplTestIT extends DataManagerIntegrationTest {
 
-    private static InventoryDataManager manager;
+    private static final String TEST_DUPLICATE = "TEST_DUPLICATE";
+	private static final String TEST_BULK_WITH = "SID1-2";
+	private static final String TEST_BULK_COMPL = "Y";
+	private static final int TEST_LOCATION_ID = 1;
+	private static final int TEST_SCALE_ID = 2;
+	private static final double TEST_AMOUNT = 1.0;
+	private static final String TEST_COMMENT = "TEST COMMENT";
+	private static final String LOT_ID_KEY = "lotId";
+	private static final String TRN_ID_KEY = "trnId";
+	private static final String LIST_DATA_PROJECT_ID_KEY = "listDataProjectId";
+	private static final String DUPLICATE_KEY = "duplicate";
+	private static final String BULK_WITH_KEY = "bulkWith";
+	private static final String BULK_COMPL_KEY = "bulkCompl";
+	private static final String LOCATION_ID_KEY = "locationId";
+	private static final String SCALE_ID_KEY = "scaleId";
+	private static final String AMOUNT_KEY = "amount";
+	private static final String COMMENT_KEY = "comment";
+	
+	private static InventoryDataManager manager;
+    private static InventoryService inventoryService;
     
     @BeforeClass
     public static void setUp() throws Exception {
         manager = managerFactory.getInventoryDataManager();
+        inventoryService = managerFactory.getInventoryMiddlewareService();
     }
 
     @Test
@@ -559,4 +582,91 @@ public class InventoryDataManagerImplTestIT extends DataManagerIntegrationTest {
     	lotEntries.add(new ReservedInventoryKey(1, lrecId, lotId));
     	manager.cancelReservedInventory(lotEntries);
     }
+    
+    @Test
+    public void testGetStockIdsByListDataProjectListId() throws MiddlewareQueryException{
+    	List<String> stockIds = manager.getStockIdsByListDataProjectListId(17);
+    	assertNotNull(stockIds);
+    }
+    
+    @Test
+    public void testUpdateInventory() throws MiddlewareQueryException{
+    	Integer listId = 17;
+		List<InventoryDetails> inventoryDetailList = 
+    			inventoryService.getInventoryListByListDataProjectListId(
+    					listId, GermplasmListType.CROSSES);
+    	if(inventoryDetailList!=null && !inventoryDetailList.isEmpty()) {
+    		InventoryDetails inventoryDetails = inventoryDetailList.get(0);
+    		Map<String,Object> originalData = getInventorySpecificDetails(inventoryDetails);
+    		modifyInventoryDetails(inventoryDetails);
+    		manager.updateInventory(listId, inventoryDetailList);
+    		InventoryDetails modifiedInventoryDetails = getModifiedInventoryDetails(originalData,
+    				inventoryService.getInventoryListByListDataProjectListId(
+    						listId, GermplasmListType.CROSSES));
+    		assertEquals(TEST_DUPLICATE,modifiedInventoryDetails.getDuplicate());
+    		assertEquals(TEST_BULK_WITH,modifiedInventoryDetails.getBulkWith());
+    		assertEquals(TEST_BULK_COMPL,modifiedInventoryDetails.getBulkCompl());
+    		assertEquals(TEST_LOCATION_ID,modifiedInventoryDetails.getLocationId().intValue());
+    		assertEquals(TEST_SCALE_ID,modifiedInventoryDetails.getScaleId().intValue());
+    		assertEquals(0,modifiedInventoryDetails.getAmount().compareTo(TEST_AMOUNT));
+    		assertEquals(TEST_COMMENT,modifiedInventoryDetails.getComment());
+    		revertChangesToInventoryDetails(inventoryDetails,originalData);
+    		manager.updateInventory(listId, inventoryDetailList);
+    	}
+    }
+
+	private InventoryDetails getModifiedInventoryDetails(
+			Map<String, Object> data,
+			List<InventoryDetails> inventoryDetailList) {
+		if(inventoryDetailList!=null && !inventoryDetailList.isEmpty()) {
+			Integer lotId = (Integer)data.get(LOT_ID_KEY);
+			Integer trnId = (Integer)data.get(TRN_ID_KEY);
+			Integer listDataProjectId = (Integer)data.get(LIST_DATA_PROJECT_ID_KEY);
+			for (InventoryDetails inventoryDetails : inventoryDetailList) {
+				if(lotId.equals(inventoryDetails.getLotId()) && 
+						trnId.equals(inventoryDetails.getTrnId()) &&
+						listDataProjectId.equals(inventoryDetails.getListDataProjectId())) {
+					return inventoryDetails;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private void revertChangesToInventoryDetails(
+			InventoryDetails inventoryDetails, Map<String, Object> originalData) {
+		inventoryDetails.setDuplicate((String)originalData.get(DUPLICATE_KEY));
+		inventoryDetails.setBulkWith((String)originalData.get(BULK_WITH_KEY));
+		inventoryDetails.setBulkCompl((String)originalData.get(BULK_COMPL_KEY));
+		inventoryDetails.setLocationId((Integer)originalData.get(LOCATION_ID_KEY));
+		inventoryDetails.setScaleId((Integer)originalData.get(SCALE_ID_KEY));
+		inventoryDetails.setAmount((Double)originalData.get(AMOUNT_KEY));
+		inventoryDetails.setComment((String)originalData.get(COMMENT_KEY));
+	}
+
+	private void modifyInventoryDetails(InventoryDetails inventoryDetails) {
+		inventoryDetails.setDuplicate(TEST_DUPLICATE);
+		inventoryDetails.setBulkWith(TEST_BULK_WITH);
+		inventoryDetails.setBulkCompl(TEST_BULK_COMPL);
+		inventoryDetails.setLocationId(TEST_LOCATION_ID);
+		inventoryDetails.setScaleId(TEST_SCALE_ID);
+		inventoryDetails.setAmount(TEST_AMOUNT);
+		inventoryDetails.setComment(TEST_COMMENT);
+	}
+
+	private Map<String, Object> getInventorySpecificDetails(
+			InventoryDetails inventoryDetails) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put(LOT_ID_KEY, inventoryDetails.getLotId());
+		data.put(TRN_ID_KEY, inventoryDetails.getTrnId());
+		data.put(LIST_DATA_PROJECT_ID_KEY, inventoryDetails.getListDataProjectId());
+		data.put(DUPLICATE_KEY, inventoryDetails.getDuplicate());
+		data.put(BULK_WITH_KEY, inventoryDetails.getBulkWith());
+		data.put(BULK_COMPL_KEY, inventoryDetails.getBulkCompl());
+		data.put(LOCATION_ID_KEY, inventoryDetails.getLocationId());
+		data.put(SCALE_ID_KEY, inventoryDetails.getScaleId());
+		data.put(AMOUNT_KEY, inventoryDetails.getAmount());
+		data.put(COMMENT_KEY, inventoryDetails.getComment());
+		return data;
+	}
 }
