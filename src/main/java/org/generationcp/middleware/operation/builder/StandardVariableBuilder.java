@@ -340,6 +340,14 @@ public class StandardVariableBuilder extends Builder {
 		return storedIn;
 	}
 	
+	public StandardVariable getByName(String name) throws MiddlewareQueryException{
+		CVTerm cvTerm = getCvTermDao().getByName(name);
+		if (cvTerm != null && cvTerm.getCvTermId() != null){
+			return getStandardVariableBuilder().create(cvTerm.getCvTermId());
+		}
+		return null;
+	}
+	
 	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
         
 		Integer stdVariableId =  getIdByPropertyScaleMethod(propertyId, scaleId, methodId);

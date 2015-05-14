@@ -180,6 +180,50 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		return term;
 	}
+	
+	public CVTerm getByName(String name) throws MiddlewareQueryException {
+		CVTerm term = null;
+
+		try {
+
+			StringBuilder sqlString = new StringBuilder()
+					.append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+					.append("FROM cvterm cvt ")
+					.append("WHERE cvt.name = :nameOrSynonym ")
+					.append("UNION ")
+					.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append("AND syn.synonym = :nameOrSynonym ");
+
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+			query.setParameter("nameOrSynonym", name);
+
+			List<Object[]> results = query.list();
+
+			if (! results.isEmpty()) {
+				Object[] row = results.get(0);
+				Integer cvtermId = (Integer) row[0];
+				Integer cvtermCvId = (Integer) row[1];
+				String cvtermName = (String) row[2];
+				String cvtermDefinition = (String) row[3];
+				Integer dbxrefId = (Integer) row[4];
+				Integer isObsolete = (Integer) row[5];
+				Integer isRelationshipType = (Integer) row[6];
+
+				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId,
+						isObsolete, isRelationshipType);
+			}
+
+		} catch (HibernateException e) {
+			logAndThrowException(
+					"Error at getByName=" + name + " query on CVTermDao: " + e
+							.getMessage(), e);
+		}
+
+		return term;
+	}
 
 	public List<CVTerm> getByIds(List<Integer> ids) throws MiddlewareQueryException {
 		List<CVTerm> terms = new ArrayList<CVTerm>();

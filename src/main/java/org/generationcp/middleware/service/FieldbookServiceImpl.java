@@ -1232,4 +1232,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
     }
 	
+	@Override
+	public StandardVariable getStandardVariableByName(String name) throws MiddlewareQueryException{
+		return this.getStandardVariableBuilder().getByName(name);
+	}
+	
 }

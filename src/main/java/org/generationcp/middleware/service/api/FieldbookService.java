@@ -885,4 +885,12 @@ public interface FieldbookService {
 
 	void addListDataProjectList(List<ListDataProject> listDataProjectList)
 			throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the StandardVariable by Name
+	 * 
+	 * @param name of the Standard Varible
+	 * @throws MiddlewareQueryException the middleware query exception
+	 * **/
+	StandardVariable getStandardVariableByName(String name) throws MiddlewareQueryException;
 }
