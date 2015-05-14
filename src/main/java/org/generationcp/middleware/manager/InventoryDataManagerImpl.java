@@ -175,7 +175,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             return id;
         } catch (HibernateException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException(e.getMessage());
+            throw new MiddlewareQueryException(e.getMessage(),e);
         } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
             throw e;
@@ -212,7 +212,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             trans.commit();
         } catch (ConstraintViolationException e) {
         	rollbackTransaction(trans);
-        	throw new MiddlewareQueryException(e.getMessage());
+        	throw new MiddlewareQueryException(e.getMessage(),e);
     	} catch (MiddlewareQueryException e) {
         	rollbackTransaction(trans);
         	throw e;

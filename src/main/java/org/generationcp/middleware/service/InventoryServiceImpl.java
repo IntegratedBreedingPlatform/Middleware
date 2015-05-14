@@ -21,11 +21,6 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.*;
 import org.generationcp.middleware.service.api.InventoryService;
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,8 +30,6 @@ import java.util.regex.Pattern;
  *
  */
 public class InventoryServiceImpl extends Service implements InventoryService {
-
-	private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
 	public InventoryServiceImpl(HibernateSessionProvider sessionProvider,
 			String localDatabaseName) {

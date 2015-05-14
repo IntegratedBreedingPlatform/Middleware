@@ -55,10 +55,12 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	Double amount;
 	
 	/** The source id. */
-	Integer sourceId;	//ims_transaction.source_id
+	//ims_transaction.source_id
+	Integer sourceId;	
 	
 	/** The source name. */
-	String sourceName;  // if list, listnms.listname
+	// if list, listnms.listname
+	String sourceName;  
 	
 	/** The scale id. */
 	Integer scaleId;
