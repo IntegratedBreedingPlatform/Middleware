@@ -54,7 +54,11 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					params.put("LoCycle", var.getValue());
 					break;
 				case "TRIAL_INSTANCE":
-					params.put("occ", Integer.valueOf(var.getValue()));
+					if("".equalsIgnoreCase(var.getValue())){
+						params.put("occ", Integer.valueOf(0));
+					}else{
+						params.put("occ", Integer.valueOf(var.getValue()));
+					}
 					break;
 				case "LOCATION_NAME":
 					params.put("lname", var.getValue());

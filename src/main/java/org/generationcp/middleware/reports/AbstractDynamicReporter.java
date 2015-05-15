@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.reports;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,7 +54,6 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 	@Override
 	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException {
 
-		String jasperFilesPath = getTemplatePath();
 		Map<String, Object> jrParams = null;
 		JRDataSource jrDataSource = null;
 		JasperReport jasperReport = null;
@@ -68,8 +68,11 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 				columnHeaders = buildColumnHeaders(collectionDataSource.iterator().next());
 
 				jrDataSource = buildJRDataSource(collectionDataSource);
-
-				JasperDesign jasperReportDesign = JRXmlLoader.load(jasperFilesPath.replace(".jasper", ".jrxml"));
+				//needed to change to input stream since code can not parse if its inside jar file
+				//for MFbNur and MFbTrial
+				InputStream jasperInputStream = getTemplateCompileInputStream();
+				//JasperDesign jasperReportDesign = JRXmlLoader.load(jasperFilesPath.replace(".jasper", ".jrxml"));
+				JasperDesign jasperReportDesign = JRXmlLoader.load(jasperInputStream);
 
 				addDynamicColumns(jasperReportDesign, columnHeaders.size());
 

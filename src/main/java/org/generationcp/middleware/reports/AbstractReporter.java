@@ -1,5 +1,6 @@
 package org.generationcp.middleware.reports;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +43,6 @@ abstract class AbstractReporter implements Reporter{
 	 */
 	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException{
 		
-		String jasperFilesPath = getTemplatePath();
 		Map<String, Object> jrParams = null;
 		JRDataSource jrDataSource = null;
 		
@@ -55,8 +55,8 @@ abstract class AbstractReporter implements Reporter{
 			}
 			
 		}
-					
-		jrPrint = JasperFillManager.fillReport(jasperFilesPath, jrParams, jrDataSource);
+		InputStream jasperReport = getTemplateInputStream();		
+		jrPrint = JasperFillManager.fillReport(jasperReport, jrParams, jrDataSource);
 
 		return jrPrint;
 		
@@ -71,40 +71,62 @@ abstract class AbstractReporter implements Reporter{
 	public Map<String, Object> buildJRParams(Map<String,Object> args){
 		Map<String, Object> params = new HashMap<String, Object>();
 
-		if(args.containsKey("datePattern"))
+		if(args.containsKey("datePattern")) {
 			params.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, args.get("datePattern"));
+		}
 		
-		if(args.containsKey("numberPattern"))
+		if(args.containsKey("numberPattern")) {
 			params.put(JsonQueryExecuterFactory.JSON_NUMBER_PATTERN, args.get("numberPattern"));
+		}
 		
-		if(args.containsKey("locale")){
-			if(args.get("locale") instanceof Locale)
+		if(args.containsKey("locale")) {
+			if(args.get("locale") instanceof Locale) {
 				params.put(JRParameter.REPORT_LOCALE, args.get("locale"));
-			else
+			} else {
 				params.put(JRParameter.REPORT_LOCALE, new Locale(args.get("locale").toString()));
-		}else{
+			}
+		}else {
 			params.put(JRParameter.REPORT_LOCALE, new Locale("en_US"));
 		}
-
+		ClassLoader loader = AbstractReporter.class.getClassLoader();
+		params.put("SUBREPORT_DIR", loader.getResource("jasper/").toExternalForm());
 		return params;
 	}
 
 	/**
-	 * Obtains the full path to the .jasper file, specified by getFileName()
+	 * Obtains the input stream to the .jasper file, specified by getFileName() 
+	 * The reason behind using input stream is that so it can work even inside a jar file
 	 * @param jasperFileName The name of the compiled .jasper file.
 	 * @return
 	 */
-	public String getTemplatePath() {
+	public InputStream getTemplateInputStream(){
 		String baseJasperDirectory = "jasper/";
 		String jasperFileName = getTemplateName();
 	   	ClassLoader loader = AbstractReporter.class.getClassLoader();
         
-	   	if(! jasperFileName.endsWith(".jasper"))
+	   	if(! jasperFileName.endsWith(".jasper")) {
         	jasperFileName = jasperFileName + ".jasper";
+	   	}
 
-        return loader.getResource(baseJasperDirectory+jasperFileName).getPath();
+        return loader.getResourceAsStream(baseJasperDirectory+jasperFileName);
 	}
+	/**
+	 * Obtains the input stream of the .jrxml file for dynamic compiling of the report
+	 * The reason behind using input stream is that so it can work even inside a jar file
+	 * 
+	 * @return
+	 */
+	public InputStream getTemplateCompileInputStream(){
+		String baseJasperDirectory = "jasper/";
+		String jasperFileName = getTemplateName();
+	   	ClassLoader loader = AbstractReporter.class.getClassLoader();
+        
+	   	if(! jasperFileName.endsWith(".jasper")) {
+        	jasperFileName = jasperFileName + ".jrxml";
+	   	}
 
+        return loader.getResourceAsStream(baseJasperDirectory+jasperFileName);
+	}
 	public void setFileNameExpression(String fileNameExpr){
 		this.fileNameExpr = fileNameExpr;
 	}
