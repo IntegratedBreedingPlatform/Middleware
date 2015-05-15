@@ -111,7 +111,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 OntologyVariableSummary variable = new OntologyVariableSummary(typeSafeObjectToInteger(items[0]), (String)items[1], (String) items[2]);
                 variable.setPropertySummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
                 variable.setMethodSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
-                variable.setScaleSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
+                variable.setScaleSummary(scaleDataManager.getScaleById(typeSafeObjectToInteger(items[9])));
                 variable.setAlias((String) items[12]);
                 variable.setMinValue((String) items[13]);
                 variable.setMaxValue((String) items[14]);
