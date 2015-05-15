@@ -6,12 +6,19 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 @Entity
 @Table(name = "listdata_project")
 public class ListDataProject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	public static final String PEDIGREE_DUPE = "Pedigree Dupe";
+	public static final String PLOT_DUPE = "Plot Dupe";
+	public static final String PEDIGREE_RECIP = "Pedigree Recip";
+	public static final String PLOT_RECIP = "Plot Recip";
 
 	@Id
     @Basic(optional = false)
@@ -250,30 +257,86 @@ public class ListDataProject implements Serializable {
 
 	public Boolean isPedigreeDupe() {
 		if(duplicate != null){
-			return duplicate.contains("Pedigree Dupe");
+			return duplicate.contains(PEDIGREE_DUPE);
 		}
 		return false;
 	}
 
 	public Boolean isPlotDupe() {
 		if(duplicate != null){
-			return duplicate.contains("Plot Dupe");
+			return duplicate.contains(PLOT_DUPE);
 		}
 		return false;
 	}
 
 	public Boolean isPedigreeRecip() {
 		if(duplicate != null){
-			return duplicate.contains("Pedigree Recip");
+			return duplicate.contains(PEDIGREE_RECIP);
 		}
 		return false;
 	}
 
 	public Boolean isPlotRecip() {
 		if(duplicate != null){
-			return duplicate.contains("Plot Recip");
+			return duplicate.contains(PLOT_RECIP);
 		}
 		return false;
+	}
+
+	public List<Integer> parsePedigreeDupeInformation() {
+		List<Integer> returnVal = new ArrayList<>();
+
+		if (! isPedigreeDupe()) {
+			return returnVal;
+		}
+
+		return parseDuplicateString(PEDIGREE_DUPE);
+	}
+
+	public List<Integer> parsePlotDupeInformation() {
+		if (! isPlotDupe()) {
+			return new ArrayList<Integer>();
+		}
+
+		return parseDuplicateString(PLOT_DUPE);
+	}
+
+	public List<Integer> parsePlotReciprocalInformation() {
+		if (! isPlotRecip()) {
+			return new ArrayList<Integer>();
+		}
+
+		return parseDuplicateString(PLOT_RECIP);
+	}
+
+	public List<Integer> parsePedigreeReciprocalInformation() {
+		if (! isPedigreeRecip()) {
+			return new ArrayList<Integer>();
+		}
+
+		return parseDuplicateString(PEDIGREE_RECIP);
+	}
+
+	protected List<Integer> parseDuplicateString(String forRemoval) {
+		String temp = duplicate.replace(forRemoval, "");
+		temp = temp.replace(":", "");
+		temp = temp.trim();
+
+		List<Integer> returnVal = new ArrayList<>();
+		StringTokenizer tokenizer = new StringTokenizer(temp, ",");
+
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken().trim();
+
+			if (token.length() == 0) {
+				continue;
+			}
+
+			returnVal.add( Integer.valueOf(token) );
+
+		}
+
+		return returnVal;
 	}
 
 }
