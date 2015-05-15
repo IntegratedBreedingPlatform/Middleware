@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-20T15:11:10 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-05-14T13:33:12 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="wfb_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="47db8205-62d7-4489-a5ad-ae8fa86f56b8">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -640,7 +640,7 @@
 			</textField>
 			<image>
 				<reportElement key="image-1" x="5" y="5" width="245" height="70" uuid="14f6caa4-1726-469e-ba88-4461d135a4e5"/>
-				<imageExpression><![CDATA["../img/logo.png"]]></imageExpression>
+				<imageExpression><![CDATA["img/logo.png"]]></imageExpression>
 			</image>
 			<line>
 				<reportElement key="line-1" x="4" y="719" width="563" height="1" uuid="c3218073-c460-4c33-b087-fe32854563b8"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-18T16:25:20 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-05-14T13:33:07 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb26_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="d2d09ff1-8954-4f03-9bf3-c6716eeef7ad">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
@@ -490,7 +490,7 @@
 			</textField>
 			<image>
 				<reportElement key="image-1" x="5" y="5" width="245" height="70" uuid="528191e8-1fba-4cf8-a3f3-83c4c36bee31"/>
-				<imageExpression><![CDATA["../img/logo.png"]]></imageExpression>
+				<imageExpression><![CDATA["img/logo.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement key="staticText-2" positionType="Float" stretchType="RelativeToBandHeight" x="125" y="125" width="338" height="65" uuid="b54aaf56-8a27-4b5b-9368-243493c27528"/>
