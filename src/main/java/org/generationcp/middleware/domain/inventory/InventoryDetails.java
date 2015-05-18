@@ -727,8 +727,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void addBulkWith(String bulkWith) {
 		if (this.bulkWith == null) {
 			this.bulkWith = bulkWith;
-		} else if (!this.bulkWith.equals(bulkWith) && ! this.bulkWith.contains("," + bulkWith + " ")) {
-			this.bulkWith += "," + bulkWith + " ";
+		} else if (!this.bulkWith.equals(bulkWith) && ! this.bulkWith.contains(", " + bulkWith)) {
+			this.bulkWith += ", " + bulkWith;
 		}
 	}
 	
