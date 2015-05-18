@@ -1,11 +1,17 @@
 package org.generationcp.middleware.manager.ontology;
 
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermRelationship;
+import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TermDataManagerImpl extends DataManager implements TermDataManager {
@@ -32,5 +38,58 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
     @Override
     public boolean isTermReferred(int termId) throws MiddlewareException {
         return getCvTermRelationshipDao().isTermReferred(termId);
+    }
+
+    @Override
+    public List<TermRelationship> getRelationshipsWithObjectAndType(Integer objectId, TermRelationshipId relationshipId) throws MiddlewareException {
+
+        List<TermRelationship> termRelationships = new ArrayList<>();
+
+        try {
+
+            SQLQuery query = getActiveSession().createSQLQuery(
+                    "select cr.cvterm_relationship_id rid, cr.type_id rtype, " +
+                            "s.cv_id scv, s.cvterm_id scvid, s.name sname, s.definition sdescription, " +
+                            "o.cv_id ocv, o.cvterm_id ocvid, o.name oname, o.definition odescription " +
+                            "from cvterm_relationship cr " +
+                            "inner join cvterm s on s.cvterm_id = cr.subject_id " +
+                            "inner join cvterm o on o.cvterm_id = cr.object_id " +
+                            "where cr.object_id = :objectId and cr.type_id = :typeId")
+                    .addScalar("rid", new org.hibernate.type.IntegerType())
+                    .addScalar("rtype", new org.hibernate.type.IntegerType())
+                    .addScalar("scv", new org.hibernate.type.IntegerType())
+                    .addScalar("scvid", new org.hibernate.type.IntegerType())
+                    .addScalar("sname", new org.hibernate.type.StringType())
+                    .addScalar("sdescription", new org.hibernate.type.StringType())
+                    .addScalar("ocv", new org.hibernate.type.IntegerType())
+                    .addScalar("ocvid", new org.hibernate.type.IntegerType())
+                    .addScalar("oname", new org.hibernate.type.StringType())
+                    .addScalar("odescription", new org.hibernate.type.StringType());
+
+            query.setParameter("objectId", objectId);
+            query.setParameter("typeId", relationshipId.getId());
+
+            List result = query.list();
+
+            for (Object row : result) {
+                Object[] items = (Object[]) row;
+
+                //Check is row does have objects to access
+                if (items.length == 0) {
+                    continue;
+                }
+
+                TermRelationship relationship = new TermRelationship();
+                relationship.setId(typeSafeObjectToInteger(items[0]));
+                relationship.setRelationshipId(TermRelationshipId.getById(typeSafeObjectToInteger(items[1])));
+                relationship.setSubjectTerm(new Term(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5], typeSafeObjectToInteger(items[2]), false));
+                relationship.setObjectTerm(new Term(typeSafeObjectToInteger(items[7]), (String) items[8], (String) items[9], typeSafeObjectToInteger(items[6]), false));
+                termRelationships.add(relationship);
+            }
+        }  catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error at getRelationshipsWithObjectAndType :" + e.getMessage(), e);
+        }
+
+        return termRelationships;
     }
 }

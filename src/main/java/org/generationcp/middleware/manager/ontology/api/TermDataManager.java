@@ -13,6 +13,8 @@
 package org.generationcp.middleware.manager.ontology.api;
 
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermRelationship;
+import org.generationcp.middleware.domain.oms.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 
 import java.util.List;
@@ -43,4 +45,12 @@ public interface TermDataManager {
      * Checks if term has referred to other term.
      */
     boolean isTermReferred(int termId) throws MiddlewareException;
+
+    /**
+     * @param objectId method, property or scale id
+     * @param relationshipId which will show type of relationship
+     * @return This will return list of relationships which have type of relationship is relationshipId and object_id is objectId
+     * @throws MiddlewareException
+     */
+    List<TermRelationship> getRelationshipsWithObjectAndType(Integer objectId, TermRelationshipId relationshipId) throws MiddlewareException;
 }

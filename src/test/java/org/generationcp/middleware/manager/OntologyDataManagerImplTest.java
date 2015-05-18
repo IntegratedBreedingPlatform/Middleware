@@ -95,6 +95,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testGetStandardVariableSummary() throws MiddlewareQueryException {
 		// Load summary from the view based method
@@ -163,7 +164,10 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		this.assertTermDataMatches(details.getMethod(), summary.getMethod());
 		this.assertTermDataMatches(details.getScale(), summary.getScale());
 		this.assertTermDataMatches(details.getIsA(), summary.getIsA());
-		this.assertTermDataMatches(details.getDataType(), summary.getDataType());
+
+		//TODO: This is deprecated and will be removed from new OM
+		//this.assertTermDataMatches(details.getDataType(), summary.getDataType());
+
 		this.assertTermDataMatches(details.getStoredIn(), summary.getStoredIn());
 
 		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
