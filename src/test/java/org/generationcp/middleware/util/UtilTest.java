@@ -23,4 +23,13 @@ public class UtilTest {
 		assertEquals("It should return the original value: "+value,
 				0, Util.zeroIfNull(value).compareTo(value));
 	}
+	
+	@Test
+	public void testPrependToCSV() {
+		String valueToPrepend = "SID1-1";
+		String csv = "SID-2,SID-3";
+		String expectedValue = "SID1-1,SID-2,SID-3";
+		assertEquals("It should return "+expectedValue,expectedValue,
+				Util.prependToCSV(valueToPrepend, csv));
+	}
 }

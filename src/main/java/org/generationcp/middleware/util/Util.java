@@ -250,6 +250,10 @@ public class Util{
     	}
     	return value;
     }
+    
+	public static String prependToCSV(String valueToPrepend, String csv) {
+		return valueToPrepend+","+csv;
+	}
 }
 
 

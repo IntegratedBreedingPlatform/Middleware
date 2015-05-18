@@ -12,6 +12,7 @@
 package org.generationcp.middleware.domain.inventory;
 
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.util.Util;
 
 import java.io.Serializable;
 
@@ -24,6 +25,8 @@ import java.io.Serializable;
 public class InventoryDetails implements Comparable<InventoryDetails>, Serializable{
 	
 	private static final long serialVersionUID = 1L;
+	public static final String BULK_COMPL_Y = "Y";
+	public static final String BULK_COMPL_COMPLETED = "Completed";
 
 	/** The index. */
 	Integer index;
@@ -94,6 +97,10 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The ff. fields are used for importing inventory for stock list */
 	private Integer listDataProjectId;
 	private Integer trnId;
+	
+	/** This is used for executing bulking instructions */
+	private Integer sourceRecordId;
+	private Integer lotGid;
 	
 	/**
 	 * Instantiates a new inventory details.
@@ -166,7 +173,15 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the gid
 	 */
 	public Integer getGid() {
+		if(isBulkingDonor()) {
+			return null;
+		}
 		return gid;
+	}
+
+	public boolean isBulkingDonor() {
+		return BULK_COMPL_COMPLETED.equals(bulkCompl) &&
+				!gid.equals(lotGid);
 	}
 
 	/**
@@ -184,6 +199,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the germplasm name
 	 */
 	public String getGermplasmName() {
+		if(isBulkingDonor()) {
+			return null;
+		}
 		return germplasmName;
 	}
 
@@ -652,7 +670,15 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getInventoryID() {
+		if(isBulkingRecipient()) {
+			return Util.prependToCSV(inventoryID,bulkWith);
+		}
 		return inventoryID;
+	}
+
+	public boolean isBulkingRecipient() {
+		return BULK_COMPL_COMPLETED.equals(bulkCompl) &&
+				gid.equals(lotGid);
 	}
 
 	public void setInventoryID(String inventoryID) {
@@ -722,6 +748,22 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setTrnId(Integer trnId) {
 		this.trnId = trnId;
+	}
+
+	public Integer getSourceRecordId() {
+		return sourceRecordId;
+	}
+
+	public void setSourceRecordId(Integer sourceRecordId) {
+		this.sourceRecordId = sourceRecordId;
+	}
+
+	public Integer getLotGid() {
+		return lotGid;
+	}
+
+	public void setLotGid(Integer lotGid) {
+		this.lotGid = lotGid;
 	}
 
 	public void addBulkWith(String bulkWith) {
