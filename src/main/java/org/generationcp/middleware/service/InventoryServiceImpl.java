@@ -120,4 +120,10 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 	public List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type) throws MiddlewareQueryException {
 		return getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId, type);
 	}
+
+	@Override
+	public boolean stockHasCompletedBulking(Integer listId)
+			throws MiddlewareQueryException {
+		return getStockTransactionDAO().stockHasCompletedBulking(listId);
+	}
 }

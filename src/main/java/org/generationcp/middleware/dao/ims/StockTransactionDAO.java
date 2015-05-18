@@ -1,5 +1,9 @@
 package org.generationcp.middleware.dao.ims;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
@@ -9,9 +13,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Daniel Villafuerte on 5/5/2015.
@@ -121,4 +122,23 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
 
         return detailsList;
     }
+
+	public boolean stockHasCompletedBulking(Integer listId) throws MiddlewareQueryException {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(1) ");
+		sql.append("FROM ims_stock_transaction ist ");
+		sql.append("INNER JOIN listdata_project d ");
+		sql.append("ON d.listdata_project_id = ist.listdata_project_id ");
+		sql.append("INNER JOIN ims_transaction tran ");
+		sql.append("ON tran.trnid = ist.trnid ");
+		sql.append("WHERE d.list_id = :listId ");
+		sql.append("AND tran.bulk_compl = 'Completed' ");
+		Query query = getSession().createSQLQuery(sql.toString());
+        query.setInteger("listId", listId);
+        BigInteger numberOfRecords = (BigInteger)query.uniqueResult();
+		if(numberOfRecords.intValue() > 0) {
+			return true;
+		}
+		return false;
+	}
 }
