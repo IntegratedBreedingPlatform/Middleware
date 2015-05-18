@@ -430,16 +430,10 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
         }
 
         //Check weather term is referred
-        if (getCvTermRelationshipDao().getRelationshipByObjectId(termId) != null) {
-            return;
+        if (getCvTermRelationshipDao().getByObjectId(termId).isEmpty() && getCvTermRelationshipDao().getBySubject(termId).isEmpty()) {
+            //Term is not referred anywhere and can be delete
+            getCvTermDao().makeTransient(term);
         }
 
-        List<CVTermRelationship> termRelationships = getCvTermRelationshipDao().getBySubject(termId);
-
-        for(CVTermRelationship r : termRelationships) {
-            getCvTermRelationshipDao().makeTransient(r);
-        }
-
-        getCvTermDao().makeTransient(term);
     }
 }

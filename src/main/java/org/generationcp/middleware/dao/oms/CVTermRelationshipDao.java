@@ -144,6 +144,27 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
     }
 
     @SuppressWarnings("unchecked")
+    public List<CVTermRelationship> getByObjectId(int objectId) throws MiddlewareQueryException {
+
+        List<CVTermRelationship> relationships = new ArrayList<>();
+
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("objectId", objectId));
+
+            List cvList = criteria.list();
+            for(Object r : cvList){
+                relationships.add((CVTermRelationship) r);
+            }
+
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByObjectId=" + objectId, e);
+
+        }
+        return relationships;
+    }
+
+    @SuppressWarnings("unchecked")
     public CVTermRelationship getRelationshipByObjectId(int objectId) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(getPersistentClass());
