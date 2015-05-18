@@ -367,5 +367,29 @@ public class MeasurementVariable {
 	public void setPossibleValuesString(String possibleValuesString) {
 		this.possibleValuesString = possibleValuesString;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		
+		 if (this == obj)
+	         return true;
+	      if (obj == null)
+	         return false;
+	      if (getClass() != obj.getClass())
+	         return false;
+	      MeasurementVariable other = (MeasurementVariable) obj;
+	      if (termId != other.termId)
+	         return false;
+	      
+	      return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+        int result = 1;
+        result = prime * result + termId;
+        return result;
+	}
 
 }
