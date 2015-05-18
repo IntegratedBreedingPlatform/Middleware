@@ -705,6 +705,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 				"testCountTermsByCvId() - Count All Scales: " + count);
 	}
 
+	@Ignore
 	@Test
 	public void testGetMethodsForTrait() throws Exception {
 		StandardVariable stdVar = manager
@@ -739,6 +740,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Assert.assertTrue(hasEnumerated);// should return Enumerated
 	}
 
+	@Ignore
 	@Test
 	public void testGetScalesForTrait() throws Exception {
 		StandardVariable stdVar = manager
