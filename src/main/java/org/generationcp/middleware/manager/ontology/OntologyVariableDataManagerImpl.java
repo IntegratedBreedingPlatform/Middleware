@@ -242,17 +242,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
             //Setting method to variable
             if(variableInfo.getMethodId() != null){
-                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_METHOD.getId(), variableInfo.getMethodId());
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_METHOD.getId(), variableInfo.getMethodId());
             }
 
             //Setting property to variable
             if(variableInfo.getPropertyId() != null){
-                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_PROPERTY.getId(), variableInfo.getPropertyId());
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_PROPERTY.getId(), variableInfo.getPropertyId());
             }
 
             //Setting scale to variable
             if(variableInfo.getScaleId() != null){
-                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_SCALE.getId(), variableInfo.getScaleId());
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_SCALE.getId(), variableInfo.getScaleId());
             }
 
             int rank = 0;
@@ -326,7 +326,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
             //Setting method to variable
             if(methodRelation == null) {
-                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_METHOD.getId(), variableInfo.getMethodId());
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_METHOD.getId(), variableInfo.getMethodId());
             } else if(!Objects.equals(methodRelation.getObjectId(), variableInfo.getMethodId())){
                 methodRelation.setObjectId(variableInfo.getMethodId());
                 getCvTermRelationshipDao().merge(methodRelation);
@@ -334,7 +334,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
             //Setting property to variable
             if(propertyRelation == null) {
-                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_PROPERTY.getId(), variableInfo.getPropertyId());
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_PROPERTY.getId(), variableInfo.getPropertyId());
             } else if(!Objects.equals(propertyRelation.getObjectId(), variableInfo.getPropertyId())){
                 propertyRelation.setObjectId(variableInfo.getPropertyId());
                 getCvTermRelationshipDao().merge(propertyRelation);
@@ -342,7 +342,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
             //Setting scale to variable
             if(scaleRelation == null) {
-                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationship.HAS_SCALE.getId(), variableInfo.getScaleId());
+                getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_SCALE.getId(), variableInfo.getScaleId());
             } else if(!Objects.equals(scaleRelation.getObjectId(), variableInfo.getScaleId())){
                 scaleRelation.setObjectId(variableInfo.getScaleId());
                 getCvTermRelationshipDao().merge(scaleRelation);
@@ -513,11 +513,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         //load scale, method and property data
         List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(variableTerm.getCvTermId());
         for(CVTermRelationship  relationship : relationships) {
-            if(Objects.equals(relationship.getTypeId(), TermRelationship.HAS_METHOD.getId())){
+            if(Objects.equals(relationship.getTypeId(), TermRelationshipId.HAS_METHOD.getId())){
                 methodRelation = relationship;
-            } else if(Objects.equals(relationship.getTypeId(), TermRelationship.HAS_PROPERTY.getId())){
+            } else if(Objects.equals(relationship.getTypeId(), TermRelationshipId.HAS_PROPERTY.getId())){
                 propertyRelation = relationship;
-            } else if(Objects.equals(relationship.getTypeId(), TermRelationship.HAS_SCALE.getId())) {
+            } else if(Objects.equals(relationship.getTypeId(), TermRelationshipId.HAS_SCALE.getId())) {
                 scaleRelation = relationship;
             }
         }

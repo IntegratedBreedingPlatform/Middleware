@@ -1,6 +1,6 @@
 package org.generationcp.middleware.domain.oms;
 
-public enum TermRelationship {
+public enum TermRelationshipId {
 
     //CV Term Relationship
     HAS_METHOD(1210)
@@ -13,7 +13,7 @@ public enum TermRelationship {
 
     private final int id;
 
-    private TermRelationship(int id) {
+    private TermRelationshipId(int id) {
         this.id = id;
     }
 
@@ -21,8 +21,8 @@ public enum TermRelationship {
         return this.id;
     }
 
-    public static TermRelationship getById(int id) {
-        for (TermRelationship term : values()) {
+    public static TermRelationshipId getById(int id) {
+        for (TermRelationshipId term : values()) {
             if (term.getId() == id) {
                 return term;
             }

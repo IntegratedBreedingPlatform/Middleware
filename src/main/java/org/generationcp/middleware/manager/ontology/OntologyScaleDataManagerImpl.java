@@ -197,7 +197,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
             scale.setId(savedTerm.getCvTermId());
 
             //Setting dataType to Scale and saving relationship
-            getCvTermRelationshipDao().save(scale.getId(), TermRelationship.HAS_TYPE.getId(), scale.getDataType().getId());
+            getCvTermRelationshipDao().save(scale.getId(), TermRelationshipId.HAS_TYPE.getId(), scale.getDataType().getId());
 
             //Saving values if present
             if (!Strings.isNullOrEmpty(scale.getMinValue())) {
