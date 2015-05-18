@@ -909,4 +909,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             session.clear();
         }
 	}
+	
+	@Override
+    public Lot getLotById(Integer id) throws MiddlewareQueryException {
+        return getLotDao().getById(id, false);
+    }
 }

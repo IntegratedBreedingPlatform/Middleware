@@ -12,8 +12,6 @@
 package org.generationcp.middleware.manager;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -668,5 +666,10 @@ public class InventoryDataManagerImplTestIT extends DataManagerIntegrationTest {
 		data.put(AMOUNT_KEY, inventoryDetails.getAmount());
 		data.put(COMMENT_KEY, inventoryDetails.getComment());
 		return data;
+	}
+	
+	@Test
+	public void testGetLotById() throws MiddlewareQueryException {
+		assertNotNull(manager.getLotById(1));
 	}
 }

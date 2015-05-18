@@ -684,4 +684,6 @@ public interface InventoryDataManager{
     List<String> getStockIdsByListDataProjectListId(Integer listId) throws MiddlewareQueryException;
 
 	void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailListFromDB) throws MiddlewareQueryException;
+
+	Lot getLotById(Integer id) throws MiddlewareQueryException;
 }
