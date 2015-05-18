@@ -122,6 +122,11 @@ public class DatabaseSetupUtil{
 		centralCommonGitURL = gitUrl + "/merged/common-update";
 		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, cropConnectionParameters);
 
+		//copy and execute merged/common-migration-410 scripts
+		checkoutURL = prefixDirectory+"/database/merged/common-migration-410";
+		centralCommonGitURL = gitUrl + "/merged/common-migration-410";
+		checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, cropConnectionParameters);
+
 		LOG.debug("  >>> Central DB initialized - all scripts from IBDBScripts ran successfully.");
 	}
 
@@ -225,7 +230,7 @@ public class DatabaseSetupUtil{
 		Map<String, List<File>> scriptsMap = setupScripts();
 
 		createTestDatabase(workbenchConnectionParameters, scriptsMap.get(WORKBENCH_SCRIPT));
-		createTestDatabase(cropConnectionParameters, scriptsMap.get(CROP_SCRIPT));	
+		createTestDatabase(cropConnectionParameters, scriptsMap.get(CROP_SCRIPT));
 	}
 
 
