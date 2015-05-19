@@ -671,7 +671,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public String getInventoryID() {
 		if(isBulkingRecipient()) {
-			return Util.prependToCSV(inventoryID,bulkWith);
+			return Util.prependToCSVAndArrange(inventoryID,bulkWith);
 		}
 		return inventoryID;
 	}

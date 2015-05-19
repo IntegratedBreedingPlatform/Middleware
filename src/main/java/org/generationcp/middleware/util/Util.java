@@ -252,7 +252,30 @@ public class Util{
     }
     
 	public static String prependToCSV(String valueToPrepend, String csv) {
-		return valueToPrepend+","+csv;
+		return valueToPrepend+", "+csv;
+	}
+	
+	public static String prependToCSVAndArrange(String valueToPrepend, String csv) {
+		String updatedValue = prependToCSV(valueToPrepend,csv);
+		String[] values = updatedValue.split(",");
+		Set<String> valueSet = new TreeSet<String>();
+		for (String value : values) {
+			valueSet.add(value.trim());
+		}
+		return convertCollectionToCSV(valueSet);
+	}
+	
+	public static String convertCollectionToCSV(Collection<String> collection) {
+		int i = 0;
+		StringBuilder csv = new StringBuilder();
+		for (String value : collection) {
+			if(i!=0) {
+				csv.append(", ");
+			}
+			csv.append(value);
+			i++;
+		}
+		return csv.toString();
 	}
 }
 
