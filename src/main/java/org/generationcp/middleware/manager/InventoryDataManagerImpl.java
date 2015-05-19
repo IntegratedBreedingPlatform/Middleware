@@ -887,10 +887,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 				if(germplasmListType == GermplasmListType.CROSSES) {
 					transaction.setBulkWith(Util.nullIfEmpty(inventoryDetails.getBulkWith()));
 					transaction.setBulkCompl(Util.nullIfEmpty(inventoryDetails.getBulkCompl()));
-					ListDataProject listDataProject = 
-							getListDataProjectDAO().getById(inventoryDetails.getListDataProjectId());
-					listDataProject.setDuplicate(Util.nullIfEmpty(inventoryDetails.getDuplicate()));
-					getListDataProjectDAO().saveOrUpdate(listDataProject);
 				}
 				getTransactionDao().saveOrUpdate(transaction);
 				if(numberOfEntries % JDBC_BATCH_SIZE == 0) {
