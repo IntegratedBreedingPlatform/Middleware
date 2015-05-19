@@ -113,6 +113,7 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		getInventoryDataManager().addTransaction(transaction);
 
 		StockTransaction stockTransaction = new StockTransaction(null, listDataProject, transaction);
+		stockTransaction.setSourceRecordId(transaction.getSourceRecordId());
 		getInventoryDataManager().addStockTransaction(stockTransaction);
 	}
 

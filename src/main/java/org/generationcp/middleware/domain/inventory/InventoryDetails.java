@@ -101,6 +101,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** This is used for executing bulking instructions */
 	private Integer sourceRecordId;
 	private Integer lotGid;
+	private Integer stockSourceRecordId;
 	
 	/**
 	 * Instantiates a new inventory details.
@@ -181,7 +182,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public boolean isBulkingDonor() {
 		return isBulkingCompleted() &&
-				!gid.equals(lotGid);
+				!sourceRecordId.equals(stockSourceRecordId);
 	}
 
 	/**
@@ -678,7 +679,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public boolean isBulkingRecipient() {
 		return isBulkingCompleted() &&
-				gid.equals(lotGid);
+				sourceRecordId.equals(stockSourceRecordId);
 	}
 
 	public void setInventoryID(String inventoryID) {
@@ -777,5 +778,15 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public boolean isBulkingCompleted() {
 		return BULK_COMPL_COMPLETED.equals(bulkCompl);
 	}
+
+	public Integer getStockSourceRecordId() {
+		return stockSourceRecordId;
+	}
+
+	public void setStockSourceRecordId(Integer stockSourceRecordId) {
+		this.stockSourceRecordId = stockSourceRecordId;
+	}
+	
+	
 	
 }

@@ -59,17 +59,41 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                 "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, " +
                 "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid, " +
                 "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, " +
-                "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid " +
+                "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId " +
                 "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id " +
                 "INNER JOIN listnms ON d.list_id = listnms.listid " +
                 "INNER JOIN ims_transaction tran ON tran.trnid = ist.trnid INNER JOIN ims_lot lot ON lot.lotid = tran.lotid " +
                 "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid " +
-                "WHERE listnms.listid = :listId";
+                "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
         try {
-            Query query = getSession().createSQLQuery(sql);
+            Query query = getSession().createSQLQuery(sql)
+            		.addScalar("lotId")
+		            .addScalar("locid")
+		            .addScalar("scaleid")
+		            .addScalar("userid")
+		            .addScalar("germplasm_id")
+		            .addScalar("entry_id")
+		            .addScalar("seed_source")
+		            .addScalar("designation")
+		            .addScalar("group_name")
+		            .addScalar("lname")
+		            .addScalar("labbr")
+		            .addScalar("name")
+		            .addScalar("trnqty")
+		            .addScalar("comments")
+		            .addScalar("inventory_id")
+		            .addScalar("sourceid")
+		            .addScalar("duplicate_notes")
+		            .addScalar("bulk_with")
+		            .addScalar("bulk_compl")
+		            .addScalar("listdata_project_id")
+		            .addScalar("trnid")
+		            .addScalar("recordid")
+		            .addScalar("eid")
+		            .addScalar("stockSourceRecordId");
             query.setInteger("listId", listDataProjectListId);
-
+            
             List<Object[]> results = query.list();
 
             if (!results.isEmpty()){
@@ -97,6 +121,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
     	        	Integer trnId = (Integer) row[20];
     	        	Integer sourceRecordId = (Integer) row[21];
     	        	Integer lotGid = (Integer) row[22];
+    	        	Integer stockSourceRecordId = (Integer) row[23];
 
                     InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
                             userId, amount, sourceId, null, scaleId, scaleName, comments);
@@ -112,6 +137,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                     details.setTrnId(trnId);
                     details.setSourceRecordId(sourceRecordId);
                     details.setLotGid(lotGid);
+                    details.setStockSourceRecordId(stockSourceRecordId);
                     detailsList.add(details);
 
                 }
