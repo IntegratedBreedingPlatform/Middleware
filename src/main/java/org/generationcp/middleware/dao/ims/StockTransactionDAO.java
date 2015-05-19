@@ -96,7 +96,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
     	        	Integer listDataProjectId = (Integer) row[19];
     	        	Integer trnId = (Integer) row[20];
     	        	Integer sourceRecordId = (Integer) row[21];
-    	        	Integer lotGid = (Integer) row[21];
+    	        	Integer lotGid = (Integer) row[22];
 
                     InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
                             userId, amount, sourceId, null, scaleId, scaleName, comments);

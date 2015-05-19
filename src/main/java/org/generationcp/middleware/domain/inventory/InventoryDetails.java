@@ -180,7 +180,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public boolean isBulkingDonor() {
-		return BULK_COMPL_COMPLETED.equals(bulkCompl) &&
+		return isBulkingCompleted() &&
 				!gid.equals(lotGid);
 	}
 
@@ -677,7 +677,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public boolean isBulkingRecipient() {
-		return BULK_COMPL_COMPLETED.equals(bulkCompl) &&
+		return isBulkingCompleted() &&
 				gid.equals(lotGid);
 	}
 
@@ -772,6 +772,10 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		} else if (!this.bulkWith.equals(bulkWith) && ! this.bulkWith.contains(", " + bulkWith)) {
 			this.bulkWith += ", " + bulkWith;
 		}
+	}
+	
+	public boolean isBulkingCompleted() {
+		return BULK_COMPL_COMPLETED.equals(bulkCompl);
 	}
 	
 }

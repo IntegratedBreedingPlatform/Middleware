@@ -42,6 +42,10 @@ public class StockTransactionDAOTest extends MiddlewareIntegrationTest {
 			assertNotNull(inventoryDetails.getTrnId());
 			assertNotNull(inventoryDetails.getSourceRecordId());
 			assertNotNull(inventoryDetails.getLotGid());
+			if(inventoryDetails.isBulkingCompleted()) {
+				assertEquals(InventoryDetails.BULK_COMPL_COMPLETED,
+						inventoryDetails.getBulkCompl());
+			}
 			if(inventoryDetails.isBulkingDonor()) {
 				assertEquals(InventoryDetails.BULK_COMPL_COMPLETED,
 						inventoryDetails.getBulkCompl());
