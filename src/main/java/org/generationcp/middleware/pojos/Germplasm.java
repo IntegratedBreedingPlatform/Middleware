@@ -334,11 +334,17 @@ public class Germplasm implements Serializable{
     @XmlElement(name = "numberOfProgenitors")
     private Integer gnpgs;
 
+    /**
+     * Usually female parent.
+     */
     @Basic(optional = false)
     @Column(name = "gpid1")
     @XmlElement(name = "firstParent")
     private Integer gpid1;
 
+    /**
+     * Usually male parent.
+     */
     @Basic(optional = false)
     @Column(name = "gpid2")
     @XmlElement(name = "secondParent")

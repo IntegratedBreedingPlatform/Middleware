@@ -65,7 +65,7 @@ public class ManagerFactory implements Serializable {
     private String databaseName;
     private String cropName;
     private String pedigreeProfile;
-    private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal();
+    private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
     
     public ManagerFactory() {
     	currentManagerFactory.set(this);

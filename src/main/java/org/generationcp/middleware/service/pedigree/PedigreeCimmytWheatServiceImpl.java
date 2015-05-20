@@ -17,7 +17,7 @@ import org.generationcp.middleware.util.CrossExpansionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeService{
+public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeService {
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 	private CimmytWheatNameUtil cimmytWheatNameUtil;
 	private static final int NSTAT_DELETED = 9;
@@ -44,9 +44,14 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 	public String getCrossExpansion(Integer gid, Integer level,
 			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
 		Germplasm germplasm =  getGermplasmDataManager().getGermplasmWithPrefName(gid);
+		return getCrossExpansion(germplasm, level, crossExpansionProperties);
+	}
+	
+	@Override
+	public String getCrossExpansion(final Germplasm germplasm, final Integer level, final CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
 		if (germplasm != null) {
     		try {
-				return getCimmytWheatPedigree(gid, level == null ? crossExpansionProperties.getWheatLevel() : level, new Germplasm(), 0, 0, 0, 0, 0);
+				return getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getWheatLevel() : level, new Germplasm(), 0, 0, 0, 0, 0);
 			} catch (Exception e) {
 				LOG.error(e.getMessage(), e);
 				throw new MiddlewareQueryException(e.getMessage(), e);
@@ -54,7 +59,8 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
         } else {
             return "";
         }
-	}
+	}   
+	
 	private List<Name> getCimmytWheatWayNamesList(int gid,List<Integer> ntypeArray, List<Integer> nstatArray, List<Integer> nuiArray) throws MiddlewareQueryException{		
 		
 		List<Name> nameList  = getNameDao().getByGIDWithFilters(gid, null, null);
@@ -83,9 +89,10 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
      * @return
      * @throws Exception
      */
-    public String getCimmytWheatPedigree(int pGid, int level, Germplasm parentGermplasmClass, int femaleBackcrossGid, int maleBackcrossGid, int Resp1, int Resp2, int ntype) throws Exception {
+    private String getCimmytWheatPedigree(final Germplasm grTemp, final int level, final Germplasm parentGermplasmClass, 
+    		final int femaleBackcrossGid, final int maleBackcrossGid, final int Resp1, final int Resp2, final int ntype) throws Exception {
         
-        LOG.debug("Armando pedigree con [p_gid] " + pGid + " [nivel] " + level + " [fback] " + femaleBackcrossGid + " [mback] " + maleBackcrossGid + " [Resp1] " + Resp1 + " [Resp2] " + Resp2);
+        LOG.debug("Armando pedigree con [p_gid] " + grTemp.getGid() + " [nivel] " + level + " [fback] " + femaleBackcrossGid + " [mback] " + maleBackcrossGid + " [Resp1] " + Resp1 + " [Resp2] " + Resp2);
         int xCurrent = 0;
         int xMax     = 0;        
         String armaPedigree = "";
@@ -107,23 +114,18 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
         String longStr;
         String shortStr;
         boolean backCrossFound = false;
-        Germplasm grTemp = new Germplasm();
-        grTemp.setGid(0);
-        grTemp.setGpid1(0);
-        grTemp.setGpid2(0);
-        List<Name> listNL = null;
+        List<Name> listNL = new ArrayList<Name>();
         int vecesRep = 0;
         
         
         try {
-            Germplasm temp = getGermplasmDataManager().getGermplasmByGID(pGid);
-            if(temp != null){
-            	grTemp = temp;
-            }
+
             if (grTemp.getGid() == 0) {
                 return "";
             }
-            listNL = getCimmytWheatWayNamesList(grTemp.getGid(), Arrays.asList(cimmytWheatNameUtil.getNtypeArray()), Arrays.asList(cimmytWheatNameUtil.getNstatArray()), Arrays.asList(cimmytWheatNameUtil.getNuidArray()));
+            if(grTemp.getGid() != Integer.MAX_VALUE) {
+            	listNL = getCimmytWheatWayNamesList(grTemp.getGid(), Arrays.asList(cimmytWheatNameUtil.getNtypeArray()), Arrays.asList(cimmytWheatNameUtil.getNstatArray()), Arrays.asList(cimmytWheatNameUtil.getNuidArray()));
+            }
             //since it should not be dependent on the status anymore
             // Determine if there was a Female or Male Backcross, that should be used in the pedigree, then the proper name of the
             // line can't be used. For instance if the name is 27217-A-4-8 and the pedigree is also MT/BRT and we are
@@ -176,7 +178,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
         }
         // If the current GID is identical to one of the backcross GIDs that must be respected,
         // cancel it as a backross and find a proper name
-        if (Resp1 == pGid || Resp2 == pGid) {
+        if (Resp1 == grTemp.getGid() || Resp2 == grTemp.getGid() ) {
             backCrossFound = false;
         }
         if ((!listNL.isEmpty()) && !(backCrossFound)) {        	
@@ -199,21 +201,21 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
                 ped = "Unknown";
             } else {
                 if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid2() != 0)) {
-                    ped = getCimmytWheatPedigree(grTemp.getGpid2(), level, parentGermplasmClass, femaleBackcrossGid, maleBackcrossGid, Resp1, Resp2, ntype);
+                    ped = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid2()), level, parentGermplasmClass, femaleBackcrossGid, maleBackcrossGid, Resp1, Resp2, ntype);
                 } else if ((grTemp.getGnpgs() == -1) && (grTemp.getGpid1() != 0)) {
-                    ped = getCimmytWheatPedigree(grTemp.getGpid1(), level, parentGermplasmClass, femaleBackcrossGid, maleBackcrossGid, Resp1, Resp2, ntype);
+                    ped = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid1()), level, parentGermplasmClass, femaleBackcrossGid, maleBackcrossGid, Resp1, Resp2, ntype);
                 } else {
                     parentGermplasmClass.setGpid1(grTemp.getGpid1());
                     parentGermplasmClass.setGpid2(grTemp.getGpid2());
                     if (grTemp.getGpid1() == femaleBackcrossGid) {
-                        p1 = getCimmytWheatPedigree(grTemp.getGpid1(), level + 1, fGpidInfClass, 0, 0, Resp1, Resp2, ntype);
+                        p1 = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid1()), level + 1, fGpidInfClass, 0, 0, Resp1, Resp2, ntype);
                     } else {
-                        p1 = getCimmytWheatPedigree(grTemp.getGpid1(), level + 1, fGpidInfClass, 0, grTemp.getGpid2(), Resp1, Resp2, ntype);
+                        p1 = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid1()), level + 1, fGpidInfClass, 0, grTemp.getGpid2(), Resp1, Resp2, ntype);
                     }
                     if (grTemp.getGpid2() == maleBackcrossGid) {
-                        p2 = getCimmytWheatPedigree(grTemp.getGpid2(), level + 1, mGpidInfClass, 0, 0, Resp1, Resp2, ntype);
+                        p2 = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid2()), level + 1, mGpidInfClass, 0, 0, Resp1, Resp2, ntype);
                     } else {
-                        p2 = getCimmytWheatPedigree(grTemp.getGpid2(), level + 1, mGpidInfClass, grTemp.getGpid1(), 0, Resp1, Resp2, ntype);
+                        p2 = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid2()), level + 1, mGpidInfClass, grTemp.getGpid1(), 0, Resp1, Resp2, ntype);
                     }
                 }
 //         ' Since female/male backcross is a bit meaningless when IWIS2 false backrosses are handled, then
@@ -232,8 +234,8 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
                             fGpidInfClass.setGpid2(0);
                             mGpidInfClass.setGpid1(0);
                             mGpidInfClass.setGpid2(0);
-                            p1 = getCimmytWheatPedigree(grTemp.getGpid1(), level + 1, fGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
-                            p2 = getCimmytWheatPedigree(grTemp.getGpid2(), level + 1, mGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
+                            p1 = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid1()), level + 1, fGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
+                            p2 = getCimmytWheatPedigree(getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid2()), level + 1, mGpidInfClass, 0, 0, grTemp.getGpid1(), grTemp.getGpid2(), ntype);
                             if ((!p1.contains(p2)) && (!p2.contains(p1))) {
                                 ped = "Houston we have a BIG problem";
                                 // Resolving situation of GID=29367 CID=22793 and GID=29456 CID=22881
@@ -307,5 +309,6 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
         }
         armaPedigree = ped;
         return armaPedigree;
-    }       
+    }
+    
 }
