@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
+<!-- 2014-12-03T16:41:04 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="555" pageHeight="802" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" resourceBundle="i18n/resources" uuid="5cb9f9e8-50e9-4a73-8db7-23f12a872181">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LoCycle" class="java.lang.String"/>
+	<parameter name="tid" class="java.lang.Integer"/>
+	<parameter name="occ" class="java.lang.Integer"/>
+	<parameter name="program" class="java.lang.String"/>
+	<parameter name="trial_name" class="java.lang.String"/>
+	<parameter name="trial_abbr" class="java.lang.String"/>
+	<parameter name="num_reporte" class="java.lang.Integer"/>
+	<parameter name="cycle" class="java.lang.String"/>
+	<parameter name="lid" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="offset_2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[offset_2]]></fieldDescription>
+	</field>
+	<field name="totalEntries" class="java.lang.Integer">
+		<fieldDescription><![CDATA[totalEntries]]></fieldDescription>
+	</field>
+	<field name="check_1" class="java.lang.Integer">
+		<fieldDescription><![CDATA[check_1]]></fieldDescription>
+	</field>
+	<field name="check_freq" class="java.lang.Integer">
+		<fieldDescription><![CDATA[check_freq]]></fieldDescription>
+	</field>
+	<field name="program" class="java.lang.String">
+		<fieldDescription><![CDATA[program]]></fieldDescription>
+	</field>
+	<field name="use_generic" class="java.lang.String">
+		<fieldDescription><![CDATA[use_generic]]></fieldDescription>
+	</field>
+	<field name="organization" class="java.lang.String">
+		<fieldDescription><![CDATA[organization]]></fieldDescription>
+	</field>
+	<field name="offset_1" class="java.lang.Integer">
+		<fieldDescription><![CDATA[offset_1]]></fieldDescription>
+	</field>
+	<field name="tid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[tid]]></fieldDescription>
+	</field>
+	<field name="new_cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[new_cycle]]></fieldDescription>
+	</field>
+	<field name="studyID" class="java.lang.Integer">
+		<fieldDescription><![CDATA[studyID]]></fieldDescription>
+	</field>
+	<field name="use_abreviation" class="java.lang.String">
+		<fieldDescription><![CDATA[use_abreviation]]></fieldDescription>
+	</field>
+	<field name="internat_type" class="java.lang.String">
+		<fieldDescription><![CDATA[internat_type]]></fieldDescription>
+	</field>
+	<field name="cycle" class="java.lang.String">
+		<fieldDescription><![CDATA[cycle]]></fieldDescription>
+	</field>
+	<field name="trial_abbr" class="java.lang.String">
+		<fieldDescription><![CDATA[trial_abbr]]></fieldDescription>
+	</field>
+	<field name="trial_name" class="java.lang.String">
+		<fieldDescription><![CDATA[trial_name]]></fieldDescription>
+	</field>
+	<field name="offset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[offset]]></fieldDescription>
+	</field>
+	<field name="check_2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[check_2]]></fieldDescription>
+	</field>
+	<field name="ocurrencesList" class="java.util.List">
+		<fieldDescription><![CDATA[ocurrencesList]]></fieldDescription>
+	</field>
+	<field name="trial_mega_environment" class="java.lang.Integer">
+		<fieldDescription><![CDATA[trial_mega_environment]]></fieldDescription>
+	</field>
+	<field name="print_mega_environment" class="java.lang.String">
+		<fieldDescription><![CDATA[print_mega_environment]]></fieldDescription>
+	</field>
+	<field name="expansion_level" class="java.lang.Integer">
+		<fieldDescription><![CDATA[expansion_level]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="254">
+			<staticText>
+				<reportElement x="243" y="227" width="266" height="13" uuid="3503bb6a-58d7-4ed7-9d76-1cfdc9bf1b53"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="216" width="267" height="13" uuid="9cea83c9-0189-4b4e-9ff7-d4b57378d3be"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="428" y="97" width="25" height="13" uuid="3766b6f3-b5c4-41a2-a350-b7d0506ecb8f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[OCC:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="243" y="96" width="118" height="13" uuid="69d0594b-5b53-40ce-b6b6-9096f6498bdd"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[XXXXXXXXXXXXXXXXX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="151" width="267" height="13" uuid="be391843-14d0-4995-a34b-0c5c53d14a36"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="194" width="267" height="13" uuid="562e9588-da01-4edb-b709-5fa6086bb221"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="140" width="267" height="13" uuid="a966a2aa-44b0-4da5-bc5b-c5d206c94b30"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="453" y="97" width="19" height="13" uuid="ce743961-47ee-4ccb-a87e-fd1815454b5a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="366" y="96" width="29" height="13" uuid="80d1d189-45ee-433c-9643-d5bca0fca0e5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[TID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="243" y="172" width="118" height="13" uuid="93fc1288-7d2f-4db7-af8a-d38772e51177"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[XXXXXXXXXXXXXXXXX]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="395" y="96" width="29" height="13" uuid="63c0a1e7-ae80-4921-b5f2-55e86984cc6c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="360" y="172" width="28" height="13" uuid="ffcae70f-7ea5-4734-877a-d98d67d19e2c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[TID:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="426" y="172" width="25" height="13" uuid="e688ca81-15b2-40ea-8394-1b9dbbb8d718"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[OCC:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="107" width="267" height="13" uuid="92ecb289-1348-4b0a-97f3-1dc1a82a2475"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="389" y="172" width="29" height="13" uuid="5d48fa4c-e512-4c76-a7be-390000e86e56"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tid}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="242" y="205" width="267" height="13" uuid="1ef439c6-0fb3-48e2-90f3-3d592f7e2e9a"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="183" width="267" height="13" uuid="9aaf5879-3d15-4e90-85e3-2b334acd0a30"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="118" width="267" height="13" uuid="225b36d6-6873-4bfd-b35c-b5b8d0d8a22e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="162" width="267" height="12" uuid="1d37b3ce-3814-4073-a6b6-276796f3bea1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="242" y="129" width="267" height="13" uuid="b4563e11-4144-4c6f-a01d-f88f476c3ac5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<text><![CDATA[0123456789012345678901234567890123456789]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="172" width="20" height="13" uuid="79c9a8d1-ddf2-4162-b485-943ec36eca5b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Courier New" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{occ}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="10" uuid="e3423cab-6352-420a-bc6b-598004180625"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="lid">
+					<subreportParameterExpression><![CDATA[$P{lid}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="cycle">
+					<subreportParameterExpression><![CDATA[$P{cycle}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LoCycle">
+					<subreportParameterExpression><![CDATA[$P{LoCycle}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="program">
+					<subreportParameterExpression><![CDATA[$P{program}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="trial_abbr">
+					<subreportParameterExpression><![CDATA[$P{trial_abbr}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="num_reporte">
+					<subreportParameterExpression><![CDATA[$P{num_reporte}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tid">
+					<subreportParameterExpression><![CDATA[$P{tid}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="trial_name">
+					<subreportParameterExpression><![CDATA[$P{trial_name}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="occ">
+					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{ocurrencesList})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "WFb22_occ.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

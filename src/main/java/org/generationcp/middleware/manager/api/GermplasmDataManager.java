@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
@@ -1428,8 +1429,17 @@ public interface GermplasmDataManager {
     void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException;
 
     /**
+    * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes in <b>linkedNodes</b> atribute,
+    * being the first node the female and the second one the male parent. The information is ultimately stored in Germplasm beans, containing only gids and information about names.
+    * The key of the map is the gid. 
+    * @param studyId The identifier for the study which parents will be retuned.
+    * @return The parents for each germplasm in a study.
+    */
+   Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
+   /*
      * get the Germplasm from the crop database based on local gid reference 
      * @param lgid
      */
 	Germplasm getGermplasmByLocalGid(Integer lgid) throws MiddlewareQueryException;	
+
 }
