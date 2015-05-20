@@ -8,7 +8,7 @@ import java.util.Map;
 public enum DataType {
 
 
-    CATEGORICAL_VARIABLE(1048, "Categorical")
+    CATEGORICAL_VARIABLE(1130, "Categorical")
     , NUMERIC_VARIABLE(1110, "Numeric")
     , DATE_TIME_VARIABLE(1117, "Date")
     , CHARACTER_VARIABLE(1120, "Character");
