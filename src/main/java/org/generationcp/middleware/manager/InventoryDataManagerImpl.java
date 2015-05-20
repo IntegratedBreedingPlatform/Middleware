@@ -691,10 +691,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         for (GermplasmListData germplasmListData : dataList) {
             boolean found = false;
             for (InventoryDetails inventoryDetails : detailList) {
-                if (inventoryDetails.getGid().equals(germplasmListData.getGid())) {
+                if (germplasmListData.getId().equals(inventoryDetails.getSourceRecordId())) {
                     inventoryDetails.copyFromGermplasmListData(germplasmListData);
                     found = true;
-                    break;
                 }
             }
 
