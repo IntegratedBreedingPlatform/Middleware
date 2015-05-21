@@ -163,7 +163,7 @@ public enum TermId {
 	, CROSS (8377)
 	, DESIG (8250)
 	, CHECK (8255)
-	, STOCKID (60027)
+	, STOCKID (1727)
 	
 	//Location 
     , TRIAL_LOCATION(8180)
@@ -280,9 +280,9 @@ public enum TermId {
     , ENTRY_TYPE(8255)
     
     //added headers of Export Inventory Template for stock list
-    , DUPLICATE(60028)
-    , BULK_WITH(60029)
-    , BULK_COMPL(60030)
+    , DUPLICATE(1728)
+    , BULK_WITH(1729)
+    , BULK_COMPL(1730)
 
 ;
 	
