@@ -36,6 +36,7 @@ public class GermplasmTestDataGenerator {
         g.setMgid(Integer.valueOf(1));
         g.setUserId(Integer.valueOf(1));
         g.setReferenceId(Integer.valueOf(1));
+        g.setLgid(Integer.valueOf(1));
 
         Name n = new Name();
         n.setLocationId(Integer.valueOf(1));
