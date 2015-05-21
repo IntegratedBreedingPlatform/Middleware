@@ -4,6 +4,8 @@ package org.generationcp.middleware.domain.common;
  * This class will be used where we need id and name pair
  */
 
+// TODO: Need to remove generic class
+@Deprecated
 public class IdName {
 
     private Integer id;

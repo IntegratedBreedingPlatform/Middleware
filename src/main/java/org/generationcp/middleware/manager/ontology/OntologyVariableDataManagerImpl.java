@@ -472,17 +472,28 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
     //TODO: Follow DmsProjectDao query COUNT_PROJECTS_WITH_VARIABLE.
     @Override
     public Integer getVariableObservations(int variableId) throws MiddlewareException {
-        SQLQuery query = getActiveSession().createSQLQuery("select (select count(*) from projectprop where type_id = :variableId) " +
-                "+ (select count(*) from phenotype where observable_id = :variableId) c");
+
+        // Note: Taken from {@link DmsProjectDao.countByVariable()}
+        final String COUNT_PROJECTS_WITH_VARIABLE =
+                "SELECT count(pp.project_id) "
+                        + " FROM projectprop pp "
+                        + " WHERE NOT EXISTS( "
+                        + " SELECT 1 FROM projectprop stat "
+                        + " WHERE stat.project_id = pp.project_id "
+                        + " AND stat.type_id = " + TermId.STUDY_STATUS.getId()
+                        + " AND value = " + TermId.DELETED_STUDY.getId() + ") "
+                        + " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+                        + " AND pp.value = :variableId";
+
+        SQLQuery query = getActiveSession().createSQLQuery(COUNT_PROJECTS_WITH_VARIABLE);
         query.setParameter("variableId", variableId);
-        query.addScalar("c");
         return ((BigInteger) query.uniqueResult()).intValue();
     }
 
     //TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
     @Override
     public Integer getVariableStudies(int variableId) throws MiddlewareException {
-        return null;
+        return 0;
     }
 
     private void checkTermIsVariable(CVTerm term) throws MiddlewareException {
