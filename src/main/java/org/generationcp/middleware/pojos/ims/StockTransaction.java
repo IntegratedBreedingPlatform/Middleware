@@ -3,6 +3,7 @@ package org.generationcp.middleware.pojos.ims;
 import org.generationcp.middleware.pojos.ListDataProject;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 
 /**
@@ -26,6 +27,9 @@ public class StockTransaction implements Serializable{
     @OneToOne(targetEntity = Transaction.class)
     @JoinColumn(name = "trnid", nullable = false, updatable = false)
     private Transaction transaction;
+    
+    @Column(name = "recordid")
+    private Integer sourceRecordId;
 
     public StockTransaction() {
     }
@@ -59,4 +63,12 @@ public class StockTransaction implements Serializable{
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
+
+	public Integer getSourceRecordId() {
+		return sourceRecordId;
+	}
+
+	public void setSourceRecordId(Integer sourceRecordId) {
+		this.sourceRecordId = sourceRecordId;
+	}
 }

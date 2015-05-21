@@ -21,11 +21,6 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ims.*;
 import org.generationcp.middleware.service.api.InventoryService;
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,8 +30,6 @@ import java.util.regex.Pattern;
  *
  */
 public class InventoryServiceImpl extends Service implements InventoryService {
-
-	private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
 	public InventoryServiceImpl(HibernateSessionProvider sessionProvider,
 			String localDatabaseName) {
@@ -114,16 +107,24 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		Lot lot = getLotBuilder().createLotForAdd(details.getGid(), details.getLocationId(), details.getScaleId(), details.getComment(), details.getUserId());
 		getInventoryDataManager().addLot(lot);
 
-		Transaction transaction = getTransactionBuilder().buildForAdd(lot, listData.getId(),
-				details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(), details.getInventoryID());
+		Transaction transaction = getTransactionBuilder().buildForAdd(lot, listData == null ? 0 : listData.getId(),
+				details.getAmount(), details.getUserId(), details.getComment(), details.getSourceId(), details.getInventoryID(),
+				details.getBulkWith(), details.getBulkCompl());
 		getInventoryDataManager().addTransaction(transaction);
 
 		StockTransaction stockTransaction = new StockTransaction(null, listDataProject, transaction);
+		stockTransaction.setSourceRecordId(transaction.getSourceRecordId());
 		getInventoryDataManager().addStockTransaction(stockTransaction);
 	}
 
 	@Override
 	public List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type) throws MiddlewareQueryException {
 		return getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId, type);
+	}
+
+	@Override
+	public boolean stockHasCompletedBulking(Integer listId)
+			throws MiddlewareQueryException {
+		return getStockTransactionDAO().stockHasCompletedBulking(listId);
 	}
 }

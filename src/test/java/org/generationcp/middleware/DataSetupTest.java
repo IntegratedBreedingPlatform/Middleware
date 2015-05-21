@@ -1,6 +1,8 @@
 package org.generationcp.middleware;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -13,11 +15,24 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
@@ -30,6 +45,8 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetupTest.class);
 
+	private static WorkbenchDataManager workbenchDataManager;
+	private static UserDataManager userDataManager;
 	private static DataImportService dataImportService;
 	private static GermplasmDataManager germplasmManager;
 	private static GermplasmListManager germplasmListManager;
@@ -79,15 +96,99 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 	
 	@BeforeClass
 	public static void setUp() {
+        workbenchDataManager = new WorkbenchDataManagerImpl(new HibernateSessionPerThreadProvider(workbenchSessionUtil.getSessionFactory()));
 		dataImportService = managerFactory.getDataImportService();
 		germplasmManager = managerFactory.getGermplasmDataManager();
 		germplasmListManager = managerFactory.getGermplasmListManager();
 		middlewareFieldbookService = managerFactory.getFieldbookMiddlewareService();
+		userDataManager = managerFactory.getUserDataManager();
 		germplasmTestDataGenerator = new GermplasmTestDataGenerator(germplasmManager);
 	}
 	
-    @Test
-    public void testCreateNursery() throws MiddlewareQueryException {
+	@Test
+	public void setUpBasicTestData() throws MiddlewareQueryException {
+		String programUUID = createWorkbenchProgram();
+		createNursery(programUUID);
+	}
+	
+	private String createWorkbenchProgram() throws MiddlewareQueryException {
+		
+		Person person = new Person();
+        person.setInstituteId(1);
+        person.setFirstName("Joe");
+        person.setMiddleName("The");
+        person.setLastName("Breeder");
+        person.setPositionName("Plant Breeder");
+        person.setTitle("Mr.");
+        person.setExtension("123");
+        person.setFax("No Fax");
+        person.setEmail("joe.breeder@ibp.org");
+        person.setNotes("No Notes");
+        person.setContact("No Contact");
+        person.setLanguage(1);
+        person.setPhone("02121212121");
+        workbenchDataManager.addPerson(person);
+        
+        User workbenchUser = new User();
+        workbenchUser.setInstalid(1);
+        workbenchUser.setStatus(1);
+        workbenchUser.setAccess(1);
+        workbenchUser.setType(1);
+        workbenchUser.setName("joe");
+        workbenchUser.setPassword("b");	
+        workbenchUser.setPersonid(person.getId());
+        workbenchUser.setAdate(20150101);
+        workbenchUser.setCdate(20150101);
+        workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, "ADMIN")));
+        
+        workbenchDataManager.addUser(workbenchUser);
+        
+		CropType cropType = workbenchDataManager.getCropTypeByName("maize");
+		if (cropType == null) {
+			cropType = new CropType("maize");
+	        cropType.setDbName("ibdbv2_maize_merged");
+	        cropType.setVersion("4.0.0");
+			workbenchDataManager.addCropType(cropType);
+		}
+		
+		Project program = new Project();
+		program.setProjectName("Draught Resistance in Maize");
+		program.setUserId(workbenchUser.getUserid());
+		program.setStartDate(new Date(System.currentTimeMillis()));
+		program.setCropType(cropType);
+		program.setLastOpenDate(new Date(System.currentTimeMillis()));
+		workbenchDataManager.addProject(program);
+		
+		List<ProjectUserRole> projectUserRoles = new ArrayList<ProjectUserRole>();
+		List<Role> allRolesList = workbenchDataManager.getAllRoles();
+		for (Role role : allRolesList) {
+            ProjectUserRole projectUserRole = new ProjectUserRole();
+            projectUserRole.setUserId(workbenchUser.getUserid());
+            projectUserRole.setRole(role);
+            projectUserRole.setProject(program);
+            projectUserRoles.add(projectUserRole);
+        }
+		workbenchDataManager.addProjectUserRole(projectUserRoles);
+		
+		User cropDBUser = workbenchUser.copy();
+		Person cropDBPerson = person.copy();
+		userDataManager.addPerson(cropDBPerson);
+		cropDBUser.setPersonid(cropDBPerson.getId());
+		userDataManager.addUser(cropDBUser);
+		
+		IbdbUserMap ibdbUserMap = new IbdbUserMap();
+		ibdbUserMap.setWorkbenchUserId(workbenchUser.getUserid());
+		ibdbUserMap.setProjectId(program.getProjectId());
+		ibdbUserMap.setIbdbUserId(cropDBUser.getUserid());
+		workbenchDataManager.addIbdbUserMap(ibdbUserMap);
+		
+		ProjectUserInfo pUserInfo = new ProjectUserInfo(program.getProjectId().intValue(), workbenchUser.getUserid());
+		workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		
+		return program.getUniqueID();
+	}
+	
+    private void createNursery(String programUUID) throws MiddlewareQueryException {
         
 		int randomInt = new Random().nextInt(100);
 		
@@ -236,7 +337,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		workbook.setObservations(observations);
     	    	
 		// Save the workbook
-        int nurseryStudyId = dataImportService.saveDataset(workbook, true, false, null);
+        int nurseryStudyId = dataImportService.saveDataset(workbook, true, false, programUUID);
         LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + nurseryStudyId);
         
 

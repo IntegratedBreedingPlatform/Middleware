@@ -285,7 +285,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	                                if (phenotype == null && field.getValue() != null 
 	                                        && !"".equals(field.getValue().trim())){
 	                                    phenotype = new Phenotype();
-	                                    phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 	                                }
 	                                if (phenotype != null) {
 		                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId()

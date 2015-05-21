@@ -360,10 +360,41 @@ public class Germplasm implements Serializable{
     		"SELECT gid, methn " +
     		"FROM germplsm " +
     		"WHERE gid IN (:gids)";
-    
-    		
-    		
+    public static final String GET_PARENT_NAMES_BY_STUDY_ID =
+    		"select N.gid, N.ntype, N.nval, N.nid, N.nstat"+
+			" from names N"+
+			" inner join ("+
+			"	select distinct G.gpid1 gid"+
+			"	from listnms LNAMES"+
+			"	inner join listdata_project LDATAPROJ on"+
+			"		LNAMES.listid = LDATAPROJ.list_id"+
+			"	inner join germplsm G on"+
+			"		G.gid = LDATAPROJ.germplasm_id and"+
+			"		G.gnpgs >= 0"+
+			"	where LNAMES.projectid = :projId"+
+			
+			"    union"+
+			
+			"	select distinct G.gpid2"+
+			"	from listnms LNAMES"+
+			"	inner join listdata_project LDATAPROJ on"+
+			"		LNAMES.listid = LDATAPROJ.list_id"+
+			"	inner join germplsm G on"+
+			"		G.gid = LDATAPROJ.germplasm_id and"+
+			"		G.gnpgs >= 0"+
+			"	where LNAMES.projectid = :projId"+
+			" ) T on "+
+			" N.gid = T.gid";
 
+    public static final String GET_PARENT_GIDS_BY_STUDY_ID =
+	    "select distinct g.gid, G.gpid1, G.gpid2, G.grplce"+
+		" from listnms LNAMES"+
+		" inner join listdata_project LDATAPROJ on"+
+		"	LNAMES.listid = LDATAPROJ.list_id"+
+		" inner join germplsm G on"+
+		"	G.gid = LDATAPROJ.germplasm_id and"+
+		"	G.gnpgs >= 0"+
+		" where LNAMES.projectid = :projId";
     
     @Id
     @Basic(optional = false)
@@ -380,11 +411,17 @@ public class Germplasm implements Serializable{
     @XmlElement(name = "numberOfProgenitors")
     private Integer gnpgs;
 
+    /**
+     * Usually female parent.
+     */
     @Basic(optional = false)
     @Column(name = "gpid1")
     @XmlElement(name = "firstParent")
     private Integer gpid1;
 
+    /**
+     * Usually male parent.
+     */
     @Basic(optional = false)
     @Column(name = "gpid2")
     @XmlElement(name = "secondParent")
@@ -460,6 +497,30 @@ public class Germplasm implements Serializable{
     @Transient
     private GermplasmInventory inventoryInfo;
 
+    /**
+     * This variable is populated only when the Germplasm POJO is retrieved by
+     * using GermplasmDataManager.getDirectParentsForStudy(). Otherwise it is
+     * null always.
+     */
+    @Transient
+    private String selectionHistory = null;
+
+    /**
+     * This variable is populated only when the Germplasm POJO is retrieved by
+     * using GermplasmDataManager.getDirectParentsForStudy(). Otherwise it is
+     * null always.
+     */
+    @Transient
+    private String crossName = null;
+
+    /**
+     * This variable is populated only when the Germplasm POJO is retrieved by
+     * using GermplasmDataManager.getDirectParentsForStudy(). Otherwise it is
+     * null always.
+     */
+    @Transient
+    private String accessionName = null;
+ 
     public Germplasm() {
     }
 
@@ -702,6 +763,30 @@ public class Germplasm implements Serializable{
 
 	public void setInventoryInfo(GermplasmInventory inventoryInfo) {
 		this.inventoryInfo = inventoryInfo;
+	}
+	
+	public String getSelectionHistory() {
+		return selectionHistory;
+	}
+
+	public void setSelectionHistory(String selectionHistory) {
+		this.selectionHistory = selectionHistory;
+	}
+
+	public String getCrossName() {
+		return crossName;
+	}
+
+	public void setCrossName(String crossName) {
+		this.crossName = crossName;
+	}
+
+	public String getAccessionName() {
+		return accessionName;
+	}
+
+	public void setAccessionName(String accessionName) {
+		this.accessionName = accessionName;
 	}
 
 }

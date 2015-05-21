@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -174,7 +175,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             return id;
         } catch (HibernateException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException(e.getMessage());
+            throw new MiddlewareQueryException(e.getMessage(),e);
         } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
             throw e;
@@ -211,7 +212,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             trans.commit();
         } catch (ConstraintViolationException e) {
         	rollbackTransaction(trans);
-        	throw new MiddlewareQueryException(e.getMessage());
+        	throw new MiddlewareQueryException(e.getMessage(),e);
     	} catch (MiddlewareQueryException e) {
         	rollbackTransaction(trans);
         	throw e;
@@ -690,10 +691,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         for (GermplasmListData germplasmListData : dataList) {
             boolean found = false;
             for (InventoryDetails inventoryDetails : detailList) {
-                if (inventoryDetails.getGid().equals(germplasmListData.getGid())) {
+                if (germplasmListData.getId().equals(inventoryDetails.getSourceRecordId())) {
                     inventoryDetails.copyFromGermplasmListData(germplasmListData);
                     found = true;
-                    break;
                 }
             }
 
@@ -705,6 +705,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         for (GermplasmListData data : forFill) {
             InventoryDetails detail = new InventoryDetails();
             detail.copyFromGermplasmListData(data);
+            detailList.add(detail);
         }
     }
 
@@ -856,5 +857,56 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public List<String> getSimilarStockIds(List<String> stockIDs) throws MiddlewareQueryException {
         return getTransactionDao().getSimilarStockIds(stockIDs);
+    }
+    
+    @Override
+    public List<String> getStockIdsByListDataProjectListId(Integer listId) throws MiddlewareQueryException {
+        return getTransactionDao().getStockIdsByListDataProjectListId(listId);
+    }
+
+	@Override
+	public void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailList)
+			throws MiddlewareQueryException {
+		Session session = getCurrentSession();
+		Transaction trans = null;
+		try {
+			trans = session.beginTransaction();
+			GermplasmList germplasmList = getGermplasmListDAO().getById(listId);
+			GermplasmListType germplasmListType = GermplasmListType.valueOf(germplasmList.getType());
+			int numberOfEntries = 1;
+			for (InventoryDetails inventoryDetails : inventoryDetailList) {
+				Lot lot = getLotDao().getById(inventoryDetails.getLotId());
+				lot.setLocationId(inventoryDetails.getLocationId());
+				lot.setScaleId(inventoryDetails.getScaleId());
+				getLotDao().saveOrUpdate(lot);
+				org.generationcp.middleware.pojos.ims.Transaction transaction = 
+						getTransactionById(inventoryDetails.getTrnId());
+				transaction.setQuantity(Util.zeroIfNull(inventoryDetails.getAmount()));
+				transaction.setComments(Util.nullIfEmpty(inventoryDetails.getComment()));
+				if(germplasmListType == GermplasmListType.CROSSES) {
+					transaction.setBulkWith(Util.nullIfEmpty(inventoryDetails.getBulkWith()));
+					transaction.setBulkCompl(Util.nullIfEmpty(inventoryDetails.getBulkCompl()));
+				}
+				getTransactionDao().saveOrUpdate(transaction);
+				if(numberOfEntries % JDBC_BATCH_SIZE == 0) {
+					session.flush();
+					session.clear();
+				}
+				numberOfEntries++;
+			}
+			trans.commit();
+		} catch (Exception e) {
+        	rollbackTransaction(trans);
+        	logAndThrowException("Error encountered while updating inventory " +
+        			"of list id " + listId + "." + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+            session.clear();
+        }
+	}
+	
+	@Override
+    public Lot getLotById(Integer id) throws MiddlewareQueryException {
+        return getLotDao().getById(id, false);
     }
 }

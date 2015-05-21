@@ -12,6 +12,7 @@
 package org.generationcp.middleware.domain.inventory;
 
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.util.Util;
 
 import java.io.Serializable;
 
@@ -24,6 +25,8 @@ import java.io.Serializable;
 public class InventoryDetails implements Comparable<InventoryDetails>, Serializable{
 	
 	private static final long serialVersionUID = 1L;
+	public static final String BULK_COMPL_Y = "Y";
+	public static final String BULK_COMPL_COMPLETED = "Completed";
 
 	/** The index. */
 	Integer index;
@@ -55,10 +58,12 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	Double amount;
 	
 	/** The source id. */
-	Integer sourceId;	//ims_transaction.source_id
+	//ims_transaction.source_id
+	Integer sourceId;	
 	
 	/** The source name. */
-	String sourceName;  // if list, listnms.listname
+	// if list, listnms.listname
+	String sourceName;  
 	
 	/** The scale id. */
 	Integer scaleId;
@@ -88,7 +93,16 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	private String duplicate;
 	private String bulkWith;
 	private String bulkCompl;
-
+	
+	/** The ff. fields are used for importing inventory for stock list */
+	private Integer listDataProjectId;
+	private Integer trnId;
+	
+	/** This is used for executing bulking instructions */
+	private Integer sourceRecordId;
+	private Integer lotGid;
+	private Integer stockSourceRecordId;
+	
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -160,7 +174,15 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the gid
 	 */
 	public Integer getGid() {
+		if(isBulkingDonor()) {
+			return null;
+		}
 		return gid;
+	}
+
+	public boolean isBulkingDonor() {
+		return isBulkingCompleted() &&
+				!sourceRecordId.equals(stockSourceRecordId);
 	}
 
 	/**
@@ -178,6 +200,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the germplasm name
 	 */
 	public String getGermplasmName() {
+		if(isBulkingDonor()) {
+			return null;
+		}
 		return germplasmName;
 	}
 
@@ -646,7 +671,15 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getInventoryID() {
+		if(isBulkingRecipient()) {
+			return Util.prependToCSVAndArrange(inventoryID,bulkWith);
+		}
 		return inventoryID;
+	}
+
+	public boolean isBulkingRecipient() {
+		return isBulkingCompleted() &&
+				sourceRecordId.equals(stockSourceRecordId);
 	}
 
 	public void setInventoryID(String inventoryID) {
@@ -701,5 +734,59 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void setBulkCompl(String bulkCompl) {
 		this.bulkCompl = bulkCompl;
 	}
+
+	public Integer getListDataProjectId() {
+		return listDataProjectId;
+	}
+
+	public void setListDataProjectId(Integer listDataProjectId) {
+		this.listDataProjectId = listDataProjectId;
+	}
+
+	public Integer getTrnId() {
+		return trnId;
+	}
+
+	public void setTrnId(Integer trnId) {
+		this.trnId = trnId;
+	}
+
+	public Integer getSourceRecordId() {
+		return sourceRecordId;
+	}
+
+	public void setSourceRecordId(Integer sourceRecordId) {
+		this.sourceRecordId = sourceRecordId;
+	}
+
+	public Integer getLotGid() {
+		return lotGid;
+	}
+
+	public void setLotGid(Integer lotGid) {
+		this.lotGid = lotGid;
+	}
+
+	public void addBulkWith(String bulkWith) {
+		if (this.bulkWith == null) {
+			this.bulkWith = bulkWith;
+		} else if (!this.bulkWith.equals(bulkWith) && ! this.bulkWith.contains(", " + bulkWith)) {
+			this.bulkWith += ", " + bulkWith;
+		}
+	}
+	
+	public boolean isBulkingCompleted() {
+		return BULK_COMPL_COMPLETED.equals(bulkCompl);
+	}
+
+	public Integer getStockSourceRecordId() {
+		return stockSourceRecordId;
+	}
+
+	public void setStockSourceRecordId(Integer stockSourceRecordId) {
+		this.stockSourceRecordId = stockSourceRecordId;
+	}
+	
+	
 	
 }
