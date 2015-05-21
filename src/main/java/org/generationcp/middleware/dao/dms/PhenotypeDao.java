@@ -11,12 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -37,6 +39,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1063,5 +1066,59 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     "Error in getByProjectAndType("    + projectId + ", " + typeId + ") in PhenotypeDao: " + e.getMessage(), e);
 		}
 		return phenotypes;
+	}
+	
+	@Override
+	public Phenotype save(final Phenotype phenotype) throws MiddlewareQueryException {
+		try {
+			savePhenotypeAndCopyUniquename(phenotype);
+			return phenotype;
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in save(" + phenotype + "): " + e.getMessage(), e);
+		}
+	}
+
+
+	
+	@Override
+    public Phenotype saveOrUpdate(Phenotype entity) throws MiddlewareQueryException {
+        try {
+        	if(entity.getPhenotypeId() == null) {
+    			savePhenotypeAndCopyUniquename(entity);
+        	}
+            getSession().saveOrUpdate(entity);
+            return entity;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in saveOrUpdate(entity): " + e.getMessage(), e);
+        }
+    }
+
+	@Override
+    public Phenotype merge(Phenotype entity) throws MiddlewareQueryException {
+        try {
+        	if(entity.getPhenotypeId() == null) {
+    			savePhenotypeAndCopyUniquename(entity);
+        	}
+            getSession().merge(entity);
+            return entity;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in merge(entity): " + e.getMessage(), e);
+        }
+    }
+
+	private void savePhenotypeAndCopyUniquename(final Phenotype phenotype) {
+
+		// TODO: why this wierdness. Comments from Graham. Indeed you are correct, there is some information duplicated in the phenotype
+		// table. This was just a problem of fitting our data model into the Chado schema without changing it. Some fields are compulsory and we had no matching
+		// information to store there so we repeated some fields.
+		// One interesting consequence is that we have some information stored both as text and number and this can be useful because the
+		// cvterm_id stored in the observable_id field sometimes needs to link to the cvterm_id stored in the projectprop.value field when
+		// it is cast as text.
+
+		final Session currentSession = getSession();
+		phenotype.setUniqueName(UUID.randomUUID().toString());
+		currentSession.save(phenotype);
+		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
+		currentSession.update(phenotype);
 	}
 }

@@ -18,12 +18,11 @@ public class CimmytWheatNameUtil {
 	
 	//Some sort of weight calculations
 	public CimmytWheatNameUtil(){
-		 
-			nstatOrderedList = "2,1,0";
-	     ntypeOrderedList = "2,5,7,6,17,4,1200,13";
-	     nuidExcludeList = "20,47,66,76,84,90";
-	     levelZeroFullName = true;
-	     initializePreferredNameRules();
+		nstatOrderedList = "2,1,0";
+		ntypeOrderedList = "7,6,17,4,1200,13";
+		nuidExcludeList = "20,47,66,76,84,90";
+		levelZeroFullName = true;
+		initializePreferredNameRules();
 	}
     
 	private void initializePreferredNameRules() {

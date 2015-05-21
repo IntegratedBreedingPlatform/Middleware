@@ -38,6 +38,7 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
@@ -1575,6 +1576,85 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		} finally {
 			session.flush();
 		}
+	}
+	
+	@Override
+	public Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId){
+
+//		setWorkingDatabase(Database.LOCAL);
+        GermplasmDAO dao = getGermplasmDao();
+		Map<Integer, Map<GermplasmNameType, Name>> namesMap = dao.getGermplasmParentNamesForStudy(studyId);
+		List<Germplasm> germs = dao.getGermplasmParentsForStudy(studyId);
+
+//		setWorkingDatabase(Database.CENTRAL);
+//		dao = getGermplasmDao();
+//		namesMap.putAll(dao.getGermplasmParentNamesForStudy(studyId));
+//		germs.addAll(dao.getGermplasmParentsForStudy(studyId));
+
+		Map<Integer, GermplasmPedigreeTreeNode> germNodes = new HashMap<>();
+		
+		
+		for(Germplasm germ : germs){
+			GermplasmPedigreeTreeNode root = new GermplasmPedigreeTreeNode();
+			root.setGermplasm(germ);
+
+			List<GermplasmPedigreeTreeNode> parents = new ArrayList<>();
+			Map<GermplasmNameType, Name> names = namesMap.get(germ.getGpid1());
+
+			//TODO: compare again new GermplasmNameTypes in merged database
+			
+			GermplasmPedigreeTreeNode femaleNode = new GermplasmPedigreeTreeNode();
+			Germplasm female = new Germplasm(germ.getGpid1());
+			female.setPreferredName( getPreferredName(names) );
+			female.setPreferredAbbreviation( getNameByType(names, GermplasmNameType.LINE_NAME).getNval()  );
+			female.setSelectionHistory( getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval() );
+			female.setCrossName( getNameByType(names, GermplasmNameType.CROSS_NAME).getNval() );
+			female.setAccessionName(getNameByType(names, GermplasmNameType.GERMPLASM_BANK_ACCESSION_NUMBER).getNval() );
+			femaleNode.setGermplasm(female);
+
+			names = namesMap.get(germ.getGpid2());
+			GermplasmPedigreeTreeNode maleNode = new GermplasmPedigreeTreeNode();
+			Germplasm male = new Germplasm(germ.getGpid2());			
+			male.setPreferredName( getPreferredName(names) );
+			male.setPreferredAbbreviation( getNameByType(names, GermplasmNameType.LINE_NAME).getNval()  );
+			male.setSelectionHistory( getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval() );
+			male.setCrossName( getNameByType(names, GermplasmNameType.CROSS_NAME).getNval() );
+			male.setAccessionName(getNameByType(names, GermplasmNameType.GERMPLASM_BANK_ACCESSION_NUMBER).getNval() );
+			maleNode.setGermplasm(male);
+
+			parents.add(femaleNode);
+			parents.add(maleNode);
+			root.setLinkedNodes(parents);
+
+			germNodes.put(germ.getGid(), root);
+		}
+		
+		
+		return germNodes;
+	}
+	
+	/**
+	 * Local method for getting a particular germplasm's Name.   
+	 * @param namesMap The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in GermplasmDAO.
+	 * @param ntype the name type, i.e. Pedigree, Selection History, Cross Name,etc.
+	 * @return an instance of Name representing the searched name, or an empty Name instance if it doesn't exist
+	 */
+	private Name getNameByType(Map<GermplasmNameType, Name> names, GermplasmNameType ntype){
+		Name n = null;
+		if(null != names)
+			n = names.get(ntype);
+			
+		return null == n ? new Name() : n;
+	}
+	
+	private Name getPreferredName(Map<GermplasmNameType, Name> names){
+		for(Name n : names.values()){
+			if(1 == n.getNstat()){
+				return n;
+			}
+		}
+		
+		return new Name();
 	}
 
 	@Override

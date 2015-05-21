@@ -920,6 +920,75 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
         return resultMap;
     }
+    /**
+     * Returns a Map with the names of parental germplasm for a given study. These names are returned in a Map, where the key is the germplasm identifier
+     * (gid) and the value is a list with all the names ({@link Name}) for such germplasm. This method optimizes data returned, because in a study is common that many entries
+     * have common parents, so those duplicated parents are omitted in returned Map.
+     * @param studyId The ID of the study from which we need to get parents information. Usually this is the ID of a crossing block.
+     * @return
+     */
+    public Map<Integer,Map<GermplasmNameType,Name>> getGermplasmParentNamesForStudy(int studyId){
+
+    	SQLQuery queryNames = getSession().createSQLQuery(Germplasm.GET_PARENT_NAMES_BY_STUDY_ID);
+    	queryNames.setParameter("projId", studyId);
+    	
+    	 List resultNames = queryNames.list();
+    	 
+    	 Germplasm g;
+    	 Name name;
+    	 Map<Integer,Map<GermplasmNameType,Name>> names = new HashMap<>();
+    	 int i = 0;
+    	 
+         for(Object result: resultNames){
+        	 i++;
+             Object resultArray[] = (Object[]) result;
+             Integer gid = Integer.valueOf(resultArray[0].toString());
+             Integer ntype = Integer.valueOf(resultArray[1].toString());
+             String nval = resultArray[2].toString();
+             Integer nid = Integer.valueOf(resultArray[3].toString());
+             Integer nstat = Integer.valueOf(resultArray[4].toString());
+             
+             name = new Name(nid);
+             name.setGermplasmId(gid);
+             name.setNval(nval);
+             name.setTypeId(ntype);
+             name.setNstat(nstat);
+         
+             if(!names.containsKey(gid)){ 
+            	 names.put(gid, new HashMap<GermplasmNameType, Name>());
+             }
+             
+             GermplasmNameType type = GermplasmNameType.valueOf(name.getTypeId());
+             if (type == null) type = GermplasmNameType.UNRESOLVED_NAME;
+             
+             if(!names.get(gid).containsKey(type) || names.get(gid).get(type).getNstat() != 1){
+            	 names.get(gid).put(type, name);
+             }
+         
+         }
+         
+         return names;
+    }
+    
+    public List<Germplasm> getGermplasmParentsForStudy(int studyId){
+    	SQLQuery queryGermplasms = getSession().createSQLQuery(Germplasm.GET_PARENT_GIDS_BY_STUDY_ID);
+    	queryGermplasms.setParameter("projId", studyId);
+   	 
+    	List<Germplasm> germplasms = new ArrayList<>();
+    	Germplasm g;
+    	
+    	List resultGermplasms = queryGermplasms.list();
+        for(Object result: resultGermplasms){
+        	 Object resultArray[] = (Object[]) result;
+        	 g = new Germplasm(Integer.valueOf(resultArray[0].toString()));
+        	 g.setGpid1(Integer.valueOf(resultArray[1].toString()));
+        	 g.setGpid2(Integer.valueOf(resultArray[2].toString()));
+        	 g.setGrplce(Integer.valueOf(resultArray[3].toString()));
+        	 
+        	 germplasms.add(g);
+        }
+        return germplasms;    	
+    }
 
 	public Germplasm getByLGid(Integer lgid) throws MiddlewareQueryException {
 	    try {

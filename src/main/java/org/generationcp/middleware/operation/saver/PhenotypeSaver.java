@@ -116,7 +116,6 @@ public class PhenotypeSaver extends Saver{
 	            	phenotype.setValue(null);
 	            }
 	            phenotype.setObservableId(variable.getVariableType().getId());
-	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 	            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
 	        } else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 	            phenotype = getPhenotypeObject(phenotype);
@@ -164,7 +163,6 @@ public class PhenotypeSaver extends Saver{
 	            	}
 	            }           
 	            phenotype.setObservableId(variable.getVariableType().getId());
-	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 	            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
 	        }
         }
@@ -194,7 +192,6 @@ public class PhenotypeSaver extends Saver{
         	setCategoricalVariatePhenotypeValues(phenotype,value,variableId);  
         }
         phenotype.setObservableId(variableId);
-        phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
         phenotype.setName(String.valueOf(variableId));
 
         return phenotype;
@@ -238,7 +235,6 @@ public class PhenotypeSaver extends Saver{
 		Phenotype phenotype = oldPhenotype;
 		if (phenotype == null) {
 			phenotype = new Phenotype();
-			phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
         }
         return phenotype;
     }
@@ -257,8 +253,6 @@ public class PhenotypeSaver extends Saver{
 
         if (experimentPhenotype == null || experimentPhenotype.getExperimentPhenotypeId() == null) {
             experimentPhenotype = new ExperimentPhenotype();
-            experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNextId(
-                    "experimentPhenotypeId"));
             experimentPhenotype.setExperiment(experimentId);
             experimentPhenotype.setPhenotype(phenotypeId);
         }
@@ -273,10 +267,8 @@ public class PhenotypeSaver extends Saver{
 			Phenotype phenotype = null;
 			if (phenotypeId == null) {
 				phenotype = new Phenotype();
-				phenotype.setPhenotypeId(getPhenotypeDao().getNextId("phenotypeId"));
 				phenotypeId = phenotype.getPhenotypeId();
 				phenotype.setObservableId(variableId);
-				phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 				phenotype.setName(String.valueOf(variableId));
 				isInsert = true;
 			} else {

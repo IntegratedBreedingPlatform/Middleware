@@ -52,6 +52,15 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 			return "";
 		}
 	}
+	
+	@Override
+	public String getCrossExpansion(final Germplasm germplasm, final Integer level, final CrossExpansionProperties crossExpansionProperties)
+			throws MiddlewareQueryException {
+		
+		// We need to clean up our pedigree service
+		throw new UnsupportedOperationException("This method is curently not supported and"
+				+ " really should not be called from anywhere in the code.");
+	}
 
 	private GermplasmCrossElement expandGermplasmCross(GermplasmCrossElement element, int level,
 			boolean forComplexCross) throws MiddlewareQueryException {
