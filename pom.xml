@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-	<version>4.0.0.SNAPSHOT-OWNDESIGN</version>
+	<version>4.0.0.SNAPSHOT</version>
 	<name>ibp middleware</name>
 
 	<distributionManagement>
