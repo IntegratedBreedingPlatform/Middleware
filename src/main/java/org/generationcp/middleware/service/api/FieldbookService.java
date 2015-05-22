@@ -877,12 +877,20 @@ public interface FieldbookService {
      * @return The id of the newly-created germplasm list
      * @throws MiddlewareQueryException the middleware query exception
      */
-	Integer saveCrossesGermplasmList(Map<Germplasm, GermplasmListData> listDataItems,
-			GermplasmList germplasmList) throws MiddlewareQueryException;
+	Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems,
+            GermplasmList germplasmList) throws MiddlewareQueryException;
 	
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds)  throws MiddlewareQueryException;
 	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException;
 
 	void addListDataProjectList(List<ListDataProject> listDataProjectList)
 			throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the StandardVariable by Name
+	 * 
+	 * @param name of the Standard Varible
+	 * @throws MiddlewareQueryException the middleware query exception
+	 * **/
+	StandardVariable getStandardVariableByName(String name) throws MiddlewareQueryException;
 }

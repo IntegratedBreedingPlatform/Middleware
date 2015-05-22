@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.ims;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.util.Util;
@@ -47,6 +48,20 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         }
         return new ArrayList<Transaction>();
     }
+
+    public List<String> getInventoryIDsWithBreederIdentifier(String identifier)
+            throws MiddlewareQueryException {
+        try {
+            String queryString = Transaction.GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY.replace(
+                    ":identifier", identifier);
+            Query query = getSession().createSQLQuery(queryString);
+            return (List<String>) query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with get query from Transaction: " + e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
 
     public long countAllReserve() throws MiddlewareQueryException {
         try {
@@ -240,7 +255,57 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         }
         return new ArrayList<Transaction>();
     }
-    
+
+    public List<InventoryDetails> getInventoryDetailsByTransactionRecordId(List<Integer> recordIds) throws MiddlewareQueryException {
+        List<InventoryDetails> detailsList = new ArrayList<InventoryDetails>();
+
+        if (recordIds == null || recordIds.isEmpty()){
+            return detailsList;
+        }
+
+        try {
+            Session session = getSession();
+
+            StringBuilder sql = new StringBuilder()
+                    .append("SELECT lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
+                    .append("tran.sourceid, tran.trnqty, tran.inventory_id, lot.comments, tran.recordid ")
+                    .append("FROM ims_transaction tran ")
+                    .append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
+                    .append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue())
+                    .append("		 AND tran.recordid IN (:recordIds) ");
+            SQLQuery query = session.createSQLQuery(sql.toString());
+            query.setParameterList("recordIds", recordIds);
+
+            List<Object[]> results = query.list();
+
+            if (!results.isEmpty()){
+                for (Object[] row: results){
+                    Integer lotId = (Integer) row[0];
+                    Integer userId = (Integer) row[1];
+                    Integer gid = (Integer) row[2];
+                    Integer locationId = (Integer) row[3];
+                    Integer scaleId = (Integer) row[4];
+                    Integer sourceId = (Integer) row[5];
+                    Double amount = (Double) row[6];
+                    String inventoryID = (String) row[7];
+                    String comment = (String) row[8];
+                    Integer sourceRecordId = (Integer) row[9];
+
+                    InventoryDetails details = new InventoryDetails(gid, null, lotId, locationId, null,
+                            userId, amount, sourceId, null, scaleId, null, comment);
+                    details.setInventoryID(inventoryID);
+                    details.setSourceRecordId(sourceRecordId);
+                    detailsList.add(details);
+                }
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getInventoryDetailsByTransactionRecordId() query from TransactionDAO: " + e.getMessage(), e);
+        }
+
+        return detailsList;
+    }
+
     @SuppressWarnings("unchecked")
     public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException {
     	List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
@@ -303,7 +368,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     		String sql = "SELECT recordid, count(DISTINCT t.lotid) " +
     		"FROM ims_transaction t " +
     		"INNER JOIN ims_lot l ON l.lotid = t.lotid " +
-    		"WHERE trnstat = 0 AND trnqty <= 0 AND recordid IN (:entryIds) " +
+    		"WHERE trnstat = 0 AND trnqty < 0 AND recordid IN (:entryIds) " +
     		"  AND l.status = 0 AND l.etype = 'GERMPLSM' " +
     		"GROUP BY recordid " +
     		"ORDER BY recordid ";
@@ -421,5 +486,90 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 		} catch (Exception e) {
 			logAndThrowException("Error at cancelUnconfirmedTransactionsForLists=" + listIds + " at TransactionDAO: " + e.getMessage(), e);
 		}
+    }
+
+    public boolean transactionsExistForListData(Integer dataListId) throws MiddlewareQueryException{
+        try {
+            Criteria criteria = getSession().createCriteria(Transaction.class);
+            criteria.add(Restrictions.eq("sourceId", dataListId));
+            criteria.add(Restrictions.eq("sourceType", EntityType.LIST.name()));
+            criteria.setProjection(Projections.rowCount());
+
+            Number number = (Number) criteria.uniqueResult();
+            return number.intValue() > 0;
+        } catch (HibernateException e) {
+            logAndThrowException("Error at transactionsExistForListData=" + dataListId + " at TransactionDAO: " + e.getMessage(), e);
+            return false;
+        }
+    }
+
+	public Map<Integer, String> retrieveStockIds(List<Integer> lrecIds) {
+		
+		Map<Integer, String> lrecIdStockIdMap = new HashMap<>();
+		
+		String sql = "SELECT a.lrecid,group_concat(inventory_id SEPARATOR ', ')  " +
+		"FROM listdata a  " +
+		"inner join ims_lot b ON a.gid = b.eid  " +
+		"INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid " +
+		"WHERE a.lrecid in (:lrecids) GROUP BY a.lrecid";
+		
+		Query query = getSession().createSQLQuery(sql)
+    			.setParameterList("lrecids", lrecIds);
+
+		List<Object[]> result = query.list();
+		for (Object[] row : result) {
+			Integer lrecid = (Integer) row[0];
+			String stockIds = (String) row[1];
+			
+			lrecIdStockIdMap.put(lrecid, stockIds);
+		}
+		return lrecIdStockIdMap;
+	
+	}
+
+    public Boolean isStockIdExists(List<String> stockIds) throws MiddlewareQueryException {
+        try {
+            List<String> result = getSimilarStockIds(stockIds);
+            if (null != result && !result.isEmpty()) {
+                return true;
+            }
+
+        } catch (Exception e) {
+            logAndThrowException("Error at isStockIdExists= at TransactionDAO: " + e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    public List<String> getSimilarStockIds(List<String> stockIds) throws MiddlewareQueryException {
+        try {
+            String sql = "SELECT inventory_id"
+                    + " FROM ims_transaction"
+                    + " WHERE inventory_id IN (:STOCK_ID_LIST)";
+
+            Query query = getSession().createSQLQuery(sql).setParameterList("STOCK_ID_LIST",stockIds);
+            return query.list();
+        } catch (Exception e) {
+            logAndThrowException("Error at isStockIdExists= at TransactionDAO: " + e.getMessage(), e);
+        }
+
+        return new ArrayList<>();
+
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<String> getStockIdsByListDataProjectListId(Integer listId) throws MiddlewareQueryException {
+        try {
+            String sql = "SELECT tran.inventory_id"
+            		+ " FROM ims_transaction tran, listnms l"
+            		+ " WHERE l.listId = :listId "
+                    + " AND sourceId = l.listref AND sourceType = 'LIST'"
+                    + " AND inventory_id IS NOT NULL";
+            Query query = getSession().createSQLQuery(sql).setParameter("listId",listId);
+            return query.list();
+        } catch (Exception e) {
+            logAndThrowException("Error at getStockIdsByListId("+listId+") at TransactionDAO: " + e.getMessage(), e);
+        }
+        return new ArrayList<String>();
     }
 }

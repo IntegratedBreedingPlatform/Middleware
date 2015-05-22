@@ -163,6 +163,7 @@ public enum TermId {
 	, CROSS (8377)
 	, DESIG (8250)
 	, CHECK (8255)
+	, STOCKID (1727)
 	
 	//Location 
     , TRIAL_LOCATION(8180)
@@ -212,6 +213,7 @@ public enum TermId {
     , RESOLVABLE_INCOMPLETE_ROW_COL (10145)
     , RESOLVABLE_INCOMPLETE_BLOCK_LATIN (10166)
     , RESOLVABLE_INCOMPLETE_ROW_COL_LATIN (10167)
+    , OTHER_DESIGN (10168)
     
     //Replications Map values
     , REPS_IN_SINGLE_ROW (8143)
@@ -277,6 +279,11 @@ public enum TermId {
     , AMOUNT_INVENTORY (1722)
     
     , ENTRY_TYPE(8255)
+    
+    //added headers of Export Inventory Template for stock list
+    , DUPLICATE(1728)
+    , BULK_WITH(1729)
+    , BULK_COMPL(1730)
 
 ;
 	

@@ -575,5 +575,6 @@ public interface OntologyDataManager {
      * @return
      */
     List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
-	
+
+	boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException;
 }

@@ -11,25 +11,21 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this
@@ -636,4 +632,19 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			List<ListDataProperty> listDataProps) throws MiddlewareQueryException {
 		return getListDataPropertySaver().saveListDataProperties(listDataProps);
 	}
+
+    @Override public List<ListDataProject> retrieveSnapshotListData(Integer listID)
+            throws MiddlewareQueryException {
+        return getListDataProjectDAO().getByListId(listID);
+    }
+    
+    @Override public List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID)
+            throws MiddlewareQueryException {
+        return getListDataProjectDAO().getListDataProjectWithParents(listID);
+    }
+
+    @Override
+    public Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID) throws MiddlewareQueryException {
+        return getGermplasmListDAO().getListDataListIDFromListDataProjectListID(listDataProjectListID);
+    }
 }

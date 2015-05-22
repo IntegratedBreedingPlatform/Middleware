@@ -2,11 +2,12 @@ package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.ims.LotsResult;
 import org.generationcp.middleware.service.api.InventoryService;
-import org.generationcp.middleware.utils.test.Debug;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +21,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InventoryServiceImplTest extends DataManagerIntegrationTest {
+public class InventoryServiceImplTestIT extends DataManagerIntegrationTest {
 
 	private static InventoryService inventoryService;
 
@@ -34,7 +35,7 @@ public class InventoryServiceImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetCurrentNotificationNumber() throws MiddlewareException {
 		Integer currentNotificationNumber = inventoryService.getCurrentNotationNumberForBreederIdentifier("TR");
-		assertEquals(2, currentNotificationNumber.intValue());
+		assertEquals(0, currentNotificationNumber.intValue());
 	}
 
 	@Test
@@ -56,5 +57,21 @@ public class InventoryServiceImplTest extends DataManagerIntegrationTest {
 		Integer currentNotationNumber = dut.getCurrentNotationNumberForBreederIdentifier("PRE");
 		assertEquals(35, currentNotationNumber.intValue());
 
+	}
+	
+	@Test
+	public void testStockHasCompletedBulking() throws MiddlewareQueryException {
+		Integer listId = 17;
+		List<InventoryDetails> inventoryDetailsList = 
+				inventoryService.getInventoryListByListDataProjectListId(
+						listId, GermplasmListType.CROSSES);
+		boolean hasCompletedBulking = false;
+		for (InventoryDetails inventoryDetails : inventoryDetailsList) {
+			if(InventoryDetails.BULK_COMPL_COMPLETED.equals(inventoryDetails.getBulkCompl())){
+				hasCompletedBulking = true;
+			}
+		}
+		assertEquals(hasCompletedBulking,
+				inventoryService.stockHasCompletedBulking(listId));
 	}
 }

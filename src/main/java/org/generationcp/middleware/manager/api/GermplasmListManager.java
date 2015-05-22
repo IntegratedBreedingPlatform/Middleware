@@ -11,17 +11,14 @@ o * Copyright (c) 2012, All Rights Reserved.
  *******************************************************************************/
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
+
+import java.util.List;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -641,4 +638,22 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException
      */
     List<ListDataProperty> saveListDataProperties(List<ListDataProperty> listDataProps) throws MiddlewareQueryException;
+
+    /**
+     * 
+     * @param listID
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<ListDataProject> retrieveSnapshotListData(Integer listID) throws MiddlewareQueryException;
+    
+    /**
+     * 
+     * @param listID
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID) throws MiddlewareQueryException;
+
+    Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID) throws MiddlewareQueryException;
 }

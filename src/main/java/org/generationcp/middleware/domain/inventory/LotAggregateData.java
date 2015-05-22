@@ -20,6 +20,8 @@ public class LotAggregateData implements Serializable {
 	private Double availableBalance;
 	
 	private Double reservedTotal;
+	
+	private String stockIds;
 
 	// key = record id and value = reserved quantity
 	private Map<Integer, Double> reservationMap;
@@ -69,6 +71,14 @@ public class LotAggregateData implements Serializable {
 		this.reservationMap = reservationMap;
 	}
 
+	public String getStockIds() {
+		return stockIds;
+	}
+
+	public void setStockIds(String stockIds) {
+		this.stockIds = stockIds;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -90,6 +100,8 @@ public class LotAggregateData implements Serializable {
         		builder.append(reservationMap.get(id));
         	}
         }
+		builder.append(", stockIds=");
+		builder.append(stockIds);
 		builder.append("]");
 		return builder.toString();
 	}

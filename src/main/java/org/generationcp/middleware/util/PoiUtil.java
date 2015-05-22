@@ -62,6 +62,11 @@ public class PoiUtil {
 
         Sheet sheet = wb.getSheetAt(sheetNumber);
         Row row = sheet.getRow(rowNumber);
+
+        if (null == row) {
+            return null;
+        }
+
         Cell cell = row.getCell(columnNumber);
         return getCellStringValue(cell);
 

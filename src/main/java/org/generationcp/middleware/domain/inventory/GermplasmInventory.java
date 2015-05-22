@@ -25,6 +25,10 @@ public class GermplasmInventory implements Serializable {
 	//number of lots for given germplasm
 	private Integer lotCount;
 	
+	//String of StockIDs separated by comma per list entry.
+	private String stockIDs; 
+
+
 	//list of lots for germplasm
 	private List<? extends LotDetails> lotRows;
 	
@@ -66,6 +70,14 @@ public class GermplasmInventory implements Serializable {
 		this.lotRows = lotRows;
 		lotCount = lotRows.size();
 	}
+	
+	public String getStockIDs() {
+		return stockIDs;
+	}
+
+	public void setStockIDs(String stockIDs) {
+		this.stockIDs = stockIDs;
+	}
 
 	@Override
 	public String toString() {
@@ -96,6 +108,9 @@ public class GermplasmInventory implements Serializable {
 			builder.append(", lotCount = ");
 			builder.append(lotCount);
 		}
+		builder.append(", stockIDs=");
+		builder.append(stockIDs);
+		
 		return builder.toString();
 	}
 

@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.util.Debug;
 
 import java.io.Serializable;
@@ -92,6 +93,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     private Integer fieldId;
     
     private Integer blockId;
+    
+    private GermplasmList stockList;
     
     /** The deleted plot coordintes in (row, range) format */
     private List<String> deletedPlots;
@@ -658,4 +661,12 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     public void setLabelHeaders(Map<Integer, String> labelHeaders) {
         this.labelHeaders = labelHeaders;
     }
+
+	public GermplasmList getStockList() {
+		return stockList;
+	}
+
+	public void setStockList(GermplasmList stockList) {
+		this.stockList = stockList;
+	}
 }

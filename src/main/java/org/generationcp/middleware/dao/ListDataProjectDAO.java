@@ -1,5 +1,9 @@
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -11,9 +15,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
@@ -72,22 +73,36 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 	public ListDataProject getByStudy(int studyId,GermplasmListType listType,int plotNo) throws MiddlewareQueryException {
 		try {
 
-			String queryStr = "SELECT ldp.*"
-					+ " FROM nd_experimentprop nep,"
-					+ "  nd_experiment_stock nes, stock s, listdata_project ldp,"
-					+ "  listnms l, nd_experiment_project p, project_relationship pr"
-					+ " WHERE nep.type_id IN (:PLOT_NO_TERM_IDS)"
-					+ "      AND nep.nd_experiment_id = nes.nd_experiment_id"
-					+ "      AND nes.stock_id = s.stock_id"
-					+ "      AND s.uniquename = ldp.entry_id"
-					+ "      AND s.dbxref_id = ldp.germplasm_id"
-					+ "      AND l.listid = ldp.list_id"
-					+ "      AND nep.nd_experiment_id = p.nd_experiment_id"
-					+ "      AND p.project_id = pr.subject_project_id"
-					+ "      AND pr.object_project_id = l.projectid"
-					+ "      AND l.listtype = :LIST_TYPE"
-					+ "      AND nep.VALUE = :PLOT_NO"
-					+ "      AND l.projectid = :STUDY_ID";
+			String queryStr =
+					"select ldp.* FROM nd_experiment_project neproj,"
+					+ " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
+					+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms"
+					+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
+					+ " AND nms.projectid = pr.object_project_id"
+					+ " AND nms.listid = ldp.list_id"
+					+ " AND pp.project_id = pr.subject_project_id"
+					+ " AND nms.projectid = :STUDY_ID"
+					+ " AND pp.value = :DATASET_TYPE"
+					+ " AND neproj.project_id = pr.subject_project_id"
+					+ " AND neproj.nd_experiment_id = nd_ep.nd_experiment_id"
+					+ " AND nd_stock.nd_experiment_id = nd_ep.nd_experiment_id"
+					+ " AND stock.stock_id = nd_stock.stock_id"
+					+ " AND ldp.germplasm_id = stock.dbxref_id"
+					+ " AND nd_ep.value = :PLOT_NO"
+					+ " AND ( EXISTS ("
+					+ " SELECT 1"
+					+ " FROM listnms cl"
+					+ " WHERE cl.listid = ldp.list_id"
+					+ " AND cl.listtype = 'CHECK'"
+					+ " AND NOT EXISTS ("
+					+ " SELECT 1 FROM listnms nl"
+					+ " WHERE nl.listid = ldp.list_id"
+					+ " AND nl.listtype = :LIST_TYPE"
+					+ " )) OR EXISTS ("
+					+ " SELECT 1 FROM listnms nl"
+					+ " WHERE nl.listid = ldp.list_id"
+					+ " AND nl.listtype = :LIST_TYPE"
+					+ " ))";
 
 
 			SQLQuery query = getSession().createSQLQuery(queryStr);
@@ -95,6 +110,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.setParameter("LIST_TYPE", listType.name());
 			query.setParameter("STUDY_ID", studyId);
 			query.setParameter("PLOT_NO",plotNo);
+			query.setParameter("DATASET_TYPE", DataSetType.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
 					new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
 
@@ -143,5 +159,89 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
         }
         return 0;
     }
+
+	public List<ListDataProject> getListDataProjectWithParents(Integer listID) throws MiddlewareQueryException {
+		List<ListDataProject> listDataProjects = new ArrayList<ListDataProject>();
+		try {
+
+			String queryStr = "select "+ 
+							" lp.listdata_project_id as listdata_project_id, "+
+							" lp.entry_id as entry_id, "+ 
+							" lp.designation as designation, "+ 
+							" lp.group_name as group_name, "+
+							" fn.nval as fnval, "+
+							" fp.gid as fpgid, "+
+							" mn.nval as mnval, "+
+							" mp.gid as mpgid, "+
+							" g.gid as gid, "+
+							" lp.seed_source as seed_source, "+
+							" lp.duplicate_notes as duplicate_notes "+
+						" from listdata_project lp "+
+						" inner join germplsm g on lp.germplasm_id = g.gid "+
+						" inner join germplsm mp on g.gpid2 = mp.gid "+
+						" inner join names mn on mp.gid = mn.gid and mn.nstat = 1 "+
+						" inner join germplsm fp on g.gpid1 = fp.gid "+
+						" inner join names fn on fp.gid = fn.gid and mn.nstat = 1 "+
+						" where lp.list_id = :listId "+
+						" group by entry_id";
+
+
+			SQLQuery query = getSession().createSQLQuery(queryStr);
+			query.setParameter("listId", listID);
+			query.addScalar("listdata_project_id");
+			query.addScalar("entry_id");
+			query.addScalar("designation");
+			query.addScalar("group_name");
+			query.addScalar("fnval");
+			query.addScalar("fpgid");
+			query.addScalar("mnval");
+			query.addScalar("mpgid");
+			query.addScalar("gid");
+			query.addScalar("seed_source");
+			query.addScalar("duplicate_notes");
+			
+			createListDataProjectRows(listDataProjects,query);
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getListDataProjectWithParents=" + listID + " in ListDataProjectDAO: " + e.getMessage(), e);
+		}
+
+		return listDataProjects;
+	}
+
+	private void createListDataProjectRows(
+			List<ListDataProject> listDataProjects, SQLQuery query) {
+		List<Object[]> result = query.list();
+		
+		for (Object[] row : result) {
+			Integer listDataProjectId = (Integer) row[0];
+			Integer entryId = (Integer) row[1];
+			String designation = (String) row[2];
+			String parentage = (String) row[3];
+			String femaleParent = (String) row[4];
+			Integer fgid = (Integer) row[5];
+			String maleParent = (String) row[6];
+			Integer mgid = (Integer) row[7];
+			Integer gid = (Integer) row[8];
+			String seedSource = (String) row[9];
+			String duplicate = (String) row[10];
+			
+			ListDataProject listDataProject = new ListDataProject();
+			listDataProject.setListDataProjectId(listDataProjectId);
+			listDataProject.setEntryId(entryId);
+			listDataProject.setDesignation(designation);
+			listDataProject.setGroupName(parentage);
+			listDataProject.setFemaleParent(femaleParent);
+			listDataProject.setFgid(fgid);
+			listDataProject.setMaleParent(maleParent);
+			listDataProject.setMgid(mgid);
+			listDataProject.setGermplasmId(gid);
+			listDataProject.setSeedSource(seedSource);
+			listDataProject.setDuplicate(duplicate);
+			
+			listDataProjects.add(listDataProject);
+		}
+		
+	}
 	
 }

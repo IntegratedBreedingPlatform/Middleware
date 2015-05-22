@@ -773,6 +773,9 @@ public class WorkbookBuilder extends Builder {
 			for (Experiment experiment : experiments) {
 				List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 				for (Variable variable : experiment.getFactors().getVariables()) {
+					if (variable.getVariableType().getId() == TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
+						continue;
+					}
 					MeasurementData measurementData = null;
 					MeasurementVariable measurementVariable = getMeasurementVariableByName(variable.getVariableType().getLocalName(), factorList); 
 	            	if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
