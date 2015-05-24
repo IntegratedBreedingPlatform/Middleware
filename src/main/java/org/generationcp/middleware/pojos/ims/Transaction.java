@@ -35,6 +35,8 @@ public class Transaction implements Serializable{
     private static final long serialVersionUID = 77866453513905521L;
     public static final String GET_EMPTY_LOT = "getEmptyLot";
     public static final String GET_LOT_WITH_MINIMUM_AMOUNT = "getLotWithMinimumAmount";
+    public static final String GET_INVENTORY_ID_WITH_IDENTIFIER_QUERY = "select inventory_id FROM ims_transaction WHERE inventory_id "
+            + "RLIKE '^:identifier[0-9][0-9]*.*'";
 
     @Id
     @Basic(optional = false)
@@ -84,6 +86,15 @@ public class Transaction implements Serializable{
     @Column(name = "personid")
     private Integer personId;
 
+    @Column(name = "inventory_id")
+    private String inventoryID;
+    
+    @Column(name = "bulk_with")
+    private String bulkWith;
+    
+    @Column(name = "bulk_compl")
+    private String bulkCompl;
+
     public Transaction() {
     }
 
@@ -94,7 +105,7 @@ public class Transaction implements Serializable{
 
     public Transaction(Integer id, Integer userId, Lot lot, Integer transactionDate, Integer status, 
     		Double quantity, String comments, Integer commitmentDate, String sourceType, Integer sourceId, 
-    		Integer sourceRecordId, Double previousAmount, Integer personId) {
+    		Integer sourceRecordId, Double previousAmount, Integer personId, String inventoryID) {
         super();
         this.id = id;
         this.userId = userId;
@@ -109,6 +120,7 @@ public class Transaction implements Serializable{
         this.sourceRecordId = sourceRecordId;
         this.previousAmount = previousAmount;
         this.personId = personId;
+        this.inventoryID = inventoryID;
     }
 
     public Integer getId() {
@@ -266,4 +278,30 @@ public class Transaction implements Serializable{
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(id).toHashCode();
     }
+
+    public String getInventoryID() {
+        return inventoryID;
+    }
+
+    public void setInventoryID(String inventoryID) {
+        this.inventoryID = inventoryID;
+    }
+
+	public String getBulkWith() {
+		return bulkWith;
+	}
+
+	public void setBulkWith(String bulkWith) {
+		this.bulkWith = bulkWith;
+	}
+
+	public String getBulkCompl() {
+		return bulkCompl;
+	}
+
+	public void setBulkCompl(String bulkCompl) {
+		this.bulkCompl = bulkCompl;
+	}
+    
+    
 }

@@ -282,7 +282,7 @@ public class PhenotypeSaver extends Saver{
 			getPhenotypeDao().saveOrUpdate(phenotype);
 			if (isInsert) {
 				int experimentId = getExperimentProjectDao().getExperimentIdByProjectId(projectId);
-				saveExperimentPhenotype(experimentId, phenotypeId);
+				saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
 			}
     	}
     }

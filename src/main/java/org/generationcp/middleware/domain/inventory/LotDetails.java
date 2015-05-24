@@ -22,6 +22,7 @@ public class LotDetails implements Serializable{
     private Location locationOfLot;
     private Double reservedTotal;
     private Term scaleOfLot;
+    private String stockIds;
 
 	public Integer getLotId() {
         return lotId;
@@ -103,6 +104,14 @@ public class LotDetails implements Serializable{
 		this.locId = locId;
 	}
 
+	public String getStockIds() {
+		return stockIds;
+	}
+
+	public void setStockIds(String stockIds) {
+		this.stockIds = stockIds;
+	}
+
 	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -126,6 +135,8 @@ public class LotDetails implements Serializable{
         builder.append(scaleOfLot);
         builder.append(", commentOfLot=");
         builder.append(commentOfLot);
+        builder.append(", stockIds=");
+        builder.append(stockIds);
         builder.append("]");
         return builder.toString();
     }

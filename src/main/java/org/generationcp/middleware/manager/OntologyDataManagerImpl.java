@@ -962,4 +962,29 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(termId);
 		return getNameSynonymBuilder().create(synonyms);
 	}
+
+    @Override
+    public boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException {
+        boolean isSeedAmountVar = false;
+
+        if ("INVENTORY AMOUNT".equalsIgnoreCase(variateProperty)) {
+            isSeedAmountVar = true;
+
+        } else {
+                List<Term> termsByNameOrSynonym = this.findTermsByNameOrSynonym("INVENTORY AMOUNT", CvId.PROPERTIES);
+                if (termsByNameOrSynonym != null && !termsByNameOrSynonym.isEmpty()) {
+                    List<NameSynonym> synonymsOfTerm = this
+                            .getSynonymsOfTerm(termsByNameOrSynonym.get(0).getId());
+                    for (NameSynonym synonym : synonymsOfTerm) {
+                        if (synonym.getName().equalsIgnoreCase(variateProperty)) {
+                            isSeedAmountVar = true;
+                            break;
+                        }
+                    }
+                }
+
+        }
+
+        return isSeedAmountVar;
+    }
 }

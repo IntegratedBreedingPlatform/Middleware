@@ -50,8 +50,8 @@ public class LotBuilder extends Builder {
 		List<Lot> lots = createLotsForAdd(newGids, locationId, scaleId, comment, userId, amount, sourceId);
 		return lots;
 	}
-	
-	private List<Integer> removeGidsWithExistingCombination(List<Integer> gids, Integer locationId, Integer scaleId) 
+
+	private List<Integer> removeGidsWithExistingCombination(List<Integer> gids, Integer locationId, Integer scaleId)
 			throws MiddlewareQueryException {
 		
 		List<Integer> newGids = new ArrayList<Integer>();
@@ -75,17 +75,20 @@ public class LotBuilder extends Builder {
 	
 	private List<Lot> createLotsForAdd(List<Integer> gids, Integer locationId, Integer scaleId, String comment, 
 			Integer userId, Double amount, Integer sourceId) throws MiddlewareQueryException {
-		List<Lot> lots = new ArrayList<Lot>();
+		List<Lot> lots = new ArrayList<>();
 		
         if (gids != null && !gids.isEmpty()) {
 			for (Integer gid : gids) {
 				
-				lots.add(new Lot(null/*lotId*/, userId, EntityType.GERMPLSM.name(), gid, locationId, scaleId
-						, LotStatus.ACTIVE.getIntValue(), LOT_NOT_DERIVED_FROM_ANOTHER, comment));
+				lots.add(createLotForAdd(gid, locationId, scaleId, comment,userId));
 			}
 		}
 		
 		return lots;
+	}
+
+	public Lot createLotForAdd(Integer gid, Integer locationId, Integer scaleId, String comment, Integer userId) throws MiddlewareQueryException {
+		return new Lot(null, userId, EntityType.GERMPLSM.name(), gid, locationId, scaleId, LotStatus.ACTIVE.getIntValue(), LOT_NOT_DERIVED_FROM_ANOTHER, comment);
 	}
 	
 	private List<Lot> createLotsForUpdate(List<Integer> gids, Integer locationId, Integer scaleId, String comment) throws MiddlewareQueryException {

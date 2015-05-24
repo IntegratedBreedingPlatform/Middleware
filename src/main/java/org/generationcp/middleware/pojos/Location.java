@@ -13,7 +13,6 @@ package org.generationcp.middleware.pojos;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
-
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -41,6 +40,8 @@ public class Location implements Serializable, Comparable<Location>{
 
     public static final String GET_PROVINCE_BY_COUNTRY = "select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV'  and l.cntryid = (:countryId) order by l.lname";
     public static final String GET_ALL_PROVINCES = "select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV' order by l.lname";
+
+    public static final int UNKNOWN_LOCATION_ID = 0;
 
     @Id
     @Basic(optional = false)

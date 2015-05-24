@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
@@ -1221,31 +1222,15 @@ public interface GermplasmDataManager {
      * @param q - the search term to be used in retrieving the germplasm
      * @param o - the operation to be used for the query (equal or like)
      * @param includeParents - boolean flag to denote whether parents will be included in search results
-     * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
-     * Given a List of GIDs, return the list of gids mapped to their corresponding location
-     * Map<Integer, String>
-     * - map of gids to their corresponding location name
+     * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
+     * @return - List of germplasms filtered by the gid, stockID and germplasm name based on the operation and search term, 
+     * with parents and with inventory only filtered if specified
+     * 
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents) throws MiddlewareQueryException;
+    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly) throws MiddlewareQueryException;
 
     
-    /**
-     * Search for germplasms given a search term Q.
-     *
-     * @param q - the search term to be used in retrieving the germplasm
-     * @param o - the operation to be used for the query (equal or like)
-     * @param includeParents - boolean flag to denote whether parents will be included in search results
-     * @param searchPublicData flag to indicate whether public (central) data should be searched
-     * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
-     * Given a List of GIDs, return the list of gids mapped to their corresponding location
-     * Map<Integer, String>
-     * - map of gids to their corresponding location name
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean searchPublicData) throws MiddlewareQueryException;
-
     /**
      * Please use LocationDataManager.getLocationsByIDs().
      * 
@@ -1428,8 +1413,17 @@ public interface GermplasmDataManager {
     void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException;
 
     /**
+    * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes in <b>linkedNodes</b> atribute,
+    * being the first node the female and the second one the male parent. The information is ultimately stored in Germplasm beans, containing only gids and information about names.
+    * The key of the map is the gid. 
+    * @param studyId The identifier for the study which parents will be retuned.
+    * @return The parents for each germplasm in a study.
+    */
+   Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
+   /*
      * get the Germplasm from the crop database based on local gid reference 
      * @param lgid
      */
 	Germplasm getGermplasmByLocalGid(Integer lgid) throws MiddlewareQueryException;	
+
 }

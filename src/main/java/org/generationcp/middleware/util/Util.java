@@ -29,6 +29,8 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * A utility class used to get primitive values of wrapper classes, check for
  * null values, and list functions such as getting the max, existence of a
@@ -291,6 +293,47 @@ public class Util{
     	SimpleDateFormat formatter = getSimpleDateFormat(format);
     	return formatter.parse(date);
     }
+    
+    public static String nullIfEmpty(String value) {
+    	if(StringUtils.isEmpty(value)) {
+    		return null;
+    	}
+    	return value;
+    }
+    
+    public static Double zeroIfNull(Double value) {
+    	if(value==null) {
+    		return 0.0;
+    	}
+    	return value;
+    }
+    
+	public static String prependToCSV(String valueToPrepend, String csv) {
+		return valueToPrepend+", "+csv;
+	}
+	
+	public static String prependToCSVAndArrange(String valueToPrepend, String csv) {
+		String updatedValue = prependToCSV(valueToPrepend,csv);
+		String[] values = updatedValue.split(",");
+		Set<String> valueSet = new TreeSet<String>();
+		for (String value : values) {
+			valueSet.add(value.trim());
+		}
+		return convertCollectionToCSV(valueSet);
+	}
+	
+	public static String convertCollectionToCSV(Collection<String> collection) {
+		int i = 0;
+		StringBuilder csv = new StringBuilder();
+		for (String value : collection) {
+			if(i!=0) {
+				csv.append(", ");
+			}
+			csv.append(value);
+			i++;
+		}
+		return csv.toString();
+	}
 }
 
 

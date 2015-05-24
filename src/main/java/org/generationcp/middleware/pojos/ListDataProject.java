@@ -4,13 +4,21 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 @Entity
 @Table(name = "listdata_project")
 public class ListDataProject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	public static final String PEDIGREE_DUPE = "Pedigree Dupe";
+	public static final String PLOT_DUPE = "Plot Dupe";
+	public static final String PEDIGREE_RECIP = "Pedigree Recip";
+	public static final String PLOT_RECIP = "Plot Recip";
 
 	@Id
     @Basic(optional = false)
@@ -47,6 +55,26 @@ public class ListDataProject implements Serializable {
 
     @Column(name = "group_name")
     private String groupName;
+    
+    @Column(name = "duplicate_notes")
+    private String duplicate;
+   
+    
+    /***
+     * The following will only be field when getListDataProjectWithParents() is called,
+     * otherwise, it will always be null
+     */
+    @Transient
+    private String femaleParent = null;
+    
+    @Transient
+    private Integer fgid = null;
+    
+    @Transient
+    private String maleParent = null;
+    
+    @Transient
+    private Integer mgid = null;
 
 	/**
 	 * @return the listDataProjectId
@@ -173,6 +201,46 @@ public class ListDataProject implements Serializable {
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
+ 
+	public String getDuplicate() {
+		return duplicate;
+	}
+
+	public void setDuplicate(String duplicate) {
+		this.duplicate = duplicate;
+	}
+
+	public String getFemaleParent() {
+		return femaleParent;
+	}
+
+	public void setFemaleParent(String femaleParent) {
+		this.femaleParent = femaleParent;
+	}
+
+	public Integer getFgid() {
+		return fgid;
+	}
+
+	public void setFgid(Integer fgid) {
+		this.fgid = fgid;
+	}
+
+	public String getMaleParent() {
+		return maleParent;
+	}
+
+	public void setMaleParent(String maleParent) {
+		this.maleParent = maleParent;
+	}
+
+	public Integer getMgid() {
+		return mgid;
+	}
+
+	public void setMgid(Integer mgid) {
+		this.mgid = mgid;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -184,7 +252,91 @@ public class ListDataProject implements Serializable {
 				+ ", checkType=" + checkType + ", entryId=" + entryId
 				+ ", entryCode=" + entryCode + ", seedSource=" + seedSource
 				+ ", designation=" + designation + ", groupName=" + groupName
-				+ "]";
+				+ ", duplicate=" + duplicate + "]";
+	}
+
+	public Boolean isPedigreeDupe() {
+		if(duplicate != null){
+			return duplicate.contains(PEDIGREE_DUPE);
+		}
+		return false;
+	}
+
+	public Boolean isPlotDupe() {
+		if(duplicate != null){
+			return duplicate.contains(PLOT_DUPE);
+		}
+		return false;
+	}
+
+	public Boolean isPedigreeRecip() {
+		if(duplicate != null){
+			return duplicate.contains(PEDIGREE_RECIP);
+		}
+		return false;
+	}
+
+	public Boolean isPlotRecip() {
+		if(duplicate != null){
+			return duplicate.contains(PLOT_RECIP);
+		}
+		return false;
+	}
+
+	public List<Integer> parsePedigreeDupeInformation() {
+		List<Integer> returnVal = new ArrayList<>();
+
+		if (! isPedigreeDupe()) {
+			return returnVal;
+		}
+
+		return parseDuplicateString(PEDIGREE_DUPE);
+	}
+
+	public List<Integer> parsePlotDupeInformation() {
+		if (! isPlotDupe()) {
+			return new ArrayList<Integer>();
+		}
+
+		return parseDuplicateString(PLOT_DUPE);
+	}
+
+	public List<Integer> parsePlotReciprocalInformation() {
+		if (! isPlotRecip()) {
+			return new ArrayList<Integer>();
+		}
+
+		return parseDuplicateString(PLOT_RECIP);
+	}
+
+	public List<Integer> parsePedigreeReciprocalInformation() {
+		if (! isPedigreeRecip()) {
+			return new ArrayList<Integer>();
+		}
+
+		return parseDuplicateString(PEDIGREE_RECIP);
+	}
+
+	protected List<Integer> parseDuplicateString(String forRemoval) {
+		String temp = duplicate.replace(forRemoval, "");
+		temp = temp.replace(":", "");
+		temp = temp.trim();
+
+		List<Integer> returnVal = new ArrayList<>();
+		StringTokenizer tokenizer = new StringTokenizer(temp, ",");
+
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken().trim();
+
+			if (token.length() == 0) {
+				continue;
+			}
+
+			returnVal.add( Integer.valueOf(token) );
+
+		}
+
+		return returnVal;
 	}
 
 }

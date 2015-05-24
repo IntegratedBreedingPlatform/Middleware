@@ -40,14 +40,16 @@ public class ListInventoryBuilder extends Builder {
 		List<GermplasmListData> listEntries) throws MiddlewareQueryException{
 		List<Integer> listEntryIds = new ArrayList<Integer>();
 		List<Integer> gids = new ArrayList<Integer>();
+		List<Integer> lrecIds = new ArrayList<Integer>();
 		for (GermplasmListData entry : listEntries){
 			listEntryIds.add(entry.getId());
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
+			lrecIds.add(entry.getId());
 		}
 
 		if (listEntries != null && !listEntries.isEmpty()){
-			retrieveLotCounts(listEntryIds, listEntries, gids);
+			retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
 		}
 		return listEntries;
 	}
@@ -57,23 +59,36 @@ public class ListInventoryBuilder extends Builder {
 		List<GermplasmListData> listEntries = null;
 		listEntries = getGermplasmListDataDAO().getByIds(entryIds);
 		List<Integer> gids = new ArrayList<Integer>();
+		List<Integer> lrecIds = new ArrayList<Integer>();
 		for (GermplasmListData entry : listEntries){
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
+			lrecIds.add(entry.getId());
 		}
-		retrieveLotCounts(entryIds, listEntries, gids);
+		retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
 		return listEntries;
 	}
 
-	private void retrieveLotCounts(List<Integer> entryIds, List<GermplasmListData> listEntries, List<Integer> gids)
+	private void retrieveLotCounts(List<Integer> entryIds, List<GermplasmListData> listEntries, List<Integer> gids, List<Integer> lrecIds)
 			throws MiddlewareQueryException {
 		
 		// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
 		// where listdata.gid may not be the final germplasm displayed
 		retrieveAvailableBalLotCounts(listEntries, gids);
 		retrieveReservedLotCounts(listEntries, entryIds);
+		retrieveStockIds(listEntries,lrecIds);
 	}
 	
+	private void retrieveStockIds(List<GermplasmListData> listEntries, List<Integer> lrecIds) {
+		Map<Integer, String> stockIDs = getTransactionDao().retrieveStockIds(lrecIds);
+		for (GermplasmListData entry : listEntries){
+			ListDataInventory inventory = entry.getInventoryInfo();
+			if (inventory != null ){
+				inventory.setStockIDs(stockIDs.get(entry.getId()));
+			}
+		}
+	}
+
 	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException{
 		Integer lotCount = null;
 		Map<Integer, BigInteger> lotCounts = getLotDao().countLotsWithAvailableBalance(Collections.singletonList(gid));

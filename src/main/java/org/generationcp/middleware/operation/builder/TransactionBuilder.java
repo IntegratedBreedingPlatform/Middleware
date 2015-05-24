@@ -32,7 +32,7 @@ public class TransactionBuilder  extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public List<Transaction> buildForSave(List<Lot> lots, Double amount, Integer userId, String comment, Integer sourceId)
+	public List<Transaction> buildForSave(List<Lot> lots, Double amount, Integer userId, String comment, Integer sourceId, String inventoryID)
 			throws MiddlewareQueryException {
 		
 		List<Transaction> transactions = new ArrayList<Transaction>();
@@ -40,9 +40,19 @@ public class TransactionBuilder  extends Builder {
 				transactions.add(new Transaction(/*id*/ null, userId, lot, getCurrentDate(), TransactionStatus.ANTICIPATED.getIntValue(), 
 						/*quantity*/ formatAmount(amount), comment, COMMITMENT_DATE_INDEFINITE, 
 						/*sourceType: LIST for now */ EntityType.LIST.name(),
-						sourceId, /*sourceRecordId*/ lot.getEntityId(), /*prevAmount*/ 0d, getPersonId(userId)));
+						sourceId, /*sourceRecordId*/ lot.getEntityId(), /*prevAmount*/ 0d, getPersonId(userId), inventoryID));
 		}
 		return transactions;
+	}
+
+	public Transaction buildForAdd(Lot lot, Integer lRecordID, Double amount, Integer userId, String comment, Integer sourceId, String inventoryID, String bulkWith, String bulkComp) throws MiddlewareQueryException {
+		Transaction transaction =  new Transaction(null, userId, lot, getCurrentDate(), TransactionStatus.ANTICIPATED.getIntValue(), formatAmount(amount), comment,
+				COMMITMENT_DATE_INDEFINITE, EntityType.LIST.name(), sourceId, lRecordID, 0d, getPersonId(userId), inventoryID);
+
+		transaction.setBulkCompl(bulkComp);
+		transaction.setBulkWith(bulkWith);
+
+		return transaction;
 	}
 	
 	public List<Transaction> buildForUpdate(List<Lot> lots, Double amount, String comment) throws MiddlewareQueryException {

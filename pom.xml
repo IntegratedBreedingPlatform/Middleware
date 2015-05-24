@@ -33,6 +33,9 @@
 			<id>default</id>
 			<properties>
 				<envConfig>ci</envConfig>
+				<jasper.version>6.0.0</jasper.version>
+				<itext.version>2.1.7</itext.version>
+				<reflections.version>0.9.9</reflections.version>
 			</properties>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -156,7 +159,24 @@
 			<version>1.8.5</version>
 		</dependency>
 
-		<!--  JAMon performance monitoring. -->		
+		<!-- Jasper reports module -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>${jasper.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>${itext.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>${reflections.version}</version>
+		</dependency>
+		<!--  JAMon performance monitoring. -->
         <dependency>
             <groupId>com.jamonapi</groupId>
             <artifactId>jamon</artifactId>
@@ -169,7 +189,7 @@
 		<developerConnection>scm:git:https://github.com/IntegratedBreedingPlatform/Middleware</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-	
+
 	<build>
 		<testResources>
 			<testResource>
@@ -217,7 +237,7 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			<!--jar-with-dependencies is built for external middleware teams such 
+			<!--jar-with-dependencies is built for external middleware teams such
 				as the one at ICRISAT India where Maven is not used. -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -286,6 +306,7 @@
 						<include>**/GermplasmDataManagerUtilTest.java</include>
 						<include>**/OntologyDataManagerImplTest.java</include>
 						<include>**/WorkbenchDataManagerImplTest.java</include>
+						<includes>**/ReportServiceImplTest.java</includes>
 						<include>**/GermplasmDataManagerImplTest.java</include>
 					</includes>
 				</configuration>
