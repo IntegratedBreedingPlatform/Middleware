@@ -76,10 +76,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
         Map<Integer, OntologyVariableSummary> map = new HashMap<>();
 
         try {
-            SQLQuery query = getActiveSession().createSQLQuery("select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, vpo.alias, vpo.min_value, vpo.max_value, pf.id fid from cvterm v " +
+            SQLQuery query = getActiveSession().createSQLQuery("select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, dsr.did, dsr.dn, dsr.dd, vpo.alias, vpo.min_value, vpo.max_value, pf.id fid from cvterm v " +
                     "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id " +
                     "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id " +
                     "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id " +
+                    "left join (select dr.subject_id sid, d.cvterm_id did, d.name dn, d.definition dd from cvterm_relationship dr inner join cvterm d on d.cvterm_id = dr.object_id and dr.type_id = 1105) dsr on dsr.sid = vsr.sid " +
                     "left join variable_program_overrides vpo on vpo.cvterm_id = v.cvterm_id " +
                     "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES'" +
                     "    WHERE (v.cv_id = 1040) " + filterClause + " ORDER BY v.cvterm_id")
@@ -87,6 +88,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                     .addScalar("pid").addScalar("pn").addScalar("pd")
                     .addScalar("mid").addScalar("mn").addScalar("md")
                     .addScalar("sid").addScalar("sn").addScalar("sd")
+                    .addScalar("did").addScalar("dn").addScalar("dd")
                     .addScalar("alias").addScalar("min_value").addScalar("max_value")
                     .addScalar("fid");
 
@@ -111,11 +113,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 OntologyVariableSummary variable = new OntologyVariableSummary(typeSafeObjectToInteger(items[0]), (String)items[1], (String) items[2]);
                 variable.setPropertySummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
                 variable.setMethodSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
-                variable.setScaleSummary(scaleDataManager.getScaleById(typeSafeObjectToInteger(items[9])));
-                variable.setAlias((String) items[12]);
-                variable.setMinValue((String) items[13]);
-                variable.setMaxValue((String) items[14]);
-                variable.setIsFavorite(items[15] != null);
+                variable.setScaleSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
+                variable.setDataType(DataType.getById(typeSafeObjectToInteger(items[12]))); // 13 and 14 does not require to map
+                variable.setAlias((String) items[15]);
+                variable.setMinValue((String) items[16]);
+                variable.setMaxValue((String) items[17]);
+                variable.setIsFavorite(items[18] != null);
                 map.put(variable.getId(), variable);
             }
 
