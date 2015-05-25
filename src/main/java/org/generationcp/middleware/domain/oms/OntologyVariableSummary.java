@@ -1,7 +1,5 @@
 package org.generationcp.middleware.domain.oms;
 
-import org.generationcp.middleware.domain.ontology.Scale;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +12,9 @@ public class OntologyVariableSummary {
 
 	private TermSummary methodSummary;
 
-    private org.generationcp.middleware.domain.ontology.Scale scaleSummary;
+    private TermSummary scaleSummary;
+
+    private DataType dataType;
 
     private final Set<VariableType> variableTypes = new HashSet<>();
 
@@ -74,13 +74,21 @@ public class OntologyVariableSummary {
 		this.methodSummary = methodSummary;
 	}
 
-	public Scale getScaleSummary() {
+	public TermSummary getScaleSummary() {
 		return scaleSummary;
 	}
 
-	public void setScaleSummary(Scale scaleSummary) {
+	public void setScaleSummary(TermSummary scaleSummary) {
 		this.scaleSummary = scaleSummary;
 	}
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
 
     public Set<VariableType> getVariableTypes() {
         return variableTypes;
@@ -130,7 +138,8 @@ public class OntologyVariableSummary {
         this.maxValue = maxValue;
     }
 
-	@Override
+
+    @Override
 	public int hashCode() {
 		return getId();
 	}
@@ -145,4 +154,22 @@ public class OntologyVariableSummary {
 		OntologyVariableSummary other = (OntologyVariableSummary) obj;
 		return getId().equals(other.getId());
 	}
+
+    @Override
+    public String toString() {
+        return "OntologyVariableSummary{" +
+                "term=" + term +
+                ", propertySummary=" + propertySummary +
+                ", methodSummary=" + methodSummary +
+                ", scaleSummary=" + scaleSummary +
+                ", dataType=" + dataType +
+                ", variableTypes=" + variableTypes +
+                ", alias='" + alias + '\'' +
+                ", isFavorite=" + isFavorite +
+                ", dateCreated=" + dateCreated +
+                ", dateLastModified=" + dateLastModified +
+                ", minValue='" + minValue + '\'' +
+                ", maxValue='" + maxValue + '\'' +
+                '}';
+    }
 }
