@@ -162,7 +162,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testGetUserByName() throws MiddlewareQueryException {
-        User user = (User) manager.getUserByName(testUser1.getName(), 0, 1, Operation.EQUAL).get(0);
+        User user = manager.getUserByName(testUser1.getName(), 0, 1, Operation.EQUAL).get(0);
         Assert.assertEquals(testUser1.getName(), user.getName());
         Assert.assertEquals(testUser1.getUserid(), user.getUserid());
     }
@@ -240,7 +240,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         ProjectUserRole projUsrRole1 = new ProjectUserRole(commonTestProject, testUser1, role1);
         ProjectUserRole projUsrRole2 = new ProjectUserRole(commonTestProject, testUser1, role2);
 
-        List<ProjectUserRole> projectUserRoles = new ArrayList<ProjectUserRole>();
+        List<ProjectUserRole> projectUserRoles = new ArrayList<>();
 		projectUserRoles.add(projUsrRole1);
 		projectUserRoles.add(projUsrRole2);
 
@@ -399,7 +399,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
     @Test
     public void testGetRoleById() throws MiddlewareQueryException {
-        Integer id = Integer.valueOf(1); // Assumption: there is a role with id 1
+        Integer id = 1; // Assumption: there is a role with id 1
         Role role = manager.getRoleById(id);
         Assert.assertNotNull(role); 
         Debug.println(INDENT, "testGetRoleById(id=" + id + "): \n  " + role);
@@ -485,7 +485,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
         ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(
                 commonTestProject.getProjectId().intValue(), testUser1.getUserid());
         Assert.assertNotNull(record);
-        Assert.assertEquals(Long.valueOf(commonTestProject.getProjectId()), new Long(record.getProject().getProjectId()));
+        Assert.assertEquals(commonTestProject.getProjectId(), record.getProject().getProjectId());
         Assert.assertEquals(testUser1.getUserid(), record.getUser().getUserid());
         Debug.println(INDENT, record.toString());
     }
@@ -936,11 +936,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
     @Test
     public void testGetAllStandardPreset() throws Exception {
         List<StandardPreset> out = manager.getStandardPresetDAO().getAll();
-        
-        // TODO : Are we expecting any preloaded data here ? There is no such insert query in merger-db scripts.
-        // Reviewer : Naymesh
-        assertTrue(out.size() == 0);
-
+        assertTrue(out.size() > 0);
     }
 
     @Test
@@ -1000,7 +996,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
 
     protected List<StandardPreset> initializeStandardPresets() throws MiddlewareQueryException {
-        List<StandardPreset> fulllist = new ArrayList<StandardPreset>();
+        List<StandardPreset> fulllist = new ArrayList<>();
         for (int j = 1; j < 3; j++) {
             for (int i = 1; i < 6; i++) {
                 StandardPreset preset = new StandardPreset();
