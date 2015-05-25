@@ -1,7 +1,5 @@
 package org.generationcp.middleware.domain.oms;
 
-import org.generationcp.middleware.domain.common.IdName;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,10 +45,8 @@ public enum DataType {
         return byId.get(id);
     }
 
-    public static DataType getByName(String name) { return byName.get(name); }
-
-    public IdName toIdName(){
-        return new IdName(getId(), getName());
+    public static DataType getByName(String name) {
+        return byName.get(name);
     }
 
     @Override
