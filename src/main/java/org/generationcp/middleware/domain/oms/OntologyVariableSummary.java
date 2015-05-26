@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.oms;
 
+import org.generationcp.middleware.domain.ontology.Scale;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,9 +14,7 @@ public class OntologyVariableSummary {
 
 	private TermSummary methodSummary;
 
-    private TermSummary scaleSummary;
-
-    private DataType dataType;
+    private Scale scaleSummary;
 
     private final Set<VariableType> variableTypes = new HashSet<>();
 
@@ -74,20 +74,12 @@ public class OntologyVariableSummary {
 		this.methodSummary = methodSummary;
 	}
 
-	public TermSummary getScaleSummary() {
-		return scaleSummary;
-	}
-
-	public void setScaleSummary(TermSummary scaleSummary) {
-		this.scaleSummary = scaleSummary;
-	}
-
-    public DataType getDataType() {
-        return dataType;
+    public Scale getScaleSummary() {
+        return scaleSummary;
     }
 
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
+    public void setScaleSummary(Scale scaleSummary) {
+        this.scaleSummary = scaleSummary;
     }
 
     public Set<VariableType> getVariableTypes() {
@@ -161,8 +153,8 @@ public class OntologyVariableSummary {
                 "term=" + term +
                 ", propertySummary=" + propertySummary +
                 ", methodSummary=" + methodSummary +
-                ", scaleSummary=" + scaleSummary +
-                ", dataType=" + dataType +
+                //", scaleSummary=" + scaleSummary +
+                //", dataType=" + dataType +
                 ", variableTypes=" + variableTypes +
                 ", alias='" + alias + '\'' +
                 ", isFavorite=" + isFavorite +

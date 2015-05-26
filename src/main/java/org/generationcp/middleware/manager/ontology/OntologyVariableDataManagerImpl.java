@@ -1,12 +1,24 @@
 package org.generationcp.middleware.manager.ontology;
 
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
+import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermRelationshipId;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.oms.VariableType;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
-import org.generationcp.middleware.manager.ontology.api.*;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableInfoDaoElements;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -113,8 +125,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
                 OntologyVariableSummary variable = new OntologyVariableSummary(typeSafeObjectToInteger(items[0]), (String)items[1], (String) items[2]);
                 variable.setPropertySummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5]));
                 variable.setMethodSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8]));
-                variable.setScaleSummary(TermSummary.createNonEmpty(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11]));
-                variable.setDataType(DataType.getById(typeSafeObjectToInteger(items[12]))); // 13 and 14 does not require to map
+                variable.setScaleSummary(new Scale(new Term(typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
+                variable.getScaleSummary().setDataType(DataType.getById(typeSafeObjectToInteger(items[12])));
                 variable.setAlias((String) items[15]);
                 variable.setMinValue((String) items[16]);
                 variable.setMaxValue((String) items[17]);
