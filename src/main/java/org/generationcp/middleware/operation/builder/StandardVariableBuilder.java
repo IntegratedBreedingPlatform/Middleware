@@ -90,6 +90,15 @@ public class StandardVariableBuilder extends Builder {
 		return result;
 	}
 	
+	public List<StandardVariableSummary> getStandardVariableSummariesWithIsAId(List<Integer> isAIds) throws MiddlewareQueryException {
+		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
+		if(isAIds != null && !isAIds.isEmpty()) {
+			List<StandardVariableSummary> localVariables = getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
+			result.addAll(localVariables);
+		}
+		return result;
+	}
+	
 	private void specialProcessing(List<StandardVariableSummary> summaries) throws MiddlewareQueryException {
 		if(summaries == null || summaries.isEmpty()) {
 			return;
