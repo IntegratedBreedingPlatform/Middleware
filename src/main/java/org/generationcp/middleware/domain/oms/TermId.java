@@ -284,6 +284,10 @@ public enum TermId {
     , DUPLICATE(1728)
     , BULK_WITH(1729)
     , BULK_COMPL(1730)
+    
+    //added to indicate the trait class of the Means/Summary Statistic standard variables
+    , TREATMENT_MEAN (1610)
+    , SUMMARY_STATISTIC (1620)
 
 ;
 	
