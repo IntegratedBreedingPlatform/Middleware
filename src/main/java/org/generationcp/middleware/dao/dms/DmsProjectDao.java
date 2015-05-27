@@ -44,7 +44,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT DISTINCT subject.project_id, subject.name,  subject.description " 
-			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study  "
+			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, subject." + PROGRAM_UUID + " "
 			+ "FROM project subject "
 			+ "		INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id  "
 			+ "WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ") " 
@@ -155,11 +155,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				String description = (String) row[2];
 				//non-zero if a study, else a folder
 				Integer isStudy = ((Integer) row[3]).intValue(); 
+				//project.program_uuid
+				String projectUUID = (String) row[4]; 
 				
 				if (isStudy > 0){
-					childrenNodes.add(new StudyReference(id, name, description, programUUID));
+					childrenNodes.add(new StudyReference(id, name, description, projectUUID));
 				} else {
-					childrenNodes.add(new FolderReference(id, name, description, programUUID));
+					childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 				}
 			}
 			

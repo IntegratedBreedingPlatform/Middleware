@@ -275,7 +275,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetChildrenOfFolder() throws Exception {
 		StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
 		String uniqueId = commonTestProject.getUniqueID();
-		studyTestDataUtil.createFolderTestData(uniqueId);
+		DmsProject folderWithUUID = studyTestDataUtil.createFolderTestData(uniqueId);
+		DmsProject folderWithoutUUID = studyTestDataUtil.createFolderTestData(null);
 
 		List<Integer> folderIds = Arrays.asList(25000, 1);
 		for (Integer folderId : folderIds) {
@@ -288,8 +289,15 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 					+ childrenNodes.size());
 			for (Reference node : childrenNodes) {
 				Debug.println(INDENT, "   " + node);
+				if(node.getId().intValue() == folderWithUUID.getProjectId().intValue()) {
+					assertNotNull(node.getProgramUUID()); 
+				} else if(node.getId().intValue() == folderWithoutUUID.getProjectId().intValue()) { 
+					assertNull(node.getProgramUUID());
+				}
 			}
 		}
+		studyTestDataUtil.deleteTestData(folderWithUUID.getProjectId());
+		studyTestDataUtil.deleteTestData(folderWithoutUUID.getProjectId());
 	}
 
 	@Test
