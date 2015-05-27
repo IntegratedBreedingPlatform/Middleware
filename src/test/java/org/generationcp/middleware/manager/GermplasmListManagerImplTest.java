@@ -520,7 +520,7 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
     	//String q = "HB2009DS";
         String q = "dinurado";  
     	
-        List<GermplasmList> results = manager.searchForGermplasmList(q, Operation.EQUAL, true);
+        List<GermplasmList> results = manager.searchForGermplasmList(q, Operation.EQUAL);
         Debug.println(INDENT, "searchForGermplasmList(" + q + ")");
         for(GermplasmList g : results){
           Debug.println(INDENT, g.getId() + " : " + g.getName());

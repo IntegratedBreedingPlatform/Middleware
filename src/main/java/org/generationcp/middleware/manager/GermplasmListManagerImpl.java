@@ -607,14 +607,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	results.addAll(getGermplasmListDAO().searchForGermplasmLists(q, o));
         return results;
     }
-    
-    @Deprecated
-    @Override
-    public List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException{
-        List<GermplasmList> results = new ArrayList<GermplasmList>();
-    	results.addAll(getGermplasmListDAO().searchForGermplasmLists(q, o));
-        return results;
-    }
 
 	@Override
 	public List<ListDataInfo> saveListDataColumns(List<ListDataInfo> listDataCollection) 
