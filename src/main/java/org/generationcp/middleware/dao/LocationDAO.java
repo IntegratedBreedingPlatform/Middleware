@@ -65,9 +65,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
             Criteria criteria = getSession().createCriteria(Location.class);
 
             if (operation == null || operation == Operation.EQUAL) {
-                criteria.add(Restrictions.eq("lname", name));
+                criteria.add(Restrictions.eq(LNAME, name));
             } else if (operation == Operation.LIKE) {
-                criteria.add(Restrictions.like("lname", name));
+                criteria.add(Restrictions.like(LNAME, name));
             }
             criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
             return criteria.list();
@@ -101,9 +101,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
             Criteria criteria = getSession().createCriteria(Location.class);
 
             if (operation == null || operation == Operation.EQUAL) {
-                criteria.add(Restrictions.eq("lname", name));
+                criteria.add(Restrictions.eq(LNAME, name));
             } else if (operation == Operation.LIKE) {
-                criteria.add(Restrictions.like("lname", name));
+                criteria.add(Restrictions.like(LNAME, name));
             }
             criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
             criteria.setFirstResult(start);
@@ -142,9 +142,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
                 criteria.setProjection(Projections.rowCount());
 
                 if (operation == null || operation == Operation.EQUAL) {
-                    criteria.add(Restrictions.eq("lname", name));
+                    criteria.add(Restrictions.eq(LNAME, name));
                 } else if (operation == Operation.LIKE) {
-                    criteria.add(Restrictions.like("lname", name));
+                    criteria.add(Restrictions.like(LNAME, name));
                 }
                 criteria.add(Restrictions.or(Restrictions.eq(UNIQUE_ID, programUUID),Restrictions.isNull(UNIQUE_ID)));
                 return ((Long) criteria.uniqueResult()).longValue();
