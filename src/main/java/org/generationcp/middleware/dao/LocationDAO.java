@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.hibernate.*;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -59,7 +60,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		if (operation == null || operation == Operation.EQUAL) {
 		    criteria.add(Restrictions.eq(LNAME, name));
 		} else if (operation == Operation.LIKE) {
-		    criteria.add(Restrictions.like(LNAME, name));
+		    criteria.add(Restrictions.like(LNAME, name, MatchMode.START));
 		}
 	}
 	
