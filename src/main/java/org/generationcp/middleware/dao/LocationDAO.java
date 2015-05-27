@@ -74,9 +74,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			Criteria criteria = this.getSession().createCriteria(Location.class);
 
 			if (operation == null || operation == Operation.EQUAL) {
-				criteria.add(Restrictions.eq("lname", name));
+				criteria.add(Restrictions.eq(LocationDAO.LNAME, name));
 			} else if (operation == Operation.LIKE) {
-				criteria.add(Restrictions.like("lname", name));
+				criteria.add(Restrictions.like(LocationDAO.LNAME, name));
 			}
 			criteria.add(Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
 			return criteria.list();
@@ -113,9 +113,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			Criteria criteria = this.getSession().createCriteria(Location.class);
 
 			if (operation == null || operation == Operation.EQUAL) {
-				criteria.add(Restrictions.eq("lname", name));
+				criteria.add(Restrictions.eq(LocationDAO.LNAME, name));
 			} else if (operation == Operation.LIKE) {
-				criteria.add(Restrictions.like("lname", name));
+				criteria.add(Restrictions.like(LocationDAO.LNAME, name));
 			}
 			criteria.add(Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
 			criteria.setFirstResult(start);
@@ -156,9 +156,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				criteria.setProjection(Projections.rowCount());
 
 				if (operation == null || operation == Operation.EQUAL) {
-					criteria.add(Restrictions.eq("lname", name));
+					criteria.add(Restrictions.eq(LocationDAO.LNAME, name));
 				} else if (operation == Operation.LIKE) {
-					criteria.add(Restrictions.like("lname", name));
+					criteria.add(Restrictions.like(LocationDAO.LNAME, name));
 				}
 				criteria.add(Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID),
 						Restrictions.isNull(LocationDAO.UNIQUE_ID)));
