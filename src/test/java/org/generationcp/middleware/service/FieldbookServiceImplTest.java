@@ -40,6 +40,7 @@ import org.junit.runners.JUnit4;
 
 import java.util.*;
 
+import junit.framework.Assert;
 import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
@@ -729,6 +730,16 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 		assertNotNull("List 1 should have list data projects",fieldbookService.getListDataProject(1));
     }
 
+    @Test
+    public void testFilterStandardVariableReferenceByIsAIds(){
+    	List<Integer> isAIds = new ArrayList<Integer>();
+    	isAIds.add(new Integer(1610));
+    	isAIds.add(new Integer(1620));
+    	List<StandardVariableReference> standardReferences = new ArrayList<StandardVariableReference>();
+    	standardReferences.add(new StandardVariableReference(18140, "GRAIN_NAME"));    	
+    	standardReferences = fieldbookService.filterStandardVariablesByIsAIds(standardReferences, isAIds);
+    	assertEquals("Should have no items remaining in the list since it was filtered", 0, standardReferences.size());
+    }
 	private ListDataProject createListDataProjectTest() {
 		ListDataProject listDataProject = new ListDataProject();
 		listDataProject.setList(new GermplasmList(1));

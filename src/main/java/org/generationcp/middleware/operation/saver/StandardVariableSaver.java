@@ -87,6 +87,10 @@ public class StandardVariableSaver extends Saver {
        	saveRelationship(varId, TermId.HAS_METHOD.getId(), stdVar.getMethod());
        	saveRelationship(varId, TermId.HAS_TYPE.getId(), stdVar.getDataType());
 		saveRelationship(varId, TermId.STORED_IN.getId(), stdVar.getStoredIn());
+		
+		if (stdVar.getIsA() != null){
+			saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
+		}
 
 		saveEnumerations(varId, stdVar.getEnumerations());
 				

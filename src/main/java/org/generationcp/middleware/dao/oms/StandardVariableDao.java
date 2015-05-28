@@ -91,6 +91,43 @@ public class StandardVariableDao {
 		LOG.debug(String.format("Number of IDs supplied: %d. Number of standard variable summaries found: %d.", standardVariableIds.size(), variableSummaries.size()));
 		return variableSummaries;
 	}
+	
+	/**
+	 * Fetches the most commonly used summary information about a standrad variable form standard_variable_summary database view.
+	 * 
+	 * @param standardVariableId
+	 * @return {@link StandardVariableSummary}
+	 * @throws MiddlewareQueryException
+	 */
+	public List<StandardVariableSummary> getStandardVariableSummaryWithIsAId(List<Integer> isAIds) throws MiddlewareQueryException {
+		long startTime = System.nanoTime();
+		assert this.session != null : "Hibernate session is required.";
+		
+		List<StandardVariableSummary> variableSummaries = new ArrayList<StandardVariableSummary>();		
+		if(isAIds != null && !isAIds.isEmpty()) {	
+			try {
+				SQLQuery query = this.session.createSQLQuery("SELECT * FROM standard_variable_summary where is_a_id in (:ids)");
+				query.setParameterList("ids", isAIds);
+				@SuppressWarnings("rawtypes")
+				List queryResults = query.list();
+				for(Object result : queryResults) {					
+					StandardVariableSummary summary = mapResults((Object[]) result);
+					if(summary != null) {
+						variableSummaries.add(summary);
+					}
+				}
+			} catch(HibernateException he) {
+				throw new MiddlewareQueryException(
+						String.format(
+								"Hibernate error in getting standard variable summaries from standard_variable_summary view. Cause: %s",
+								he.getCause().getMessage()));
+			}
+		}
+		
+		long elapsedTime = System.nanoTime() - startTime;
+		LOG.debug(String.format("Time taken: %f ms.", ((double) elapsedTime/1000000L )));
+		return variableSummaries;
+	}
 
 	private StandardVariableSummary mapResults(Object[] queryResult) {
 		if(queryResult != null) {

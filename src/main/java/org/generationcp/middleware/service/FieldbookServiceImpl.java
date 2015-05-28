@@ -65,7 +65,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     		if(detail.hasRows()) {
                 newList.add(detail);
             }
-    	}
+    	}    	
     	return newList;
     }
     
@@ -659,7 +659,31 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
 
-    private void addAllVariableIdsInMode(Set<Integer> variableIds
+    @Override
+	public List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds) {
+    	List<StandardVariableReference> newRefs = new ArrayList<StandardVariableReference>(); 
+		try {
+			List<StandardVariableSummary> variableSummaries = getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
+			for(StandardVariableReference ref : standardReferences){
+				boolean isFound = false;			
+				for(StandardVariableSummary summary : variableSummaries){
+					if(ref.getId().intValue() == summary.getId().intValue() ){
+						isFound = true;
+						break;
+					}					
+				}
+				if(!isFound){
+					newRefs.add(ref);
+				}
+			}
+		} catch (MiddlewareQueryException e) {
+			LOG.error(e.getMessage(), e);
+			newRefs = standardReferences;
+		}
+		return newRefs;
+	}
+
+	private void addAllVariableIdsInMode(Set<Integer> variableIds
             , List<Integer> storedInIds) throws MiddlewareQueryException {
     	for (Integer storedInId : storedInIds) {
     		variableIds.addAll(getCvTermRelationshipDao()

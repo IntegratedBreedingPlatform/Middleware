@@ -893,4 +893,6 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * **/
 	StandardVariable getStandardVariableByName(String name) throws MiddlewareQueryException;
+	
+	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
 }

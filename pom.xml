@@ -44,13 +44,6 @@
 	</profiles>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>18.0</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
@@ -176,7 +169,7 @@
 			<artifactId>reflections</artifactId>
 			<version>${reflections.version}</version>
 		</dependency>
-		<!--  JAMon performance monitoring. -->
+		<!--  JAMon performance monitoring. -->		
         <dependency>
             <groupId>com.jamonapi</groupId>
             <artifactId>jamon</artifactId>
@@ -184,11 +177,6 @@
         </dependency>
 
 	</dependencies>
-
-	<scm>
-		<developerConnection>scm:git:https://github.com/IntegratedBreedingPlatform/Middleware</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
 
 	<build>
 		<testResources>
@@ -237,7 +225,7 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			<!--jar-with-dependencies is built for external middleware teams such
+			<!--jar-with-dependencies is built for external middleware teams such 
 				as the one at ICRISAT India where Maven is not used. -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -309,34 +297,6 @@
 						<includes>**/ReportServiceImplTest.java</includes>
 						<include>**/GermplasmDataManagerImplTest.java</include>
 					</includes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<git-SHA-1>${buildNumber}</git-SHA-1>
-						</manifestEntries>
-					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
