@@ -73,5 +73,6 @@ public interface InventoryService {
 			throws MiddlewareQueryException;
 
 	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type)  throws MiddlewareQueryException;
+	List<InventoryDetails> getSummedInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type) throws MiddlewareQueryException;
 	boolean stockHasCompletedBulking(Integer listId) throws MiddlewareQueryException;
 }
