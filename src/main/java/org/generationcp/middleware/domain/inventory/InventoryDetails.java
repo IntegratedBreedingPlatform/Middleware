@@ -102,8 +102,6 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	private Integer sourceRecordId;
 	private Integer lotGid;
 	private Integer stockSourceRecordId;
-
-	private boolean stockIDBulked;
 	
 	/**
 	 * Instantiates a new inventory details.
@@ -673,7 +671,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getInventoryID() {
-		if(isBulkingRecipient() && ! stockIDBulked) {
+		if(isBulkingRecipient()) {
 			return Util.prependToCSVAndArrange(inventoryID,bulkWith);
 		}
 		return inventoryID;
@@ -787,13 +785,5 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setStockSourceRecordId(Integer stockSourceRecordId) {
 		this.stockSourceRecordId = stockSourceRecordId;
-	}
-
-	public boolean isStockIDBulked() {
-		return stockIDBulked;
-	}
-
-	public void setStockIDBulked(boolean stockIDBulked) {
-		this.stockIDBulked = stockIDBulked;
 	}
 }
