@@ -67,79 +67,14 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
                 "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
         try {
-            Query query = getSession().createSQLQuery(sql)
-            		.addScalar("lotId")
-		            .addScalar("locid")
-		            .addScalar("scaleid")
-		            .addScalar("userid")
-		            .addScalar("germplasm_id")
-		            .addScalar("entry_id")
-		            .addScalar("seed_source")
-		            .addScalar("designation")
-		            .addScalar("group_name")
-		            .addScalar("lname")
-		            .addScalar("labbr")
-		            .addScalar("name")
-		            .addScalar("trnqty")
-		            .addScalar("comments")
-		            .addScalar("inventory_id")
-		            .addScalar("sourceid")
-		            .addScalar("duplicate_notes")
-		            .addScalar("bulk_with")
-		            .addScalar("bulk_compl")
-		            .addScalar("listdata_project_id")
-		            .addScalar("trnid")
-		            .addScalar("recordid")
-		            .addScalar("eid")
-		            .addScalar("stockSourceRecordId");
+            Query query = setupInventoryDetailQueryObject(sql);
             query.setInteger("listId", listDataProjectListId);
             
             List<Object[]> results = query.list();
 
             if (!results.isEmpty()){
                 for (Object[] row: results){
-                    Integer lotId = (Integer) row[0];
-                    Integer locationId = (Integer) row[1];
-                    Integer scaleId = (Integer) row[2];
-                    Integer userId = (Integer) row[3];
-                    Integer gid = (Integer) row[4];
-                    Integer entryId = (Integer) row[5];
-                    String seedSource = (String) row[6];
-                    String designation = (String) row[7];
-                    String groupName = (String) row[8];
-                    String locationName = (String) row[9];
-                    String locationAbbr = (String) row[10];
-                    String scaleName = (String) row[11];
-                    Double amount = (Double) row[12];
-                    String comments = (String) row[13];
-                    String inventoryID = (String) row[14];
-                    Integer sourceId = (Integer) row[15];
-                    String duplicate = (String) row[16];
-    	        	String bulkWith = (String) row[17];
-    	        	String bulkCompl = (String) row[18];
-    	        	Integer listDataProjectId = (Integer) row[19];
-    	        	Integer trnId = (Integer) row[20];
-    	        	Integer sourceRecordId = (Integer) row[21];
-    	        	Integer lotGid = (Integer) row[22];
-    	        	Integer stockSourceRecordId = (Integer) row[23];
-
-                    InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
-                            userId, amount, sourceId, null, scaleId, scaleName, comments);
-                    details.setInventoryID(inventoryID);
-                    details.setLocationAbbr(locationAbbr);
-                    details.setEntryId(entryId);
-                    details.setSource(seedSource);
-                    details.setParentage(groupName);
-                    details.setDuplicate(duplicate);
-                    details.setBulkWith(bulkWith);
-                    details.setBulkCompl(bulkCompl);
-                    details.setListDataProjectId(listDataProjectId);
-                    details.setTrnId(trnId);
-                    details.setSourceRecordId(sourceRecordId);
-                    details.setLotGid(lotGid);
-                    details.setStockSourceRecordId(stockSourceRecordId);
-                    detailsList.add(details);
-
+                    detailsList.add(convertSQLResultsToInventoryDetails(row));
                 }
             }
         } catch (HibernateException e) {
@@ -147,6 +82,121 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
         }
 
         return detailsList;
+    }
+
+    public List<InventoryDetails> retrieveSummedInventoryDetailsForListDataProjectListId(Integer listDataProjectListId, GermplasmListType germplasmListType) throws MiddlewareQueryException {
+        List<InventoryDetails> detailsList = new ArrayList<>();
+
+        if (! germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
+            throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
+        }
+
+        String sql = "select lot.lotid, lot.locid, lot.scaleid, lot.userid, " +
+                "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, " +
+                "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,summed.stockid as inventory_id, tran.sourceid, " +
+                "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, " +
+                "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId " +
+                "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id " +
+                "INNER JOIN listnms ON d.list_id = listnms.listid " +
+                "INNER JOIN summed_transaction summed ON (summed.recordid = ist.recordid) " +
+                "INNER JOIN ims_transaction tran ON (tran.trnid = ist.trnid AND tran.recordid = summed.recordid) " +
+                "INNER JOIN ims_lot lot ON lot.lotid = tran.lotid " +
+                "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid " +
+                "WHERE listnms.listid = :listId ORDER BY d.entry_id";
+
+        try {
+            Query query = setupInventoryDetailQueryObject(sql);
+            query.setInteger("listId", listDataProjectListId);
+
+            List<Object[]> results = query.list();
+
+            if (!results.isEmpty()){
+                for (Object[] row: results){
+                    InventoryDetails details = convertSQLResultsToInventoryDetails(row);
+                    details.setStockIDBulked(true);
+                    detailsList.add(details);
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with retrieveInventoryDetailsForListDataProjectListId() query from StockTransactionDAO: " + e.getMessage(), e);
+        }
+
+        return detailsList;
+    }
+
+    protected Query setupInventoryDetailQueryObject(String querySQL) {
+        Query query = getSession().createSQLQuery(querySQL)
+                .addScalar("lotId")
+                .addScalar("locid")
+                .addScalar("scaleid")
+                .addScalar("userid")
+                .addScalar("germplasm_id")
+                .addScalar("entry_id")
+                .addScalar("seed_source")
+                .addScalar("designation")
+                .addScalar("group_name")
+                .addScalar("lname")
+                .addScalar("labbr")
+                .addScalar("name")
+                .addScalar("trnqty")
+                .addScalar("comments")
+                .addScalar("inventory_id")
+                .addScalar("sourceid")
+                .addScalar("duplicate_notes")
+                .addScalar("bulk_with")
+                .addScalar("bulk_compl")
+                .addScalar("listdata_project_id")
+                .addScalar("trnid")
+                .addScalar("recordid")
+                .addScalar("eid")
+                .addScalar("stockSourceRecordId");
+
+        return query;
+    }
+
+    protected InventoryDetails convertSQLResultsToInventoryDetails(Object[] resultRow){
+        Integer lotId = (Integer) resultRow[0];
+        Integer locationId = (Integer) resultRow[1];
+        Integer scaleId = (Integer) resultRow[2];
+        Integer userId = (Integer) resultRow[3];
+        Integer gid = (Integer) resultRow[4];
+        Integer entryId = (Integer) resultRow[5];
+        String seedSource = (String) resultRow[6];
+        String designation = (String) resultRow[7];
+        String groupName = (String) resultRow[8];
+        String locationName = (String) resultRow[9];
+        String locationAbbr = (String) resultRow[10];
+        String scaleName = (String) resultRow[11];
+        Double amount = (Double) resultRow[12];
+        String comments = (String) resultRow[13];
+        String inventoryID = (String) resultRow[14];
+        Integer sourceId = (Integer) resultRow[15];
+        String duplicate = (String) resultRow[16];
+        String bulkWith = (String) resultRow[17];
+        String bulkCompl = (String) resultRow[18];
+        Integer listDataProjectId = (Integer) resultRow[19];
+        Integer trnId = (Integer) resultRow[20];
+        Integer sourceRecordId = (Integer) resultRow[21];
+        Integer lotGid = (Integer) resultRow[22];
+        Integer stockSourceRecordId = (Integer) resultRow[23];
+
+        InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
+                userId, amount, sourceId, null, scaleId, scaleName, comments);
+        details.setInventoryID(inventoryID);
+        details.setLocationAbbr(locationAbbr);
+        details.setEntryId(entryId);
+        details.setSource(seedSource);
+        details.setParentage(groupName);
+        details.setDuplicate(duplicate);
+        details.setBulkWith(bulkWith);
+        details.setBulkCompl(bulkCompl);
+        details.setListDataProjectId(listDataProjectId);
+        details.setTrnId(trnId);
+        details.setSourceRecordId(sourceRecordId);
+        details.setLotGid(lotGid);
+        details.setStockSourceRecordId(stockSourceRecordId);
+
+        return details;
     }
 
 	public boolean stockHasCompletedBulking(Integer listId) throws MiddlewareQueryException {
