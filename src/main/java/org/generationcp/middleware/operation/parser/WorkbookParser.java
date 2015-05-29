@@ -504,7 +504,9 @@ public class WorkbookParser {
         for (int i = 0; i < expectedHeaders.length; i++) {
             // a plus is added to the column count, since the first column is the name of the group; e.g., FACTOR, CONDITION, ETC
             String cellValue = getCellStringValue(workbook, sheetNumber, row, i + 1);
-            if (!expectedHeaders[i].equals(cellValue)) {
+            if(StringUtils.isEmpty(cellValue) && !StringUtils.isEmpty(expectedHeaders[i])) {
+            	 return false;
+            } else if (!StringUtils.isEmpty(cellValue) && !expectedHeaders[i].equals(cellValue)) {
                 return false;
             }
         }
