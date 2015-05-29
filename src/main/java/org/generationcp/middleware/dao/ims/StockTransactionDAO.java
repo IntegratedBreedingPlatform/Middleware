@@ -91,17 +91,17 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
             throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
         }
 
-        String sql = "select lot.lotid, lot.locid, lot.scaleid, lot.userid, " +
+        String sql = "select lot.lotid, lot.locid, summed.scaleid, lot.userid, " +
                 "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, " +
-                "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,summed.stockid as inventory_id, tran.sourceid, " +
+                "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,tran.inventory_id, tran.sourceid, " +
                 "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, " +
                 "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId " +
                 "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id " +
                 "INNER JOIN listnms ON d.list_id = listnms.listid " +
                 "INNER JOIN summed_transaction summed ON (summed.recordid = ist.recordid) " +
                 "INNER JOIN ims_transaction tran ON (tran.trnid = ist.trnid AND tran.recordid = summed.recordid) " +
-                "INNER JOIN ims_lot lot ON lot.lotid = tran.lotid " +
-                "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid " +
+                "INNER JOIN ims_lot lot ON lot.lotid = summed.lotid " +
+                "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = summed.scaleid " +
                 "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
         try {
@@ -113,7 +113,6 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
             if (!results.isEmpty()){
                 for (Object[] row: results){
                     InventoryDetails details = convertSQLResultsToInventoryDetails(row);
-                    details.setStockIDBulked(true);
                     detailsList.add(details);
                 }
             }
