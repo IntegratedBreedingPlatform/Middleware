@@ -11,9 +11,12 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
+import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.service.api.study.TraitService;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -21,14 +24,18 @@ import org.hibernate.Transaction;
 
 public class StudyServiceImpl extends Service implements StudyService {
 
-	final TraitServiceImpl trialTraits;
+	final TraitService trialTraits;
 
 	final StudyMeasurements studyMeasurements;
 
+	final StudyGermplasmListService studyGermplasmListService;
+
 	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		trialTraits = new TraitServiceImpl(getCurrentSession());
+		Session currentSession = getCurrentSession();
+		trialTraits = new TraitServiceImpl(currentSession);
 		studyMeasurements = new StudyMeasurements(getCurrentSession());
+		studyGermplasmListService = new StudyGermplasmListServiceImpl(getCurrentSession());
 	}
 
 	/**
@@ -37,9 +44,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialTraits
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final TraitServiceImpl trialTraits, final StudyMeasurements trialMeasurements) {
+	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements, 
+			final StudyGermplasmListService studyGermplasmListServiceImpl) {
 		this.trialTraits = trialTraits;
 		this.studyMeasurements = trialMeasurements;
+		this.studyGermplasmListService = studyGermplasmListServiceImpl;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -141,5 +150,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 			}
 			throw e; // or display error message
 		}
+	}
+
+	@Override
+	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
+		return studyGermplasmListService.getGermplasmList(studyIdentifer);
 	}
 }

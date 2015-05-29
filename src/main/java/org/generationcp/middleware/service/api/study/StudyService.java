@@ -20,6 +20,6 @@ public interface StudyService {
 	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
 
 	ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement);
-	
 
+	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
 }
