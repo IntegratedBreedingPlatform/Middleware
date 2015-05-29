@@ -55,7 +55,7 @@ public class CVTerm implements Serializable {
 	private String name;
 
 	/** A human-readable text definition. */
-	@Column(name = "definition")
+	@Column(name = "definition", length = 1024)
 	private String definition;
 
 	/**
