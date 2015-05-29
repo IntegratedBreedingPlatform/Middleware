@@ -27,6 +27,7 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -133,6 +134,10 @@ public class ManagerFactory implements Serializable {
 
     public InventoryDataManager getInventoryDataManager() throws ConfigException {
         return new InventoryDataManagerImpl(sessionProvider, databaseName);
+    }
+    
+    public UserProgramStateDataManager getUserProgramStateDataManager() throws ConfigException {
+        return new UserProgramStateDataManagerImpl(sessionProvider);
     }
     
     public GenotypicDataManager getGenotypicDataManager() throws ConfigException {

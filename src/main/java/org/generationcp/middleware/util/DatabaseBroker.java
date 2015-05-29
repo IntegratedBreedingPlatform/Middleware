@@ -521,7 +521,11 @@ public class DatabaseBroker {
         programPresetDAO.setSession(getActiveSession());
         return programPresetDAO;
     }
-
+    public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
+        UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
+        userProgramTreeStateDAO.setSession(getActiveSession());
+        return userProgramTreeStateDAO;
+    }
     //===========================================================================================
     
     protected void clearSessions() {
