@@ -786,7 +786,4 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void setStockSourceRecordId(Integer stockSourceRecordId) {
 		this.stockSourceRecordId = stockSourceRecordId;
 	}
-	
-	
-	
 }

@@ -333,7 +333,7 @@ public class WorkbookSaver extends Saver {
                 && !isDeleteObservations) {
             saveTrialObservations(workbook);
         } else {            
-            if(trialVariableTypeList!=null || workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {//multi-location
+            if(locationIds!=null && !locationIds.isEmpty()) {//multi-location
                 for(Integer locationId : locationIds) {
                     createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
                 }

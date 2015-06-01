@@ -825,23 +825,23 @@ public class WorkbookBuilder extends Builder {
 		return rows;
 	}
 	
-	private VariableTypeList removeTrialDatasetVariables(VariableTypeList variables, VariableList conditions, VariableList constants) {
-		List<String> trialList = new ArrayList<String>();
+	protected VariableTypeList removeTrialDatasetVariables(VariableTypeList variables, VariableList conditions, VariableList constants) {
+		List<Integer> trialList = new ArrayList<Integer>();
 		if (conditions != null && !conditions.isEmpty()) {
 			for (Variable condition : conditions.getVariables()) {
-				trialList.add(condition.getVariableType().getLocalName());
+				trialList.add(condition.getVariableType().getId());
 			}
 		}
 		if (constants != null && !constants.isEmpty()) {
 			for (Variable constant : constants.getVariables()) {
-				trialList.add(constant.getVariableType().getLocalName());
+				trialList.add(constant.getVariableType().getId());
 			}
 		}
 		
 		VariableTypeList list = new VariableTypeList();
 		if (variables != null) {
 			for (VariableType type : variables.getVariableTypes()) {
-				if (!trialList.contains(type.getLocalName())) {
+				if (!trialList.contains(type.getId())) {
 					list.add(type);
 				}
 			}

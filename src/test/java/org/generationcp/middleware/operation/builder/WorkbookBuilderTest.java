@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -26,16 +29,18 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
+import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +58,8 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 
     private static StandardVariableBuilder standardVariableBuilder;
     
+    private static VariableTypeListTransformer variableTypeListTransformer;
+    
     private static final int SITE_SOIL_PH = 8270;
     private static final int CRUST = 20310;
     private static final int CUSTOM_VARIATE = 18020;
@@ -65,6 +72,7 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
     	fieldbookService = managerFactory.getFieldbookMiddlewareService();
     	measurementVariableTransformer = new MeasurementVariableTransformer(sessionProvider);
     	standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
+    	variableTypeListTransformer = new VariableTypeListTransformer(sessionProvider);
     }
  
     @Test
@@ -280,6 +288,56 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 				measurementVariable.getName(), 
 				measurementVariable.getDescription(), 
 				standardVariable, 0);
+	}
+	
+	@Test
+    public void testRemoveTrialDatasetVariables() throws MiddlewareException {
+		WorkbookTest.setTestWorkbook(null);
+		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+		//add trial instance (also added in conditions)
+		workbook.getFactors().add(WorkbookTest.createTrialInstanceMeasurementVariable(1));
+		VariableTypeList factorsVariableTypeList = variableTypeListTransformer.transform(workbook.getFactors(), false);
+		VariableTypeList conditionsVariableTypeList = variableTypeListTransformer.transform(workbook.getConditions(), false);
+		VariableTypeList constantsVariableTypeList = variableTypeListTransformer.transform(workbook.getConstants(), false);
+		VariableList conditions = transformMeasurementVariablesToVariableList(
+				workbook.getConditions(),conditionsVariableTypeList);
+		VariableList constants = transformMeasurementVariablesToVariableList(
+				workbook.getConstants(),constantsVariableTypeList);
+		//find the trial instance variable before removing it as a factor
+		VariableType trialInstance = factorsVariableTypeList.findById(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		//call the method to test: remove trial instance
+		VariableTypeList finalFactors = workbookBuilder.removeTrialDatasetVariables(
+							    			factorsVariableTypeList,
+							    			conditions,
+							    			constants);
+		//verify if the trial instance is no longer found in the final factors
+		assertFalse(finalFactors.getVariableTypes().contains(trialInstance));
+    	
+    	
+    }
+	
+	//derived from VariableListTransformer.transformTrialEnvironment (but with no specific role to filter)
+	private VariableList transformMeasurementVariablesToVariableList(
+			List<MeasurementVariable> mVarList, VariableTypeList variableTypeList) {
+		VariableList variableList = new VariableList();
+		if (mVarList != null  && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			if (mVarList.size() == variableTypeList.getVariableTypes().size()) {
+				
+				List<VariableType> varTypes = variableTypeList.getVariableTypes();
+				for(int i = 0, l = mVarList.size(); i < l ; i++ ){
+				    VariableType varTypeFinal = null;
+				    String value = mVarList.get(i).getValue();
+				    for (VariableType varType : varTypes) {
+				        if (mVarList.get(i).getTermId() == varType.getId()) {
+		                    varTypeFinal = varType;
+				        }
+				    }
+				    variableList.add(new Variable(varTypeFinal,value));
+				}
+			}
+		}
+		
+		return variableList;
 	}
 
 }
