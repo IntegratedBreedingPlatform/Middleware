@@ -13,8 +13,11 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;
 import org.junit.Before;
@@ -30,16 +33,20 @@ import static org.junit.Assert.*;
 public class PropertyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyPropertyDataManager propertyDataManager;
+    private static TermDataManager termDataManager;
     private static Property testProperty;
+
+    private static String className = "newClass";
 
 	@Before
 	public void setUp() throws Exception {
 		propertyDataManager = DataManagerIntegrationTest.managerFactory.getOntologyPropertyDataManager();
+        termDataManager = DataManagerIntegrationTest.managerFactory.getTermDataManager();
         testProperty = new Property();
         testProperty.setName(getNewRandomName());
         testProperty.setDefinition("definition");
         testProperty.setCropOntologyId("CO_322:0000046");
-        testProperty.addClass("newClass");
+        testProperty.addClass(className);
         testProperty.addClass(getNewRandomName());
         Debug.println("adding test property " + testProperty);
         propertyDataManager.addProperty(testProperty);
@@ -84,6 +91,10 @@ public class PropertyDataManagerImplTest extends DataManagerIntegrationTest {
         assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
         assertEquals(updatedProperty.getClasses().size(), 1);
         assertTrue(updatedProperty.getClasses().containsAll(testProperty.getClasses()));
+
+        //className = newClass should delete on-fly when class is no longer used by any property.
+        Term classTerm = termDataManager.getTermByNameAndCvId(className, CvId.TRAIT_CLASS.getId());
+        assertNull(classTerm);
     }
 
     @After
