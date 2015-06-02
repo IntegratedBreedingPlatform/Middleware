@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -174,12 +175,18 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         //Check supplied value as numeric if non null
         if(Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE)) {
-            if(!Strings.isNullOrEmpty(scale.getMinValue()) && !Util.isNonNullValidNumericString(scale.getMinValue())){
-                throw new MiddlewareException(SCALE_MIN_VALUE_NOT_VALID);
+            if(!Strings.isNullOrEmpty(scale.getMinValue())){
+                Integer min = StringUtil.parseInt(scale.getMinValue(), null);
+                if(min == null){
+                    throw new MiddlewareException(SCALE_MIN_VALUE_NOT_VALID);
+                }
             }
 
-            if(!Strings.isNullOrEmpty(scale.getMaxValue()) && !Util.isNonNullValidNumericString(scale.getMaxValue())){
-                throw new MiddlewareException(SCALE_MAX_VALUE_NOT_VALID);
+            if(!Strings.isNullOrEmpty(scale.getMaxValue())){
+                Integer max = StringUtil.parseInt(scale.getMaxValue(), null);
+                if(max == null){
+                    throw new MiddlewareException(SCALE_MAX_VALUE_NOT_VALID);
+                }
             }
         }
 
@@ -251,12 +258,18 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
         //Check supplied value as numeric if non null
         if(Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE)) {
-            if(!Strings.isNullOrEmpty(scale.getMinValue()) && !Util.isNonNullValidNumericString(scale.getMinValue())){
-                throw new MiddlewareException(SCALE_MIN_VALUE_NOT_VALID);
+            if(!Strings.isNullOrEmpty(scale.getMinValue())){
+                Integer min = StringUtil.parseInt(scale.getMinValue(), null);
+                if(min == null){
+                    throw new MiddlewareException(SCALE_MIN_VALUE_NOT_VALID);
+                }
             }
 
-            if(!Strings.isNullOrEmpty(scale.getMaxValue()) && !Util.isNonNullValidNumericString(scale.getMaxValue())){
-                throw new MiddlewareException(SCALE_MAX_VALUE_NOT_VALID);
+            if(!Strings.isNullOrEmpty(scale.getMaxValue())){
+                Integer max = StringUtil.parseInt(scale.getMaxValue(), null);
+                if(max == null){
+                    throw new MiddlewareException(SCALE_MAX_VALUE_NOT_VALID);
+                }
             }
         }
 
