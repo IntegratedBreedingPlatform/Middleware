@@ -1,14 +1,13 @@
 /*******************************************************************************
-
+ * 
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -26,38 +25,37 @@ import org.junit.Test;
 
 public class ProjectPropertyDaoTest extends MiddlewareIntegrationTest {
 
-    private static ProjectPropertyDao dao;
+	private static ProjectPropertyDao dao;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        dao = new ProjectPropertyDao();
-        dao.setSession(sessionUtil.getCurrentSession());
-    }
+	@BeforeClass
+	public static void setUp() throws Exception {
+		ProjectPropertyDaoTest.dao = new ProjectPropertyDao();
+		ProjectPropertyDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	}
 
-    @Test
-    public void testGetStandardVariableIdsByPropertyNames() throws Exception {
-    	List<String> propertyNames = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
-    			
-    	Map<String, Set<Integer>> results = dao.getStandardVariableIdsByPropertyNames(propertyNames);
+	@Test
+	public void testGetStandardVariableIdsByPropertyNames() throws Exception {
+		List<String> propertyNames =
+				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
 
-        Debug.println(0, "testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
-        for (String name : propertyNames) {
-        	Debug.println(0, "    Header = " + name + ", Terms = " + results.get(name));
-        	
-        	/* TO VERIFY:
-        	 	SELECT DISTINCT ppValue.value, ppStdVar.id 
-				FROM projectprop ppValue 
-					INNER JOIN (SELECT project_id, value id FROM projectprop WHERE type_id = 1070) AS ppStdVar  
-					 		ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id = 1060 
-					 				AND ppValue.value IN (:propertyNames)  
-        	 */
-        }
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-        dao.setSession(null);
-        dao = null;
-    }
+		Map<String, Set<Integer>> results = ProjectPropertyDaoTest.dao.getStandardVariableIdsByPropertyNames(propertyNames);
+
+		Debug.println(0, "testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
+		for (String name : propertyNames) {
+			Debug.println(0, "    Header = " + name + ", Terms = " + results.get(name));
+
+			/*
+			 * TO VERIFY: SELECT DISTINCT ppValue.value, ppStdVar.id FROM projectprop ppValue INNER JOIN (SELECT project_id, value id FROM
+			 * projectprop WHERE type_id = 1070) AS ppStdVar ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id = 1060 AND
+			 * ppValue.value IN (:propertyNames)
+			 */
+		}
+	}
+
+	@AfterClass
+	public static void tearDown() throws Exception {
+		ProjectPropertyDaoTest.dao.setSession(null);
+		ProjectPropertyDaoTest.dao = null;
+	}
 
 }

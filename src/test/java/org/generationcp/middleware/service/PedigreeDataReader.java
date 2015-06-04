@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.service;
 
 import java.io.BufferedReader;
@@ -24,9 +25,9 @@ public class PedigreeDataReader {
 
 		final List<String> listFilesForFolder;
 		try {
-			listFilesForFolder = lestAllCSVFilesInFolder(Paths.get(
-					getClass().getResource(CSV_FILE_PARENT_FOLDER_LOCATION + folderName).toURI())
-					.toFile());
+			listFilesForFolder =
+					this.lestAllCSVFilesInFolder(Paths.get(
+							this.getClass().getResource(PedigreeDataReader.CSV_FILE_PARENT_FOLDER_LOCATION + folderName).toURI()).toFile());
 			// TODO: Use CSV Reader Library. Error handling
 			for (final String string : listFilesForFolder) {
 				BufferedReader br = null;
@@ -42,21 +43,19 @@ public class PedigreeDataReader {
 				} catch (IOException e) {
 					throw e;
 				} finally {
-						IOUtils.closeQuietly(br);
+					IOUtils.closeQuietly(br);
 				}
 			}
 
 		} catch (URISyntaxException | IOException e) {
-			throw new RuntimeException(String.format("Unable to get a list for files from %s",
-					folderName), e);
+			throw new RuntimeException(String.format("Unable to get a list for files from %s", folderName), e);
 		}
 
 		return map;
 	}
 
 	/**
-	 * @param folder
-	 *            folder to search for csv files
+	 * @param folder folder to search for csv files
 	 * @return list of all csv files found in a folder
 	 */
 	private List<String> lestAllCSVFilesInFolder(final File folder) {
@@ -75,7 +74,7 @@ public class PedigreeDataReader {
 		final List<String> list = new ArrayList<>();
 		for (final File fileEntry : folder.listFiles(csvFilter)) {
 			if (fileEntry.isDirectory()) {
-				list.addAll(lestAllCSVFilesInFolder(fileEntry));
+				list.addAll(this.lestAllCSVFilesInFolder(fileEntry));
 			} else {
 				list.add(fileEntry.getAbsolutePath());
 			}

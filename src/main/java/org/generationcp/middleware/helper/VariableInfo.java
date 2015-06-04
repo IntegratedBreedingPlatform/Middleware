@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.helper;
 
 import org.generationcp.middleware.util.Debug;
@@ -16,17 +16,17 @@ import org.generationcp.middleware.util.Debug;
 public class VariableInfo {
 
 	private String localName;
-	
+
 	private String localDescription;
-	
+
 	private int rank;
-	
+
 	private int stdVariableId;
-	
+
 	private String treatmentLabel;
 
 	public String getLocalName() {
-		return localName;
+		return this.localName;
 	}
 
 	public void setLocalName(String localName) {
@@ -34,7 +34,7 @@ public class VariableInfo {
 	}
 
 	public String getLocalDescription() {
-		return localDescription;
+		return this.localDescription;
 	}
 
 	public void setLocalDescription(String localDescription) {
@@ -42,7 +42,7 @@ public class VariableInfo {
 	}
 
 	public int getStdVariableId() {
-		return stdVariableId;
+		return this.stdVariableId;
 	}
 
 	public void setStdVariableId(int stdVariableId) {
@@ -50,7 +50,7 @@ public class VariableInfo {
 	}
 
 	public int getRank() {
-		return rank;
+		return this.rank;
 	}
 
 	public void setRank(int rank) {
@@ -58,7 +58,7 @@ public class VariableInfo {
 	}
 
 	public String getTreatmentLabel() {
-		return treatmentLabel;
+		return this.treatmentLabel;
 	}
 
 	public void setTreatmentLabel(String treatmentLabel) {
@@ -66,24 +66,23 @@ public class VariableInfo {
 	}
 
 	public void print(int indent) {
-		Debug.println(indent, "VariableInfo:" );
-		Debug.println(indent + 3, "stdVariableId: " + stdVariableId);
-		Debug.println(indent + 3, "localName: " + localName);
-		Debug.println(indent + 3, "localDescription: " + localDescription);
+		Debug.println(indent, "VariableInfo:");
+		Debug.println(indent + 3, "stdVariableId: " + this.stdVariableId);
+		Debug.println(indent + 3, "localName: " + this.localName);
+		Debug.println(indent + 3, "localDescription: " + this.localDescription);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("VariableInfo [localName=");
-		builder.append(localName);
+		builder.append(this.localName);
 		builder.append(", localDescription=");
-		builder.append(localDescription);
+		builder.append(this.localDescription);
 		builder.append(", stdVariableId=");
-		builder.append(stdVariableId);
+		builder.append(this.stdVariableId);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
+
 }

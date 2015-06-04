@@ -4,42 +4,42 @@
  * Generation Challenge Programme (GCP)
  *
  *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
 public class Property {
-    
+
 	private Term term;
-	
+
 	private Term isA;
-	
+
 	private String cropOntologyId;
-	
+
 	public Property() {
 	}
 
-    public Property(Term term) {
-        this.term = term;
-    }
+	public Property(Term term) {
+		this.term = term;
+	}
 
-    public Property(Term term, Term isA) {
-        this.term = term;
-        this.isA = isA;
-    }
-    
-    public Property(Term term, Term isA, String cropOntologyId) {
-        this(term, isA);
-        this.cropOntologyId = cropOntologyId;
-    }
+	public Property(Term term, Term isA) {
+		this.term = term;
+		this.isA = isA;
+	}
 
-    public Term getIsA() {
-		return isA;
+	public Property(Term term, Term isA, String cropOntologyId) {
+		this(term, isA);
+		this.cropOntologyId = cropOntologyId;
+	}
+
+	public Term getIsA() {
+		return this.isA;
 	}
 
 	public void setIsA(Term isA) {
@@ -47,84 +47,82 @@ public class Property {
 	}
 
 	public Term getTerm() {
-		return term;
+		return this.term;
 	}
 
 	public void setTerm(Term term) {
 		this.term = term;
 	}
-	
-    public int getId() {
-        return term.getId();
-    }
 
-    public void setId(int id) {
-        term.setId(id);
-    }
-	
+	public int getId() {
+		return this.term.getId();
+	}
 
-    public String getName() {
-        return term.getName();
-    }
+	public void setId(int id) {
+		this.term.setId(id);
+	}
 
-    public void setName(String name) {
-        term.setName(name);
-    }
+	public String getName() {
+		return this.term.getName();
+	}
 
-    public String getDefinition() {
-       return term.getDefinition();
-    }
-    
-    public void setDefinition(String definition) {
-        term.setDefinition(definition);
-    }
-    
-    public int getIsAId() {
-        if(isA != null){
-            return isA.getId();
-        }else{
-            return -1;
-        }
-        
-    }
-   
-    public void setCropOntologyId(String cropOntologyId) {
+	public void setName(String name) {
+		this.term.setName(name);
+	}
+
+	public String getDefinition() {
+		return this.term.getDefinition();
+	}
+
+	public void setDefinition(String definition) {
+		this.term.setDefinition(definition);
+	}
+
+	public int getIsAId() {
+		if (this.isA != null) {
+			return this.isA.getId();
+		} else {
+			return -1;
+		}
+
+	}
+
+	public void setCropOntologyId(String cropOntologyId) {
 		this.cropOntologyId = cropOntologyId;
 	}
 
 	public String getCropOntologyId() {
-        return this.cropOntologyId;
-    }
-	
-	
-    @Override
-    public String toString() {
+		return this.cropOntologyId;
+	}
 
-        if (term == null){
-            return "";
-        }
+	@Override
+	public String toString() {
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("Property [id=");
-        builder.append(term.getId());
-        builder.append(", name=");
-        builder.append(term.getName());
-        builder.append(", definition=");
-        builder.append(term.getDefinition());
-        builder.append(", IsA=");
-        builder.append(isA);
-        builder.append("]");
+		if (this.term == null) {
+			return "";
+		}
+
+		StringBuilder builder = new StringBuilder();
+		builder.append("Property [id=");
+		builder.append(this.term.getId());
+		builder.append(", name=");
+		builder.append(this.term.getName());
+		builder.append(", definition=");
+		builder.append(this.term.getDefinition());
+		builder.append(", IsA=");
+		builder.append(this.isA);
+		builder.append("]");
 		return builder.toString();
 	}
 
-    public void print(int indent) {
-        Debug.println(indent, "Property: ");
-        Debug.println(indent + 3, "term: ");
-        term.print(indent + 6);
-        if (isA != null){
-            Debug.println(indent + 3, "IsA: ");
-            isA.print(indent + 6);
-        }
-    }
-	
+	public void print(int indent) {
+		Debug.println(indent, "Property: ");
+		Debug.println(indent + 3, "term: ");
+		this.term.print(indent + 6);
+		if (this.isA != null) {
+			Debug.println(indent + 3, "IsA: ");
+			this.isA.print(indent + 6);
+		}
+	}
+
 }

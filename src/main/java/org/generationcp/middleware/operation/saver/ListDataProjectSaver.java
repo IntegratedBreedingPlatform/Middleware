@@ -1,4 +1,7 @@
+
 package org.generationcp.middleware.operation.saver;
+
+import java.util.List;
 
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -6,7 +9,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.util.Util;
-import java.util.List;
 
 public class ListDataProjectSaver extends Saver {
 
@@ -14,45 +16,45 @@ public class ListDataProjectSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public int saveOrUpdateListDataProject(int projectId,
-			GermplasmListType type, Integer originalListId,
-			List<ListDataProject> listDatas, int userId) throws MiddlewareQueryException {
+	public int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> listDatas,
+			int userId) throws MiddlewareQueryException {
 
-		boolean isAdvanced = type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES; 
-		GermplasmList snapList = isAdvanced ? null : getGermplasmList(projectId, type);
+		boolean isAdvanced = type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES;
+		GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
 		boolean isCreate = snapList == null;
-		
+
 		if (isCreate) {
-			snapList = createInitialGermplasmList(projectId, originalListId, type);
+			snapList = this.createInitialGermplasmList(projectId, originalListId, type);
 		}
-		
+
 		if (originalListId != null) {
-			updateGermplasmListInfo(snapList, originalListId, userId);
+			this.updateGermplasmListInfo(snapList, originalListId, userId);
 		} else {
-			setDefaultGermplasmListInfo(snapList,userId);			
+			this.setDefaultGermplasmListInfo(snapList, userId);
 		}
-		
-		getGermplasmListDAO().saveOrUpdate(snapList);
-		
-		if (!isCreate && !isAdvanced) {  
-			//delete old list data projects
-			getListDataProjectDAO().deleteByListId(snapList.getId());
+
+		this.getGermplasmListDAO().saveOrUpdate(snapList);
+
+		if (!isCreate && !isAdvanced) {
+			// delete old list data projects
+			this.getListDataProjectDAO().deleteByListId(snapList.getId());
 		}
-		
+
 		if (listDatas != null) {
 			for (ListDataProject listDataProject : listDatas) {
-				prepareListDataProjectForSaving(listDataProject, snapList);
-				getListDataProjectDAO().save(listDataProject);
+				this.prepareListDataProjectForSaving(listDataProject, snapList);
+				this.getListDataProjectDAO().save(listDataProject);
 			}
 		}
-		
+
 		return snapList.getId();
 	}
-	
-	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type) throws MiddlewareQueryException {
-		GermplasmList snapList = new GermplasmList(); 
-		
-		snapList.setId(getGermplasmListDAO().getNextId("id"));
+
+	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type)
+			throws MiddlewareQueryException {
+		GermplasmList snapList = new GermplasmList();
+
+		snapList.setId(this.getGermplasmListDAO().getNextId("id"));
 		snapList.setProjectId(projectId);
 		snapList.setDate(Util.getCurrentDateAsLongValue());
 		snapList.setStatus(1);
@@ -65,9 +67,9 @@ public class ListDataProjectSaver extends Saver {
 
 		return snapList;
 	}
-	
+
 	private void updateGermplasmListInfo(GermplasmList germplasmList, int originalListId, int userId) throws MiddlewareQueryException {
-		GermplasmList origList = getGermplasmListDAO().getById(originalListId);
+		GermplasmList origList = this.getGermplasmListDAO().getById(originalListId);
 		if (origList != null) {
 			germplasmList.setListLocation(origList.getListLocation());
 			germplasmList.setUserId(origList.getUserId());
@@ -79,16 +81,16 @@ public class ListDataProjectSaver extends Saver {
 			germplasmList.setDescription(origList.getDescription());
 			germplasmList.setListRef(originalListId);
 		} else {
-			setDefaultGermplasmListInfo(germplasmList,userId);
+			this.setDefaultGermplasmListInfo(germplasmList, userId);
 		}
 	}
-	
-	public void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException{
-		GermplasmList crossesList = getGermplasmListDAO().getById(crossesListId);
+
+	public void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException {
+		GermplasmList crossesList = this.getGermplasmListDAO().getById(crossesListId);
 		if (crossesList != null) {
-			crossesList.setProjectId(studyId);		
+			crossesList.setProjectId(studyId);
 		}
-		getGermplasmListDAO().saveOrUpdate(crossesList);
+		this.getGermplasmListDAO().saveOrUpdate(crossesList);
 	}
 
 	private void setDefaultGermplasmListInfo(GermplasmList snapList, int userId) {
@@ -99,18 +101,18 @@ public class ListDataProjectSaver extends Saver {
 		snapList.seteDate(null);
 		snapList.setListRef(null);
 	}
-	
+
 	private GermplasmList getGermplasmList(int projectId, GermplasmListType type) throws MiddlewareQueryException {
 		GermplasmList gList = null;
-		List<GermplasmList> tempList = getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		List<GermplasmList> tempList = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (tempList != null && !tempList.isEmpty()) {
 			gList = tempList.get(0);
 		}
 		return gList;
 	}
-	
+
 	private void prepareListDataProjectForSaving(ListDataProject listDataProject, GermplasmList snapList) throws MiddlewareQueryException {
-		listDataProject.setListDataProjectId(getListDataProjectDAO().getNextId("listDataProjectId"));
+		listDataProject.setListDataProjectId(this.getListDataProjectDAO().getNextId("listDataProjectId"));
 		listDataProject.setList(snapList);
 		if (listDataProject.getCheckType() == null) {
 			listDataProject.setCheckType(0);

@@ -43,29 +43,31 @@ public class WTags04 extends AbstractReporter {
 		return null;
 	}
 
+	@Override
 	public String getFileExtension() {
 		return "txt";
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException {
 
 		Map<String, Object> jrParams = null;
 
 		if (null != args) {
-			jrParams = buildJRParams(args);
-			setFileName(super.buildOutputFileName(jrParams));
+			jrParams = this.buildJRParams(args);
+			this.setFileName(super.buildOutputFileName(jrParams));
 
 		}
 
 		MeasurementRow[] entries = {};
 		entries = ((Collection<MeasurementRow>) args.get("dataSource")).toArray(entries);
 
-		dataSource.clear();
-		studyMeta.clear();
+		this.dataSource.clear();
+		this.studyMeta.clear();
 
-		for (MeasurementVariable var : ((List<MeasurementVariable>) args.get("studyConditions"))) {
-			studyMeta.put(var.getName(), var.getValue());
+		for (MeasurementVariable var : (List<MeasurementVariable>) args.get("studyConditions")) {
+			this.studyMeta.put(var.getName(), var.getValue());
 		}
 
 		// add headers in first row of dataSource
@@ -73,14 +75,14 @@ public class WTags04 extends AbstractReporter {
 		for (MeasurementData data : entries[0].getDataList()) {
 			row.add(data.getLabel());
 		}
-		dataSource.add(row);
+		this.dataSource.add(row);
 
 		for (MeasurementRow measurementRow : entries) {
 			row = new ArrayList<>();
 			for (MeasurementData data : measurementRow.getDataList()) {
 				row.add(data.getValue());
 			}
-			dataSource.add(row);
+			this.dataSource.add(row);
 		}
 
 		return null;
@@ -116,6 +118,7 @@ public class WTags04 extends AbstractReporter {
 		return null;
 	}
 
+	@Override
 	public void asOutputStream(OutputStream output) throws BuildReportException {
 		try {
 			StringBuilder sb = new StringBuilder();
@@ -123,11 +126,11 @@ public class WTags04 extends AbstractReporter {
 			int rowSpan = 40;
 			int rowSize = 40;
 
-			sb.append(buildPrintTestRecord(rowSpan, rowSize));
-			sb.append(buildPrintTestRecord(rowSpan, rowSize));
+			sb.append(this.buildPrintTestRecord(rowSpan, rowSize));
+			sb.append(this.buildPrintTestRecord(rowSpan, rowSize));
 
-			for (int i = 1; i < dataSource.size(); i++) {
-				sb.append(buildRecord(dataSource.get(i), dataSource.get(0), rowSpan, rowSize));
+			for (int i = 1; i < this.dataSource.size(); i++) {
+				sb.append(this.buildRecord(this.dataSource.get(i), this.dataSource.get(0), rowSpan, rowSize));
 			}
 			output.write(sb.toString().getBytes());
 		} catch (IOException e) {
@@ -149,11 +152,11 @@ public class WTags04 extends AbstractReporter {
 		String selHistB = null;
 		String entryType = null;
 
-		study = studyMeta.get("STUDY_NAME");
-		occ = studyMeta.get("TRIAL_INSTANCE");
-		subProg = studyMeta.get("BreedingProgram");
-		type = studyMeta.get("STUDY_TYPE"); // a type for nal,int, etc
-		season = studyMeta.get("CROP_SEASON");
+		study = this.studyMeta.get("STUDY_NAME");
+		occ = this.studyMeta.get("TRIAL_INSTANCE");
+		subProg = this.studyMeta.get("BreedingProgram");
+		type = this.studyMeta.get("STUDY_TYPE"); // a type for nal,int, etc
+		season = this.studyMeta.get("CROP_SEASON");
 
 		for (int i = 0; i < headers.size(); i++) {
 			switch (headers.get(i)) {
@@ -165,8 +168,8 @@ public class WTags04 extends AbstractReporter {
 					pedigreeB = pedigreeA;
 					pedigreeA =
 							pedigreeA.length() > 40 ? pedigreeA.substring(0, pedigreeA.substring(0, 40).lastIndexOf("/") + 1) : pedigreeA;
-					pedigreeB = pedigreeB.length() > 40 ? pedigreeB.substring(pedigreeB.lastIndexOf("/", 40) + 1, pedigreeB.length()) : "";
-					break;
+							pedigreeB = pedigreeB.length() > 40 ? pedigreeB.substring(pedigreeB.lastIndexOf("/", 40) + 1, pedigreeB.length()) : "";
+							break;
 				case "DESIGNATION":
 					selHistA = row.get(i);
 					selHistB = selHistA;
@@ -183,22 +186,22 @@ public class WTags04 extends AbstractReporter {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(StringUtil.stringOf(" ", rowSpan)).append(StringUtil.format(study, 30, true)).append(" OCC: ")
-				.append(StringUtil.format(occ, 4, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-				.append(StringUtil.format(subProg, 3, true)).append(" ").append(StringUtil.format(type, 5, true)).append(" ")
-				.append(StringUtil.format(season, 13, true)).append(StringUtil.format("ENTRY", 7, false)).append(" ")
-				.append(StringUtil.format(entry, 6, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan - 15))
-				.append(StringUtil.format("CIMMYT", 6, false)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan));
+		.append(StringUtil.format(occ, 4, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+		.append(StringUtil.format(subProg, 3, true)).append(" ").append(StringUtil.format(type, 5, true)).append(" ")
+		.append(StringUtil.format(season, 13, true)).append(StringUtil.format("ENTRY", 7, false)).append(" ")
+		.append(StringUtil.format(entry, 6, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan - 15))
+		.append(StringUtil.format("CIMMYT", 6, false)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan));
 
 		if (entryType == null || !entryType.equals("T")) { // test entry, meaning Not-a-check.
 			sb.append(StringUtil.format(pedigreeA, rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-					.append(StringUtil.format(pedigreeB, rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-					.append(StringUtil.format("", 4, true)).append(StringUtil.format(selHistA, 36, true)).append("\r\n")
-					.append(StringUtil.stringOf(" ", rowSpan)).append(StringUtil.format("", 4, true))
-					.append(StringUtil.format(selHistB, 36, true));
+			.append(StringUtil.format(pedigreeB, rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+			.append(StringUtil.format("", 4, true)).append(StringUtil.format(selHistA, 36, true)).append("\r\n")
+			.append(StringUtil.stringOf(" ", rowSpan)).append(StringUtil.format("", 4, true))
+			.append(StringUtil.format(selHistB, 36, true));
 		} else {
 			sb.append(StringUtil.format("LOCAL CHECK ", rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-					.append(StringUtil.format("** CHECK **", rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2))
-					.append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2));
+			.append(StringUtil.format("** CHECK **", rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2))
+			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2));
 		}
 
 		return sb.append("\r\n\r\n").toString();

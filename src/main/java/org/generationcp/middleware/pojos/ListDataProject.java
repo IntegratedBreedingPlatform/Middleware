@@ -1,14 +1,22 @@
+
 package org.generationcp.middleware.pojos;
-
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
-import javax.persistence.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "listdata_project")
@@ -21,66 +29,64 @@ public class ListDataProject implements Serializable {
 	public static final String PLOT_RECIP = "Plot Recip";
 
 	@Id
-    @Basic(optional = false)
-    @Column(name = "listdata_project_id")
+	@Basic(optional = false)
+	@Column(name = "listdata_project_id")
 	private Integer listDataProjectId;
-	
-    @ManyToOne(targetEntity = GermplasmList.class)
-    @JoinColumn(name = "list_id", nullable = false)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private GermplasmList list;
 
-    @Basic(optional = false)
-    @Column(name = "germplasm_id")
-    private Integer germplasmId;
-    
-    @Basic(optional = false)
-    @Column(name = "check_type")
-    private Integer checkType;
+	@ManyToOne(targetEntity = GermplasmList.class)
+	@JoinColumn(name = "list_id", nullable = false)
+	@NotFound(action = NotFoundAction.IGNORE)
+	private GermplasmList list;
 
-    @Basic(optional = false)
-    @Column(name = "entry_id")
-    private Integer entryId;
+	@Basic(optional = false)
+	@Column(name = "germplasm_id")
+	private Integer germplasmId;
 
-    @Basic(optional = false)
-    @Column(name = "entry_code")
-    private String entryCode;
+	@Basic(optional = false)
+	@Column(name = "check_type")
+	private Integer checkType;
 
-    @Column(name = "seed_source")
-    private String seedSource;
+	@Basic(optional = false)
+	@Column(name = "entry_id")
+	private Integer entryId;
 
-    @Basic(optional = false)
-    @Column(name = "designation")
-    private String designation;
+	@Basic(optional = false)
+	@Column(name = "entry_code")
+	private String entryCode;
 
-    @Column(name = "group_name")
-    private String groupName;
-    
-    @Column(name = "duplicate_notes")
-    private String duplicate;
-   
-    
-    /***
-     * The following will only be field when getListDataProjectWithParents() is called,
-     * otherwise, it will always be null
-     */
-    @Transient
-    private String femaleParent = null;
-    
-    @Transient
-    private Integer fgid = null;
-    
-    @Transient
-    private String maleParent = null;
-    
-    @Transient
-    private Integer mgid = null;
+	@Column(name = "seed_source")
+	private String seedSource;
+
+	@Basic(optional = false)
+	@Column(name = "designation")
+	private String designation;
+
+	@Column(name = "group_name")
+	private String groupName;
+
+	@Column(name = "duplicate_notes")
+	private String duplicate;
+
+	/***
+	 * The following will only be field when getListDataProjectWithParents() is called, otherwise, it will always be null
+	 */
+	@Transient
+	private String femaleParent = null;
+
+	@Transient
+	private Integer fgid = null;
+
+	@Transient
+	private String maleParent = null;
+
+	@Transient
+	private Integer mgid = null;
 
 	/**
 	 * @return the listDataProjectId
 	 */
 	public Integer getListDataProjectId() {
-		return listDataProjectId;
+		return this.listDataProjectId;
 	}
 
 	/**
@@ -94,7 +100,7 @@ public class ListDataProject implements Serializable {
 	 * @return the list
 	 */
 	public GermplasmList getList() {
-		return list;
+		return this.list;
 	}
 
 	/**
@@ -108,7 +114,7 @@ public class ListDataProject implements Serializable {
 	 * @return the germplasmId
 	 */
 	public Integer getGermplasmId() {
-		return germplasmId;
+		return this.germplasmId;
 	}
 
 	/**
@@ -122,7 +128,7 @@ public class ListDataProject implements Serializable {
 	 * @return the checkType
 	 */
 	public Integer getCheckType() {
-		return checkType;
+		return this.checkType;
 	}
 
 	/**
@@ -136,7 +142,7 @@ public class ListDataProject implements Serializable {
 	 * @return the entryId
 	 */
 	public Integer getEntryId() {
-		return entryId;
+		return this.entryId;
 	}
 
 	/**
@@ -150,7 +156,7 @@ public class ListDataProject implements Serializable {
 	 * @return the entryCode
 	 */
 	public String getEntryCode() {
-		return entryCode;
+		return this.entryCode;
 	}
 
 	/**
@@ -164,7 +170,7 @@ public class ListDataProject implements Serializable {
 	 * @return the seedSource
 	 */
 	public String getSeedSource() {
-		return seedSource;
+		return this.seedSource;
 	}
 
 	/**
@@ -178,7 +184,7 @@ public class ListDataProject implements Serializable {
 	 * @return the designation
 	 */
 	public String getDesignation() {
-		return designation;
+		return this.designation;
 	}
 
 	/**
@@ -192,7 +198,7 @@ public class ListDataProject implements Serializable {
 	 * @return the groupName
 	 */
 	public String getGroupName() {
-		return groupName;
+		return this.groupName;
 	}
 
 	/**
@@ -201,9 +207,9 @@ public class ListDataProject implements Serializable {
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
- 
+
 	public String getDuplicate() {
-		return duplicate;
+		return this.duplicate;
 	}
 
 	public void setDuplicate(String duplicate) {
@@ -211,7 +217,7 @@ public class ListDataProject implements Serializable {
 	}
 
 	public String getFemaleParent() {
-		return femaleParent;
+		return this.femaleParent;
 	}
 
 	public void setFemaleParent(String femaleParent) {
@@ -219,7 +225,7 @@ public class ListDataProject implements Serializable {
 	}
 
 	public Integer getFgid() {
-		return fgid;
+		return this.fgid;
 	}
 
 	public void setFgid(Integer fgid) {
@@ -227,7 +233,7 @@ public class ListDataProject implements Serializable {
 	}
 
 	public String getMaleParent() {
-		return maleParent;
+		return this.maleParent;
 	}
 
 	public void setMaleParent(String maleParent) {
@@ -235,50 +241,50 @@ public class ListDataProject implements Serializable {
 	}
 
 	public Integer getMgid() {
-		return mgid;
+		return this.mgid;
 	}
 
 	public void setMgid(Integer mgid) {
 		this.mgid = mgid;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "ListDataProject [listDataProjectId=" + listDataProjectId
-				+ ", list=" + list + ", germplasmId=" + germplasmId
-				+ ", checkType=" + checkType + ", entryId=" + entryId
-				+ ", entryCode=" + entryCode + ", seedSource=" + seedSource
-				+ ", designation=" + designation + ", groupName=" + groupName
-				+ ", duplicate=" + duplicate + "]";
+		return "ListDataProject [listDataProjectId=" + this.listDataProjectId + ", list=" + this.list + ", germplasmId=" + this.germplasmId
+				+ ", checkType=" + this.checkType + ", entryId=" + this.entryId + ", entryCode=" + this.entryCode + ", seedSource="
+				+ this.seedSource + ", designation=" + this.designation + ", groupName=" + this.groupName + ", duplicate=" + this.duplicate
+				+ "]";
 	}
 
 	public Boolean isPedigreeDupe() {
-		if(duplicate != null){
-			return duplicate.contains(PEDIGREE_DUPE);
+		if (this.duplicate != null) {
+			return this.duplicate.contains(ListDataProject.PEDIGREE_DUPE);
 		}
 		return false;
 	}
 
 	public Boolean isPlotDupe() {
-		if(duplicate != null){
-			return duplicate.contains(PLOT_DUPE);
+		if (this.duplicate != null) {
+			return this.duplicate.contains(ListDataProject.PLOT_DUPE);
 		}
 		return false;
 	}
 
 	public Boolean isPedigreeRecip() {
-		if(duplicate != null){
-			return duplicate.contains(PEDIGREE_RECIP);
+		if (this.duplicate != null) {
+			return this.duplicate.contains(ListDataProject.PEDIGREE_RECIP);
 		}
 		return false;
 	}
 
 	public Boolean isPlotRecip() {
-		if(duplicate != null){
-			return duplicate.contains(PLOT_RECIP);
+		if (this.duplicate != null) {
+			return this.duplicate.contains(ListDataProject.PLOT_RECIP);
 		}
 		return false;
 	}
@@ -286,39 +292,39 @@ public class ListDataProject implements Serializable {
 	public List<Integer> parsePedigreeDupeInformation() {
 		List<Integer> returnVal = new ArrayList<>();
 
-		if (! isPedigreeDupe()) {
+		if (!this.isPedigreeDupe()) {
 			return returnVal;
 		}
 
-		return parseDuplicateString(PEDIGREE_DUPE);
+		return this.parseDuplicateString(ListDataProject.PEDIGREE_DUPE);
 	}
 
 	public List<Integer> parsePlotDupeInformation() {
-		if (! isPlotDupe()) {
+		if (!this.isPlotDupe()) {
 			return new ArrayList<Integer>();
 		}
 
-		return parseDuplicateString(PLOT_DUPE);
+		return this.parseDuplicateString(ListDataProject.PLOT_DUPE);
 	}
 
 	public List<Integer> parsePlotReciprocalInformation() {
-		if (! isPlotRecip()) {
+		if (!this.isPlotRecip()) {
 			return new ArrayList<Integer>();
 		}
 
-		return parseDuplicateString(PLOT_RECIP);
+		return this.parseDuplicateString(ListDataProject.PLOT_RECIP);
 	}
 
 	public List<Integer> parsePedigreeReciprocalInformation() {
-		if (! isPedigreeRecip()) {
+		if (!this.isPedigreeRecip()) {
 			return new ArrayList<Integer>();
 		}
 
-		return parseDuplicateString(PEDIGREE_RECIP);
+		return this.parseDuplicateString(ListDataProject.PEDIGREE_RECIP);
 	}
 
 	protected List<Integer> parseDuplicateString(String forRemoval) {
-		String temp = duplicate.replace(forRemoval, "");
+		String temp = this.duplicate.replace(forRemoval, "");
 		temp = temp.replace(":", "");
 		temp = temp.trim();
 
@@ -332,7 +338,7 @@ public class ListDataProject implements Serializable {
 				continue;
 			}
 
-			returnVal.add( Integer.valueOf(token) );
+			returnVal.add(Integer.valueOf(token));
 
 		}
 

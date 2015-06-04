@@ -1,6 +1,13 @@
+
 package org.generationcp.middleware.operation.destroyer;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -9,8 +16,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.Util;
 
-import java.util.List;
-
 public class StudyDestroyer extends Destroyer {
 
 	public StudyDestroyer(HibernateSessionProvider sessionProviderForLocal) {
@@ -18,16 +23,16 @@ public class StudyDestroyer extends Destroyer {
 	}
 
 	public void deleteStudy(int studyId) throws MiddlewareQueryException {
-		DmsProject study = getDmsProjectDao().getById(studyId);
-		renameStudyAndDatasets(study);
+		DmsProject study = this.getDmsProjectDao().getById(studyId);
+		this.renameStudyAndDatasets(study);
 
 		if (study.getProperties() != null && !study.getProperties().isEmpty()) {
-			updateStudyStatusToDeleted(study);
+			this.updateStudyStatusToDeleted(study);
 		}
-		
-		deleteRelationshipsIfNotAStudy(study);
+
+		this.deleteRelationshipsIfNotAStudy(study);
 	}
-	
+
 	private void updateStudyStatusToDeleted(DmsProject study) throws MiddlewareQueryException {
 		int maxRank = 0;
 		boolean found = false;
@@ -36,7 +41,7 @@ public class StudyDestroyer extends Destroyer {
 				found = true;
 				if (property.getValue() == null || !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
 					property.setValue(String.valueOf(TermId.DELETED_STUDY.getId()));
-					getProjectPropertyDao().saveOrUpdate(property);
+					this.getProjectPropertyDao().saveOrUpdate(property);
 				}
 				break;
 			}
@@ -45,7 +50,7 @@ public class StudyDestroyer extends Destroyer {
 			}
 		}
 		if (!found) {
-			//create a study status using the maxRank
+			// create a study status using the maxRank
 			VariableTypeList typeList = new VariableTypeList();
 			StandardVariable statusDeletedTerm = new StandardVariable();
 			statusDeletedTerm.setId(TermId.STUDY_STATUS.getId());
@@ -55,30 +60,30 @@ public class StudyDestroyer extends Destroyer {
 			VariableList varList = new VariableList();
 			Variable var = new Variable(type, TermId.DELETED_STUDY.getId());
 			varList.add(var);
-			
-			getProjectPropertySaver().saveProjectProperties(study, typeList);
-			getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
+
+			this.getProjectPropertySaver().saveProjectProperties(study, typeList);
+			this.getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
 		}
 	}
 
 	protected void deleteRelationshipsIfNotAStudy(DmsProject study) throws MiddlewareQueryException {
-		boolean isAStudy = getProjectRelationshipDao().isSubjectTypeExisting(
-				study.getProjectId(), TermId.IS_STUDY.getId());
-		if(!isAStudy) {
-			getProjectRelationshipDao().deleteByProjectId(study.getProjectId());
+		boolean isAStudy = this.getProjectRelationshipDao().isSubjectTypeExisting(study.getProjectId(), TermId.IS_STUDY.getId());
+		if (!isAStudy) {
+			this.getProjectRelationshipDao().deleteByProjectId(study.getProjectId());
 		}
 	}
 
 	private void renameStudyAndDatasets(DmsProject study) throws MiddlewareQueryException {
 		String tstamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
 		study.setName(study.getName() + "#" + tstamp);
-		getDmsProjectDao().save(study);
-		
-		List<DmsProject> datasets = getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
+		this.getDmsProjectDao().save(study);
+
+		List<DmsProject> datasets =
+				this.getProjectRelationshipDao().getSubjectsByObjectIdAndTypeId(study.getProjectId(), TermId.BELONGS_TO_STUDY.getId());
 		if (datasets != null) {
 			for (DmsProject dataset : datasets) {
 				dataset.setName(dataset.getName() + "#" + tstamp);
-				getDmsProjectDao().save(dataset);
+				this.getDmsProjectDao().save(dataset);
 			}
 		}
 	}

@@ -4,18 +4,23 @@
  * Generation Challenge Programme (GCP)
  *
  *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
+
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * POJO for allele_values table.
@@ -26,115 +31,114 @@ import java.io.Serializable;
 @Table(name = "gdms_allele_values")
 public class AlleleValues implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "an_id")
-    private Integer anId;
+	@Id
+	@Basic(optional = false)
+	@Column(name = "an_id")
+	private Integer anId;
 
-    @Basic(optional = false)
-    @Column(name = "dataset_id")
-    private Integer datasetId;
+	@Basic(optional = false)
+	@Column(name = "dataset_id")
+	private Integer datasetId;
 
-    @Basic(optional = false)
-    @Column(name = "gid")
-    private Integer gId;
+	@Basic(optional = false)
+	@Column(name = "gid")
+	private Integer gId;
 
-    @Basic(optional = false)
-    @Column(name = "marker_id")
-    private Integer markerId;
+	@Basic(optional = false)
+	@Column(name = "marker_id")
+	private Integer markerId;
 
-    @Basic(optional = false)
-    @Column(name = "allele_bin_value")
-    private String alleleBinValue;
+	@Basic(optional = false)
+	@Column(name = "allele_bin_value")
+	private String alleleBinValue;
 
-    @Basic(optional = false)
-    @Column(name = "allele_raw_value")
-    private String alleleRawValue;
+	@Basic(optional = false)
+	@Column(name = "allele_raw_value")
+	private String alleleRawValue;
 
-    @Column(name = "peak_height")
-    private Integer peakHeight;
+	@Column(name = "peak_height")
+	private Integer peakHeight;
 
-    @Column(name = "marker_sample_id")
-    private Integer markerSampleId;
+	@Column(name = "marker_sample_id")
+	private Integer markerSampleId;
 
-    @Column(name = "acc_sample_id")
-    private Integer accSampleId;
-    
-    public AlleleValues() {
-    }
+	@Column(name = "acc_sample_id")
+	private Integer accSampleId;
 
-    public AlleleValues(Integer anId, Integer datasetId, Integer gId,
-                        Integer markerId, String alleleBinValue, String alleleRawValue,
-                        Integer peakHeight) {
-        this.anId = anId;
-        this.datasetId = datasetId;
-        this.gId = gId;
-        this.markerId = markerId;
-        this.alleleBinValue = alleleBinValue;
-        this.alleleRawValue = alleleRawValue;
-        this.peakHeight = peakHeight;
-    }
+	public AlleleValues() {
+	}
 
-    public Integer getAnId() {
-        return anId;
-    }
+	public AlleleValues(Integer anId, Integer datasetId, Integer gId, Integer markerId, String alleleBinValue, String alleleRawValue,
+			Integer peakHeight) {
+		this.anId = anId;
+		this.datasetId = datasetId;
+		this.gId = gId;
+		this.markerId = markerId;
+		this.alleleBinValue = alleleBinValue;
+		this.alleleRawValue = alleleRawValue;
+		this.peakHeight = peakHeight;
+	}
 
-    public void setAnId(Integer anId) {
-        this.anId = anId;
-    }
+	public Integer getAnId() {
+		return this.anId;
+	}
 
-    public Integer getDatasetId() {
-        return datasetId;
-    }
+	public void setAnId(Integer anId) {
+		this.anId = anId;
+	}
 
-    public void setDatasetId(Integer datasetId) {
-        this.datasetId = datasetId;
-    }
+	public Integer getDatasetId() {
+		return this.datasetId;
+	}
 
-    public Integer getGid() {
-        return gId;
-    }
+	public void setDatasetId(Integer datasetId) {
+		this.datasetId = datasetId;
+	}
 
-    public void setGid(Integer gId) {
-        this.gId = gId;
-    }
+	public Integer getGid() {
+		return this.gId;
+	}
 
-    public Integer getMarkerId() {
-        return markerId;
-    }
+	public void setGid(Integer gId) {
+		this.gId = gId;
+	}
 
-    public void setMarkerId(Integer markerId) {
-        this.markerId = markerId;
-    }
+	public Integer getMarkerId() {
+		return this.markerId;
+	}
 
-    public String getAlleleBinValue() {
-        return alleleBinValue;
-    }
+	public void setMarkerId(Integer markerId) {
+		this.markerId = markerId;
+	}
 
-    public void setAlleleBinValue(String alleleBinValue) {
-        this.alleleBinValue = alleleBinValue;
-    }
+	public String getAlleleBinValue() {
+		return this.alleleBinValue;
+	}
 
-    public String getAlleleRawValue() {
-        return alleleRawValue;
-    }
+	public void setAlleleBinValue(String alleleBinValue) {
+		this.alleleBinValue = alleleBinValue;
+	}
 
-    public void setAlleleRawValue(String alleleRawValue) {
-        this.alleleRawValue = alleleRawValue;
-    }
+	public String getAlleleRawValue() {
+		return this.alleleRawValue;
+	}
 
-    public Integer getPeakHeight() {
-        return peakHeight;
-    }
+	public void setAlleleRawValue(String alleleRawValue) {
+		this.alleleRawValue = alleleRawValue;
+	}
 
-    public void setPeakHeight(Integer peakHeight) {
-        this.peakHeight = peakHeight;
-    }
+	public Integer getPeakHeight() {
+		return this.peakHeight;
+	}
+
+	public void setPeakHeight(Integer peakHeight) {
+		this.peakHeight = peakHeight;
+	}
 
 	public Integer getMarkerSampleId() {
-		return markerSampleId;
+		return this.markerSampleId;
 	}
 
 	public void setMarkerSampleId(Integer markerSampleId) {
@@ -142,7 +146,7 @@ public class AlleleValues implements Serializable {
 	}
 
 	public Integer getAccSampleId() {
-		return accSampleId;
+		return this.accSampleId;
 	}
 
 	public void setAccSampleId(Integer accSampleId) {
@@ -150,47 +154,47 @@ public class AlleleValues implements Serializable {
 	}
 
 	@Override
-    public int hashCode() {
-        return new HashCodeBuilder(37, 127).append(anId).toHashCode();
-    }
+	public int hashCode() {
+		return new HashCodeBuilder(37, 127).append(this.anId).toHashCode();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof AlleleValues)) {
-            return false;
-        }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof AlleleValues)) {
+			return false;
+		}
 
-        AlleleValues rhs = (AlleleValues) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(anId, rhs.anId).isEquals();
-    }
+		AlleleValues rhs = (AlleleValues) obj;
+		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.anId, rhs.anId).isEquals();
+	}
 
-    @Override
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("AlleleValues [anId=");
-		builder.append(anId);
+		builder.append(this.anId);
 		builder.append(", datasetId=");
-		builder.append(datasetId);
+		builder.append(this.datasetId);
 		builder.append(", gId=");
-		builder.append(gId);
+		builder.append(this.gId);
 		builder.append(", markerId=");
-		builder.append(markerId);
+		builder.append(this.markerId);
 		builder.append(", alleleBinValue=");
-		builder.append(alleleBinValue);
+		builder.append(this.alleleBinValue);
 		builder.append(", alleleRawValue=");
-		builder.append(alleleRawValue);
+		builder.append(this.alleleRawValue);
 		builder.append(", peakHeight=");
-		builder.append(peakHeight);
+		builder.append(this.peakHeight);
 		builder.append(", markerSampleId=");
-		builder.append(markerSampleId);
+		builder.append(this.markerSampleId);
 		builder.append(", accSampleId=");
-		builder.append(accSampleId);
+		builder.append(this.accSampleId);
 		builder.append("]");
 		return builder.toString();
 	}

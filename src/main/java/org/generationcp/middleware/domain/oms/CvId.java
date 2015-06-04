@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.oms;
 
 /**
@@ -17,32 +17,26 @@ package org.generationcp.middleware.domain.oms;
  */
 public enum CvId {
 
-	//Ontology
-	IBDB_TERMS(1000)
-	,PROPERTIES(1010)
-	,METHODS(1020)
-	,SCALES(1030)
-	,VARIABLES(1040)
-	,STUDY_STATUS(2005)
-	;
-	
+	// Ontology
+	IBDB_TERMS(1000), PROPERTIES(1010), METHODS(1020), SCALES(1030), VARIABLES(1040), STUDY_STATUS(2005);
+
 	private final int id;
-	
+
 	private CvId(int id) {
 		this.id = id;
 	}
-	
+
 	public int getId() {
 		return this.id;
 	}
 
-    public static CvId valueOf(int id) {
-        for (CvId cvId : CvId.values()) {
-            if (cvId.getId() == id) {
-                return cvId;
-            }
-        }
+	public static CvId valueOf(int id) {
+		for (CvId cvId : CvId.values()) {
+			if (cvId.getId() == id) {
+				return cvId;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

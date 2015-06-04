@@ -60,35 +60,35 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 		Collection<?> collectionDataSource = null;
 
 		if (null != args) {
-			jrParams = buildJRParams(args);
-			setFileName(buildOutputFileName(jrParams));
+			jrParams = this.buildJRParams(args);
+			this.setFileName(this.buildOutputFileName(jrParams));
 
 			if (args.containsKey("dataSource")) {
 				collectionDataSource = (Collection<?>) args.get("dataSource");
-				columnHeaders = buildColumnHeaders(collectionDataSource.iterator().next());
+				this.columnHeaders = this.buildColumnHeaders(collectionDataSource.iterator().next());
 
-				jrDataSource = buildJRDataSource(collectionDataSource);
-				//needed to change to input stream since code can not parse if its inside jar file
-				//for MFbNur and MFbTrial
-				InputStream jasperInputStream = getTemplateCompileInputStream();
-				//JasperDesign jasperReportDesign = JRXmlLoader.load(jasperFilesPath.replace(".jasper", ".jrxml"));
+				jrDataSource = this.buildJRDataSource(collectionDataSource);
+				// needed to change to input stream since code can not parse if its inside jar file
+				// for MFbNur and MFbTrial
+				InputStream jasperInputStream = this.getTemplateCompileInputStream();
+				// JasperDesign jasperReportDesign = JRXmlLoader.load(jasperFilesPath.replace(".jasper", ".jrxml"));
 				JasperDesign jasperReportDesign = JRXmlLoader.load(jasperInputStream);
 
-				addDynamicColumns(jasperReportDesign, columnHeaders.size());
+				this.addDynamicColumns(jasperReportDesign, this.columnHeaders.size());
 
 				jasperReport = JasperCompileManager.compileReport(jasperReportDesign);
 			}
-			jrPrint = JasperFillManager.fillReport(jasperReport, jrParams, jrDataSource);
+			this.jrPrint = JasperFillManager.fillReport(jasperReport, jrParams, jrDataSource);
 
 		}
 
-		return jrPrint;
+		return this.jrPrint;
 
 	}
 
 	/**
 	 * Creates the list of columns headers to be used when generating a dynamic Jasper Design.
-	 * 
+	 *
 	 * @param param any source object that contains the column headers
 	 * @return The plains String List with the header's names.
 	 */
@@ -97,7 +97,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 		MeasurementRow row = (MeasurementRow) param;
 		List<String> columnHeaders = new ArrayList<>();
 
-		for (MeasurementData rowData : (Collection<MeasurementData>) row.getDataList()) {
+		for (MeasurementData rowData : row.getDataList()) {
 			columnHeaders.add(rowData.getLabel());
 		}
 
@@ -107,13 +107,13 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 	@Override
 	public JRDataSource buildJRDataSource(Collection<?> dataRecords) {
 
-		return new DynamicColumnDataSource(columnHeaders, convertBeanCollectionToStringLists(dataRecords));
+		return new DynamicColumnDataSource(this.columnHeaders, this.convertBeanCollectionToStringLists(dataRecords));
 	}
 
 	/**
 	 * Converts a Collection of beans (usually passed via 'dataSource' parameter) to a List containing the records to be used as datasource,
 	 * where each record is defined by a String List.
-	 * 
+	 *
 	 * @param dataRecords A collection of beans to be parsed
 	 * @return A
 	 */
@@ -136,7 +136,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 	/**
 	 * Regenerates a JasperDesign, by adding it a Header Band for columns headers; and a detail band for displaying data records. The column
 	 * width is uniformly distributed among columns.
-	 * 
+	 *
 	 * @param jasperDesign the design where both bands(header and detail) will be added to.
 	 * @param numColumns the number of columns to generate.
 	 * @throws JRException If the Jasper Design modification fails.
@@ -146,59 +146,60 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 		JRDesignBand detailBand = new JRDesignBand();
 		JRDesignBand headerBand = new JRDesignBand();
 
-		JRDesignStyle normalStyle = getNormalStyle();
-		JRDesignStyle columnHeaderStyle = getColumnHeaderStyle();
+		JRDesignStyle normalStyle = this.getNormalStyle();
+		JRDesignStyle columnHeaderStyle = this.getColumnHeaderStyle();
 		jasperDesign.addStyle(normalStyle);
 		jasperDesign.addStyle(columnHeaderStyle);
 
-		int xPos = MARGIN;
-		int columnWidth = (TOTAL_PAGE_WIDTH - (SPACE_BETWEEN_COLS * (numColumns - 1))) / numColumns;
+		int xPos = AbstractDynamicReporter.MARGIN;
+		int columnWidth =
+				(AbstractDynamicReporter.TOTAL_PAGE_WIDTH - AbstractDynamicReporter.SPACE_BETWEEN_COLS * (numColumns - 1)) / numColumns;
 
 		for (int i = 0; i < numColumns; i++) {
 
 			// Create a Column Field
 			JRDesignField field = new JRDesignField();
-			field.setName(COL_EXPR_PREFIX + i);
+			field.setName(AbstractDynamicReporter.COL_EXPR_PREFIX + i);
 			field.setValueClass(java.lang.String.class);
 			jasperDesign.addField(field);
 
 			// Create a Header Field
 			JRDesignField headerField = new JRDesignField();
-			headerField.setName(COL_HEADER_EXPR_PREFIX + i);
+			headerField.setName(AbstractDynamicReporter.COL_HEADER_EXPR_PREFIX + i);
 			headerField.setValueClass(java.lang.String.class);
 			jasperDesign.addField(headerField);
 
 			// Add a Header Field to the headerBand
-			headerBand.setHeight(BAND_HEIGHT);
+			headerBand.setHeight(AbstractDynamicReporter.BAND_HEIGHT);
 			JRDesignTextField colHeaderField = new JRDesignTextField();
 			colHeaderField.setX(xPos);
 			colHeaderField.setY(0);
 			colHeaderField.setWidth(columnWidth);
-			colHeaderField.setHeight(COLUMN_HEIGHT);
+			colHeaderField.setHeight(AbstractDynamicReporter.COLUMN_HEIGHT);
 			colHeaderField.setHorizontalAlignment(HorizontalAlignEnum.LEFT);
 			colHeaderField.setStyle(columnHeaderStyle);
 			JRDesignExpression headerExpression = new JRDesignExpression();
 			headerExpression.setValueClass(java.lang.String.class);
-			headerExpression.setText("$F{" + COL_HEADER_EXPR_PREFIX + i + "}");
+			headerExpression.setText("$F{" + AbstractDynamicReporter.COL_HEADER_EXPR_PREFIX + i + "}");
 			colHeaderField.setExpression(headerExpression);
 			headerBand.addElement(colHeaderField);
 
 			// Add text field to the detailBand
-			detailBand.setHeight(BAND_HEIGHT);
+			detailBand.setHeight(AbstractDynamicReporter.BAND_HEIGHT);
 			JRDesignTextField textField = new JRDesignTextField();
 			textField.setX(xPos);
 			textField.setY(0);
 			textField.setWidth(columnWidth);
-			textField.setHeight(COLUMN_HEIGHT);
+			textField.setHeight(AbstractDynamicReporter.COLUMN_HEIGHT);
 			textField.setHorizontalAlignment(HorizontalAlignEnum.LEFT);
 			textField.setStyle(normalStyle);
 			JRDesignExpression expression = new JRDesignExpression();
 			expression.setValueClass(java.lang.String.class);
-			expression.setText("$F{" + COL_EXPR_PREFIX + i + "}");
+			expression.setText("$F{" + AbstractDynamicReporter.COL_EXPR_PREFIX + i + "}");
 			textField.setExpression(expression);
 			detailBand.addElement(textField);
 
-			xPos = xPos + columnWidth + SPACE_BETWEEN_COLS;
+			xPos = xPos + columnWidth + AbstractDynamicReporter.SPACE_BETWEEN_COLS;
 		}
 
 		jasperDesign.setColumnHeader(headerBand);
@@ -208,7 +209,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	/**
 	 * Helper method definig the predefined style to be used in Jasper elements.
-	 * 
+	 *
 	 * @return A default style with small font size.
 	 */
 	private JRDesignStyle getNormalStyle() {
@@ -225,7 +226,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	/**
 	 * Helper method definig the predefined style to be used in Jasper columns headers.
-	 * 
+	 *
 	 * @return A default style with bold and small font size.
 	 */
 	private JRDesignStyle getColumnHeaderStyle() {
@@ -276,11 +277,11 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 	 */
 	@Override
 	public void asOutputStream(OutputStream output) throws BuildReportException {
-		if (null != jrPrint) {
+		if (null != this.jrPrint) {
 			try {
 
-				JRXlsxExporter ex = createDefaultExcelExporter();
-				ex.setExporterInput(new SimpleExporterInput(jrPrint));
+				JRXlsxExporter ex = this.createDefaultExcelExporter();
+				ex.setExporterInput(new SimpleExporterInput(this.jrPrint));
 				ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
 
 				ex.exportReport();
@@ -288,8 +289,9 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 			} catch (JRException e) {
 				e.printStackTrace();
 			}
-		} else
-			throw new BuildReportException(getReportCode());
+		} else {
+			throw new BuildReportException(this.getReportCode());
+		}
 	}
 
 	@Override

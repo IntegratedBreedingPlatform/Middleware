@@ -1,45 +1,43 @@
+
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * POJO for storing aggregate inventory information and list of
- * lots associated with germplasm
- * 
+ * POJO for storing aggregate inventory information and list of lots associated with germplasm
+ *
  * @author Darla Ani
  *
  */
 public class GermplasmInventory implements Serializable {
 
 	private static final long serialVersionUID = -5519155457123841685L;
-	
+
 	private Integer gid;
-	
-	//number of lots with actual inventory available for given germplasm
+
+	// number of lots with actual inventory available for given germplasm
 	private Integer actualInventoryLotCount;
-	
-	//number of lots with reserved amount for given germplasm
+
+	// number of lots with reserved amount for given germplasm
 	private Integer reservedLotCount;
-	
-	//number of lots for given germplasm
+
+	// number of lots for given germplasm
 	private Integer lotCount;
-	
-	//String of StockIDs separated by comma per list entry.
-	private String stockIDs; 
 
+	// String of StockIDs separated by comma per list entry.
+	private String stockIDs;
 
-	//list of lots for germplasm
+	// list of lots for germplasm
 	private List<? extends LotDetails> lotRows;
-	
-	
+
 	public GermplasmInventory(Integer gid) {
 		super();
 		this.gid = gid;
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(Integer gid) {
@@ -47,7 +45,7 @@ public class GermplasmInventory implements Serializable {
 	}
 
 	public Integer getActualInventoryLotCount() {
-		return actualInventoryLotCount;
+		return this.actualInventoryLotCount;
 	}
 
 	public void setActualInventoryLotCount(Integer actualInventoryLotCount) {
@@ -55,7 +53,7 @@ public class GermplasmInventory implements Serializable {
 	}
 
 	public Integer getReservedLotCount() {
-		return reservedLotCount;
+		return this.reservedLotCount;
 	}
 
 	public void setReservedLotCount(Integer reservedLotCount) {
@@ -63,16 +61,16 @@ public class GermplasmInventory implements Serializable {
 	}
 
 	public List<? extends LotDetails> getLotRows() {
-		return lotRows;
+		return this.lotRows;
 	}
 
 	public void setLotRows(List<? extends LotDetails> lotRows) {
 		this.lotRows = lotRows;
-		lotCount = lotRows.size();
+		this.lotCount = lotRows.size();
 	}
-	
+
 	public String getStockIDs() {
-		return stockIDs;
+		return this.stockIDs;
 	}
 
 	public void setStockIDs(String stockIDs) {
@@ -83,7 +81,7 @@ public class GermplasmInventory implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("GermplasmInventory [");
-		builder.append(getFieldsToString());
+		builder.append(this.getFieldsToString());
 		builder.append("]");
 		return builder.toString();
 	}
@@ -91,31 +89,31 @@ public class GermplasmInventory implements Serializable {
 	protected String getFieldsToString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("gid=");
-		builder.append(gid);
+		builder.append(this.gid);
 		builder.append(", actualInventoryLotCount=");
-		builder.append(actualInventoryLotCount);
+		builder.append(this.actualInventoryLotCount);
 		builder.append(", reservedLotCount=");
-		builder.append(reservedLotCount);
-		if (lotRows != null){
+		builder.append(this.reservedLotCount);
+		if (this.lotRows != null) {
 			builder.append(", lotCount = ");
-			builder.append(lotRows.size());
+			builder.append(this.lotRows.size());
 			builder.append(", lots={");
-			for (LotDetails lot : lotRows) {
+			for (LotDetails lot : this.lotRows) {
 				builder.append(lot);
 			}
 			builder.append("}");
-		}else{
+		} else {
 			builder.append(", lotCount = ");
-			builder.append(lotCount);
+			builder.append(this.lotCount);
 		}
 		builder.append(", stockIDs=");
-		builder.append(stockIDs);
-		
+		builder.append(this.stockIDs);
+
 		return builder.toString();
 	}
 
 	public Integer getLotCount() {
-		return lotCount;
+		return this.lotCount;
 	}
 
 	public void setLotCount(Integer lotCount) {

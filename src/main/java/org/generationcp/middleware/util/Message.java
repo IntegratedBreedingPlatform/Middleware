@@ -1,39 +1,39 @@
+
 package org.generationcp.middleware.util;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Daniel Villafuerte
-
+ * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
 public class Message {
-    private String messageKey;
 
-    private String[] messageParams;
+	private String messageKey;
 
-    public Message(String messageKey) {
-        this.messageKey = messageKey;
-    }
+	private String[] messageParams;
 
-    public Message(String messageKey, String... params) {
-        this.messageKey = messageKey;
-        if (params != null) {
-            messageParams = params;
-        }
-    }
+	public Message(String messageKey) {
+		this.messageKey = messageKey;
+	}
 
-    public String getMessageKey() {
-        return messageKey;
-    }
+	public Message(String messageKey, String... params) {
+		this.messageKey = messageKey;
+		if (params != null) {
+			this.messageParams = params;
+		}
+	}
 
-    public String[] getMessageParams() {
-        return messageParams;
-    }
+	public String getMessageKey() {
+		return this.messageKey;
+	}
 
-    public void setMessageKey(String messageKey) {
-        this.messageKey = messageKey;
-    }
+	public String[] getMessageParams() {
+		return this.messageParams;
+	}
 
-    public void setMessageParams(String[] messageParams) {
-        this.messageParams = messageParams;
-    }
+	public void setMessageKey(String messageKey) {
+		this.messageKey = messageKey;
+	}
+
+	public void setMessageParams(String[] messageParams) {
+		this.messageParams = messageParams;
+	}
 }

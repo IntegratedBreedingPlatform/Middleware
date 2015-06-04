@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.reports;
 
 import java.io.InputStream;
@@ -20,72 +21,76 @@ import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
 import net.sf.jasperreports.export.SimpleXlsReportConfiguration;
 
 /**
- * Defines the base class for all Reporters. Each reporter pretending to
- * be discovered by ReporterFactory must extend this class
+ * Defines the base class for all Reporters. Each reporter pretending to be discovered by ReporterFactory must extend this class
+ * 
  * @author jarojas
  *
  */
-abstract class AbstractReporter implements Reporter{
-	
-	private String fileNameExpr = getReportCode()+"-{tid}";
+abstract class AbstractReporter implements Reporter {
+
+	private String fileNameExpr = this.getReportCode() + "-{tid}";
 	private String fileName = null;
-	private Pattern fileNameParamsPattern = Pattern.compile("\\{[\\w-_]*\\}");
+	private final Pattern fileNameParamsPattern = Pattern.compile("\\{[\\w-_]*\\}");
 	private boolean isParentsInfoRequired = false;
 	JasperPrint jrPrint;
-	
+
 	@Override
-	public String toString(){
-		return String.format("Report[%s : %s]", getReportCode(),this.getClass().getSimpleName());
+	public String toString() {
+		return String.format("Report[%s : %s]", this.getReportCode(), this.getClass().getSimpleName());
 	}
 
 	/**
-	 * Uses the data passed to build a JasperPrint, which can be used to generate a file, an outputStream or any other format for distribution.
+	 * Uses the data passed to build a JasperPrint, which can be used to generate a file, an outputStream or any other format for
+	 * distribution.
 	 */
-	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException{
-		
+	@Override
+	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException {
+
 		Map<String, Object> jrParams = null;
 		JRDataSource jrDataSource = null;
-		
-		if(null != args){
-			jrParams = buildJRParams(args);
-			fileName = buildOutputFileName(jrParams);
 
-			if(args.containsKey("dataSource")){
-				jrDataSource = buildJRDataSource((Collection<?>)args.get("dataSource"));
+		if (null != args) {
+			jrParams = this.buildJRParams(args);
+			this.fileName = this.buildOutputFileName(jrParams);
+
+			if (args.containsKey("dataSource")) {
+				jrDataSource = this.buildJRDataSource((Collection<?>) args.get("dataSource"));
 			}
-			
-		}
-		InputStream jasperReport = getTemplateInputStream();		
-		jrPrint = JasperFillManager.fillReport(jasperReport, jrParams, jrDataSource);
 
-		return jrPrint;
-		
+		}
+		InputStream jasperReport = this.getTemplateInputStream();
+		this.jrPrint = JasperFillManager.fillReport(jasperReport, jrParams, jrDataSource);
+
+		return this.jrPrint;
+
 	}
-	
+
 	/**
-	 * Returns a Map with the parameters required for creating a JasperPrint for this Reporter.
-	 * This method configures some basic jasper options like language and text formatting;
-	 * subclasses extending AbstractReporter may add extra parameters to fill in its particular template.
-	 * @return Map of parameters for a JarperPrint 
+	 * Returns a Map with the parameters required for creating a JasperPrint for this Reporter. This method configures some basic jasper
+	 * options like language and text formatting; subclasses extending AbstractReporter may add extra parameters to fill in its particular
+	 * template.
+	 * 
+	 * @return Map of parameters for a JarperPrint
 	 */
-	public Map<String, Object> buildJRParams(Map<String,Object> args){
+	@Override
+	public Map<String, Object> buildJRParams(Map<String, Object> args) {
 		Map<String, Object> params = new HashMap<String, Object>();
 
-		if(args.containsKey("datePattern")) {
+		if (args.containsKey("datePattern")) {
 			params.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, args.get("datePattern"));
 		}
-		
-		if(args.containsKey("numberPattern")) {
+
+		if (args.containsKey("numberPattern")) {
 			params.put(JsonQueryExecuterFactory.JSON_NUMBER_PATTERN, args.get("numberPattern"));
 		}
-		
-		if(args.containsKey("locale")) {
-			if(args.get("locale") instanceof Locale) {
+
+		if (args.containsKey("locale")) {
+			if (args.get("locale") instanceof Locale) {
 				params.put(JRParameter.REPORT_LOCALE, args.get("locale"));
 			} else {
 				params.put(JRParameter.REPORT_LOCALE, new Locale(args.get("locale").toString()));
 			}
-		}else {
+		} else {
 			params.put(JRParameter.REPORT_LOCALE, new Locale("en_US"));
 		}
 		ClassLoader loader = AbstractReporter.class.getClassLoader();
@@ -94,105 +99,115 @@ abstract class AbstractReporter implements Reporter{
 	}
 
 	/**
-	 * Obtains the input stream to the .jasper file, specified by getFileName() 
-	 * The reason behind using input stream is that so it can work even inside a jar file
+	 * Obtains the input stream to the .jasper file, specified by getFileName() The reason behind using input stream is that so it can work
+	 * even inside a jar file
+	 * 
 	 * @param jasperFileName The name of the compiled .jasper file.
 	 * @return
 	 */
-	public InputStream getTemplateInputStream(){
+	public InputStream getTemplateInputStream() {
 		String baseJasperDirectory = "jasper/";
-		String jasperFileName = getTemplateName();
-	   	ClassLoader loader = AbstractReporter.class.getClassLoader();
-        
-	   	if(! jasperFileName.endsWith(".jasper")) {
-        	jasperFileName = jasperFileName + ".jasper";
-	   	}
+		String jasperFileName = this.getTemplateName();
+		ClassLoader loader = AbstractReporter.class.getClassLoader();
 
-        return loader.getResourceAsStream(baseJasperDirectory+jasperFileName);
+		if (!jasperFileName.endsWith(".jasper")) {
+			jasperFileName = jasperFileName + ".jasper";
+		}
+
+		return loader.getResourceAsStream(baseJasperDirectory + jasperFileName);
 	}
+
 	/**
-	 * Obtains the input stream of the .jrxml file for dynamic compiling of the report
-	 * The reason behind using input stream is that so it can work even inside a jar file
-	 * 
+	 * Obtains the input stream of the .jrxml file for dynamic compiling of the report The reason behind using input stream is that so it
+	 * can work even inside a jar file
+	 *
 	 * @return
 	 */
-	public InputStream getTemplateCompileInputStream(){
+	public InputStream getTemplateCompileInputStream() {
 		String baseJasperDirectory = "jasper/";
-		String jasperFileName = getTemplateName();
-	   	ClassLoader loader = AbstractReporter.class.getClassLoader();
-        
-	   	if(! jasperFileName.endsWith(".jasper")) {
-        	jasperFileName = jasperFileName + ".jrxml";
-	   	}
+		String jasperFileName = this.getTemplateName();
+		ClassLoader loader = AbstractReporter.class.getClassLoader();
 
-        return loader.getResourceAsStream(baseJasperDirectory+jasperFileName);
+		if (!jasperFileName.endsWith(".jasper")) {
+			jasperFileName = jasperFileName + ".jrxml";
+		}
+
+		return loader.getResourceAsStream(baseJasperDirectory + jasperFileName);
 	}
-	public void setFileNameExpression(String fileNameExpr){
+
+	@Override
+	public void setFileNameExpression(String fileNameExpr) {
 		this.fileNameExpr = fileNameExpr;
 	}
 
-	protected String buildOutputFileName(Map<String,Object> jrParams){
+	protected String buildOutputFileName(Map<String, Object> jrParams) {
 		String fileName = this.fileNameExpr;
-		
-		
-		Matcher paramsMatcher = fileNameParamsPattern.matcher(this.fileNameExpr);
-		
-		 while (paramsMatcher.find()) {
-			 String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
-			 
-			 if(null == jrParams || null == jrParams.get(paramName)){
-				 fileName = fileName.replace(paramsMatcher.group(), "");
-			 }else{
-				 fileName = fileName.replace(paramsMatcher.group(), jrParams.get(paramName).toString());
-			 }
-		 }
-		
+
+		Matcher paramsMatcher = this.fileNameParamsPattern.matcher(this.fileNameExpr);
+
+		while (paramsMatcher.find()) {
+			String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
+
+			if (null == jrParams || null == jrParams.get(paramName)) {
+				fileName = fileName.replace(paramsMatcher.group(), "");
+			} else {
+				fileName = fileName.replace(paramsMatcher.group(), jrParams.get(paramName).toString());
+			}
+		}
+
 		return fileName;
 	}
-	
+
 	@Override
 	public void asOutputStream(OutputStream output) throws BuildReportException {
-		if(null != jrPrint)
+		if (null != this.jrPrint) {
 			try {
-				JasperExportManager.exportReportToPdfStream(jrPrint, output);
+				JasperExportManager.exportReportToPdfStream(this.jrPrint, output);
 			} catch (JRException e) {
 				e.printStackTrace();
 			}
-		else throw new BuildReportException(getReportCode());
+		} else {
+			throw new BuildReportException(this.getReportCode());
+		}
 	}
 
 	/**
 	 * Does not set the input and output of this exporter, only returns a pre-configured xlsx exporter.
+	 * 
 	 * @return
 	 */
-	protected JRXlsxExporter createDefaultExcelExporter(){
+	protected JRXlsxExporter createDefaultExcelExporter() {
 		JRXlsxExporter ex = new JRXlsxExporter();
-		
+
 		SimpleXlsReportConfiguration jrConfig = new SimpleXlsReportConfiguration();
 		jrConfig.setOnePagePerSheet(false);
 		jrConfig.setDetectCellType(true);
 		jrConfig.setIgnoreCellBorder(true);
 		jrConfig.setWhitePageBackground(true);
-		
+
 		return ex;
 	}
 
-	public String getFileName(){
-		return fileName+"."+getFileExtension();
+	@Override
+	public String getFileName() {
+		return this.fileName + "." + this.getFileExtension();
 	}
-	public void setFileName(String fileName){
+
+	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	
-	public String getFileExtension(){
+
+	@Override
+	public String getFileExtension() {
 		return "pdf";
 	}
-	
-	public boolean isParentsInfoRequired(){
-		return isParentsInfoRequired;
+
+	@Override
+	public boolean isParentsInfoRequired() {
+		return this.isParentsInfoRequired;
 	}
-	
-	protected void setParentInfoRequired(boolean isParentsInfoRequired){
+
+	protected void setParentInfoRequired(boolean isParentsInfoRequired) {
 		this.isParentsInfoRequired = isParentsInfoRequired;
 	}
 }

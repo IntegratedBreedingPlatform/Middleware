@@ -1,4 +1,7 @@
+
 package org.generationcp.middleware.dao.mbdt;
+
+import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -9,84 +12,79 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.List;
-
 /**
- * Created by IntelliJ IDEA.
- * User: Daniel Villafuerte
+ * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
 
-
 public class MBDTGenerationDAO extends GenericDAO<MBDTGeneration, Integer> {
-    public MBDTGeneration getByProjectAndDatasetID(Integer datasetID, Integer projectID) throws MiddlewareQueryException {
 
-        MBDTGeneration generation = null;
+	public MBDTGeneration getByProjectAndDatasetID(Integer datasetID, Integer projectID) throws MiddlewareQueryException {
 
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("genotypeDatasetID", datasetID));
-            criteria.add(Restrictions.eq("project.projectID", projectID));
+		MBDTGeneration generation = null;
 
-            generation = (MBDTGeneration) criteria.uniqueResult();
+		try {
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("genotypeDatasetID", datasetID));
+			criteria.add(Restrictions.eq("project.projectID", projectID));
 
-        } catch (HibernateException e) {
-            logAndThrowException("Error at getByDatasetID=" + datasetID + " query on MBDTGenerationDAO: " + e.getMessage(), e);
-        }
+			generation = (MBDTGeneration) criteria.uniqueResult();
 
-        return generation;
-    }
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getByDatasetID=" + datasetID + " query on MBDTGenerationDAO: " + e.getMessage(), e);
+		}
 
-    public MBDTGeneration getByNameAndProjectID(String name, Integer projectID) throws MiddlewareQueryException {
+		return generation;
+	}
 
-        try {
-            MBDTGeneration generation = null;
+	public MBDTGeneration getByNameAndProjectID(String name, Integer projectID) throws MiddlewareQueryException {
 
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria
-                    .add(Restrictions.eq("generationName", name))
-                    .add(Restrictions.eq("project.projectID", projectID));
+		try {
+			MBDTGeneration generation = null;
 
-            Object obj = criteria.uniqueResult();
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("generationName", name)).add(Restrictions.eq("project.projectID", projectID));
 
-            if (obj == null) {
-                return null;
-            } else {
-                generation = (MBDTGeneration) obj;
-            }
+			Object obj = criteria.uniqueResult();
 
-            return generation;
-        } catch (HibernateException e) {
-            logAndThrowException("Error at getByNameAndProjectID query on MBDTGenerationDAO: " + e.getMessage(), e);
-            return null;
-        }
-    }
+			if (obj == null) {
+				return null;
+			} else {
+				generation = (MBDTGeneration) obj;
+			}
 
-    public List<MBDTGeneration> getByProjectID(Integer projectID) throws MiddlewareQueryException {
-        Criteria crit = getSession().createCriteria(getPersistentClass());
+			return generation;
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getByNameAndProjectID query on MBDTGenerationDAO: " + e.getMessage(), e);
+			return null;
+		}
+	}
 
-        crit.add(Restrictions.eq("project.projectID", projectID));
+	public List<MBDTGeneration> getByProjectID(Integer projectID) throws MiddlewareQueryException {
+		Criteria crit = this.getSession().createCriteria(this.getPersistentClass());
 
-        return crit.list();
-    }
+		crit.add(Restrictions.eq("project.projectID", projectID));
 
-    @Override
-    public MBDTGeneration saveOrUpdate(MBDTGeneration entity) throws MiddlewareQueryException {
-        Session session = getSession();
-        Transaction transaction = session.beginTransaction();
+		return crit.list();
+	}
 
-        try {
-            MBDTGeneration returnVal = super.saveOrUpdate(entity);
-            transaction.commit();
-            session.flush();
-            session.clear();
+	@Override
+	public MBDTGeneration saveOrUpdate(MBDTGeneration entity) throws MiddlewareQueryException {
+		Session session = this.getSession();
+		Transaction transaction = session.beginTransaction();
 
-            return returnVal;
-        } catch (MiddlewareQueryException e) {
-            transaction.rollback();
-            throw e;
-        } catch (HibernateException e) {
-            transaction.rollback();
-            throw e;
-        }
-    }
+		try {
+			MBDTGeneration returnVal = super.saveOrUpdate(entity);
+			transaction.commit();
+			session.flush();
+			session.clear();
+
+			return returnVal;
+		} catch (MiddlewareQueryException e) {
+			transaction.rollback();
+			throw e;
+		} catch (HibernateException e) {
+			transaction.rollback();
+			throw e;
+		}
+	}
 }

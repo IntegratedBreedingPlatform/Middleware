@@ -1,68 +1,70 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * POJO for gdms_map table.
- * 
+ *
  * @author Michael Blancaflor
  */
 @Entity
 @Table(name = "gdms_map")
-public class Map implements Serializable{
+public class Map implements Serializable {
 
-    private static final long serialVersionUID = 1803546446290398372L;
+	private static final long serialVersionUID = 1803546446290398372L;
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "map_id")
-    private Integer mapId;
-    
-    @Basic(optional = false)
-    @Column(name = "map_name")
-    private String mapName;
-    
-    @Basic(optional = false)
-    @Column(name = "map_type")
-    private String mapType;
-    
-    @Column(name = "mp_id")
-    private Integer mpId;
-    
-    @Column(name = "map_desc")
-    private String mapDesc;
-    
-    @Column(name = "map_unit")
-    private String mapUnit;
-    
-    @Column(name = "genus", columnDefinition = "char(25)")
-    private String genus;
-    
-    @Column(name = "species", columnDefinition = "char(25)")
-    private String species;
-    
-    @Column(name = "institute")
-    private String institute;
-       
-    public Map() {        
-    }
+	@Id
+	@Basic(optional = false)
+	@Column(name = "map_id")
+	private Integer mapId;
 
+	@Basic(optional = false)
+	@Column(name = "map_name")
+	private String mapName;
 
-    public Map(Integer mapId, String mapName, String mapType, Integer mpId,
-			String mapDesc, String mapUnit, String genus, String species,
+	@Basic(optional = false)
+	@Column(name = "map_type")
+	private String mapType;
+
+	@Column(name = "mp_id")
+	private Integer mpId;
+
+	@Column(name = "map_desc")
+	private String mapDesc;
+
+	@Column(name = "map_unit")
+	private String mapUnit;
+
+	@Column(name = "genus", columnDefinition = "char(25)")
+	private String genus;
+
+	@Column(name = "species", columnDefinition = "char(25)")
+	private String species;
+
+	@Column(name = "institute")
+	private String institute;
+
+	public Map() {
+	}
+
+	public Map(Integer mapId, String mapName, String mapType, Integer mpId, String mapDesc, String mapUnit, String genus, String species,
 			String institute) {
 		this.mapId = mapId;
 		this.mapName = mapName;
@@ -75,52 +77,44 @@ public class Map implements Serializable{
 		this.institute = institute;
 	}
 
-
 	public Map(Integer mapId) {
-        this.mapId = mapId;
-    }
-    
-    public Integer getMapId() {
-        return mapId;
-    }
+		this.mapId = mapId;
+	}
 
-    
-    public void setMapId(Integer mapId) {
-        this.mapId = mapId;
-    }
+	public Integer getMapId() {
+		return this.mapId;
+	}
 
-    
-    public String getMapName() {
-        return mapName;
-    }
+	public void setMapId(Integer mapId) {
+		this.mapId = mapId;
+	}
 
-    
-    public void setMapName(String mapName) {
-        this.mapName = mapName;
-    }
+	public String getMapName() {
+		return this.mapName;
+	}
 
-    
-    public String getMapType() {
-        return mapType;
-    }
+	public void setMapName(String mapName) {
+		this.mapName = mapName;
+	}
 
-    
-    public void setMapType(String mapType) {
-        this.mapType = mapType;
-    }
+	public String getMapType() {
+		return this.mapType;
+	}
 
-    
-    public Integer getMpId() {
-        return mpId;
-    }
+	public void setMapType(String mapType) {
+		this.mapType = mapType;
+	}
 
-    
-    public void setMpId(Integer mpId) {
-        this.mpId = mpId;
-    }
-    
-    public String getMapDesc() {
-		return mapDesc;
+	public Integer getMpId() {
+		return this.mpId;
+	}
+
+	public void setMpId(Integer mpId) {
+		this.mpId = mpId;
+	}
+
+	public String getMapDesc() {
+		return this.mapDesc;
 	}
 
 	public void setMapDesc(String mapDesc) {
@@ -128,7 +122,7 @@ public class Map implements Serializable{
 	}
 
 	public String getMapUnit() {
-		return mapUnit;
+		return this.mapUnit;
 	}
 
 	public void setMapUnit(String mapUnit) {
@@ -136,7 +130,7 @@ public class Map implements Serializable{
 	}
 
 	public String getGenus() {
-		return genus;
+		return this.genus;
 	}
 
 	public void setGenus(String genus) {
@@ -144,7 +138,7 @@ public class Map implements Serializable{
 	}
 
 	public String getSpecies() {
-		return species;
+		return this.species;
 	}
 
 	public void setSpecies(String species) {
@@ -152,7 +146,7 @@ public class Map implements Serializable{
 	}
 
 	public String getInstitute() {
-		return institute;
+		return this.institute;
 	}
 
 	public void setInstitute(String institute) {
@@ -163,94 +157,93 @@ public class Map implements Serializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((genus == null) ? 0 : genus.hashCode());
-		result = prime * result
-				+ ((institute == null) ? 0 : institute.hashCode());
-		result = prime * result + ((mapDesc == null) ? 0 : mapDesc.hashCode());
-		result = prime * result + ((mapId == null) ? 0 : mapId.hashCode());
-		result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
-		result = prime * result + ((mapType == null) ? 0 : mapType.hashCode());
-		result = prime * result + ((mapUnit == null) ? 0 : mapUnit.hashCode());
-		result = prime * result + ((mpId == null) ? 0 : mpId.hashCode());
-		result = prime * result + ((species == null) ? 0 : species.hashCode());
+		result = prime * result + (this.genus == null ? 0 : this.genus.hashCode());
+		result = prime * result + (this.institute == null ? 0 : this.institute.hashCode());
+		result = prime * result + (this.mapDesc == null ? 0 : this.mapDesc.hashCode());
+		result = prime * result + (this.mapId == null ? 0 : this.mapId.hashCode());
+		result = prime * result + (this.mapName == null ? 0 : this.mapName.hashCode());
+		result = prime * result + (this.mapType == null ? 0 : this.mapType.hashCode());
+		result = prime * result + (this.mapUnit == null ? 0 : this.mapUnit.hashCode());
+		result = prime * result + (this.mpId == null ? 0 : this.mpId.hashCode());
+		result = prime * result + (this.species == null ? 0 : this.species.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		Map other = (Map) obj;
-		if (genus == null) {
+		if (this.genus == null) {
 			if (other.genus != null) {
-                return false;
-            }
-		} else if (!genus.equals(other.genus)) {
-            return false;
-        }
-		if (institute == null) {
+				return false;
+			}
+		} else if (!this.genus.equals(other.genus)) {
+			return false;
+		}
+		if (this.institute == null) {
 			if (other.institute != null) {
-                return false;
-            }
-		} else if (!institute.equals(other.institute)) {
-            return false;
-        }
-		if (mapDesc == null) {
+				return false;
+			}
+		} else if (!this.institute.equals(other.institute)) {
+			return false;
+		}
+		if (this.mapDesc == null) {
 			if (other.mapDesc != null) {
-                return false;
-            }
-		} else if (!mapDesc.equals(other.mapDesc)) {
-            return false;
-        }
-		if (mapId == null) {
+				return false;
+			}
+		} else if (!this.mapDesc.equals(other.mapDesc)) {
+			return false;
+		}
+		if (this.mapId == null) {
 			if (other.mapId != null) {
-                return false;
-            }
-		} else if (!mapId.equals(other.mapId)) {
-            return false;
-        }
-		if (mapName == null) {
+				return false;
+			}
+		} else if (!this.mapId.equals(other.mapId)) {
+			return false;
+		}
+		if (this.mapName == null) {
 			if (other.mapName != null) {
-                return false;
-            }
-		} else if (!mapName.equals(other.mapName)) {
-            return false;
-        }
-		if (mapType == null) {
+				return false;
+			}
+		} else if (!this.mapName.equals(other.mapName)) {
+			return false;
+		}
+		if (this.mapType == null) {
 			if (other.mapType != null) {
-                return false;
-            }
-		} else if (!mapType.equals(other.mapType)) {
-            return false;
-        }
-		if (mapUnit == null) {
+				return false;
+			}
+		} else if (!this.mapType.equals(other.mapType)) {
+			return false;
+		}
+		if (this.mapUnit == null) {
 			if (other.mapUnit != null) {
-                return false;
-            }
-		} else if (!mapUnit.equals(other.mapUnit)) {
-            return false;
-        }
-		if (mpId == null) {
+				return false;
+			}
+		} else if (!this.mapUnit.equals(other.mapUnit)) {
+			return false;
+		}
+		if (this.mpId == null) {
 			if (other.mpId != null) {
-                return false;
-            }
-		} else if (!mpId.equals(other.mpId)) {
-            return false;
-        }
-		if (species == null) {
+				return false;
+			}
+		} else if (!this.mpId.equals(other.mpId)) {
+			return false;
+		}
+		if (this.species == null) {
 			if (other.species != null) {
-                return false;
-            }
-		} else if (!species.equals(other.species)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.species.equals(other.species)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -258,26 +251,25 @@ public class Map implements Serializable{
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Map [mapId=");
-		builder.append(mapId);
+		builder.append(this.mapId);
 		builder.append(", mapName=");
-		builder.append(mapName);
+		builder.append(this.mapName);
 		builder.append(", mapType=");
-		builder.append(mapType);
+		builder.append(this.mapType);
 		builder.append(", mpId=");
-		builder.append(mpId);
+		builder.append(this.mpId);
 		builder.append(", mapDesc=");
-		builder.append(mapDesc);
+		builder.append(this.mapDesc);
 		builder.append(", mapUnit=");
-		builder.append(mapUnit);
+		builder.append(this.mapUnit);
 		builder.append(", genus=");
-		builder.append(genus);
+		builder.append(this.genus);
 		builder.append(", species=");
-		builder.append(species);
+		builder.append(this.species);
 		builder.append(", institute=");
-		builder.append(institute);
+		builder.append(this.institute);
 		builder.append("]");
 		return builder.toString();
 	}
-    
-}
 
+}

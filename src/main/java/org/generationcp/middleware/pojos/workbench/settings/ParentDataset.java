@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;

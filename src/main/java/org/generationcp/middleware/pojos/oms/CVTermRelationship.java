@@ -1,74 +1,72 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos.oms;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
- * 
+ *
  * http://gmod.org/wiki/Chado_Tables#Table:_cvterm_relationship
- * 
- * A relationship linking two cvterms. 
- * Each cvterm_relationship constitutes an edge in the graph defined by the collection of cvterms and cvterm_relationships. 
- * The meaning of the cvterm_relationship depends on the definition of the cvterm R refered to by type_id. 
- * However, in general the definitions are such that the statement "all SUBJs REL some OBJ" is true. 
- * The cvterm_relationship statement is about the subject, not the object. For example "insect wing part_of thorax".
- * 
+ *
+ * A relationship linking two cvterms. Each cvterm_relationship constitutes an edge in the graph defined by the collection of cvterms and
+ * cvterm_relationships. The meaning of the cvterm_relationship depends on the definition of the cvterm R refered to by type_id. However, in
+ * general the definitions are such that the statement "all SUBJs REL some OBJ" is true. The cvterm_relationship statement is about the
+ * subject, not the object. For example "insect wing part_of thorax".
+ *
  * @author Joyce Avestro
  *
  */
 @Entity
-@Table(	name = "cvterm_relationship")
-public class CVTermRelationship implements Serializable{
+@Table(name = "cvterm_relationship")
+public class CVTermRelationship implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "cvterm_relationship_id")
-    private Integer cvTermRelationshipId;
-    
-    /**
-     * The nature of the relationship between subject and object. 
-     * Note that relations are also housed in the cvterm table, typically from the OBO relationship ontology, 
-     * although other relationship types are allowed.
-     * References cvterm
-     */
-    @Column(name="type_id")
-    private Integer typeId;
-    
-    /**
-     * The subject of the subj-predicate-obj sentence. The cvterm_relationship is about the subject. 
-     * In a graph, this typically corresponds to the child node.
-     * References cvterm
-     */
-    @Column(name="subject_id")
-    private Integer subjectId;
-    
-    /**
-     * The object of the subj-predicate-obj sentence. The cvterm_relationship refers to the object. 
-     * In a graph, this typically corresponds to the parent node.
-     * References cvterm
-     */
-    @Column(name="object_id")
-    private Integer objectId;
-    
+	@Id
+	@Basic(optional = false)
+	@Column(name = "cvterm_relationship_id")
+	private Integer cvTermRelationshipId;
+
+	/**
+	 * The nature of the relationship between subject and object. Note that relations are also housed in the cvterm table, typically from
+	 * the OBO relationship ontology, although other relationship types are allowed. References cvterm
+	 */
+	@Column(name = "type_id")
+	private Integer typeId;
+
+	/**
+	 * The subject of the subj-predicate-obj sentence. The cvterm_relationship is about the subject. In a graph, this typically corresponds
+	 * to the child node. References cvterm
+	 */
+	@Column(name = "subject_id")
+	private Integer subjectId;
+
+	/**
+	 * The object of the subj-predicate-obj sentence. The cvterm_relationship refers to the object. In a graph, this typically corresponds
+	 * to the parent node. References cvterm
+	 */
+	@Column(name = "object_id")
+	private Integer objectId;
+
 	public CVTermRelationship() {
 	}
 
-	public CVTermRelationship(Integer cvTermRelationshipId, Integer typeId,
-			Integer subjectId, Integer objectId) {
+	public CVTermRelationship(Integer cvTermRelationshipId, Integer typeId, Integer subjectId, Integer objectId) {
 		super();
 		this.cvTermRelationshipId = cvTermRelationshipId;
 		this.typeId = typeId;
@@ -77,7 +75,7 @@ public class CVTermRelationship implements Serializable{
 	}
 
 	public Integer getCvTermRelationshipId() {
-		return cvTermRelationshipId;
+		return this.cvTermRelationshipId;
 	}
 
 	public void setCvTermRelationshipId(Integer cvTermRelationshipId) {
@@ -85,7 +83,7 @@ public class CVTermRelationship implements Serializable{
 	}
 
 	public Integer getTypeId() {
-		return typeId;
+		return this.typeId;
 	}
 
 	public void setTypeId(Integer typeId) {
@@ -93,7 +91,7 @@ public class CVTermRelationship implements Serializable{
 	}
 
 	public Integer getSubjectId() {
-		return subjectId;
+		return this.subjectId;
 	}
 
 	public void setSubjectId(Integer subjectId) {
@@ -101,7 +99,7 @@ public class CVTermRelationship implements Serializable{
 	}
 
 	public Integer getObjectId() {
-		return objectId;
+		return this.objectId;
 	}
 
 	public void setObjectId(Integer objectId) {
@@ -112,40 +110,36 @@ public class CVTermRelationship implements Serializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((cvTermRelationshipId == null) ? 0 : cvTermRelationshipId
-						.hashCode());
+		result = prime * result + (this.cvTermRelationshipId == null ? 0 : this.cvTermRelationshipId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		CVTermRelationship other = (CVTermRelationship) obj;
-		if (cvTermRelationshipId == null) {
+		if (this.cvTermRelationshipId == null) {
 			if (other.cvTermRelationshipId != null) {
-                return false;
-            }
-		} else if (!cvTermRelationshipId.equals(other.cvTermRelationshipId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.cvTermRelationshipId.equals(other.cvTermRelationshipId)) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "CVTermRelationship [cvTermRelationshipId="
-				+ cvTermRelationshipId + ", typeId=" + typeId + ", subjectId="
-				+ subjectId + ", objectId=" + objectId + "]";
+		return "CVTermRelationship [cvTermRelationshipId=" + this.cvTermRelationshipId + ", typeId=" + this.typeId + ", subjectId="
+				+ this.subjectId + ", objectId=" + this.objectId + "]";
 	}
 
 }

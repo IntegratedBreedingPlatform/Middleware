@@ -1,175 +1,205 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.dms.*;
-
-import java.util.*;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentStock;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 
 public class ExperimentBuilder extends Builder {
 
 	public ExperimentBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
-	
+
 	public long count(int dataSetId) throws MiddlewareQueryException {
-		return getExperimentProjectDao().count(dataSetId);
+		return this.getExperimentProjectDao().count(dataSetId);
 	}
 
-	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes) throws MiddlewareQueryException {
+	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes)
+			throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
-		List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);			
-		Map<Integer, StockModel> stockModelMap = getStockModelMap(experimentProjects);
+		List<ExperimentProject> experimentProjects =
+				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+		Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
 		for (ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
 		}
 		return experiments;
 	}
-	
-	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+
+	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes,
+			boolean hasVariableType) throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
-		List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+		List<ExperimentProject> experimentProjects =
+				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
 		for (ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
+			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
 		}
 		return experiments;
 	}
-	
-	private Map<Integer, StockModel> getStockModelMap(List<ExperimentProject> experimentProjects)  throws MiddlewareQueryException{
+
+	private Map<Integer, StockModel> getStockModelMap(List<ExperimentProject> experimentProjects) throws MiddlewareQueryException {
 		Map<Integer, StockModel> stockModelMap = new HashMap<Integer, StockModel>();
 		List<Integer> stockIds = new ArrayList<Integer>();
-		for (ExperimentProject experimentProject  : experimentProjects) {
+		for (ExperimentProject experimentProject : experimentProjects) {
 			List<ExperimentStock> experimentStocks = experimentProject.getExperiment().getExperimentStocks();
 			if (experimentStocks != null && experimentStocks.size() == 1) {
-                stockIds.add(experimentStocks.get(0).getStock().getStockId());
-            }
+				stockIds.add(experimentStocks.get(0).getStock().getStockId());
+			}
 		}
-		stockModelMap = getStockBuilder().get(stockIds);
+		stockModelMap = this.getStockBuilder().get(stockIds);
 
 		return stockModelMap;
 	}
-	
-	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes) throws MiddlewareQueryException {
+
+	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes)
+			throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
-		List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
-		//to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
-		Map<Integer, StockModel> stockModelMap = getStockModelMap(experimentProjects);
+		List<ExperimentProject> experimentProjects =
+				this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
+		// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
+		Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
 
 		for (ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
 		}
 		return experiments;
 	}
-	
+
 	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes) throws MiddlewareQueryException {
-		List<Experiment> experiments = build(projectId, type, 0, 1, variableTypes);
+		List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes);
 		if (experiments != null && experiments.size() > 0) {
 			return experiments.get(0);
 		}
 		return null;
 	}
-	
-	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
-		List<Experiment> experiments = build(projectId, type, 0, 1, variableTypes, hasVariableType);
+
+	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes, boolean hasVariableType)
+			throws MiddlewareQueryException {
+		List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes, hasVariableType);
 		if (experiments != null && experiments.size() > 0) {
 			return experiments.get(0);
 		}
 		return null;
 	}
-	
-	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes, Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
+
+	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes,
+			Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
 		Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		experiment.setFactors(getFactors(experimentModel, variableTypes, stockModelMap));
-		experiment.setVariates(getVariates(experimentModel, variableTypes));
+		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap));
+		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
 	}
-	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+
+	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType)
+			throws MiddlewareQueryException {
 		Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		experiment.setFactors(getFactors(experimentModel, variableTypes, hasVariableType));
-		experiment.setVariates(getVariates(experimentModel, variableTypes));
+		experiment.setFactors(this.getFactors(experimentModel, variableTypes, hasVariableType));
+		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
 	}
 
 	private VariableList getVariates(ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		VariableList variates = new VariableList();
-		
-		addPlotVariates(experimentModel, variates, variableTypes);
-		
+
+		this.addPlotVariates(experimentModel, variates, variableTypes);
+
 		return variates.sort();
 	}
 
-	private void addPlotVariates(ExperimentModel experimentModel, VariableList variates, VariableTypeList variableTypes) throws MiddlewareQueryException {
-		addVariates(experimentModel, variates, variableTypes);
+	private void addPlotVariates(ExperimentModel experimentModel, VariableList variates, VariableTypeList variableTypes)
+			throws MiddlewareQueryException {
+		this.addVariates(experimentModel, variates, variableTypes);
 	}
 
-	private void addVariates(ExperimentModel experiment, VariableList variates, VariableTypeList variableTypes) throws MiddlewareQueryException {
+	private void addVariates(ExperimentModel experiment, VariableList variates, VariableTypeList variableTypes)
+			throws MiddlewareQueryException {
 		this.getExperimentDao().refresh(experiment);
 		if (experiment.getPhenotypes() != null) {
 			for (Phenotype phenotype : experiment.getPhenotypes()) {
 				VariableType variableType = variableTypes.findById(phenotype.getObservableId());
-				//TODO: trial constants are currently being saved in the measurement effect dataset
-				//added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
-				//in the future, trial constant will no longer be saved at the measurements level
+				// TODO: trial constants are currently being saved in the measurement effect dataset
+				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
+				// in the future, trial constant will no longer be saved at the measurements level
 				if (variableType != null) {
-					if (variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId() &&
-							variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+					if (variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()
+							&& variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
-						if(phenotype.getcValueId() == null && phenotype.getValue() != null){
+						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
 							var.setValue(phenotype.getValue());
 							var.setCustomValue(true);
 						}
 						variates.add(var);
-					}
-					else {
+					} else {
 						variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
-						
+
 					}
 				}
 			}
 		}
 	}
 
-	private VariableList getFactors(ExperimentModel experimentModel, VariableTypeList variableTypes, Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
+	private VariableList getFactors(ExperimentModel experimentModel, VariableTypeList variableTypes, Map<Integer, StockModel> stockModelMap)
+			throws MiddlewareQueryException {
 		VariableList factors = new VariableList();
-		
-		addPlotExperimentFactors(factors, experimentModel, variableTypes, stockModelMap);
-		
-		addLocationFactors(experimentModel, factors, variableTypes);
-		
+
+		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, stockModelMap);
+
+		this.addLocationFactors(experimentModel, factors, variableTypes);
+
 		return factors.sort();
 	}
-	
-	private VariableList getFactors(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+
+	private VariableList getFactors(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType)
+			throws MiddlewareQueryException {
 		VariableList factors = new VariableList();
-		
-		addPlotExperimentFactors(factors, experimentModel, variableTypes, hasVariableType);
-		
-		addLocationFactors(experimentModel, factors, variableTypes);
-		
+
+		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, hasVariableType);
+
+		this.addLocationFactors(experimentModel, factors, variableTypes);
+
 		return factors.sort();
 	}
 
 	private void addLocationFactors(ExperimentModel experimentModel, VariableList factors, VariableTypeList variableTypes) {
 		for (VariableType variableType : variableTypes.getVariableTypes()) {
-			if (isLocationFactor(variableType)) {
-				factors.add(createLocationFactor(experimentModel.getGeoLocation(), variableType));
+			if (this.isLocationFactor(variableType)) {
+				factors.add(this.createLocationFactor(experimentModel.getGeoLocation(), variableType));
 			}
 		}
 	}
@@ -182,9 +212,9 @@ public class ExperimentBuilder extends Builder {
 		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
 			return true;
 		}
-	    if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
-	    	return true;
-	    }
+		if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
+			return true;
+		}
 		if (standardVariable.getStoredIn().getId() == TermId.LONGITUDE_STORAGE.getId()) {
 			return true;
 		}
@@ -194,21 +224,21 @@ public class ExperimentBuilder extends Builder {
 		if (standardVariable.getStoredIn().getId() == TermId.ALTITUDE_STORAGE.getId()) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	private Variable createLocationFactor(Geolocation geoLocation, VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
 		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-			return new Variable(variableType, findLocationValue(variableType.getId(), geoLocation.getProperties()));
+			return new Variable(variableType, this.findLocationValue(variableType.getId(), geoLocation.getProperties()));
 		}
 		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getDescription());
 		}
-	    if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
-	    	return new Variable(variableType, geoLocation.getLatitude());
-	    }
+		if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
+			return new Variable(variableType, geoLocation.getLatitude());
+		}
 		if (standardVariable.getStoredIn().getId() == TermId.LONGITUDE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getLongitude());
 		}
@@ -232,29 +262,32 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 
-	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes, Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
-		addExperimentFactors(variables, experimentModel, variableTypes);
-		addGermplasmFactors(variables, experimentModel, variableTypes, stockModelMap);
+	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes,
+			Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
+		this.addExperimentFactors(variables, experimentModel, variableTypes);
+		this.addGermplasmFactors(variables, experimentModel, variableTypes, stockModelMap);
 	}
-	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
-		addExperimentFactors(variables, experimentModel, variableTypes, hasVariableType);
-		addGermplasmFactors(variables, experimentModel, variableTypes, null);
+
+	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes,
+			boolean hasVariableType) throws MiddlewareQueryException {
+		this.addExperimentFactors(variables, experimentModel, variableTypes, hasVariableType);
+		this.addGermplasmFactors(variables, experimentModel, variableTypes, null);
 	}
-	
-	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes, Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
+
+	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes,
+			Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
 		List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
 		if (experimentStocks != null && experimentStocks.size() == 1) {
 			StockModel stockModel = null;
-			if(stockModelMap != null && stockModelMap.get(experimentStocks.get(0).getStock().getStockId()) != null) {
-                stockModel = stockModelMap.get(experimentStocks.get(0).getStock().getStockId());
-            } else {
-                stockModel = getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
-            }
-			
-			
+			if (stockModelMap != null && stockModelMap.get(experimentStocks.get(0).getStock().getStockId()) != null) {
+				stockModel = stockModelMap.get(experimentStocks.get(0).getStock().getStockId());
+			} else {
+				stockModel = this.getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
+			}
+
 			for (VariableType variableType : variableTypes.getVariableTypes()) {
-				if (isGermplasmFactor(variableType)) {
-					factors.add(createGermplasmFactor(stockModel, variableType));
+				if (this.isGermplasmFactor(variableType)) {
+					factors.add(this.createGermplasmFactor(stockModel, variableType));
 				}
 			}
 		}
@@ -279,11 +312,11 @@ public class ExperimentBuilder extends Builder {
 		}
 		return false;
 	}
-	
+
 	private Variable createGermplasmFactor(StockModel stockModel, VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
 		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
-			return new Variable(variableType, findStockValue(variableType.getId(), stockModel.getProperties()));
+			return new Variable(variableType, this.findStockValue(variableType.getId(), stockModel.getProperties()));
 		}
 		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
 			return new Variable(variableType, stockModel.getUniqueName());
@@ -311,49 +344,53 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 
-	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
+	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes)
+			throws MiddlewareQueryException {
 		if (experimentModel.getProperties() != null) {
 			for (ExperimentProperty property : experimentModel.getProperties()) {
-				variables.add(createVariable(property, variableTypes));
+				variables.add(this.createVariable(property, variableTypes));
 			}
 		}
 	}
-	
-	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+
+	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes,
+			boolean hasVariableType) throws MiddlewareQueryException {
 		if (experimentModel.getProperties() != null) {
 			for (ExperimentProperty property : experimentModel.getProperties()) {
-				Variable var = createVariable(property, variableTypes, hasVariableType);
-				if(var.getVariableType() != null) {
-                    variables.add(var);
-                }
+				Variable var = this.createVariable(property, variableTypes, hasVariableType);
+				if (var.getVariableType() != null) {
+					variables.add(var);
+				}
 			}
 		}
 	}
-	
+
 	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableTypes.findById(property.getTypeId()));
 		variable.setValue(property.getValue());
 		return variable;
 	}
-	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+
+	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes, boolean hasVariableType)
+			throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableTypes.findById(property.getTypeId()), hasVariableType);
 		variable.setValue(property.getValue());
 		return variable;
 	}
-	
+
 	public ExperimentModel getExperimentModel(int experimentId) throws MiddlewareQueryException {
-        return getExperimentDao().getById(experimentId);
+		return this.getExperimentDao().getById(experimentId);
 	}
-	
+
 	public boolean hasFieldmap(int datasetId) throws MiddlewareQueryException {
-		return getExperimentDao().hasFieldmap(datasetId);
+		return this.getExperimentDao().hasFieldmap(datasetId);
 	}
-	
+
 	public boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException {
-		List<Integer> geolocationIdsOfStudy = getExperimentDao().getLocationIdsOfStudy(studyId);
-		List<Integer> geolocationIdsOfStudyWithFieldmap = getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
+		List<Integer> geolocationIdsOfStudy = this.getExperimentDao().getLocationIdsOfStudy(studyId);
+		List<Integer> geolocationIdsOfStudyWithFieldmap = this.getExperimentDao().getLocationIdsOfStudyWithFieldmap(studyId);
 		return geolocationIdsOfStudy.size() == geolocationIdsOfStudyWithFieldmap.size();
 	}
 }

@@ -1,19 +1,17 @@
 /*******************************************************************************
- * 
- * Generation Challenge Programme (GCP)
- * Copyright (c) 2012, All Rights Reserved.
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ * Generation Challenge Programme (GCP) Copyright (c) 2012, All Rights Reserved.
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -35,186 +33,187 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 public class ExperimentModelSaver extends Saver {
-	
+
 	public ExperimentModelSaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
-	
+
 	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
-		TermId myExperimentType = mapExperimentType(experimentType);
-		ExperimentModel experimentModel = create(projectId, values, myExperimentType);
-		getExperimentDao().save(experimentModel);
-		addExperimentProject(experimentModel, projectId);
-		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+		TermId myExperimentType = this.mapExperimentType(experimentType);
+		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
+		this.getExperimentDao().save(experimentModel);
+		this.addExperimentProject(experimentModel, projectId);
+		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 	}
-	
+
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
-		int experimentId = getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(), values.getGermplasmId());
-		
-		//update if existing
+		int experimentId =
+				this.getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
+						values.getGermplasmId());
+
+		// update if existing
 		Boolean isUpdated = false;
-		for (Variable variable : values.getVariableList().getVariables()){
-			int val = getPhenotypeDao().updatePhenotypesByProjectIdAndLocationId(projectId, 
-					values.getLocationId(), 
-					values.getGermplasmId(), 
-					variable.getVariableType().getId(), 
-					variable.getValue());
+		for (Variable variable : values.getVariableList().getVariables()) {
+			int val =
+					this.getPhenotypeDao().updatePhenotypesByProjectIdAndLocationId(projectId, values.getLocationId(),
+							values.getGermplasmId(), variable.getVariableType().getId(), variable.getValue());
 
 			if (val > 0) {
-                isUpdated = true;
-            }
-			
-			if (experimentId != 0 && val == 0){
-				getPhenotypeSaver().save(experimentId, variable);
+				isUpdated = true;
 			}
-				
-			
-			
+
+			if (experimentId != 0 && val == 0) {
+				this.getPhenotypeSaver().save(experimentId, variable);
+			}
+
 		}
-		
-		if (!isUpdated && experimentId==0){
+
+		if (!isUpdated && experimentId == 0) {
 			TermId myExperimentType = null;
 			if (values instanceof StudyValues) {
 				myExperimentType = TermId.STUDY_EXPERIMENT;
 			} else {
-				myExperimentType = mapExperimentType(experimentType);
+				myExperimentType = this.mapExperimentType(experimentType);
 			}
-			
-			ExperimentModel experimentModel = create(projectId, values, myExperimentType);
-			getExperimentDao().save(experimentModel);
-			addExperimentProject(experimentModel, projectId);
-			getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+
+			ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
+			this.getExperimentDao().save(experimentModel);
+			this.addExperimentProject(experimentModel, projectId);
+			this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 		}
 	}
-	
-	
+
 	private TermId mapExperimentType(ExperimentType experimentType) {
 		switch (experimentType) {
-			case PLOT: return TermId.PLOT_EXPERIMENT;
-			case AVERAGE: return TermId.AVERAGE_EXPERIMENT;
-			case SUMMARY: return TermId.SUMMARY_EXPERIMENT;
-			case SAMPLE: return TermId.SAMPLE_EXPERIMENT;
-			case STUDY_INFORMATION: return TermId.STUDY_INFORMATION;
-			case TRIAL_ENVIRONMENT: return TermId.TRIAL_ENVIRONMENT_EXPERIMENT;
+			case PLOT:
+				return TermId.PLOT_EXPERIMENT;
+			case AVERAGE:
+				return TermId.AVERAGE_EXPERIMENT;
+			case SUMMARY:
+				return TermId.SUMMARY_EXPERIMENT;
+			case SAMPLE:
+				return TermId.SAMPLE_EXPERIMENT;
+			case STUDY_INFORMATION:
+				return TermId.STUDY_INFORMATION;
+			case TRIAL_ENVIRONMENT:
+				return TermId.TRIAL_ENVIRONMENT_EXPERIMENT;
 		}
 		return null;
 	}
 
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
-		
-		experimentModel.setNdExperimentId(getExperimentDao().getNextId("ndExperimentId"));
+
+		experimentModel.setNdExperimentId(this.getExperimentDao().getNextId("ndExperimentId"));
 		experimentModel.setTypeId(expType.getId());
-		experimentModel.setProperties(createProperties(experimentModel, values.getVariableList()));
-		
+		experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
+
 		if (values.getLocationId() == null && values instanceof StudyValues) {
-			experimentModel.setGeoLocation(createNewGeoLocation());
-		}
-		else if (values.getLocationId() != null) {
-			experimentModel.setGeoLocation(getGeolocationDao().getById(values.getLocationId())); 
+			experimentModel.setGeoLocation(this.createNewGeoLocation());
+		} else if (values.getLocationId() != null) {
+			experimentModel.setGeoLocation(this.getGeolocationDao().getById(values.getLocationId()));
 		}
 		if (values.getGermplasmId() != null) {
 			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
-			experimentModel.getExperimentStocks().add(createExperimentStock(experimentModel, values.getGermplasmId()));
+			experimentModel.getExperimentStocks().add(this.createExperimentStock(experimentModel, values.getGermplasmId()));
 		}
 		return experimentModel;
 	}
 
-   	//GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
+	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
 	private Geolocation createNewGeoLocation() throws MiddlewareQueryException {
 		Geolocation location = new Geolocation();
-		location.setLocationId(getGeolocationDao().getNextId("locationId"));
+		location.setLocationId(this.getGeolocationDao().getNextId("locationId"));
 		location.setDescription("1");
-		getGeolocationDao().save(location);
+		this.getGeolocationDao().save(location);
 		return location;
 	}
 
-	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors) throws MiddlewareQueryException {
+	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors)
+			throws MiddlewareQueryException {
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
-			int id = getExperimentPropertyDao().getNextId("ndExperimentpropId");
+			int id = this.getExperimentPropertyDao().getNextId("ndExperimentpropId");
 			for (Variable variable : factors.getVariables()) {
 				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-					addProperty(experimentModel, variable, id++);
+					this.addProperty(experimentModel, variable, id++);
 				}
 			}
 		}
-		
+
 		return experimentModel.getProperties();
 	}
-	
+
 	private void addProperty(ExperimentModel experimentModel, Variable variable, int id) throws MiddlewareQueryException {
 		if (experimentModel.getProperties() == null) {
 			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
 		}
 		ExperimentProperty property = new ExperimentProperty();
-		
+
 		property.setNdExperimentpropId(id);
 		property.setExperiment(experimentModel);
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
 		property.setRank(variable.getVariableType().getRank());
-		
+
 		experimentModel.getProperties().add(property);
 	}
-	
+
 	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
 		ExperimentProject exproj = new ExperimentProject();
-		
-		exproj.setExperimentProjectId(getExperimentProjectDao().getNextId("experimentProjectId"));
+
+		exproj.setExperimentProjectId(this.getExperimentProjectDao().getNextId("experimentProjectId"));
 		exproj.setProjectId(projectId);
 		exproj.setExperiment(experimentModel);
-		getExperimentProjectDao().save(exproj);
+		this.getExperimentProjectDao().save(exproj);
 	}
-	
+
 	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) throws MiddlewareQueryException {
 		ExperimentStock experimentStock = new ExperimentStock();
-		experimentStock.setExperimentStockId(getExperimentStockDao().getNextId("experimentStockId"));
+		experimentStock.setExperimentStockId(this.getExperimentStockDao().getNextId("experimentStockId"));
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
 		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
 		experimentStock.setExperiment(experiment);
-		
+
 		return experimentStock;
 	}
 
 	public void setExperimentValue(int experimentId, int variableId, Object value) throws MiddlewareQueryException {
-	    ExperimentModel experiment = getExperimentDao().getById(experimentId);
-	    StandardVariable stdVariable = getStandardVariableBuilder().create(variableId);
-	    if (experiment != null && stdVariable != null) {
+		ExperimentModel experiment = this.getExperimentDao().getById(experimentId);
+		StandardVariable stdVariable = this.getStandardVariableBuilder().create(variableId);
+		if (experiment != null && stdVariable != null) {
 
-	    	if (stdVariable.getStoredIn().getId() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
-	    		setExperimentValue(experiment, stdVariable, value);
-	    	}
-	    	else if (stdVariable.getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()) {
-	    		setObservationVariateValue(experiment, stdVariable, value);
-	    	}
-	    	else if (stdVariable.getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()) {
-	    		setCategoricalVariateValue(experiment, stdVariable, value);
-	    	}
-	    }
+			if (stdVariable.getStoredIn().getId() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+				this.setExperimentValue(experiment, stdVariable, value);
+			} else if (stdVariable.getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()) {
+				this.setObservationVariateValue(experiment, stdVariable, value);
+			} else if (stdVariable.getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()) {
+				this.setCategoricalVariateValue(experiment, stdVariable, value);
+			}
+		}
 	}
 
-	private void setObservationVariateValue(ExperimentModel experiment, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
-		Phenotype phenotype = findPhenotype(experiment, stdVariable);
+	private void setObservationVariateValue(ExperimentModel experiment, StandardVariable stdVariable, Object value)
+			throws MiddlewareQueryException {
+		Phenotype phenotype = this.findPhenotype(experiment, stdVariable);
 		if (phenotype != null) {
 			phenotype.setValue(value == null ? null : value.toString());
-			getPhenotypeDao().update(phenotype);
-		}
-		else {
-			addNewPhenotype(experiment, stdVariable, value);
+			this.getPhenotypeDao().update(phenotype);
+		} else {
+			this.addNewPhenotype(experiment, stdVariable, value);
 		}
 	}
-	
-	private void setCategoricalVariateValue(ExperimentModel experiment, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
-		Phenotype phenotype = findPhenotype(experiment, stdVariable);
+
+	private void setCategoricalVariateValue(ExperimentModel experiment, StandardVariable stdVariable, Object value)
+			throws MiddlewareQueryException {
+		Phenotype phenotype = this.findPhenotype(experiment, stdVariable);
 		if (phenotype != null) {
 			phenotype.setcValue(value == null ? null : Integer.valueOf(value.toString()));
-			getPhenotypeDao().update(phenotype);
-		}
-		else {
-			addNewCPhenotype(experiment, stdVariable, value);
+			this.getPhenotypeDao().update(phenotype);
+		} else {
+			this.addNewCPhenotype(experiment, stdVariable, value);
 		}
 	}
-	
+
 	private Phenotype findPhenotype(ExperimentModel experiment, StandardVariable variable) {
 		List<Phenotype> phenotypes = experiment.getPhenotypes();
 		if (phenotypes != null) {
@@ -226,53 +225,54 @@ public class ExperimentModelSaver extends Saver {
 		}
 		return null;
 	}
-	
-	private void addNewPhenotype(ExperimentModel experimentModel, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
+
+	private void addNewPhenotype(ExperimentModel experimentModel, StandardVariable stdVariable, Object value)
+			throws MiddlewareQueryException {
 		if (experimentModel.getPhenotypes() == null) {
 			experimentModel.setPhenotypes(new ArrayList<Phenotype>());
 		}
-		
+
 		Phenotype phenotype = new Phenotype();
 		phenotype.setValue(value == null ? null : value.toString());
 		phenotype.setObservableId(stdVariable.getId());
 		phenotype.setName(String.valueOf(stdVariable.getId()));
-		getPhenotypeDao().save(phenotype);
-		
-        ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
+		this.getPhenotypeDao().save(phenotype);
+
+		ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
 		experimentPhenotype.setExperiment(experimentModel.getNdExperimentId());
 		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
-		getExperimentPhenotypeDao().save(experimentPhenotype);
-		
+		this.getExperimentPhenotypeDao().save(experimentPhenotype);
+
 		this.getExperimentDao().refresh(experimentModel);
 	}
-	
-	private void addNewCPhenotype(ExperimentModel experimentModel, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
+
+	private void addNewCPhenotype(ExperimentModel experimentModel, StandardVariable stdVariable, Object value)
+			throws MiddlewareQueryException {
 		if (experimentModel.getPhenotypes() == null) {
 			experimentModel.setPhenotypes(new ArrayList<Phenotype>());
 		}
-		
+
 		Phenotype phenotype = new Phenotype();
 		phenotype.setcValue(value == null ? null : Integer.valueOf(value.toString()));
 		phenotype.setObservableId(stdVariable.getId());
 		phenotype.setName(String.valueOf(stdVariable.getId()));
-		getPhenotypeDao().save(phenotype);
-		
-        ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
+		this.getPhenotypeDao().save(phenotype);
+
+		ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
 		experimentPhenotype.setExperiment(experimentModel.getNdExperimentId());
 		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
-		getExperimentPhenotypeDao().save(experimentPhenotype);
-		
+		this.getExperimentPhenotypeDao().save(experimentPhenotype);
+
 		this.getExperimentDao().refresh(experimentModel);
 	}
 
 	private void setExperimentValue(ExperimentModel experiment, StandardVariable variable, Object value) throws MiddlewareQueryException {
-		ExperimentProperty property = findProperty(experiment, variable);
+		ExperimentProperty property = this.findProperty(experiment, variable);
 		if (property != null) {
 			property.setValue(value == null ? null : value.toString());
-			getExperimentPropertyDao().update(property);
-		}
-		else {
-			addNewProperty(experiment, variable, value);
+			this.getExperimentPropertyDao().update(property);
+		} else {
+			this.addNewProperty(experiment, variable, value);
 		}
 	}
 
@@ -287,28 +287,29 @@ public class ExperimentModelSaver extends Saver {
 		}
 		return null;
 	}
-	
-	private void addNewProperty(ExperimentModel experimentModel, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
+
+	private void addNewProperty(ExperimentModel experimentModel, StandardVariable stdVariable, Object value)
+			throws MiddlewareQueryException {
 		if (experimentModel.getProperties() == null) {
 			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
 		}
 		ExperimentProperty property = new ExperimentProperty();
-		
-		property.setNdExperimentpropId(getExperimentPropertyDao().getNextId("ndExperimentpropId"));
+
+		property.setNdExperimentpropId(this.getExperimentPropertyDao().getNextId("ndExperimentpropId"));
 		property.setExperiment(experimentModel);
 		property.setTypeId(stdVariable.getId());
 		property.setValue(value == null ? null : value.toString());
-	    property.setRank(0);
-				
+		property.setRank(0);
+
 		experimentModel.getProperties().add(property);
-		getExperimentPropertyDao().save(property);
+		this.getExperimentPropertyDao().save(property);
 	}
-	
+
 	public int moveStudyToNewGeolocation(int studyId) throws MiddlewareQueryException {
 		if (studyId > 0) {
 			throw new MiddlewareQueryException("Can not update central studies");
 		}
-		List<DatasetReference> datasets = getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		List<DatasetReference> datasets = this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
 		List<Integer> ids = new ArrayList<Integer>();
 		ids.add(studyId);
 		if (datasets != null) {
@@ -316,24 +317,24 @@ public class ExperimentModelSaver extends Saver {
 				ids.add(dataset.getId());
 			}
 		}
-		
-		Geolocation location = getGeolocationSaver().createMinimumGeolocation();
-		List<ExperimentModel> experiments = getExperimentDao().getExperimentsByProjectIds(ids);
+
+		Geolocation location = this.getGeolocationSaver().createMinimumGeolocation();
+		List<ExperimentModel> experiments = this.getExperimentDao().getExperimentsByProjectIds(ids);
 		if (experiments != null && !experiments.isEmpty()) {
 			int i = 0;
 			for (ExperimentModel experiment : experiments) {
 				if (experiment.getGeoLocation().getLocationId().intValue() == 1) {
 					experiment.setGeoLocation(location);
-					getExperimentDao().update(experiment);
+					this.getExperimentDao().update(experiment);
 				}
-            	if (i > 0 && i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-                    getExperimentDao().flush();
-                    getExperimentDao().clear();
-                }
-            	i++;
+				if (i > 0 && i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
+					this.getExperimentDao().flush();
+					this.getExperimentDao().clear();
+				}
+				i++;
 			}
 		}
-		
+
 		return location.getLocationId();
 	}
 }

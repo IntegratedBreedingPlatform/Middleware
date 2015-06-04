@@ -17,7 +17,7 @@ import org.generationcp.middleware.pojos.User;
 public class UserRole {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", nullable = false)
 	private Integer id;
 
@@ -37,7 +37,7 @@ public class UserRole {
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Integer id) {
@@ -45,7 +45,7 @@ public class UserRole {
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setUser(User user) {
@@ -53,7 +53,7 @@ public class UserRole {
 	}
 
 	public String getRole() {
-		return role;
+		return this.role;
 	}
 
 	public void setRole(String role) {
@@ -62,7 +62,7 @@ public class UserRole {
 
 	@Override
 	public String toString() {
-		return "UserRole [User=" + user + ", role=" + role + "]";
+		return "UserRole [User=" + this.user + ", role=" + this.role + "]";
 	}
 
 }

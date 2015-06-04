@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
@@ -7,22 +8,21 @@ public class TreatmentFactor implements Serializable {
 	private static final long serialVersionUID = -3067470952889656613L;
 
 	private Factor levelFactor;
-	
+
 	private Factor valueFactor;
-	
+
 	private Integer levelNumber;
-	
+
 	private String value;
-	
 
 	public TreatmentFactor() {
 	}
-	
+
 	public TreatmentFactor(Factor levelFactor, Factor valueFactor) {
 		this.levelFactor = levelFactor;
 		this.valueFactor = valueFactor;
 	}
-	
+
 	public TreatmentFactor(Factor levelFactor, Factor valueFactor, Integer levelNumber, String value) {
 		this(levelFactor, valueFactor);
 		this.levelNumber = levelNumber;
@@ -33,7 +33,7 @@ public class TreatmentFactor implements Serializable {
 	 * @return the levelFactor
 	 */
 	public Factor getLevelFactor() {
-		return levelFactor;
+		return this.levelFactor;
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class TreatmentFactor implements Serializable {
 	 * @return the valueFactor
 	 */
 	public Factor getValueFactor() {
-		return valueFactor;
+		return this.valueFactor;
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class TreatmentFactor implements Serializable {
 	}
 
 	public Integer getLevelNumber() {
-		return levelNumber;
+		return this.levelNumber;
 	}
 
 	public void setLevelNumber(Integer levelNumber) {
@@ -66,7 +66,7 @@ public class TreatmentFactor implements Serializable {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(String value) {
@@ -75,9 +75,8 @@ public class TreatmentFactor implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TreatmentFactor [levelFactor=" + levelFactor + ", valueFactor="
-				+ valueFactor + ", levelNumber=" + levelNumber + ", value="
-				+ value + "]";
+		return "TreatmentFactor [levelFactor=" + this.levelFactor + ", valueFactor=" + this.valueFactor + ", levelNumber="
+				+ this.levelNumber + ", value=" + this.value + "]";
 	}
 
 }

@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.operation.builder;
 
 import java.math.BigInteger;
@@ -21,241 +22,232 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 
 public class ListInventoryBuilder extends Builder {
-	
+
 	public ListInventoryBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
-	
+
 	/**
-	 * Return list of GermplasmListData objects for given list, with counts for
-	 * number of lots with available balance and number of lots with reserved seed per entry
-	 * 
+	 * Return list of GermplasmListData objects for given list, with counts for number of lots with available balance and number of lots
+	 * with reserved seed per entry
+	 *
 	 * @param listId
 	 * @param start
 	 * @param numOfRows
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public List<GermplasmListData> retrieveLotCountsForList(Integer listId, Integer start, Integer numOfRows, 
-		List<GermplasmListData> listEntries) throws MiddlewareQueryException{
+	public List<GermplasmListData> retrieveLotCountsForList(Integer listId, Integer start, Integer numOfRows,
+			List<GermplasmListData> listEntries) throws MiddlewareQueryException {
 		List<Integer> listEntryIds = new ArrayList<Integer>();
 		List<Integer> gids = new ArrayList<Integer>();
 		List<Integer> lrecIds = new ArrayList<Integer>();
-		for (GermplasmListData entry : listEntries){
+		for (GermplasmListData entry : listEntries) {
 			listEntryIds.add(entry.getId());
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			lrecIds.add(entry.getId());
 		}
 
-		if (listEntries != null && !listEntries.isEmpty()){
-			retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
+		if (listEntries != null && !listEntries.isEmpty()) {
+			this.retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
 		}
 		return listEntries;
 	}
-	
-	
-	public List<GermplasmListData> retrieveLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException{
+
+	public List<GermplasmListData> retrieveLotCountsForListEntries(Integer listId, List<Integer> entryIds) throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = null;
-		listEntries = getGermplasmListDataDAO().getByIds(entryIds);
+		listEntries = this.getGermplasmListDataDAO().getByIds(entryIds);
 		List<Integer> gids = new ArrayList<Integer>();
 		List<Integer> lrecIds = new ArrayList<Integer>();
-		for (GermplasmListData entry : listEntries){
+		for (GermplasmListData entry : listEntries) {
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			lrecIds.add(entry.getId());
 		}
-		retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
+		this.retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
 		return listEntries;
 	}
 
 	private void retrieveLotCounts(List<Integer> entryIds, List<GermplasmListData> listEntries, List<Integer> gids, List<Integer> lrecIds)
 			throws MiddlewareQueryException {
-		
+
 		// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
 		// where listdata.gid may not be the final germplasm displayed
-		retrieveAvailableBalLotCounts(listEntries, gids);
-		retrieveReservedLotCounts(listEntries, entryIds);
-		retrieveStockIds(listEntries,lrecIds);
+		this.retrieveAvailableBalLotCounts(listEntries, gids);
+		this.retrieveReservedLotCounts(listEntries, entryIds);
+		this.retrieveStockIds(listEntries, lrecIds);
 	}
-	
+
 	private void retrieveStockIds(List<GermplasmListData> listEntries, List<Integer> lrecIds) {
-		Map<Integer, String> stockIDs = getTransactionDao().retrieveStockIds(lrecIds);
-		for (GermplasmListData entry : listEntries){
+		Map<Integer, String> stockIDs = this.getTransactionDao().retrieveStockIds(lrecIds);
+		for (GermplasmListData entry : listEntries) {
 			ListDataInventory inventory = entry.getInventoryInfo();
-			if (inventory != null ){
+			if (inventory != null) {
 				inventory.setStockIDs(stockIDs.get(entry.getId()));
 			}
 		}
 	}
 
-	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException{
+	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException {
 		Integer lotCount = null;
-		Map<Integer, BigInteger> lotCounts = getLotDao().countLotsWithAvailableBalance(Collections.singletonList(gid));
+		Map<Integer, BigInteger> lotCounts = this.getLotDao().countLotsWithAvailableBalance(Collections.singletonList(gid));
 		BigInteger lotCountBigInt = lotCounts.get(gid);
-		if (lotCounts != null && lotCountBigInt != null){
+		if (lotCounts != null && lotCountBigInt != null) {
 			lotCount = lotCountBigInt.intValue();
 		}
-		return lotCount; 
+		return lotCount;
 	}
 
-	public List<LotDetails> retrieveInventoryLotsForGermplasm(Integer gid) throws MiddlewareQueryException{
+	public List<LotDetails> retrieveInventoryLotsForGermplasm(Integer gid) throws MiddlewareQueryException {
 		List<LotDetails> lotDetails = null;
-		List<Lot> lots = getLotDao().getLotAggregateDataForGermplasm(gid);
+		List<Lot> lots = this.getLotDao().getLotAggregateDataForGermplasm(gid);
 		lotDetails = LotTransformer.extraLotDetails(lots);
-		setLocationsAndScales(lotDetails);
+		this.setLocationsAndScales(lotDetails);
 		return lotDetails;
 	}
-	
-	
+
 	/**
-	 * Return list of GermplasmListData objects for given list with
-	 * list of lots associated per germplasm entry
-	 * 
+	 * Return list of GermplasmListData objects for given list with list of lots associated per germplasm entry
+	 *
 	 * @param listId
 	 * @param start
 	 * @param numOfRows
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public List<GermplasmListData> retrieveInventoryLotsForList(Integer listId, 
-			int start, int numOfRows, List<GermplasmListData> listEntries) throws MiddlewareQueryException{
+	public List<GermplasmListData> retrieveInventoryLotsForList(Integer listId, int start, int numOfRows,
+			List<GermplasmListData> listEntries) throws MiddlewareQueryException {
 
 		List<Integer> listEntryIds = new ArrayList<Integer>();
 		List<Integer> gids = new ArrayList<Integer>();
-		for (GermplasmListData entry : listEntries){
+		for (GermplasmListData entry : listEntries) {
 			listEntryIds.add(entry.getId());
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 		}
 
-		if (listEntries != null && !listEntries.isEmpty()){
+		if (listEntries != null && !listEntries.isEmpty()) {
 			// retrieve inventory information from local db
 
 			// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
 			// where listdata.gid may not be the final germplasm displayed
-			List<Lot> lots = getLotDao().getLotAggregateDataForList(listId, gids);
-			
+			List<Lot> lots = this.getLotDao().getLotAggregateDataForList(listId, gids);
+
 			// add to each list entry related lot information
 			List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
-			setLocationsAndScales(lotRows);
+			this.setLocationsAndScales(lotRows);
 		}
 		return listEntries;
 	}
-	
-	
-	public List<ListEntryLotDetails> retrieveInventoryLotsForListEntry(Integer listId, Integer recordId, Integer gid) throws MiddlewareQueryException{
+
+	public List<ListEntryLotDetails> retrieveInventoryLotsForListEntry(Integer listId, Integer recordId, Integer gid)
+			throws MiddlewareQueryException {
 		List<ListEntryLotDetails> lotRows = new ArrayList<ListEntryLotDetails>();
-		
-		List<Lot> lots = getLotDao().getLotAggregateDataForListEntry(listId, gid);
+
+		List<Lot> lots = this.getLotDao().getLotAggregateDataForListEntry(listId, gid);
 		lotRows = LotTransformer.extractLotDetailsForListEntry(lots, recordId);
-		setLocationsAndScales(lotRows);
-			
+		this.setLocationsAndScales(lotRows);
+
 		return lotRows;
 	}
-	
+
 	/*
 	 * Retrieve the number of lots with available balance per germplasm
 	 */
-	private void retrieveAvailableBalLotCounts(List<GermplasmListData> listEntries, List<Integer> gids) throws MiddlewareQueryException{
-		Map<Integer, BigInteger[]> lotCounts = getLotDao().getLotsWithAvailableBalanceCountAndTotalLotsCount(gids);
-		for (GermplasmListData entry : listEntries){
+	private void retrieveAvailableBalLotCounts(List<GermplasmListData> listEntries, List<Integer> gids) throws MiddlewareQueryException {
+		Map<Integer, BigInteger[]> lotCounts = this.getLotDao().getLotsWithAvailableBalanceCountAndTotalLotsCount(gids);
+		for (GermplasmListData entry : listEntries) {
 			ListDataInventory inventory = entry.getInventoryInfo();
-			if (inventory != null ){
+			if (inventory != null) {
 				BigInteger[] count = lotCounts.get(entry.getGid());
-				if (count != null){
+				if (count != null) {
 					inventory.setActualInventoryLotCount(count[0].intValue());
 					inventory.setLotCount(count[1].intValue());
-				}else{
+				} else {
 					inventory.setActualInventoryLotCount(0);
 					inventory.setLotCount(0);
 				}
 			}
 		}
 	}
-	
-	
+
 	/*
 	 * Retrieve the number of lots with reserved seeds per list entry
 	 */
-	private void retrieveReservedLotCounts(List<GermplasmListData> listEntries, List<Integer> listEntryIds) throws MiddlewareQueryException{
-		Map<Integer, BigInteger> reservedLotCounts = getTransactionDao().countLotsWithReservationForListEntries(listEntryIds);
+	private void retrieveReservedLotCounts(List<GermplasmListData> listEntries, List<Integer> listEntryIds) throws MiddlewareQueryException {
+		Map<Integer, BigInteger> reservedLotCounts = this.getTransactionDao().countLotsWithReservationForListEntries(listEntryIds);
 		Debug.print(0, listEntryIds);
-		for (GermplasmListData entry : listEntries){
+		for (GermplasmListData entry : listEntries) {
 			ListDataInventory inventory = entry.getInventoryInfo();
-			if (inventory != null ){
+			if (inventory != null) {
 				BigInteger count = reservedLotCounts.get(entry.getId());
-				if (count != null){
+				if (count != null) {
 					inventory.setReservedLotCount(count.intValue());
-				}else{
+				} else {
 					inventory.setReservedLotCount(0);
 				}
 			}
 		}
 	}
-	
-	
+
 	/*
-	 * Perform one-retrieval for central/local scales and central/local locations
-	 * for list of lots
+	 * Perform one-retrieval for central/local scales and central/local locations for list of lots
 	 */
-	private void setLocationsAndScales(List<? extends LotDetails> lots) throws MiddlewareQueryException{
-		
+	private void setLocationsAndScales(List<? extends LotDetails> lots) throws MiddlewareQueryException {
+
 		List<Integer> locationIds = new ArrayList<Integer>();
 		List<Integer> scaleIds = new ArrayList<Integer>();
 		Map<Integer, List<LotDetails>> scaleLotMap = new HashMap<Integer, List<LotDetails>>();
 		Map<Integer, List<LotDetails>> locationLotMap = new HashMap<Integer, List<LotDetails>>();
-		
-		createScaleAndLocationMaps(lots, locationIds, scaleIds,	scaleLotMap, locationLotMap);
-		
-		List<Location> allLocations = getLocationDao().getByIds(locationIds);
+
+		this.createScaleAndLocationMaps(lots, locationIds, scaleIds, scaleLotMap, locationLotMap);
+
+		List<Location> allLocations = this.getLocationDao().getByIds(locationIds);
 		List<Term> allScales = new ArrayList<Term>();
-		List<CVTerm> cvTerms = getCvTermDao().getByIds(scaleIds);
-		for (CVTerm cvTerm : cvTerms){
+		List<CVTerm> cvTerms = this.getCvTermDao().getByIds(scaleIds);
+		for (CVTerm cvTerm : cvTerms) {
 			allScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
 		}
-		
-		for (Location location : allLocations){
+
+		for (Location location : allLocations) {
 			List<LotDetails> lotList = locationLotMap.get(location.getLocid());
-			for (LotDetails lot : lotList){
+			for (LotDetails lot : lotList) {
 				lot.setLocationOfLot(location);
 			}
 		}
-		
-		for (Term scale : allScales){
+
+		for (Term scale : allScales) {
 			List<LotDetails> lotList = scaleLotMap.get(scale.getId());
-			for (LotDetails lot : lotList){
+			for (LotDetails lot : lotList) {
 				lot.setScaleOfLot(scale);
 			}
 		}
 	}
 
 	// create maps of scale/location IDs to lots for easier setting of Terms and Locations
-	private void createScaleAndLocationMaps(List<? extends LotDetails> lots,
-			List<Integer> locationIds,
-			List<Integer> scaleIds,
-			Map<Integer, List<LotDetails>> scaleLotMap,
-			Map<Integer, List<LotDetails>> locationLotMap) {
-		
-		for (LotDetails lot : lots){
+	private void createScaleAndLocationMaps(List<? extends LotDetails> lots, List<Integer> locationIds, List<Integer> scaleIds,
+			Map<Integer, List<LotDetails>> scaleLotMap, Map<Integer, List<LotDetails>> locationLotMap) {
+
+		for (LotDetails lot : lots) {
 			Integer locationId = lot.getLocId();
 			List<LotDetails> lotList = locationLotMap.get(locationId);
-			if (lotList != null){
+			if (lotList != null) {
 				lotList.add(lot);
 			} else {
 				List<LotDetails> listLot = new ArrayList<LotDetails>();
 				listLot.add(lot);
-				locationLotMap.put(locationId, listLot); 
+				locationLotMap.put(locationId, listLot);
 			}
 			locationIds.add(locationId);
-			
+
 			Integer scaleId = lot.getScaleId();
-			if (scaleLotMap.get(scaleId) != null){
+			if (scaleLotMap.get(scaleId) != null) {
 				scaleLotMap.get(scaleId).add(lot);
 			} else {
 				List<LotDetails> listLot = new ArrayList<LotDetails>();
 				listLot.add(lot);
-				scaleLotMap.put(scaleId, listLot); 
+				scaleLotMap.put(scaleId, listLot);
 			}
 			scaleIds.add(scaleId);
 		}

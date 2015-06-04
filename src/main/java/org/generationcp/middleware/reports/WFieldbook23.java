@@ -46,7 +46,8 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 
 		List<GermplasmEntry> entries = new ArrayList<>();
 
-		// this null record is added because in Jasper, the record pointer in the data source is incremented by every element that receives it.
+		// this null record is added because in Jasper, the record pointer in the data source is incremented by every element that receives
+		// it.
 		// since the datasource used in entry, is previously passed from occ to entry subreport.
 		entries.add(null);
 
@@ -94,7 +95,7 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 						entry.setM_ent(Integer.valueOf(dataItem.getValue()));
 						break;
 
-					// TODO: pending mappings
+						// TODO: pending mappings
 					default:
 						entry.setS_ent(-99);
 						entry.setS_tabbr("???");

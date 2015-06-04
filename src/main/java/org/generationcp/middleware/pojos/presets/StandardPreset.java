@@ -1,12 +1,20 @@
+
 package org.generationcp.middleware.pojos.presets;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by cyrus on 12/19/14.
  */
-@Entity @Table(name = "standard_preset")
+@Entity
+@Table(name = "standard_preset")
 public class StandardPreset {
+
 	private int standardPresetId;
 	private Integer toolId;
 	private String toolSection;
@@ -15,54 +23,60 @@ public class StandardPreset {
 	private String configuration;
 
 	@GeneratedValue
-	@Id @Column(name = "standard_preset_id")
+	@Id
+	@Column(name = "standard_preset_id")
 	public int getStandardPresetId() {
-		return standardPresetId;
+		return this.standardPresetId;
 	}
 
 	public void setStandardPresetId(int standardPresetId) {
 		this.standardPresetId = standardPresetId;
 	}
 
-	@Basic @Column(name = "tool_id")
+	@Basic
+	@Column(name = "tool_id")
 	public Integer getToolId() {
-		return toolId;
+		return this.toolId;
 	}
 
 	public void setToolId(Integer toolId) {
 		this.toolId = toolId;
 	}
 
-	@Basic @Column(name = "tool_section")
+	@Basic
+	@Column(name = "tool_section")
 	public String getToolSection() {
-		return toolSection;
+		return this.toolSection;
 	}
 
 	public void setToolSection(String toolSection) {
 		this.toolSection = toolSection;
 	}
 
-	@Basic @Column(name = "crop_name")
+	@Basic
+	@Column(name = "crop_name")
 	public String getCropName() {
-		return cropName;
+		return this.cropName;
 	}
 
 	public void setCropName(String cropName) {
 		this.cropName = cropName;
 	}
 
-	@Basic @Column(name = "name")
+	@Basic
+	@Column(name = "name")
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	@Basic @Column(name = "configuration")
+	@Basic
+	@Column(name = "configuration")
 	public String getConfiguration() {
-		return configuration;
+		return this.configuration;
 	}
 
 	public void setConfiguration(String configuration) {
@@ -74,30 +88,28 @@ public class StandardPreset {
 		if (this == o) {
 			return true;
 		}
-		if (o == null || getClass() != o.getClass()) {
+		if (o == null || this.getClass() != o.getClass()) {
 			return false;
 		}
 
 		StandardPreset that = (StandardPreset) o;
 
-		if (standardPresetId != that.standardPresetId) {
+		if (this.standardPresetId != that.standardPresetId) {
 			return false;
 		}
-		if (configuration != null ?
-				!configuration.equals(that.configuration) :
-				that.configuration != null) {
+		if (this.configuration != null ? !this.configuration.equals(that.configuration) : that.configuration != null) {
 			return false;
 		}
-		if (cropName != null ? !cropName.equals(that.cropName) : that.cropName != null) {
+		if (this.cropName != null ? !this.cropName.equals(that.cropName) : that.cropName != null) {
 			return false;
 		}
-		if (name != null ? !name.equals(that.name) : that.name != null) {
+		if (this.name != null ? !this.name.equals(that.name) : that.name != null) {
 			return false;
 		}
-		if (toolId != null ? !toolId.equals(that.toolId) : that.toolId != null) {
+		if (this.toolId != null ? !this.toolId.equals(that.toolId) : that.toolId != null) {
 			return false;
 		}
-		if (toolSection != null ? !toolSection.equals(that.toolSection) : that.toolSection != null) {
+		if (this.toolSection != null ? !this.toolSection.equals(that.toolSection) : that.toolSection != null) {
 			return false;
 		}
 
@@ -106,12 +118,12 @@ public class StandardPreset {
 
 	@Override
 	public int hashCode() {
-		int result = standardPresetId;
-		result = 31 * result + (toolId != null ? toolId.hashCode() : 0);
-		result = 31 * result + (toolSection != null ? toolSection.hashCode() : 0);
-		result = 31 * result + (cropName != null ? cropName.hashCode() : 0);
-		result = 31 * result + (name != null ? name.hashCode() : 0);
-		result = 31 * result + (configuration != null ? configuration.hashCode() : 0);
+		int result = this.standardPresetId;
+		result = 31 * result + (this.toolId != null ? this.toolId.hashCode() : 0);
+		result = 31 * result + (this.toolSection != null ? this.toolSection.hashCode() : 0);
+		result = 31 * result + (this.cropName != null ? this.cropName.hashCode() : 0);
+		result = 31 * result + (this.name != null ? this.name.hashCode() : 0);
+		result = 31 * result + (this.configuration != null ? this.configuration.hashCode() : 0);
 		return result;
 	}
 }

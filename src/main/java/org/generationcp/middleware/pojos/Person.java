@@ -1,317 +1,319 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
+
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 
-import javax.persistence.*;
-import java.io.Serializable;
-
 /**
  * POJO for persons table.
- * 
+ *
  */
 @Entity
 @Table(name = "persons")
-public class Person implements  Comparable<Person>, Serializable{
+public class Person implements Comparable<Person>, Serializable {
 
-    private static final long serialVersionUID = -3159738927364282485L;
+	private static final long serialVersionUID = -3159738927364282485L;
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "personid")
-    private Integer id;
+	@Id
+	@Basic(optional = false)
+	@Column(name = "personid")
+	private Integer id;
 
-    @Column(name = "fname")
-    private String firstName;
+	@Column(name = "fname")
+	private String firstName;
 
-    @Column(name = "lname")
-    private String lastName;
+	@Column(name = "lname")
+	private String lastName;
 
-    @Column(name = "ioname")
-    private String middleName;
+	@Column(name = "ioname")
+	private String middleName;
 
-    @Column(name = "institid")
-    private Integer instituteId;
+	@Column(name = "institid")
+	private Integer instituteId;
 
-    @Column(name = "ptitle")
-    private String title;
+	@Column(name = "ptitle")
+	private String title;
 
-    @Column(name = "poname")
-    private String positionName;
+	@Column(name = "poname")
+	private String positionName;
 
-    @Column(name = "plangu")
-    private Integer language;
+	@Column(name = "plangu")
+	private Integer language;
 
-    @Column(name = "pphone")
-    private String phone;
+	@Column(name = "pphone")
+	private String phone;
 
-    @Column(name = "pextent")
-    private String extension;
+	@Column(name = "pextent")
+	private String extension;
 
-    @Column(name = "pfax")
-    private String fax;
+	@Column(name = "pfax")
+	private String fax;
 
-    @Column(name = "pemail")
-    private String email;
+	@Column(name = "pemail")
+	private String email;
 
-    @Column(name = "pnotes")
-    private String notes;
-    
-    @Column(name = "contact")
-    private String contact;
+	@Column(name = "pnotes")
+	private String notes;
 
-    public Person() {
-    }
-    
-    public Person(String firstName, String middleName, String lastName){
-    	this.firstName = firstName;
-    	this.middleName = middleName;
-    	this.lastName = lastName;
-    }
-    
-    /**
-     * Create a copy of this Person object.
-     * Note that this method does not copy the {@link Person#id} field.
-     * 
-     * @return the copy of this Person object.
-     */
-    public Person copy() {
-        Person person = new Person();
-        person.setFirstName(firstName);
-        person.setLastName(lastName);
-        person.setMiddleName(middleName);
-        person.setInstituteId(instituteId);
-        person.setTitle(title);
-        person.setPositionName(positionName);
-        person.setLanguage(language);
-        person.setPhone(phone);
-        person.setExtension(extension);
-        person.setFax(fax);
-        person.setEmail(email);
-        person.setNotes(notes);
-        person.setContact(contact);
-        
-        return person;
-    }
+	@Column(name = "contact")
+	private String contact;
 
-    public Integer getId() {
-        return id;
-    }
+	public Person() {
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Person(String firstName, String middleName, String lastName) {
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+	}
 
-    public String getFirstName() {
-        return firstName;
-    }
+	/**
+	 * Create a copy of this Person object. Note that this method does not copy the {@link Person#id} field.
+	 * 
+	 * @return the copy of this Person object.
+	 */
+	public Person copy() {
+		Person person = new Person();
+		person.setFirstName(this.firstName);
+		person.setLastName(this.lastName);
+		person.setMiddleName(this.middleName);
+		person.setInstituteId(this.instituteId);
+		person.setTitle(this.title);
+		person.setPositionName(this.positionName);
+		person.setLanguage(this.language);
+		person.setPhone(this.phone);
+		person.setExtension(this.extension);
+		person.setFax(this.fax);
+		person.setEmail(this.email);
+		person.setNotes(this.notes);
+		person.setContact(this.contact);
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+		return person;
+	}
 
-    public String getLastName() {
-        return lastName;
-    }
+	public Integer getId() {
+		return this.id;
+	}
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public String getMiddleName() {
-        return middleName;
-    }
+	public String getFirstName() {
+		return this.firstName;
+	}
 
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-    
-    public String getInitials() {
-        StringBuilder initials = new StringBuilder();
-        if(!StringUtil.isEmptyOrWhitespaceOnly(firstName)){
-            initials.append(firstName.trim().charAt(0));
-        }
-        if(!StringUtil.isEmptyOrWhitespaceOnly(middleName)) {
-            initials.append(middleName.trim().charAt(0));
-        }
-        if(!StringUtil.isEmptyOrWhitespaceOnly(lastName)) {
-            initials.append(lastName.trim().charAt(0));
-        }
-        
-        return initials.toString().toLowerCase();
-    }
-    
-    public String getInitialsWithTimestamp() {
-        String timestamp = Util.getCurrentDateAsStringValue("yyMMddHHmmssSS");
-        timestamp = timestamp.substring(0, 13);
-        return getInitials() + timestamp;
-    }
-    
-    public String getDisplayName() {
-    	String displayFirstName = firstName == null || Util.isOneOf(firstName, "-", "'-'") ? "" : firstName;
-    	String displayMiddleName = middleName == null || Util.isOneOf(middleName, "-", "'-'") ? "" : middleName;
-    	String displayLastName = lastName == null || Util.isOneOf(lastName, "-", "'-'") ? "" : lastName;
-    	return StringUtil.joinIgnoreEmpty(" ",
-        		displayFirstName,displayMiddleName,displayLastName);
-    }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-    public Integer getInstituteId() {
-        return instituteId;
-    }
+	public String getLastName() {
+		return this.lastName;
+	}
 
-    public void setInstituteId(Integer instituteId) {
-        this.instituteId = instituteId;
-    }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public String getMiddleName() {
+		return this.middleName;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
+	}
 
-    public String getPositionName() {
-        return positionName;
-    }
+	public String getInitials() {
+		StringBuilder initials = new StringBuilder();
+		if (!StringUtil.isEmptyOrWhitespaceOnly(this.firstName)) {
+			initials.append(this.firstName.trim().charAt(0));
+		}
+		if (!StringUtil.isEmptyOrWhitespaceOnly(this.middleName)) {
+			initials.append(this.middleName.trim().charAt(0));
+		}
+		if (!StringUtil.isEmptyOrWhitespaceOnly(this.lastName)) {
+			initials.append(this.lastName.trim().charAt(0));
+		}
 
-    public void setPositionName(String positionName) {
-        this.positionName = positionName;
-    }
+		return initials.toString().toLowerCase();
+	}
 
-    public Integer getLanguage() {
-        return language;
-    }
+	public String getInitialsWithTimestamp() {
+		String timestamp = Util.getCurrentDateAsStringValue("yyMMddHHmmssSS");
+		timestamp = timestamp.substring(0, 13);
+		return this.getInitials() + timestamp;
+	}
 
-    public void setLanguage(Integer language) {
-        this.language = language;
-    }
+	public String getDisplayName() {
+		String displayFirstName = this.firstName == null || Util.isOneOf(this.firstName, "-", "'-'") ? "" : this.firstName;
+		String displayMiddleName = this.middleName == null || Util.isOneOf(this.middleName, "-", "'-'") ? "" : this.middleName;
+		String displayLastName = this.lastName == null || Util.isOneOf(this.lastName, "-", "'-'") ? "" : this.lastName;
+		return StringUtil.joinIgnoreEmpty(" ", displayFirstName, displayMiddleName, displayLastName);
+	}
 
-    public String getPhone() {
-        return phone;
-    }
+	public Integer getInstituteId() {
+		return this.instituteId;
+	}
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+	public void setInstituteId(Integer instituteId) {
+		this.instituteId = instituteId;
+	}
 
-    public String getExtension() {
-        return extension;
-    }
+	public String getTitle() {
+		return this.title;
+	}
 
-    public void setExtension(String extension) {
-        this.extension = extension;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public String getFax() {
-        return fax;
-    }
+	public String getPositionName() {
+		return this.positionName;
+	}
 
-    public void setFax(String fax) {
-        this.fax = fax;
-    }
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public Integer getLanguage() {
+		return this.language;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setLanguage(Integer language) {
+		this.language = language;
+	}
 
-    public String getNotes() {
-        return notes;
-    }
+	public String getPhone() {
+		return this.phone;
+	}
 
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-    
-    public String getContact() {
-        return contact;
-    }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
+	public String getExtension() {
+		return this.extension;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Person [id=");
-        builder.append(id);
-        builder.append(", firstName=");
-        builder.append(firstName);
-        builder.append(", lastName=");
-        builder.append(lastName);
-        builder.append(", middleName=");
-        builder.append(middleName);
-        builder.append(", instituteId=");
-        builder.append(instituteId);
-        builder.append(", title=");
-        builder.append(title);
-        builder.append(", positionName=");
-        builder.append(positionName);
-        builder.append(", language=");
-        builder.append(language);
-        builder.append(", phone=");
-        builder.append(phone);
-        builder.append(", extension=");
-        builder.append(extension);
-        builder.append(", fax=");
-        builder.append(fax);
-        builder.append(", email=");
-        builder.append(email);
-        builder.append(", notes=");
-        builder.append(notes);
-        builder.append(", contact=");
-        builder.append(contact);
-        builder.append("]");
-        return builder.toString();
-    }
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(id).hashCode();
-    }
+	public String getFax() {
+		return this.fax;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!Person.class.isInstance(obj)) {
-            return false;
-        }
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
 
-        Person otherObj = (Person) obj;
+	public String getEmail() {
+		return this.email;
+	}
 
-        return new EqualsBuilder().append(id, otherObj.id).isEquals();
-    }
-    
-    @Override
-    public int compareTo(Person o) {
-        if (this.getDisplayName() != null && o != null) {
-            return this.getDisplayName().compareTo(o.getDisplayName());
-        }
-        return 0;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
+	public String getNotes() {
+		return this.notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	public String getContact() {
+		return this.contact;
+	}
+
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Person [id=");
+		builder.append(this.id);
+		builder.append(", firstName=");
+		builder.append(this.firstName);
+		builder.append(", lastName=");
+		builder.append(this.lastName);
+		builder.append(", middleName=");
+		builder.append(this.middleName);
+		builder.append(", instituteId=");
+		builder.append(this.instituteId);
+		builder.append(", title=");
+		builder.append(this.title);
+		builder.append(", positionName=");
+		builder.append(this.positionName);
+		builder.append(", language=");
+		builder.append(this.language);
+		builder.append(", phone=");
+		builder.append(this.phone);
+		builder.append(", extension=");
+		builder.append(this.extension);
+		builder.append(", fax=");
+		builder.append(this.fax);
+		builder.append(", email=");
+		builder.append(this.email);
+		builder.append(", notes=");
+		builder.append(this.notes);
+		builder.append(", contact=");
+		builder.append(this.contact);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(this.id).hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!Person.class.isInstance(obj)) {
+			return false;
+		}
+
+		Person otherObj = (Person) obj;
+
+		return new EqualsBuilder().append(this.id, otherObj.id).isEquals();
+	}
+
+	@Override
+	public int compareTo(Person o) {
+		if (this.getDisplayName() != null && o != null) {
+			return this.getDisplayName().compareTo(o.getDisplayName());
+		}
+		return 0;
+	}
 
 }

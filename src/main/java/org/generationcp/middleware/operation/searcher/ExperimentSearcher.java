@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.operation.searcher;
 
 import java.util.ArrayList;
@@ -27,69 +27,68 @@ public class ExperimentSearcher extends Searcher {
 		super(sessionProviderForLocal);
 	}
 
-	//TODO: Not all factors were considered in this method. to be added as needed
+	// TODO: Not all factors were considered in this method. to be added as needed
 	public List<Integer> searchExperimentsByFactor(Integer factorId, String value) throws MiddlewareQueryException {
-		Integer storedInId = getStoredInId(factorId);
-		
+		Integer storedInId = this.getStoredInId(factorId);
+
 		if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
-			return findExperimentsByGeolocationFactorValue(factorId, value);
-			
+			return this.findExperimentsByGeolocationFactorValue(factorId, value);
+
 		} else if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == storedInId) {
-			return findExperimentsByExperimentFactorValue(factorId, value);
-			
+			return this.findExperimentsByExperimentFactorValue(factorId, value);
+
 		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
-			return findExperimentsByStockFactorValue(factorId, value);
-		
+			return this.findExperimentsByStockFactorValue(factorId, value);
+
 		} else if (TermId.ENTRY_GID_STORAGE.getId() == storedInId) {
-			return findExperimentsByStock("dbxrefId", value);
-		
+			return this.findExperimentsByStock("dbxrefId", value);
+
 		} else if (TermId.ENTRY_NUMBER_STORAGE.getId() == storedInId) {
-			return findExperimentsByStock("uniqueName", value);
-			
+			return this.findExperimentsByStock("uniqueName", value);
+
 		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId() == storedInId) {
-			return findExperimentsByStock("name", value);
-			
+			return this.findExperimentsByStock("name", value);
+
 		} else if (TermId.ENTRY_CODE_STORAGE.getId() == storedInId) {
-			return findExperimentsByStock("value", value);
+			return this.findExperimentsByStock("value", value);
 		}
-		
-		return new ArrayList<Integer>();		
+
+		return new ArrayList<Integer>();
 	}
 
-
 	private Integer getStoredInId(Integer factorId) throws MiddlewareQueryException {
-		List<Integer> termIds = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
-		return (termIds != null && termIds.size() > 0 ? termIds.get(0) : null);
+		List<Integer> termIds = this.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
+		return termIds != null && termIds.size() > 0 ? termIds.get(0) : null;
 	}
 
 	private List<Integer> findExperimentsByGeolocationFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> geolocationIds = new HashSet<Integer>();
-		geolocationIds.addAll(getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
-		
+		geolocationIds.addAll(this.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
+
 		Set<Integer> experimentIds = new HashSet<Integer>();
-		experimentIds.addAll(getExperimentDao().getExperimentIdsByGeolocationIds(geolocationIds));
-		
+		experimentIds.addAll(this.getExperimentDao().getExperimentIdsByGeolocationIds(geolocationIds));
+
 		return new ArrayList<Integer>(experimentIds);
 	}
-	
+
 	private List<Integer> findExperimentsByStockFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
 		Set<Integer> stockIds = new HashSet<Integer>();
-		stockIds.addAll(getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
-		
-		return getExperimentIdsByStockIds(stockIds);
+		stockIds.addAll(this.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
+
+		return this.getExperimentIdsByStockIds(stockIds);
 	}
-	
+
 	private List<Integer> findExperimentsByExperimentFactorValue(Integer factorId, String value) throws MiddlewareQueryException {
-		return getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value);
+		return this.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value);
 	}
-	
+
 	private List<Integer> getExperimentIdsByStockIds(Collection<Integer> stockIds) throws MiddlewareQueryException {
-		return getExperimentStockDao().getExperimentIdsByStockIds(stockIds);
+		return this.getExperimentStockDao().getExperimentIdsByStockIds(stockIds);
 	}
-	
+
 	private List<Integer> findExperimentsByStock(String columnName, String value) throws MiddlewareQueryException {
 		Set<Integer> stockIds = new HashSet<Integer>();
-		stockIds.addAll(getStockDao().getStockIdsByProperty(columnName, value));
-		return getExperimentIdsByStockIds(stockIds);
+		stockIds.addAll(this.getStockDao().getStockIdsByProperty(columnName, value));
+		return this.getExperimentIdsByStockIds(stockIds);
 	}
 }

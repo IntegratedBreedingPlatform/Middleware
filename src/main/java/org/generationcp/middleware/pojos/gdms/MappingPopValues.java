@@ -1,60 +1,63 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * POJO for gdms_mapping_pop_values table.
- * 
+ *
  * @author Mark Agarrado
  */
 @Entity
 @Table(name = "gdms_mapping_pop_values")
-public class MappingPopValues implements Serializable{
+public class MappingPopValues implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @Basic(optional = false)
-    @Column(name = "mp_id")
-    private Integer mpId;
-    
-    @Column(name = "map_char_value")
-    private String mapCharValue;
-    
-    @Column(name = "dataset_id")
-    private Integer datasetId;
-    
-    @Column(name = "gid")
-    private Integer gid;
-    
-    @Column(name = "marker_id")
-    private Integer markerId;
-   
-    @Column(name = "acc_sample_id")
-    private Integer accSampleId;
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "marker_sample_id")
-    private Integer markerSampleId;
+	@Id
+	@Basic(optional = false)
+	@Column(name = "mp_id")
+	private Integer mpId;
 
-    
-    public MappingPopValues() {
-    }
+	@Column(name = "map_char_value")
+	private String mapCharValue;
 
-    public MappingPopValues(Integer mpId, String mapCharValue,
-			Integer datasetId, Integer gid, Integer markerId,
-			Integer accSampleId, Integer markerSampleId) {
+	@Column(name = "dataset_id")
+	private Integer datasetId;
+
+	@Column(name = "gid")
+	private Integer gid;
+
+	@Column(name = "marker_id")
+	private Integer markerId;
+
+	@Column(name = "acc_sample_id")
+	private Integer accSampleId;
+
+	@Column(name = "marker_sample_id")
+	private Integer markerSampleId;
+
+	public MappingPopValues() {
+	}
+
+	public MappingPopValues(Integer mpId, String mapCharValue, Integer datasetId, Integer gid, Integer markerId, Integer accSampleId,
+			Integer markerSampleId) {
 		this.mpId = mpId;
 		this.mapCharValue = mapCharValue;
 		this.datasetId = datasetId;
@@ -65,47 +68,47 @@ public class MappingPopValues implements Serializable{
 	}
 
 	public Integer getMpId() {
-        return mpId;
-    }
+		return this.mpId;
+	}
 
-    public void setMpId(Integer mpId) {
-        this.mpId = mpId;
-    }
+	public void setMpId(Integer mpId) {
+		this.mpId = mpId;
+	}
 
-    public String getMapCharValue() {
-        return mapCharValue;
-    }
+	public String getMapCharValue() {
+		return this.mapCharValue;
+	}
 
-    public void setMapCharValue(String mapCharValue) {
-        this.mapCharValue = mapCharValue;
-    }
+	public void setMapCharValue(String mapCharValue) {
+		this.mapCharValue = mapCharValue;
+	}
 
-    public Integer getDatasetId() {
-        return datasetId;
-    }
+	public Integer getDatasetId() {
+		return this.datasetId;
+	}
 
-    public void setDatasetId(Integer datasetId) {
-        this.datasetId = datasetId;
-    }
+	public void setDatasetId(Integer datasetId) {
+		this.datasetId = datasetId;
+	}
 
-    public Integer getGid() {
-        return gid;
-    }
+	public Integer getGid() {
+		return this.gid;
+	}
 
-    public void setGid(Integer gid) {
-        this.gid = gid;
-    }
+	public void setGid(Integer gid) {
+		this.gid = gid;
+	}
 
-    public Integer getMarkerId() {
-        return markerId;
-    }
+	public Integer getMarkerId() {
+		return this.markerId;
+	}
 
-    public void setMarkerId(Integer markerId) {
-        this.markerId = markerId;
-    }
+	public void setMarkerId(Integer markerId) {
+		this.markerId = markerId;
+	}
 
 	public Integer getAccSampleId() {
-		return accSampleId;
+		return this.accSampleId;
 	}
 
 	public void setAccSampleId(Integer accSampleId) {
@@ -113,7 +116,7 @@ public class MappingPopValues implements Serializable{
 	}
 
 	public Integer getMarkerSampleId() {
-		return markerSampleId;
+		return this.markerSampleId;
 	}
 
 	public void setMarkerSampleId(Integer markerSampleId) {
@@ -124,82 +127,77 @@ public class MappingPopValues implements Serializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((accSampleId == null) ? 0 : accSampleId.hashCode());
-		result = prime * result
-				+ ((datasetId == null) ? 0 : datasetId.hashCode());
-		result = prime * result + ((gid == null) ? 0 : gid.hashCode());
-		result = prime * result
-				+ ((mapCharValue == null) ? 0 : mapCharValue.hashCode());
-		result = prime * result
-				+ ((markerId == null) ? 0 : markerId.hashCode());
-		result = prime * result
-				+ ((markerSampleId == null) ? 0 : markerSampleId.hashCode());
-		result = prime * result + ((mpId == null) ? 0 : mpId.hashCode());
+		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
+		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
+		result = prime * result + (this.gid == null ? 0 : this.gid.hashCode());
+		result = prime * result + (this.mapCharValue == null ? 0 : this.mapCharValue.hashCode());
+		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
+		result = prime * result + (this.markerSampleId == null ? 0 : this.markerSampleId.hashCode());
+		result = prime * result + (this.mpId == null ? 0 : this.mpId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		MappingPopValues other = (MappingPopValues) obj;
-		if (accSampleId == null) {
+		if (this.accSampleId == null) {
 			if (other.accSampleId != null) {
-                return false;
-            }
-		} else if (!accSampleId.equals(other.accSampleId)) {
-            return false;
-        }
-		if (datasetId == null) {
+				return false;
+			}
+		} else if (!this.accSampleId.equals(other.accSampleId)) {
+			return false;
+		}
+		if (this.datasetId == null) {
 			if (other.datasetId != null) {
-                return false;
-            }
-		} else if (!datasetId.equals(other.datasetId)) {
-            return false;
-        }
-		if (gid == null) {
+				return false;
+			}
+		} else if (!this.datasetId.equals(other.datasetId)) {
+			return false;
+		}
+		if (this.gid == null) {
 			if (other.gid != null) {
-                return false;
-            }
-		} else if (!gid.equals(other.gid)) {
-            return false;
-        }
-		if (mapCharValue == null) {
+				return false;
+			}
+		} else if (!this.gid.equals(other.gid)) {
+			return false;
+		}
+		if (this.mapCharValue == null) {
 			if (other.mapCharValue != null) {
-                return false;
-            }
-		} else if (!mapCharValue.equals(other.mapCharValue)) {
-            return false;
-        }
-		if (markerId == null) {
+				return false;
+			}
+		} else if (!this.mapCharValue.equals(other.mapCharValue)) {
+			return false;
+		}
+		if (this.markerId == null) {
 			if (other.markerId != null) {
-                return false;
-            }
-		} else if (!markerId.equals(other.markerId)) {
-            return false;
-        }
-		if (markerSampleId == null) {
+				return false;
+			}
+		} else if (!this.markerId.equals(other.markerId)) {
+			return false;
+		}
+		if (this.markerSampleId == null) {
 			if (other.markerSampleId != null) {
-                return false;
-            }
-		} else if (!markerSampleId.equals(other.markerSampleId)) {
-            return false;
-        }
-		if (mpId == null) {
+				return false;
+			}
+		} else if (!this.markerSampleId.equals(other.markerSampleId)) {
+			return false;
+		}
+		if (this.mpId == null) {
 			if (other.mpId != null) {
-                return false;
-            }
-		} else if (!mpId.equals(other.mpId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.mpId.equals(other.mpId)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -207,22 +205,21 @@ public class MappingPopValues implements Serializable{
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("MappingPopValues [mpId=");
-		builder.append(mpId);
+		builder.append(this.mpId);
 		builder.append(", mapCharValue=");
-		builder.append(mapCharValue);
+		builder.append(this.mapCharValue);
 		builder.append(", datasetId=");
-		builder.append(datasetId);
+		builder.append(this.datasetId);
 		builder.append(", gid=");
-		builder.append(gid);
+		builder.append(this.gid);
 		builder.append(", markerId=");
-		builder.append(markerId);
+		builder.append(this.markerId);
 		builder.append(", accSampleId=");
-		builder.append(accSampleId);
+		builder.append(this.accSampleId);
 		builder.append(", markerSampleId=");
-		builder.append(markerSampleId);
+		builder.append(this.markerSampleId);
 		builder.append("]");
 		return builder.toString();
 	}
-    
-    
+
 }

@@ -38,25 +38,27 @@ public class MiddlewareIntegrationTest {
 				DatabaseSetupUtil.setupTestDatabases();
 			}
 
-			workbenchConnectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
-			connectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "crop");
+			MiddlewareIntegrationTest.workbenchConnectionParameters =
+					new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
+			MiddlewareIntegrationTest.connectionParameters = new DatabaseConnectionParameters("testDatabaseConfig.properties", "crop");
 
-			sessionUtil = new HibernateUtil(connectionParameters);
-			workbenchSessionUtil = new HibernateUtil(workbenchConnectionParameters);
+			MiddlewareIntegrationTest.sessionUtil = new HibernateUtil(MiddlewareIntegrationTest.connectionParameters);
+			MiddlewareIntegrationTest.workbenchSessionUtil = new HibernateUtil(MiddlewareIntegrationTest.workbenchConnectionParameters);
 
 		} catch (ConversionException e) {
-			Assert.fail("Boolean config for drop.create.dbs in testDatabaseConfig.properties was not formed properly - needs to be true,t,false or f" + e.getMessage());		
+			Assert.fail("Boolean config for drop.create.dbs in testDatabaseConfig.properties was not formed properly - needs to be true,t,false or f"
+					+ e.getMessage());
 		} catch (Exception e) {
-			logExceptionInfoAndFail(e);
-		} 
+			MiddlewareIntegrationTest.logExceptionInfoAndFail(e);
+		}
 	}
-	
+
 	static void logExceptionInfoAndFail(Exception e) {
 		String msg = "Exception " + e.getMessage();
-		if(e.getCause() != null) {
+		if (e.getCause() != null) {
 			msg += " caused by: " + e.getCause().getMessage();
 		}
-		LOG.info(msg);
+		MiddlewareIntegrationTest.LOG.info(msg);
 		Assert.fail(msg);
 	}
 
@@ -66,13 +68,13 @@ public class MiddlewareIntegrationTest {
 
 	@Before
 	public void beforeEachTest() {
-		startTime = System.nanoTime();
+		this.startTime = System.nanoTime();
 	}
 
 	@After
 	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - startTime;
-		LOG.debug("+++++ Test: " + getClass().getSimpleName() + "." + name.getMethodName() + " took " + ((double) elapsedTime / 1000000)
-				+ " ms = " + ((double) elapsedTime / 1000000000) + " s +++++");
+		long elapsedTime = System.nanoTime() - this.startTime;
+		MiddlewareIntegrationTest.LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
+				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
 	}
 }

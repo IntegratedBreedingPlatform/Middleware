@@ -1,104 +1,111 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.dms;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experimentprop
- * 
+ *
  * Tag-value properties - follows standard chado model.
- * 
+ *
  * @author Aldrin Batac
  *
  */
 @Entity
-@Table(name = "nd_experimentprop", uniqueConstraints = {
-		@UniqueConstraint(columnNames = { "nd_experiment_id","type_id","rank" }) })
+@Table(name = "nd_experimentprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"nd_experiment_id", "type_id", "rank"})})
 public class ExperimentProperty implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@Basic(optional = false)
-	@Column(name = "nd_experimentprop_id")	
+	@Column(name = "nd_experimentprop_id")
 	private Integer ndExperimentpropId;
-	
+
 	@Basic(optional = false)
 	@Column(name = "type_id")
 	private Integer typeId;
-	
+
 	@Column(name = "value", columnDefinition = "default NULL")
 	private String value;
-	
+
 	@Basic(optional = false)
 	@Column(name = "rank", columnDefinition = "default 0")
 	private Integer rank;
-	
-    @ManyToOne
-    @JoinColumn(name = "nd_experiment_id", nullable = false)
+
+	@ManyToOne
+	@JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
-    
-	public ExperimentProperty(){
+
+	public ExperimentProperty() {
 	}
-	
-    @Override
-    public String toString() {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("ExperimentProperties [nd_experimentprop_id=" + ndExperimentpropId);
-    	sb.append(", type_id=" + typeId);
-    	sb.append(", value=" + value);
-    	sb.append(", rank=" + rank);
-    	sb.append("]");
-    	
-    	return sb.toString();
-    }
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("ExperimentProperties [nd_experimentprop_id=" + this.ndExperimentpropId);
+		sb.append(", type_id=" + this.typeId);
+		sb.append(", value=" + this.value);
+		sb.append(", rank=" + this.rank);
+		sb.append("]");
+
+		return sb.toString();
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((ndExperimentpropId == null) ? 0 : ndExperimentpropId.hashCode());
-		
+		result = prime * result + (this.ndExperimentpropId == null ? 0 : this.ndExperimentpropId.hashCode());
+
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
+			return false;
+		}
 		if (!(obj instanceof ExperimentProperty)) {
-            return false;
-        }
-		
+			return false;
+		}
+
 		ExperimentProperty other = (ExperimentProperty) obj;
-		if (ndExperimentpropId == null) {
+		if (this.ndExperimentpropId == null) {
 			if (other.ndExperimentpropId != null) {
-                return false;
-            }
-		} else if (!ndExperimentpropId.equals(other.ndExperimentpropId)) {
-            return false;
-        }
-		
+				return false;
+			}
+		} else if (!this.ndExperimentpropId.equals(other.ndExperimentpropId)) {
+			return false;
+		}
+
 		return true;
 	}
 
 	public Integer getNdExperimentpropId() {
-		return ndExperimentpropId;
+		return this.ndExperimentpropId;
 	}
 
 	public void setNdExperimentpropId(Integer ndExperimentpropId) {
@@ -106,7 +113,7 @@ public class ExperimentProperty implements Serializable {
 	}
 
 	public Integer getTypeId() {
-		return typeId;
+		return this.typeId;
 	}
 
 	public void setTypeId(Integer typeId) {
@@ -114,7 +121,7 @@ public class ExperimentProperty implements Serializable {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(String value) {
@@ -122,7 +129,7 @@ public class ExperimentProperty implements Serializable {
 	}
 
 	public Integer getRank() {
-		return rank;
+		return this.rank;
 	}
 
 	public void setRank(Integer rank) {
@@ -130,11 +137,11 @@ public class ExperimentProperty implements Serializable {
 	}
 
 	public ExperimentModel getExperiment() {
-		return experiment;
+		return this.experiment;
 	}
 
 	public void setExperiment(ExperimentModel experiment) {
 		this.experiment = experiment;
 	}
-	
+
 }

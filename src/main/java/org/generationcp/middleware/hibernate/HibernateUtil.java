@@ -1,16 +1,21 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.hibernate;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -22,189 +27,178 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 /**
- * This utility class instantiates a SessionFactory from which Sessions for a
- * thread can be opened.
- * 
+ * This utility class instantiates a SessionFactory from which Sessions for a thread can be opened.
+ *
  * @author klmanansala
- * 
+ *
  */
-public class HibernateUtil implements Serializable{
+public class HibernateUtil implements Serializable {
 
-    private static final long serialVersionUID = -6399030839728425831L;
+	private static final long serialVersionUID = -6399030839728425831L;
 
-    private final static Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
+	private final static Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
 
-    private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
+	private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
 
-    private SessionFactory sessionFactory;
-    private ThreadLocal<Session> threadSession;
+	private SessionFactory sessionFactory;
+	private ThreadLocal<Session> threadSession;
 
-    /**
-     * Given a file name of a hibernate cfg xml file, this constructor creates a
-     * SessionFactory based on it. It is assumed that connection properties are
-     * defined in the config file.
-     * 
-     * @param hibernateCfgFileName
-     * @throws ConfigException
-     * @throws HibernateException
-     */
-    public HibernateUtil(String hibernateCfgFileName) throws ConfigException, HibernateException {
-        try {
-            LOG.info("Reading Hibernate config file: " + hibernateCfgFileName);
-            URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFileName);
+	/**
+	 * Given a file name of a hibernate cfg xml file, this constructor creates a SessionFactory based on it. It is assumed that connection
+	 * properties are defined in the config file.
+	 * 
+	 * @param hibernateCfgFileName
+	 * @throws ConfigException
+	 * @throws HibernateException
+	 */
+	public HibernateUtil(String hibernateCfgFileName) throws ConfigException, HibernateException {
+		try {
+			HibernateUtil.LOG.info("Reading Hibernate config file: " + hibernateCfgFileName);
+			URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFileName);
 
-            AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
-            LOG.info("Opening SessionFactory...");
-            sessionFactory = cfg.buildSessionFactory();
+			AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
+			HibernateUtil.LOG.info("Opening SessionFactory...");
+			this.sessionFactory = cfg.buildSessionFactory();
 
-            threadSession = new ThreadLocal<Session>();
-        } catch (FileNotFoundException e) {
-            throw new ConfigException(e.getMessage(), e);
-        }
-    }
+			this.threadSession = new ThreadLocal<Session>();
+		} catch (FileNotFoundException e) {
+			throw new ConfigException(e.getMessage(), e);
+		}
+	}
 
-    /**
-     * Creates a SessionFactory which connects to the database identified by the
-     * host, port, and dbname parameters. The username and password parameters
-     * are used for authentication with the database system. The parameters are
-     * used in conjuction with the ibpmidware_hib.cfg.xml file in
-     * src/main/config.
-     * 
-     * @param host
-     * @param port
-     * @param dbName
-     * @param username
-     * @param password
-     * @throws ConfigException
-     * @throws HibernateException
-     */
-    public HibernateUtil(String host, String port, String dbName, String username, String password) throws ConfigException,
-            HibernateException {
-        this(MIDDLEWARE_INTERNAL_HIBERNATE_CFG, "jdbc:mysql://" + host + ":" + port + "/" + dbName, username, password);
-    }
-    
-    /**
-     * Creates a SessionFactory which connects to the database identified by the
-     * host, port, and dbname parameters. The username and password parameters
-     * are used for authentication with the database system. The parameters are
-     * used in conjuction with the ibpmidware_hib.cfg.xml file in
-     * src/main/config.
-     * 
-     * @param hibernateCfgFilename
-     * @param host
-     * @param port
-     * @param dbName
-     * @param username
-     * @param password
-     * @throws ConfigException
-     * @throws HibernateException
-     */
-    public HibernateUtil(String hibernateCfgFilename, String host, String port, String dbName, String username, String password) throws ConfigException,
-            HibernateException {
-        this(hibernateCfgFilename, "jdbc:mysql://" + host + ":" + port + "/" + dbName, username, password);
-    }
-    
-    public HibernateUtil(String hibernateCfgFilename, String connectionUrl, String username, String password) {
-        try {
-            LOG.info("Reading Hibernate config file: " + hibernateCfgFilename);
-            URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFilename);
+	/**
+	 * Creates a SessionFactory which connects to the database identified by the host, port, and dbname parameters. The username and
+	 * password parameters are used for authentication with the database system. The parameters are used in conjuction with the
+	 * ibpmidware_hib.cfg.xml file in src/main/config.
+	 * 
+	 * @param host
+	 * @param port
+	 * @param dbName
+	 * @param username
+	 * @param password
+	 * @throws ConfigException
+	 * @throws HibernateException
+	 */
+	public HibernateUtil(String host, String port, String dbName, String username, String password) throws ConfigException,
+			HibernateException {
+		this(HibernateUtil.MIDDLEWARE_INTERNAL_HIBERNATE_CFG, "jdbc:mysql://" + host + ":" + port + "/" + dbName, username, password);
+	}
 
-            AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
-            cfg.setProperty("hibernate.connection.url", connectionUrl);
-            cfg.setProperty("hibernate.connection.username", username);
-            cfg.setProperty("hibernate.connection.password", password);
-            LOG.info("Opening SessionFactory...");
-            sessionFactory = cfg.buildSessionFactory();
+	/**
+	 * Creates a SessionFactory which connects to the database identified by the host, port, and dbname parameters. The username and
+	 * password parameters are used for authentication with the database system. The parameters are used in conjuction with the
+	 * ibpmidware_hib.cfg.xml file in src/main/config.
+	 * 
+	 * @param hibernateCfgFilename
+	 * @param host
+	 * @param port
+	 * @param dbName
+	 * @param username
+	 * @param password
+	 * @throws ConfigException
+	 * @throws HibernateException
+	 */
+	public HibernateUtil(String hibernateCfgFilename, String host, String port, String dbName, String username, String password)
+			throws ConfigException, HibernateException {
+		this(hibernateCfgFilename, "jdbc:mysql://" + host + ":" + port + "/" + dbName, username, password);
+	}
 
-            threadSession = new ThreadLocal<Session>();
-        } catch (FileNotFoundException e) {
-            throw new ConfigException(e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * Creates a SessionFactory which connects to the database given the DatabaseConnectionParameters object. 
-     * The host, port, databasename, username and password fields will be used as connection parameters.
-     * 
-     * 
-     * 
-     * @param connectionParams
-     * @throws ConfigException
-     * @throws HibernateException
-     * @throws IOException 
-     * @throws URISyntaxException 
-     * @throws FileNotFoundException 
-     */
-    public HibernateUtil(DatabaseConnectionParameters connectionParams) throws ConfigException,
-            HibernateException, FileNotFoundException, URISyntaxException, IOException {
-        this(MIDDLEWARE_INTERNAL_HIBERNATE_CFG, connectionParams);
-    }
-    
-    /**
-     * Creates a SessionFactory which connects to the database given the DatabaseConnectionParameters object. 
-     * The host, port, databasename, username and password fields will be used as connection parameters.
-     * 
-     * @param hibernateCfgFilename
-     * @param connectionParams
-     * @throws ConfigException
-     * @throws HibernateException
-     */
-    public HibernateUtil(String hibernateCfgFilename, DatabaseConnectionParameters connectionParams) throws ConfigException,
-            HibernateException {
-        this(hibernateCfgFilename, "jdbc:mysql://" + connectionParams.getHost() + ":" + connectionParams.getPort() + "/" + connectionParams.getDbName(), connectionParams.getUsername(), connectionParams.getPassword());
-    }
+	public HibernateUtil(String hibernateCfgFilename, String connectionUrl, String username, String password) {
+		try {
+			HibernateUtil.LOG.info("Reading Hibernate config file: " + hibernateCfgFilename);
+			URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFilename);
 
-    /**
-     * Returns the SessionFactory object.
-     * 
-     * @return the SessionFactory
-     */
-    public SessionFactory getSessionFactory() {
-        return this.sessionFactory;
-    }
+			AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
+			cfg.setProperty("hibernate.connection.url", connectionUrl);
+			cfg.setProperty("hibernate.connection.username", username);
+			cfg.setProperty("hibernate.connection.password", password);
+			HibernateUtil.LOG.info("Opening SessionFactory...");
+			this.sessionFactory = cfg.buildSessionFactory();
 
-    /**
-     * Closes the SessionFactory object to release its resources.
-     */
-    public void shutdown() {
-        closeCurrentSession();
-        getSessionFactory().close();
-    }
+			this.threadSession = new ThreadLocal<Session>();
+		} catch (FileNotFoundException e) {
+			throw new ConfigException(e.getMessage(), e);
+		}
+	}
 
-    /**
-     * Returns the Session for the thread which made the call to this method.
-     * 
-     * @return the Session
-     */
-    public Session getCurrentSession() {
-        Session session = threadSession.get();
+	/**
+	 * Creates a SessionFactory which connects to the database given the DatabaseConnectionParameters object. The host, port, databasename,
+	 * username and password fields will be used as connection parameters.
+	 * 
+	 * 
+	 * 
+	 * @param connectionParams
+	 * @throws ConfigException
+	 * @throws HibernateException
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 * @throws FileNotFoundException
+	 */
+	public HibernateUtil(DatabaseConnectionParameters connectionParams) throws ConfigException, HibernateException, FileNotFoundException,
+			URISyntaxException, IOException {
+		this(HibernateUtil.MIDDLEWARE_INTERNAL_HIBERNATE_CFG, connectionParams);
+	}
 
-        if (session == null || !session.isOpen()) {
-            session = getSessionFactory().openSession();
-            threadSession.set(session);
-        }
+	/**
+	 * Creates a SessionFactory which connects to the database given the DatabaseConnectionParameters object. The host, port, databasename,
+	 * username and password fields will be used as connection parameters.
+	 * 
+	 * @param hibernateCfgFilename
+	 * @param connectionParams
+	 * @throws ConfigException
+	 * @throws HibernateException
+	 */
+	public HibernateUtil(String hibernateCfgFilename, DatabaseConnectionParameters connectionParams) throws ConfigException,
+			HibernateException {
+		this(hibernateCfgFilename, "jdbc:mysql://" + connectionParams.getHost() + ":" + connectionParams.getPort() + "/"
+				+ connectionParams.getDbName(), connectionParams.getUsername(), connectionParams.getPassword());
+	}
 
-        return session;
-    }
+	/**
+	 * Returns the SessionFactory object.
+	 * 
+	 * @return the SessionFactory
+	 */
+	public SessionFactory getSessionFactory() {
+		return this.sessionFactory;
+	}
 
-    /**
-     * Closes the Session associated with the thread which called this method.
-     */
-    public void closeCurrentSession() {
-        Session session = threadSession.get();
+	/**
+	 * Closes the SessionFactory object to release its resources.
+	 */
+	public void shutdown() {
+		this.closeCurrentSession();
+		this.getSessionFactory().close();
+	}
 
-        if (session != null) {
-            session.close();
-            session = null;
-        }
+	/**
+	 * Returns the Session for the thread which made the call to this method.
+	 * 
+	 * @return the Session
+	 */
+	public Session getCurrentSession() {
+		Session session = this.threadSession.get();
 
-        threadSession.set(null);
-    }
+		if (session == null || !session.isOpen()) {
+			session = this.getSessionFactory().openSession();
+			this.threadSession.set(session);
+		}
+
+		return session;
+	}
+
+	/**
+	 * Closes the Session associated with the thread which called this method.
+	 */
+	public void closeCurrentSession() {
+		Session session = this.threadSession.get();
+
+		if (session != null) {
+			session.close();
+			session = null;
+		}
+
+		this.threadSession.set(null);
+	}
 }

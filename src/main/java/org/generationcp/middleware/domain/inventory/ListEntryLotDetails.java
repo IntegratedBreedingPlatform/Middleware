@@ -1,15 +1,17 @@
+
 package org.generationcp.middleware.domain.inventory;
 
 public class ListEntryLotDetails extends LotDetails implements Cloneable {
-private static final long serialVersionUID = -4418453030620877249L;
-	
+
+	private static final long serialVersionUID = -4418453030620877249L;
+
 	private Integer id;
-	
+
 	private Double reservedTotalForEntry;
-	
+
 	private Double reservedTotalForOtherEntries;
-	
-	public ListEntryLotDetails(){
+
+	public ListEntryLotDetails() {
 	}
 
 	public ListEntryLotDetails(Integer id) {
@@ -18,7 +20,7 @@ private static final long serialVersionUID = -4418453030620877249L;
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Integer id) {
@@ -26,7 +28,7 @@ private static final long serialVersionUID = -4418453030620877249L;
 	}
 
 	public Double getReservedTotalForEntry() {
-		return reservedTotalForEntry;
+		return this.reservedTotalForEntry;
 	}
 
 	public void setReservedTotalForEntry(Double reservedTotalForEntry) {
@@ -34,52 +36,52 @@ private static final long serialVersionUID = -4418453030620877249L;
 	}
 
 	public Double getReservedTotalForOtherEntries() {
-		return reservedTotalForOtherEntries;
+		return this.reservedTotalForOtherEntries;
 	}
 
 	public void setReservedTotalForOtherEntries(Double reservedTotalForOtherEntries) {
 		this.reservedTotalForOtherEntries = reservedTotalForOtherEntries;
 	}
-	
+
 	@Override
 	public String toString() {
-		 StringBuilder builder = new StringBuilder();
-	        builder.append("ListEntryLotReportRow [id=");
-	        builder.append(getId());
-	        builder.append(", lotId=");
-	        builder.append(getLotId());
-	        builder.append(", entityIdOfLot=");
-	        builder.append(getEntityIdOfLot());
-	        builder.append(", actualLotBalance=");
-	        builder.append(getActualLotBalance());
-	        builder.append(", availableLotBalance=");
-	        builder.append(getAvailableLotBalance());
-	        builder.append(", reservedTotal=");
-	        builder.append(getReservedTotal());
-	        builder.append(", locationId=");
-	        builder.append(getLocId());
-	        builder.append(", locationOfLot=");
-	        builder.append(getLocationOfLot());
-	        builder.append(", scaleId=");
-	        builder.append(getScaleId());
-	        builder.append(", scaleOfLot=");
-	        builder.append(getScaleOfLot());
-	        builder.append(", commentOfLot=");
-	        builder.append(getCommentOfLot());
-	        builder.append(", reservedTotalForEntry=");
-	        builder.append(reservedTotalForEntry);
-	        builder.append(", reservedTotalForOtherEntries=");
-	        builder.append(reservedTotalForOtherEntries);
-	        builder.append("]");
-	        return builder.toString();
+		StringBuilder builder = new StringBuilder();
+		builder.append("ListEntryLotReportRow [id=");
+		builder.append(this.getId());
+		builder.append(", lotId=");
+		builder.append(this.getLotId());
+		builder.append(", entityIdOfLot=");
+		builder.append(this.getEntityIdOfLot());
+		builder.append(", actualLotBalance=");
+		builder.append(this.getActualLotBalance());
+		builder.append(", availableLotBalance=");
+		builder.append(this.getAvailableLotBalance());
+		builder.append(", reservedTotal=");
+		builder.append(this.getReservedTotal());
+		builder.append(", locationId=");
+		builder.append(this.getLocId());
+		builder.append(", locationOfLot=");
+		builder.append(this.getLocationOfLot());
+		builder.append(", scaleId=");
+		builder.append(this.getScaleId());
+		builder.append(", scaleOfLot=");
+		builder.append(this.getScaleOfLot());
+		builder.append(", commentOfLot=");
+		builder.append(this.getCommentOfLot());
+		builder.append(", reservedTotalForEntry=");
+		builder.append(this.reservedTotalForEntry);
+		builder.append(", reservedTotalForOtherEntries=");
+		builder.append(this.reservedTotalForOtherEntries);
+		builder.append("]");
+		return builder.toString();
 	}
 
-	public ListEntryLotDetails makeClone(){
-        try{
-            return (ListEntryLotDetails) super.clone();
-        }catch( CloneNotSupportedException e ){
-            return null;
-        }
-    } 
-	
+	public ListEntryLotDetails makeClone() {
+		try {
+			return (ListEntryLotDetails) super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
+
 }

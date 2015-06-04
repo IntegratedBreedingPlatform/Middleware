@@ -4,101 +4,97 @@
  * Generation Challenge Programme (GCP)
  *
  *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
 public class Scale {
-    
-    private Term term;
 
-    private String displayName;
-    
-    public Scale() {
-    }
+	private Term term;
 
-    public Scale(Term term) {
-        this.term = term;
-    }
-    
+	private String displayName;
 
-    public Term getTerm() {
-        return term;
-    }
+	public Scale() {
+	}
 
-    
-    public void setTerm(Term term) {
-        this.term = term;
-    }
+	public Scale(Term term) {
+		this.term = term;
+	}
 
-    public String getDisplayName() {
-        if (displayName == null) {
-            return term.getName();
-        } else {
-            return displayName;
-        }
-    }
+	public Term getTerm() {
+		return this.term;
+	}
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
+	public void setTerm(Term term) {
+		this.term = term;
+	}
 
-    public int getId() {
-        return term.getId();
-    }
+	public String getDisplayName() {
+		if (this.displayName == null) {
+			return this.term.getName();
+		} else {
+			return this.displayName;
+		}
+	}
 
-    public void setId(int id) {
-        term.setId(id);
-    }
-    
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
 
-    public String getName() {
-        return term.getName();
-    }
+	public int getId() {
+		return this.term.getId();
+	}
 
-    public void setName(String name) {
-        term.setName(name);
-    }
+	public void setId(int id) {
+		this.term.setId(id);
+	}
 
-    public String getDefinition() {
-       return term.getDefinition();
-    }
+	public String getName() {
+		return this.term.getName();
+	}
 
-    public void setDefinition(String definition) {
-        term.setDefinition(definition);
-    }
-    
+	public void setName(String name) {
+		this.term.setName(name);
+	}
+
+	public String getDefinition() {
+		return this.term.getDefinition();
+	}
+
+	public void setDefinition(String definition) {
+		this.term.setDefinition(definition);
+	}
 
 	@Override
 	public String toString() {
-	    
-	    if (term == null){
-	        return "";
-	    }
-	    
+
+		if (this.term == null) {
+			return "";
+		}
+
 		StringBuilder builder = new StringBuilder();
 		builder.append("Scale [id=");
-        builder.append(term.getId());
-        builder.append(", name=");
-        builder.append(term.getName());
-        builder.append(", definition=");
-        builder.append(term.getDefinition());
+		builder.append(this.term.getId());
+		builder.append(", name=");
+		builder.append(this.term.getName());
+		builder.append(", definition=");
+		builder.append(this.term.getDefinition());
 		builder.append("]");
 		return builder.toString();
 	}
 
-    public void print(int indent) {
-        Debug.println(indent, "Scale: ");
-        if (term != null){
-            term.print(indent + 3);
-        } else {
-            Debug.println(indent + 3, "null");
-        }
-    }
-	
+	public void print(int indent) {
+		Debug.println(indent, "Scale: ");
+		if (this.term != null) {
+			this.term.print(indent + 3);
+		} else {
+			Debug.println(indent + 3, "null");
+		}
+	}
+
 }

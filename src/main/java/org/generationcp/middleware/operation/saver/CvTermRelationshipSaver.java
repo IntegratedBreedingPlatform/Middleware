@@ -1,16 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
-package org.generationcp.middleware.operation.saver;
 
+package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -25,21 +24,21 @@ public class CvTermRelationshipSaver extends Saver {
 	}
 
 	// Returns the id
-	public Integer save(Integer subjectId, Integer typeId, Integer objectId)  throws MiddlewareException, MiddlewareQueryException{ 
-        CVTermRelationshipDao dao = getCvTermRelationshipDao();
-        Integer generatedId;
+	public Integer save(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareException, MiddlewareQueryException {
+		CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
+		Integer generatedId;
 		try {
 			generatedId = dao.getNextId("cvTermRelationshipId");
 		} catch (MiddlewareQueryException e) {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
-		CVTermRelationship cvTermRelationship = create(generatedId, subjectId, typeId, objectId); 
+		CVTermRelationship cvTermRelationship = this.create(generatedId, subjectId, typeId, objectId);
 		dao.save(cvTermRelationship);
-		
+
 		return cvTermRelationship.getCvTermRelationshipId();
 	}
-	
-	public CVTermRelationship create(Integer relationshipId, Integer subjectId, Integer typeId, Integer objectId){
+
+	public CVTermRelationship create(Integer relationshipId, Integer subjectId, Integer typeId, Integer objectId) {
 		CVTermRelationship relationship = new CVTermRelationship();
 		relationship.setCvTermRelationshipId(relationshipId);
 		relationship.setSubjectId(subjectId);
@@ -47,24 +46,25 @@ public class CvTermRelationshipSaver extends Saver {
 		relationship.setObjectId(objectId);
 		return relationship;
 	}
-	
-	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
-        CVTermRelationshipDao dao = getCvTermRelationshipDao();
-        CVTermRelationship relationship = null;
-        try {
-            relationship = dao.saveOrUpdateRelationship(cvTermRelationship);
-        } catch (MiddlewareQueryException e) {
-            throw new MiddlewareQueryException(e.getMessage(), e);
-        }
-        return relationship;
-    }
 
-	public void deleteRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
-	    CVTermRelationshipDao dao = getCvTermRelationshipDao();
-	    try {
-	        dao.makeTransient(cvTermRelationship);
-	    } catch (MiddlewareQueryException e) {
-	        throw new MiddlewareQueryException(e.getMessage(), e);
-	    }
+	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException,
+			MiddlewareQueryException {
+		CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
+		CVTermRelationship relationship = null;
+		try {
+			relationship = dao.saveOrUpdateRelationship(cvTermRelationship);
+		} catch (MiddlewareQueryException e) {
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+		return relationship;
+	}
+
+	public void deleteRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException {
+		CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
+		try {
+			dao.makeTransient(cvTermRelationship);
+		} catch (MiddlewareQueryException e) {
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
 	}
 }

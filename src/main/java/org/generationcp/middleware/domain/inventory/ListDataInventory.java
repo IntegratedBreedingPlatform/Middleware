@@ -1,15 +1,14 @@
+
 package org.generationcp.middleware.domain.inventory;
 
-
 /**
- * POJO for storing aggregate inventory data for specific
- * GermplasmListData record
- * 
+ * POJO for storing aggregate inventory data for specific GermplasmListData record
+ *
  * @author Darla Ani
  *
  */
-public class ListDataInventory extends GermplasmInventory  {
-	
+public class ListDataInventory extends GermplasmInventory {
+
 	private static final long serialVersionUID = -8594381810347667269L;
 
 	private Integer listDataId;
@@ -20,7 +19,7 @@ public class ListDataInventory extends GermplasmInventory  {
 	}
 
 	public Integer getListDataId() {
-		return listDataId;
+		return this.listDataId;
 	}
 
 	public void setListDataId(Integer listDataId) {
@@ -31,13 +30,11 @@ public class ListDataInventory extends GermplasmInventory  {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ListDataInventory [listDataId=");
-		builder.append(listDataId);
+		builder.append(this.listDataId);
 		builder.append(", ");
-		builder.append(getFieldsToString());
+		builder.append(this.getFieldsToString());
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
 
 }

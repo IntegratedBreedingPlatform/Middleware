@@ -1,15 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.search;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
@@ -18,67 +21,65 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.searcher.Searcher;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class StudyResultSetByParentFolder extends Searcher implements StudyResultSet {
-	
-	private ParentFolderStudyQueryFilter filter;
-	private int numOfRows;
-	private long size;
+
+	private final ParentFolderStudyQueryFilter filter;
+	private final int numOfRows;
+	private final long size;
 	private long count;
-	private List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+	private final List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 	private int startIndex;
 	private int index;
 
-	public StudyResultSetByParentFolder(ParentFolderStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProviderForLocal) throws MiddlewareQueryException {
-		
+	public StudyResultSetByParentFolder(ParentFolderStudyQueryFilter filter, int numOfRows, HibernateSessionProvider sessionProviderForLocal)
+			throws MiddlewareQueryException {
+
 		super(sessionProviderForLocal);
 		this.filter = filter;
 		this.numOfRows = numOfRows;
-		this.size = countStudies();
+		this.size = this.countStudies();
 		this.count = 0;
 		this.startIndex = 0;
 	}
-	
+
 	@Override
 	public boolean hasMore() {
-		return count < size;
+		return this.count < this.size;
 	}
 
 	@Override
 	public StudyReference next() throws MiddlewareQueryException {
-		count++;
-		if (isEmpty(studyReferences)) {
-			getNextStudies();
+		this.count++;
+		if (this.isEmpty(this.studyReferences)) {
+			this.getNextStudies();
 		}
-	    return studyReferences.get(index++);
+		return this.studyReferences.get(this.index++);
 	}
 
 	private boolean isEmpty(List<StudyReference> studyReferences) {
-		return studyReferences == null || studyReferences.size() == 0 || index == numOfRows;
+		return studyReferences == null || studyReferences.size() == 0 || this.index == this.numOfRows;
 	}
 
 	@Override
 	public long size() {
-		return size;
+		return this.size;
 	}
-	
+
 	private void getNextStudies() throws MiddlewareQueryException {
-		index = 0;
-		int folderId = filter.getFolderId();
-		studyReferences.clear();
-		List<DmsProject> projects = (List<DmsProject>) getDmsProjectDao().getProjectsByFolder(folderId, startIndex, numOfRows);
+		this.index = 0;
+		int folderId = this.filter.getFolderId();
+		this.studyReferences.clear();
+		List<DmsProject> projects = this.getDmsProjectDao().getProjectsByFolder(folderId, this.startIndex, this.numOfRows);
 		for (DmsProject project : projects) {
-			studyReferences.add(new StudyReference(project.getProjectId(), project.getName(), project.getDescription()));
+			this.studyReferences.add(new StudyReference(project.getProjectId(), project.getName(), project.getDescription()));
 		}
-		startIndex += numOfRows;
+		this.startIndex += this.numOfRows;
 	}
-	
+
 	private long countStudies() throws MiddlewareQueryException {
-		int folderId = filter.getFolderId();
+		int folderId = this.filter.getFolderId();
 		long count = 0;
-		count = getDmsProjectDao().countProjectsByFolder(folderId);
+		count = this.getDmsProjectDao().countProjectsByFolder(folderId);
 		return count;
 	}
 }

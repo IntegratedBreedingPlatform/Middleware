@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware;
 
 import org.generationcp.middleware.manager.CrossStudyDataManagerImplTest;
@@ -11,16 +12,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-
 @RunWith(Suite.class)
-@SuiteClasses({UserRoleSetupTest.class,
-	UserDataManagerImplTest.class,
-	CrossStudyDataManagerImplTest.class,
-	GermplasmDataManagerUtilTest.class,
-	GermplasmDataManagerImplTest.class,
-	OntologyDataManagerImplTest.class,
-	WorkbenchDataManagerImplTest.class
-})
+@SuiteClasses({UserRoleSetupTest.class, UserDataManagerImplTest.class, CrossStudyDataManagerImplTest.class,
+		GermplasmDataManagerUtilTest.class, GermplasmDataManagerImplTest.class, OntologyDataManagerImplTest.class,
+		WorkbenchDataManagerImplTest.class})
 public class AllMWTests {
 
 }

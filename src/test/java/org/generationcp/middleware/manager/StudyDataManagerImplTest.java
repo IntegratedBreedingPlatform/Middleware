@@ -1,18 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
-
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -82,98 +80,96 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		
-		manager = managerFactory.getNewStudyDataManager();
-		ontologyManager = managerFactory.getNewOntologyDataManager();
-		workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
-		workbenchTestDataUtil.setUpWorkbench();
-		commonTestProject = workbenchTestDataUtil.getCommonTestProject();
-		crossExpansionProperties = new CrossExpansionProperties();
-		crossExpansionProperties.setWheatLevel(0);
-		crossExpansionProperties.setDefaultLevel(1);
+
+		StudyDataManagerImplTest.manager = DataManagerIntegrationTest.managerFactory.getNewStudyDataManager();
+		StudyDataManagerImplTest.ontologyManager = DataManagerIntegrationTest.managerFactory.getNewOntologyDataManager();
+		StudyDataManagerImplTest.workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
+		StudyDataManagerImplTest.workbenchTestDataUtil.setUpWorkbench();
+		StudyDataManagerImplTest.commonTestProject = StudyDataManagerImplTest.workbenchTestDataUtil.getCommonTestProject();
+		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties();
+		StudyDataManagerImplTest.crossExpansionProperties.setWheatLevel(0);
+		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 	}
 
 	@Test
 	public void testGetStudy() throws Exception {
-		Study study = manager.getStudy(STUDY_ID);
-		assertNotNull(study);
-		Debug.println(INDENT, "ID: " + study.getId());
-		Debug.println(INDENT, "Name: " + study.getName());
-		Debug.println(INDENT, "Title: " + study.getTitle());
-		Debug.println(INDENT, "PI: " + study.getPrimaryInvestigator());
-		Debug.println(INDENT, "Start Date:" + study.getStartDate());
-		Debug.println(INDENT, "Creation Date: " + study.getCreationDate());
-		Debug.println(INDENT, "Study status: " + study.getStatus());
-		Debug.println(INDENT, "Study type: " + study.getType());
+		Study study = StudyDataManagerImplTest.manager.getStudy(StudyDataManagerImplTest.STUDY_ID);
+		Assert.assertNotNull(study);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "ID: " + study.getId());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Name: " + study.getName());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Title: " + study.getTitle());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "PI: " + study.getPrimaryInvestigator());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Start Date:" + study.getStartDate());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Creation Date: " + study.getCreationDate());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Study status: " + study.getStatus());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Study type: " + study.getType());
 	}
 
 	@Test
 	public void testGetStudyConditions() throws Exception {
-		Study study = manager.getStudy(STUDY_ID);
-		assertNotNull(study);
+		Study study = StudyDataManagerImplTest.manager.getStudy(StudyDataManagerImplTest.STUDY_ID);
+		Assert.assertNotNull(study);
 		VariableList vList = study.getConditions();
 		for (Variable v : vList.getVariables()) {
 			Debug.print(0, "name[" + v.getVariableType().getStandardVariable().getName() + "]=");
-			Debug.println(INDENT, v.getDisplayValue());
+			Debug.println(MiddlewareIntegrationTest.INDENT, v.getDisplayValue());
 		}
 	}
 
 	@Test
 	public void testGetAllStudyFactor() throws Exception {
-		Debug.println(INDENT, "testGetFactorDetails");
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetFactorDetails");
 		int studyId = 10010;
-		VariableTypeList factors = manager.getAllStudyFactors(studyId);
-		assertNotNull(factors);
-		assertTrue(factors.getVariableTypes().size() > 0);
-		Debug.println(INDENT, "FACTORS RETRIEVED " + factors.getVariableTypes().size());
-		factors.print(INDENT);
+		VariableTypeList factors = StudyDataManagerImplTest.manager.getAllStudyFactors(studyId);
+		Assert.assertNotNull(factors);
+		Assert.assertTrue(factors.getVariableTypes().size() > 0);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "FACTORS RETRIEVED " + factors.getVariableTypes().size());
+		factors.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	@Test
 	public void testGetAllStudyVariates() throws Exception {
 		int studyId = 10010;
-		VariableTypeList variates = manager.getAllStudyVariates(studyId);
-		assertNotNull(variates);
-		assertTrue(variates.getVariableTypes().size() > 0);
-		variates.print(INDENT);
+		VariableTypeList variates = StudyDataManagerImplTest.manager.getAllStudyVariates(studyId);
+		Assert.assertNotNull(variates);
+		Assert.assertTrue(variates.getVariableTypes().size() > 0);
+		variates.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	@Test
 	public void testGetStudiesByFolder() throws Exception {
 		int folderId = 1030;
-		StudyResultSet resultSet = manager.searchStudies(
-				new ParentFolderStudyQueryFilter(folderId), 5);
-		Debug.println(INDENT, "testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
-		assertTrue(resultSet.size() > 0);
+		StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(new ParentFolderStudyQueryFilter(folderId), 5);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
+		Assert.assertTrue(resultSet.size() > 0);
 		while (resultSet.hasMore()) {
 			StudyReference studyRef = resultSet.next();
-			Debug.println(INDENT, studyRef.toString());
+			Debug.println(MiddlewareIntegrationTest.INDENT, studyRef.toString());
 		}
 	}
 
 	@Test
 	public void testSearchStudiesForName() throws Exception {
-		Debug.println(INDENT, "testSearchStudiesForName");
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testSearchStudiesForName");
 		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
 
 		filter.setName("FooFoo"); // INVALID: Not a study, should not find any
-									// studies
-		StudyResultSet resultSet = manager.searchStudies(filter, 10);
-		assertTrue(resultSet.size() == 0);
+		// studies
+		StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 10);
+		Assert.assertTrue(resultSet.size() == 0);
 
 		filter.setName("RYT2000WS"); // VALID: is a study
 
-		resultSet = manager.searchStudies(filter, 10);
-		Debug.println(INDENT, "INPUT: " + filter);
-		Debug.println(INDENT, "Size: " + resultSet.size());
+		resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 10);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "INPUT: " + filter);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Size: " + resultSet.size());
 		while (resultSet.hasMore()) {
-			Debug.println(INDENT, "\t" + resultSet.next());
+			Debug.println(MiddlewareIntegrationTest.INDENT, "\t" + resultSet.next());
 			System.out.flush();
 		}
 		/*
-		 * to test deleted study, run in mysql: update projectprop set value =
-		 * 12990 where type_id = 8006 and project_id = (select project_id from
-		 * project where name = 'RYT2000WS') then uncomment the test below
+		 * to test deleted study, run in mysql: update projectprop set value = 12990 where type_id = 8006 and project_id = (select
+		 * project_id from project where name = 'RYT2000WS') then uncomment the test below
 		 */
 		// Assert.assertTrue(resultSet.size() == 0);
 	}
@@ -183,34 +179,32 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
 		filter.setStartDate(20050119);
 
-		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 10);
 
-		Debug.println(INDENT, "INPUT: " + filter);
-		Debug.println(INDENT, "Size: " + resultSet.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "INPUT: " + filter);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Size: " + resultSet.size());
 		while (resultSet.hasMore()) {
-			Debug.println(INDENT, "\t" + resultSet.next());
+			Debug.println(MiddlewareIntegrationTest.INDENT, "\t" + resultSet.next());
 			System.out.flush();
 		}
 		/*
-		 * to test deleted study, uncomment line above, then run in mysql:
-		 * update projectprop set value = 12990 where type_id = 8006 and
-		 * project_id = 5739 Note: 5739 is one of the project_id returned then
-		 * uncomment the test below
+		 * to test deleted study, uncomment line above, then run in mysql: update projectprop set value = 12990 where type_id = 8006 and
+		 * project_id = 5739 Note: 5739 is one of the project_id returned then uncomment the test below
 		 */
 		// Assert.assertTrue(resultSet.size() == before-1);
 	}
 
 	@Test
 	public void testSearchStudiesForSeason() throws Exception {
-		Season seasons[] = { Season.GENERAL, Season.DRY, Season.WET };
+		Season seasons[] = {Season.GENERAL, Season.DRY, Season.WET};
 		for (Season season : seasons) {
-			Debug.println(INDENT, "Season: " + season);
+			Debug.println(MiddlewareIntegrationTest.INDENT, "Season: " + season);
 			BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
 			filter.setSeason(season);
-			StudyResultSet resultSet = manager.searchStudies(filter, 10);
-			Debug.println(INDENT, "Size: " + resultSet.size());
+			StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 10);
+			Debug.println(MiddlewareIntegrationTest.INDENT, "Size: " + resultSet.size());
 			while (resultSet.hasMore()) {
-				Debug.println(INDENT, "\t" + resultSet.next());
+				Debug.println(MiddlewareIntegrationTest.INDENT, "\t" + resultSet.next());
 				System.out.flush();
 			}
 		}
@@ -222,11 +216,11 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		filter.setCountry("Republic of the Philippines");
 
-		StudyResultSet resultSet = manager.searchStudies(filter, 10);
-		Debug.println(INDENT, "INPUT: " + filter);
-		Debug.println(INDENT, "Size: " + resultSet.size());
+		StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 10);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "INPUT: " + filter);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Size: " + resultSet.size());
 		while (resultSet.hasMore()) {
-			Debug.println(INDENT, "\t" + resultSet.next());
+			Debug.println(MiddlewareIntegrationTest.INDENT, "\t" + resultSet.next());
 			System.out.flush();
 		}
 	}
@@ -239,60 +233,61 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		filter.setCountry("Republic of the Philippines");
 		filter.setSeason(Season.DRY);
 
-		StudyResultSet resultSet = manager.searchStudies(filter, 10);
-		Debug.println(INDENT, "INPUT: " + filter);
-		Debug.println(INDENT, "Size: " + resultSet.size());
+		StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 10);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "INPUT: " + filter);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Size: " + resultSet.size());
 		while (resultSet.hasMore()) {
-			Debug.println(INDENT, "\t" + resultSet.next());
+			Debug.println(MiddlewareIntegrationTest.INDENT, "\t" + resultSet.next());
 			System.out.flush();
 		}
 	}
 
 	@Test
 	public void testGetRootFolders() throws Exception {
-		List<FolderReference> rootFolders = manager.getRootFolders(commonTestProject.getUniqueID());
-		assertNotNull(rootFolders);
+		List<FolderReference> rootFolders =
+				StudyDataManagerImplTest.manager.getRootFolders(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		Assert.assertNotNull(rootFolders);
 		// this should contain the nursery and trial templates
-		assertFalse(rootFolders.isEmpty());
+		Assert.assertFalse(rootFolders.isEmpty());
 
 		StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
-		String uniqueId = commonTestProject.getUniqueID();
+		String uniqueId = StudyDataManagerImplTest.commonTestProject.getUniqueID();
 		studyTestDataUtil.createFolderTestData(uniqueId);
 		studyTestDataUtil.createStudyTestData(uniqueId);
 
-		rootFolders = manager.getRootFolders(commonTestProject.getUniqueID());
-		assertNotNull(rootFolders);
-		assertFalse(rootFolders.isEmpty());
+		rootFolders = StudyDataManagerImplTest.manager.getRootFolders(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		Assert.assertNotNull(rootFolders);
+		Assert.assertFalse(rootFolders.isEmpty());
 
-		Debug.println(INDENT, "testGetRootFolders(): " + rootFolders.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetRootFolders(): " + rootFolders.size());
 		for (FolderReference node : rootFolders) {
-			Debug.println(INDENT, "   " + node);
-			assertEquals(node.getParentFolderId(), ROOT_STUDY_FOLDER);
+			Debug.println(MiddlewareIntegrationTest.INDENT, "   " + node);
+			Assert.assertEquals(node.getParentFolderId(), StudyDataManagerImplTest.ROOT_STUDY_FOLDER);
 		}
 	}
 
 	@Test
 	public void testGetChildrenOfFolder() throws Exception {
 		StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
-		String uniqueId = commonTestProject.getUniqueID();
+		String uniqueId = StudyDataManagerImplTest.commonTestProject.getUniqueID();
 		DmsProject folderWithUUID = studyTestDataUtil.createFolderTestData(uniqueId);
 		DmsProject folderWithoutUUID = studyTestDataUtil.createFolderTestData(null);
 
 		List<Integer> folderIds = Arrays.asList(25000, 1);
 		for (Integer folderId : folderIds) {
-			Debug.println(INDENT, " folderId = " + folderId);
-			List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId,
-					commonTestProject.getUniqueID());
-			assertNotNull(childrenNodes);
-			assertTrue(childrenNodes.size() > 0);
-			Debug.println(INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): "
-					+ childrenNodes.size());
+			Debug.println(MiddlewareIntegrationTest.INDENT, " folderId = " + folderId);
+			List<Reference> childrenNodes =
+					StudyDataManagerImplTest.manager
+							.getChildrenOfFolder(folderId, StudyDataManagerImplTest.commonTestProject.getUniqueID());
+			Assert.assertNotNull(childrenNodes);
+			Assert.assertTrue(childrenNodes.size() > 0);
+			Debug.println(MiddlewareIntegrationTest.INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
 			for (Reference node : childrenNodes) {
-				Debug.println(INDENT, "   " + node);
-				if(node.getId().intValue() == folderWithUUID.getProjectId().intValue()) {
-					assertNotNull(node.getProgramUUID()); 
-				} else if(node.getId().intValue() == folderWithoutUUID.getProjectId().intValue()) { 
-					assertNull(node.getProgramUUID());
+				Debug.println(MiddlewareIntegrationTest.INDENT, "   " + node);
+				if (node.getId().intValue() == folderWithUUID.getProjectId().intValue()) {
+					Assert.assertNotNull(node.getProgramUUID());
+				} else if (node.getId().intValue() == folderWithoutUUID.getProjectId().intValue()) {
+					Assert.assertNull(node.getProgramUUID());
 				}
 			}
 		}
@@ -303,12 +298,12 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetDatasetNodesByStudyId() throws Exception {
 		Integer studyId = 10010;
-		List<DatasetReference> datasetReferences = manager.getDatasetReferences(studyId);
-		assertNotNull(datasetReferences);
-		assertTrue(datasetReferences.size() > 0);
-		Debug.println(INDENT, "Dataset Nodes By Study Id Count: " + datasetReferences.size());
+		List<DatasetReference> datasetReferences = StudyDataManagerImplTest.manager.getDatasetReferences(studyId);
+		Assert.assertNotNull(datasetReferences);
+		Assert.assertTrue(datasetReferences.size() > 0);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Dataset Nodes By Study Id Count: " + datasetReferences.size());
 		for (DatasetReference node : datasetReferences) {
-			Debug.println(INDENT, "   " + node);
+			Debug.println(MiddlewareIntegrationTest.INDENT, "   " + node);
 		}
 	}
 
@@ -316,12 +311,12 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testSearchStudiesByGid() throws Exception {
 		Integer gid = 2434138;
 		GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
-		StudyResultSet resultSet = manager.searchStudies(filter, 50);
-		assertNotNull(resultSet);
-		Debug.println(INDENT, "Study Count: " + resultSet.size());
+		StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 50);
+		Assert.assertNotNull(resultSet);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Study Count: " + resultSet.size());
 		while (resultSet.hasMore()) {
 			StudyReference studyRef = resultSet.next();
-			Debug.println(INDENT, studyRef.toString());
+			Debug.println(MiddlewareIntegrationTest.INDENT, studyRef.toString());
 		}
 	}
 
@@ -334,32 +329,30 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		VariableList variableList = new VariableList();
 
-		Variable variable = createVariable(TermId.STUDY_NAME.getId(),
-				"Study Name " + new Random().nextInt(10000), 1);
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
 		StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
-		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0",
-				"data", "3.0", "prop1", "prop2");
-		studyValues.setLocationId(manager.addTrialEnvironment(locationVariableList));
+		VariableList locationVariableList = this.createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		studyValues.setLocationId(StudyDataManagerImplTest.manager.addTrialEnvironment(locationVariableList));
 
-		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000",
-				"prop1", "prop2");
-		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+		VariableList germplasmVariableList = this.createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(StudyDataManagerImplTest.manager.addStock(germplasmVariableList));
 
-		StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues,
-				commonTestProject.getUniqueID());
+		StudyReference studyRef =
+				StudyDataManagerImplTest.manager.addStudy(parentStudyId, typeList, studyValues,
+						StudyDataManagerImplTest.commonTestProject.getUniqueID());
 
-		assertNotNull(studyRef.getId());
-		assertTrue(studyRef.getId() != 0);
-		Debug.println(INDENT, "testAddStudy(): " + studyRef);
+		Assert.assertNotNull(studyRef.getId());
+		Assert.assertTrue(studyRef.getId() != 0);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testAddStudy(): " + studyRef);
 	}
 
 	@Test
@@ -371,51 +364,50 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		VariableList variableList = new VariableList();
 
-		Variable variable = createVariable(TermId.STUDY_NAME.getId(),
-				"Study Name " + new Random().nextInt(10000), 1);
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		typeList.add(createVariableType(TermId.GID.getId(), "GID", "gid", 3));
+		typeList.add(this.createVariableType(TermId.GID.getId(), "GID", "gid", 3));
 
 		StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
 		studyValues.setLocationId(null);
 
-		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000",
-				"prop1", "prop2");
-		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+		VariableList germplasmVariableList = this.createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(StudyDataManagerImplTest.manager.addStock(germplasmVariableList));
 
-		StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues, null);
+		StudyReference studyRef = StudyDataManagerImplTest.manager.addStudy(parentStudyId, typeList, studyValues, null);
 
-		assertTrue(studyRef.getId() < 0);
-		Study study = manager.getStudy(studyRef.getId());
-		study.print(INDENT);
+		Assert.assertTrue(studyRef.getId() < 0);
+		Study study = StudyDataManagerImplTest.manager.getStudy(studyRef.getId());
+		study.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	@Test
 	public void testGetDataSet() throws Exception {
 		for (int i = 10015; i <= 10075; i += 10) {
-			DataSet dataSet = manager.getDataSet(i);
-			dataSet.print(INDENT);
+			DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(i);
+			dataSet.print(MiddlewareIntegrationTest.INDENT);
 		}
 	}
 
 	@Test
 	public void testGetDataSetOfSorghum() throws Exception { // GCP-4986
 		int dataSetId = -4; // Local sorghum
-		DataSet dataSet = manager.getDataSet(dataSetId);
-		dataSet.print(INDENT);
-		List<Experiment> experiments = manager.getExperiments(dataSetId, 0,
-				(int) manager.countExperiments(dataSetId));
-		Debug.println(INDENT, " Experiments: " + experiments.size());
+		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(dataSetId);
+		dataSet.print(MiddlewareIntegrationTest.INDENT);
+		List<Experiment> experiments =
+				StudyDataManagerImplTest.manager.getExperiments(dataSetId, 0,
+						(int) StudyDataManagerImplTest.manager.countExperiments(dataSetId));
+		Debug.println(MiddlewareIntegrationTest.INDENT, " Experiments: " + experiments.size());
 
-		Debug.println(INDENT, " Variables.getDisplayValue(): " + experiments.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT, " Variables.getDisplayValue(): " + experiments.size());
 		for (Experiment experiment : experiments) {
 			List<Variable> variables = new ArrayList<Variable>();
 
@@ -430,14 +422,12 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			}
 
 			for (Variable variable : variables) {
-				if (!("GID".equals(variable.getVariableType().getLocalName().trim()))) {
+				if (!"GID".equals(variable.getVariableType().getLocalName().trim())) {
 					String value = variable.getDisplayValue();
-					Debug.println(INDENT, "Data Type is "
-							+ variable.getVariableType().getStandardVariable().getDataType()
-									.getName());
-					Debug.println(INDENT, "\t" + experiment.getId() + "  :  "
-							+ variable.getVariableType().getStandardVariable().getName() + "  :  "
-							+ value);
+					Debug.println(MiddlewareIntegrationTest.INDENT, "Data Type is "
+							+ variable.getVariableType().getStandardVariable().getDataType().getName());
+					Debug.println(MiddlewareIntegrationTest.INDENT, "\t" + experiment.getId() + "  :  "
+							+ variable.getVariableType().getStandardVariable().getName() + "  :  " + value);
 				}
 			}
 		}
@@ -445,33 +435,33 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountExperiments() throws Exception {
-		Debug.println(INDENT, "Dataset Experiment Count: " + manager.countExperiments(DATASET_ID));
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"Dataset Experiment Count: " + StudyDataManagerImplTest.manager.countExperiments(StudyDataManagerImplTest.DATASET_ID));
 	}
 
 	@Test
 	public void testGetExperiments() throws Exception {
 		for (int i = 0; i < 2; i++) {
-			List<Experiment> experiments = manager.getExperiments(DATASET_ID, 50 * i, 50);
+			List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(StudyDataManagerImplTest.DATASET_ID, 50 * i, 50);
 			for (Experiment experiment : experiments) {
-				experiment.print(INDENT);
+				experiment.print(MiddlewareIntegrationTest.INDENT);
 			}
 		}
 	}
 
 	@Test
 	public void testGetExperimentsWithAverage() throws Exception {
-		List<Experiment> experiments = manager.getExperiments(5803, 0, 50);
+		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(5803, 0, 50);
 		for (Experiment experiment : experiments) {
-			experiment.print(INDENT);
+			experiment.print(MiddlewareIntegrationTest.INDENT);
 		}
 	}
 
 	@Test
 	public void testGetExperimentsWithTrialEnvironments() throws Exception {
-		List<Experiment> experiments = manager
-				.getExperimentsWithTrialEnvironment(5803, 5803, 0, 50);
+		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperimentsWithTrialEnvironment(5803, 5803, 0, 50);
 		for (Experiment experiment : experiments) {
-			experiment.print(INDENT);
+			experiment.print(MiddlewareIntegrationTest.INDENT);
 		}
 	}
 
@@ -489,34 +479,32 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		// please make sure that the study name is unique and does not exist in
 		// the db.
-		variable = createVariable(TermId.DATASET_NAME.getId(),
-				"My Dataset Name " + new Random().nextInt(10000), 1);
+		variable = this.createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
+		this.updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
 		variableList.add(variable);
 
-		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
+		variable = this.createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
 		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
+		this.updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
 		variableList.add(variable);
 
-		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
+		variable = this.createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
 		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
+		this.updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
 		variableList.add(variable);
 
 		DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setVariables(variableList);
 
-		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList,
-				datasetValues, null);
-		Debug.println(INDENT, "Dataset added : " + datasetReference);
+		DatasetReference datasetReference = StudyDataManagerImplTest.manager.addDataSet(parentStudyId, typeList, datasetValues, null);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Dataset added : " + datasetReference);
 
 	}
 
 	@Test
 	public void testAddDatasetWithNoDataType() throws Exception {
-		Debug.println(INDENT, "Test addDatasetWithNoCoreValues");
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Test addDatasetWithNoCoreValues");
 		StudyReference studyRef = this.addTestStudy();
 		VariableTypeList typeList = new VariableTypeList();
 
@@ -524,20 +512,19 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		datasetValues.setName("No Datatype dataset" + new Random().nextInt(10000));
 		datasetValues.setDescription("whatever ds");
 
-		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
-		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
 		typeList.add(variableType);
 
-		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		variableType = this.createVariableType(8200, "Plot No", "whatever", 6);
 		typeList.add(variableType);
 
-		DatasetReference dataSetRef = manager.addDataSet(studyRef.getId(), typeList, datasetValues,
-				null);
+		DatasetReference dataSetRef = StudyDataManagerImplTest.manager.addDataSet(studyRef.getId(), typeList, datasetValues, null);
 
-		DataSet dataSet = manager.getDataSet(dataSetRef.getId());
-		dataSet.print(INDENT);
+		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(dataSetRef.getId());
+		dataSet.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	@Test
@@ -554,49 +541,47 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		// please make sure that the study name is unique and does not exist in
 		// the db.
-		variable = createVariable(TermId.DATASET_NAME.getId(),
-				"My Dataset Name " + new Random().nextInt(10000), 1);
+		variable = this.createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
+		this.updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
 		variableList.add(variable);
 
-		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
+		variable = this.createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
 		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
+		this.updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
 		variableList.add(variable);
 
-		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
+		variable = this.createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
 		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
+		this.updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
 		variableList.add(variable);
 
 		DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setVariables(variableList);
 
-		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList,
-				datasetValues, null);
-		Debug.println(INDENT, "Dataset added : " + datasetReference);
+		DatasetReference datasetReference = StudyDataManagerImplTest.manager.addDataSet(parentStudyId, typeList, datasetValues, null);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Dataset added : " + datasetReference);
 
-		DataSet dataSet = manager.getDataSet(datasetReference.getId());
-		Debug.println(INDENT, "Original Dataset");
+		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(datasetReference.getId());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Original Dataset");
 		dataSet.print(3);
 
 		VariableType variableType = new VariableType();
 		variableType.setLocalName("Dog");
 		variableType.setLocalDescription("Man's best friend");
-		variableType.setStandardVariable(ontologyManager.getStandardVariable(8240));
+		variableType.setStandardVariable(StudyDataManagerImplTest.ontologyManager.getStandardVariable(8240));
 		variableType.setRank(99);
-		manager.addDataSetVariableType(dataSet.getId(), variableType);
+		StudyDataManagerImplTest.manager.addDataSetVariableType(dataSet.getId(), variableType);
 
-		dataSet = manager.getDataSet(datasetReference.getId());
-		Debug.println(INDENT, "Modified Dataset");
+		dataSet = StudyDataManagerImplTest.manager.getDataSet(datasetReference.getId());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Modified Dataset");
 		dataSet.print(3);
 
 	}
 
 	@Test
 	public void testAddExperiment() throws Exception {
-		List<Experiment> experiments = manager.getExperiments(10015, 0, /* 1093 */1);
+		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(10015, 0, /* 1093 */1);
 		int dataSetId = -1;
 		ExperimentValues experimentValues = new ExperimentValues();
 		List<Variable> varList = new ArrayList<Variable>();
@@ -607,41 +592,41 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		experimentValues.setVariableList(list);
 		experimentValues.setGermplasmId(-1);
 		experimentValues.setLocationId(-1);
-		manager.addExperiment(dataSetId, ExperimentType.PLOT, experimentValues);
+		StudyDataManagerImplTest.manager.addExperiment(dataSetId, ExperimentType.PLOT, experimentValues);
 	}
 
 	@Test
 	public void testSetExperimentValue() throws Exception {
 		StudyReference studyRef = this.addTestStudy();
 		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
-		addTestExperiments(datasetRef.getId(), 4);
-		List<Experiment> experiments = manager.getExperiments(datasetRef.getId(), 0, 2);
+		this.addTestExperiments(datasetRef.getId(), 4);
+		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(datasetRef.getId(), 0, 2);
 
-		printExperiments("Original", datasetRef.getId());
+		this.printExperiments("Original", datasetRef.getId());
 		for (Experiment experiment : experiments) {
-			manager.setExperimentValue(experiment.getId(), 18000, "666");
-			manager.setExperimentValue(experiment.getId(), 18050, "19010");
-			manager.setExperimentValue(experiment.getId(), 8200, "4");
+			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18000, "666");
+			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18050, "19010");
+			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 8200, "4");
 		}
-		printExperiments("Modified", datasetRef.getId());
+		this.printExperiments("Modified", datasetRef.getId());
 	}
 
 	@Test
 	public void testGetTrialEnvironmentsInDataset() throws Exception {
-		Debug.println(INDENT, "Test getTrialEnvironmentsInDataset");
-		TrialEnvironments trialEnvironments = manager.getTrialEnvironmentsInDataset(10085);
-		trialEnvironments.print(INDENT);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Test getTrialEnvironmentsInDataset");
+		TrialEnvironments trialEnvironments = StudyDataManagerImplTest.manager.getTrialEnvironmentsInDataset(10085);
+		trialEnvironments.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	@Test
 	public void testGetStocksInDataset() throws Exception {
-		Stocks stocks = manager.getStocksInDataset(10085);
-		stocks.print(INDENT);
+		Stocks stocks = StudyDataManagerImplTest.manager.getStocksInDataset(10085);
+		stocks.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	private void printExperiments(String title, int datasetId) throws Exception {
-		Debug.println(INDENT, title);
-		List<Experiment> experiments = manager.getExperiments(datasetId, 0, 4);
+		Debug.println(MiddlewareIntegrationTest.INDENT, title);
+		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(datasetId, 0, 4);
 		for (Experiment experiment : experiments) {
 			experiment.print(3);
 		}
@@ -649,34 +634,30 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testAddTrialEnvironment() throws Exception {
-		VariableList variableList = createTrialEnvironment("loc desc", "1.1", "2.2", "datum",
-				"3.3", "prop1", "prop2");
-		manager.addTrialEnvironment(variableList);
+		VariableList variableList = this.createTrialEnvironment("loc desc", "1.1", "2.2", "datum", "3.3", "prop1", "prop2");
+		StudyDataManagerImplTest.manager.addTrialEnvironment(variableList);
 	}
 
 	@Test
 	public void testAddGermplasm() throws Exception {
-		VariableList variableList = createGermplasm("unique name", "1000", "name", "2000", "prop1",
-				"prop2");
-		manager.addStock(variableList);
+		VariableList variableList = this.createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		StudyDataManagerImplTest.manager.addStock(variableList);
 	}
 
 	@Test
 	public void testGetFactorsByProperty() throws Exception {
 		int propertyId = 2205;
 		int datasetId = 10015;
-		Debug.println(INDENT, "testGetFactorsByProperty (dataset=" + datasetId + ", property="
-				+ propertyId);
-		DataSet dataset = manager.getDataSet(datasetId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetFactorsByProperty (dataset=" + datasetId + ", property=" + propertyId);
+		DataSet dataset = StudyDataManagerImplTest.manager.getDataSet(datasetId);
 		VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
-		if (factors != null && factors.getVariableTypes() != null
-				&& factors.getVariableTypes().size() > 0) {
+		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
 			for (VariableType factor : factors.getVariableTypes()) {
-				factor.print(INDENT);
+				factor.print(MiddlewareIntegrationTest.INDENT);
 			}
 		} else {
-			Debug.println(INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId
-					+ " WITH PROPERTY = " + propertyId);
+			Debug.println(MiddlewareIntegrationTest.INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = "
+					+ propertyId);
 		}
 	}
 
@@ -684,23 +665,22 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetFactorsByPhenotypicType() throws Exception {
 		PhenotypicType phenotypicType = PhenotypicType.DATASET;
 		int datasetId = 10087;
-		Debug.println(INDENT, "testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role="
-				+ phenotypicType + ")");
-		DataSet dataset = manager.getDataSet(datasetId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + phenotypicType
+				+ ")");
+		DataSet dataset = StudyDataManagerImplTest.manager.getDataSet(datasetId);
 		if (dataset != null) {
 			VariableTypeList factors = dataset.getFactorsByPhenotypicType(phenotypicType);
 
-			if (factors != null && factors.getVariableTypes() != null
-					&& factors.getVariableTypes().size() > 0) {
+			if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
 				for (VariableType factor : factors.getVariableTypes()) {
-					factor.print(INDENT);
+					factor.print(MiddlewareIntegrationTest.INDENT);
 				}
 			} else {
-				Debug.println(INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId
-						+ " WITH FACTOR TYPE = " + phenotypicType);
+				Debug.println(MiddlewareIntegrationTest.INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = "
+						+ phenotypicType);
 			}
 		} else {
-			Debug.println(INDENT, "DATASET = " + datasetId + " NOT FOUND. ");
+			Debug.println(MiddlewareIntegrationTest.INDENT, "DATASET = " + datasetId + " NOT FOUND. ");
 		}
 	}
 
@@ -708,72 +688,69 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetDataSetsByType() throws Exception {
 		int studyId = 10010;
 		DataSetType dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = "
-				+ dataSetType + ")");
-		List<DataSet> datasets = manager.getDataSetsByType(studyId, dataSetType);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType
+				+ ")");
+		List<DataSet> datasets = StudyDataManagerImplTest.manager.getDataSetsByType(studyId, dataSetType);
 		for (DataSet dataset : datasets) {
-			Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-"
-					+ dataset.getDescription());
+			Debug.println(MiddlewareIntegrationTest.INDENT,
+					"Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
 		}
 
 		studyId = 10080;
 		dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = "
-				+ dataSetType + ")");
-		datasets = manager.getDataSetsByType(studyId, dataSetType);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType
+				+ ")");
+		datasets = StudyDataManagerImplTest.manager.getDataSetsByType(studyId, dataSetType);
 		for (DataSet dataset : datasets) {
-			Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-"
-					+ dataset.getDescription());
+			Debug.println(MiddlewareIntegrationTest.INDENT,
+					"Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
 		}
 
-		Debug.println(INDENT, "Display data set type in getDataSet");
-		DataSet dataSet = manager.getDataSet(10087);
-		Debug.println(
-				INDENT,
-				"DataSet = " + dataSet.getId() + ", name = " + dataSet.getName()
-						+ ", description = " + dataSet.getDescription() + ", type = "
-						+ dataSet.getDataSetType());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Display data set type in getDataSet");
+		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(10087);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "DataSet = " + dataSet.getId() + ", name = " + dataSet.getName()
+				+ ", description = " + dataSet.getDescription() + ", type = " + dataSet.getDataSetType());
 	}
 
 	@Test
 	public void testFindOneDataSetByType() throws Exception {
 		int studyId = 10010;
 		DataSetType dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = "
-				+ dataSetType + ")");
-		DataSet dataset = manager.findOneDataSetByType(studyId, dataSetType);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType
+				+ ")");
+		DataSet dataset = StudyDataManagerImplTest.manager.findOneDataSetByType(studyId, dataSetType);
 		if (dataset != null) {
-			Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-"
-					+ dataset.getDescription());
+			Debug.println(MiddlewareIntegrationTest.INDENT,
+					"Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
 		}
 
 		studyId = 10080;
 		dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = "
-				+ dataSetType + ")");
-		dataset = manager.findOneDataSetByType(studyId, dataSetType);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType
+				+ ")");
+		dataset = StudyDataManagerImplTest.manager.findOneDataSetByType(studyId, dataSetType);
 		if (dataset != null) {
-			Debug.println(INDENT, "Dataset" + dataset.getId() + "-" + dataset.getName() + "-"
-					+ dataset.getDescription());
+			Debug.println(MiddlewareIntegrationTest.INDENT,
+					"Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
 		}
 
 		dataSetType = DataSetType.SUMMARY_DATA;
-		Debug.println(INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = "
-				+ dataSetType + ")");
-		dataset = manager.findOneDataSetByType(studyId, dataSetType);
-		assertNull(dataset);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType
+				+ ")");
+		dataset = StudyDataManagerImplTest.manager.findOneDataSetByType(studyId, dataSetType);
+		Assert.assertNull(dataset);
 	}
 
 	@Test
 	public void testCountExperimentsByTrialEnvironmentAndVariate() throws Exception {
-		long count = manager.countExperimentsByTrialEnvironmentAndVariate(10070, 20870);
-		Debug.println(INDENT, "Count of Experiments By TE and Variate: " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByTrialEnvironmentAndVariate(10070, 20870);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Count of Experiments By TE and Variate: " + count);
 	}
 
 	@Test
 	public void testCountStocks() throws Exception {
-		long count = manager.countStocks(10087, 10081, 18190);
-		Debug.println(INDENT, "Test CountStocks: " + count);
+		long count = StudyDataManagerImplTest.manager.countStocks(10087, 10081, 18190);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Test CountStocks: " + count);
 	}
 
 	@Test
@@ -782,8 +759,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
 		this.addTestExperiments(datasetRef.getId(), 10);
 
-		Debug.println(INDENT, "Test Delete DataSet: " + datasetRef.getId());
-		manager.deleteDataSet(datasetRef.getId());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Test Delete DataSet: " + datasetRef.getId());
+		StudyDataManagerImplTest.manager.deleteDataSet(datasetRef.getId());
 	}
 
 	@Test
@@ -793,118 +770,109 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		int locationId = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
 		int locationId2 = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
 
-		Debug.println(INDENT, "Test Delete ExperimentsByLocation: " + datasetRef.getId() + ", "
-				+ locationId);
-		Debug.println(INDENT, "Location id of " + locationId2 + " will NOT be deleted");
-		manager.deleteExperimentsByLocation(datasetRef.getId(), locationId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Test Delete ExperimentsByLocation: " + datasetRef.getId() + ", " + locationId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Location id of " + locationId2 + " will NOT be deleted");
+		StudyDataManagerImplTest.manager.deleteExperimentsByLocation(datasetRef.getId(), locationId);
 	}
 
 	@Test
 	public void testGetLocalNameByStandardVariableId() throws Exception {
 		Integer projectId = 10085;
 		Integer standardVariableId = 8230;
-		String localName = manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
-		Debug.println(INDENT, "testGetLocalNameByStandardVariableId(" + projectId + ", "
-				+ standardVariableId + "): " + localName);
+		String localName = StudyDataManagerImplTest.manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocalNameByStandardVariableId(" + projectId + ", " + standardVariableId
+				+ "): " + localName);
 	}
 
 	@Test
 	public void testGetAllStudyDetails() throws Exception {
-		List<StudyDetails> nurseryStudyDetails = manager.getAllStudyDetails(StudyType.N,
-				commonTestProject.getUniqueID());
-		Debug.println(INDENT,
-				"testGetAllStudyDetails(StudyType.N, " + commonTestProject.getUniqueID() + ")");
-		Debug.printFormattedObjects(INDENT, nurseryStudyDetails);
+		List<StudyDetails> nurseryStudyDetails =
+				StudyDataManagerImplTest.manager.getAllStudyDetails(StudyType.N, StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetAllStudyDetails(StudyType.N, " + StudyDataManagerImplTest.commonTestProject.getUniqueID() + ")");
+		Debug.printFormattedObjects(MiddlewareIntegrationTest.INDENT, nurseryStudyDetails);
 	}
 
 	@Test
 	public void testGetAllNurseryAndTrialStudyNodes() throws Exception {
-		List<StudyNode> studyNodes = manager.getAllNurseryAndTrialStudyNodes(commonTestProject
-				.getUniqueID());
-		Debug.printFormattedObjects(INDENT, studyNodes);
+		List<StudyNode> studyNodes =
+				StudyDataManagerImplTest.manager.getAllNurseryAndTrialStudyNodes(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		Debug.printFormattedObjects(MiddlewareIntegrationTest.INDENT, studyNodes);
 	}
 
 	@Test
 	public void testCountProjectsByVariable() throws Exception {
 		int variableId = 8050;
-		long count = manager.countProjectsByVariable(variableId);
-		Debug.println(INDENT, "countProjectsByVariable on " + variableId + " = " + count);
+		long count = StudyDataManagerImplTest.manager.countProjectsByVariable(variableId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countProjectsByVariable on " + variableId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByProjectPropVariable() throws Exception {
 		int variableId = 8050;
 		int storedInId = 1010;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByProjectVariable() throws Exception {
 		int variableId = 8005;
 		int storedInId = 1011;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByExperimentPropVariable() throws Exception {
 		int variableId = 8200;
 		int storedInId = 1030;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByGeolocationVariable() throws Exception {
 		int variableId = 8170;
 		int storedInId = 1021;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByGeolocationPropVariable() throws Exception {
 		int variableId = 8370;
 		int storedInId = 1020;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByStockVariable() throws Exception {
 		int variableId = 8230;
 		int storedInId = 1041;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByStockPropVariable() throws Exception {
 		int variableId = 8255;
 		int storedInId = 1040;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	@Test
 	public void testCountExperimentsByPhenotypeVariable() throws Exception {
 		int variableId = 18000;
 		int storedInId = 1043;
-		long count = manager.countExperimentsByVariable(variableId, storedInId);
-		Debug.println(INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId
-				+ " = " + count);
+		long count = StudyDataManagerImplTest.manager.countExperimentsByVariable(variableId, storedInId);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
 	private Variable createVariable(int termId, String value, int rank) throws Exception {
-		StandardVariable stVar = ontologyManager.getStandardVariable(termId);
+		StandardVariable stVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(termId);
 
 		VariableType vtype = new VariableType();
 		vtype.setStandardVariable(stVar);
@@ -915,9 +883,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		return var;
 	}
 
-	private VariableType createVariableType(int termId, String name, String description, int rank)
-			throws Exception {
-		StandardVariable stdVar = ontologyManager.getStandardVariable(termId);
+	private VariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
+		StandardVariable stdVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(termId);
 
 		VariableType vtype = new VariableType();
 		vtype.setLocalName(name);
@@ -933,29 +900,29 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		type.setLocalDescription(description);
 	}
 
-	private VariableList createTrialEnvironment(String name, String latitude, String longitude,
-			String data, String altitude, String property1, String property2) throws Exception {
+	private VariableList createTrialEnvironment(String name, String latitude, String longitude, String data, String altitude,
+			String property1, String property2) throws Exception {
 		VariableList variableList = new VariableList();
-		variableList.add(createVariable(8170, name, 0));
-		variableList.add(createVariable(8191, latitude, 0));
-		variableList.add(createVariable(8192, longitude, 0));
-		variableList.add(createVariable(8193, data, 0));
-		variableList.add(createVariable(8194, altitude, 0));
-		variableList.add(createVariable(8135, property1, 0));
-		variableList.add(createVariable(8180, property2, 0));
-		variableList.add(createVariable(8195, "999", 0));
+		variableList.add(this.createVariable(8170, name, 0));
+		variableList.add(this.createVariable(8191, latitude, 0));
+		variableList.add(this.createVariable(8192, longitude, 0));
+		variableList.add(this.createVariable(8193, data, 0));
+		variableList.add(this.createVariable(8194, altitude, 0));
+		variableList.add(this.createVariable(8135, property1, 0));
+		variableList.add(this.createVariable(8180, property2, 0));
+		variableList.add(this.createVariable(8195, "999", 0));
 		return variableList;
 	}
 
-	private VariableList createGermplasm(String name, String gid, String designation, String code,
-			String property1, String property2) throws Exception {
+	private VariableList createGermplasm(String name, String gid, String designation, String code, String property1, String property2)
+			throws Exception {
 		VariableList variableList = new VariableList();
-		variableList.add(createVariable(8230, name, 1));
-		variableList.add(createVariable(8240, gid, 2));
-		variableList.add(createVariable(8250, designation, 3));
-		variableList.add(createVariable(8300, code, 4));
-		variableList.add(createVariable(8255, property1, 5));
-		variableList.add(createVariable(8377, property2, 6));
+		variableList.add(this.createVariable(8230, name, 1));
+		variableList.add(this.createVariable(8240, gid, 2));
+		variableList.add(this.createVariable(8250, designation, 3));
+		variableList.add(this.createVariable(8300, code, 4));
+		variableList.add(this.createVariable(8255, property1, 5));
+		variableList.add(this.createVariable(8377, property2, 6));
 		return variableList;
 	}
 
@@ -966,27 +933,24 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		VariableList variableList = new VariableList();
 
-		Variable variable = createVariable(TermId.STUDY_NAME.getId(),
-				"Study Name " + new Random().nextInt(10000), 1);
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
 		StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
-		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0",
-				"data", "3.0", "prop1", "prop2");
-		studyValues.setLocationId(manager.addTrialEnvironment(locationVariableList));
+		VariableList locationVariableList = this.createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		studyValues.setLocationId(StudyDataManagerImplTest.manager.addTrialEnvironment(locationVariableList));
 
-		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000",
-				"prop1", "prop2");
-		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+		VariableList germplasmVariableList = this.createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(StudyDataManagerImplTest.manager.addStock(germplasmVariableList));
 
-		return manager.addStudy(parentStudyId, typeList, studyValues, null);
+		return StudyDataManagerImplTest.manager.addStudy(parentStudyId, typeList, studyValues, null);
 	}
 
 	private StudyReference addTestStudyWithNoLocation() throws Exception {
@@ -996,23 +960,21 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		VariableList variableList = new VariableList();
 
-		Variable variable = createVariable(TermId.STUDY_NAME.getId(),
-				"Study Name " + new Random().nextInt(10000), 1);
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
 		StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
-		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000",
-				"prop1", "prop2");
-		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+		VariableList germplasmVariableList = this.createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(StudyDataManagerImplTest.manager.addStock(germplasmVariableList));
 
-		return manager.addStudy(parentStudyId, typeList, studyValues, null);
+		return StudyDataManagerImplTest.manager.addStudy(parentStudyId, typeList, studyValues, null);
 	}
 
 	private DatasetReference addTestDataset(int studyId) throws Exception {
@@ -1025,16 +987,16 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
-		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
 		typeList.add(variableType);
 
-		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		variableType = this.createVariableType(8200, "Plot No", "whatever", 6);
 		typeList.add(variableType);
 
-		return manager.addDataSet(studyId, typeList, datasetValues, null);
+		return StudyDataManagerImplTest.manager.addDataSet(studyId, typeList, datasetValues, null);
 	}
 
 	private DatasetReference addTestDatasetWithLocation(int studyId) throws Exception {
@@ -1047,54 +1009,53 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
-		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
 		typeList.add(variableType);
 
-		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		variableType = this.createVariableType(8200, "Plot No", "whatever", 6);
 		typeList.add(variableType);
 
-		variableType = createVariableType(8195, "Site Code", "whatever", 7);
+		variableType = this.createVariableType(8195, "Site Code", "whatever", 7);
 		typeList.add(variableType);
 
-		return manager.addDataSet(studyId, typeList, datasetValues, null);
+		return StudyDataManagerImplTest.manager.addDataSet(studyId, typeList, datasetValues, null);
 	}
 
 	public void addTestExperiments(int datasetId, int numExperiments) throws Exception {
-		DataSet dataSet = manager.getDataSet(datasetId);
+		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(datasetId);
 		for (int i = 0; i < numExperiments; i++) {
 			ExperimentValues experimentValues = new ExperimentValues();
 			VariableList varList = new VariableList();
-			varList.add(createVariable(dataSet, 18000, "99"));
-			varList.add(createVariable(dataSet, 18050, "19000"));
-			varList.add(createVariable(dataSet, 8200, "3"));
+			varList.add(this.createVariable(dataSet, 18000, "99"));
+			varList.add(this.createVariable(dataSet, 18050, "19000"));
+			varList.add(this.createVariable(dataSet, 8200, "3"));
 
 			experimentValues.setVariableList(varList);
 			experimentValues.setGermplasmId(-1);
 			experimentValues.setLocationId(-1);
-			manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+			StudyDataManagerImplTest.manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 		}
 	}
 
 	public int addTestExperimentsWithLocation(int datasetId, int numExperiments) throws Exception {
-		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0",
-				"data", "3.0", "prop1", "prop2");
-		int locationId = manager.addTrialEnvironment(locationVariableList);
+		VariableList locationVariableList = this.createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		int locationId = StudyDataManagerImplTest.manager.addTrialEnvironment(locationVariableList);
 
-		DataSet dataSet = manager.getDataSet(datasetId);
+		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(datasetId);
 		for (int i = 0; i < numExperiments; i++) {
 			ExperimentValues experimentValues = new ExperimentValues();
 			VariableList varList = new VariableList();
-			varList.add(createVariable(dataSet, 18000, "99"));
-			varList.add(createVariable(dataSet, 18050, "19000"));
-			varList.add(createVariable(dataSet, 8200, "3"));
+			varList.add(this.createVariable(dataSet, 18000, "99"));
+			varList.add(this.createVariable(dataSet, 18050, "19000"));
+			varList.add(this.createVariable(dataSet, 8200, "3"));
 
 			experimentValues.setVariableList(varList);
 			experimentValues.setGermplasmId(-1);
 			experimentValues.setLocationId(locationId);
-			manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+			StudyDataManagerImplTest.manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 		}
 		return locationId;
 	}
@@ -1107,30 +1068,33 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	public void testCheckIfProjectNameIsExisting() throws Exception {
-		Study study = manager.getStudy(10010);
+		Study study = StudyDataManagerImplTest.manager.getStudy(10010);
 		String name = study.getName();
-		Debug.println(INDENT, "Name: " + name);
-		boolean isExisting = manager.checkIfProjectNameIsExistingInProgram(name,
-				commonTestProject.getUniqueID());
-		assertTrue(isExisting);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Name: " + name);
+		boolean isExisting =
+				StudyDataManagerImplTest.manager.checkIfProjectNameIsExistingInProgram(name,
+						StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		Assert.assertTrue(isExisting);
 
 		name = "SHOULDNOTEXISTSTUDY";
-		Debug.println(INDENT, "Name: " + name);
-		isExisting = manager.checkIfProjectNameIsExistingInProgram(name,
-				commonTestProject.getUniqueID());
-		assertFalse(isExisting);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "Name: " + name);
+		isExisting =
+				StudyDataManagerImplTest.manager.checkIfProjectNameIsExistingInProgram(name,
+						StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		Assert.assertFalse(isExisting);
 	}
 
 	@Test
 	public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException {
 		List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(Integer.valueOf(-4)));
-		List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
-				crossExpansionProperties);
+		List<FieldMapInfo> fieldMapInfos =
+				StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
+						StudyDataManagerImplTest.crossExpansionProperties);
 		for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
-			Debug.println(INDENT, fieldMapInfo.getFieldbookName());
+			Debug.println(MiddlewareIntegrationTest.INDENT, fieldMapInfo.getFieldbookName());
 			if (fieldMapInfo.getDatasets() != null) {
-				Debug.println(INDENT, fieldMapInfo.getDatasets().toString());
+				Debug.println(MiddlewareIntegrationTest.INDENT, fieldMapInfo.getDatasets().toString());
 			}
 		}
 		// assertTrue(fieldMapCount.getEntryCount() > 0);
@@ -1138,11 +1102,11 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetParentFolder() throws MiddlewareQueryException {
-		DmsProject proj = manager.getParentFolder(10010);
+		DmsProject proj = StudyDataManagerImplTest.manager.getParentFolder(10010);
 		if (proj == null) {
-			Debug.println(INDENT, "Parent is null");
+			Debug.println(MiddlewareIntegrationTest.INDENT, "Parent is null");
 		} else {
-			Debug.println(INDENT, "Parent is NOT null");
+			Debug.println(MiddlewareIntegrationTest.INDENT, "Parent is NOT null");
 		}
 	}
 
@@ -1152,8 +1116,9 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		// REPLACED BY THIS TO MAKE THE JUNIT WORK - Get the first nursery from
 		// the db
-		List<StudyDetails> studyDetailsList = manager
-				.getAllNurseryAndTrialStudyDetails(commonTestProject.getUniqueID());
+		List<StudyDetails> studyDetailsList =
+				StudyDataManagerImplTest.manager
+						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		if (studyDetailsList != null && studyDetailsList.size() > 0) {
 			for (StudyDetails study : studyDetailsList) {
 				if (study.getStudyType() == StudyType.N) {
@@ -1165,12 +1130,13 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		if (nurseryIdList.size() > 0) {
 
-			List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList,
-					StudyType.N, crossExpansionProperties);
+			List<FieldMapInfo> fieldMapInfos =
+					StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N,
+							StudyDataManagerImplTest.crossExpansionProperties);
 			for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
-				Debug.println(INDENT, fieldMapInfo.getFieldbookName());
+				Debug.println(MiddlewareIntegrationTest.INDENT, fieldMapInfo.getFieldbookName());
 				if (fieldMapInfo.getDatasets() != null) {
-					Debug.println(INDENT, fieldMapInfo.getDatasets().toString());
+					Debug.println(MiddlewareIntegrationTest.INDENT, fieldMapInfo.getDatasets().toString());
 				}
 			}
 			// assertTrue(fieldMapCount.getEntryCount() > 0);
@@ -1179,8 +1145,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetGeolocationPropValue() throws MiddlewareQueryException {
-		String value = manager.getGeolocationPropValue(TermId.LOCATION_ID.getId(), -1);
-		Debug.println(INDENT, value);
+		String value = StudyDataManagerImplTest.manager.getGeolocationPropValue(TermId.LOCATION_ID.getId(), -1);
+		Debug.println(MiddlewareIntegrationTest.INDENT, value);
 	}
 
 	@Test
@@ -1188,8 +1154,9 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		List<Integer> trialIdList = new ArrayList<Integer>();
 
 		// REPLACED BY THIS TO MAKE THE JUNIT WORK
-		List<StudyDetails> studyDetailsList = manager
-				.getAllNurseryAndTrialStudyDetails(commonTestProject.getUniqueID());
+		List<StudyDetails> studyDetailsList =
+				StudyDataManagerImplTest.manager
+						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		if (studyDetailsList != null && studyDetailsList.size() > 0) {
 			for (StudyDetails study : studyDetailsList) {
 				if (study.getStudyType() == StudyType.T) {
@@ -1199,58 +1166,56 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			}
 		}
 
-		List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
-				crossExpansionProperties);
+		List<FieldMapInfo> info =
+				StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
+						StudyDataManagerImplTest.crossExpansionProperties);
 
-		manager.saveOrUpdateFieldmapProperties(info, -1, false);
+		StudyDataManagerImplTest.manager.saveOrUpdateFieldmapProperties(info, -1, false);
 	}
 
 	@Test
 	public void testGetAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
-		Debug.println(INDENT, "testGetStudyDetailsWithPaging");
-		Debug.println(INDENT, "List ALL Trials and Nurseries");
-		List<StudyDetails> list = manager.getAllNurseryAndTrialStudyDetails(commonTestProject
-				.getUniqueID());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetStudyDetailsWithPaging");
+		Debug.println(MiddlewareIntegrationTest.INDENT, "List ALL Trials and Nurseries");
+		List<StudyDetails> list =
+				StudyDataManagerImplTest.manager
+						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		for (StudyDetails s : list) {
-			Debug.println(INDENT, s.toString());
+			Debug.println(MiddlewareIntegrationTest.INDENT, s.toString());
 		}
-		Debug.println(INDENT, String.valueOf(manager
-				.countAllNurseryAndTrialStudyDetails(commonTestProject.getUniqueID())));
-		Debug.println(INDENT, "List ALL Trials and Nurseries");
-		list = manager.getAllNurseryAndTrialStudyDetails(commonTestProject.getUniqueID());
+		Debug.println(MiddlewareIntegrationTest.INDENT, String.valueOf(StudyDataManagerImplTest.manager
+				.countAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID())));
+		Debug.println(MiddlewareIntegrationTest.INDENT, "List ALL Trials and Nurseries");
+		list = StudyDataManagerImplTest.manager.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		for (StudyDetails s : list) {
-			Debug.println(INDENT, s.toString());
+			Debug.println(MiddlewareIntegrationTest.INDENT, s.toString());
 		}
-		Debug.println(INDENT, String.valueOf(manager
-				.countAllNurseryAndTrialStudyDetails(commonTestProject.getUniqueID())));
+		Debug.println(MiddlewareIntegrationTest.INDENT, String.valueOf(StudyDataManagerImplTest.manager
+				.countAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID())));
 
-		Debug.println(INDENT, "List ALL Trials");
-		list = manager.getAllStudyDetails(StudyType.T, commonTestProject.getUniqueID());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "List ALL Trials");
+		list = StudyDataManagerImplTest.manager.getAllStudyDetails(StudyType.T, StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		for (StudyDetails s : list) {
-			Debug.println(INDENT, s.toString());
+			Debug.println(MiddlewareIntegrationTest.INDENT, s.toString());
 		}
-		Debug.println(
-				INDENT,
-				String.valueOf(manager.countAllStudyDetails(StudyType.T,
-						commonTestProject.getUniqueID())));
+		Debug.println(MiddlewareIntegrationTest.INDENT, String.valueOf(StudyDataManagerImplTest.manager.countAllStudyDetails(StudyType.T,
+				StudyDataManagerImplTest.commonTestProject.getUniqueID())));
 
-		Debug.println(INDENT, "List ALL Nurseries");
-		list = manager.getAllStudyDetails(StudyType.T, commonTestProject.getUniqueID());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "List ALL Nurseries");
+		list = StudyDataManagerImplTest.manager.getAllStudyDetails(StudyType.T, StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		for (StudyDetails s : list) {
-			Debug.println(INDENT, s.toString());
+			Debug.println(MiddlewareIntegrationTest.INDENT, s.toString());
 		}
-		Debug.println(
-				INDENT,
-				String.valueOf(manager.countAllStudyDetails(StudyType.N,
-						commonTestProject.getUniqueID())));
+		Debug.println(MiddlewareIntegrationTest.INDENT, String.valueOf(StudyDataManagerImplTest.manager.countAllStudyDetails(StudyType.N,
+				StudyDataManagerImplTest.commonTestProject.getUniqueID())));
 
 	}
 
 	@Test
 	public void testGetFolderTree() throws MiddlewareQueryException {
-		List<FolderReference> tree = manager.getFolderTree();
-		Debug.println(INDENT, "GetFolderTree Test");
-		printFolderTree(tree, 1);
+		List<FolderReference> tree = StudyDataManagerImplTest.manager.getFolderTree();
+		Debug.println(MiddlewareIntegrationTest.INDENT, "GetFolderTree Test");
+		this.printFolderTree(tree, 1);
 	}
 
 	@Test
@@ -1258,7 +1223,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		List<Integer> cvTermIds = new ArrayList<Integer>();
 
-		DataSet dataSet = manager.getDataSet(-9999);
+		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(-9999);
 
 		if (dataSet == null) {
 			return;
@@ -1268,11 +1233,11 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			cvTermIds.add(vType.getStandardVariable().getId());
 		}
 
-		List<Object[]> value = manager.getPhenotypeIdsByLocationAndPlotNo(-26, -14, 101, cvTermIds);
+		List<Object[]> value = StudyDataManagerImplTest.manager.getPhenotypeIdsByLocationAndPlotNo(-26, -14, 101, cvTermIds);
 
-		assertNotNull(value);
+		Assert.assertNotNull(value);
 
-		Debug.println(INDENT, "getPhenotypeIdsByLocationAndPlotNo Test");
+		Debug.println(MiddlewareIntegrationTest.INDENT, "getPhenotypeIdsByLocationAndPlotNo Test");
 		for (Object[] val : value) {
 			Debug.println(val.toString());
 		}
@@ -1290,12 +1255,12 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		outliers.add(phenotypeOutlier);
 
 		try {
-			manager.saveOrUpdatePhenotypeOutliers(outliers);
+			StudyDataManagerImplTest.manager.saveOrUpdatePhenotypeOutliers(outliers);
 		} catch (Exception e) {
 
 		}
 
-		Debug.println(INDENT, "testSavePhenotypeOutlier Test");
+		Debug.println(MiddlewareIntegrationTest.INDENT, "testSavePhenotypeOutlier Test");
 
 	}
 
@@ -1305,8 +1270,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 				for (int i = 0; i < tab; i++) {
 					Debug.print(0, "\t");
 				}
-				Debug.println(INDENT, folder.getId() + " - " + folder.getName());
-				printFolderTree(folder.getSubFolders(), tab + 1);
+				Debug.println(MiddlewareIntegrationTest.INDENT, folder.getId() + " - " + folder.getName());
+				this.printFolderTree(folder.getSubFolders(), tab + 1);
 			}
 		}
 	}
@@ -1315,42 +1280,33 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
 		LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID,
-				FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
-				FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+		FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
 
-		StudyDataManagerImpl localManager = ((StudyDataManagerImpl) manager);
+		StudyDataManagerImpl localManager = (StudyDataManagerImpl) StudyDataManagerImplTest.manager;
 
 		List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
 
 		localManager.setLocationDataManager(locationDataManager);
 
 		try {
-			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID))
-					.thenReturn(fieldMapBlockInfo);
+			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
 			localManager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
 
-			FieldMapTrialInstanceInfo trialInstance = infos.get(0)
-					.getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+			FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
 
-			Assert.assertEquals("Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got "
-					+ trialInstance.getRowsInBlock() + " instead.", FieldMapDataUtil.ROWS_IN_BLOCK,
-					trialInstance.getRowsInBlock().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got "
-					+ trialInstance.getRangesInBlock() + " instead.",
-					FieldMapDataUtil.RANGES_IN_BLOCK, trialInstance.getRangesInBlock().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got "
-					+ trialInstance.getRowsPerPlot() + " instead.",
-					FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, trialInstance.getRowsPerPlot()
-							.intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got "
-					+ trialInstance.getPlantingOrder() + " instead.",
-					FieldMapDataUtil.PLANTING_ORDER, trialInstance.getPlantingOrder().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got "
-					+ trialInstance.getMachineRowCapacity() + " instead.",
-					FieldMapDataUtil.MACHINE_ROW_CAPACITY, trialInstance.getMachineRowCapacity()
-							.intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + trialInstance.getRowsInBlock() + " instead.",
+					FieldMapDataUtil.ROWS_IN_BLOCK, trialInstance.getRowsInBlock().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + trialInstance.getRangesInBlock()
+					+ " instead.", FieldMapDataUtil.RANGES_IN_BLOCK, trialInstance.getRangesInBlock().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got " + trialInstance.getRowsPerPlot()
+					+ " instead.", FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, trialInstance.getRowsPerPlot().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + trialInstance.getPlantingOrder()
+					+ " instead.", FieldMapDataUtil.PLANTING_ORDER, trialInstance.getPlantingOrder().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + trialInstance.getMachineRowCapacity()
+					+ " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY, trialInstance.getMachineRowCapacity().intValue());
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
@@ -1360,35 +1316,29 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
 		LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID,
-				FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
-				FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
-				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
+		FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
 
-		StudyDataManagerImpl localManager = ((StudyDataManagerImpl) manager);
+		StudyDataManagerImpl localManager = (StudyDataManagerImpl) StudyDataManagerImplTest.manager;
 
 		List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
-		FieldMapTrialInstanceInfo trialInstance = infos.get(0)
-				.getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+		FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
 		trialInstance.setBlockId(null);
 
 		localManager.setLocationDataManager(locationDataManager);
 
 		try {
-			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID))
-					.thenReturn(fieldMapBlockInfo);
+			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
 			localManager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
 
-			Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock()
-					+ " instead.", trialInstance.getRowsInBlock());
-			Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock()
-					+ " instead.", trialInstance.getRangesInBlock());
-			Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot()
-					+ " instead.", trialInstance.getRowsPerPlot());
-			Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder()
-					+ " instead.", trialInstance.getPlantingOrder());
-			Assert.assertNull("Expected null but got " + trialInstance.getMachineRowCapacity()
-					+ " instead.", trialInstance.getMachineRowCapacity());
+			Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
+			Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+			Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot() + " instead.", trialInstance.getRowsPerPlot());
+			Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder() + " instead.", trialInstance.getPlantingOrder());
+			Assert.assertNull("Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.",
+					trialInstance.getMachineRowCapacity());
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
@@ -1397,7 +1347,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetStudyType() {
 		try {
 			Assert.assertEquals("Study type returned did not match.", StudyType.BON,
-					manager.getStudyType(STUDY_ID));
+					StudyDataManagerImplTest.manager.getStudyType(StudyDataManagerImplTest.STUDY_ID));
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -1408,7 +1358,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		try {
 			final int PRESUMABLY_NON_EXISTENT_STUDY_ID = -1000000;
 			Assert.assertNull("Expected null return value but was non null.",
-					manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_ID));
+					StudyDataManagerImplTest.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_ID));
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
@@ -1417,20 +1367,19 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testDeleteProgramStudies() {
 		StudyTestDataUtil studyTestDataUtil = StudyTestDataUtil.getInstance();
-		String uniqueId = commonTestProject.getUniqueID();
+		String uniqueId = StudyDataManagerImplTest.commonTestProject.getUniqueID();
 		try {
 			studyTestDataUtil.createFolderTestData(uniqueId);
 			studyTestDataUtil.createStudyTestData(uniqueId);
 			studyTestDataUtil.createStudyTestDataWithActiveStatus(uniqueId);
 
-			List<FolderReference> programStudiesAndFolders = studyTestDataUtil
-					.getLocalRootFolders(commonTestProject.getUniqueID());
-			assertEquals("Current Program with programUUID " + commonTestProject.getUniqueID()
+			List<FolderReference> programStudiesAndFolders =
+					studyTestDataUtil.getLocalRootFolders(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+			Assert.assertEquals("Current Program with programUUID " + StudyDataManagerImplTest.commonTestProject.getUniqueID()
 					+ " should return 3 children", 3, programStudiesAndFolders.size());
-			manager.deleteProgramStudies(commonTestProject.getUniqueID());
-			programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(commonTestProject
-					.getUniqueID());
-			assertEquals("Current Program with programUUID " + commonTestProject.getUniqueID()
+			StudyDataManagerImplTest.manager.deleteProgramStudies(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+			programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+			Assert.assertEquals("Current Program with programUUID " + StudyDataManagerImplTest.commonTestProject.getUniqueID()
 					+ " should return no children", 0, programStudiesAndFolders.size());
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
@@ -1440,28 +1389,30 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetStudyDetails() throws MiddlewareQueryException {
-		List<StudyDetails> studyDetailsList = manager.getStudyDetails(StudyType.N,
-				commonTestProject.getUniqueID(), -1, -1);
-		assertNotNull(studyDetailsList);
+		List<StudyDetails> studyDetailsList =
+				StudyDataManagerImplTest.manager.getStudyDetails(StudyType.N, StudyDataManagerImplTest.commonTestProject.getUniqueID(), -1,
+						-1);
+		Assert.assertNotNull(studyDetailsList);
 	}
 
 	@Test
 	public void testGetNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
-		List<StudyDetails> studyDetailsList = manager.getNurseryAndTrialStudyDetails(
-				commonTestProject.getUniqueID(), -1, -1);
-		assertNotNull(studyDetailsList);
+		List<StudyDetails> studyDetailsList =
+				StudyDataManagerImplTest.manager.getNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID(),
+						-1, -1);
+		Assert.assertNotNull(studyDetailsList);
 	}
 
 	@Test
 	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareQueryException {
-		DmsProject study = StudyTestDataUtil.getInstance().createStudyTestDataWithActiveStatus(
-				commonTestProject.getUniqueID());
-		StudyDetails studyDetails = manager.getStudyDetails(StudyType.T, study.getProjectId());
-		assertNotNull("Study should not be null", studyDetails);
-		assertEquals("Study should have the id " + study.getProjectId(), study.getProjectId(),
-				studyDetails.getId());
-		assertEquals("Study should have the programUUID " + commonTestProject.getUniqueID(),
-				commonTestProject.getUniqueID(), studyDetails.getProgramUUID());
-		assertEquals("Study should be a trial", StudyType.T, studyDetails.getStudyType());
+		DmsProject study =
+				StudyTestDataUtil.getInstance().createStudyTestDataWithActiveStatus(
+						StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		StudyDetails studyDetails = StudyDataManagerImplTest.manager.getStudyDetails(StudyType.T, study.getProjectId());
+		Assert.assertNotNull("Study should not be null", studyDetails);
+		Assert.assertEquals("Study should have the id " + study.getProjectId(), study.getProjectId(), studyDetails.getId());
+		Assert.assertEquals("Study should have the programUUID " + StudyDataManagerImplTest.commonTestProject.getUniqueID(),
+				StudyDataManagerImplTest.commonTestProject.getUniqueID(), studyDetails.getProgramUUID());
+		Assert.assertEquals("Study should be a trial", StudyType.T, studyDetails.getStudyType());
 	}
 }

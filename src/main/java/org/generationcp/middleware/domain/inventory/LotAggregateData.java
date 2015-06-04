@@ -1,26 +1,27 @@
+
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
 import java.util.Map;
 
 /**
- * This POJO stores aggregate information about lot such as
- * actual balance, available balance, total reserved etc
+ * This POJO stores aggregate information about lot such as actual balance, available balance, total reserved etc
+ * 
  * @author Darla Ani
  *
  */
 public class LotAggregateData implements Serializable {
-	
+
 	private static final long serialVersionUID = 438412738380543621L;
 
 	private Integer lotId;
-	
+
 	private Double actualBalance;
-	
+
 	private Double availableBalance;
-	
+
 	private Double reservedTotal;
-	
+
 	private String stockIds;
 
 	// key = record id and value = reserved quantity
@@ -32,7 +33,7 @@ public class LotAggregateData implements Serializable {
 	}
 
 	public Integer getLotId() {
-		return lotId;
+		return this.lotId;
 	}
 
 	public void setLotId(Integer lotId) {
@@ -40,7 +41,7 @@ public class LotAggregateData implements Serializable {
 	}
 
 	public Double getActualBalance() {
-		return actualBalance;
+		return this.actualBalance;
 	}
 
 	public void setActualBalance(Double actualBalance) {
@@ -48,7 +49,7 @@ public class LotAggregateData implements Serializable {
 	}
 
 	public Double getAvailableBalance() {
-		return availableBalance;
+		return this.availableBalance;
 	}
 
 	public void setAvailableBalance(Double availableBalance) {
@@ -56,15 +57,15 @@ public class LotAggregateData implements Serializable {
 	}
 
 	public Double getReservedTotal() {
-		return reservedTotal;
+		return this.reservedTotal;
 	}
 
 	public void setReservedTotal(Double reservedTotal) {
 		this.reservedTotal = reservedTotal;
 	}
-	
+
 	public Map<Integer, Double> getReservationMap() {
-		return reservationMap;
+		return this.reservationMap;
 	}
 
 	public void setReservationMap(Map<Integer, Double> reservationMap) {
@@ -72,7 +73,7 @@ public class LotAggregateData implements Serializable {
 	}
 
 	public String getStockIds() {
-		return stockIds;
+		return this.stockIds;
 	}
 
 	public void setStockIds(String stockIds) {
@@ -83,29 +84,27 @@ public class LotAggregateData implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("LotAggregateData [lotId=");
-		builder.append(lotId);
+		builder.append(this.lotId);
 		builder.append(", actualBalance=");
-		builder.append(actualBalance);
+		builder.append(this.actualBalance);
 		builder.append(", availableBalance=");
-		builder.append(availableBalance);
+		builder.append(this.availableBalance);
 		builder.append(", reservedTotal=");
-		builder.append(reservedTotal);
-		if (reservationMap != null && reservationMap.size() > 0){
-        	builder.append(", reservationMap={");
-        	for (Integer id : reservationMap.keySet()){
-        		builder.append("Id:");
-        		builder.append(id);
-        		builder.append("->");
-        		builder.append("Qty:");
-        		builder.append(reservationMap.get(id));
-        	}
-        }
+		builder.append(this.reservedTotal);
+		if (this.reservationMap != null && this.reservationMap.size() > 0) {
+			builder.append(", reservationMap={");
+			for (Integer id : this.reservationMap.keySet()) {
+				builder.append("Id:");
+				builder.append(id);
+				builder.append("->");
+				builder.append("Qty:");
+				builder.append(this.reservationMap.get(id));
+			}
+		}
 		builder.append(", stockIds=");
-		builder.append(stockIds);
+		builder.append(this.stockIds);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
 
 }

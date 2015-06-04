@@ -4,15 +4,32 @@
  * Generation Challenge Programme (GCP)
  *
  *
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *
  *******************************************************************************/
+
 package org.generationcp.middleware.service;
 
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.oms.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -20,379 +37,374 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.OntologyService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 public class OntologyServiceImpl extends Service implements OntologyService {
-    
-    public OntologyServiceImpl(HibernateSessionProvider sessionProvider) {
-        super(sessionProvider);
-    }
 
-    /*======================= STANDARD VARIABLE ================================== */
+	public OntologyServiceImpl(HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
+	}
 
-    @Override
-    public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-        return getOntologyDataManager().getStandardVariable(stdVariableId);
-    }
-    
+	/* ======================= STANDARD VARIABLE ================================== */
+
+	@Override
+	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariable(stdVariableId);
+	}
+
 	@Override
 	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
-		return getOntologyDataManager().getStandardVariables(standardVariableIds);
+		return this.getOntologyDataManager().getStandardVariables(standardVariableIds);
 	}
-	
+
 	@Override
 	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
-		return getOntologyDataManager().getStandardVariableSummaries(standardVariableIds);
+		return this.getOntologyDataManager().getStandardVariableSummaries(standardVariableIds);
 	}
 
-    @Override
-    public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId)
-            throws MiddlewareQueryException {
-        OntologyDataManager manager = getOntologyDataManager();
-        Integer standardVariableId = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
-        return manager.getStandardVariable(standardVariableId);
-    }
+	@Override
+	public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
+		OntologyDataManager manager = this.getOntologyDataManager();
+		Integer standardVariableId = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+		return manager.getStandardVariable(standardVariableId);
+	}
 
-    @Override
-    public List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException {
-        List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
-        standardVariables.addAll(getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym));
-        return standardVariables;
-    }
-    
-    @Override
-    public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
-        getOntologyDataManager().addStandardVariable(stdVariable);
-    }
-    
-    @Override
-    public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllTermsByCvId(cvId);
-    }
-    
-    @Override
-    public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
-        return getOntologyDataManager().getStandardVariableIdByTermId(cvTermId, termId);
-    }
-    
-    @Override
-    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllStandardVariables();
-    }
+	@Override
+	public List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException {
+		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+		standardVariables.addAll(this.getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym));
+		return standardVariables;
+	}
 
-    @Override
-    public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException{
-        return getOntologyDataManager().getStandardVariables(traitClassId, null, null, null);
-    }
-    
-    @Override
-    public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException{
-        return getOntologyDataManager().getStandardVariables(null, propertyId, null, null);
-    }
-    
-    @Override
-    public List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException{
-        return getOntologyDataManager().getStandardVariables(null, null, methodId, null);
-    }
-    
-    @Override
-    public List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException{
-        return getOntologyDataManager().getStandardVariables(null, null, null, scaleId);
-    }
-    
-    @Override
-    public void saveOrUpdateStandardVariable(StandardVariable standardVariable,
-            Operation operation) throws MiddlewareQueryException, MiddlewareException {
-        getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
-    }
-    
-    @Override
-    public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-        getOntologyDataManager().deleteStandardVariable(stdVariableId);
-    }
+	@Override
+	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
+		this.getOntologyDataManager().addStandardVariable(stdVariable);
+	}
 
-    @Override
-    public void addOrUpdateStandardVariableMinMaxConstraints(int standardVariableId, VariableConstraints constraints) 
-            throws MiddlewareQueryException, MiddlewareException{
-        getOntologyDataManager().addOrUpdateStandardVariableConstraints(standardVariableId, constraints);
-    }
-    
-    @Override
-    public void deleteStandardVariableMinMaxConstraints(int standardVariableId) throws MiddlewareQueryException{
-        getOntologyDataManager().deleteStandardVariableLocalConstraints(standardVariableId);
-    }
+	@Override
+	public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getAllTermsByCvId(cvId);
+	}
 
-    @Override
-    public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) 
-            throws MiddlewareQueryException, MiddlewareException{
-        return getOntologyDataManager().addStandardVariableEnumeration(variable, validValue);
-    }
-    
-    @Override
-    public void deleteStandardVariableValidValue(int standardVariableId, int validValueId) throws MiddlewareQueryException{
-        getOntologyDataManager().deleteStandardVariableEnumeration(standardVariableId, validValueId);
-    }
-    
-    @Override
-    public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException {
-        getOntologyDataManager().saveOrUpdateStandardVariableEnumeration(variable, enumeration);
-    }
-    
-    /*======================= PROPERTY ================================== */
+	@Override
+	public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariableIdByTermId(cvTermId, termId);
+	}
 
+	@Override
+	public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getAllStandardVariables();
+	}
 
-    @Override
-    public Property getProperty(int id) throws MiddlewareQueryException {
-        return getOntologyDataManager().getProperty(id);
-    }
+	@Override
+	public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariables(traitClassId, null, null, null);
+	}
 
-    @Override
-    public Property getProperty(String name) throws MiddlewareQueryException {
-        return getOntologyDataManager().getProperty(name);
-    }
+	@Override
+	public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariables(null, propertyId, null, null);
+	}
 
-    @Override
-    public List<Property> getAllProperties() throws MiddlewareQueryException {
-        List<Property> properties = new ArrayList<Property>();
-        List<Term> propertyTerms = getOntologyDataManager().getAllTermsByCvId(CvId.PROPERTIES);
-        
-        for (Term term : propertyTerms){
-            properties.add(new Property(term));
-        }
-        return properties;        
-    }
+	@Override
+	public List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariables(null, null, methodId, null);
+	}
 
-    @Override
-    public Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException {
-        return new Property(getOntologyDataManager().addProperty(name, definition, isA));
-    }
-    
+	@Override
+	public List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariables(null, null, null, scaleId);
+	}
 
-    @Override
-    public Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException, MiddlewareException {
+	@Override
+	public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException,
+			MiddlewareException {
+		this.getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
+	}
 
-        Property property = new Property(getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES,  TermId.IS_A.getId(), isAId),
-                            getTermById(isAId));
-        getOntologyDataManager().addOrUpdateCropOntologyID(property, cropOntologyId);
+	@Override
+	public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
+		this.getOntologyDataManager().deleteStandardVariable(stdVariableId);
+	}
 
-        return property;
-    }
-    
-    @Override
-    public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException{
-        getOntologyDataManager().updateTermAndRelationship(property.getTerm(),  TermId.IS_A.getId(), property.getIsA().getId());
-    }
+	@Override
+	public void addOrUpdateStandardVariableMinMaxConstraints(int standardVariableId, VariableConstraints constraints)
+			throws MiddlewareQueryException, MiddlewareException {
+		this.getOntologyDataManager().addOrUpdateStandardVariableConstraints(standardVariableId, constraints);
+	}
 
-    @Override
-    public void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException {
-        getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.PROPERTIES, TermId.IS_A.getId(), isAId);
-    }
-    
-    
-    /*======================= SCALE ================================== */
+	@Override
+	public void deleteStandardVariableMinMaxConstraints(int standardVariableId) throws MiddlewareQueryException {
+		this.getOntologyDataManager().deleteStandardVariableLocalConstraints(standardVariableId);
+	}
 
-    @Override
-    public Scale getScale(int id) throws MiddlewareQueryException {
-        Term scaleTerm = getOntologyDataManager().getTermById(id);
-        return (scaleTerm != null && scaleTerm.getVocabularyId() == CvId.SCALES.getId())
-                ? new Scale(scaleTerm)
-                : null;
-    }
+	@Override
+	public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareQueryException,
+			MiddlewareException {
+		return this.getOntologyDataManager().addStandardVariableEnumeration(variable, validValue);
+	}
 
-    @Override
-    public Scale getScale(String name) throws MiddlewareQueryException{
-        return new Scale(getOntologyDataManager().findTermByName(name, CvId.SCALES));
-    }
+	@Override
+	public void deleteStandardVariableValidValue(int standardVariableId, int validValueId) throws MiddlewareQueryException {
+		this.getOntologyDataManager().deleteStandardVariableEnumeration(standardVariableId, validValueId);
+	}
 
-    
-    @Override
-    public List<Scale> getAllScales() throws MiddlewareQueryException {
-        List<Scale> scales = new ArrayList<Scale>();
-        List<Term> scaleTerms = getOntologyDataManager().getAllTermsByCvId(CvId.SCALES);
-        
-        for (Term term : scaleTerms){
-            scales.add(new Scale(term));
-        }
-        return scales;        
-    }
-    
-    @Override
-    public Scale addScale(String name, String definition) throws MiddlewareQueryException {
-        return new Scale(getOntologyDataManager().addTerm(name, definition, CvId.SCALES));
+	@Override
+	public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration)
+			throws MiddlewareQueryException, MiddlewareException {
+		this.getOntologyDataManager().saveOrUpdateStandardVariableEnumeration(variable, enumeration);
+	}
 
-    }
-    
-    @Override
-    public Scale addOrUpdateScale(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
-        return new Scale(getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.SCALES));
-    }
-    
-    @Override
-    public void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException{
-        getOntologyDataManager().updateTerm(scale.getTerm());
-    }
+	/* ======================= PROPERTY ================================== */
 
-    @Override
-    public void deleteScale(int cvTermId) throws MiddlewareQueryException {
-        getOntologyDataManager().deleteTerm(cvTermId, CvId.SCALES);
-    }
+	@Override
+	public Property getProperty(int id) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getProperty(id);
+	}
 
-    /*======================= METHOD ================================== */
-    
-    @Override
-    public Method getMethod(int id) throws MiddlewareQueryException {
-        Term methodTerm = getOntologyDataManager().findMethodById(id);
-        return methodTerm != null && methodTerm.getVocabularyId() == CvId.METHODS.getId()
-                ? new Method(methodTerm)
-                : null;
-    }
+	@Override
+	public Property getProperty(String name) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getProperty(name);
+	}
 
-    @Override
-    public Method getMethod(String name) throws MiddlewareQueryException {
-        return new Method(getOntologyDataManager().findMethodByName(name));
-    }
-    
-    @Override
-    public List<Method> getAllMethods() throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-        List<Term> methodTerms = getOntologyDataManager().getAllTermsByCvId(CvId.METHODS);
-        
-        for (Term term : methodTerms){
-            methods.add(new Method(term));
-        }
-        return methods; 
-    }
-    
-    @Override
-    public Method addMethod(String name, String definition) throws MiddlewareQueryException {
-        return new Method(getOntologyDataManager().addTerm(name, definition, CvId.METHODS));
-    }
-    
-    @Override
-    public Method addOrUpdateMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
-        return new Method(getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.METHODS));
-    }
-    
-    @Override
-    public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException{
-        getOntologyDataManager().updateTerm(method.getTerm());
-    }
+	@Override
+	public List<Property> getAllProperties() throws MiddlewareQueryException {
+		List<Property> properties = new ArrayList<Property>();
+		List<Term> propertyTerms = this.getOntologyDataManager().getAllTermsByCvId(CvId.PROPERTIES);
 
-    @Override
-    public void deleteMethod(int cvTermId) throws MiddlewareQueryException {
-        getOntologyDataManager().deleteTerm(cvTermId, CvId.METHODS);
-    }
-    
-    /*======================= OTHERS ================================== */
+		for (Term term : propertyTerms) {
+			properties.add(new Property(term));
+		}
+		return properties;
+	}
 
-    @Override
-    public List<Term> getAllDataTypes() throws MiddlewareQueryException {
-        return getOntologyDataManager().getDataTypes();
-    }
-    
-    @Override
-    public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariable) throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllTraitGroupsHierarchy(includePropertiesAndVariable);
-    }
+	@Override
+	public Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException {
+		return new Property(this.getOntologyDataManager().addProperty(name, definition, isA));
+	}
 
-    @Override
-    public List<Term> getAllRoles() throws MiddlewareQueryException{
-        List<Integer> roleIds = new ArrayList<Integer>();
-        roleIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
-        roleIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
-        roleIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
-        roleIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
-        
-        return getOntologyDataManager().getTermsByIds(roleIds);
-    }
+	@Override
+	public Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException,
+			MiddlewareException {
 
-    @Override
-    public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
-        return getStudyDataManager().countProjectsByVariable(variableId);
-    }
+		Property property =
+				new Property(this.getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES,
+						TermId.IS_A.getId(), isAId), this.getTermById(isAId));
+		this.getOntologyDataManager().addOrUpdateCropOntologyID(property, cropOntologyId);
 
-    @Override
-    public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
-        return getStudyDataManager().countExperimentsByVariable(variableId, storedInId);
-    }
-    
-    @Override 
-    public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {       
-        return getOntologyDataManager().addTerm(name, definition, cvId);
-    }
+		return property;
+	}
 
-    @Override
-    public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException {
-        return getOntologyDataManager().addTraitClass(name, definition, parentTraitClassId);
-    }
-    
-    @Override
-    public TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException, MiddlewareException {
-        Term term =  getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), parentTraitClassId);
-        Term isA = getOntologyDataManager().getTermById(parentTraitClassId);
-        return new TraitClass(term, isA);
-    }
+	@Override
+	public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+		this.getOntologyDataManager().updateTermAndRelationship(property.getTerm(), TermId.IS_A.getId(), property.getIsA().getId());
+	}
 
-    @Override
-    public TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException{
-        Term term = getOntologyDataManager().updateTermAndRelationship(traitClass.getTerm(),  TermId.IS_A.getId(), traitClass.getIsA().getId());
-        Term isA = getOntologyDataManager().getTermById(traitClass.getIsA().getId());
-        return new TraitClass(term, isA);
-    }
+	@Override
+	public void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException {
+		this.getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.PROPERTIES, TermId.IS_A.getId(), isAId);
+	}
 
-    
-    @Override
-    public void deleteTraitClass(int cvTermId) throws MiddlewareQueryException {
-        getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
-    }
-    
-    @Override
-    public Term getTermById(int termId) throws MiddlewareQueryException {
-        return getOntologyDataManager().getTermById(termId);
-    }
-    
-    @Override
-    public PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException {
-        return PhenotypicType.getPhenotypicTypeById(termId);
-    }
-    
-    @Override
-    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
-        return getOntologyDataManager().findTermByName(name, cvId);
-    }
-    
-    @Override
-    public List<Property> getAllPropertiesWithTraitClass()
-            throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllPropertiesWithTraitClass();
-    }
+	/* ======================= SCALE ================================== */
 
-    @Override
-    public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
-    	return getOntologyDataManager().validateDeleteStandardVariableEnumeration(standardVariableId, enumerationId);
-    }
-    
-    @Override
-    public List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException {
-    	return getStandardVariableBuilder().findAllByProperty(propertyId);
-    }
-    
-    public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
-    	return getTermBuilder().getAllInventoryScales();
-    }
+	@Override
+	public Scale getScale(int id) throws MiddlewareQueryException {
+		Term scaleTerm = this.getOntologyDataManager().getTermById(id);
+		return scaleTerm != null && scaleTerm.getVocabularyId() == CvId.SCALES.getId() ? new Scale(scaleTerm) : null;
+	}
 
-    /**
-     * Get All distinct values given a standard variable id.
-     *
-     * @param stdVarId the std var id
-     * @return the distinct standard variable values
-     * @throws MiddlewareQueryException the middleware query exception
-     */
+	@Override
+	public Scale getScale(String name) throws MiddlewareQueryException {
+		return new Scale(this.getOntologyDataManager().findTermByName(name, CvId.SCALES));
+	}
 
-    public List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
-            throws MiddlewareQueryException {
-        return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
-    }
+	@Override
+	public List<Scale> getAllScales() throws MiddlewareQueryException {
+		List<Scale> scales = new ArrayList<Scale>();
+		List<Term> scaleTerms = this.getOntologyDataManager().getAllTermsByCvId(CvId.SCALES);
+
+		for (Term term : scaleTerms) {
+			scales.add(new Scale(term));
+		}
+		return scales;
+	}
+
+	@Override
+	public Scale addScale(String name, String definition) throws MiddlewareQueryException {
+		return new Scale(this.getOntologyDataManager().addTerm(name, definition, CvId.SCALES));
+
+	}
+
+	@Override
+	public Scale addOrUpdateScale(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
+		return new Scale(this.getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.SCALES));
+	}
+
+	@Override
+	public void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
+		this.getOntologyDataManager().updateTerm(scale.getTerm());
+	}
+
+	@Override
+	public void deleteScale(int cvTermId) throws MiddlewareQueryException {
+		this.getOntologyDataManager().deleteTerm(cvTermId, CvId.SCALES);
+	}
+
+	/* ======================= METHOD ================================== */
+
+	@Override
+	public Method getMethod(int id) throws MiddlewareQueryException {
+		Term methodTerm = this.getOntologyDataManager().findMethodById(id);
+		return methodTerm != null && methodTerm.getVocabularyId() == CvId.METHODS.getId() ? new Method(methodTerm) : null;
+	}
+
+	@Override
+	public Method getMethod(String name) throws MiddlewareQueryException {
+		return new Method(this.getOntologyDataManager().findMethodByName(name));
+	}
+
+	@Override
+	public List<Method> getAllMethods() throws MiddlewareQueryException {
+		List<Method> methods = new ArrayList<Method>();
+		List<Term> methodTerms = this.getOntologyDataManager().getAllTermsByCvId(CvId.METHODS);
+
+		for (Term term : methodTerms) {
+			methods.add(new Method(term));
+		}
+		return methods;
+	}
+
+	@Override
+	public Method addMethod(String name, String definition) throws MiddlewareQueryException {
+		return new Method(this.getOntologyDataManager().addTerm(name, definition, CvId.METHODS));
+	}
+
+	@Override
+	public Method addOrUpdateMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
+		return new Method(this.getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.METHODS));
+	}
+
+	@Override
+	public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException {
+		this.getOntologyDataManager().updateTerm(method.getTerm());
+	}
+
+	@Override
+	public void deleteMethod(int cvTermId) throws MiddlewareQueryException {
+		this.getOntologyDataManager().deleteTerm(cvTermId, CvId.METHODS);
+	}
+
+	/* ======================= OTHERS ================================== */
+
+	@Override
+	public List<Term> getAllDataTypes() throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getDataTypes();
+	}
+
+	@Override
+	public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariable) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getAllTraitGroupsHierarchy(includePropertiesAndVariable);
+	}
+
+	@Override
+	public List<Term> getAllRoles() throws MiddlewareQueryException {
+		List<Integer> roleIds = new ArrayList<Integer>();
+		roleIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+		roleIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
+		roleIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+		roleIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+
+		return this.getOntologyDataManager().getTermsByIds(roleIds);
+	}
+
+	@Override
+	public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
+		return this.getStudyDataManager().countProjectsByVariable(variableId);
+	}
+
+	@Override
+	public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
+		return this.getStudyDataManager().countExperimentsByVariable(variableId, storedInId);
+	}
+
+	@Override
+	public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().addTerm(name, definition, cvId);
+	}
+
+	@Override
+	public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().addTraitClass(name, definition, parentTraitClassId);
+	}
+
+	@Override
+	public TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException,
+			MiddlewareException {
+		Term term =
+				this.getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(),
+						parentTraitClassId);
+		Term isA = this.getOntologyDataManager().getTermById(parentTraitClassId);
+		return new TraitClass(term, isA);
+	}
+
+	@Override
+	public TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException {
+		Term term =
+				this.getOntologyDataManager().updateTermAndRelationship(traitClass.getTerm(), TermId.IS_A.getId(),
+						traitClass.getIsA().getId());
+		Term isA = this.getOntologyDataManager().getTermById(traitClass.getIsA().getId());
+		return new TraitClass(term, isA);
+	}
+
+	@Override
+	public void deleteTraitClass(int cvTermId) throws MiddlewareQueryException {
+		this.getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.IBDB_TERMS, TermId.IS_A.getId(),
+				TermId.ONTOLOGY_TRAIT_CLASS.getId());
+	}
+
+	@Override
+	public Term getTermById(int termId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getTermById(termId);
+	}
+
+	@Override
+	public PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException {
+		return PhenotypicType.getPhenotypicTypeById(termId);
+	}
+
+	@Override
+	public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().findTermByName(name, cvId);
+	}
+
+	@Override
+	public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getAllPropertiesWithTraitClass();
+	}
+
+	@Override
+	public boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
+		return this.getOntologyDataManager().validateDeleteStandardVariableEnumeration(standardVariableId, enumerationId);
+	}
+
+	@Override
+	public List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException {
+		return this.getStandardVariableBuilder().findAllByProperty(propertyId);
+	}
+
+	@Override
+					public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+		return this.getTermBuilder().getAllInventoryScales();
+	}
+
+	/**
+	 * Get All distinct values given a standard variable id.
+	 *
+	 * @param stdVarId the std var id
+	 * @return the distinct standard variable values
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+
+	@Override
+					public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
+		return this.getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
+	}
 }

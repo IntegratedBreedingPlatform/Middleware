@@ -1,222 +1,211 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.h2h;
 
 import org.generationcp.middleware.util.Debug;
 
-
 /**
- * Contains the details of a trait - name, id, description, 
- * number of locations, germplasms and observations.
+ * Contains the details of a trait - name, id, description, number of locations, germplasms and observations.
  */
-public class TraitInfo  implements Comparable<TraitInfo>{
-    
-    private int id;
-    
-    private String name;
-    
-    private String description;
-    
-    private long locationCount;
-    
-    private long germplasmCount;
-    
-    private long observationCount;
-    
-    private TraitType type;
-    
-    private String scaleName;
-    
-    public TraitInfo() {
-    }
+public class TraitInfo implements Comparable<TraitInfo> {
 
-    public TraitInfo( int id){
-        this.id = id;
-    }
+	private int id;
 
-    public TraitInfo( int id, String name){
-        this.id = id;
-        this.name = name;
-    }
-        
-    public TraitInfo( int id, String name, String description){
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
-        
-    public TraitInfo( int id, String name, String description, String scaleName, Integer typeId){
-    	this(id, name, description);
-        this.scaleName = scaleName;
-        this.type = TraitType.valueOf(typeId);
-        this.description = description;
-    }
-        
-    public TraitInfo( int id, String name, String description,
-            long locationCount, long germplasmCount, long observationCount) {
-    	this(id, name, description);
-    	this.locationCount = locationCount;
-        this.germplasmCount = germplasmCount;
-        this.observationCount = observationCount;
-    }
+	private String name;
 
-    public int getId() {
-        return id;
-    }
-    
-    public void setId(int id) {
-        this.id = id;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
-    public long getLocationCount() {
-        return locationCount;
-    }
-    
-    public void setLocationCount(long locationCount) {
-        this.locationCount = locationCount;
-    }
-    
-    public long getGermplasmCount() {
-        return germplasmCount;
-    }
-    
-    public void setGermplasmCount(long germplasmCount) {
-        this.germplasmCount = germplasmCount;
-    }
-    
-    public void setType(TraitType type) {
-        this.type = type;
-    }
+	private String description;
 
-    public TraitType getType() {
-    	return type;
-    }
-    
+	private long locationCount;
+
+	private long germplasmCount;
+
+	private long observationCount;
+
+	private TraitType type;
+
+	private String scaleName;
+
+	public TraitInfo() {
+	}
+
+	public TraitInfo(int id) {
+		this.id = id;
+	}
+
+	public TraitInfo(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
+	public TraitInfo(int id, String name, String description) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+	}
+
+	public TraitInfo(int id, String name, String description, String scaleName, Integer typeId) {
+		this(id, name, description);
+		this.scaleName = scaleName;
+		this.type = TraitType.valueOf(typeId);
+		this.description = description;
+	}
+
+	public TraitInfo(int id, String name, String description, long locationCount, long germplasmCount, long observationCount) {
+		this(id, name, description);
+		this.locationCount = locationCount;
+		this.germplasmCount = germplasmCount;
+		this.observationCount = observationCount;
+	}
+
+	public int getId() {
+		return this.id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public long getLocationCount() {
+		return this.locationCount;
+	}
+
+	public void setLocationCount(long locationCount) {
+		this.locationCount = locationCount;
+	}
+
+	public long getGermplasmCount() {
+		return this.germplasmCount;
+	}
+
+	public void setGermplasmCount(long germplasmCount) {
+		this.germplasmCount = germplasmCount;
+	}
+
+	public void setType(TraitType type) {
+		this.type = type;
+	}
+
+	public TraitType getType() {
+		return this.type;
+	}
+
 	public String getScaleName() {
-		return scaleName;
+		return this.scaleName;
 	}
 
 	public void setScaleName(String scaleName) {
 		this.scaleName = scaleName;
 	}
-    
-    public void setObservationCount(long observationCount) {
-        this.observationCount = observationCount;
-    }
 
-    public long getObservationCount() {
-        return observationCount;
-    }
-    
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((description == null) ? 0 : description.hashCode());
-        result = prime * result
-                + (int) (germplasmCount ^ (germplasmCount >>> 32));
-        result = prime * result
-                + (int) (locationCount ^ (locationCount >>> 32));
-        result = prime * result
-                + (int) (observationCount ^ (observationCount >>> 32));
-        result = prime * result + id;
-        result = prime * result
-                + ((name == null) ? 0 : name.hashCode());
-        return result;
-    }
+	public void setObservationCount(long observationCount) {
+		this.observationCount = observationCount;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        TraitInfo other = (TraitInfo) obj;
-        if (id != other.id) {
-            return false;
-        }
-        return true;
-    }
+	public long getObservationCount() {
+		return this.observationCount;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("TraitInfo [");
-        builder.append("traitId=");
-        builder.append(id);
-        builder.append(", traitName=");
-        builder.append(name);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", locationCount=");
-        builder.append(locationCount);
-        builder.append(", germplasmCount=");
-        builder.append(germplasmCount);
-        builder.append(", observationCount=");
-        builder.append(observationCount);
-        builder.append(", type=");
-        builder.append(type);
-        builder.append(", scaleName=");
-        builder.append(scaleName);
-        builder.append("]");
-        return builder.toString();
-    }
-    
-    public void print(int indent){
-        Debug.println(indent, getEntityName() + ":");
-        Debug.println(indent + 3, "Trait Id: " + getId());
-        Debug.println(indent + 3, "Trait Name: " + getName());
-        Debug.println(indent + 3, "Description: " + getDescription());
-        Debug.println(indent + 3, "Location Count: " + getLocationCount());
-        Debug.println(indent + 3, "Germplasm Count: " + getGermplasmCount());
-        Debug.println(indent + 3, "Observation Count: " + getObservationCount());
-        Debug.println(indent + 3, "Trait Type: " + getType());
-        Debug.println(indent + 3, "Scale Name: " + getScaleName());
-    }
-    
-    private String getEntityName() {
-        return this.getClass().getName();
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
+		result = prime * result + (int) (this.germplasmCount ^ this.germplasmCount >>> 32);
+		result = prime * result + (int) (this.locationCount ^ this.locationCount >>> 32);
+		result = prime * result + (int) (this.observationCount ^ this.observationCount >>> 32);
+		result = prime * result + this.id;
+		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
+		return result;
+	}
 
-    @Override
-    // Sort in ascending order by trait id
-    public int compareTo(TraitInfo compareValue) { 
-        int compareId = ((TraitInfo) compareValue).getId(); 
-        return Integer.valueOf(getId()).compareTo(compareId);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		TraitInfo other = (TraitInfo) obj;
+		if (this.id != other.id) {
+			return false;
+		}
+		return true;
+	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TraitInfo [");
+		builder.append("traitId=");
+		builder.append(this.id);
+		builder.append(", traitName=");
+		builder.append(this.name);
+		builder.append(", description=");
+		builder.append(this.description);
+		builder.append(", locationCount=");
+		builder.append(this.locationCount);
+		builder.append(", germplasmCount=");
+		builder.append(this.germplasmCount);
+		builder.append(", observationCount=");
+		builder.append(this.observationCount);
+		builder.append(", type=");
+		builder.append(this.type);
+		builder.append(", scaleName=");
+		builder.append(this.scaleName);
+		builder.append("]");
+		return builder.toString();
+	}
 
+	public void print(int indent) {
+		Debug.println(indent, this.getEntityName() + ":");
+		Debug.println(indent + 3, "Trait Id: " + this.getId());
+		Debug.println(indent + 3, "Trait Name: " + this.getName());
+		Debug.println(indent + 3, "Description: " + this.getDescription());
+		Debug.println(indent + 3, "Location Count: " + this.getLocationCount());
+		Debug.println(indent + 3, "Germplasm Count: " + this.getGermplasmCount());
+		Debug.println(indent + 3, "Observation Count: " + this.getObservationCount());
+		Debug.println(indent + 3, "Trait Type: " + this.getType());
+		Debug.println(indent + 3, "Scale Name: " + this.getScaleName());
+	}
+
+	private String getEntityName() {
+		return this.getClass().getName();
+	}
+
+	@Override
+	// Sort in ascending order by trait id
+	public int compareTo(TraitInfo compareValue) {
+		int compareId = compareValue.getId();
+		return Integer.valueOf(this.getId()).compareTo(compareId);
+	}
 
 }

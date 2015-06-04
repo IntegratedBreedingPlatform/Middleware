@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2014, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.ims;
 
 import java.util.List;
@@ -19,15 +19,15 @@ import java.util.List;
 public class LotsResult {
 
 	private List<Integer> lotIdsAdded;
-	
+
 	private List<Integer> lotIdsUpdated;
-	
+
 	private List<Integer> gidsUpdated;
-	
+
 	private List<Integer> gidsAdded;
-	
+
 	public List<Integer> getLotIdsAdded() {
-		return lotIdsAdded;
+		return this.lotIdsAdded;
 	}
 
 	public void setLotIdsAdded(List<Integer> lotIdsAdded) {
@@ -35,7 +35,7 @@ public class LotsResult {
 	}
 
 	public List<Integer> getLotIdsUpdated() {
-		return lotIdsUpdated;
+		return this.lotIdsUpdated;
 	}
 
 	public void setLotIdsUpdated(List<Integer> lotIdsUpdated) {
@@ -43,7 +43,7 @@ public class LotsResult {
 	}
 
 	public List<Integer> getGidsUpdated() {
-		return gidsUpdated;
+		return this.gidsUpdated;
 	}
 
 	public void setGidsUpdated(List<Integer> gidsUpdated) {
@@ -51,7 +51,7 @@ public class LotsResult {
 	}
 
 	public List<Integer> getGidsAdded() {
-		return gidsAdded;
+		return this.gidsAdded;
 	}
 
 	public void setGidsAdded(List<Integer> gidsAdded) {
@@ -62,15 +62,15 @@ public class LotsResult {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("LotsResult [lotIdsAdded=");
-		builder.append(lotIdsAdded);
+		builder.append(this.lotIdsAdded);
 		builder.append(", lotIdsUpdated=");
-		builder.append(lotIdsUpdated);
+		builder.append(this.lotIdsUpdated);
 		builder.append(", gidsUpdated=");
-		builder.append(gidsUpdated);
+		builder.append(this.gidsUpdated);
 		builder.append(", gidsAdded=");
-		builder.append(gidsAdded);
+		builder.append(this.gidsAdded);
 		builder.append("]");
 		return builder.toString();
 	}
-	
+
 }

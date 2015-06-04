@@ -1,35 +1,41 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.dms;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_stock
- * 
- * Any stock can be globally identified by the combination of organism, uniquename and stock type. 
- * A stock is the physical entities, either living or preserved, held by collections. 
- * Stocks belong to a collection; they have IDs, type, organism, description and may have a genotype.
- * 
+ *
+ * Any stock can be globally identified by the combination of organism, uniquename and stock type. A stock is the physical entities, either
+ * living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a
+ * genotype.
+ *
  * @author Joyce Avestro
  *
  */
 @Entity
-@Table(	name = "stock", 
-		uniqueConstraints = {
-			@UniqueConstraint(columnNames = { "organism_id", "uniquename", "type_id" })
-		})
+@Table(name = "stock", uniqueConstraints = {@UniqueConstraint(columnNames = {"organism_id", "uniquename", "type_id"})})
 public class StockModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -40,72 +46,70 @@ public class StockModel implements Serializable {
 	private Integer stockId;
 
 	/**
-	 * The dbxref_id is an optional primary stable identifier for this stock. 
-	 * Secondary indentifiers and external dbxrefs go in table: stock_dbxref.
+	 * The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table:
+	 * stock_dbxref.
 	 */
 	@Column(name = "dbxref_id")
 	private Integer dbxrefId;
-	
+
 	/**
 	 * The organism_id is the organism to which the stock belongs. This column is mandatory.
 	 */
 	@Column(name = "organism_id")
 	private Integer organismId;
-	
+
 	/**
 	 * The name is a human-readable local name for a stock.
 	 */
 	@Column(name = "name")
 	private String name;
-	
+
 	@Basic(optional = false)
 	@Column(name = "uniquename")
 	private String uniqueName;
 
 	@Column(name = "value")
 	private String value;
-	
+
 	/**
 	 * The description is the genetic description provided in the stock list.
 	 */
 	@Column(name = "description")
 	private String description;
-	
+
 	/**
-	 * The type_id foreign key links to a controlled vocabulary of stock types. 
-	 * The would include living stock, genomic DNA, preserved specimen. 
-	 * Secondary cvterms for stocks would go in stock_cvterm.
-	 * References cvterm
+	 * The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved
+	 * specimen. Secondary cvterms for stocks would go in stock_cvterm. References cvterm
 	 */
-    @Column(name="type_id")
-    private Integer typeId;
+	@Column(name = "type_id")
+	private Integer typeId;
 
 	@Basic(optional = false)
-    @Column(name="is_obsolete")
-    private Boolean isObsolete;
-	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="stockModel")
+	@Column(name = "is_obsolete")
+	private Boolean isObsolete;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "stockModel")
 	private Set<StockProperty> properties;
-	
-	public StockModel(){
+
+	public StockModel() {
 	}
-	
-    public StockModel(Integer stockId, Integer dbxrefId, Integer organismId, String name, String uniqueName,
-            String value, String description, Integer typeId, Boolean isObsolete) {
-        super();
-        this.stockId = stockId;
-        this.dbxrefId = dbxrefId;
-        this.organismId = organismId;
-        this.name = name;
-        this.uniqueName = uniqueName;
-        this.value = value;
-        this.description = description;
-        this.typeId = typeId;
-        this.isObsolete = isObsolete;
-    }
+
+	public StockModel(Integer stockId, Integer dbxrefId, Integer organismId, String name, String uniqueName, String value,
+			String description, Integer typeId, Boolean isObsolete) {
+		super();
+		this.stockId = stockId;
+		this.dbxrefId = dbxrefId;
+		this.organismId = organismId;
+		this.name = name;
+		this.uniqueName = uniqueName;
+		this.value = value;
+		this.description = description;
+		this.typeId = typeId;
+		this.isObsolete = isObsolete;
+	}
 
 	public Integer getStockId() {
-		return stockId;
+		return this.stockId;
 	}
 
 	public void setStockId(Integer stockId) {
@@ -113,7 +117,7 @@ public class StockModel implements Serializable {
 	}
 
 	public Integer getDbxrefId() {
-		return dbxrefId;
+		return this.dbxrefId;
 	}
 
 	public void setDbxrefId(Integer dbxrefId) {
@@ -121,7 +125,7 @@ public class StockModel implements Serializable {
 	}
 
 	public Integer getOrganismId() {
-		return organismId;
+		return this.organismId;
 	}
 
 	public void setOrganismId(Integer organismId) {
@@ -129,7 +133,7 @@ public class StockModel implements Serializable {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -137,7 +141,7 @@ public class StockModel implements Serializable {
 	}
 
 	public String getUniqueName() {
-		return uniqueName;
+		return this.uniqueName;
 	}
 
 	public void setUniqueName(String uniqueName) {
@@ -145,7 +149,7 @@ public class StockModel implements Serializable {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(String value) {
@@ -153,7 +157,7 @@ public class StockModel implements Serializable {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(String description) {
@@ -161,7 +165,7 @@ public class StockModel implements Serializable {
 	}
 
 	public Integer getTypeId() {
-		return typeId;
+		return this.typeId;
 	}
 
 	public void setTypeId(Integer typeId) {
@@ -169,7 +173,7 @@ public class StockModel implements Serializable {
 	}
 
 	public Boolean getIsObsolete() {
-		return isObsolete;
+		return this.isObsolete;
 	}
 
 	public void setIsObsolete(Boolean isObsolete) {
@@ -177,7 +181,7 @@ public class StockModel implements Serializable {
 	}
 
 	public Set<StockProperty> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public void setProperties(Set<StockProperty> properties) {
@@ -188,98 +192,93 @@ public class StockModel implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((dbxrefId == null) ? 0 : dbxrefId.hashCode());
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result
-				+ ((isObsolete == null) ? 0 : isObsolete.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((organismId == null) ? 0 : organismId.hashCode());
-		result = prime * result + ((stockId == null) ? 0 : stockId.hashCode());
-		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
-		result = prime * result
-				+ ((uniqueName == null) ? 0 : uniqueName.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + (this.dbxrefId == null ? 0 : this.dbxrefId.hashCode());
+		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
+		result = prime * result + (this.isObsolete == null ? 0 : this.isObsolete.hashCode());
+		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
+		result = prime * result + (this.organismId == null ? 0 : this.organismId.hashCode());
+		result = prime * result + (this.stockId == null ? 0 : this.stockId.hashCode());
+		result = prime * result + (this.typeId == null ? 0 : this.typeId.hashCode());
+		result = prime * result + (this.uniqueName == null ? 0 : this.uniqueName.hashCode());
+		result = prime * result + (this.value == null ? 0 : this.value.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		StockModel other = (StockModel) obj;
-		if (dbxrefId == null) {
+		if (this.dbxrefId == null) {
 			if (other.dbxrefId != null) {
-                return false;
-            }
-		} else if (!dbxrefId.equals(other.dbxrefId)) {
-            return false;
-        }
-		if (description == null) {
+				return false;
+			}
+		} else if (!this.dbxrefId.equals(other.dbxrefId)) {
+			return false;
+		}
+		if (this.description == null) {
 			if (other.description != null) {
-                return false;
-            }
-		} else if (!description.equals(other.description)) {
-            return false;
-        }
-		if (isObsolete == null) {
+				return false;
+			}
+		} else if (!this.description.equals(other.description)) {
+			return false;
+		}
+		if (this.isObsolete == null) {
 			if (other.isObsolete != null) {
-                return false;
-            }
-		} else if (!isObsolete.equals(other.isObsolete)) {
-            return false;
-        }
-		if (name == null) {
+				return false;
+			}
+		} else if (!this.isObsolete.equals(other.isObsolete)) {
+			return false;
+		}
+		if (this.name == null) {
 			if (other.name != null) {
-                return false;
-            }
-		} else if (!name.equals(other.name)) {
-            return false;
-        }
-		if (organismId == null) {
+				return false;
+			}
+		} else if (!this.name.equals(other.name)) {
+			return false;
+		}
+		if (this.organismId == null) {
 			if (other.organismId != null) {
-                return false;
-            }
-		} else if (!organismId.equals(other.organismId)) {
-            return false;
-        }
-		if (stockId == null) {
+				return false;
+			}
+		} else if (!this.organismId.equals(other.organismId)) {
+			return false;
+		}
+		if (this.stockId == null) {
 			if (other.stockId != null) {
-                return false;
-            }
-		} else if (!stockId.equals(other.stockId)) {
-            return false;
-        }
-		if (typeId == null) {
+				return false;
+			}
+		} else if (!this.stockId.equals(other.stockId)) {
+			return false;
+		}
+		if (this.typeId == null) {
 			if (other.typeId != null) {
-                return false;
-            }
-		} else if (!typeId.equals(other.typeId)) {
-            return false;
-        }
-		if (uniqueName == null) {
+				return false;
+			}
+		} else if (!this.typeId.equals(other.typeId)) {
+			return false;
+		}
+		if (this.uniqueName == null) {
 			if (other.uniqueName != null) {
-                return false;
-            }
-		} else if (!uniqueName.equals(other.uniqueName)) {
-            return false;
-        }
-		if (value == null) {
+				return false;
+			}
+		} else if (!this.uniqueName.equals(other.uniqueName)) {
+			return false;
+		}
+		if (this.value == null) {
 			if (other.value != null) {
-                return false;
-            }
-		} else if (!value.equals(other.value)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.value.equals(other.value)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -287,25 +286,25 @@ public class StockModel implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Stock [stockId=");
-		builder.append(stockId);
+		builder.append(this.stockId);
 		builder.append(", dbxrefId=");
-		builder.append(dbxrefId);
+		builder.append(this.dbxrefId);
 		builder.append(", organismId=");
-		builder.append(organismId);
+		builder.append(this.organismId);
 		builder.append(", name=");
-		builder.append(name);
+		builder.append(this.name);
 		builder.append(", uniqueName=");
-		builder.append(uniqueName);
+		builder.append(this.uniqueName);
 		builder.append(", value=");
-		builder.append(value);
+		builder.append(this.value);
 		builder.append(", description=");
-		builder.append(description);
+		builder.append(this.description);
 		builder.append(", typeId=");
-		builder.append(typeId);
+		builder.append(this.typeId);
 		builder.append(", isObsolete=");
-		builder.append(isObsolete);
+		builder.append(this.isObsolete);
 		builder.append("]");
 		return builder.toString();
-	}  
-	
+	}
+
 }

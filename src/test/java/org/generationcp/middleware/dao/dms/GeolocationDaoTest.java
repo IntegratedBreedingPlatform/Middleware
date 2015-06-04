@@ -1,14 +1,13 @@
 /*******************************************************************************
-
+ * 
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -26,30 +25,29 @@ import org.junit.Test;
 
 public class GeolocationDaoTest extends MiddlewareIntegrationTest {
 
-    private static GeolocationDao dao;
+	private static GeolocationDao dao;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        dao = new GeolocationDao();
-        dao.setSession(sessionUtil.getCurrentSession());
-    }
+	@BeforeClass
+	public static void setUp() throws Exception {
+		GeolocationDaoTest.dao = new GeolocationDao();
+		GeolocationDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	}
 
+	@Test
+	public void testGetTrialEnvironmentDetails() throws Exception {
+		Set<Integer> environmentIds = new HashSet<Integer>();
+		environmentIds.add(5822);
+		List<TrialEnvironment> results = GeolocationDaoTest.dao.getTrialEnvironmentDetails(environmentIds);
+		Debug.println(0, "testGetTrialEnvironmentDetails(environmentIds=" + environmentIds + ") RESULTS:");
+		for (TrialEnvironment env : results) {
+			env.print(4);
+		}
+	}
 
-    @Test
-    public void testGetTrialEnvironmentDetails() throws Exception {
-        Set<Integer> environmentIds = new HashSet<Integer>();
-        environmentIds.add(5822);
-        List<TrialEnvironment> results = dao.getTrialEnvironmentDetails(environmentIds);
-        Debug.println(0, "testGetTrialEnvironmentDetails(environmentIds=" + environmentIds + ") RESULTS:");
-        for (TrialEnvironment env : results) {
-        	env.print(4);
-        }
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-        dao.setSession(null);
-        dao = null;
-    }
+	@AfterClass
+	public static void tearDown() throws Exception {
+		GeolocationDaoTest.dao.setSession(null);
+		GeolocationDaoTest.dao = null;
+	}
 
 }

@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
@@ -26,41 +26,42 @@ public class TermPropertyBuilder extends Builder {
 	}
 
 	public TermProperty get(int termPropertyId) throws MiddlewareQueryException {
-	    TermProperty term = null;
-		term = create(getCvTermPropertyDao().getById(termPropertyId));
+		TermProperty term = null;
+		term = this.create(this.getCvTermPropertyDao().getById(termPropertyId));
 		return term;
 	}
-	
-	public TermProperty create(CVTermProperty cVTermProperty){
+
+	public TermProperty create(CVTermProperty cVTermProperty) {
 		TermProperty termProperty = null;
-		if (cVTermProperty != null){
-			termProperty = new TermProperty(cVTermProperty.getCvTermPropertyId(), cVTermProperty.getTypeId(), cVTermProperty.getValue(),
-			        cVTermProperty.getRank());
+		if (cVTermProperty != null) {
+			termProperty =
+					new TermProperty(cVTermProperty.getCvTermPropertyId(), cVTermProperty.getTypeId(), cVTermProperty.getValue(),
+							cVTermProperty.getRank());
 		}
 		return termProperty;
 	}
-	
+
 	public List<TermProperty> create(List<CVTermProperty> cvTermProperties) {
-	    List<TermProperty> properties = new ArrayList<TermProperty>();
-	    
-	    if (cvTermProperties != null && !cvTermProperties.isEmpty()) {
-	        for (CVTermProperty cvTermProperty : cvTermProperties) {
-	            properties.add(create(cvTermProperty));
-	        }
-	    }
-	    
-	    return properties;
+		List<TermProperty> properties = new ArrayList<TermProperty>();
+
+		if (cvTermProperties != null && !cvTermProperties.isEmpty()) {
+			for (CVTermProperty cvTermProperty : cvTermProperties) {
+				properties.add(this.create(cvTermProperty));
+			}
+		}
+
+		return properties;
 	}
-	
+
 	public List<CVTermProperty> findProperties(int cvTermId) throws MiddlewareQueryException {
-        return getCvTermPropertyDao().getByCvTermId(cvTermId);
+		return this.getCvTermPropertyDao().getByCvTermId(cvTermId);
 	}
-	
+
 	public List<CVTermProperty> findPropertiesByType(int cvTermId, int typeId) throws MiddlewareQueryException {
-        return getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
+		return this.getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
 	}
-	
+
 	public CVTermProperty findPropertyByType(int cvTermId, int typeId) throws MiddlewareQueryException {
-        return getCvTermPropertyDao().getOneByCvTermAndType(cvTermId, typeId);
-    }
+		return this.getCvTermPropertyDao().getOneByCvTermAndType(cvTermId, typeId);
+	}
 }
