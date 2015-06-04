@@ -1,26 +1,31 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.dms;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
- * 
+ *
  * @author Aldrin Batac
  *
  */
 @Entity
-@Table(	name = "phenotype_outlier")
+@Table(name = "phenotype_outlier")
 public class PhenotypeOutlier implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -32,87 +37,76 @@ public class PhenotypeOutlier implements Serializable {
 
 	// References phenotype
 	@Basic(optional = false)
-    @Column(name="phenotype_id")
+	@Column(name = "phenotype_id")
 	private Integer phenotypeId;
-    
+
 	@Column(name = "value")
 	private String value;
-	
 
 	public PhenotypeOutlier() {
 	}
 
-
-	public PhenotypeOutlier(
-			Integer phenotypeOutlierId,
-			Integer phenotypeId, 
-			Integer observableId,
-			Integer plotNo,
-			Integer projectId,
+	public PhenotypeOutlier(Integer phenotypeOutlierId, Integer phenotypeId, Integer observableId, Integer plotNo, Integer projectId,
 			String value) {
 		this.setPhenotypeOutlierId(phenotypeOutlierId);
 		this.setPhenotypeId(phenotypeId);
 		this.setValue(value);
 	}
-	
-	public Integer getPhenotypeOutlierId() {
-		return phenotypeOutlierId;
-	}
 
+	public Integer getPhenotypeOutlierId() {
+		return this.phenotypeOutlierId;
+	}
 
 	public void setPhenotypeOutlierId(Integer phenotypeOutlierId) {
 		this.phenotypeOutlierId = phenotypeOutlierId;
 	}
 
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((phenotypeOutlierId == null) ? 0 : phenotypeOutlierId.hashCode());
-		result = prime * result + ((phenotypeId == null) ? 0 : phenotypeId.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + (this.phenotypeOutlierId == null ? 0 : this.phenotypeOutlierId.hashCode());
+		result = prime * result + (this.phenotypeId == null ? 0 : this.phenotypeId.hashCode());
+		result = prime * result + (this.value == null ? 0 : this.value.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		PhenotypeOutlier other = (PhenotypeOutlier) obj;
-		
-		if (phenotypeOutlierId == null) {
+
+		if (this.phenotypeOutlierId == null) {
 			if (other.phenotypeOutlierId != null) {
-                return false;
-            }
-		} else if (!phenotypeOutlierId.equals(other.phenotypeOutlierId)) {
-            return false;
-        }
-		
-		if (phenotypeId == null) {
+				return false;
+			}
+		} else if (!this.phenotypeOutlierId.equals(other.phenotypeOutlierId)) {
+			return false;
+		}
+
+		if (this.phenotypeId == null) {
 			if (other.phenotypeId != null) {
-                return false;
-            }
-		} else if (!phenotypeId.equals(other.phenotypeId)) {
-            return false;
-        }
-	
-		
-		if (value == null) {
+				return false;
+			}
+		} else if (!this.phenotypeId.equals(other.phenotypeId)) {
+			return false;
+		}
+
+		if (this.value == null) {
 			if (other.value != null) {
-                return false;
-            }
-		} else if (!value.equals(other.value)) {
-            return false;
-        }
-		
+				return false;
+			}
+		} else if (!this.value.equals(other.value)) {
+			return false;
+		}
 
 		return true;
 	}
@@ -121,35 +115,29 @@ public class PhenotypeOutlier implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("PhenotypeOutlier [phenotypeOutlierId=");
-		builder.append(getPhenotypeOutlierId());
+		builder.append(this.getPhenotypeOutlierId());
 		builder.append(", phenotypeId=");
-		builder.append(getPhenotypeId());
+		builder.append(this.getPhenotypeId());
 		builder.append(", value=");
-		builder.append(getValue());
+		builder.append(this.getValue());
 		builder.append("]");
 		return builder.toString();
 	}
 
-
 	public Integer getPhenotypeId() {
-		return phenotypeId;
+		return this.phenotypeId;
 	}
-
 
 	public void setPhenotypeId(Integer phenotypeId) {
 		this.phenotypeId = phenotypeId;
 	}
 
-
 	public String getValue() {
-		return value;
+		return this.value;
 	}
-
 
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
-	
-	
+
 }

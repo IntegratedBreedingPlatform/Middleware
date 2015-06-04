@@ -25,7 +25,7 @@ public interface PedigreeService {
 	String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
 
 	/**
-	 * 
+	 *
 	 * @param germplasm A preconstructed germplasm object. We need this when generating the cross from the crossing manager.
 	 * @param level the number of levels we are suppose to do the expansion for
 	 * @param crossExpansionProperties default expansion properties

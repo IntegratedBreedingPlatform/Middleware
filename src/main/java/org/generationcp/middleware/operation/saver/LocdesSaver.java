@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
@@ -22,80 +23,88 @@ public class LocdesSaver extends Saver {
 	}
 
 	public void saveLocationDescriptions(List<FieldMapInfo> infoList, int userId) throws MiddlewareQueryException {
-		Map<Integer, BlockInfo> blockMap = extractAllBlockInformation(infoList);
+		Map<Integer, BlockInfo> blockMap = this.extractAllBlockInformation(infoList);
 		if (!blockMap.isEmpty()) {
 			for (Integer blockId : blockMap.keySet()) {
 				BlockInfo blockInfo = blockMap.get(blockId);
-				
-				List<Locdes> descriptions = getLocdesDao().getByLocation(blockInfo.getBlockId());
-				Map<String, Integer> udfldMap = getUdfldMap();
-				
-				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.ROWS_IN_BLOCK), blockInfo.getNumberOfRowsInBlock(), userId);
-				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.RANGES_IN_BLOCK), blockInfo.getNumberOfRangesInBlock(), userId);
-				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.ROWS_IN_PLOT), blockInfo.getNumberOfRowsPerPlot(), userId);
-				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.MACHINE_ROW_CAPACITY), blockInfo.getMachineRowCapacity(), userId);
-				saveOrUpdateLocdes(blockId, descriptions, getId(udfldMap, LocdesType.PLANTING_ORDER), blockInfo.getPlantingOrder(), userId);
-				
-				updateDeletedPlots(blockId, descriptions, blockInfo.getDeletedPlots(), userId);
+
+				List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
+				Map<String, Integer> udfldMap = this.getUdfldMap();
+
+				this.saveOrUpdateLocdes(blockId, descriptions, this.getId(udfldMap, LocdesType.ROWS_IN_BLOCK),
+						blockInfo.getNumberOfRowsInBlock(), userId);
+				this.saveOrUpdateLocdes(blockId, descriptions, this.getId(udfldMap, LocdesType.RANGES_IN_BLOCK),
+						blockInfo.getNumberOfRangesInBlock(), userId);
+				this.saveOrUpdateLocdes(blockId, descriptions, this.getId(udfldMap, LocdesType.ROWS_IN_PLOT),
+						blockInfo.getNumberOfRowsPerPlot(), userId);
+				this.saveOrUpdateLocdes(blockId, descriptions, this.getId(udfldMap, LocdesType.MACHINE_ROW_CAPACITY),
+						blockInfo.getMachineRowCapacity(), userId);
+				this.saveOrUpdateLocdes(blockId, descriptions, this.getId(udfldMap, LocdesType.PLANTING_ORDER),
+						blockInfo.getPlantingOrder(), userId);
+
+				this.updateDeletedPlots(blockId, descriptions, blockInfo.getDeletedPlots(), userId);
 			}
 		}
 	}
-	
+
 	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
-		return getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE", 
-				Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode()
-						, LocdesType.RANGES_IN_BLOCK.getCode()
-						, LocdesType.ROWS_IN_PLOT.getCode()
-						, LocdesType.MACHINE_ROW_CAPACITY.getCode()
-						, LocdesType.PLANTING_ORDER.getCode()
-						, LocdesType.DELETED_PLOTS.getCode()));
+		return this.getUserDefinedFieldDao()
+				.getByCodesInMap(
+						"LOCDES",
+						"DTYPE",
+						Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(),
+								LocdesType.ROWS_IN_PLOT.getCode(), LocdesType.MACHINE_ROW_CAPACITY.getCode(),
+								LocdesType.PLANTING_ORDER.getCode(), LocdesType.DELETED_PLOTS.getCode()));
 	}
-	
+
 	private int getId(Map<String, Integer> map, LocdesType type) throws MiddlewareQueryException {
 		Integer id = map.get(type.getCode());
 		if (id == null) {
-			throw new MiddlewareQueryException("Locdes Type " + type.getCode() + " does not exists, please contact your system administrator");
+			throw new MiddlewareQueryException("Locdes Type " + type.getCode()
+					+ " does not exists, please contact your system administrator");
 		}
 		return id;
 	}
-	
+
 	public void updateDeletedPlots(List<FieldMapInfo> infoList, int userId) throws MiddlewareQueryException {
-		Map<Integer, BlockInfo> blockMap = extractAllBlockInformation(infoList);
+		Map<Integer, BlockInfo> blockMap = this.extractAllBlockInformation(infoList);
 		if (!blockMap.isEmpty()) {
 			for (Integer blockId : blockMap.keySet()) {
 				BlockInfo blockInfo = blockMap.get(blockId);
-				List<Locdes> descriptions = getLocdesDao().getByLocation(blockInfo.getBlockId());
-				updateDeletedPlots(blockId, descriptions, blockInfo.getDeletedPlots(), userId);
+				List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
+				this.updateDeletedPlots(blockId, descriptions, blockInfo.getDeletedPlots(), userId);
 			}
 		}
 	}
-	
-	private void updateDeletedPlots(Integer locId, List<Locdes> descriptions, List<String> deletedPlots, int userId) throws MiddlewareQueryException {
-		Map<String, Integer> udfldMap = getUdfldMap();
-		List<Locdes> savedDeletedPlots = findAllLocdes(descriptions, getId(udfldMap, LocdesType.DELETED_PLOTS));
+
+	private void updateDeletedPlots(Integer locId, List<Locdes> descriptions, List<String> deletedPlots, int userId)
+			throws MiddlewareQueryException {
+		Map<String, Integer> udfldMap = this.getUdfldMap();
+		List<Locdes> savedDeletedPlots = this.findAllLocdes(descriptions, this.getId(udfldMap, LocdesType.DELETED_PLOTS));
 		if (savedDeletedPlots != null && !savedDeletedPlots.isEmpty()) {
 			for (Locdes savedDeletedPlot : savedDeletedPlots) {
-				getLocdesDao().makeTransient(savedDeletedPlot);
+				this.getLocdesDao().makeTransient(savedDeletedPlot);
 			}
 		}
 		if (deletedPlots != null && !deletedPlots.isEmpty()) {
 			for (String deletedPlot : deletedPlots) {
-				Locdes locdes = createLocdes(locId, getId(udfldMap, LocdesType.DELETED_PLOTS), deletedPlot, userId);
-				getLocdesDao().save(locdes);
+				Locdes locdes = this.createLocdes(locId, this.getId(udfldMap, LocdesType.DELETED_PLOTS), deletedPlot, userId);
+				this.getLocdesDao().save(locdes);
 			}
 		}
 	}
-	
-	private void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value, int userId) throws MiddlewareQueryException {
+
+	private void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value, int userId)
+			throws MiddlewareQueryException {
 		if (value != null) {
-			Locdes locdes = findLocdes(descriptions, typeId);
+			Locdes locdes = this.findLocdes(descriptions, typeId);
 			if (locdes == null) {
-				locdes = createLocdes(locId, typeId, value, userId);
+				locdes = this.createLocdes(locId, typeId, value, userId);
 			}
-			getLocdesDao().saveOrUpdate(locdes);
+			this.getLocdesDao().saveOrUpdate(locdes);
 		}
 	}
-	
+
 	private Locdes findLocdes(List<Locdes> descriptions, int typeId) {
 		if (descriptions != null && !descriptions.isEmpty()) {
 			for (Locdes description : descriptions) {
@@ -106,7 +115,7 @@ public class LocdesSaver extends Saver {
 		}
 		return null;
 	}
-	
+
 	private List<Locdes> findAllLocdes(List<Locdes> descriptions, int typeId) {
 		List<Locdes> list = new ArrayList<Locdes>();
 		if (descriptions != null && !descriptions.isEmpty()) {
@@ -118,10 +127,10 @@ public class LocdesSaver extends Saver {
 		}
 		return list;
 	}
-	
+
 	private Locdes createLocdes(Integer locId, int typeId, Object value, int userId) throws MiddlewareQueryException {
 		Locdes locdes = new Locdes();
-		locdes.setLdid(getLocdesDao().getNextId("ldid"));
+		locdes.setLdid(this.getLocdesDao().getNextId("ldid"));
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
@@ -137,16 +146,15 @@ public class LocdesSaver extends Saver {
 		for (FieldMapInfo info : infoList) {
 			for (FieldMapDatasetInfo dataset : info.getDatasets()) {
 				for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
-					putAllBlockInformationToAMap(trial,blockMap);
+					this.putAllBlockInformationToAMap(trial, blockMap);
 				}
 			}
 		}
-		
+
 		return blockMap;
 	}
-	
-	private void putAllBlockInformationToAMap(FieldMapTrialInstanceInfo trial,
-			Map<Integer, BlockInfo> blockMap) {
+
+	private void putAllBlockInformationToAMap(FieldMapTrialInstanceInfo trial, Map<Integer, BlockInfo> blockMap) {
 		if (trial.getBlockId() != null) {
 			BlockInfo blockInfo = blockMap.get(trial.getBlockId());
 
@@ -159,13 +167,14 @@ public class LocdesSaver extends Saver {
 				blockInfo.setNumberOfRowsPerPlot(trial.getRowsPerPlot());
 				blockInfo.setPlantingOrder(trial.getPlantingOrder());
 				blockInfo.setDeletedPlots(trial.getDeletedPlots());
-				
+
 				blockMap.put(trial.getBlockId(), blockInfo);
 			}
 		}
 	}
 
 	private class BlockInfo {
+
 		private Integer blockId;
 		private Integer numberOfRowsInBlock;
 		private Integer numberOfRangesInBlock;
@@ -173,46 +182,59 @@ public class LocdesSaver extends Saver {
 		private Integer numberOfRowsPerPlot;
 		private Integer machineRowCapacity;
 		private List<String> deletedPlots;
-		
+
 		public Integer getBlockId() {
-			return blockId;
+			return this.blockId;
 		}
+
 		public void setBlockId(Integer blockId) {
 			this.blockId = blockId;
 		}
+
 		public Integer getNumberOfRowsInBlock() {
-			return numberOfRowsInBlock;
+			return this.numberOfRowsInBlock;
 		}
+
 		public void setNumberOfRowsInBlock(Integer numberOfRowsInBlock) {
 			this.numberOfRowsInBlock = numberOfRowsInBlock;
 		}
+
 		public Integer getNumberOfRangesInBlock() {
-			return numberOfRangesInBlock;
+			return this.numberOfRangesInBlock;
 		}
+
 		public void setNumberOfRangesInBlock(Integer numberOfRangesInBlock) {
 			this.numberOfRangesInBlock = numberOfRangesInBlock;
 		}
+
 		public Integer getPlantingOrder() {
-			return plantingOrder;
+			return this.plantingOrder;
 		}
+
 		public void setPlantingOrder(Integer plantingOrder) {
 			this.plantingOrder = plantingOrder;
 		}
+
 		public Integer getNumberOfRowsPerPlot() {
-			return numberOfRowsPerPlot;
+			return this.numberOfRowsPerPlot;
 		}
+
 		public void setNumberOfRowsPerPlot(Integer numberOfRowsPerPlot) {
 			this.numberOfRowsPerPlot = numberOfRowsPerPlot;
 		}
+
 		public Integer getMachineRowCapacity() {
-			return machineRowCapacity;
+			return this.machineRowCapacity;
 		}
+
 		public void setMachineRowCapacity(Integer machineRowCapacity) {
 			this.machineRowCapacity = machineRowCapacity;
 		}
+
 		public List<String> getDeletedPlots() {
-			return deletedPlots;
+			return this.deletedPlots;
 		}
+
 		public void setDeletedPlots(List<String> deletedPlots) {
 			this.deletedPlots = deletedPlots;
 		}

@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.domain.etl;
 
 import java.util.ArrayList;
@@ -10,24 +11,26 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class MeasurementDataTest {
+
 	@Test
-	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsNonCategorical(){
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsNonCategorical() {
 		MeasurementData data = new MeasurementData();
 		MeasurementVariable var = new MeasurementVariable();
 		var.setDataTypeId(TermId.DATE_VARIABLE.getId());
 		data.setMeasurementVariable(var);
-		Assert.assertFalse("Should return false since measurement variable is non categorical", data.isCategoricalDisplayAcceptedValidValues());
+		Assert.assertFalse("Should return false since measurement variable is non categorical",
+				data.isCategoricalDisplayAcceptedValidValues());
 	}
-	
+
 	@Test
-	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsNull(){
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsNull() {
 		MeasurementData data = new MeasurementData();
 		data.setMeasurementVariable(null);
 		Assert.assertFalse("Should return false since measurement variable is null", data.isCategoricalDisplayAcceptedValidValues());
 	}
-	
+
 	@Test
-	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndPossibleValuesIsEmpty(){
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndPossibleValuesIsEmpty() {
 		MeasurementData data = new MeasurementData();
 		data.setValue("1");
 		MeasurementVariable var = new MeasurementVariable();
@@ -36,9 +39,9 @@ public class MeasurementDataTest {
 		data.setMeasurementVariable(var);
 		Assert.assertTrue("Should return false since possible values is empty list", data.isCategoricalDisplayAcceptedValidValues());
 	}
-	
+
 	@Test
-	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndDisplayValueIsEmptyString(){
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndDisplayValueIsEmptyString() {
 		MeasurementData data = Mockito.spy(new MeasurementData());
 		MeasurementVariable var = new MeasurementVariable();
 		var.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
@@ -47,9 +50,9 @@ public class MeasurementDataTest {
 		Mockito.doReturn("").when(data).getDisplayValue();
 		Assert.assertFalse("Should return false since possible values is empty list", data.isCategoricalDisplayAcceptedValidValues());
 	}
-	
+
 	@Test
-	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndValueMarkedMissing(){
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndValueMarkedMissing() {
 		MeasurementData data = Mockito.spy(new MeasurementData());
 		MeasurementVariable var = new MeasurementVariable();
 		var.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
@@ -58,9 +61,9 @@ public class MeasurementDataTest {
 		Mockito.doReturn(MeasurementData.MISSING_VALUE).when(data).getDisplayValue();
 		Assert.assertFalse("Should return false since value is marked as missing", data.isCategoricalDisplayAcceptedValidValues());
 	}
-	
+
 	@Test
-	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndDisplayValueIsMatching(){
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndDisplayValueIsMatching() {
 		MeasurementData data = Mockito.spy(new MeasurementData());
 		MeasurementVariable var = new MeasurementVariable();
 		var.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
@@ -69,11 +72,12 @@ public class MeasurementDataTest {
 		var.setPossibleValues(possibleValues);
 		data.setMeasurementVariable(var);
 		Mockito.doReturn("Desc").when(data).getDisplayValue();
-		Assert.assertFalse("Should return false since dispay value part of the possible values", data.isCategoricalDisplayAcceptedValidValues());
+		Assert.assertFalse("Should return false since dispay value part of the possible values",
+				data.isCategoricalDisplayAcceptedValidValues());
 	}
-	
+
 	@Test
-	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndDisplayValueIsNotMatching(){
+	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsCategoricalAndDisplayValueIsNotMatching() {
 		MeasurementData data = Mockito.spy(new MeasurementData());
 		MeasurementVariable var = new MeasurementVariable();
 		var.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
@@ -82,6 +86,7 @@ public class MeasurementDataTest {
 		var.setPossibleValues(possibleValues);
 		data.setMeasurementVariable(var);
 		Mockito.doReturn("5").when(data).getDisplayValue();
-		Assert.assertTrue("Should return true since dispay value is a custom out of bounds value (accepted value)", data.isCategoricalDisplayAcceptedValidValues());
+		Assert.assertTrue("Should return true since dispay value is a custom out of bounds value (accepted value)",
+				data.isCategoricalDisplayAcceptedValidValues());
 	}
 }

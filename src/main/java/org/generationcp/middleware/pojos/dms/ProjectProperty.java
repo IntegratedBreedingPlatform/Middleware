@@ -1,17 +1,24 @@
+
 package org.generationcp.middleware.pojos.dms;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * http://wiki.cimmyt.org/confluence/display/MBP/Business+Rules+for+Mapping+to+Chado
- * 
- * The project_properties table captures links to the ontology. 
- * Properties with the same rank represent a single compound property. 
- * The type column distinguishes the components of the compound property. 
- * Note that these entries are just the names of the properties with their ontology mappings. 
- * Values for properties are stored in the appropriate sub-module, usually in Experiment. 
- * 
+ *
+ * The project_properties table captures links to the ontology. Properties with the same rank represent a single compound property. The type
+ * column distinguishes the components of the compound property. Note that these entries are just the names of the properties with their
+ * ontology mappings. Values for properties are stored in the appropriate sub-module, usually in Experiment.
+ *
  * @author tippsgo
  *
  */
@@ -25,38 +32,36 @@ public class ProjectProperty implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "projectprop_id")
 	private Integer projectPropertyId;
-	
+
 	/**
 	 * The DMS Project associated with this property.
 	 */
 	@ManyToOne(targetEntity = DmsProject.class)
 	@JoinColumn(name = "project_id", nullable = false)
 	private DmsProject project;
-	
+
 	/**
 	 * The type defined in CV term.
 	 */
 	@Column(name = "type_id")
 	private Integer typeId;
-	
+
 	/**
 	 * The value of the property.
 	 */
 	@Column(name = "value")
 	private String value;
-	
+
 	/**
 	 * Used for grouping compound properties.
 	 */
 	@Column(name = "rank")
 	private Integer rank;
-	
-	
+
 	public ProjectProperty() {
 	}
 
-	public ProjectProperty(Integer projectPropertyId, DmsProject project,
-			Integer typeId, String value, Integer rank) {
+	public ProjectProperty(Integer projectPropertyId, DmsProject project, Integer typeId, String value, Integer rank) {
 		this.projectPropertyId = projectPropertyId;
 		this.project = project;
 		this.typeId = typeId;
@@ -65,7 +70,7 @@ public class ProjectProperty implements Serializable {
 	}
 
 	public Integer getProjectPropertyId() {
-		return projectPropertyId;
+		return this.projectPropertyId;
 	}
 
 	public void setProjectPropertyId(Integer id) {
@@ -73,7 +78,7 @@ public class ProjectProperty implements Serializable {
 	}
 
 	public DmsProject getProject() {
-		return project;
+		return this.project;
 	}
 
 	public void setProject(DmsProject project) {
@@ -81,7 +86,7 @@ public class ProjectProperty implements Serializable {
 	}
 
 	public Integer getTypeId() {
-		return typeId;
+		return this.typeId;
 	}
 
 	public void setTypeId(Integer type) {
@@ -89,7 +94,7 @@ public class ProjectProperty implements Serializable {
 	}
 
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	public void setValue(String value) {
@@ -97,7 +102,7 @@ public class ProjectProperty implements Serializable {
 	}
 
 	public Integer getRank() {
-		return rank;
+		return this.rank;
 	}
 
 	public void setRank(Integer rank) {
@@ -108,50 +113,47 @@ public class ProjectProperty implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((projectPropertyId == null) ? 0 : projectPropertyId
-						.hashCode());
+		result = prime * result + (this.projectPropertyId == null ? 0 : this.projectPropertyId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		ProjectProperty other = (ProjectProperty) obj;
-		if (projectPropertyId == null) {
+		if (this.projectPropertyId == null) {
 			if (other.projectPropertyId != null) {
-                return false;
-            }
-		} else if (!projectPropertyId.equals(other.projectPropertyId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.projectPropertyId.equals(other.projectPropertyId)) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ProjectProperty [projectPropertyId=");
-        builder.append(projectPropertyId);
-        builder.append(", project=");
-        builder.append(project.getName());
-        builder.append(", typeId=");
-        builder.append(typeId);
-        builder.append(", value=");
-        builder.append(value);
-        builder.append(", rank=");
-        builder.append(rank);
-        builder.append("]");
-        return builder.toString();
-    }
-	
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ProjectProperty [projectPropertyId=");
+		builder.append(this.projectPropertyId);
+		builder.append(", project=");
+		builder.append(this.project.getName());
+		builder.append(", typeId=");
+		builder.append(this.typeId);
+		builder.append(", value=");
+		builder.append(this.value);
+		builder.append(", rank=");
+		builder.append(this.rank);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

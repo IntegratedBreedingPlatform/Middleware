@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.dao.ims;
 
 import java.math.BigInteger;
@@ -17,186 +18,179 @@ import org.hibernate.criterion.Restrictions;
 /**
  * Created by Daniel Villafuerte on 5/5/2015.
  */
-public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
-    public List<StockTransaction> getTransactionsForListDataProjectIDs(List<Integer> listDataProjectIDList) throws MiddlewareQueryException {
-        try {
-            Criteria criteria = getSession().createCriteria(StockTransaction.class);
-            criteria.createAlias("listDataProject", "ldp");
-            criteria.add(Restrictions.in("ldp.listDataProjectId", listDataProjectIDList));
+public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 
-            return criteria.list();
-        } catch (HibernateException e) {
-            logAndThrowException("Error with getTransactionsForListDataProjectIDs() query from StockTransactionDAO: " + e.getMessage(), e);
-            return new ArrayList<StockTransaction>();
-        }
-    }
+	public List<StockTransaction> getTransactionsForListDataProjectIDs(List<Integer> listDataProjectIDList) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = this.getSession().createCriteria(StockTransaction.class);
+			criteria.createAlias("listDataProject", "ldp");
+			criteria.add(Restrictions.in("ldp.listDataProjectId", listDataProjectIDList));
 
-    public boolean listDataProjectListHasStockTransactions(Integer listDataProjectListId) throws MiddlewareQueryException {
-        String sql = "select count(*) from ims_stock_transaction ist " +
-                "WHERE EXISTS (select 1 from listdata_project ldp where ldp.listdata_project_id = ist.listdata_project_id" +
-                " AND ldp.list_id = :listId)";
+			return criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with getTransactionsForListDataProjectIDs() query from StockTransactionDAO: " + e.getMessage(), e);
+			return new ArrayList<StockTransaction>();
+		}
+	}
 
-        try {
-            Query query = getSession().createSQLQuery(sql);
-            query.setInteger("listId", listDataProjectListId);
+	public boolean listDataProjectListHasStockTransactions(Integer listDataProjectListId) throws MiddlewareQueryException {
+		String sql =
+				"select count(*) from ims_stock_transaction ist "
+						+ "WHERE EXISTS (select 1 from listdata_project ldp where ldp.listdata_project_id = ist.listdata_project_id"
+						+ " AND ldp.list_id = :listId)";
 
-            Number number = (Number) query.uniqueResult();
-            return number.intValue() > 0;
-        } catch (HibernateException e) {
-            logAndThrowException("Error with listDataProjectListHasStockTransactions() query from StockTransactionDAO: " + e.getMessage(), e);
-            return false;
-        }
-    }
+		try {
+			Query query = this.getSession().createSQLQuery(sql);
+			query.setInteger("listId", listDataProjectListId);
 
-    public List<InventoryDetails> retrieveInventoryDetailsForListDataProjectListId(Integer listDataProjectListId, GermplasmListType germplasmListType) throws MiddlewareQueryException {
-        List<InventoryDetails> detailsList = new ArrayList<>();
+			Number number = (Number) query.uniqueResult();
+			return number.intValue() > 0;
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with listDataProjectListHasStockTransactions() query from StockTransactionDAO: " + e.getMessage(), e);
+			return false;
+		}
+	}
 
-        if (! germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
-            throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
-        }
+	public List<InventoryDetails> retrieveInventoryDetailsForListDataProjectListId(Integer listDataProjectListId,
+			GermplasmListType germplasmListType) throws MiddlewareQueryException {
+		List<InventoryDetails> detailsList = new ArrayList<>();
 
-        String sql = "select lot.lotid, lot.locid, lot.scaleid, lot.userid, " +
-                "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, " +
-                "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid, " +
-                "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, " +
-                "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId " +
-                "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id " +
-                "INNER JOIN listnms ON d.list_id = listnms.listid " +
-                "INNER JOIN ims_transaction tran ON tran.trnid = ist.trnid INNER JOIN ims_lot lot ON lot.lotid = tran.lotid " +
-                "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid " +
-                "WHERE listnms.listid = :listId ORDER BY d.entry_id";
+		if (!germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
+			throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
+		}
 
-        try {
-            Query query = setupInventoryDetailQueryObject(sql);
-            query.setInteger("listId", listDataProjectListId);
-            
-            List<Object[]> results = query.list();
+		String sql =
+				"select lot.lotid, lot.locid, lot.scaleid, lot.userid, "
+						+ "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, "
+						+ "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid, "
+						+ "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, "
+						+ "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId "
+						+ "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id "
+						+ "INNER JOIN listnms ON d.list_id = listnms.listid "
+						+ "INNER JOIN ims_transaction tran ON tran.trnid = ist.trnid INNER JOIN ims_lot lot ON lot.lotid = tran.lotid "
+						+ "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid "
+						+ "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
-            if (!results.isEmpty()){
-                for (Object[] row: results){
-                    detailsList.add(convertSQLResultsToInventoryDetails(row));
-                }
-            }
-        } catch (HibernateException e) {
-            logAndThrowException("Error with retrieveInventoryDetailsForListDataProjectListId() query from StockTransactionDAO: " + e.getMessage(), e);
-        }
+		try {
+			Query query = this.setupInventoryDetailQueryObject(sql);
+			query.setInteger("listId", listDataProjectListId);
 
-        return detailsList;
-    }
+			List<Object[]> results = query.list();
 
-    public List<InventoryDetails> retrieveSummedInventoryDetailsForListDataProjectListId(Integer listDataProjectListId, GermplasmListType germplasmListType) throws MiddlewareQueryException {
-        List<InventoryDetails> detailsList = new ArrayList<>();
+			if (!results.isEmpty()) {
+				for (Object[] row : results) {
+					detailsList.add(this.convertSQLResultsToInventoryDetails(row));
+				}
+			}
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with retrieveInventoryDetailsForListDataProjectListId() query from StockTransactionDAO: " + e.getMessage(), e);
+		}
 
-        if (! germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
-            throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
-        }
+		return detailsList;
+	}
 
-        String sql = "select lot.lotid, lot.locid, summed.scaleid, lot.userid, " +
-                "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, " +
-                "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,tran.inventory_id, tran.sourceid, " +
-                "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, " +
-                "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId " +
-                "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id " +
-                "INNER JOIN listnms ON d.list_id = listnms.listid " +
-                "INNER JOIN summed_transaction summed ON (summed.recordid = ist.recordid) " +
-                "INNER JOIN ims_transaction tran ON (tran.trnid = ist.trnid AND tran.recordid = summed.recordid) " +
-                "INNER JOIN ims_lot lot ON lot.lotid = summed.lotid " +
-                "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = summed.scaleid " +
-                "WHERE listnms.listid = :listId ORDER BY d.entry_id";
+	public List<InventoryDetails> retrieveSummedInventoryDetailsForListDataProjectListId(Integer listDataProjectListId,
+			GermplasmListType germplasmListType) throws MiddlewareQueryException {
+		List<InventoryDetails> detailsList = new ArrayList<>();
 
-        try {
-            Query query = setupInventoryDetailQueryObject(sql);
-            query.setInteger("listId", listDataProjectListId);
+		if (!germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
+			throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
+		}
 
-            List<Object[]> results = query.list();
+		String sql =
+				"select lot.lotid, lot.locid, summed.scaleid, lot.userid, "
+						+ "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, "
+						+ "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,tran.inventory_id, tran.sourceid, "
+						+ "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, "
+						+ "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId "
+						+ "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id "
+						+ "INNER JOIN listnms ON d.list_id = listnms.listid "
+						+ "INNER JOIN summed_transaction summed ON (summed.recordid = ist.recordid) "
+						+ "INNER JOIN ims_transaction tran ON (tran.trnid = ist.trnid AND tran.recordid = summed.recordid) "
+						+ "INNER JOIN ims_lot lot ON lot.lotid = summed.lotid "
+						+ "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = summed.scaleid "
+						+ "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
-            if (!results.isEmpty()){
-                for (Object[] row: results){
-                    InventoryDetails details = convertSQLResultsToInventoryDetails(row);
-                    detailsList.add(details);
-                }
-            }
-        } catch (HibernateException e) {
-            logAndThrowException("Error with retrieveInventoryDetailsForListDataProjectListId() query from StockTransactionDAO: " + e.getMessage(), e);
-        }
+		try {
+			Query query = this.setupInventoryDetailQueryObject(sql);
+			query.setInteger("listId", listDataProjectListId);
 
-        return detailsList;
-    }
+			List<Object[]> results = query.list();
 
-    protected Query setupInventoryDetailQueryObject(String querySQL) {
-        Query query = getSession().createSQLQuery(querySQL)
-                .addScalar("lotId")
-                .addScalar("locid")
-                .addScalar("scaleid")
-                .addScalar("userid")
-                .addScalar("germplasm_id")
-                .addScalar("entry_id")
-                .addScalar("seed_source")
-                .addScalar("designation")
-                .addScalar("group_name")
-                .addScalar("lname")
-                .addScalar("labbr")
-                .addScalar("name")
-                .addScalar("trnqty")
-                .addScalar("comments")
-                .addScalar("inventory_id")
-                .addScalar("sourceid")
-                .addScalar("duplicate_notes")
-                .addScalar("bulk_with")
-                .addScalar("bulk_compl")
-                .addScalar("listdata_project_id")
-                .addScalar("trnid")
-                .addScalar("recordid")
-                .addScalar("eid")
-                .addScalar("stockSourceRecordId");
+			if (!results.isEmpty()) {
+				for (Object[] row : results) {
+					InventoryDetails details = this.convertSQLResultsToInventoryDetails(row);
+					detailsList.add(details);
+				}
+			}
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with retrieveInventoryDetailsForListDataProjectListId() query from StockTransactionDAO: " + e.getMessage(), e);
+		}
 
-        return query;
-    }
+		return detailsList;
+	}
 
-    protected InventoryDetails convertSQLResultsToInventoryDetails(Object[] resultRow){
-        Integer lotId = (Integer) resultRow[0];
-        Integer locationId = (Integer) resultRow[1];
-        Integer scaleId = (Integer) resultRow[2];
-        Integer userId = (Integer) resultRow[3];
-        Integer gid = (Integer) resultRow[4];
-        Integer entryId = (Integer) resultRow[5];
-        String seedSource = (String) resultRow[6];
-        String designation = (String) resultRow[7];
-        String groupName = (String) resultRow[8];
-        String locationName = (String) resultRow[9];
-        String locationAbbr = (String) resultRow[10];
-        String scaleName = (String) resultRow[11];
-        Double amount = (Double) resultRow[12];
-        String comments = (String) resultRow[13];
-        String inventoryID = (String) resultRow[14];
-        Integer sourceId = (Integer) resultRow[15];
-        String duplicate = (String) resultRow[16];
-        String bulkWith = (String) resultRow[17];
-        String bulkCompl = (String) resultRow[18];
-        Integer listDataProjectId = (Integer) resultRow[19];
-        Integer trnId = (Integer) resultRow[20];
-        Integer sourceRecordId = (Integer) resultRow[21];
-        Integer lotGid = (Integer) resultRow[22];
-        Integer stockSourceRecordId = (Integer) resultRow[23];
+	protected Query setupInventoryDetailQueryObject(String querySQL) {
+		Query query =
+				this.getSession().createSQLQuery(querySQL).addScalar("lotId").addScalar("locid").addScalar("scaleid").addScalar("userid")
+						.addScalar("germplasm_id").addScalar("entry_id").addScalar("seed_source").addScalar("designation")
+						.addScalar("group_name").addScalar("lname").addScalar("labbr").addScalar("name").addScalar("trnqty")
+						.addScalar("comments").addScalar("inventory_id").addScalar("sourceid").addScalar("duplicate_notes")
+						.addScalar("bulk_with").addScalar("bulk_compl").addScalar("listdata_project_id").addScalar("trnid")
+						.addScalar("recordid").addScalar("eid").addScalar("stockSourceRecordId");
 
-        InventoryDetails details = new InventoryDetails(gid, designation, lotId, locationId, locationName,
-                userId, amount, sourceId, null, scaleId, scaleName, comments);
-        details.setInventoryID(inventoryID);
-        details.setLocationAbbr(locationAbbr);
-        details.setEntryId(entryId);
-        details.setSource(seedSource);
-        details.setParentage(groupName);
-        details.setDuplicate(duplicate);
-        details.setBulkWith(bulkWith);
-        details.setBulkCompl(bulkCompl);
-        details.setListDataProjectId(listDataProjectId);
-        details.setTrnId(trnId);
-        details.setSourceRecordId(sourceRecordId);
-        details.setLotGid(lotGid);
-        details.setStockSourceRecordId(stockSourceRecordId);
+		return query;
+	}
 
-        return details;
-    }
+	protected InventoryDetails convertSQLResultsToInventoryDetails(Object[] resultRow) {
+		Integer lotId = (Integer) resultRow[0];
+		Integer locationId = (Integer) resultRow[1];
+		Integer scaleId = (Integer) resultRow[2];
+		Integer userId = (Integer) resultRow[3];
+		Integer gid = (Integer) resultRow[4];
+		Integer entryId = (Integer) resultRow[5];
+		String seedSource = (String) resultRow[6];
+		String designation = (String) resultRow[7];
+		String groupName = (String) resultRow[8];
+		String locationName = (String) resultRow[9];
+		String locationAbbr = (String) resultRow[10];
+		String scaleName = (String) resultRow[11];
+		Double amount = (Double) resultRow[12];
+		String comments = (String) resultRow[13];
+		String inventoryID = (String) resultRow[14];
+		Integer sourceId = (Integer) resultRow[15];
+		String duplicate = (String) resultRow[16];
+		String bulkWith = (String) resultRow[17];
+		String bulkCompl = (String) resultRow[18];
+		Integer listDataProjectId = (Integer) resultRow[19];
+		Integer trnId = (Integer) resultRow[20];
+		Integer sourceRecordId = (Integer) resultRow[21];
+		Integer lotGid = (Integer) resultRow[22];
+		Integer stockSourceRecordId = (Integer) resultRow[23];
+
+		InventoryDetails details =
+				new InventoryDetails(gid, designation, lotId, locationId, locationName, userId, amount, sourceId, null, scaleId, scaleName,
+						comments);
+		details.setInventoryID(inventoryID);
+		details.setLocationAbbr(locationAbbr);
+		details.setEntryId(entryId);
+		details.setSource(seedSource);
+		details.setParentage(groupName);
+		details.setDuplicate(duplicate);
+		details.setBulkWith(bulkWith);
+		details.setBulkCompl(bulkCompl);
+		details.setListDataProjectId(listDataProjectId);
+		details.setTrnId(trnId);
+		details.setSourceRecordId(sourceRecordId);
+		details.setLotGid(lotGid);
+		details.setStockSourceRecordId(stockSourceRecordId);
+
+		return details;
+	}
 
 	public boolean stockHasCompletedBulking(Integer listId) throws MiddlewareQueryException {
 		StringBuilder sql = new StringBuilder();
@@ -208,10 +202,10 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer>{
 		sql.append("ON tran.trnid = ist.trnid ");
 		sql.append("WHERE d.list_id = :listId ");
 		sql.append("AND tran.bulk_compl = 'Completed' ");
-		Query query = getSession().createSQLQuery(sql.toString());
-        query.setInteger("listId", listId);
-        BigInteger numberOfRecords = (BigInteger)query.uniqueResult();
-		if(numberOfRecords.intValue() > 0) {
+		Query query = this.getSession().createSQLQuery(sql.toString());
+		query.setInteger("listId", listId);
+		BigInteger numberOfRecords = (BigInteger) query.uniqueResult();
+		if (numberOfRecords.intValue() > 0) {
 			return true;
 		}
 		return false;

@@ -1,83 +1,75 @@
+
 package org.generationcp.middleware.domain.conformity;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Daniel Villafuerte
-
+ * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
 public class ConformityGermplasmInput {
 
-    private String line;
-    private String alias;
-    private Integer gid;
-    private Integer sNumber;
+	private String line;
+	private String alias;
+	private Integer gid;
+	private Integer sNumber;
 
-    private Map<String, String> markerValues;
+	private Map<String, String> markerValues;
 
-    public ConformityGermplasmInput() {
-        this(null, null, null);
-    }
+	public ConformityGermplasmInput() {
+		this(null, null, null);
+	}
 
-    public ConformityGermplasmInput(String line, String alias, Integer gid) {
-        this.line = line;
-        this.gid = gid;
+	public ConformityGermplasmInput(String line, String alias, Integer gid) {
+		this.line = line;
+		this.gid = gid;
 
-        this.markerValues = new HashMap<String, String>();
-    }
+		this.markerValues = new HashMap<String, String>();
+	}
 
-    public String getLine() {
-        return line;
-    }
+	public String getLine() {
+		return this.line;
+	}
 
-    public void setLine(String line) {
-        this.line = line;
-    }
+	public void setLine(String line) {
+		this.line = line;
+	}
 
-    public String getAlias() {
-        return alias;
-    }
+	public String getAlias() {
+		return this.alias;
+	}
 
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
 
-    public Integer getGid() {
-        return gid;
-    }
+	public Integer getGid() {
+		return this.gid;
+	}
 
-    public void setGid(Integer gid) {
-        this.gid = gid;
-    }
+	public void setGid(Integer gid) {
+		this.gid = gid;
+	}
 
+	public Map<String, String> getMarkerValues() {
+		return this.markerValues;
+	}
 
+	public void setMarkerValues(Map<String, String> markerValues) {
+		this.markerValues = markerValues;
+	}
 
-    public Map<String, String> getMarkerValues() {
-        return markerValues;
-    }
+	public Integer getsNumber() {
+		return this.sNumber;
+	}
 
-    public void setMarkerValues(Map<String, String> markerValues) {
-        this.markerValues = markerValues;
-    }
+	public void setsNumber(Integer sNumber) {
+		this.sNumber = sNumber;
+	}
 
-    public Integer getsNumber() {
-        return sNumber;
-    }
-
-    public void setsNumber(Integer sNumber) {
-        this.sNumber = sNumber;
-    }
-
-    @Override
-    public String toString() {
-        return "ConformityGermplasmInput{" +
-                "line='" + line + '\'' +
-                ", alias='" + alias + '\'' +
-                ", gid=" + gid +
-                ", sNumber=" + sNumber +
-                ", markerValues=" + markerValues +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "ConformityGermplasmInput{" + "line='" + this.line + '\'' + ", alias='" + this.alias + '\'' + ", gid=" + this.gid
+				+ ", sNumber=" + this.sNumber + ", markerValues=" + this.markerValues + '}';
+	}
 }

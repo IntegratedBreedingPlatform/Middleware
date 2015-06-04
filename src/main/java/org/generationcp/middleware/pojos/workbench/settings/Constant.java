@@ -1,12 +1,13 @@
-package org.generationcp.middleware.pojos.workbench.settings;
 
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.manager.Operation;
+package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class Constant  implements Serializable {
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.manager.Operation;
+
+public class Constant implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String name;
@@ -23,18 +24,16 @@ public class Constant  implements Serializable {
 	private Operation operation;
 	private boolean isTrial;
 	private int id;
-    private int storedIn;
-    private String label;
+	private int storedIn;
+	private String label;
 	private List<ValueReference> possibleValues;
-	
-	public Constant(){
+
+	public Constant() {
 		super();
 	}
-	
-	public Constant(String name, String description, String property,
-			String scale, String method, String role, String datatype,
-			String value, Integer dataTypeId, Double minRange, Double maxRange,
-			boolean isTrial) {
+
+	public Constant(String name, String description, String property, String scale, String method, String role, String datatype,
+			String value, Integer dataTypeId, Double minRange, Double maxRange, boolean isTrial) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -51,56 +50,71 @@ public class Constant  implements Serializable {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public String getProperty() {
-		return property;
+		return this.property;
 	}
+
 	public void setProperty(String property) {
 		this.property = property;
 	}
+
 	public String getScale() {
-		return scale;
+		return this.scale;
 	}
+
 	public void setScale(String scale) {
 		this.scale = scale;
 	}
+
 	public String getMethod() {
-		return method;
+		return this.method;
 	}
+
 	public void setMethod(String method) {
 		this.method = method;
 	}
+
 	public String getRole() {
-		return role;
+		return this.role;
 	}
+
 	public void setRole(String role) {
 		this.role = role;
 	}
+
 	public String getDatatype() {
-		return datatype;
+		return this.datatype;
 	}
+
 	public void setDatatype(String datatype) {
 		this.datatype = datatype;
 	}
+
 	public String getValue() {
-		return value;
+		return this.value;
 	}
+
 	public void setValue(String value) {
 		this.value = value;
 	}
 
 	public Integer getDataTypeId() {
-		return dataTypeId;
+		return this.dataTypeId;
 	}
 
 	public void setDataTypeId(Integer dataTypeId) {
@@ -108,7 +122,7 @@ public class Constant  implements Serializable {
 	}
 
 	public Double getMinRange() {
-		return minRange;
+		return this.minRange;
 	}
 
 	public void setMinRange(Double minRange) {
@@ -116,60 +130,60 @@ public class Constant  implements Serializable {
 	}
 
 	public Double getMaxRange() {
-		return maxRange;
+		return this.maxRange;
 	}
 
 	public void setMaxRange(Double maxRange) {
 		this.maxRange = maxRange;
 	}
 
-    /**
-     * @return the operation
-     */
-    public Operation getOperation() {
-        return operation;
-    }
+	/**
+	 * @return the operation
+	 */
+	public Operation getOperation() {
+		return this.operation;
+	}
 
-    /**
-     * @param operation the operation to set
-     */
-    public void setOperation(Operation operation) {
-        this.operation = operation;
-    }
+	/**
+	 * @param operation the operation to set
+	 */
+	public void setOperation(Operation operation) {
+		this.operation = operation;
+	}
 
-    /**
-     * @return the id
-     */
-    public int getId() {
-        return id;
-    }
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return this.id;
+	}
 
-    /**
-     * @param id the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    /**
-     * @return the storedIn
-     */
-    public int getStoredIn() {
-        return storedIn;
-    }
+	/**
+	 * @return the storedIn
+	 */
+	public int getStoredIn() {
+		return this.storedIn;
+	}
 
-    /**
-     * @param storedIn the storedIn to set
-     */
-    public void setStoredIn(int storedIn) {
-        this.storedIn = storedIn;
-    }
+	/**
+	 * @param storedIn the storedIn to set
+	 */
+	public void setStoredIn(int storedIn) {
+		this.storedIn = storedIn;
+	}
 
 	/**
 	 * @return the isTrial
 	 */
 	public boolean isTrial() {
-		return isTrial;
+		return this.isTrial;
 	}
 
 	/**
@@ -183,7 +197,7 @@ public class Constant  implements Serializable {
 	 * @return the label
 	 */
 	public String getLabel() {
-		return label;
+		return this.label;
 	}
 
 	/**
@@ -197,7 +211,7 @@ public class Constant  implements Serializable {
 	 * @return the possibleValues
 	 */
 	public List<ValueReference> getPossibleValues() {
-		return possibleValues;
+		return this.possibleValues;
 	}
 
 	/**

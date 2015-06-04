@@ -1,19 +1,21 @@
+
 package org.generationcp.middleware.util;
 
 /**
  * Created by EfficioDaniel on 3/31/2015.
  */
 public class CrossExpansionProperties {
-	private String profile;
-    private int wheatLevel;
-    private int defaultLevel;
-    
-    public CrossExpansionProperties(){
 
-    }
+	private String profile;
+	private int wheatLevel;
+	private int defaultLevel;
+
+	public CrossExpansionProperties() {
+
+	}
 
 	public int getWheatLevel() {
-		return wheatLevel;
+		return this.wheatLevel;
 	}
 
 	public void setWheatLevel(int wheatLevel) {
@@ -21,7 +23,7 @@ public class CrossExpansionProperties {
 	}
 
 	public int getDefaultLevel() {
-		return defaultLevel;
+		return this.defaultLevel;
 	}
 
 	public void setDefaultLevel(int defaultLevel) {
@@ -29,12 +31,11 @@ public class CrossExpansionProperties {
 	}
 
 	public String getProfile() {
-		return profile;
+		return this.profile;
 	}
 
 	public void setProfile(String profile) {
 		this.profile = profile;
 	}
-      
-    
+
 }

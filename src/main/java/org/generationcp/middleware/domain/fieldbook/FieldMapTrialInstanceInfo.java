@@ -1,593 +1,577 @@
 /*******************************************************************************
  * Copyright (c) 2013, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.fieldbook;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.util.Debug;
-
-import java.io.Serializable;
-import java.util.*;
 
 /**
  * The Class FieldMapTrialInstanceInfo.
  */
-public class FieldMapTrialInstanceInfo implements Serializable{
-    
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = 1L;
+public class FieldMapTrialInstanceInfo implements Serializable {
 
-    /** The geolocation id. */
-    private Integer geolocationId;
-    
-    /** The site name. trial location id */
-    private String siteName;
-    
-    /** The trial instance no. */
-    private String trialInstanceNo;
-    
-    /** The labels. */
-    private List<FieldMapLabel> labels;
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 1L;
 
-    private Map<Integer, String> labelHeaders;
-    
-    /** The block name. */
-    private String blockName;
-    
-    /** The field name. */
-    private String fieldName;
-    
-    /** site name or location name. */
-    private String locationName;
-    
-    /** The fieldmap uuid. */
-    private String fieldmapUUID;
-    
-    /** The columns in block. */
-    private Integer rowsInBlock;
-    
-    /** The ranges in block. */
-    private Integer rangesInBlock;
-    
-    /** The planting order. */
-    private Integer plantingOrder;
-    
-    /** The start column index. */
-    private Integer startColumn;
-    
-    /** The start range index. */
-    private Integer startRange;
-    
-    /** The entry count. */
-    private long entryCount;
-    
-    /** The rep count. */
-    private long repCount;
-    
-    /** The plot count. */
-    private long plotCount;
-    
-    /** The has field map. */
-    private boolean hasFieldMap;
-    
-    /** The rows per plot. */
-    private Integer rowsPerPlot;
-    
-    /** The machine row capacity. */
-    private Integer machineRowCapacity;
-    
-    /** The order. */
-    private Integer order;
-    
-    private Integer locationId;
-    
-    private Integer fieldId;
-    
-    private Integer blockId;
-    
-    private GermplasmList stockList;
-    
-    /** The deleted plot coordintes in (row, range) format */
-    private List<String> deletedPlots;
-    
-        
-    /**
-     * Instantiates a new field map trial instance info.
-     */
-    public FieldMapTrialInstanceInfo() {
-    }
+	/** The geolocation id. */
+	private Integer geolocationId;
 
-    /**
-     * Instantiates a new field map trial instance info.
-     *
-     * @param geolocationId the geolocation id
-     * @param siteName the site name
-     * @param labels the labels
-     */
-    public FieldMapTrialInstanceInfo(Integer geolocationId, String siteName, 
-    	List<FieldMapLabel> labels) {
-	this.geolocationId = geolocationId;
-	this.siteName = siteName;
-	this.labels = labels;
-    }
+	/** The site name. trial location id */
+	private String siteName;
 
-    /**
-     * Checks if is field map generated.
-     *
-     * @return true, if is field map generated
-     */
-    public boolean isFieldMapGenerated() {
-        if (getFieldMapLabels() != null) {
-            for (FieldMapLabel label : getFieldMapLabels()) {
-                if (label.getColumn() != null && label.getColumn() > 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Gets the geolocation id.
-     *
-     * @return the geolocation id
-     */
-    public Integer getGeolocationId() {
-        return geolocationId;
-    }
+	/** The trial instance no. */
+	private String trialInstanceNo;
 
-    /**
-     * Sets the geolocation id.
-     *
-     * @param geolocationId the new geolocation id
-     */
-    public void setGeolocationId(Integer geolocationId) {
-        this.geolocationId = geolocationId;
-    }
+	/** The labels. */
+	private List<FieldMapLabel> labels;
 
-    /**
-     * Gets the site name.
-     *
-     * @return the site name
-     */
-    public String getSiteName() {
-        return siteName;
-    }
+	private Map<Integer, String> labelHeaders;
 
-    /**
-     * Sets the site name.
-     *
-     * @param siteName the new site name
-     */
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
-    }
+	/** The block name. */
+	private String blockName;
 
-    /**
-     * Gets the trial instance no.
-     *
-     * @return the trial instance no
-     */
-    public String getTrialInstanceNo() {
-        return trialInstanceNo;
-    }
+	/** The field name. */
+	private String fieldName;
 
-    /**
-     * Sets the trial instance no.
-     *
-     * @param trialInstanceNo the new trial instance no
-     */
-    public void setTrialInstanceNo(String trialInstanceNo) {
-        this.trialInstanceNo = trialInstanceNo;
-    }
+	/** site name or location name. */
+	private String locationName;
 
-    /**
-     * Gets the field map labels.
-     *
-     * @return the field map labels
-     */
-    public List<FieldMapLabel> getFieldMapLabels() {
-        return labels;
-    }
+	/** The fieldmap uuid. */
+	private String fieldmapUUID;
 
-    /**
-     * Sets the field map labels.
-     *
-     * @param labels the new field map labels
-     */
-    public void setFieldMapLabels(List<FieldMapLabel> labels) {
-        this.labels = labels;
-    }
-    
-    /**
-     * Gets the block name.
-     *
-     * @return the blockName
-     */
-    public String getBlockName() {
-        return blockName;
-    }
+	/** The columns in block. */
+	private Integer rowsInBlock;
 
-    
-    /**
-     * Sets the block name.
-     *
-     * @param blockName the blockName to set
-     */
-    public void setBlockName(String blockName) {
-        this.blockName = blockName;
-    }
+	/** The ranges in block. */
+	private Integer rangesInBlock;
 
-    
-    /**
-     * Gets the columns in block.
-     *
-     * @return the columnsInBlock
-     */
-    public Integer getRowsInBlock() {
-        return rowsInBlock;
-    }
+	/** The planting order. */
+	private Integer plantingOrder;
 
-    
-    /**
-     * Sets the columns in block.
-     *
-     * @param rowsInBlock the rowsInBlock to set
-     */
-    public void setRowsInBlock(Integer rowsInBlock) {
-        this.rowsInBlock = rowsInBlock;
-    }
+	/** The start column index. */
+	private Integer startColumn;
 
-    
-    /**
-     * Gets the ranges in block.
-     *
-     * @return the rangesInBlock
-     */
-    public Integer getRangesInBlock() {
-        return rangesInBlock;
-    }
+	/** The start range index. */
+	private Integer startRange;
 
-    
-    /**
-     * Sets the ranges in block.
-     *
-     * @param rangesInBlock the rangesInBlock to set
-     */
-    public void setRangesInBlock(Integer rangesInBlock) {
-        this.rangesInBlock = rangesInBlock;
-    }
-    
-    /**
-     * Gets the planting order.
-     *
-     * @return the plantingOrder
-     */
-    public Integer getPlantingOrder() {
-        return plantingOrder;
-    }
-    
-    /**
-     * Sets the planting order.
-     *
-     * @param plantingOrder the plantingOrder to set
-     */
-    public void setPlantingOrder(Integer plantingOrder) {
-        this.plantingOrder = plantingOrder;
-    }
-    
-    /**
-     * Gets the entry count.
-     *
-     * @return the entry count
-     */
-    public long getEntryCount() {
-        Set<Integer> entries = new HashSet<Integer>();
-        for (FieldMapLabel label : labels){
-                entries.add(label.getEntryNumber());
-        }
-        return entries.size();
-    }
-    
-    /**
-     * Sets the entry count.
-     *
-     * @param entryCount the new entry count
-     */
-    public void setEntryCount(long entryCount) {
-        this.entryCount = entryCount;
-    }
-    
-    /**
-     * Gets the rep count.
-     *
-     * @return the rep count
-     */
-    public long getRepCount() {
-        List<Integer> reps = new ArrayList<Integer>();
-        for (FieldMapLabel label : labels){
-                reps.add(label.getRep());
-        }
-        if (reps.size() == 0){
-                return 1;
-        }
-        return Collections.max(reps);
-    }
-    
-    /**
-     * Sets the rep count.
-     *
-     * @param repCount the new rep count
-     */
-    public void setRepCount(long repCount) {
-        this.repCount = repCount;
-    }
+	/** The entry count. */
+	private long entryCount;
 
-    /**
-     * Gets the plot count.
-     *
-     * @return the plot count
-     */
-    public long getPlotCount() {
-        return labels.size();
-    }
-    
-    /**
-     * Sets the plot count.
-     *
-     * @param plotCount the new plot count
-     */
-    public void setPlotCount(long plotCount) {
-        this.plotCount = plotCount;
-    }
-    
-    /**
-     * Gets the field map label.
-     *
-     * @param experimentId the experiment id
-     * @return the field map label
-     */
-    public FieldMapLabel getFieldMapLabel(Integer experimentId) {
-        for (FieldMapLabel label: labels) {
-            if (experimentId.equals(label.getExperimentId())) {
-                return label;
-            } 
-        }
-        return null;
-    }
+	/** The rep count. */
+	private long repCount;
 
-    
-    /**
-     * Gets the start column.
-     *
-     * @return the startColumn
-     */
-    public Integer getStartColumn() {
-        return startColumn;
-    }
+	/** The plot count. */
+	private long plotCount;
 
-    
-    /**
-     * Sets the start column.
-     *
-     * @param startColumn the startColumn to set
-     */
-    public void setStartColumn(Integer startColumn) {
-        this.startColumn = startColumn;
-    }
+	/** The has field map. */
+	private boolean hasFieldMap;
 
-    
-    /**
-     * Gets the start range.
-     *
-     * @return the startRange
-     */
-    public Integer getStartRange() {
-        return startRange;
-    }
+	/** The rows per plot. */
+	private Integer rowsPerPlot;
 
-    
-    /**
-     * Sets the start range.
-     *
-     * @param startRange the startRange to set
-     */
-    public void setStartRange(Integer startRange) {
-        this.startRange = startRange;
-    }
+	/** The machine row capacity. */
+	private Integer machineRowCapacity;
 
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-	StringBuilder builder = new StringBuilder();
-	    builder.append("FieldMapTrialInstanceInfo [geolocationId=");
-	    builder.append(geolocationId);
-	    builder.append(", siteName=");
-	    builder.append(siteName);
-	    builder.append(", labels=");
-	    builder.append(labels.toString());
-	    builder.append(", numberOfEntries=");
-	    builder.append(getEntryCount());
-	    builder.append(", numberOfReps=");
-	    builder.append(getRepCount());
-	    builder.append(", numberOfPlots=");
-	    builder.append(getPlotCount());
-	    builder.append("]");
-	    return builder.toString();
-    }
+	/** The order. */
+	private Integer order;
 
-    /**
-     * Prints the.
-     *
-     * @param indent the indent
-     */
-    public void print(int indent) {
-        Debug.println(indent, "FieldMapTrialInstanceInfo: " );
-        indent = indent + 3;
-        Debug.println(indent, "Geolocation Id = " + geolocationId);
-        Debug.println(indent, "Site Name = " + siteName);
-        Debug.println(indent, "Labels = " );
-        for (FieldMapLabel label : labels){
-            label.print(indent + 3);
-        }
-        Debug.println(indent, "Number of Entries: " + getEntryCount());
-        Debug.println(indent, "Number of Reps: " + getRepCount());
-        Debug.println(indent, "Number of Plots: " + getPlotCount());
-    }
+	private Integer locationId;
 
-    
-    /**
-     * Gets the checks for field map.
-     *
-     * @return the hasFieldMap
-     */
-    public boolean getHasFieldMap() {
-        return isFieldMapGenerated();
-    }
+	private Integer fieldId;
 
-    
-    /**
-     * Sets the checks for field map.
-     *
-     * @param hasFieldMap the hasFieldMap to set
-     */
-    public void setHasFieldMap(boolean hasFieldMap) {
-        this.hasFieldMap = hasFieldMap;
-    }
+	private Integer blockId;
 
-    
-    /**
-     * Gets the rows per plot.
-     *
-     * @return the rowsPerPlot
-     */
-    public Integer getRowsPerPlot() {
-        return rowsPerPlot;
-    }
+	private GermplasmList stockList;
 
-    
-    /**
-     * Sets the rows per plot.
-     *
-     * @param rowsPerPlot the rowsPerPlot to set
-     */
-    public void setRowsPerPlot(Integer rowsPerPlot) {
-        this.rowsPerPlot = rowsPerPlot;
-    }
+	/** The deleted plot coordintes in (row, range) format */
+	private List<String> deletedPlots;
 
-    /**
-     * Gets the field name.
-     *
-     * @return the fieldName
-     */
-    public String getFieldName() {
-        return fieldName;
-    }
+	/**
+	 * Instantiates a new field map trial instance info.
+	 */
+	public FieldMapTrialInstanceInfo() {
+	}
 
-    
-    /**
-     * Sets the field name.
-     *
-     * @param fieldName the fieldName to set
-     */
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
+	/**
+	 * Instantiates a new field map trial instance info.
+	 *
+	 * @param geolocationId the geolocation id
+	 * @param siteName the site name
+	 * @param labels the labels
+	 */
+	public FieldMapTrialInstanceInfo(Integer geolocationId, String siteName, List<FieldMapLabel> labels) {
+		this.geolocationId = geolocationId;
+		this.siteName = siteName;
+		this.labels = labels;
+	}
 
-    
-    /**
-     * Gets the fieldmap uuid.
-     *
-     * @return the fieldmapUUID
-     */
-    public String getFieldmapUUID() {
-        return fieldmapUUID;
-    }
+	/**
+	 * Checks if is field map generated.
+	 *
+	 * @return true, if is field map generated
+	 */
+	public boolean isFieldMapGenerated() {
+		if (this.getFieldMapLabels() != null) {
+			for (FieldMapLabel label : this.getFieldMapLabels()) {
+				if (label.getColumn() != null && label.getColumn() > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    
-    /**
-     * Sets the fieldmap uuid.
-     *
-     * @param fieldmapUUID the fieldmapUUID to set
-     */
-    public void setFieldmapUUID(String fieldmapUUID) {
-        this.fieldmapUUID = fieldmapUUID;
-    }
+	/**
+	 * Gets the geolocation id.
+	 *
+	 * @return the geolocation id
+	 */
+	public Integer getGeolocationId() {
+		return this.geolocationId;
+	}
 
-    
-    /**
-     * Gets the machine row capacity.
-     *
-     * @return the machineRowCapacity
-     */
-    public Integer getMachineRowCapacity() {
-        return machineRowCapacity;
-    }
+	/**
+	 * Sets the geolocation id.
+	 *
+	 * @param geolocationId the new geolocation id
+	 */
+	public void setGeolocationId(Integer geolocationId) {
+		this.geolocationId = geolocationId;
+	}
 
-    
-    /**
-     * Sets the machine row capacity.
-     *
-     * @param machineRowCapacity the machineRowCapacity to set
-     */
-    public void setMachineRowCapacity(Integer machineRowCapacity) {
-        this.machineRowCapacity = machineRowCapacity;
-    }
+	/**
+	 * Gets the site name.
+	 *
+	 * @return the site name
+	 */
+	public String getSiteName() {
+		return this.siteName;
+	}
 
-    
-    /**
-     * Gets the location name.
-     *
-     * @return the locationName
-     */
-    public String getLocationName() {
-        return locationName;
-    }
-    
-    /**
-     * Sets the location name.
-     *
-     * @param locationName the locationName to set
-     */
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
-    }
+	/**
+	 * Sets the site name.
+	 *
+	 * @param siteName the new site name
+	 */
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
+	}
 
-    /**
-     * Gets the order.
-     *
-     * @return the order
-     */
-    public Integer getOrder() {
-        return order;
-    }
+	/**
+	 * Gets the trial instance no.
+	 *
+	 * @return the trial instance no
+	 */
+	public String getTrialInstanceNo() {
+		return this.trialInstanceNo;
+	}
 
-    /**
-     * Sets the order.
-     *
-     * @param order the new order
-     */
-    public void setOrder(Integer order) {
-        this.order = order;
-    }
+	/**
+	 * Sets the trial instance no.
+	 *
+	 * @param trialInstanceNo the new trial instance no
+	 */
+	public void setTrialInstanceNo(String trialInstanceNo) {
+		this.trialInstanceNo = trialInstanceNo;
+	}
+
+	/**
+	 * Gets the field map labels.
+	 *
+	 * @return the field map labels
+	 */
+	public List<FieldMapLabel> getFieldMapLabels() {
+		return this.labels;
+	}
+
+	/**
+	 * Sets the field map labels.
+	 *
+	 * @param labels the new field map labels
+	 */
+	public void setFieldMapLabels(List<FieldMapLabel> labels) {
+		this.labels = labels;
+	}
+
+	/**
+	 * Gets the block name.
+	 *
+	 * @return the blockName
+	 */
+	public String getBlockName() {
+		return this.blockName;
+	}
+
+	/**
+	 * Sets the block name.
+	 *
+	 * @param blockName the blockName to set
+	 */
+	public void setBlockName(String blockName) {
+		this.blockName = blockName;
+	}
+
+	/**
+	 * Gets the columns in block.
+	 *
+	 * @return the columnsInBlock
+	 */
+	public Integer getRowsInBlock() {
+		return this.rowsInBlock;
+	}
+
+	/**
+	 * Sets the columns in block.
+	 *
+	 * @param rowsInBlock the rowsInBlock to set
+	 */
+	public void setRowsInBlock(Integer rowsInBlock) {
+		this.rowsInBlock = rowsInBlock;
+	}
+
+	/**
+	 * Gets the ranges in block.
+	 *
+	 * @return the rangesInBlock
+	 */
+	public Integer getRangesInBlock() {
+		return this.rangesInBlock;
+	}
+
+	/**
+	 * Sets the ranges in block.
+	 *
+	 * @param rangesInBlock the rangesInBlock to set
+	 */
+	public void setRangesInBlock(Integer rangesInBlock) {
+		this.rangesInBlock = rangesInBlock;
+	}
+
+	/**
+	 * Gets the planting order.
+	 *
+	 * @return the plantingOrder
+	 */
+	public Integer getPlantingOrder() {
+		return this.plantingOrder;
+	}
+
+	/**
+	 * Sets the planting order.
+	 *
+	 * @param plantingOrder the plantingOrder to set
+	 */
+	public void setPlantingOrder(Integer plantingOrder) {
+		this.plantingOrder = plantingOrder;
+	}
+
+	/**
+	 * Gets the entry count.
+	 *
+	 * @return the entry count
+	 */
+	public long getEntryCount() {
+		Set<Integer> entries = new HashSet<Integer>();
+		for (FieldMapLabel label : this.labels) {
+			entries.add(label.getEntryNumber());
+		}
+		return entries.size();
+	}
+
+	/**
+	 * Sets the entry count.
+	 *
+	 * @param entryCount the new entry count
+	 */
+	public void setEntryCount(long entryCount) {
+		this.entryCount = entryCount;
+	}
+
+	/**
+	 * Gets the rep count.
+	 *
+	 * @return the rep count
+	 */
+	public long getRepCount() {
+		List<Integer> reps = new ArrayList<Integer>();
+		for (FieldMapLabel label : this.labels) {
+			reps.add(label.getRep());
+		}
+		if (reps.size() == 0) {
+			return 1;
+		}
+		return Collections.max(reps);
+	}
+
+	/**
+	 * Sets the rep count.
+	 *
+	 * @param repCount the new rep count
+	 */
+	public void setRepCount(long repCount) {
+		this.repCount = repCount;
+	}
+
+	/**
+	 * Gets the plot count.
+	 *
+	 * @return the plot count
+	 */
+	public long getPlotCount() {
+		return this.labels.size();
+	}
+
+	/**
+	 * Sets the plot count.
+	 *
+	 * @param plotCount the new plot count
+	 */
+	public void setPlotCount(long plotCount) {
+		this.plotCount = plotCount;
+	}
+
+	/**
+	 * Gets the field map label.
+	 *
+	 * @param experimentId the experiment id
+	 * @return the field map label
+	 */
+	public FieldMapLabel getFieldMapLabel(Integer experimentId) {
+		for (FieldMapLabel label : this.labels) {
+			if (experimentId.equals(label.getExperimentId())) {
+				return label;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the start column.
+	 *
+	 * @return the startColumn
+	 */
+	public Integer getStartColumn() {
+		return this.startColumn;
+	}
+
+	/**
+	 * Sets the start column.
+	 *
+	 * @param startColumn the startColumn to set
+	 */
+	public void setStartColumn(Integer startColumn) {
+		this.startColumn = startColumn;
+	}
+
+	/**
+	 * Gets the start range.
+	 *
+	 * @return the startRange
+	 */
+	public Integer getStartRange() {
+		return this.startRange;
+	}
+
+	/**
+	 * Sets the start range.
+	 *
+	 * @param startRange the startRange to set
+	 */
+	public void setStartRange(Integer startRange) {
+		this.startRange = startRange;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("FieldMapTrialInstanceInfo [geolocationId=");
+		builder.append(this.geolocationId);
+		builder.append(", siteName=");
+		builder.append(this.siteName);
+		builder.append(", labels=");
+		builder.append(this.labels.toString());
+		builder.append(", numberOfEntries=");
+		builder.append(this.getEntryCount());
+		builder.append(", numberOfReps=");
+		builder.append(this.getRepCount());
+		builder.append(", numberOfPlots=");
+		builder.append(this.getPlotCount());
+		builder.append("]");
+		return builder.toString();
+	}
+
+	/**
+	 * Prints the.
+	 *
+	 * @param indent the indent
+	 */
+	public void print(int indent) {
+		Debug.println(indent, "FieldMapTrialInstanceInfo: ");
+		indent = indent + 3;
+		Debug.println(indent, "Geolocation Id = " + this.geolocationId);
+		Debug.println(indent, "Site Name = " + this.siteName);
+		Debug.println(indent, "Labels = ");
+		for (FieldMapLabel label : this.labels) {
+			label.print(indent + 3);
+		}
+		Debug.println(indent, "Number of Entries: " + this.getEntryCount());
+		Debug.println(indent, "Number of Reps: " + this.getRepCount());
+		Debug.println(indent, "Number of Plots: " + this.getPlotCount());
+	}
+
+	/**
+	 * Gets the checks for field map.
+	 *
+	 * @return the hasFieldMap
+	 */
+	public boolean getHasFieldMap() {
+		return this.isFieldMapGenerated();
+	}
+
+	/**
+	 * Sets the checks for field map.
+	 *
+	 * @param hasFieldMap the hasFieldMap to set
+	 */
+	public void setHasFieldMap(boolean hasFieldMap) {
+		this.hasFieldMap = hasFieldMap;
+	}
+
+	/**
+	 * Gets the rows per plot.
+	 *
+	 * @return the rowsPerPlot
+	 */
+	public Integer getRowsPerPlot() {
+		return this.rowsPerPlot;
+	}
+
+	/**
+	 * Sets the rows per plot.
+	 *
+	 * @param rowsPerPlot the rowsPerPlot to set
+	 */
+	public void setRowsPerPlot(Integer rowsPerPlot) {
+		this.rowsPerPlot = rowsPerPlot;
+	}
+
+	/**
+	 * Gets the field name.
+	 *
+	 * @return the fieldName
+	 */
+	public String getFieldName() {
+		return this.fieldName;
+	}
+
+	/**
+	 * Sets the field name.
+	 *
+	 * @param fieldName the fieldName to set
+	 */
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
+
+	/**
+	 * Gets the fieldmap uuid.
+	 *
+	 * @return the fieldmapUUID
+	 */
+	public String getFieldmapUUID() {
+		return this.fieldmapUUID;
+	}
+
+	/**
+	 * Sets the fieldmap uuid.
+	 *
+	 * @param fieldmapUUID the fieldmapUUID to set
+	 */
+	public void setFieldmapUUID(String fieldmapUUID) {
+		this.fieldmapUUID = fieldmapUUID;
+	}
+
+	/**
+	 * Gets the machine row capacity.
+	 *
+	 * @return the machineRowCapacity
+	 */
+	public Integer getMachineRowCapacity() {
+		return this.machineRowCapacity;
+	}
+
+	/**
+	 * Sets the machine row capacity.
+	 *
+	 * @param machineRowCapacity the machineRowCapacity to set
+	 */
+	public void setMachineRowCapacity(Integer machineRowCapacity) {
+		this.machineRowCapacity = machineRowCapacity;
+	}
+
+	/**
+	 * Gets the location name.
+	 *
+	 * @return the locationName
+	 */
+	public String getLocationName() {
+		return this.locationName;
+	}
+
+	/**
+	 * Sets the location name.
+	 *
+	 * @param locationName the locationName to set
+	 */
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
+	}
+
+	/**
+	 * Gets the order.
+	 *
+	 * @return the order
+	 */
+	public Integer getOrder() {
+		return this.order;
+	}
+
+	/**
+	 * Sets the order.
+	 *
+	 * @param order the new order
+	 */
+	public void setOrder(Integer order) {
+		this.order = order;
+	}
 
 	/**
 	 * @return the locationId
 	 */
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	/**
@@ -601,7 +585,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	 * @return the fieldId
 	 */
 	public Integer getFieldId() {
-		return fieldId;
+		return this.fieldId;
 	}
 
 	/**
@@ -615,7 +599,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	 * @return the blockId
 	 */
 	public Integer getBlockId() {
-		return blockId;
+		return this.blockId;
 	}
 
 	/**
@@ -629,7 +613,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	 * @return the deletedPlots
 	 */
 	public List<String> getDeletedPlots() {
-		return deletedPlots;
+		return this.deletedPlots;
 	}
 
 	/**
@@ -654,16 +638,16 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 		}
 	}
 
-    public Map<Integer, String> getLabelHeaders() {
-        return labelHeaders;
-    }
+	public Map<Integer, String> getLabelHeaders() {
+		return this.labelHeaders;
+	}
 
-    public void setLabelHeaders(Map<Integer, String> labelHeaders) {
-        this.labelHeaders = labelHeaders;
-    }
+	public void setLabelHeaders(Map<Integer, String> labelHeaders) {
+		this.labelHeaders = labelHeaders;
+	}
 
 	public GermplasmList getStockList() {
-		return stockList;
+		return this.stockList;
 	}
 
 	public void setStockList(GermplasmList stockList) {

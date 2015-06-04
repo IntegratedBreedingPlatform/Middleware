@@ -1,18 +1,18 @@
+
 package org.generationcp.middleware.domain.gms;
 
-import org.generationcp.middleware.util.Debug;
-
 import java.io.Serializable;
+
+import org.generationcp.middleware.util.Debug;
 
 public class ListDataColumnValues implements Serializable {
 
 	private static final long serialVersionUID = 7758932229889246290L;
-	
+
 	private String column;
 	private Integer listDataId;
 	private String value;
-	
-	
+
 	public ListDataColumnValues(String column, Integer listDataId, String value) {
 		super();
 		this.column = column;
@@ -21,25 +21,25 @@ public class ListDataColumnValues implements Serializable {
 	}
 
 	public String getColumn() {
-		return column;
+		return this.column;
 	}
-	
+
 	public void setColumn(String column) {
 		this.column = column;
 	}
-	
+
 	public Integer getListDataId() {
-		return listDataId;
+		return this.listDataId;
 	}
-	
+
 	public void setListDataId(Integer listDataId) {
 		this.listDataId = listDataId;
 	}
-	
+
 	public String getValue() {
-		return value;
+		return this.value;
 	}
-	
+
 	public void setValue(String value) {
 		this.value = value;
 	}
@@ -48,46 +48,45 @@ public class ListDataColumnValues implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((column == null) ? 0 : column.hashCode());
-		result = prime * result
-				+ ((listDataId == null) ? 0 : listDataId.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + (this.column == null ? 0 : this.column.hashCode());
+		result = prime * result + (this.listDataId == null ? 0 : this.listDataId.hashCode());
+		result = prime * result + (this.value == null ? 0 : this.value.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		ListDataColumnValues other = (ListDataColumnValues) obj;
-		if (column == null) {
+		if (this.column == null) {
 			if (other.column != null) {
-                return false;
-            }
-		} else if (!column.equals(other.column)) {
-            return false;
-        }
-		if (listDataId == null) {
+				return false;
+			}
+		} else if (!this.column.equals(other.column)) {
+			return false;
+		}
+		if (this.listDataId == null) {
 			if (other.listDataId != null) {
-                return false;
-            }
-		} else if (!listDataId.equals(other.listDataId)) {
-            return false;
-        }
-		if (value == null) {
+				return false;
+			}
+		} else if (!this.listDataId.equals(other.listDataId)) {
+			return false;
+		}
+		if (this.value == null) {
 			if (other.value != null) {
-                return false;
-            }
-		} else if (!value.equals(other.value)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.value.equals(other.value)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -95,19 +94,17 @@ public class ListDataColumnValues implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ListDataColumnValues [column=");
-		builder.append(column);
+		builder.append(this.column);
 		builder.append(", listDataId=");
-		builder.append(listDataId);
+		builder.append(this.listDataId);
 		builder.append(", value=");
-		builder.append(value);
+		builder.append(this.value);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	public void print(int indent){
-		Debug.print(indent, toString());
+
+	public void print(int indent) {
+		Debug.print(indent, this.toString());
 	}
-	
-	
 
 }

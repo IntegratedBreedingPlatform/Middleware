@@ -1,38 +1,48 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos.dms;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 /**
- * 
+ *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
- * 
- * This is the core table for the natural diversity module, representing each individual assay that is undertaken 
- * (nb this is usually *not* an entire experiment). Each nd_experiment should give rise to a single genotype or 
- * phenotype and be described via 1 (or more) protocols. Collections of assays that relate to each other should be 
- * linked to the same record in the project table.
- * 
- * Experiment.type is a cvterm that will define which records are expected for other tables. Any CV may be used but 
- * it was designed with terms such as: [phenotype_assay, genotype_assay, field_collection, cross_experiment] in mind.
- * 
+ *
+ * This is the core table for the natural diversity module, representing each individual assay that is undertaken (nb this is usually *not*
+ * an entire experiment). Each nd_experiment should give rise to a single genotype or phenotype and be described via 1 (or more) protocols.
+ * Collections of assays that relate to each other should be linked to the same record in the project table.
+ *
+ * Experiment.type is a cvterm that will define which records are expected for other tables. Any CV may be used but it was designed with
+ * terms such as: [phenotype_assay, genotype_assay, field_collection, cross_experiment] in mind.
+ *
  * @author Joyce Avestro
  *
  */
 @Entity
-@Table(	name = "nd_experiment")
+@Table(name = "nd_experiment")
 public class ExperimentModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -44,37 +54,33 @@ public class ExperimentModel implements Serializable {
 
 	// Geolocation
 	@OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "nd_geolocation_id")
+	@JoinColumn(name = "nd_geolocation_id")
 	private Geolocation geoLocation;
 
-    // References cvterm
-    @Column(name="type_id")
-    private Integer typeId;
-    
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy="experiment")
+	// References cvterm
+	@Column(name = "type_id")
+	private Integer typeId;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	private List<ExperimentProperty> properties;
-    
-    @ManyToOne
-    @JoinTable(name="nd_experiment_project", 
-        joinColumns={@JoinColumn(name="nd_experiment_id", insertable=false,updatable=false)},
-        inverseJoinColumns={@JoinColumn(name="project_id", insertable=false,updatable=false)})
-    private DmsProject project;
-    
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy="experiment")    
-    private List<ExperimentStock> experimentStocks;
-    
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name="nd_experiment_phenotype",
-            joinColumns = @JoinColumn( name="nd_experiment_id"),
-            inverseJoinColumns = @JoinColumn( name="phenotype_id")
-    )
-    private List<Phenotype> phenotypes;
-    
+
+	@ManyToOne
+	@JoinTable(name = "nd_experiment_project",
+			joinColumns = {@JoinColumn(name = "nd_experiment_id", insertable = false, updatable = false)},
+			inverseJoinColumns = {@JoinColumn(name = "project_id", insertable = false, updatable = false)})
+	private DmsProject project;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
+	private List<ExperimentStock> experimentStocks;
+
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "nd_experiment_phenotype", joinColumns = @JoinColumn(name = "nd_experiment_id"), inverseJoinColumns = @JoinColumn(
+			name = "phenotype_id"))
+	private List<Phenotype> phenotypes;
 
 	public ExperimentModel() {
 	}
-	
+
 	public ExperimentModel(Integer ndExperimentId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
@@ -88,7 +94,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public Integer getNdExperimentId() {
-		return ndExperimentId;
+		return this.ndExperimentId;
 	}
 
 	public void setNdExperimentId(Integer ndExperimentId) {
@@ -96,7 +102,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public Geolocation getGeoLocation() {
-		return geoLocation;
+		return this.geoLocation;
 	}
 
 	public void setGeoLocation(Geolocation geoLocation) {
@@ -104,7 +110,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public Integer getTypeId() {
-		return typeId;
+		return this.typeId;
 	}
 
 	public void setTypeId(Integer typeId) {
@@ -112,7 +118,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public List<ExperimentProperty> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public void setProperties(List<ExperimentProperty> properties) {
@@ -120,7 +126,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public DmsProject getProject() {
-		return project;
+		return this.project;
 	}
 
 	public void setProject(DmsProject project) {
@@ -128,7 +134,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public List<ExperimentStock> getExperimentStocks() {
-		return experimentStocks;
+		return this.experimentStocks;
 	}
 
 	public void setExperimentStocks(List<ExperimentStock> experimentStocks) {
@@ -136,7 +142,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public List<Phenotype> getPhenotypes() {
-		return phenotypes;
+		return this.phenotypes;
 	}
 
 	public void setPhenotypes(List<Phenotype> phenotypes) {
@@ -147,47 +153,45 @@ public class ExperimentModel implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((geoLocation == null) ? 0 : geoLocation.hashCode());
-		result = prime * result
-				+ ((ndExperimentId == null) ? 0 : ndExperimentId.hashCode());
-		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
+		result = prime * result + (this.geoLocation == null ? 0 : this.geoLocation.hashCode());
+		result = prime * result + (this.ndExperimentId == null ? 0 : this.ndExperimentId.hashCode());
+		result = prime * result + (this.typeId == null ? 0 : this.typeId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		ExperimentModel other = (ExperimentModel) obj;
-		if (geoLocation == null) {
+		if (this.geoLocation == null) {
 			if (other.geoLocation != null) {
-                return false;
-            }
-		} else if (!geoLocation.equals(other.geoLocation)) {
-            return false;
-        }
-		if (ndExperimentId == null) {
+				return false;
+			}
+		} else if (!this.geoLocation.equals(other.geoLocation)) {
+			return false;
+		}
+		if (this.ndExperimentId == null) {
 			if (other.ndExperimentId != null) {
-                return false;
-            }
-		} else if (!ndExperimentId.equals(other.ndExperimentId)) {
-            return false;
-        }
-		if (typeId == null) {
+				return false;
+			}
+		} else if (!this.ndExperimentId.equals(other.ndExperimentId)) {
+			return false;
+		}
+		if (this.typeId == null) {
 			if (other.typeId != null) {
-                return false;
-            }
-		} else if (!typeId.equals(other.typeId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.typeId.equals(other.typeId)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -195,15 +199,13 @@ public class ExperimentModel implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Experiment [ndExperimentId=");
-		builder.append(ndExperimentId);
+		builder.append(this.ndExperimentId);
 		builder.append(", geoLocationId=");
-		builder.append(geoLocation);
+		builder.append(this.geoLocation);
 		builder.append(", typeId=");
-		builder.append(typeId);
+		builder.append(this.typeId);
 		builder.append("]");
 		return builder.toString();
 	}
-    
-
 
 }

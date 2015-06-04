@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
@@ -5,28 +6,28 @@ import java.util.List;
 public class ObservationDto {
 
 	private final Integer measurementId;
-	
+
 	private final String trialInstance;
-	
+
 	private final String entryType;
-	
+
 	private final Integer gid;
-	
+
 	private final String designation;
-	
+
 	private final String entryNo;
-	
+
 	private final String seedSource;
-	
+
 	private final String repitionNumber;
-	
+
 	private final String plotNumber;
-	
+
 	private final List<MeasurementDto> traitMeasurements;
-	
-	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType,
-			final Integer gid, final String designation, final String entryNo, final String seedSource,
-			final String repitionNumber, final String plotNumber, final List<MeasurementDto> traitMeasurements) {
+
+	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType, final Integer gid,
+			final String designation, final String entryNo, final String seedSource, final String repitionNumber, final String plotNumber,
+			final List<MeasurementDto> traitMeasurements) {
 		this.measurementId = measurementId;
 		this.trialInstance = trialInstance;
 		this.entryType = entryType;
@@ -40,47 +41,43 @@ public class ObservationDto {
 	}
 
 	public Integer getMeasurementId() {
-		return measurementId;
+		return this.measurementId;
 	}
 
 	public String getTrialInstance() {
-		return trialInstance;
+		return this.trialInstance;
 	}
 
 	public String getEntryType() {
-		return entryType;
+		return this.entryType;
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public String getDesignation() {
-		return designation;
+		return this.designation;
 	}
 
 	public String getEntryNo() {
-		return entryNo;
+		return this.entryNo;
 	}
 
 	public String getSeedSource() {
-		return seedSource;
+		return this.seedSource;
 	}
 
 	public String getRepitionNumber() {
-		return repitionNumber;
+		return this.repitionNumber;
 	}
 
 	public String getPlotNumber() {
-		return plotNumber;
+		return this.plotNumber;
 	}
 
 	public List<MeasurementDto> getTraitMeasurements() {
-		return traitMeasurements;
+		return this.traitMeasurements;
 	}
 
-
-
-	
-		
 }

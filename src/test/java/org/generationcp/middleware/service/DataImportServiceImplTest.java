@@ -1,4 +1,10 @@
+
 package org.generationcp.middleware.service;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -6,158 +12,160 @@ import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.util.Message;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataImportServiceImplTest {
 
-    public static final int INVALID_VARIABLES_COUNT = 5;
-    public static final int VALID_VARIABLES_COUNT = 5;
-    @Mock
-    private WorkbookParser parser;
+	public static final int INVALID_VARIABLES_COUNT = 5;
+	public static final int VALID_VARIABLES_COUNT = 5;
+	@Mock
+	private WorkbookParser parser;
 
-    @Mock
-    private Workbook workbook;
+	@Mock
+	private Workbook workbook;
 
-    @Mock
-    private OntologyDataManager ontology;
+	@Mock
+	private OntologyDataManager ontology;
 
-    @Mock
-    private File file;
+	@Mock
+	private File file;
 
-    @InjectMocks
-    private DataImportServiceImpl dataImportService;
-    
-    public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[]{"1234", "word@", "_+world=", "!!world!!", "&&&"};
-    public static final String[] STRINGS_WITH_VALID_CHARACTERS = new String[]{"i_am_groot", "hello123world", "%%bangbang", "something_something", "zawaruldoisbig"};
-    private static final String PROGRAM_UUID = "123456789";
+	@InjectMocks
+	private DataImportServiceImpl dataImportService;
 
-    @Test
-    public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
-        DataImportServiceImpl moleDataImportService = spy(dataImportService);
+	public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[] {"1234", "word@", "_+world=", "!!world!!", "&&&"};
+	public static final String[] STRINGS_WITH_VALID_CHARACTERS = new String[] {"i_am_groot", "hello123world", "%%bangbang",
+			"something_something", "zawaruldoisbig"};
+	private static final String PROGRAM_UUID = "123456789";
 
-        // we just need to test if isTrialInstanceNumberExists works, so lets mock out other dataImportService calls for the moment
-        when(workbook.isNursery()).thenReturn(true);
+	@Test
+	public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
+		DataImportServiceImpl moleDataImportService = Mockito.spy(this.dataImportService);
 
-        // tip! do note that spy-ed object still calls the real method, may cause changing internal state as side effect
-        when(moleDataImportService.isEntryExists(ontology, workbook.getFactors())).thenReturn(true);
-        when(moleDataImportService.isPlotExists(ontology, workbook.getFactors())).thenReturn(true);
-        when(moleDataImportService.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())).thenReturn(true);
+		// we just need to test if isTrialInstanceNumberExists works, so lets mock out other dataImportService calls for the moment
+		Mockito.when(this.workbook.isNursery()).thenReturn(true);
 
-        when(workbook.getAllVariables()).thenReturn(initializeTestMeasurementVariables());
+		// tip! do note that spy-ed object still calls the real method, may cause changing internal state as side effect
+		Mockito.when(moleDataImportService.isEntryExists(this.ontology, this.workbook.getFactors())).thenReturn(true);
+		Mockito.when(moleDataImportService.isPlotExists(this.ontology, this.workbook.getFactors())).thenReturn(true);
+		Mockito.when(moleDataImportService.isTrialInstanceNumberExists(this.ontology, this.workbook.getTrialVariables())).thenReturn(true);
 
-        try {
-            moleDataImportService.strictParseWorkbook(file, parser, workbook, ontology, PROGRAM_UUID);
-            fail("We expects workbookParserException to be thrown");
-        } catch (WorkbookParserException e) {
+		Mockito.when(this.workbook.getAllVariables()).thenReturn(this.initializeTestMeasurementVariables());
 
-            verify(moleDataImportService).validateMeasurementVariableName(workbook.getAllVariables());
+		try {
+			moleDataImportService.strictParseWorkbook(this.file, this.parser, this.workbook, this.ontology,
+					DataImportServiceImplTest.PROGRAM_UUID);
+			Assert.fail("We expects workbookParserException to be thrown");
+		} catch (WorkbookParserException e) {
 
-            final String[] errorTypes = {DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH,DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
-            for (Message error : e.getErrorMessages()) {
-                assertTrue("All errors should contain either ERROR_INVALID_VARIABLE_NAME_CHARACTERS or ERROR_INVALID_VARIABLE_NAME_LENGTH", Arrays.asList(errorTypes).contains(error.getMessageKey()));
-            }
-        }
-    }
+			Mockito.verify(moleDataImportService).validateMeasurementVariableName(this.workbook.getAllVariables());
 
-    @Test
-    public void testValidateMeasurementVariableNameLengths() throws Exception {
-        List<MeasurementVariable> measurementVariables = initializeTestMeasurementVariables();
+			final String[] errorTypes =
+					{DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH, DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
+			for (Message error : e.getErrorMessages()) {
+				Assert.assertTrue(
+						"All errors should contain either ERROR_INVALID_VARIABLE_NAME_CHARACTERS or ERROR_INVALID_VARIABLE_NAME_LENGTH",
+						Arrays.asList(errorTypes).contains(error.getMessageKey()));
+			}
+		}
+	}
 
-        List<Message> messages = dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
+	@Test
+	public void testValidateMeasurementVariableNameLengths() throws Exception {
+		List<MeasurementVariable> measurementVariables = this.initializeTestMeasurementVariables();
 
-        assertEquals("we should only have 5 variables with > 32 char length", INVALID_VARIABLES_COUNT,messages.size());
+		List<Message> messages = this.dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
 
-        for (Message message : messages) {
-            assertTrue("returned messages should only contain the variables with names > 32",message.getMessageParams()[0].length() > 32);
-        }
-    }
+		Assert.assertEquals("we should only have 5 variables with > 32 char length", DataImportServiceImplTest.INVALID_VARIABLES_COUNT,
+				messages.size());
 
-    @Test
-    public void testValidateMeasurementVariableNameLengthsAllShortNames() throws Exception {
-        List<MeasurementVariable> measurementVariables = getShortNamedMeasurementVariables();
+		for (Message message : messages) {
+			Assert.assertTrue("returned messages should only contain the variables with names > 32",
+					message.getMessageParams()[0].length() > 32);
+		}
+	}
 
-        List<Message> messages = dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
+	@Test
+	public void testValidateMeasurementVariableNameLengthsAllShortNames() throws Exception {
+		List<MeasurementVariable> measurementVariables = this.getShortNamedMeasurementVariables();
 
-        assertEquals("messages should be empty",0,messages.size());
-    }
+		List<Message> messages = this.dataImportService.validateMeasurmentVariableNameLengths(measurementVariables);
 
-    @Test
-    public void testValidateMeasurmentVariableNameCharacters() throws Exception {
-        List<MeasurementVariable> measurementVariables = getValidNamedMeasurementVariables();
-        measurementVariables.addAll(getInvalidNamedMeasurementVariables());
+		Assert.assertEquals("messages should be empty", 0, messages.size());
+	}
 
-        List<Message> messages = dataImportService.validateMeasurmentVariableNameCharacters(measurementVariables);
+	@Test
+	public void testValidateMeasurmentVariableNameCharacters() throws Exception {
+		List<MeasurementVariable> measurementVariables = this.getValidNamedMeasurementVariables();
+		measurementVariables.addAll(this.getInvalidNamedMeasurementVariables());
 
-        assertEquals("we should only have messages same size with the STRINGS_WITH_INVALID_CHARACTERS count", STRINGS_WITH_INVALID_CHARACTERS.length,messages.size());
+		List<Message> messages = this.dataImportService.validateMeasurmentVariableNameCharacters(measurementVariables);
 
-        for (Message message : messages) {
-            assertTrue("returned messages should contain the names from the set of invalid strings list", Arrays.asList(STRINGS_WITH_INVALID_CHARACTERS).contains(message.getMessageParams()[0]));
-        }
-    }
+		Assert.assertEquals("we should only have messages same size with the STRINGS_WITH_INVALID_CHARACTERS count",
+				DataImportServiceImplTest.STRINGS_WITH_INVALID_CHARACTERS.length, messages.size());
 
-    protected List<MeasurementVariable> initializeTestMeasurementVariables() {
-        List<MeasurementVariable> measurementVariables = getShortNamedMeasurementVariables();
+		for (Message message : messages) {
+			Assert.assertTrue("returned messages should contain the names from the set of invalid strings list",
+					Arrays.asList(DataImportServiceImplTest.STRINGS_WITH_INVALID_CHARACTERS).contains(message.getMessageParams()[0]));
+		}
+	}
 
-        // 5 long names
-        for (int i = 0; i < INVALID_VARIABLES_COUNT; i++) {
-            MeasurementVariable mv = new MeasurementVariable();
+	protected List<MeasurementVariable> initializeTestMeasurementVariables() {
+		List<MeasurementVariable> measurementVariables = this.getShortNamedMeasurementVariables();
 
-            mv.setName("NUM_" + i + "_MEASUREMENT_VARIABLE_WITH_NAME_UP_TO_THIRTY_TWO_CHARACTERS");
-            measurementVariables.add(mv);
-        }
+		// 5 long names
+		for (int i = 0; i < DataImportServiceImplTest.INVALID_VARIABLES_COUNT; i++) {
+			MeasurementVariable mv = new MeasurementVariable();
 
-        // also add those invalid variables to add to the main test
-        measurementVariables.addAll(getInvalidNamedMeasurementVariables());
+			mv.setName("NUM_" + i + "_MEASUREMENT_VARIABLE_WITH_NAME_UP_TO_THIRTY_TWO_CHARACTERS");
+			measurementVariables.add(mv);
+		}
 
-        return measurementVariables;
-    }
+		// also add those invalid variables to add to the main test
+		measurementVariables.addAll(this.getInvalidNamedMeasurementVariables());
 
-    private List<MeasurementVariable> getShortNamedMeasurementVariables() {
-        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		return measurementVariables;
+	}
 
-        // 5 short names
-        for (int i = 0; i < VALID_VARIABLES_COUNT; i++) {
-            MeasurementVariable mv = new MeasurementVariable();
-            mv.setName("NUM_"+ i +"_SHORT");
-            measurementVariables.add(mv);
-        }
-        return measurementVariables;
-    }
+	private List<MeasurementVariable> getShortNamedMeasurementVariables() {
+		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
-    private List<MeasurementVariable> getInvalidNamedMeasurementVariables() {
-        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		// 5 short names
+		for (int i = 0; i < DataImportServiceImplTest.VALID_VARIABLES_COUNT; i++) {
+			MeasurementVariable mv = new MeasurementVariable();
+			mv.setName("NUM_" + i + "_SHORT");
+			measurementVariables.add(mv);
+		}
+		return measurementVariables;
+	}
 
-        for (int i = 0; i < STRINGS_WITH_INVALID_CHARACTERS.length; i++) {
-            MeasurementVariable mv = new MeasurementVariable();
-            mv.setName(STRINGS_WITH_INVALID_CHARACTERS[i]);
-            measurementVariables.add(mv);
-        }
-        return measurementVariables;
-    }
+	private List<MeasurementVariable> getInvalidNamedMeasurementVariables() {
+		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
-    private List<MeasurementVariable> getValidNamedMeasurementVariables() {
-        List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		for (int i = 0; i < DataImportServiceImplTest.STRINGS_WITH_INVALID_CHARACTERS.length; i++) {
+			MeasurementVariable mv = new MeasurementVariable();
+			mv.setName(DataImportServiceImplTest.STRINGS_WITH_INVALID_CHARACTERS[i]);
+			measurementVariables.add(mv);
+		}
+		return measurementVariables;
+	}
 
-        for (int i = 0; i < STRINGS_WITH_VALID_CHARACTERS.length; i++) {
-            MeasurementVariable mv = new MeasurementVariable();
-            mv.setName(STRINGS_WITH_VALID_CHARACTERS[i]);
-            measurementVariables.add(mv);
-        }
-        return measurementVariables;
-    }
+	private List<MeasurementVariable> getValidNamedMeasurementVariables() {
+		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
+		for (int i = 0; i < DataImportServiceImplTest.STRINGS_WITH_VALID_CHARACTERS.length; i++) {
+			MeasurementVariable mv = new MeasurementVariable();
+			mv.setName(DataImportServiceImplTest.STRINGS_WITH_VALID_CHARACTERS[i]);
+			measurementVariables.add(mv);
+		}
+		return measurementVariables;
+	}
 
 }

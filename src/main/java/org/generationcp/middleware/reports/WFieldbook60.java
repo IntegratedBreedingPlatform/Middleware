@@ -1,6 +1,7 @@
+
 package org.generationcp.middleware.reports;
 
-public class WFieldbook60 extends AbstractWheatTrialReporter{
+public class WFieldbook60 extends AbstractWheatTrialReporter {
 
 	@Override
 	public Reporter createReporter() {
@@ -18,7 +19,6 @@ public class WFieldbook60 extends AbstractWheatTrialReporter{
 	public String getTemplateName() {
 		return "WFb60_header.jasper";
 	}
-	
-	
-	//TODO : needs replication_no and subblock (entryNum and plot already provided)
+
+	// TODO : needs replication_no and subblock (entryNum and plot already provided)
 }

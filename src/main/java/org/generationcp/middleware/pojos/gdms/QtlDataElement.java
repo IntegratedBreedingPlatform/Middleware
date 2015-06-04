@@ -1,20 +1,19 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
 
 /**
- * Placeholder POJO for QtlData element.
- * Mainly used by GenotypicDataManager.getQtlDataByTraits().
- * 
+ * Placeholder POJO for QtlData element. Mainly used by GenotypicDataManager.getQtlDataByTraits().
+ *
  * @author Joyce Avestro
  *
  */
@@ -22,27 +21,22 @@ public class QtlDataElement {
 
 	String qtlName;
 	String linkageGroup;
-	Float position; 
+	Float position;
 	Float minPosition;
-	Float maxPosition; 
-	Integer traitId; 
-	String experiment; 
-	String leftFlankingMarker; 
-	String rightFlankingMarker; 
-	Float effect; 
-	Float scoreValue; 
+	Float maxPosition;
+	Integer traitId;
+	String experiment;
+	String leftFlankingMarker;
+	String rightFlankingMarker;
+	Float effect;
+	Float scoreValue;
 	Float rSquare;
 
-	
 	public QtlDataElement() {
 	}
 
-
-	public QtlDataElement(String qtlName, String linkageGroup, Float position,
-			Float minPosition, Float maxPosition, Integer traitId,
-			String experiment, String leftFlankingMarker,
-			String rightFlankingMarker, Float effect, Float scoreValue,
-			Float rSquare) {
+	public QtlDataElement(String qtlName, String linkageGroup, Float position, Float minPosition, Float maxPosition, Integer traitId,
+			String experiment, String leftFlankingMarker, String rightFlankingMarker, Float effect, Float scoreValue, Float rSquare) {
 		super();
 		this.qtlName = qtlName;
 		this.linkageGroup = linkageGroup;
@@ -59,7 +53,7 @@ public class QtlDataElement {
 	}
 
 	public String getQtlName() {
-		return qtlName;
+		return this.qtlName;
 	}
 
 	public void setQtlName(String qtlName) {
@@ -67,7 +61,7 @@ public class QtlDataElement {
 	}
 
 	public String getLinkageGroup() {
-		return linkageGroup;
+		return this.linkageGroup;
 	}
 
 	public void setLinkageGroup(String linkageGroup) {
@@ -75,7 +69,7 @@ public class QtlDataElement {
 	}
 
 	public Float getPosition() {
-		return position;
+		return this.position;
 	}
 
 	public void setPosition(Float position) {
@@ -83,7 +77,7 @@ public class QtlDataElement {
 	}
 
 	public Float getMinPosition() {
-		return minPosition;
+		return this.minPosition;
 	}
 
 	public void setMinPosition(Float minPosition) {
@@ -91,7 +85,7 @@ public class QtlDataElement {
 	}
 
 	public Float getMaxPosition() {
-		return maxPosition;
+		return this.maxPosition;
 	}
 
 	public void setMaxPosition(Float maxPosition) {
@@ -99,7 +93,7 @@ public class QtlDataElement {
 	}
 
 	public Integer getTraitId() {
-		return traitId;
+		return this.traitId;
 	}
 
 	public void setTraitId(Integer traitId) {
@@ -107,7 +101,7 @@ public class QtlDataElement {
 	}
 
 	public String getExperiment() {
-		return experiment;
+		return this.experiment;
 	}
 
 	public void setExperiment(String experiment) {
@@ -115,7 +109,7 @@ public class QtlDataElement {
 	}
 
 	public String getLeftFlankingMarker() {
-		return leftFlankingMarker;
+		return this.leftFlankingMarker;
 	}
 
 	public void setLeftFlankingMarker(String leftFlankingMarker) {
@@ -123,7 +117,7 @@ public class QtlDataElement {
 	}
 
 	public String getRightFlankingMarker() {
-		return rightFlankingMarker;
+		return this.rightFlankingMarker;
 	}
 
 	public void setRightFlankingMarker(String rightFlankingMarker) {
@@ -131,7 +125,7 @@ public class QtlDataElement {
 	}
 
 	public Float getEffect() {
-		return effect;
+		return this.effect;
 	}
 
 	public void setEffect(Float effect) {
@@ -139,7 +133,7 @@ public class QtlDataElement {
 	}
 
 	public Float getScoreValue() {
-		return scoreValue;
+		return this.scoreValue;
 	}
 
 	public void setScoreValue(Float scoreValue) {
@@ -147,7 +141,7 @@ public class QtlDataElement {
 	}
 
 	public Float getrSquare() {
-		return rSquare;
+		return this.rSquare;
 	}
 
 	public void setrSquare(Float rSquare) {
@@ -158,32 +152,31 @@ public class QtlDataElement {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("QtlDataElement [qtlName=");
-		builder.append(qtlName);
+		builder.append(this.qtlName);
 		builder.append(", linkageGroup=");
-		builder.append(linkageGroup);
+		builder.append(this.linkageGroup);
 		builder.append(", position=");
-		builder.append(position);
+		builder.append(this.position);
 		builder.append(", minPosition=");
-		builder.append(minPosition);
+		builder.append(this.minPosition);
 		builder.append(", maxPosition=");
-		builder.append(maxPosition);
+		builder.append(this.maxPosition);
 		builder.append(", traitId=");
-		builder.append(traitId);
+		builder.append(this.traitId);
 		builder.append(", experiment=");
-		builder.append(experiment);
+		builder.append(this.experiment);
 		builder.append(", leftFlankingMarker=");
-		builder.append(leftFlankingMarker);
+		builder.append(this.leftFlankingMarker);
 		builder.append(", rightFlankingMarker=");
-		builder.append(rightFlankingMarker);
+		builder.append(this.rightFlankingMarker);
 		builder.append(", effect=");
-		builder.append(effect);
+		builder.append(this.effect);
 		builder.append(", scoreValue=");
-		builder.append(scoreValue);
+		builder.append(this.scoreValue);
 		builder.append(", rSquare=");
-		builder.append(rSquare);
+		builder.append(this.rSquare);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
+
 }

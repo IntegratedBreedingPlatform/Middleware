@@ -1,15 +1,32 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.util.Debug;
@@ -17,15 +34,11 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.List;
-
 /**
  * POJO for listdata table.
- * 
+ *
  * @author Kevin Manansala
- * 
+ *
  */
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId")})
 @Entity
@@ -109,7 +122,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Integer id) {
@@ -117,7 +130,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public GermplasmList getList() {
-		return list;
+		return this.list;
 	}
 
 	public void setList(GermplasmList list) {
@@ -125,7 +138,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(Integer gid) {
@@ -133,7 +146,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public Integer getEntryId() {
-		return entryId;
+		return this.entryId;
 	}
 
 	public void setEntryId(Integer entryId) {
@@ -141,7 +154,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public String getEntryCode() {
-		return entryCode;
+		return this.entryCode;
 	}
 
 	public void setEntryCode(String entryCode) {
@@ -149,7 +162,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public String getSeedSource() {
-		return seedSource;
+		return this.seedSource;
 	}
 
 	public void setSeedSource(String seedSource) {
@@ -157,7 +170,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public String getDesignation() {
-		return designation;
+		return this.designation;
 	}
 
 	public void setDesignation(String designation) {
@@ -165,7 +178,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public String getGroupName() {
-		return groupName;
+		return this.groupName;
 	}
 
 	public void setGroupName(String groupName) {
@@ -173,14 +186,14 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public Integer getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public String getStatusString() {
 		// TODO: make internationalizable
-		if (getStatus().equals(0)) {
+		if (this.getStatus().equals(0)) {
 			return "Active";
-		} else if (getStatus().equals(9)) {
+		} else if (this.getStatus().equals(9)) {
 			return "Deleted";
 		} else {
 			return "";
@@ -192,7 +205,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public Integer getLocalRecordId() {
-		return localRecordId;
+		return this.localRecordId;
 	}
 
 	public void setLocalRecordId(Integer localRecordId) {
@@ -200,7 +213,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public List<ListDataProperty> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public void setProperties(List<ListDataProperty> properties) {
@@ -208,7 +221,7 @@ public class GermplasmListData implements Serializable {
 	}
 
 	public ListDataInventory getInventoryInfo() {
-		return inventoryInfo;
+		return this.inventoryInfo;
 	}
 
 	public void setInventoryInfo(ListDataInventory inventoryInfo) {
@@ -219,23 +232,23 @@ public class GermplasmListData implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("GermplasmListData [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", gid=");
-		builder.append(gid);
+		builder.append(this.gid);
 		builder.append(", entryId=");
-		builder.append(entryId);
+		builder.append(this.entryId);
 		builder.append(", entryCode=");
-		builder.append(entryCode);
+		builder.append(this.entryCode);
 		builder.append(", seedSource=");
-		builder.append(seedSource);
+		builder.append(this.seedSource);
 		builder.append(", designation=");
-		builder.append(designation);
+		builder.append(this.designation);
 		builder.append(", groupName=");
-		builder.append(groupName);
+		builder.append(this.groupName);
 		builder.append(", status=");
-		builder.append(status);
+		builder.append(this.status);
 		builder.append(", localRecordId=");
-		builder.append(localRecordId);
+		builder.append(this.localRecordId);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -244,7 +257,7 @@ public class GermplasmListData implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (id == null ? 0 : id.hashCode());
+		result = prime * result + (this.id == null ? 0 : this.id.hashCode());
 		return result;
 	}
 
@@ -256,24 +269,24 @@ public class GermplasmListData implements Serializable {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
 		GermplasmListData other = (GermplasmListData) obj;
-		if (id == null) {
+		if (this.id == null) {
 			if (other.id != null) {
 				return false;
 			}
-		} else if (!id.equals(other.id)) {
+		} else if (!this.id.equals(other.id)) {
 			return false;
 		}
 		return true;
 	}
 
 	public void print(int indent) {
-		Debug.println(indent, toString());
-		if (properties != null) {
-			for (ListDataProperty property : properties) {
+		Debug.println(indent, this.toString());
+		if (this.properties != null) {
+			for (ListDataProperty property : this.properties) {
 				property.print(indent + 3);
 			}
 		}

@@ -59,7 +59,7 @@ public class StudyGermplasmDto {
 
 	/**
 	 * @param desingation the desingation to set
-	 * 
+	 *
 	 */
 	public void setDesignation(String designation) {
 		this.designation = designation;

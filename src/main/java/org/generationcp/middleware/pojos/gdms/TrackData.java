@@ -1,46 +1,47 @@
 /*******************************************************************************
  * Copyright (c) 2014, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
+
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
 
 /**
  * POJO for the gdms_track_data table.
- * 
+ *
  * @author Joyce Avestro
- * 
+ *
  */
 @Entity
 @Table(name = "gdms_track_data")
-public class TrackData implements Serializable{
+public class TrackData implements Serializable {
 
-    private static final long serialVersionUID = 1L;   
-    
-    @Id
-    @Column(name = "track_id")
-    private Integer trackId;
-    
-    @Column(name = "track_name")
-    private String trackName;
-    
-    @Column(name = "user_id")
-    private Integer userId;
-    
-    public TrackData(){
-    }
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name = "track_id")
+	private Integer trackId;
+
+	@Column(name = "track_name")
+	private String trackName;
+
+	@Column(name = "user_id")
+	private Integer userId;
+
+	public TrackData() {
+	}
 
 	public TrackData(Integer trackId, String trackName, Integer userId) {
 		this.trackId = trackId;
@@ -49,7 +50,7 @@ public class TrackData implements Serializable{
 	}
 
 	public Integer getTrackId() {
-		return trackId;
+		return this.trackId;
 	}
 
 	public void setTrackId(Integer trackId) {
@@ -57,7 +58,7 @@ public class TrackData implements Serializable{
 	}
 
 	public String getTrackName() {
-		return trackName;
+		return this.trackName;
 	}
 
 	public void setTrackName(String trackName) {
@@ -65,7 +66,7 @@ public class TrackData implements Serializable{
 	}
 
 	public Integer getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	public void setUserId(Integer userId) {
@@ -76,46 +77,45 @@ public class TrackData implements Serializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((trackId == null) ? 0 : trackId.hashCode());
-		result = prime * result
-				+ ((trackName == null) ? 0 : trackName.hashCode());
-		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		result = prime * result + (this.trackId == null ? 0 : this.trackId.hashCode());
+		result = prime * result + (this.trackName == null ? 0 : this.trackName.hashCode());
+		result = prime * result + (this.userId == null ? 0 : this.userId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		TrackData other = (TrackData) obj;
-		if (trackId == null) {
+		if (this.trackId == null) {
 			if (other.trackId != null) {
-                return false;
-            }
-		} else if (!trackId.equals(other.trackId)) {
-            return false;
-        }
-		if (trackName == null) {
+				return false;
+			}
+		} else if (!this.trackId.equals(other.trackId)) {
+			return false;
+		}
+		if (this.trackName == null) {
 			if (other.trackName != null) {
-                return false;
-            }
-		} else if (!trackName.equals(other.trackName)) {
-            return false;
-        }
-		if (userId == null) {
+				return false;
+			}
+		} else if (!this.trackName.equals(other.trackName)) {
+			return false;
+		}
+		if (this.userId == null) {
 			if (other.userId != null) {
-                return false;
-            }
-		} else if (!userId.equals(other.userId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.userId.equals(other.userId)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -123,13 +123,13 @@ public class TrackData implements Serializable{
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("TrackData [trackId=");
-		builder.append(trackId);
+		builder.append(this.trackId);
 		builder.append(", trackName=");
-		builder.append(trackName);
+		builder.append(this.trackName);
 		builder.append(", userId=");
-		builder.append(userId);
+		builder.append(this.userId);
 		builder.append("]");
 		return builder.toString();
 	}
-    
+
 }

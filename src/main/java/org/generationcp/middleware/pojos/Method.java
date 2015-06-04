@@ -1,183 +1,192 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
-import org.generationcp.middleware.domain.oms.TermId;
-
-import javax.persistence.*;
-import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+import org.generationcp.middleware.domain.oms.TermId;
+
 /**
  * POJO for methods table.
- * 
+ *
  * @author Kevin Manansala, Mark Agarrado
  */
-@NamedQueries({ @NamedQuery(name = "getAllMethods", query = "FROM Method") })
+@NamedQueries({@NamedQuery(name = "getAllMethods", query = "FROM Method")})
 @Entity
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "method")
-@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator", "prefix", "count", "suffix","program_uuid" })
+@XmlType(propOrder = {"mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator",
+		"prefix", "count", "suffix", "program_uuid"})
 @XmlAccessorType(XmlAccessType.NONE)
-public class Method implements Serializable{
+public class Method implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
-    public static final List<Integer> BULKED_CLASSES = Arrays.asList(
-    		TermId.BULKING_BREEDING_METHOD_CLASS.getId() 
-    		, TermId.SEED_INCREASE_METHOD_CLASS.getId() 
-    		, TermId.SEED_ACQUISITION_METHOD_CLASS.getId()
-    		, TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
-    
-    public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(
-    		TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
+	private static final long serialVersionUID = 1L;
 
-    public static final String GET_ALL = "getAllMethods";
+	public static final List<Integer> BULKED_CLASSES = Arrays.asList(TermId.BULKING_BREEDING_METHOD_CLASS.getId(),
+			TermId.SEED_INCREASE_METHOD_CLASS.getId(), TermId.SEED_ACQUISITION_METHOD_CLASS.getId(),
+			TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "mid")
-    @XmlElement(name = "methodId")
-    private Integer mid;
-    
-    @Basic(optional = true)
-    @Column(name = "program_uuid")
-    private String uniqueID;
+	public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
 
-    @Basic(optional = false)
-    @Column(name = "mtype")
-    @XmlElement(name = "type")
-    private String mtype;
+	public static final String GET_ALL = "getAllMethods";
 
-    @Basic(optional = false)
-    @Column(name = "mgrp")
-    @XmlElement(name = "breedingSystem")
-    private String mgrp;
+	@Id
+	@Basic(optional = false)
+	@Column(name = "mid")
+	@XmlElement(name = "methodId")
+	private Integer mid;
 
-    @Basic(optional = false)
-    @Column(name = "mcode")
-    @XmlElement(name = "code")
-    private String mcode;
+	@Basic(optional = true)
+	@Column(name = "program_uuid")
+	private String uniqueID;
 
-    @Basic(optional = false)
-    @Column(name = "mname")
-    @XmlElement(name = "name")
-    private String mname;
+	@Basic(optional = false)
+	@Column(name = "mtype")
+	@XmlElement(name = "type")
+	private String mtype;
 
-    @Basic(optional = false)
-    @Column(name = "mdesc")
-    @XmlElement(name = "description")
-    private String mdesc;
+	@Basic(optional = false)
+	@Column(name = "mgrp")
+	@XmlElement(name = "breedingSystem")
+	private String mgrp;
 
-    @Basic(optional = false)
-    @Column(name = "mref")
-    @XmlElement(name = "reference")
-    private Integer mref;
+	@Basic(optional = false)
+	@Column(name = "mcode")
+	@XmlElement(name = "code")
+	private String mcode;
 
-    @Basic(optional = false)
-    @Column(name = "mprgn")
-    @XmlElement(name = "numberOfProgenitors")
-    private Integer mprgn;
+	@Basic(optional = false)
+	@Column(name = "mname")
+	@XmlElement(name = "name")
+	private String mname;
 
-    @Basic(optional = false)
-    @Column(name = "mfprg")
-    @XmlElement(name = "numberOfFemaleParents")
-    private Integer mfprg;
+	@Basic(optional = false)
+	@Column(name = "mdesc")
+	@XmlElement(name = "description")
+	private String mdesc;
 
-    @Basic(optional = false)
-    @Column(name = "mattr")
-    private Integer mattr;
+	@Basic(optional = false)
+	@Column(name = "mref")
+	@XmlElement(name = "reference")
+	private Integer mref;
 
-    @Basic(optional = false)
-    @Column(name = "geneq")
-    private Integer geneq;
+	@Basic(optional = false)
+	@Column(name = "mprgn")
+	@XmlElement(name = "numberOfProgenitors")
+	private Integer mprgn;
 
-    @Basic(optional = false)
-    @Column(name = "muid")
-    @XmlElement(name = "userid")
-    private Integer muid;
+	@Basic(optional = false)
+	@Column(name = "mfprg")
+	@XmlElement(name = "numberOfFemaleParents")
+	private Integer mfprg;
 
-    @Basic(optional = false)
-    @Column(name = "lmid")
-    private Integer lmid;
+	@Basic(optional = false)
+	@Column(name = "mattr")
+	private Integer mattr;
 
-    @Basic(optional = false)
-    @Column(name = "mdate")
-    private Integer mdate;
-    
-    @Basic(optional = true)
-    @Column(name = "snametype")
-    private Integer snametype;
-    
-    @Basic(optional = true)
-    @Column(name = "[separator]")
-    private String separator;
-    
-    @Basic(optional = true)
-    @Column(name = "[prefix]")
-    private String prefix;
-    
-    @Basic(optional = true)
-    @Column(name = "[count]")
-    private String count;
-    
-    @Basic(optional = true)
-    @Column(name = "[suffix]")
-    private String suffix;
-    
-    
-    @Transient
-    private Boolean isnew = false;
+	@Basic(optional = false)
+	@Column(name = "geneq")
+	private Integer geneq;
 
-    public Method() {
-    }
+	@Basic(optional = false)
+	@Column(name = "muid")
+	@XmlElement(name = "userid")
+	private Integer muid;
 
-    public Method(Integer mid) {
-        this.mid = mid;
-    }
+	@Basic(optional = false)
+	@Column(name = "lmid")
+	private Integer lmid;
 
-    public Method(Integer mid, String mtype, String mgrp, String mcode, String mname, String mdesc, Integer mref, Integer mprgn,
-            Integer mfprg, Integer mattr, Integer geneq, Integer muid, Integer lmid, Integer mdate, String uniqueID) {
-        super();
-        this.mid = mid;
-        this.mtype = mtype;
-        this.mgrp = mgrp;
-        this.mcode = mcode;
-        this.mname = mname;
-        this.mdesc = mdesc;
-        this.mref = mref;
-        this.mprgn = mprgn;
-        this.mfprg = mfprg;
-        this.mattr = mattr;
-        this.geneq = geneq;
-        this.muid = muid;
-        this.lmid = lmid;
-        this.mdate = mdate;
-        this.uniqueID = uniqueID;
-    }
+	@Basic(optional = false)
+	@Column(name = "mdate")
+	private Integer mdate;
 
-    public Integer getMid() {
-        return mid;
-    }
+	@Basic(optional = true)
+	@Column(name = "snametype")
+	private Integer snametype;
 
-    public void setMid(Integer mid) {
-        this.mid = mid;
-    }
+	@Basic(optional = true)
+	@Column(name = "[separator]")
+	private String separator;
 
-    public String getUniqueID() {
-		return uniqueID;
+	@Basic(optional = true)
+	@Column(name = "[prefix]")
+	private String prefix;
+
+	@Basic(optional = true)
+	@Column(name = "[count]")
+	private String count;
+
+	@Basic(optional = true)
+	@Column(name = "[suffix]")
+	private String suffix;
+
+	@Transient
+	private Boolean isnew = false;
+
+	public Method() {
+	}
+
+	public Method(Integer mid) {
+		this.mid = mid;
+	}
+
+	public Method(Integer mid, String mtype, String mgrp, String mcode, String mname, String mdesc, Integer mref, Integer mprgn,
+			Integer mfprg, Integer mattr, Integer geneq, Integer muid, Integer lmid, Integer mdate, String uniqueID) {
+		super();
+		this.mid = mid;
+		this.mtype = mtype;
+		this.mgrp = mgrp;
+		this.mcode = mcode;
+		this.mname = mname;
+		this.mdesc = mdesc;
+		this.mref = mref;
+		this.mprgn = mprgn;
+		this.mfprg = mfprg;
+		this.mattr = mattr;
+		this.geneq = geneq;
+		this.muid = muid;
+		this.lmid = lmid;
+		this.mdate = mdate;
+		this.uniqueID = uniqueID;
+	}
+
+	public Integer getMid() {
+		return this.mid;
+	}
+
+	public void setMid(Integer mid) {
+		this.mid = mid;
+	}
+
+	public String getUniqueID() {
+		return this.uniqueID;
 	}
 
 	public void setUniqueID(String uniqueID) {
@@ -185,184 +194,183 @@ public class Method implements Serializable{
 	}
 
 	public String getMtype() {
-        return mtype;
-    }
+		return this.mtype;
+	}
 
-    public void setMtype(String mtype) {
-        this.mtype = mtype;
-    }
+	public void setMtype(String mtype) {
+		this.mtype = mtype;
+	}
 
-    public String getMgrp() {
-        return mgrp;
-    }
+	public String getMgrp() {
+		return this.mgrp;
+	}
 
-    public void setMgrp(String mgrp) {
-        this.mgrp = mgrp;
-    }
+	public void setMgrp(String mgrp) {
+		this.mgrp = mgrp;
+	}
 
-    public String getMcode() {
-        return mcode;
-    }
+	public String getMcode() {
+		return this.mcode;
+	}
 
-    public void setMcode(String mcode) {
-        this.mcode = mcode;
-    }
+	public void setMcode(String mcode) {
+		this.mcode = mcode;
+	}
 
-    public String getMname() {
-        return mname;
-    }
+	public String getMname() {
+		return this.mname;
+	}
 
-    public void setMname(String mname) {
-        this.mname = mname;
-    }
+	public void setMname(String mname) {
+		this.mname = mname;
+	}
 
-    public String getMdesc() {
-        return mdesc;
-    }
+	public String getMdesc() {
+		return this.mdesc;
+	}
 
-    public void setMdesc(String mdesc) {
-        this.mdesc = mdesc;
-    }
+	public void setMdesc(String mdesc) {
+		this.mdesc = mdesc;
+	}
 
-    public Integer getMprgn() {
-        return mprgn;
-    }
+	public Integer getMprgn() {
+		return this.mprgn;
+	}
 
-    public void setMprgn(Integer mprgn) {
-        this.mprgn = mprgn;
-    }
+	public void setMprgn(Integer mprgn) {
+		this.mprgn = mprgn;
+	}
 
-    public Integer getMfprg() {
-        return mfprg;
-    }
+	public Integer getMfprg() {
+		return this.mfprg;
+	}
 
-    public void setMfprg(Integer mfprg) {
-        this.mfprg = mfprg;
-    }
+	public void setMfprg(Integer mfprg) {
+		this.mfprg = mfprg;
+	}
 
-    public Integer getMattr() {
-        return mattr;
-    }
+	public Integer getMattr() {
+		return this.mattr;
+	}
 
-    public void setMattr(Integer mattr) {
-        this.mattr = mattr;
-    }
+	public void setMattr(Integer mattr) {
+		this.mattr = mattr;
+	}
 
-    public Integer getGeneq() {
-        return geneq;
-    }
+	public Integer getGeneq() {
+		return this.geneq;
+	}
 
-    public void setGeneq(Integer geneq) {
-        this.geneq = geneq;
-    }
+	public void setGeneq(Integer geneq) {
+		this.geneq = geneq;
+	}
 
-    public Integer getLmid() {
-        return lmid;
-    }
+	public Integer getLmid() {
+		return this.lmid;
+	}
 
-    public void setLmid(Integer lmid) {
-        this.lmid = lmid;
-    }
+	public void setLmid(Integer lmid) {
+		this.lmid = lmid;
+	}
 
-    public Integer getMdate() {
-        return mdate;
-    }
+	public Integer getMdate() {
+		return this.mdate;
+	}
 
-    public void setMdate(Integer mdate) {
-        this.mdate = mdate;
-    }
+	public void setMdate(Integer mdate) {
+		this.mdate = mdate;
+	}
 
-    public Integer getReference() {
-        return mref;
-    }
+	public Integer getReference() {
+		return this.mref;
+	}
 
-    public void setReference(Integer mref) {
-        this.mref = mref;
-    }
+	public void setReference(Integer mref) {
+		this.mref = mref;
+	}
 
-    public Integer getUser() {
-        return muid;
-    }
+	public Integer getUser() {
+		return this.muid;
+	}
 
-    public void setUser(Integer muid) {
-        this.muid = muid;
-    }
-    
+	public void setUser(Integer muid) {
+		this.muid = muid;
+	}
 
-    @Override
-    public int hashCode() {
-        return this.getMid();
-    }
+	@Override
+	public int hashCode() {
+		return this.getMid();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Method other = (Method) obj;
-        if (mid == null) {
-            if (other.getMid() != null) {
-                return false;
-            }
-        } else if (!mid.equals(other.getMid())) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		Method other = (Method) obj;
+		if (this.mid == null) {
+			if (other.getMid() != null) {
+				return false;
+			}
+		} else if (!this.mid.equals(other.getMid())) {
+			return false;
+		}
+		return true;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Method [mid=");
-        builder.append(mid);
-        builder.append(", mtype=");
-        builder.append(mtype);
-        builder.append(", mgrp=");
-        builder.append(mgrp);
-        builder.append(", mcode=");
-        builder.append(mcode);
-        builder.append(", mname=");
-        builder.append(mname);
-        builder.append(", mdesc=");
-        builder.append(mdesc);
-        builder.append(", mref=");
-        builder.append(mref);
-        builder.append(", mprgn=");
-        builder.append(mprgn);
-        builder.append(", mfprg=");
-        builder.append(mfprg);
-        builder.append(", mattr=");
-        builder.append(mattr);
-        builder.append(", geneq=");
-        builder.append(geneq);
-        builder.append(", muid=");
-        builder.append(muid);
-        builder.append(", lmid=");
-        builder.append(lmid);
-        builder.append(", mdate=");
-        builder.append(mdate);
-        builder.append(", snametype=");
-        builder.append(snametype);
-        builder.append(", separator=");
-        builder.append(separator);
-        builder.append(", prefix=");
-        builder.append(prefix);
-        builder.append(", count=");
-        builder.append(count);
-        builder.append(", suffix=");
-        builder.append(suffix);
-        builder.append("]");
-        return builder.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Method [mid=");
+		builder.append(this.mid);
+		builder.append(", mtype=");
+		builder.append(this.mtype);
+		builder.append(", mgrp=");
+		builder.append(this.mgrp);
+		builder.append(", mcode=");
+		builder.append(this.mcode);
+		builder.append(", mname=");
+		builder.append(this.mname);
+		builder.append(", mdesc=");
+		builder.append(this.mdesc);
+		builder.append(", mref=");
+		builder.append(this.mref);
+		builder.append(", mprgn=");
+		builder.append(this.mprgn);
+		builder.append(", mfprg=");
+		builder.append(this.mfprg);
+		builder.append(", mattr=");
+		builder.append(this.mattr);
+		builder.append(", geneq=");
+		builder.append(this.geneq);
+		builder.append(", muid=");
+		builder.append(this.muid);
+		builder.append(", lmid=");
+		builder.append(this.lmid);
+		builder.append(", mdate=");
+		builder.append(this.mdate);
+		builder.append(", snametype=");
+		builder.append(this.snametype);
+		builder.append(", separator=");
+		builder.append(this.separator);
+		builder.append(", prefix=");
+		builder.append(this.prefix);
+		builder.append(", count=");
+		builder.append(this.count);
+		builder.append(", suffix=");
+		builder.append(this.suffix);
+		builder.append("]");
+		return builder.toString();
+	}
 
 	public Boolean getIsnew() {
-		return isnew;
+		return this.isnew;
 	}
 
 	public void setIsnew(Boolean isnew) {
@@ -373,7 +381,7 @@ public class Method implements Serializable{
 	 * @return the snametype
 	 */
 	public Integer getSnametype() {
-		return snametype;
+		return this.snametype;
 	}
 
 	/**
@@ -387,7 +395,7 @@ public class Method implements Serializable{
 	 * @return the separator
 	 */
 	public String getSeparator() {
-		return separator;
+		return this.separator;
 	}
 
 	/**
@@ -401,7 +409,7 @@ public class Method implements Serializable{
 	 * @return the prefix
 	 */
 	public String getPrefix() {
-		return prefix;
+		return this.prefix;
 	}
 
 	/**
@@ -415,7 +423,7 @@ public class Method implements Serializable{
 	 * @return the count
 	 */
 	public String getCount() {
-		return count;
+		return this.count;
 	}
 
 	/**
@@ -429,7 +437,7 @@ public class Method implements Serializable{
 	 * @return the suffix
 	 */
 	public String getSuffix() {
-		return suffix;
+		return this.suffix;
 	}
 
 	/**
@@ -438,18 +446,17 @@ public class Method implements Serializable{
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
 	}
-	
+
 	@Transient
 	public Boolean isBulkingMethod() {
-		if (geneq != null) {
-			if (BULKED_CLASSES.contains(geneq)) {
+		if (this.geneq != null) {
+			if (Method.BULKED_CLASSES.contains(this.geneq)) {
 				return true;
-			}
-			else if (NON_BULKED_CLASSES.contains(geneq)) {
+			} else if (Method.NON_BULKED_CLASSES.contains(this.geneq)) {
 				return false;
 			}
 		}
 		return null;
 	}
-	
+
 }

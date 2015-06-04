@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware;
 
 import java.util.Date;
@@ -18,136 +19,133 @@ import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 
 public class WorkbenchTestDataUtil extends DataManagerIntegrationTest {
-	
+
 	private static WorkbenchTestDataUtil instance;
-	private WorkbenchDataManager workbenchDataManager;
+	private final WorkbenchDataManager workbenchDataManager;
 	private Project commonTestProject;
-    private User testUser1, testUser2;
-    private Person testPerson1, testPerson2;
-    private ProjectActivity testProjectActivity1, testProjectActivity2;
-	
+	private User testUser1, testUser2;
+	private Person testPerson1, testPerson2;
+	private ProjectActivity testProjectActivity1, testProjectActivity2;
+
 	private WorkbenchTestDataUtil() {
-		HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(workbenchSessionUtil.getSessionFactory());
-		workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);   
+		HibernateSessionProvider sessionProvider =
+				new HibernateSessionPerThreadProvider(MiddlewareIntegrationTest.workbenchSessionUtil.getSessionFactory());
+		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 	}
-	
+
 	public static WorkbenchTestDataUtil getInstance() {
-		if(instance==null) {
-			instance = new WorkbenchTestDataUtil();
+		if (WorkbenchTestDataUtil.instance == null) {
+			WorkbenchTestDataUtil.instance = new WorkbenchTestDataUtil();
 		}
-		return instance;
+		return WorkbenchTestDataUtil.instance;
 	}
-	
+
 	public Person createTestPersonData() {
 		Person person = new Person();
-        person.setInstituteId(1);
-        person.setFirstName("Test");
-        person.setMiddleName("M");
-        person.setLastName("Person " + new Random().nextInt());
-        person.setPositionName("King of Icewind Dale");
-        person.setTitle("His Highness");
-        person.setExtension("Ext");
-        person.setFax("Fax");
-        person.setEmail("lichking@blizzard.com");
-        person.setNotes("notes");
-        person.setContact("Contact");
-        person.setLanguage(-1);
-        person.setPhone("Phone");
+		person.setInstituteId(1);
+		person.setFirstName("Test");
+		person.setMiddleName("M");
+		person.setLastName("Person " + new Random().nextInt());
+		person.setPositionName("King of Icewind Dale");
+		person.setTitle("His Highness");
+		person.setExtension("Ext");
+		person.setFax("Fax");
+		person.setEmail("lichking@blizzard.com");
+		person.setNotes("notes");
+		person.setContact("Contact");
+		person.setLanguage(-1);
+		person.setPhone("Phone");
 		return person;
 	}
-	
+
 	public User createTestUserData() {
 		User user = new User();
-        user.setInstalid(-1);
-        user.setStatus(-1);
-        user.setAccess(-1);
-        user.setType(-1);
-        user.setName("user_test" + new Random().nextInt());
-        user.setPassword("user_password");
-        user.setPersonid(1);
-        user.setAdate(20120101);
-        user.setCdate(20120101);
+		user.setInstalid(-1);
+		user.setStatus(-1);
+		user.setAccess(-1);
+		user.setType(-1);
+		user.setName("user_test" + new Random().nextInt());
+		user.setPassword("user_password");
+		user.setPersonid(1);
+		user.setAdate(20120101);
+		user.setCdate(20120101);
 		return user;
 	}
-	
-
 
 	public Project createTestProjectData() throws MiddlewareQueryException {
 		Project project = new Project();
-        project.setUserId(1);
-        int uniqueId = new Random().nextInt(10000);
-        project.setProjectName("Test Project " + uniqueId);
-        project.setStartDate(new Date(System.currentTimeMillis()));
-        project.setCropType(workbenchDataManager.getCropTypeByName(CropType.CropEnum.RICE.toString()));
-        project.setLastOpenDate(new Date(System.currentTimeMillis()));
-        project.setUniqueID(Integer.toString(uniqueId));
+		project.setUserId(1);
+		int uniqueId = new Random().nextInt(10000);
+		project.setProjectName("Test Project " + uniqueId);
+		project.setStartDate(new Date(System.currentTimeMillis()));
+		project.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.RICE.toString()));
+		project.setLastOpenDate(new Date(System.currentTimeMillis()));
+		project.setUniqueID(Integer.toString(uniqueId));
 		return project;
 	}
-	
+
 	public ProjectActivity createTestProjectActivityData(Project project, User user) {
 		ProjectActivity projectActivity = new ProjectActivity();
-        projectActivity.setProject(project);
-        projectActivity.setName("Project Activity" + new Random().nextInt());
-        projectActivity.setDescription("Some project activity");
-        projectActivity.setUser(user);
-        projectActivity.setCreatedAt(new Date(System.currentTimeMillis()));
+		projectActivity.setProject(project);
+		projectActivity.setName("Project Activity" + new Random().nextInt());
+		projectActivity.setDescription("Some project activity");
+		projectActivity.setUser(user);
+		projectActivity.setCreatedAt(new Date(System.currentTimeMillis()));
 		return projectActivity;
 	}
-	
-	public void setUpWorkbench() throws MiddlewareQueryException  {
-        testPerson1 = createTestPersonData();
-        workbenchDataManager.addPerson(testPerson1);
-        testPerson2 = createTestPersonData();
-        workbenchDataManager.addPerson(testPerson2);
-        
-        testUser1 = createTestUserData();
-        testUser1.setPersonid(testPerson1.getId());
-        workbenchDataManager.addUser(testUser1);
-        testUser2 = createTestUserData();
-        testUser2.setPersonid(testPerson2.getId());
-        workbenchDataManager.addUser(testUser2);
-        
-        commonTestProject = createTestProjectData();
-        commonTestProject.setUserId(testUser1.getUserid());
-        workbenchDataManager.addProject(commonTestProject);
-        
-        testProjectActivity1 = createTestProjectActivityData(commonTestProject, testUser1);
-        workbenchDataManager.addProjectActivity(testProjectActivity1);
-        
-        testProjectActivity2 = createTestProjectActivityData(commonTestProject, testUser2);
-        workbenchDataManager.addProjectActivity(testProjectActivity2);
-        
-        UserInfo userInfo = new UserInfo();
-        userInfo.setUserId(3);
-        userInfo.setLoginCount(5);
-        workbenchDataManager.insertOrUpdateUserInfo(userInfo);
-        
-    	ProjectUserInfo pui =  new ProjectUserInfo();
-    	pui.setProjectId(new Integer(Integer.parseInt(commonTestProject.getProjectId().toString())));
-    	pui.setUserId(commonTestProject.getUserId());
-    	pui.setLastOpenDate(new Date());
-    	workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
-        
-        WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
-        workbenchRuntimeData.setUserId(1);
-        workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
-        
-    }
+
+	public void setUpWorkbench() throws MiddlewareQueryException {
+		this.testPerson1 = this.createTestPersonData();
+		this.workbenchDataManager.addPerson(this.testPerson1);
+		this.testPerson2 = this.createTestPersonData();
+		this.workbenchDataManager.addPerson(this.testPerson2);
+
+		this.testUser1 = this.createTestUserData();
+		this.testUser1.setPersonid(this.testPerson1.getId());
+		this.workbenchDataManager.addUser(this.testUser1);
+		this.testUser2 = this.createTestUserData();
+		this.testUser2.setPersonid(this.testPerson2.getId());
+		this.workbenchDataManager.addUser(this.testUser2);
+
+		this.commonTestProject = this.createTestProjectData();
+		this.commonTestProject.setUserId(this.testUser1.getUserid());
+		this.workbenchDataManager.addProject(this.commonTestProject);
+
+		this.testProjectActivity1 = this.createTestProjectActivityData(this.commonTestProject, this.testUser1);
+		this.workbenchDataManager.addProjectActivity(this.testProjectActivity1);
+
+		this.testProjectActivity2 = this.createTestProjectActivityData(this.commonTestProject, this.testUser2);
+		this.workbenchDataManager.addProjectActivity(this.testProjectActivity2);
+
+		UserInfo userInfo = new UserInfo();
+		userInfo.setUserId(3);
+		userInfo.setLoginCount(5);
+		this.workbenchDataManager.insertOrUpdateUserInfo(userInfo);
+
+		ProjectUserInfo pui = new ProjectUserInfo();
+		pui.setProjectId(new Integer(Integer.parseInt(this.commonTestProject.getProjectId().toString())));
+		pui.setUserId(this.commonTestProject.getUserId());
+		pui.setLastOpenDate(new Date());
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
+
+		WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
+		workbenchRuntimeData.setUserId(1);
+		this.workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
+
+	}
 
 	public Project getCommonTestProject() throws MiddlewareQueryException {
-		if(commonTestProject==null) {
-			commonTestProject = createTestProjectData();
+		if (this.commonTestProject == null) {
+			this.commonTestProject = this.createTestProjectData();
 		}
-		return commonTestProject;
+		return this.commonTestProject;
 	}
 
 	public User getTestUser1() {
-		if(testUser1==null) {
-			testUser1 = createTestUserData();
+		if (this.testUser1 == null) {
+			this.testUser1 = this.createTestUserData();
 		}
-		return testUser1;
+		return this.testUser1;
 	}
-	
-	
-	
+
 }

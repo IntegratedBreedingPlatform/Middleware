@@ -1,248 +1,241 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
-
 /**
  * The Class MapInfo. For the details of a MappingData.
- * 
+ *
  * @author Joyce Avestro
- * 
+ *
  */
-public class MapInfo implements Serializable, Comparable<MapInfo>{
+public class MapInfo implements Serializable, Comparable<MapInfo> {
 
-    private static final long serialVersionUID = 1L;
-    
-    private Integer markerId;
+	private static final long serialVersionUID = 1L;
 
-    private String markerName;
-    
-    private Integer mapId;
-    
-    private String mapName;
-    
-    private String linkageGroup;
-    
-    private Float startPosition;
-    
-    private String mapType;
-    
-    private String mapUnit;
+	private Integer markerId;
 
-    public MapInfo(Integer markerId, String markerName, Integer mapId, String mapName, 
-            String linkageGroup, Float startPosition, String mapType, String mapUnit) {
-        this.markerId = markerId;
-        this.markerName = markerName;
-        this.mapId = mapId;
-        this.mapName = mapName;
-        this.linkageGroup = linkageGroup;
-        this.startPosition = startPosition;
-        this.mapType = mapType;
-        this.mapUnit = mapUnit;
-    }
+	private String markerName;
 
-    
-    public String getMarkerName() {
-        return markerName;
-    }
+	private Integer mapId;
 
-    public void setMarkerName(String markerName) {
-        this.markerName = markerName;
-    }
-    
-    public String getLinkageGroup() {
-        return linkageGroup;
-    }
+	private String mapName;
 
-    public void setLinkageGroup(String linkageGroup) {
-        this.linkageGroup = linkageGroup;
-    }
+	private String linkageGroup;
 
-    public Float getStartPosition() {
-        return startPosition;
-    }
+	private Float startPosition;
 
-    public void setStartPosition(Float startPosition) {
-        this.startPosition = startPosition;
-    }
-    
-    public Integer getMapId() {
-        return mapId;
-    }
+	private String mapType;
 
-    
-    public void setMapId(Integer mapId) {
-        this.mapId = mapId;
-    }
+	private String mapUnit;
 
-    public String getMapName() {
-        return mapName;
-    }
+	public MapInfo(Integer markerId, String markerName, Integer mapId, String mapName, String linkageGroup, Float startPosition,
+			String mapType, String mapUnit) {
+		this.markerId = markerId;
+		this.markerName = markerName;
+		this.mapId = mapId;
+		this.mapName = mapName;
+		this.linkageGroup = linkageGroup;
+		this.startPosition = startPosition;
+		this.mapType = mapType;
+		this.mapUnit = mapUnit;
+	}
 
-    public void setMapName(String mapName) {
-        this.mapName = mapName;
-    }
+	public String getMarkerName() {
+		return this.markerName;
+	}
 
-    public Integer getMarkerId() {
-        return markerId;
-    }
+	public void setMarkerName(String markerName) {
+		this.markerName = markerName;
+	}
 
-    
-    public void setMarkerId(Integer markerId) {
-        this.markerId = markerId;
-    }
-    
-    public String getMapType() {
-        return mapType;
-    }
-    
-    public void setMapType(String mapType) {
-        this.mapType = mapType;
-    }
+	public String getLinkageGroup() {
+		return this.linkageGroup;
+	}
 
-    public String getMapUnit() {
-        return mapUnit;
-    }
-    
-    public void setMapUnit(String mapUnit) {
-        this.mapUnit = mapUnit;
-    }
+	public void setLinkageGroup(String linkageGroup) {
+		this.linkageGroup = linkageGroup;
+	}
 
+	public Float getStartPosition() {
+		return this.startPosition;
+	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((linkageGroup == null) ? 0 : linkageGroup.hashCode());
-        result = prime * result + ((mapId == null) ? 0 : mapId.hashCode());
-        result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
-        result = prime * result + ((mapType == null) ? 0 : mapType.hashCode());
-        result = prime * result + ((mapUnit == null) ? 0 : mapUnit.hashCode());
-        result = prime * result + ((markerId == null) ? 0 : markerId.hashCode());
-        result = prime * result + ((markerName == null) ? 0 : markerName.hashCode());
-        result = prime * result + ((startPosition == null) ? 0 : startPosition.hashCode());
-        return result;
-    }
+	public void setStartPosition(Float startPosition) {
+		this.startPosition = startPosition;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        MapInfo other = (MapInfo) obj;
-        if (linkageGroup == null) {
-            if (other.linkageGroup != null) {
-                return false;
-            }
-        } else if (!linkageGroup.equals(other.linkageGroup)) {
-            return false;
-        }
-        if (mapId == null) {
-            if (other.mapId != null) {
-                return false;
-            }
-        } else if (!mapId.equals(other.mapId)) {
-            return false;
-        }
-        if (mapName == null) {
-            if (other.mapName != null) {
-                return false;
-            }
-        } else if (!mapName.equals(other.mapName)) {
-            return false;
-        }
-        if (mapType == null) {
-            if (other.mapType != null) {
-                return false;
-            }
-        } else if (!mapType.equals(other.mapType)) {
-            return false;
-        }
-        if (mapUnit == null) {
-            if (other.mapUnit != null) {
-                return false;
-            }
-        } else if (!mapUnit.equals(other.mapUnit)) {
-            return false;
-        }
-        if (markerId == null) {
-            if (other.markerId != null) {
-                return false;
-            }
-        } else if (!markerId.equals(other.markerId)) {
-            return false;
-        }
-        if (markerName == null) {
-            if (other.markerName != null) {
-                return false;
-            }
-        } else if (!markerName.equals(other.markerName)) {
-            return false;
-        }
-        if (startPosition == null) {
-            if (other.startPosition != null) {
-                return false;
-            }
-        } else if (!startPosition.equals(other.startPosition)) {
-            return false;
-        }
-        return true;
-    }
+	public Integer getMapId() {
+		return this.mapId;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("MapInfo [markerId=");
-        builder.append(markerId);
-        builder.append(", markerName=");
-        builder.append(markerName);
-        builder.append(", mapId=");
-        builder.append(mapId);
-        builder.append(", mapName=");
-        builder.append(mapName);
-        builder.append(", linkageGroup=");
-        builder.append(linkageGroup);
-        builder.append(", startPosition=");
-        builder.append(startPosition);
-        builder.append(", mapType=");
-        builder.append(mapType);
-        builder.append(", mapUnit=");
-        builder.append(mapUnit);
-        builder.append("]");
-        return builder.toString();
-    }
-    
-    public static MapInfo build(MappingData mapData){
-        return new MapInfo(mapData.getMarkerId(), mapData.getMarkerName(), mapData.getMapId(), mapData.getMapName(), 
-                mapData.getLinkageGroup(), mapData.getStartPosition(), null, null);
-    }
-    
-    @Override
-    public int compareTo(MapInfo mapInfo2) {
-        int c = this.getLinkageGroup().compareTo(mapInfo2.getLinkageGroup()); // ascending by linkage group
-        if (c == 0){
-            c = this.getStartPosition().compareTo(mapInfo2.getStartPosition()); // ascending by start position
-        }
-        return c;
-    }
+	public void setMapId(Integer mapId) {
+		this.mapId = mapId;
+	}
 
+	public String getMapName() {
+		return this.mapName;
+	}
 
+	public void setMapName(String mapName) {
+		this.mapName = mapName;
+	}
+
+	public Integer getMarkerId() {
+		return this.markerId;
+	}
+
+	public void setMarkerId(Integer markerId) {
+		this.markerId = markerId;
+	}
+
+	public String getMapType() {
+		return this.mapType;
+	}
+
+	public void setMapType(String mapType) {
+		this.mapType = mapType;
+	}
+
+	public String getMapUnit() {
+		return this.mapUnit;
+	}
+
+	public void setMapUnit(String mapUnit) {
+		this.mapUnit = mapUnit;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (this.linkageGroup == null ? 0 : this.linkageGroup.hashCode());
+		result = prime * result + (this.mapId == null ? 0 : this.mapId.hashCode());
+		result = prime * result + (this.mapName == null ? 0 : this.mapName.hashCode());
+		result = prime * result + (this.mapType == null ? 0 : this.mapType.hashCode());
+		result = prime * result + (this.mapUnit == null ? 0 : this.mapUnit.hashCode());
+		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
+		result = prime * result + (this.markerName == null ? 0 : this.markerName.hashCode());
+		result = prime * result + (this.startPosition == null ? 0 : this.startPosition.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		MapInfo other = (MapInfo) obj;
+		if (this.linkageGroup == null) {
+			if (other.linkageGroup != null) {
+				return false;
+			}
+		} else if (!this.linkageGroup.equals(other.linkageGroup)) {
+			return false;
+		}
+		if (this.mapId == null) {
+			if (other.mapId != null) {
+				return false;
+			}
+		} else if (!this.mapId.equals(other.mapId)) {
+			return false;
+		}
+		if (this.mapName == null) {
+			if (other.mapName != null) {
+				return false;
+			}
+		} else if (!this.mapName.equals(other.mapName)) {
+			return false;
+		}
+		if (this.mapType == null) {
+			if (other.mapType != null) {
+				return false;
+			}
+		} else if (!this.mapType.equals(other.mapType)) {
+			return false;
+		}
+		if (this.mapUnit == null) {
+			if (other.mapUnit != null) {
+				return false;
+			}
+		} else if (!this.mapUnit.equals(other.mapUnit)) {
+			return false;
+		}
+		if (this.markerId == null) {
+			if (other.markerId != null) {
+				return false;
+			}
+		} else if (!this.markerId.equals(other.markerId)) {
+			return false;
+		}
+		if (this.markerName == null) {
+			if (other.markerName != null) {
+				return false;
+			}
+		} else if (!this.markerName.equals(other.markerName)) {
+			return false;
+		}
+		if (this.startPosition == null) {
+			if (other.startPosition != null) {
+				return false;
+			}
+		} else if (!this.startPosition.equals(other.startPosition)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MapInfo [markerId=");
+		builder.append(this.markerId);
+		builder.append(", markerName=");
+		builder.append(this.markerName);
+		builder.append(", mapId=");
+		builder.append(this.mapId);
+		builder.append(", mapName=");
+		builder.append(this.mapName);
+		builder.append(", linkageGroup=");
+		builder.append(this.linkageGroup);
+		builder.append(", startPosition=");
+		builder.append(this.startPosition);
+		builder.append(", mapType=");
+		builder.append(this.mapType);
+		builder.append(", mapUnit=");
+		builder.append(this.mapUnit);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	public static MapInfo build(MappingData mapData) {
+		return new MapInfo(mapData.getMarkerId(), mapData.getMarkerName(), mapData.getMapId(), mapData.getMapName(),
+				mapData.getLinkageGroup(), mapData.getStartPosition(), null, null);
+	}
+
+	@Override
+	public int compareTo(MapInfo mapInfo2) {
+		int c = this.getLinkageGroup().compareTo(mapInfo2.getLinkageGroup()); // ascending by linkage group
+		if (c == 0) {
+			c = this.getStartPosition().compareTo(mapInfo2.getStartPosition()); // ascending by start position
+		}
+		return c;
+	}
 
 }

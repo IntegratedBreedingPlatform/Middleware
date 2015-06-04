@@ -1,15 +1,19 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.dao.dms;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -22,13 +26,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 /**
  * DAO class for {@link ExperimentProject}.
- * 
+ *
  */
 public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer> {
 
@@ -38,56 +38,61 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			if (experimentIds != null && experimentIds.size() > 0) {
 				boolean first = true;
 				StringBuffer buf = new StringBuffer();
-				for (@SuppressWarnings("unused") Integer id : experimentIds) {
+				for (@SuppressWarnings("unused")
+				Integer id : experimentIds) {
 					if (first) {
 						first = false;
 						buf.append("?");
-					}
-					else {
+					} else {
 						buf.append(",?");
 					}
 				}
-				SQLQuery query = getSession().createSQLQuery("select distinct ep.project_id from nd_experiment_project ep where ep.nd_experiment_id in (" + buf + ")");
+				SQLQuery query =
+						this.getSession().createSQLQuery(
+								"select distinct ep.project_id from nd_experiment_project ep where ep.nd_experiment_id in (" + buf + ")");
 				int index = 0;
 				for (Integer id : experimentIds) {
-				    query.setParameter(index, id); 
-				    index++;
+					query.setParameter(index, id);
+					index++;
 				}
 				return query.list();
 			}
-			
+
 		} catch (HibernateException e) {
-			logAndThrowException("Error at getProjectIdsByExperimentIds=" + experimentIds + " query at ExperimentDao: " + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error at getProjectIdsByExperimentIds=" + experimentIds + " query at ExperimentDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<Integer>();
-		
+
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public List<ExperimentProject> getExperimentProjects(int projectId, int typeId, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<ExperimentProject> getExperimentProjects(int projectId, int typeId, int start, int numOfRows)
+			throws MiddlewareQueryException {
 		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("projectId", projectId));
 			criteria.createAlias("experiment", "experiment").add(Restrictions.eq("experiment.typeId", typeId));
 			criteria.setMaxResults(numOfRows);
 			criteria.setFirstResult(start);
 			return criteria.list();
-		} 
-		catch (HibernateException e) {
-			logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + typeId + " query at ExperimentProjectDao: " + e.getMessage(), e);
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + typeId + " query at ExperimentProjectDao: "
+					+ e.getMessage(), e);
 			return null;
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows)
+			throws MiddlewareQueryException {
 		try {
 
-			List <Integer> lists = new ArrayList<Integer>();
+			List<Integer> lists = new ArrayList<Integer>();
 			for (TermId termId : types) {
 				lists.add(termId.getId());
 			}
-			
+
 			StringBuilder queryString = new StringBuilder();
 			queryString.append("select distinct ep from ExperimentProject as ep ");
 			queryString.append("inner join ep.experiment as exp ");
@@ -102,64 +107,59 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			queryString.append("(st.uniqueName * 1) ASC, ");
 			queryString.append("ep.experiment.ndExperimentId ASC");
 
-			//Query q = getSession().createQuery("from ExperimentProject as ep where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids)")
-			Query q = getSession().createQuery(queryString.toString())
-					.setParameter("p_id",projectId)
-					.setParameterList("type_ids",lists)
-					.setMaxResults(numOfRows)
-					.setFirstResult(start)
-					;
-			
+			// Query q =
+			// getSession().createQuery("from ExperimentProject as ep where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids)")
+			Query q =
+					this.getSession().createQuery(queryString.toString()).setParameter("p_id", projectId)
+							.setParameterList("type_ids", lists).setMaxResults(numOfRows).setFirstResult(start);
+
 			return q.list();
-		} 
-		catch (HibernateException e) {
-			logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + types + " query at ExperimentProjectDao: " + e.getMessage(), e);
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error at getExperimentProjects=" + projectId + ", " + types + " query at ExperimentProjectDao: " + e.getMessage(), e);
 			return null;
 		}
 	}
 
 	public long count(int dataSetId) throws MiddlewareQueryException {
 		try {
-			return (Long) getSession().createQuery("select count(*) from ExperimentProject where project_id = " + dataSetId).uniqueResult();
-		} 
-		catch (HibernateException e) {
-			logAndThrowException("Error at getExperimentProjects=" + dataSetId + " query at ExperimentProjectDao: " + e.getMessage(), e);
+			return (Long) this.getSession().createQuery("select count(*) from ExperimentProject where project_id = " + dataSetId)
+					.uniqueResult();
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getExperimentProjects=" + dataSetId + " query at ExperimentProjectDao: " + e.getMessage(),
+					e);
 			return 0;
 		}
 	}
 
-	public int getExperimentIdByLocationIdStockId(int projectId,
-			Integer locationId, Integer stockId) throws MiddlewareQueryException {
+	public int getExperimentIdByLocationIdStockId(int projectId, Integer locationId, Integer stockId) throws MiddlewareQueryException {
 		try {
 			this.flush();
-			
+
 			// update the value of phenotypes
-			String sql = "SELECT exp.nd_experiment_id " +
-					"FROM nd_experiment_project ep " +
-					"INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id " +
-					"INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  " +
-					"INNER JOIN stock ON expstock.stock_id = stock.stock_id " +
-					" WHERE ep.project_id = " + projectId +
-					" AND exp.nd_geolocation_id = " + locationId + 
-					" AND exp.type_id = 1170 " +
-					" AND stock.stock_id = " + stockId;
+			String sql =
+					"SELECT exp.nd_experiment_id " + "FROM nd_experiment_project ep "
+							+ "INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id "
+							+ "INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  "
+							+ "INNER JOIN stock ON expstock.stock_id = stock.stock_id " + " WHERE ep.project_id = " + projectId
+							+ " AND exp.nd_geolocation_id = " + locationId + " AND exp.type_id = 1170 " + " AND stock.stock_id = "
+							+ stockId;
 
-			SQLQuery statement = getSession().createSQLQuery(sql);
+			SQLQuery statement = this.getSession().createSQLQuery(sql);
 			Integer returnVal = (Integer) statement.uniqueResult();
-			
-            this.flush();
-            this.clear();
-            
-            if (returnVal==null){
-            	return 0;
-            }else{
-            	return returnVal.intValue();
-            }
-            
 
-		} catch(HibernateException e) {
-			logAndThrowException("Error in getExperimentIdByLocationIdStockId=" 
-					+ projectId + ", " + locationId + " in ExperimentProjectDao: " + e.getMessage(), e);
+			this.flush();
+			this.clear();
+
+			if (returnVal == null) {
+				return 0;
+			} else {
+				return returnVal.intValue();
+			}
+
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error in getExperimentIdByLocationIdStockId=" + projectId + ", " + locationId
+					+ " in ExperimentProjectDao: " + e.getMessage(), e);
 			return 0;
 		}
 	}
@@ -167,18 +167,18 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 	@SuppressWarnings("unchecked")
 	public Integer getExperimentIdByProjectId(int projectId) throws MiddlewareQueryException {
 		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("projectId", projectId));
 			criteria.setProjection(Projections.property("experiment.ndExperimentId"));
 			List<Integer> list = criteria.list();
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
 			}
-		} 
-		catch (HibernateException e) {
-			logAndThrowException("Error at getExperimentIdByProjectId=" + projectId + ", " + " query at ExperimentProjectDao: " + e.getMessage(), e);
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error at getExperimentIdByProjectId=" + projectId + ", " + " query at ExperimentProjectDao: " + e.getMessage(), e);
 		}
 		return null;
 	}
-	
+
 }

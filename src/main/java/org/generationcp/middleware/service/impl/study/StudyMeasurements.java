@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 public class StudyMeasurements {
 
-	private Session session;
+	private final Session session;
 
 	private final ObservationQuery measurementQuery = new ObservationQuery();
 
@@ -23,45 +23,41 @@ public class StudyMeasurements {
 	}
 
 	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits) {
-		final String generateQuery = measurementQuery.getObservationQuery(traits);
-		return executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery);
+		final String generateQuery = this.measurementQuery.getObservationQuery(traits);
+		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery);
 	}
-	
-	
 
 	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<TraitDto> traits, final Integer measurementId) {
-		final String generateQuery = measurementQuery.getSingleObservationQuery(traits);
-		final List<ObservationDto> measurement = executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery, measurementId);
-		//Defensive programming
+		final String generateQuery = this.measurementQuery.getSingleObservationQuery(traits);
+		final List<ObservationDto> measurement =
+				this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery, measurementId);
+		// Defensive programming
 		if (measurement.size() > 1) {
-			
-			throw new IllegalStateException(
-					"We should never have more than on measurment in the measurment list. "
-					+ "Please contact support for further help.");
+
+			throw new IllegalStateException("We should never have more than on measurment in the measurment list. "
+							+ "Please contact support for further help.");
 		}
 		return measurement;
 	}
-	
-
 
 	@SuppressWarnings("unchecked")
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
 			final String generateQuery) {
-		final SQLQuery createSQLQuery = createQueryAndAddScalar(traits, generateQuery);
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 
-		setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
+		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
 
-		return mapResults(createSQLQuery.list(), traits);
+		return this.mapResults(createSQLQuery.list(), traits);
 	}
 
 	@SuppressWarnings("unchecked")
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
 			final String generateQuery, final Integer measurementId) {
-		final SQLQuery createSQLQuery = createQueryAndAddScalar(traits, generateQuery);
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 
-		setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery, measurementId);
+		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery, measurementId);
 
-		return mapResults(createSQLQuery.list(), traits);
+		return this.mapResults(createSQLQuery.list(), traits);
 	}
 
 	private SQLQuery createQueryAndAddScalar(final List<TraitDto> traits, final String generateQuery) {
@@ -93,7 +89,7 @@ public class StudyMeasurements {
 				final List<MeasurementDto> traitResults = new ArrayList<MeasurementDto>();
 				int counterTwo = 1;
 				for (final TraitDto trait : projectTraits) {
-					traitResults.add(new MeasurementDto(trait, (Integer) row[(8 + counterTwo + 1)], (String) row[(8 + counterTwo)]));
+					traitResults.add(new MeasurementDto(trait, (Integer) row[8 + counterTwo + 1], (String) row[8 + counterTwo]));
 					counterTwo += 2;
 				}
 				ObservationDto measurement =
@@ -107,7 +103,7 @@ public class StudyMeasurements {
 	}
 
 	private void setQueryParameters(int projectBusinessIdentifier, List<TraitDto> traits, SQLQuery createSQLQuery, Integer measurementId) {
-		int parameterCounter = setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
+		int parameterCounter = this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
 		createSQLQuery.setParameter(parameterCounter++, measurementId);
 
 	}
@@ -120,6 +116,5 @@ public class StudyMeasurements {
 		createSQLQuery.setParameter(counter++, studyIdentifier);
 		return counter;
 	}
-
 
 }

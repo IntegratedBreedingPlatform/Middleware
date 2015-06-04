@@ -1,47 +1,51 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.dms;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
-import java.io.Serializable;
-import java.util.*;
-
-/** 
+/**
  * List of variables and types.
  */
-public class VariableList implements Serializable{
+public class VariableList implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private List<Variable> variables = new ArrayList<Variable>();
 	private VariableTypeList variableTypes = null;
 	private Map<String, Variable> variableMap;
-	
+
 	public void add(Variable variable) {
-		variables.add(variable);
+		this.variables.add(variable);
 	}
-	
+
 	public void addAll(VariableList variableList) {
-	    variables.addAll(variableList.getVariables());
+		this.variables.addAll(variableList.getVariables());
 	}
 
 	public Variable findById(TermId termId) {
-		return findById(termId.getId());
+		return this.findById(termId.getId());
 	}
-	
+
 	public Variable findById(int id) {
-		if (variables != null) {
-			for (Variable variable : variables) {
+		if (this.variables != null) {
+			for (Variable variable : this.variables) {
 				if (variable.getVariableType().getId() == id) {
 					return variable;
 				}
@@ -50,75 +54,76 @@ public class VariableList implements Serializable{
 		return null;
 	}
 
-	public Map<String, Variable> getVariableMap(){
-		if(variableMap == null){
-			variableMap = new HashMap<String, Variable>();
-			for (Variable variable : this.getVariables()) {				
-				variableMap.put(Integer.toString(variable.getVariableType().getStandardVariable().getStoredIn().getId()), variable);
+	public Map<String, Variable> getVariableMap() {
+		if (this.variableMap == null) {
+			this.variableMap = new HashMap<String, Variable>();
+			for (Variable variable : this.getVariables()) {
+				this.variableMap.put(Integer.toString(variable.getVariableType().getStandardVariable().getStoredIn().getId()), variable);
 			}
 		}
-		return variableMap;
+		return this.variableMap;
 	}
+
 	public List<Variable> getVariables() {
-		return variables;
+		return this.variables;
 	}
 
 	public void setVariables(List<Variable> variables) {
 		this.variables = variables;
 	}
-	
+
 	public VariableTypeList getVariableTypes() {
-		if (variableTypes == null) {
-			variableTypes = new VariableTypeList();
-			for (Variable variable : variables) {
-				variableTypes.add(variable.getVariableType());
+		if (this.variableTypes == null) {
+			this.variableTypes = new VariableTypeList();
+			for (Variable variable : this.variables) {
+				this.variableTypes.add(variable.getVariableType());
 			}
 		}
-		return variableTypes.sort();
+		return this.variableTypes.sort();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("VariableList [variables=");
-		builder.append(variables);
+		builder.append(this.variables);
 		builder.append("]");
 		return builder.toString();
-	}	
-	
-	public VariableList sort(){
-		Collections.sort(variables);
-		if (variableTypes != null){
-			variableTypes.sort();
+	}
+
+	public VariableList sort() {
+		Collections.sort(this.variables);
+		if (this.variableTypes != null) {
+			this.variableTypes.sort();
 		}
 		return this;
 	}
 
 	public boolean containsValueByLocalName(String localName, String value) {
 		boolean found = false;
-		Variable variable = findByLocalName(localName);
+		Variable variable = this.findByLocalName(localName);
 		if (variable != null) {
-			found = strEquals(variable.getValue(), value);
+			found = this.strEquals(variable.getValue(), value);
 		}
 		return found;
 	}
-	
+
 	private boolean strEquals(String s1, String s2) {
 		if (s1 == null && s2 == null) {
-            return true;
-        }
+			return true;
+		}
 		if (s1 == s2) {
-            return true;
-        }
+			return true;
+		}
 		if (s1 != null && s1.equals(s2)) {
-            return true;
-        }
+			return true;
+		}
 		return false;
 	}
 
 	public Variable findByLocalName(String localName) {
-		if (variables != null && localName != null) {
-			for (Variable variable : variables) {
+		if (this.variables != null && localName != null) {
+			for (Variable variable : this.variables) {
 				if (localName.equals(variable.getVariableType().getLocalName())) {
 					return variable;
 				}
@@ -126,18 +131,18 @@ public class VariableList implements Serializable{
 		}
 		return null;
 	}
-	
+
 	public int size() {
-		return variables != null ? variables.size() : 0;
+		return this.variables != null ? this.variables.size() : 0;
 	}
-	
+
 	public boolean isEmpty() {
-		return variables == null || variables.isEmpty();
+		return this.variables == null || this.variables.isEmpty();
 	}
 
 	public void print(int indent) {
-		if (variables != null) {
-			for (Variable variable : variables) {
+		if (this.variables != null) {
+			for (Variable variable : this.variables) {
 				variable.print(indent);
 			}
 		}

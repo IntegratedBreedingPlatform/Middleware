@@ -23,7 +23,7 @@ public class MeasurementDto {
 	 * @return the trait
 	 */
 	public TraitDto getTrait() {
-		return trait;
+		return this.trait;
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class MeasurementDto {
 	 * @return the phenotypeId
 	 */
 	public Integer getPhenotypeId() {
-		return phenotypeId;
+		return this.phenotypeId;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class MeasurementDto {
 	 * @return the triatValue
 	 */
 	public String getTriatValue() {
-		return triatValue;
+		return this.triatValue;
 	}
 
 	/**

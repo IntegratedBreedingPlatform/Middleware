@@ -1,39 +1,41 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos.oms;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvterm
- * 
- * A term, class, universal or type within an ontology or controlled vocabulary. 
- * This table is also used for relations and properties. 
+ *
+ * A term, class, universal or type within an ontology or controlled vocabulary. This table is also used for relations and properties.
  * cvterms constitute nodes in the graph defined by the collection of cvterms and cvterm_relationships.
- * 
+ *
  * @author Joyce Avestro
  *
  */
 @Entity
-@Table(	name = "cvterm", 
-		uniqueConstraints = {
-			@UniqueConstraint(columnNames = { "name", "cv_id", "is_obsolete" }),
-			@UniqueConstraint(columnNames = { "dbxref_id" }) })
+@Table(name = "cvterm", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "cv_id", "is_obsolete"}),
+		@UniqueConstraint(columnNames = {"dbxref_id"})})
 public class CVTerm implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-    public static final String ID_NAME = "cvTermId";
+	public static final String ID_NAME = "cvTermId";
 
 	@Id
 	@Basic(optional = false)
@@ -47,8 +49,7 @@ public class CVTerm implements Serializable {
 	private Integer cvId;
 
 	/**
-	 * A concise human-readable name or label for the cvterm. Uniquely
-	 * identifies a cvterm within a cv.
+	 * A concise human-readable name or label for the cvterm. Uniquely identifies a cvterm within a cv.
 	 */
 	@Basic(optional = false)
 	@Column(name = "name")
@@ -59,37 +60,33 @@ public class CVTerm implements Serializable {
 	private String definition;
 
 	/**
-	 * Primary identifier dbxref - The unique global OBO identifier for this
-	 * cvterm. Note that a cvterm may have multiple secondary dbxrefs - see also
-	 * table: cvterm_dbxref (from http://gmod.org/wiki/Chado_Tables)
+	 * Primary identifier dbxref - The unique global OBO identifier for this cvterm. Note that a cvterm may have multiple secondary dbxrefs
+	 * - see also table: cvterm_dbxref (from http://gmod.org/wiki/Chado_Tables)
 	 */
 	@Column(name = "dbxref_id")
 	private Integer dbxRefId;
 
 	/**
-	 * Boolean 0=false,1=true; see GO documentation for details of obsoletion.
-	 * Note that two terms with different primary dbxrefs may exist if one is
-	 * obsolete. Duplicate names when obsoletes are included: Note that
-	 * is_obsolete is an integer and can be incremented to fake uniqueness.
+	 * Boolean 0=false,1=true; see GO documentation for details of obsoletion. Note that two terms with different primary dbxrefs may exist
+	 * if one is obsolete. Duplicate names when obsoletes are included: Note that is_obsolete is an integer and can be incremented to fake
+	 * uniqueness.
 	 */
 	@Column(name = "is_obsolete")
 	private Integer isObsolete;
 
 	/**
-	 * Boolean 0=false,1=true relations or relationship types (also known as
-	 * Typedefs in OBO format, or as properties or slots) form a cv/ontology in
-	 * themselves. We use this flag to indicate whether this cvterm is an actual
-	 * term/class/universal or a relation. Relations may be drawn from the OBO
-	 * Relations ontology, but are not exclusively drawn from there.
+	 * Boolean 0=false,1=true relations or relationship types (also known as Typedefs in OBO format, or as properties or slots) form a
+	 * cv/ontology in themselves. We use this flag to indicate whether this cvterm is an actual term/class/universal or a relation.
+	 * Relations may be drawn from the OBO Relations ontology, but are not exclusively drawn from there.
 	 */
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
-	
+
 	public CVTerm() {
 	}
 
-	public CVTerm(Integer cvTermId, Integer cv, String name, String definition,
-			Integer dbxRefId, Integer isObsolete, Integer isRelationshipType) {
+	public CVTerm(Integer cvTermId, Integer cv, String name, String definition, Integer dbxRefId, Integer isObsolete,
+			Integer isRelationshipType) {
 		super();
 		this.cvTermId = cvTermId;
 		this.cvId = cv;
@@ -101,7 +98,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Integer getCvTermId() {
-		return cvTermId;
+		return this.cvTermId;
 	}
 
 	public void setCvTermId(Integer cvTermId) {
@@ -109,7 +106,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Integer getCv() {
-		return cvId;
+		return this.cvId;
 	}
 
 	public void setCv(Integer cv) {
@@ -117,7 +114,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -125,7 +122,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public String getDefinition() {
-		return definition;
+		return this.definition;
 	}
 
 	public void setDefinition(String definition) {
@@ -133,7 +130,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Integer getDbxRefId() {
-		return dbxRefId;
+		return this.dbxRefId;
 	}
 
 	public void setDbxRefId(Integer dbxRefId) {
@@ -141,7 +138,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean isObsolete() {
-		return isObsolete > 0;
+		return this.isObsolete > 0;
 	}
 
 	public void setIsObsolete(Boolean isObsolete) {
@@ -150,7 +147,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean isRelationshipType() {
-		return isRelationshipType > 0;
+		return this.isRelationshipType > 0;
 	}
 
 	public void setIsRelationshipType(Boolean isRelationshipType) {
@@ -161,84 +158,77 @@ public class CVTerm implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((cvId == null) ? 0 : cvId.hashCode());
-		result = prime * result
-				+ ((cvTermId == null) ? 0 : cvTermId.hashCode());
-		result = prime * result
-				+ ((dbxRefId == null) ? 0 : dbxRefId.hashCode());
-		result = prime * result
-				+ ((definition == null) ? 0 : definition.hashCode());
-		result = prime * result
-				+ ((isObsolete == null) ? 0 : isObsolete.hashCode());
-		result = prime
-				* result
-				+ ((isRelationshipType == null) ? 0 : isRelationshipType
-						.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + (this.cvId == null ? 0 : this.cvId.hashCode());
+		result = prime * result + (this.cvTermId == null ? 0 : this.cvTermId.hashCode());
+		result = prime * result + (this.dbxRefId == null ? 0 : this.dbxRefId.hashCode());
+		result = prime * result + (this.definition == null ? 0 : this.definition.hashCode());
+		result = prime * result + (this.isObsolete == null ? 0 : this.isObsolete.hashCode());
+		result = prime * result + (this.isRelationshipType == null ? 0 : this.isRelationshipType.hashCode());
+		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		CVTerm other = (CVTerm) obj;
-		if (cvId == null) {
+		if (this.cvId == null) {
 			if (other.cvId != null) {
-                return false;
-            }
-		} else if (!cvId.equals(other.cvId)) {
-            return false;
-        }
-		if (cvTermId == null) {
+				return false;
+			}
+		} else if (!this.cvId.equals(other.cvId)) {
+			return false;
+		}
+		if (this.cvTermId == null) {
 			if (other.cvTermId != null) {
-                return false;
-            }
-		} else if (!cvTermId.equals(other.cvTermId)) {
-            return false;
-        }
-		if (dbxRefId == null) {
+				return false;
+			}
+		} else if (!this.cvTermId.equals(other.cvTermId)) {
+			return false;
+		}
+		if (this.dbxRefId == null) {
 			if (other.dbxRefId != null) {
-                return false;
-            }
-		} else if (!dbxRefId.equals(other.dbxRefId)) {
-            return false;
-        }
-		if (definition == null) {
+				return false;
+			}
+		} else if (!this.dbxRefId.equals(other.dbxRefId)) {
+			return false;
+		}
+		if (this.definition == null) {
 			if (other.definition != null) {
-                return false;
-            }
-		} else if (!definition.equals(other.definition)) {
-            return false;
-        }
-		if (isObsolete == null) {
+				return false;
+			}
+		} else if (!this.definition.equals(other.definition)) {
+			return false;
+		}
+		if (this.isObsolete == null) {
 			if (other.isObsolete != null) {
-                return false;
-            }
-		} else if (!isObsolete.equals(other.isObsolete)) {
-            return false;
-        }
-		if (isRelationshipType == null) {
+				return false;
+			}
+		} else if (!this.isObsolete.equals(other.isObsolete)) {
+			return false;
+		}
+		if (this.isRelationshipType == null) {
 			if (other.isRelationshipType != null) {
-                return false;
-            }
-		} else if (!isRelationshipType.equals(other.isRelationshipType)) {
-            return false;
-        }
-		if (name == null) {
+				return false;
+			}
+		} else if (!this.isRelationshipType.equals(other.isRelationshipType)) {
+			return false;
+		}
+		if (this.name == null) {
 			if (other.name != null) {
-                return false;
-            }
-		} else if (!name.equals(other.name)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.name.equals(other.name)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -246,19 +236,19 @@ public class CVTerm implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CVTerm [cvTermId=");
-		builder.append(cvTermId);
+		builder.append(this.cvTermId);
 		builder.append(", cvId=");
-		builder.append(cvId);
+		builder.append(this.cvId);
 		builder.append(", name=");
-		builder.append(name);
+		builder.append(this.name);
 		builder.append(", definition=");
-		builder.append(definition);
+		builder.append(this.definition);
 		builder.append(", dbxRefId=");
-		builder.append(dbxRefId);
+		builder.append(this.dbxRefId);
 		builder.append(", isObsolete=");
-		builder.append(isObsolete);
+		builder.append(this.isObsolete);
 		builder.append(", isRelationshipType=");
-		builder.append(isRelationshipType);
+		builder.append(this.isRelationshipType);
 		builder.append("]");
 		return builder.toString();
 	}

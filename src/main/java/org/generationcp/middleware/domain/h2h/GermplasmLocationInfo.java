@@ -1,10 +1,11 @@
+
 package org.generationcp.middleware.domain.h2h;
 
 public class GermplasmLocationInfo {
 
 	private final Integer environmentId;
 	private final Integer gid;
-	private final String germplasmName;	
+	private final String germplasmName;
 	private final String locationName;
 	private final String countryName;
 
@@ -17,22 +18,22 @@ public class GermplasmLocationInfo {
 	}
 
 	public Integer getEnvironmentId() {
-		return environmentId;
+		return this.environmentId;
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public String getCountryName() {
-		return countryName;
+		return this.countryName;
 	}
 
 	public String getGermplasmName() {
-		return germplasmName;
+		return this.germplasmName;
 	}
 }

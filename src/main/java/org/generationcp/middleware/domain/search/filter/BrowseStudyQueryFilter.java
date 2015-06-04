@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.search.filter;
 
 import org.generationcp.middleware.manager.Season;
@@ -16,15 +16,15 @@ import org.generationcp.middleware.manager.Season;
 public class BrowseStudyQueryFilter implements StudyQueryFilter {
 
 	private Integer startDate;
-	
+
 	private String name;
-	
+
 	private String country;
-	
+
 	private Season season;
-	
+
 	public Integer getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(Integer startDate) {
@@ -32,7 +32,7 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -40,7 +40,7 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 	}
 
 	public String getCountry() {
-		return country;
+		return this.country;
 	}
 
 	public void setCountry(String country) {
@@ -48,7 +48,7 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 	}
 
 	public Season getSeason() {
-		return season;
+		return this.season;
 	}
 
 	public void setSeason(Season season) {
@@ -57,9 +57,8 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 
 	@Override
 	public String toString() {
-		return "StudyQueryFilter [startDate=" + startDate + ", name=" + name
-				+ ", country=" + country + ", season=" + season
-				+ "]";
+		return "StudyQueryFilter [startDate=" + this.startDate + ", name=" + this.name + ", country=" + this.country + ", season="
+				+ this.season + "]";
 	}
 
 }

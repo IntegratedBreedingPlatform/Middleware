@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.domain.etl;
 
 import java.util.List;
@@ -5,14 +6,13 @@ import java.util.List;
 public class TreatmentVariable {
 
 	private MeasurementVariable levelVariable;
-	
+
 	private MeasurementVariable valueVariable;
-	
+
 	private List<String> values;
-	
 
 	public MeasurementVariable getLevelVariable() {
-		return levelVariable;
+		return this.levelVariable;
 	}
 
 	public void setLevelVariable(MeasurementVariable levelVariable) {
@@ -20,7 +20,7 @@ public class TreatmentVariable {
 	}
 
 	public MeasurementVariable getValueVariable() {
-		return valueVariable;
+		return this.valueVariable;
 	}
 
 	public void setValueVariable(MeasurementVariable valueVariable) {
@@ -31,7 +31,7 @@ public class TreatmentVariable {
 	 * @return the values
 	 */
 	public List<String> getValues() {
-		return values;
+		return this.values;
 	}
 
 	/**
@@ -40,6 +40,5 @@ public class TreatmentVariable {
 	public void setValues(List<String> values) {
 		this.values = values;
 	}
-	
-	
+
 }

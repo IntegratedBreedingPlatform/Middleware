@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.domain.dms;
 
 import org.generationcp.middleware.domain.oms.TermSummary;
@@ -19,31 +20,31 @@ public class StandardVariableSummary {
 	private TermSummary storedIn;
 
 	private PhenotypicType phenotypicType;
-	
+
 	private boolean hasPair;
 
 	public StandardVariableSummary(Integer id, String name, String description) {
 		this.term = new TermSummary(id, name, description);
 	}
-	
+
 	public Integer getId() {
-    	return term.getId();
-    }
+		return this.term.getId();
+	}
 
 	public String getName() {
-		return term.getName();
+		return this.term.getName();
 	}
-	
+
 	public String getDescription() {
-		return term.getDefinition();
+		return this.term.getDefinition();
 	}
-	
+
 	public TermSummary getTerm() {
-		return term;
+		return this.term;
 	}
 
 	public TermSummary getProperty() {
-		return property;
+		return this.property;
 	}
 
 	public void setProperty(TermSummary property) {
@@ -51,7 +52,7 @@ public class StandardVariableSummary {
 	}
 
 	public TermSummary getMethod() {
-		return method;
+		return this.method;
 	}
 
 	public void setMethod(TermSummary method) {
@@ -59,7 +60,7 @@ public class StandardVariableSummary {
 	}
 
 	public TermSummary getScale() {
-		return scale;
+		return this.scale;
 	}
 
 	public void setScale(TermSummary scale) {
@@ -67,7 +68,7 @@ public class StandardVariableSummary {
 	}
 
 	public TermSummary getIsA() {
-		return isA;
+		return this.isA;
 	}
 
 	public void setIsA(TermSummary isA) {
@@ -75,7 +76,7 @@ public class StandardVariableSummary {
 	}
 
 	public TermSummary getDataType() {
-		return dataType;
+		return this.dataType;
 	}
 
 	public void setDataType(TermSummary dataType) {
@@ -83,7 +84,7 @@ public class StandardVariableSummary {
 	}
 
 	public TermSummary getStoredIn() {
-		return storedIn;
+		return this.storedIn;
 	}
 
 	public void setStoredIn(TermSummary storedIn) {
@@ -91,18 +92,18 @@ public class StandardVariableSummary {
 	}
 
 	public PhenotypicType getPhenotypicType() {
-		return phenotypicType;
+		return this.phenotypicType;
 	}
 
 	public void setPhenotypicType(PhenotypicType phenotypicType) {
 		this.phenotypicType = phenotypicType;
 	}
-	
+
 	/**
 	 * @return the hasPair
 	 */
 	public boolean isHasPair() {
-		return hasPair;
+		return this.hasPair;
 	}
 
 	/**
@@ -114,25 +115,25 @@ public class StandardVariableSummary {
 
 	@Override
 	public int hashCode() {
-		return getId();
+		return this.getId();
 	}
-	
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
-            return false;
-        }
+			return false;
+		}
 		if (!(obj instanceof StandardVariableSummary)) {
-            return false;
-        }
+			return false;
+		}
 		StandardVariableSummary other = (StandardVariableSummary) obj;
-		return getId().equals(other.getId());
+		return this.getId().equals(other.getId());
 	}
 
 	@Override
 	public String toString() {
-		return "StandardVariableSummary [term=" + term + ", property="
-				+ property + ", method=" + method + ", scale=" + scale
-				+ ", isA=" + isA + ", dataType=" + dataType + ", storedIn="
-				+ storedIn + ", phenotypicType=" + phenotypicType + "]";
+		return "StandardVariableSummary [term=" + this.term + ", property=" + this.property + ", method=" + this.method + ", scale="
+				+ this.scale + ", isA=" + this.isA + ", dataType=" + this.dataType + ", storedIn=" + this.storedIn + ", phenotypicType="
+				+ this.phenotypicType + "]";
 	}
 }

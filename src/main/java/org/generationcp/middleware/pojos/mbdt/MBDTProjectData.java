@@ -1,193 +1,189 @@
+
 package org.generationcp.middleware.pojos.mbdt;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Daniel Villafuerte
- */
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
+/**
+ * Created by IntelliJ IDEA. User: Daniel Villafuerte
+ */
 
 @Entity
 @Table(name = "mbdt_project")
 public class MBDTProjectData implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "project_id")
-    private Integer projectID;
+	@Id
+	@Basic(optional = false)
+	@Column(name = "project_id")
+	private Integer projectID;
 
-    @Basic(optional = false)
-    @Column(name = "pname")
-    private String projectName;
+	@Basic(optional = false)
+	@Column(name = "pname")
+	private String projectName;
 
-    @Basic(optional = false)
-    @Column(name = "user_id")
-    private Integer userID;
+	@Basic(optional = false)
+	@Column(name = "user_id")
+	private Integer userID;
 
-    @Column(name = "map_id")
-    private Integer mapID;
+	@Column(name = "map_id")
+	private Integer mapID;
 
-    @Column(name = "qtl_id")
-    private Integer qtlID;
+	@Column(name = "qtl_id")
+	private Integer qtlID;
 
-    @Column(name = "phenodataset_id")
-    private Integer phenoDatasetID;
+	@Column(name = "phenodataset_id")
+	private Integer phenoDatasetID;
 
-    @Column(name = "principal_investigator")
-    private String principalInvestigator;
+	@Column(name = "principal_investigator")
+	private String principalInvestigator;
 
-    @Column(name = "email")
-    private String email;
+	@Column(name = "email")
+	private String email;
 
-    @Column(name = "institute")
-    private String institute;
+	@Column(name = "institute")
+	private String institute;
 
-    @OneToMany(targetEntity = MBDTGeneration.class, mappedBy = "project", fetch = FetchType.LAZY)
-    private List<MBDTGeneration> generations;
+	@OneToMany(targetEntity = MBDTGeneration.class, mappedBy = "project", fetch = FetchType.LAZY)
+	private List<MBDTGeneration> generations;
 
+	public MBDTProjectData() {
+	}
 
-    public MBDTProjectData() {
-    }
+	public MBDTProjectData(Integer projectID, String projectName, Integer userID, Integer mapID, Integer qtlID, Integer phenoDatasetID) {
+		this(projectID, projectName, userID, mapID, qtlID, phenoDatasetID, null, null, null);
+	}
 
-    public MBDTProjectData(Integer projectID, String projectName, Integer userID,
-                           Integer mapID, Integer qtlID, Integer phenoDatasetID) {
-        this(projectID, projectName, userID, mapID, qtlID, phenoDatasetID, null, null, null);
-    }
+	public MBDTProjectData(Integer projectID, String projectName, Integer userID, Integer mapID, Integer qtlID, Integer phenoDatasetID,
+			String principalInvestigator, String email, String institute) {
+		this.projectID = projectID;
+		this.projectName = projectName;
+		this.mapID = mapID;
+		this.qtlID = qtlID;
+		this.phenoDatasetID = phenoDatasetID;
+		this.userID = userID;
+		this.principalInvestigator = principalInvestigator;
+		this.email = email;
+		this.institute = institute;
+	}
 
-    public MBDTProjectData(Integer projectID, String projectName, Integer userID, Integer mapID, Integer qtlID,
-                           Integer phenoDatasetID, String principalInvestigator, String email, String institute) {
-        this.projectID = projectID;
-        this.projectName = projectName;
-        this.mapID = mapID;
-        this.qtlID = qtlID;
-        this.phenoDatasetID = phenoDatasetID;
-        this.userID = userID;
-        this.principalInvestigator = principalInvestigator;
-        this.email = email;
-        this.institute = institute;
-    }
+	public Integer getProjectID() {
+		return this.projectID;
+	}
 
-    public Integer getProjectID() {
-        return projectID;
-    }
+	public Integer getMapID() {
+		return this.mapID;
+	}
 
+	public void setMapID(Integer mapID) {
+		this.mapID = mapID;
+	}
 
-    public Integer getMapID() {
-        return mapID;
-    }
+	public Integer getQtlID() {
+		return this.qtlID;
+	}
 
-    public void setMapID(Integer mapID) {
-        this.mapID = mapID;
-    }
+	public void setQtlID(Integer qtlID) {
+		this.qtlID = qtlID;
+	}
 
-    public Integer getQtlID() {
-        return qtlID;
-    }
+	public Integer getPhenoDatasetID() {
+		return this.phenoDatasetID;
+	}
 
-    public void setQtlID(Integer qtlID) {
-        this.qtlID = qtlID;
-    }
+	public void setPhenoDatasetID(Integer phenoDatasetID) {
+		this.phenoDatasetID = phenoDatasetID;
+	}
 
-    public Integer getPhenoDatasetID() {
-        return phenoDatasetID;
-    }
+	public Integer getUserID() {
+		return this.userID;
+	}
 
-    public void setPhenoDatasetID(Integer phenoDatasetID) {
-        this.phenoDatasetID = phenoDatasetID;
-    }
+	public void setUserID(Integer userID) {
+		this.userID = userID;
+	}
 
-    public Integer getUserID() {
-        return userID;
-    }
+	public String getPrincipalInvestigator() {
+		return this.principalInvestigator;
+	}
 
-    public void setUserID(Integer userID) {
-        this.userID = userID;
-    }
+	public void setPrincipalInvestigator(String principalInvestigator) {
+		this.principalInvestigator = principalInvestigator;
+	}
 
-    public String getPrincipalInvestigator() {
-        return principalInvestigator;
-    }
+	public String getEmail() {
+		return this.email;
+	}
 
-    public void setPrincipalInvestigator(String principalInvestigator) {
-        this.principalInvestigator = principalInvestigator;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getInstitute() {
+		return this.institute;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setInstitute(String institute) {
+		this.institute = institute;
+	}
 
-    public String getInstitute() {
-        return institute;
-    }
+	public void setProjectID(Integer projectID) {
+		this.projectID = projectID;
+	}
 
-    public void setInstitute(String institute) {
-        this.institute = institute;
-    }
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
 
-    public void setProjectID(Integer projectID) {
-        this.projectID = projectID;
-    }
+	public String getProjectName() {
+		return this.projectName;
+	}
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
 
-    public String getProjectName() {
-        return projectName;
-    }
+		if (!(obj instanceof MBDTProjectData)) {
+			return false;
+		}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
+		MBDTProjectData other = (MBDTProjectData) obj;
 
-        if (! (obj instanceof MBDTProjectData)) {
-            return false;
-        }
+		if (!other.getProjectID().equals(this.getProjectID())) {
+			return false;
+		}
 
-        MBDTProjectData other = (MBDTProjectData) obj;
+		if (!other.getProjectName().equals(this.getProjectName())) {
+			return false;
+		}
+		return true;
+	}
 
-        if (! other.getProjectID().equals(this.getProjectID())) {
-            return false;
-        }
-
-        if (! other.getProjectName().equals(this.getProjectName())) {
-            return false;
-        }
-        return true;
-    }
-	
-    @Override
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((projectID == null) ? 0 : projectID.hashCode());
-		result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+		result = prime * result + (this.projectID == null ? 0 : this.projectID.hashCode());
+		result = prime * result + (this.projectName == null ? 0 : this.projectName.hashCode());
 		return result;
 	}
 
-    @Override
-    public String toString() {
-        return "MBDTProjectData{" +
-                "projectID=" + projectID +
-                ", projectName='" + projectName + '\'' +
-                ", userID=" + userID +
-                ", mapID=" + mapID +
-                ", qtlID=" + qtlID +
-                ", phenoDatasetID=" + phenoDatasetID +
-                ", principalInvestigator='" + principalInvestigator + '\'' +
-                ", email='" + email + '\'' +
-                ", institute='" + institute + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "MBDTProjectData{" + "projectID=" + this.projectID + ", projectName='" + this.projectName + '\'' + ", userID=" + this.userID
+				+ ", mapID=" + this.mapID + ", qtlID=" + this.qtlID + ", phenoDatasetID=" + this.phenoDatasetID
+				+ ", principalInvestigator='" + this.principalInvestigator + '\'' + ", email='" + this.email + '\'' + ", institute='"
+				+ this.institute + '\'' + '}';
+	}
 }

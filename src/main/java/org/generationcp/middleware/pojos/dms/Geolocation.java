@@ -1,27 +1,36 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.dms;
 
-import org.generationcp.middleware.domain.dms.VariableList;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.generationcp.middleware.domain.dms.VariableList;
+
 /**
+ *
+ * The Geolocation table maps to the Location module of the logical data model. Information in this table corresponds to actual physical
+ * locations where Field Trials are conducted.
  * 
- * The Geolocation table maps to the Location module of the logical data model. 
- * Information in this table corresponds to actual physical locations where Field Trials are conducted. 
- *  
  * @author Darla Ani
  *
  */
@@ -30,48 +39,47 @@ import java.util.List;
 public class Geolocation implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-    @Id
-    @Basic(optional = false)
-    @Column(name = "nd_geolocation_id")
+
+	@Id
+	@Basic(optional = false)
+	@Column(name = "nd_geolocation_id")
 	private Integer locationId;
-	
-    @Column(name = "description")
+
+	@Column(name = "description")
 	private String description;
-	
-    @Column(name = "latitude")
+
+	@Column(name = "latitude")
 	private Double latitude;
-	
-    @Column(name = "longitude")
+
+	@Column(name = "longitude")
 	private Double longitude;
-    
-    @Column(name = "geodetic_datum")
+
+	@Column(name = "geodetic_datum")
 	private String geodeticDatum;
-	
-    @Column(name = "altitude")
+
+	@Column(name = "altitude")
 	private Double altitude;
-    
-    @Transient
-    private VariableList variates;
-    
-    /**
+
+	@Transient
+	private VariableList variates;
+
+	/**
 	 * List of Geolocation Properties
 	 */
 	@OneToMany(mappedBy = "geolocation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<GeolocationProperty> properties;
-	
-    
-    public Geolocation(){
-    	
-    }
-    
-    public Geolocation(Integer id){
-    	super();
-    	this.locationId = id;
-    }
+
+	public Geolocation() {
+
+	}
+
+	public Geolocation(Integer id) {
+		super();
+		this.locationId = id;
+	}
 
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public void setLocationId(Integer id) {
@@ -79,7 +87,7 @@ public class Geolocation implements Serializable {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(String description) {
@@ -87,7 +95,7 @@ public class Geolocation implements Serializable {
 	}
 
 	public Double getLatitude() {
-		return latitude;
+		return this.latitude;
 	}
 
 	public void setLatitude(Double latitude) {
@@ -95,7 +103,7 @@ public class Geolocation implements Serializable {
 	}
 
 	public Double getLongitude() {
-		return longitude;
+		return this.longitude;
 	}
 
 	public void setLongitude(Double longitude) {
@@ -103,7 +111,7 @@ public class Geolocation implements Serializable {
 	}
 
 	public String getGeodeticDatum() {
-		return geodeticDatum;
+		return this.geodeticDatum;
 	}
 
 	public void setGeodeticDatum(String geodeticDatum) {
@@ -111,16 +119,15 @@ public class Geolocation implements Serializable {
 	}
 
 	public Double getAltitude() {
-		return altitude;
+		return this.altitude;
 	}
 
 	public void setAltitude(Double altitude) {
 		this.altitude = altitude;
 	}
-    
 
 	public List<GeolocationProperty> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public void setProperties(List<GeolocationProperty> properties) {
@@ -131,30 +138,30 @@ public class Geolocation implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((locationId == null) ? 0 : locationId.hashCode());
+		result = prime * result + (this.locationId == null ? 0 : this.locationId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
+			return false;
+		}
 		if (!(obj instanceof Geolocation)) {
-            return false;
-        }
-		
+			return false;
+		}
+
 		Geolocation other = (Geolocation) obj;
-		if (locationId == null) {
+		if (this.locationId == null) {
 			if (other.locationId != null) {
-                return false;
-            }
-		} else if (!locationId.equals(other.locationId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.locationId.equals(other.locationId)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -162,31 +169,29 @@ public class Geolocation implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Geolocation [locationId=");
-		builder.append(locationId);
+		builder.append(this.locationId);
 		builder.append(", description=");
-		builder.append(description);
+		builder.append(this.description);
 		builder.append(", latitude=");
-		builder.append(latitude);
+		builder.append(this.latitude);
 		builder.append(", longitude=");
-		builder.append(longitude);
+		builder.append(this.longitude);
 		builder.append(", geodeticDatum=");
-		builder.append(geodeticDatum);
+		builder.append(this.geodeticDatum);
 		builder.append(", altitude=");
-		builder.append(altitude);
+		builder.append(this.altitude);
 		builder.append("]");
 		return builder.toString();
 	}
 
-	@Transient 
+	@Transient
 	public VariableList getVariates() {
-		return variates;
+		return this.variates;
 	}
 
-	@Transient 
+	@Transient
 	public void setVariates(VariableList variates) {
 		this.variates = variates;
 	}
-
-	
 
 }

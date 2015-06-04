@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.oms;
 
 /**
@@ -25,7 +25,7 @@ public class TermRelationship {
 	private TermRelationshipId relationshipId;
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -33,7 +33,7 @@ public class TermRelationship {
 	}
 
 	public Term getSubjectTerm() {
-		return subjectTerm;
+		return this.subjectTerm;
 	}
 
 	public void setSubjectTerm(Term subjectTerm) {
@@ -41,7 +41,7 @@ public class TermRelationship {
 	}
 
 	public Term getObjectTerm() {
-		return objectTerm;
+		return this.objectTerm;
 	}
 
 	public void setObjectTerm(Term objectTerm) {
@@ -49,7 +49,7 @@ public class TermRelationship {
 	}
 
 	public TermRelationshipId getRelationshipId() {
-		return relationshipId;
+		return this.relationshipId;
 	}
 
 	public void setRelationshipId(TermRelationshipId relationshipId) {
@@ -58,11 +58,7 @@ public class TermRelationship {
 
 	@Override
 	public String toString() {
-		return "TermRelationship{" +
-				"id=" + id +
-				", subjectTerm=" + subjectTerm +
-				", objectTerm=" + objectTerm +
-				", relationshipId=" + relationshipId +
-				'}';
+		return "TermRelationship{" + "id=" + this.id + ", subjectTerm=" + this.subjectTerm + ", objectTerm=" + this.objectTerm
+				+ ", relationshipId=" + this.relationshipId + '}';
 	}
 }

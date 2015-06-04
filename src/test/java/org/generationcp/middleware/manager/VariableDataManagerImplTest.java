@@ -1,37 +1,39 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
 
+import java.util.List;
+
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.domain.oms.*;
-import org.generationcp.middleware.domain.ontology.*;
+import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
+import org.generationcp.middleware.domain.oms.OntologyVariableSummary;
+import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
-import org.junit.Assert;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * Extends {@link DataManagerIntegrationTest}
@@ -39,95 +41,105 @@ import java.util.List;
 public class VariableDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static OntologyVariableDataManager variableManager;
-    private static OntologyMethodDataManager methodManager;
-    private static OntologyPropertyDataManager propertyManager;
-    private static OntologyScaleDataManager scaleManager;
-    private static Project testProject;
-    private static Method testMethod;
-    private static Property testProperty;
-    private static Scale testScale;
-    private static OntologyVariableInfo testVariableInfo;
+	private static OntologyMethodDataManager methodManager;
+	private static OntologyPropertyDataManager propertyManager;
+	private static OntologyScaleDataManager scaleManager;
+	private static Project testProject;
+	private static Method testMethod;
+	private static Property testProperty;
+	private static Scale testScale;
+	private static OntologyVariableInfo testVariableInfo;
 
-    @Test
-    public void testGetAllVariables() throws Exception {
-        List<OntologyVariableSummary> variables = variableManager.getWithFilter(testProject.getUniqueID(), null, null, null, null);
-        Assert.assertTrue(variables.size() > 0);
-        Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
-    }
+	@Test
+	public void testGetAllVariables() throws Exception {
+		List<OntologyVariableSummary> variables =
+				VariableDataManagerImplTest.variableManager.getWithFilter(VariableDataManagerImplTest.testProject.getUniqueID(), null,
+						null, null, null);
+		Assert.assertTrue(variables.size() > 0);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
+	}
 
-    @Test
-    public void testGetVariablesByProperty() throws Exception {
-        List<OntologyVariableSummary> variables = variableManager.getWithFilter(testProject.getUniqueID(), null, testMethod.getId(), testProperty.getId(), testScale.getId());
-        Assert.assertTrue(variables.size() == 1);
-    }
+	@Test
+	public void testGetVariablesByProperty() throws Exception {
+		List<OntologyVariableSummary> variables =
+				VariableDataManagerImplTest.variableManager.getWithFilter(VariableDataManagerImplTest.testProject.getUniqueID(), null,
+						VariableDataManagerImplTest.testMethod.getId(), VariableDataManagerImplTest.testProperty.getId(),
+						VariableDataManagerImplTest.testScale.getId());
+		Assert.assertTrue(variables.size() == 1);
+	}
 
-    @Test
-    public void testGetVariable() throws Exception {
-        Variable variable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
-        Assert.assertNotNull(variable);
-    }
+	@Test
+	public void testGetVariable() throws Exception {
+		Variable variable =
+				VariableDataManagerImplTest.variableManager.getVariable(VariableDataManagerImplTest.testProject.getUniqueID(),
+						VariableDataManagerImplTest.testVariableInfo.getId());
+		Assert.assertNotNull(variable);
+	}
 
-    @Test
-    public void testUpdateVariable() throws Exception {
-        variableManager.updateVariable(testVariableInfo);
-        Variable updatedVariable = variableManager.getVariable(testProject.getUniqueID(), testVariableInfo.getId());
-        Assert.assertNotNull(updatedVariable);
-    }
+	@Test
+	public void testUpdateVariable() throws Exception {
+		VariableDataManagerImplTest.variableManager.updateVariable(VariableDataManagerImplTest.testVariableInfo);
+		Variable updatedVariable =
+				VariableDataManagerImplTest.variableManager.getVariable(VariableDataManagerImplTest.testProject.getUniqueID(),
+						VariableDataManagerImplTest.testVariableInfo.getId());
+		Assert.assertNotNull(updatedVariable);
+	}
 
-    /**
-     * All test depend on add variable, scale, property, method
-     * @throws Exception
-     */
-    @BeforeClass
-    public static void setUp() throws Exception {
-        WorkbenchTestDataUtil instance = WorkbenchTestDataUtil.getInstance();
-        testProject = instance.createTestProjectData();
-        variableManager = DataManagerIntegrationTest.managerFactory.getOntologyVariableDataManager();
-        methodManager = DataManagerIntegrationTest.managerFactory.getOntologyMethodDataManager();
-        propertyManager = DataManagerIntegrationTest.managerFactory.getOntologyPropertyDataManager();
-        scaleManager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
+	/**
+	 * All test depend on add variable, scale, property, method
+	 * 
+	 * @throws Exception
+	 */
+	@BeforeClass
+	public static void setUp() throws Exception {
+		WorkbenchTestDataUtil instance = WorkbenchTestDataUtil.getInstance();
+		VariableDataManagerImplTest.testProject = instance.createTestProjectData();
+		VariableDataManagerImplTest.variableManager = DataManagerIntegrationTest.managerFactory.getOntologyVariableDataManager();
+		VariableDataManagerImplTest.methodManager = DataManagerIntegrationTest.managerFactory.getOntologyMethodDataManager();
+		VariableDataManagerImplTest.propertyManager = DataManagerIntegrationTest.managerFactory.getOntologyPropertyDataManager();
+		VariableDataManagerImplTest.scaleManager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
 
-        testMethod = new org.generationcp.middleware.domain.ontology.Method();
-        testMethod.setName(getNewRandomName());
-        testMethod.setDefinition("Test Method");
-        methodManager.addMethod(testMethod);
+		VariableDataManagerImplTest.testMethod = new org.generationcp.middleware.domain.ontology.Method();
+		VariableDataManagerImplTest.testMethod.setName(MiddlewareIntegrationTest.getNewRandomName());
+		VariableDataManagerImplTest.testMethod.setDefinition("Test Method");
+		VariableDataManagerImplTest.methodManager.addMethod(VariableDataManagerImplTest.testMethod);
 
-        testProperty = new Property();
-        testProperty.setName(getNewRandomName());
-        testProperty.setDefinition("Test Property");
-        testProperty.setCropOntologyId("CO:0000001");
-        testProperty.addClass("My New Class");
-        propertyManager.addProperty(testProperty);
+		VariableDataManagerImplTest.testProperty = new Property();
+		VariableDataManagerImplTest.testProperty.setName(MiddlewareIntegrationTest.getNewRandomName());
+		VariableDataManagerImplTest.testProperty.setDefinition("Test Property");
+		VariableDataManagerImplTest.testProperty.setCropOntologyId("CO:0000001");
+		VariableDataManagerImplTest.testProperty.addClass("My New Class");
+		VariableDataManagerImplTest.propertyManager.addProperty(VariableDataManagerImplTest.testProperty);
 
-        testScale = new Scale();
-        testScale.setName(getNewRandomName());
-        testScale.setDefinition("Test Scale");
-        testScale.setDataType(DataType.NUMERIC_VARIABLE);
-        testScale.setMinValue("0");
-        testScale.setMaxValue("100");
-        scaleManager.addScale(testScale);
+		VariableDataManagerImplTest.testScale = new Scale();
+		VariableDataManagerImplTest.testScale.setName(MiddlewareIntegrationTest.getNewRandomName());
+		VariableDataManagerImplTest.testScale.setDefinition("Test Scale");
+		VariableDataManagerImplTest.testScale.setDataType(DataType.NUMERIC_VARIABLE);
+		VariableDataManagerImplTest.testScale.setMinValue("0");
+		VariableDataManagerImplTest.testScale.setMaxValue("100");
+		VariableDataManagerImplTest.scaleManager.addScale(VariableDataManagerImplTest.testScale);
 
-        testVariableInfo = new OntologyVariableInfo();
-        testVariableInfo.setProgramUuid(testProject.getUniqueID());
-        testVariableInfo.setName(getNewRandomName());
-        testVariableInfo.setDescription("Test Variable");
-        testVariableInfo.setMethodId(testMethod.getId());
-        testVariableInfo.setPropertyId(testProperty.getId());
-        testVariableInfo.setScaleId(testScale.getId());
-        testVariableInfo.setAlias("My alias");
-        testVariableInfo.setMinValue("0");
-        testVariableInfo.setMaxValue("100");
-        testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-        testVariableInfo.addVariableType(VariableType.ANALYSIS);
-        testVariableInfo.setIsFavorite(true);
-        variableManager.addVariable(testVariableInfo);
-    }
+		VariableDataManagerImplTest.testVariableInfo = new OntologyVariableInfo();
+		VariableDataManagerImplTest.testVariableInfo.setProgramUuid(VariableDataManagerImplTest.testProject.getUniqueID());
+		VariableDataManagerImplTest.testVariableInfo.setName(MiddlewareIntegrationTest.getNewRandomName());
+		VariableDataManagerImplTest.testVariableInfo.setDescription("Test Variable");
+		VariableDataManagerImplTest.testVariableInfo.setMethodId(VariableDataManagerImplTest.testMethod.getId());
+		VariableDataManagerImplTest.testVariableInfo.setPropertyId(VariableDataManagerImplTest.testProperty.getId());
+		VariableDataManagerImplTest.testVariableInfo.setScaleId(VariableDataManagerImplTest.testScale.getId());
+		VariableDataManagerImplTest.testVariableInfo.setAlias("My alias");
+		VariableDataManagerImplTest.testVariableInfo.setMinValue("0");
+		VariableDataManagerImplTest.testVariableInfo.setMaxValue("100");
+		VariableDataManagerImplTest.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		VariableDataManagerImplTest.testVariableInfo.addVariableType(VariableType.ANALYSIS);
+		VariableDataManagerImplTest.testVariableInfo.setIsFavorite(true);
+		VariableDataManagerImplTest.variableManager.addVariable(VariableDataManagerImplTest.testVariableInfo);
+	}
 
-    @AfterClass
-    public static void tearDown() throws Exception {
-        variableManager.deleteVariable(testVariableInfo.getId());
-        methodManager.deleteMethod(testMethod.getId());
-        propertyManager.deleteProperty(testProperty.getId());
-        scaleManager.deleteScale(testScale.getId());
-    }
+	@AfterClass
+	public static void tearDown() throws Exception {
+		VariableDataManagerImplTest.variableManager.deleteVariable(VariableDataManagerImplTest.testVariableInfo.getId());
+		VariableDataManagerImplTest.methodManager.deleteMethod(VariableDataManagerImplTest.testMethod.getId());
+		VariableDataManagerImplTest.propertyManager.deleteProperty(VariableDataManagerImplTest.testProperty.getId());
+		VariableDataManagerImplTest.scaleManager.deleteScale(VariableDataManagerImplTest.testScale.getId());
+	}
 }

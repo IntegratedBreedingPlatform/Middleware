@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -33,69 +33,69 @@ import org.generationcp.middleware.pojos.User;
 
 /**
  * POJO for workbench_project table.
- *  
+ * 
  */
 @Entity
 @Table(name = "workbench_project")
-public class Project implements Serializable{
+public class Project implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String ID_NAME = "projectId";
+	public static final String ID_NAME = "projectId";
 
-    @Id
-    @Basic(optional = false)
-    @GeneratedValue
-    @Column(name = "project_id")
-    private Long projectId;
-    
-    @Basic(optional = false)
-    @Column(name = "project_uuid")
-    private String uniqueID;
+	@Id
+	@Basic(optional = false)
+	@GeneratedValue
+	@Column(name = "project_id")
+	private Long projectId;
 
-    @Basic(optional = false)
-    @Column(name = "project_name")
-    private String projectName = "";
+	@Basic(optional = false)
+	@Column(name = "project_uuid")
+	private String uniqueID;
 
-    @Basic(optional = false)
-    @Column(name = "start_date")
-    private Date startDate;
+	@Basic(optional = false)
+	@Column(name = "project_name")
+	private String projectName = "";
 
-    @Basic(optional = false)
-    @Column(name = "user_id")
-    private int userId;
+	@Basic(optional = false)
+	@Column(name = "start_date")
+	private Date startDate;
 
-    @OneToOne
-    @JoinColumn(name = "crop_type", referencedColumnName = "crop_name")
-    private CropType cropType;
+	@Basic(optional = false)
+	@Column(name = "user_id")
+	private int userId;
 
-    @Basic(optional = true)
-    @Column(name = "last_open_date")
-    private Date lastOpenDate;
+	@OneToOne
+	@JoinColumn(name = "crop_type", referencedColumnName = "crop_name")
+	private CropType cropType;
 
-    @Transient
-    private Set<User> members;
+	@Basic(optional = true)
+	@Column(name = "last_open_date")
+	private Date lastOpenDate;
 
-    @Transient
-    private Set<Method> methods;
+	@Transient
+	private Set<User> members;
 
-    @Transient
-    private Set<Location> locations;
+	@Transient
+	private Set<Method> methods;
 
-    public Long getProjectId() {
-        return projectId;
-    }
+	@Transient
+	private Set<Location> locations;
 
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
+	public Long getProjectId() {
+		return this.projectId;
+	}
 
-    public int getUserId() {
-        return userId;
-    }
-    
+	public void setProjectId(Long projectId) {
+		this.projectId = projectId;
+	}
+
+	public int getUserId() {
+		return this.userId;
+	}
+
 	public String getUniqueID() {
-		return uniqueID;
+		return this.uniqueID;
 	}
 
 	public void setUniqueID(String uniqueID) {
@@ -103,109 +103,100 @@ public class Project implements Serializable{
 	}
 
 	public void setUserId(int userId) {
-        this.userId = userId;
-    }
+		this.userId = userId;
+	}
 
-    public String getProjectName() {
-        return projectName;
-    }
+	public String getProjectName() {
+		return this.projectName;
+	}
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
 
-    public Date getStartDate() {
-        return startDate;
-    }
+	public Date getStartDate() {
+		return this.startDate;
+	}
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
 
-    public CropType getCropType() {
-        return cropType;
-    }
+	public CropType getCropType() {
+		return this.cropType;
+	}
 
-    public void setCropType(CropType cropType) {
-        this.cropType = cropType;
-    }
+	public void setCropType(CropType cropType) {
+		this.cropType = cropType;
+	}
 
-    public void setLastOpenDate(Date lastOpenDate) {
-        this.lastOpenDate = lastOpenDate;
-    }
+	public void setLastOpenDate(Date lastOpenDate) {
+		this.lastOpenDate = lastOpenDate;
+	}
 
-    public Date getLastOpenDate() {
-        return lastOpenDate;
-    }
+	public Date getLastOpenDate() {
+		return this.lastOpenDate;
+	}
 
-    public Set<User> getMembers() {
-        return members;
-    }
+	public Set<User> getMembers() {
+		return this.members;
+	}
 
-    public void setMembers(Set<User> members) {
-        this.members = members;
-    }
+	public void setMembers(Set<User> members) {
+		this.members = members;
+	}
 
-    public Set<Method> getMethods() {
-        return methods;
-    }
+	public Set<Method> getMethods() {
+		return this.methods;
+	}
 
-    public void setMethods(Set<Method> methods) {
-        this.methods = methods;
-    }
+	public void setMethods(Set<Method> methods) {
+		this.methods = methods;
+	}
 
-    public Set<Location> getLocations() {
-        return locations;
-    }
+	public Set<Location> getLocations() {
+		return this.locations;
+	}
 
-    public void setLocations(Set<Location> locations) {
-        this.locations = locations;
-    }
-    
-    /**
-     * @return the name of the (IBDB) database where program's breeding activities related information 
-     * 		such as Nurseries, Trials, Germplasm, Lists, Datasets etc are stored. 
-     */
-    @Transient
-    public String getDatabaseName() {
-    	return this.cropType.getDbName();
-    }
+	public void setLocations(Set<Location> locations) {
+		this.locations = locations;
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(projectId).hashCode();
-    }
+	/**
+	 * @return the name of the (IBDB) database where program's breeding activities related information such as Nurseries, Trials, Germplasm,
+	 *         Lists, Datasets etc are stored.
+	 */
+	@Transient
+	public String getDatabaseName() {
+		return this.cropType.getDbName();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!Project.class.isInstance(obj)) {
-            return false;
-        }
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(this.projectId).hashCode();
+	}
 
-        Project otherObj = (Project) obj;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!Project.class.isInstance(obj)) {
+			return false;
+		}
 
-        return new EqualsBuilder().append(projectId, otherObj.projectId).isEquals();
-    }
+		Project otherObj = (Project) obj;
 
-    @Override
-    public String toString() {
-        return "Project{" +
-                "projectId=" + projectId +
-                ", uniqueID='" + uniqueID + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", startDate=" + startDate +
-                ", userId=" + userId +
-                ", cropType=" + cropType +
-                ", lastOpenDate=" + lastOpenDate +
-                ", members=" + members +
-                ", methods=" + methods +
-                ", locations=" + locations +
-                '}';
-    }
+		return new EqualsBuilder().append(this.projectId, otherObj.projectId).isEquals();
+	}
+
+	@Override
+	public String toString() {
+		return "Project{" + "projectId=" + this.projectId + ", uniqueID='" + this.uniqueID + '\'' + ", projectName='" + this.projectName
+				+ '\'' + ", startDate=" + this.startDate + ", userId=" + this.userId + ", cropType=" + this.cropType + ", lastOpenDate="
+				+ this.lastOpenDate + ", members=" + this.members + ", methods=" + this.methods + ", locations=" + this.locations + '}';
+	}
 }

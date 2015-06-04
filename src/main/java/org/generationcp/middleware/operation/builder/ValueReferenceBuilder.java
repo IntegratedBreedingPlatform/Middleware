@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2013, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
@@ -31,13 +31,13 @@ public class ValueReferenceBuilder extends Builder {
 	}
 
 	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
-		List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(stdVarId);
-		Integer dataType = getRelationshipValue(relationships, TermId.HAS_TYPE.getId());
-		
+		List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(stdVarId);
+		Integer dataType = this.getRelationshipValue(relationships, TermId.HAS_TYPE.getId());
+
 		if (dataType != null && dataType == TermId.CATEGORICAL_VARIABLE.getId()) {
-			Set<ValueReference> set = getRelationshipValues(relationships, TermId.HAS_VALUE.getId());
+			Set<ValueReference> set = this.getRelationshipValues(relationships, TermId.HAS_VALUE.getId());
 			for (ValueReference ref : set) {
-				CVTerm term = getCvTermDao().getById(ref.getId());
+				CVTerm term = this.getCvTermDao().getById(ref.getId());
 				if (term != null) {
 					ref.setKey(ref.getId().toString());
 					ref.setName(term.getName());
@@ -50,7 +50,7 @@ public class ValueReferenceBuilder extends Builder {
 		}
 		return new ArrayList<ValueReference>();
 	}
-	
+
 	private Integer getRelationshipValue(List<CVTermRelationship> relationships, int typeId) {
 		if (relationships != null && !relationships.isEmpty()) {
 			for (CVTermRelationship relationship : relationships) {

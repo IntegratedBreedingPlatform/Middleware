@@ -1,10 +1,12 @@
+
 package org.generationcp.middleware.pojos.ims;
 
 public class ReservedInventoryKey {
+
 	Integer id; // this is just the count of the reservedInventoryEntry
-	Integer lrecId; //lrecId in List
+	Integer lrecId; // lrecId in List
 	Integer lotId;
-	
+
 	public ReservedInventoryKey(Integer id, Integer lrecId, Integer lotId) {
 		super();
 		this.id = id;
@@ -13,7 +15,7 @@ public class ReservedInventoryKey {
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Integer id) {
@@ -21,7 +23,7 @@ public class ReservedInventoryKey {
 	}
 
 	public Integer getLrecId() {
-		return lrecId;
+		return this.lrecId;
 	}
 
 	public void setLrecId(Integer lrecId) {
@@ -29,31 +31,30 @@ public class ReservedInventoryKey {
 	}
 
 	public Integer getLotId() {
-		return lotId;
+		return this.lotId;
 	}
 
 	public void setLotId(Integer lotId) {
 		this.lotId = lotId;
 	}
-	
-    @Override
-    public boolean equals(Object obj) {
-    	ReservedInventoryKey toCompare = (ReservedInventoryKey)obj;
-        if((this.getLotId() == toCompare.getLotId()) && (this.getLrecId() == toCompare.getLrecId())){
-        	return true;
-        }
-        else{
-        	return false;
-        }
-    }
-    
-    @Override
+
+	@Override
+	public boolean equals(Object obj) {
+		ReservedInventoryKey toCompare = (ReservedInventoryKey) obj;
+		if (this.getLotId() == toCompare.getLotId() && this.getLrecId() == toCompare.getLrecId()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((lotId == null) ? 0 : lotId.hashCode());
-		result = prime * result + ((lrecId == null) ? 0 : lrecId.hashCode());
+		result = prime * result + (this.lotId == null ? 0 : this.lotId.hashCode());
+		result = prime * result + (this.lrecId == null ? 0 : this.lrecId.hashCode());
 		return result;
 	}
-    
+
 }

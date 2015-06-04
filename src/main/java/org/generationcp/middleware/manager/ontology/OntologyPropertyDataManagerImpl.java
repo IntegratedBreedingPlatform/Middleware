@@ -1,6 +1,15 @@
+
 package org.generationcp.middleware.manager.ontology;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -19,7 +28,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.*;
+import com.google.common.base.Strings;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
@@ -27,413 +36,421 @@ import java.util.*;
 
 public class OntologyPropertyDataManagerImpl extends DataManager implements OntologyPropertyDataManager {
 
-    private static final String SHOULD_VALID_TRAIT_CLASS = "Term should be of valid TRAIT_CLASS";
-    private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
-    private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
-    private static final String PROPERTY_IS_REFERRED_TO_VARIABLE = "Property is referred to variable.";
-
-    public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
-        super(sessionProvider);
-    }
-
-    @Override
-    public Property getProperty(int id) throws MiddlewareException {
-
-        CVTerm term = getCvTermDao().getById(id);
-
-       checkTermIsProperty(term);
-
-        try {
-            List<Property> properties = getProperties(false, new ArrayList<>(Collections.singletonList(id)));
-            if(properties.size() == 0) return null;
-            return properties.get(0);
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error at getProperty :" + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public List<Property> getAllProperties() throws MiddlewareException {
-        try {
-            return getProperties(true, null);
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error at getAllProperties :" + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException {
-        try{
-
-            SQLQuery query = getActiveSession().createSQLQuery(
-                    "SELECT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id" +
-                            " inner join cvterm dt on dt.cvterm_id = cvtr.object_id" +
-                            " where cvtr.type_id = " + TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId()
-                            + " and p.is_obsolete = 0" +
-                            " and dt.name = :className");
-
-            query.setParameter("className", className);
-
-            List propertyIds = query.list();
-
-            return getProperties(false, propertyIds);
-
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * This will fetch list of properties by passing propertyIds
-     * This method is private and consumed by other methods
-     * @param fetchAll will tell weather query should get all properties or not.
-     * @param propertyIds will tell weather propertyIds should be pass to filter result. Combination of these two will give flexible usage.
-     * @return List<Property>
-     * @throws MiddlewareException
-     */
-    private List<Property> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareException {
-
-        Map<Integer, Property> map = new HashMap<>();
-
-        if(propertyIds == null) propertyIds = new ArrayList<>();
-
-        if(!fetchAll && propertyIds.size() == 0){
-            return new ArrayList<>();
-        }
-
-        try {
-
-            String filterClause = "";
-            if(propertyIds.size() > 0){
-                filterClause = " and p.cvterm_id in (:propertyIds)";
-            }
-
-            SQLQuery query = getActiveSession().createSQLQuery(
-                    "select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete" +
-                            ", tp.value cropOntologyId" +
-                            ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes" +
-                            "  from cvterm p" +
-                            " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() +
-                            " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete " +
-                            " from cvTerm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = " + TermId.IS_A.getId() + ")" +
-                            " cs on cs.PropertyId = p.cvterm_id" +
-                            " where p.cv_id = " + CvId.PROPERTIES.getId() + " and p." + getCvTermDao().SHOULD_NOT_OBSOLETE +
-                            filterClause + " Group BY p.cvterm_id Order BY p.name ")
-                    .addScalar("pId", new org.hibernate.type.IntegerType())
-                    .addScalar("pName")
-                    .addScalar("pDescription")
-                    .addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
-                    .addScalar("pObsolete", new org.hibernate.type.IntegerType())
-                    .addScalar("cropOntologyId")
-                    .addScalar("classes");
-
-            if(propertyIds.size() > 0){
-                query.setParameterList("propertyIds", propertyIds);
-            }
+	private static final String SHOULD_VALID_TRAIT_CLASS = "Term should be of valid TRAIT_CLASS";
+	private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
+	private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
+	private static final String PROPERTY_IS_REFERRED_TO_VARIABLE = "Property is referred to variable.";
+
+	public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
+	}
+
+	@Override
+	public Property getProperty(int id) throws MiddlewareException {
+
+		CVTerm term = this.getCvTermDao().getById(id);
+
+		this.checkTermIsProperty(term);
+
+		try {
+			List<Property> properties = this.getProperties(false, new ArrayList<>(Collections.singletonList(id)));
+			if (properties.size() == 0) {
+				return null;
+			}
+			return properties.get(0);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getProperty :" + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public List<Property> getAllProperties() throws MiddlewareException {
+		try {
+			return this.getProperties(true, null);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getAllProperties :" + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException {
+		try {
+
+			SQLQuery query =
+					this.getActiveSession().createSQLQuery(
+							"SELECT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id"
+									+ " inner join cvterm dt on dt.cvterm_id = cvtr.object_id" + " where cvtr.type_id = "
+									+ TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p.is_obsolete = 0"
+									+ " and dt.name = :className");
+
+			query.setParameter("className", className);
+
+			List propertyIds = query.list();
+
+			return this.getProperties(false, propertyIds);
+
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * This will fetch list of properties by passing propertyIds This method is private and consumed by other methods
+	 * 
+	 * @param fetchAll will tell weather query should get all properties or not.
+	 * @param propertyIds will tell weather propertyIds should be pass to filter result. Combination of these two will give flexible usage.
+	 * @return List<Property>
+	 * @throws MiddlewareException
+	 */
+	private List<Property> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareException {
+
+		Map<Integer, Property> map = new HashMap<>();
+
+		if (propertyIds == null) {
+			propertyIds = new ArrayList<>();
+		}
+
+		if (!fetchAll && propertyIds.size() == 0) {
+			return new ArrayList<>();
+		}
+
+		try {
+
+			String filterClause = "";
+			if (propertyIds.size() > 0) {
+				filterClause = " and p.cvterm_id in (:propertyIds)";
+			}
+
+			SQLQuery query =
+					this.getActiveSession()
+							.createSQLQuery(
+									"select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete"
+											+ ", tp.value cropOntologyId"
+											+ ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes"
+											+ "  from cvterm p"
+											+ " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = "
+											+ TermId.CROP_ONTOLOGY_ID.getId()
+											+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
+											+ " from cvTerm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
+											+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = "
+											+ CvId.PROPERTIES.getId() + " and p." + this.getCvTermDao().SHOULD_NOT_OBSOLETE + filterClause
+											+ " Group BY p.cvterm_id Order BY p.name ")
+							.addScalar("pId", new org.hibernate.type.IntegerType()).addScalar("pName").addScalar("pDescription")
+							.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
+							.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
 
-            List result = query.list();
+			if (propertyIds.size() > 0) {
+				query.setParameterList("propertyIds", propertyIds);
+			}
 
-            for (Object row : result) {
-                Object[] items = (Object[]) row;
+			List result = query.list();
 
-                //Check is row does have objects to access
-                if(items.length == 0) {
-                    continue;
-                }
+			for (Object row : result) {
+				Object[] items = (Object[]) row;
 
-                //Check if Property term is already added to Map. We are iterating multiple classes for property
-                Property property = new Property(new Term((Integer) items[0], (String)items[1], (String)items[2], (Integer) items[3], typeSafeObjectToBoolean(items[4])));
+				// Check is row does have objects to access
+				if (items.length == 0) {
+					continue;
+				}
 
-                if(items[5] != null) {
-                    property.setCropOntologyId((String) items[5]);
-                }
+				// Check if Property term is already added to Map. We are iterating multiple classes for property
+				Property property =
+						new Property(new Term((Integer) items[0], (String) items[1], (String) items[2], (Integer) items[3],
+								this.typeSafeObjectToBoolean(items[4])));
 
-                if(items[6] != null){
-                    String classes = (String) items[6];
-                    for(String c : classes.split(",")) {
-                        if(Strings.isNullOrEmpty(c)){
-                            continue;
-                        }
-                        property.addClass(c.trim());
-                    }
-                }
+				if (items[5] != null) {
+					property.setCropOntologyId((String) items[5]);
+				}
 
-                map.put(property.getId(), property);
-            }
+				if (items[6] != null) {
+					String classes = (String) items[6];
+					for (String c : classes.split(",")) {
+						if (Strings.isNullOrEmpty(c)) {
+							continue;
+						}
+						property.addClass(c.trim());
+					}
+				}
 
-            //Created, modified from CVTermProperty
-            List propertyProp = getCvTermPropertyDao().getByCvId(CvId.PROPERTIES.getId());
-            for(Object p : propertyProp){
-                CVTermProperty property = (CVTermProperty) p;
+				map.put(property.getId(), property);
+			}
 
-                Property ontologyProperty = map.get(property.getCvTermId());
+			// Created, modified from CVTermProperty
+			List propertyProp = this.getCvTermPropertyDao().getByCvId(CvId.PROPERTIES.getId());
+			for (Object p : propertyProp) {
+				CVTermProperty property = (CVTermProperty) p;
 
-                if(ontologyProperty == null){
-                    continue;
-                }
+				Property ontologyProperty = map.get(property.getCvTermId());
 
-                if(Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())){
-                    ontologyProperty.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-                } else if(Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())){
-                    ontologyProperty.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-                }
-            }
+				if (ontologyProperty == null) {
+					continue;
+				}
 
+				if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+					ontologyProperty.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+					ontologyProperty.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+				}
+			}
 
-        } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
-        }
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
+		}
 
-        ArrayList<Property> properties = new ArrayList<>(map.values());
+		ArrayList<Property> properties = new ArrayList<>(map.values());
 
-        Collections.sort(properties, new Comparator<org.generationcp.middleware.domain.ontology.Property>() {
-            @Override
-            public int compare(Property l, Property r) {
-                return l.getName().compareToIgnoreCase(r.getName());
-            }
-        });
+		Collections.sort(properties, new Comparator<org.generationcp.middleware.domain.ontology.Property>() {
 
-        return properties;
-    }
+			@Override
+			public int compare(Property l, Property r) {
+				return l.getName().compareToIgnoreCase(r.getName());
+			}
+		});
 
-    @Override
-    public void addProperty(Property property) throws MiddlewareException {
+		return properties;
+	}
 
-        CVTerm term = getCvTermDao().getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
+	@Override
+	public void addProperty(Property property) throws MiddlewareException {
 
-        if (term != null) {
-            throw new MiddlewareException("Property exist with same name");
-        }
+		CVTerm term = this.getCvTermDao().getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 
-        //Constant CvId
-        property.setVocabularyId(CvId.PROPERTIES.getId());
+		if (term != null) {
+			throw new MiddlewareException("Property exist with same name");
+		}
 
-        List<Term> allClasses = getCvTermDao().getAllClasses();
+		// Constant CvId
+		property.setVocabularyId(CvId.PROPERTIES.getId());
 
-        Session session = getActiveSession();
-        Transaction transaction = null;
+		List<Term> allClasses = this.getCvTermDao().getAllClasses();
 
-        try {
-            transaction = session.beginTransaction();
+		Session session = this.getActiveSession();
+		Transaction transaction = null;
 
-            CVTerm propertyTerm = getCvTermDao().save(property.getName(), property.getDefinition(), CvId.PROPERTIES);
-            property.setId(propertyTerm.getCvTermId());
+		try {
+			transaction = session.beginTransaction();
 
-            if (property.getCropOntologyId() != null) {
-                getCvTermPropertyDao().save(property.getId(), TermId.CROP_ONTOLOGY_ID.getId(), property.getCropOntologyId(), 0);
-            }
+			CVTerm propertyTerm = this.getCvTermDao().save(property.getName(), property.getDefinition(), CvId.PROPERTIES);
+			property.setId(propertyTerm.getCvTermId());
 
-            for (String c : property.getClasses()) {
+			if (property.getCropOntologyId() != null) {
+				this.getCvTermPropertyDao().save(property.getId(), TermId.CROP_ONTOLOGY_ID.getId(), property.getCropOntologyId(), 0);
+			}
 
-                //Discarding empty or null strings
-                if(c == null) {
-                    continue;
-                }
+			for (String c : property.getClasses()) {
 
-                c = c.trim();
+				// Discarding empty or null strings
+				if (c == null) {
+					continue;
+				}
 
-                if(Strings.isNullOrEmpty(c.trim())) {
-                    continue;
-                }
+				c = c.trim();
 
-                Term classTerm = null;
-                for (Term tClass : allClasses) {
+				if (Strings.isNullOrEmpty(c.trim())) {
+					continue;
+				}
 
-                    if (c.compareToIgnoreCase(tClass.getName()) != 0) {
-                        continue;
-                    }
+				Term classTerm = null;
+				for (Term tClass : allClasses) {
 
-                    classTerm = tClass;
-                    break;
-                }
+					if (c.compareToIgnoreCase(tClass.getName()) != 0) {
+						continue;
+					}
 
-                //Add new term if does not exist
-                if(classTerm == null){
-                    classTerm = this.addTraitClass(c);
-                }
+					classTerm = tClass;
+					break;
+				}
 
-                getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
-            }
+				// Add new term if does not exist
+				if (classTerm == null) {
+					classTerm = this.addTraitClass(c);
+				}
 
-            //Save creation time
-            getCvTermPropertyDao().save(property.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+				this.getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
+			}
 
-            transaction.commit();
-        } catch (Exception e) {
-            rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error at addProperty :" + e.getMessage(), e);
-        }
-    }
+			// Save creation time
+			this.getCvTermPropertyDao().save(property.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-    @Override
-    public void updateProperty(Property property) throws MiddlewareException {
+			transaction.commit();
+		} catch (Exception e) {
+			this.rollbackTransaction(transaction);
+			throw new MiddlewareQueryException("Error at addProperty :" + e.getMessage(), e);
+		}
+	}
 
-        CVTerm term = getCvTermDao().getById(property.getId());
+	@Override
+	public void updateProperty(Property property) throws MiddlewareException {
 
-        checkTermIsProperty(term);
+		CVTerm term = this.getCvTermDao().getById(property.getId());
 
-        List<Term> allClasses = getCvTermDao().getAllClasses();
+		this.checkTermIsProperty(term);
 
-        Session session = getActiveSession();
-        Transaction transaction = null;
+		List<Term> allClasses = this.getCvTermDao().getAllClasses();
 
-        try {
-            transaction = session.beginTransaction();
+		Session session = this.getActiveSession();
+		Transaction transaction = null;
 
-            term.setName(property.getName());
-            term.setDefinition(property.getDefinition());
+		try {
+			transaction = session.beginTransaction();
 
-            getCvTermDao().merge(term);
+			term.setName(property.getName());
+			term.setDefinition(property.getDefinition());
 
-            //Save or update crop ontology
-            if (property.getCropOntologyId() != null) {
-                getCvTermPropertyDao().save(property.getId(), TermId.CROP_ONTOLOGY_ID.getId(), property.getCropOntologyId(), 0);
-            } else{
-                CVTermProperty cropProperty = getCvTermPropertyDao().getOneByCvTermAndType(property.getId(), TermId.CROP_ONTOLOGY_ID.getId());
-                if(cropProperty != null){
-                    getCvTermPropertyDao().makeTransient(cropProperty);
-                }
-            }
+			this.getCvTermDao().merge(term);
 
-            //Prepare list of relations
-            Map<Integer, CVTermRelationship> relationsToDelete = new HashMap<>();
-            List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubjectIdAndTypeId(property.getId(), TermId.IS_A.getId());
-            for(CVTermRelationship cl : relationships){
-                relationsToDelete.put(cl.getObjectId(), cl);
-            }
+			// Save or update crop ontology
+			if (property.getCropOntologyId() != null) {
+				this.getCvTermPropertyDao().save(property.getId(), TermId.CROP_ONTOLOGY_ID.getId(), property.getCropOntologyId(), 0);
+			} else {
+				CVTermProperty cropProperty =
+						this.getCvTermPropertyDao().getOneByCvTermAndType(property.getId(), TermId.CROP_ONTOLOGY_ID.getId());
+				if (cropProperty != null) {
+					this.getCvTermPropertyDao().makeTransient(cropProperty);
+				}
+			}
 
-            for (String c : property.getClasses()) {
-                //Discarding empty or null strings
-                if(c == null) {
-                    continue;
-                }
+			// Prepare list of relations
+			Map<Integer, CVTermRelationship> relationsToDelete = new HashMap<>();
+			List<CVTermRelationship> relationships =
+					this.getCvTermRelationshipDao().getBySubjectIdAndTypeId(property.getId(), TermId.IS_A.getId());
+			for (CVTermRelationship cl : relationships) {
+				relationsToDelete.put(cl.getObjectId(), cl);
+			}
 
-                c = c.trim();
+			for (String c : property.getClasses()) {
+				// Discarding empty or null strings
+				if (c == null) {
+					continue;
+				}
 
-                if(Strings.isNullOrEmpty(c.trim())) {
-                    continue;
-                }
+				c = c.trim();
 
-                Term classTerm = null;
+				if (Strings.isNullOrEmpty(c.trim())) {
+					continue;
+				}
 
-                for (Term tClass : allClasses) {
+				Term classTerm = null;
 
-                    if (c.compareToIgnoreCase(tClass.getName()) != 0) {
-                        continue;
-                    }
+				for (Term tClass : allClasses) {
 
-                    classTerm = tClass;
-                    break;
-                }
+					if (c.compareToIgnoreCase(tClass.getName()) != 0) {
+						continue;
+					}
 
-                //Add new term if does not exist
-                if(classTerm == null){
-                    classTerm = this.addTraitClass(c);
-                }
+					classTerm = tClass;
+					break;
+				}
 
-                if(relationsToDelete.containsKey(classTerm.getId())){
-                    relationsToDelete.remove(classTerm.getId());
-                    continue;
-                }
+				// Add new term if does not exist
+				if (classTerm == null) {
+					classTerm = this.addTraitClass(c);
+				}
 
-                getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
-            }
+				if (relationsToDelete.containsKey(classTerm.getId())) {
+					relationsToDelete.remove(classTerm.getId());
+					continue;
+				}
 
-            //Removing old classes which are not in used
-            for (CVTermRelationship cl : relationsToDelete.values()){
-                getCvTermRelationshipDao().makeTransient(cl);
-                //Remove trait class if not in used
-                this.removeTraitClass(cl.getObjectId());
-            }
+				this.getCvTermRelationshipDao().save(property.getId(), TermId.IS_A.getId(), classTerm.getId());
+			}
 
-            // Save last modified Time
-            getCvTermPropertyDao().save(property.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+			// Removing old classes which are not in used
+			for (CVTermRelationship cl : relationsToDelete.values()) {
+				this.getCvTermRelationshipDao().makeTransient(cl);
+				// Remove trait class if not in used
+				this.removeTraitClass(cl.getObjectId());
+			}
 
-            transaction.commit();
-        } catch (Exception e) {
-            rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error at updateProperty" + e.getMessage(), e);
-        }
-    }
+			// Save last modified Time
+			this.getCvTermPropertyDao().save(property.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-    @Override
-    public void deleteProperty(Integer propertyId) throws MiddlewareException {
+			transaction.commit();
+		} catch (Exception e) {
+			this.rollbackTransaction(transaction);
+			throw new MiddlewareQueryException("Error at updateProperty" + e.getMessage(), e);
+		}
+	}
 
-        CVTerm term = getCvTermDao().getById(propertyId);
+	@Override
+	public void deleteProperty(Integer propertyId) throws MiddlewareException {
 
-        checkTermIsProperty(term);
+		CVTerm term = this.getCvTermDao().getById(propertyId);
 
-        if(getCvTermRelationshipDao().isTermReferred(propertyId)){
-            throw new MiddlewareException(PROPERTY_IS_REFERRED_TO_VARIABLE);
-        }
+		this.checkTermIsProperty(term);
 
-        Session session = getActiveSession();
-        Transaction transaction = null;
+		if (this.getCvTermRelationshipDao().isTermReferred(propertyId)) {
+			throw new MiddlewareException(OntologyPropertyDataManagerImpl.PROPERTY_IS_REFERRED_TO_VARIABLE);
+		}
 
-        try {
-            transaction = session.beginTransaction();
+		Session session = this.getActiveSession();
+		Transaction transaction = null;
 
-            //Deleting existing relationships for property
-            List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(propertyId);
-            for (CVTermRelationship cl : relationships){
-                getCvTermRelationshipDao().makeTransient(cl);
-                //Remove trait class if not in used
-                this.removeTraitClass(cl.getObjectId());
-            }
+		try {
+			transaction = session.beginTransaction();
 
-            //Deleting existing values for property
-            List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermId(propertyId);
-            for(CVTermProperty p : properties){
-                getCvTermPropertyDao().makeTransient(p);
-            }
+			// Deleting existing relationships for property
+			List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(propertyId);
+			for (CVTermRelationship cl : relationships) {
+				this.getCvTermRelationshipDao().makeTransient(cl);
+				// Remove trait class if not in used
+				this.removeTraitClass(cl.getObjectId());
+			}
 
-            getCvTermDao().makeTransient(term);
-            transaction.commit();
+			// Deleting existing values for property
+			List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermId(propertyId);
+			for (CVTermProperty p : properties) {
+				this.getCvTermPropertyDao().makeTransient(p);
+			}
 
-        } catch (HibernateException e) {
-            rollbackTransaction(transaction);
-            throw new MiddlewareQueryException("Error at deleteProperty" + e.getMessage(), e);
-        }
-    }
+			this.getCvTermDao().makeTransient(term);
+			transaction.commit();
 
-    private void checkTermIsProperty(CVTerm term) throws MiddlewareException {
+		} catch (HibernateException e) {
+			this.rollbackTransaction(transaction);
+			throw new MiddlewareQueryException("Error at deleteProperty" + e.getMessage(), e);
+		}
+	}
 
-        if (term == null) {
-            throw new MiddlewareException(PROPERTY_DOES_NOT_EXIST);
-        }
+	private void checkTermIsProperty(CVTerm term) throws MiddlewareException {
 
-        if(term.getCv() != CvId.PROPERTIES.getId()){
-            throw new MiddlewareException(TERM_IS_NOT_PROPERTY);
-        }
-    }
+		if (term == null) {
+			throw new MiddlewareException(OntologyPropertyDataManagerImpl.PROPERTY_DOES_NOT_EXIST);
+		}
 
-    private Term addTraitClass(String className) throws MiddlewareException {
+		if (term.getCv() != CvId.PROPERTIES.getId()) {
+			throw new MiddlewareException(OntologyPropertyDataManagerImpl.TERM_IS_NOT_PROPERTY);
+		}
+	}
 
-        //Check weather class term exist with CV 1011.
-        CVTerm classTerm = getCvTermDao().getByNameAndCvId(className, CvId.TRAIT_CLASS.getId());
+	private Term addTraitClass(String className) throws MiddlewareException {
 
-        //If exist then don't add.
-        if(classTerm == null) {
-            classTerm = getCvTermDao().save(className, null, CvId.TRAIT_CLASS);
-        }
+		// Check weather class term exist with CV 1011.
+		CVTerm classTerm = this.getCvTermDao().getByNameAndCvId(className, CvId.TRAIT_CLASS.getId());
 
-        return Term.fromCVTerm(classTerm);
-    }
+		// If exist then don't add.
+		if (classTerm == null) {
+			classTerm = this.getCvTermDao().save(className, null, CvId.TRAIT_CLASS);
+		}
 
-    private void removeTraitClass(Integer termId) throws MiddlewareException {
+		return Term.fromCVTerm(classTerm);
+	}
 
-        CVTerm term = getCvTermDao().getById(termId);
+	private void removeTraitClass(Integer termId) throws MiddlewareException {
 
-        //Validate parent class. Parent class should be from cvId as 1000
-        if(term.getCv() != CvId.TRAIT_CLASS.getId()) {
-            throw new MiddlewareException(SHOULD_VALID_TRAIT_CLASS);
-        }
+		CVTerm term = this.getCvTermDao().getById(termId);
 
-        //Check weather term is referred
-        if (getCvTermRelationshipDao().getByObjectId(termId).isEmpty() && getCvTermRelationshipDao().getBySubject(termId).isEmpty()) {
-            //Term is not referred anywhere and can be delete
-            getCvTermDao().makeTransient(term);
-        }
+		// Validate parent class. Parent class should be from cvId as 1000
+		if (term.getCv() != CvId.TRAIT_CLASS.getId()) {
+			throw new MiddlewareException(OntologyPropertyDataManagerImpl.SHOULD_VALID_TRAIT_CLASS);
+		}
 
-    }
+		// Check weather term is referred
+		if (this.getCvTermRelationshipDao().getByObjectId(termId).isEmpty()
+				&& this.getCvTermRelationshipDao().getBySubject(termId).isEmpty()) {
+			// Term is not referred anywhere and can be delete
+			this.getCvTermDao().makeTransient(term);
+		}
+
+	}
 }

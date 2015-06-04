@@ -1,12 +1,13 @@
-package org.generationcp.middleware.pojos.workbench.settings;
 
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.manager.Operation;
+package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class Factor  implements Serializable {
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.manager.Operation;
+
+public class Factor implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String name;
@@ -20,18 +21,18 @@ public class Factor  implements Serializable {
 	private String treatmentLabel;
 	private Operation operation;
 	private int id;
-    private int storedIn;
-    private Integer dataTypeId;
-    private List<ValueReference> possibleValues;
-    private Double minRange;
-    private Double maxRange;
-	
-	public Factor(){
+	private int storedIn;
+	private Integer dataTypeId;
+	private List<ValueReference> possibleValues;
+	private Double minRange;
+	private Double maxRange;
+
+	public Factor() {
 		super();
 	}
-	
-	public Factor(String name, String description, String property,
-			String scale, String method, String role, String datatype, Integer termId) {
+
+	public Factor(String name, String description, String property, String scale, String method, String role, String datatype,
+			Integer termId) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -42,51 +43,65 @@ public class Factor  implements Serializable {
 		this.datatype = datatype;
 		this.termId = termId;
 	}
+
 	public String getName() {
-		return name;
+		return this.name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public String getProperty() {
-		return property;
+		return this.property;
 	}
+
 	public void setProperty(String property) {
 		this.property = property;
 	}
+
 	public String getScale() {
-		return scale;
+		return this.scale;
 	}
+
 	public void setScale(String scale) {
 		this.scale = scale;
 	}
+
 	public String getMethod() {
-		return method;
+		return this.method;
 	}
+
 	public void setMethod(String method) {
 		this.method = method;
 	}
+
 	public String getRole() {
-		return role;
+		return this.role;
 	}
+
 	public void setRole(String role) {
 		this.role = role;
 	}
+
 	public String getDatatype() {
-		return datatype;
+		return this.datatype;
 	}
+
 	public void setDatatype(String datatype) {
 		this.datatype = datatype;
 	}
 
 	public Integer getTermId() {
-		return termId;
+		return this.termId;
 	}
 
 	public void setTermId(Integer termId) {
@@ -94,85 +109,85 @@ public class Factor  implements Serializable {
 	}
 
 	public String getTreatmentLabel() {
-		return treatmentLabel;
+		return this.treatmentLabel;
 	}
 
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
 
-    /**
-     * @return the operation
-     */
-    public Operation getOperation() {
-        return operation;
-    }
+	/**
+	 * @return the operation
+	 */
+	public Operation getOperation() {
+		return this.operation;
+	}
 
-    /**
-     * @param operation the operation to set
-     */
-    public void setOperation(Operation operation) {
-        this.operation = operation;
-    }
+	/**
+	 * @param operation the operation to set
+	 */
+	public void setOperation(Operation operation) {
+		this.operation = operation;
+	}
 
-    /**
-     * @return the id
-     */
-    public int getId() {
-        return id;
-    }
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return this.id;
+	}
 
-    /**
-     * @param id the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    /**
-     * @return the storedIn
-     */
-    public int getStoredIn() {
-        return storedIn;
-    }
+	/**
+	 * @return the storedIn
+	 */
+	public int getStoredIn() {
+		return this.storedIn;
+	}
 
-    /**
-     * @param storedIn the storedIn to set
-     */
-    public void setStoredIn(int storedIn) {
-        this.storedIn = storedIn;
-    }
+	/**
+	 * @param storedIn the storedIn to set
+	 */
+	public void setStoredIn(int storedIn) {
+		this.storedIn = storedIn;
+	}
 
-    public Integer getDataTypeId() {
-        return dataTypeId;
-    }
+	public Integer getDataTypeId() {
+		return this.dataTypeId;
+	}
 
-    public void setDataTypeId(Integer dataTypeId) {
-        this.dataTypeId = dataTypeId;
-    }
+	public void setDataTypeId(Integer dataTypeId) {
+		this.dataTypeId = dataTypeId;
+	}
 
-    public List<ValueReference> getPossibleValues() {
-        return possibleValues;
-    }
+	public List<ValueReference> getPossibleValues() {
+		return this.possibleValues;
+	}
 
-    public void setPossibleValues(List<ValueReference> possibleValues) {
-        this.possibleValues = possibleValues;
-    }
+	public void setPossibleValues(List<ValueReference> possibleValues) {
+		this.possibleValues = possibleValues;
+	}
 
-    public Double getMinRange() {
-        return minRange;
-    }
+	public Double getMinRange() {
+		return this.minRange;
+	}
 
-    public void setMinRange(Double minRange) {
-        this.minRange = minRange;
-    }
+	public void setMinRange(Double minRange) {
+		this.minRange = minRange;
+	}
 
-    public Double getMaxRange() {
-        return maxRange;
-    }
+	public Double getMaxRange() {
+		return this.maxRange;
+	}
 
-    public void setMaxRange(Double maxRange) {
-        this.maxRange = maxRange;
-    }
+	public void setMaxRange(Double maxRange) {
+		this.maxRange = maxRange;
+	}
 
- }
+}

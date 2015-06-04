@@ -1,79 +1,80 @@
+
 package org.generationcp.middleware.domain.inventory;
+
+import java.io.Serializable;
 
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.Location;
 
-import java.io.Serializable;
+public class LotDetails implements Serializable {
 
-public class LotDetails implements Serializable{
-	
 	private static final long serialVersionUID = 2572260467983831666L;
 
 	// ims_lot fields
-    private Integer lotId;
-    private Integer entityIdOfLot;
-    private Integer scaleId;
-    private Integer locId;
-    private String commentOfLot;
-    
-    // computed or looked up values
-    private Double actualLotBalance; 
-    private Double availableLotBalance;
-    private Location locationOfLot;
-    private Double reservedTotal;
-    private Term scaleOfLot;
-    private String stockIds;
+	private Integer lotId;
+	private Integer entityIdOfLot;
+	private Integer scaleId;
+	private Integer locId;
+	private String commentOfLot;
+
+	// computed or looked up values
+	private Double actualLotBalance;
+	private Double availableLotBalance;
+	private Location locationOfLot;
+	private Double reservedTotal;
+	private Term scaleOfLot;
+	private String stockIds;
 
 	public Integer getLotId() {
-        return lotId;
-    }
+		return this.lotId;
+	}
 
-    public void setLotId(Integer lotId) {
-        this.lotId = lotId;
-    }
+	public void setLotId(Integer lotId) {
+		this.lotId = lotId;
+	}
 
-    public Integer getEntityIdOfLot() {
-        return entityIdOfLot;
-    }
+	public Integer getEntityIdOfLot() {
+		return this.entityIdOfLot;
+	}
 
-    public void setEntityIdOfLot(Integer entityIdOfLot) {
-        this.entityIdOfLot = entityIdOfLot;
-    }
+	public void setEntityIdOfLot(Integer entityIdOfLot) {
+		this.entityIdOfLot = entityIdOfLot;
+	}
 
-    public Double getActualLotBalance() {
-        return actualLotBalance;
-    }
+	public Double getActualLotBalance() {
+		return this.actualLotBalance;
+	}
 
-    public void setActualLotBalance(Double actualLotBalance) {
-        this.actualLotBalance = actualLotBalance;
-    }
+	public void setActualLotBalance(Double actualLotBalance) {
+		this.actualLotBalance = actualLotBalance;
+	}
 
-    public Location getLocationOfLot() {
-        return locationOfLot;
-    }
+	public Location getLocationOfLot() {
+		return this.locationOfLot;
+	}
 
-    public void setLocationOfLot(Location locationOfLot) {
-        this.locationOfLot = locationOfLot;
-    }
+	public void setLocationOfLot(Location locationOfLot) {
+		this.locationOfLot = locationOfLot;
+	}
 
-    public Term getScaleOfLot() {
-        return scaleOfLot;
-    }
+	public Term getScaleOfLot() {
+		return this.scaleOfLot;
+	}
 
-    public void setScaleOfLot(Term scaleOfLot) {
-        this.scaleOfLot = scaleOfLot;
-    }
-    
-    public String getCommentOfLot() {
-        return commentOfLot;
-    }
-    
-    public void setCommentOfLot(String commentOfLot) {
-        this.commentOfLot = commentOfLot;
-    }
+	public void setScaleOfLot(Term scaleOfLot) {
+		this.scaleOfLot = scaleOfLot;
+	}
 
-    public Double getAvailableLotBalance() {
-		return availableLotBalance;
+	public String getCommentOfLot() {
+		return this.commentOfLot;
+	}
+
+	public void setCommentOfLot(String commentOfLot) {
+		this.commentOfLot = commentOfLot;
+	}
+
+	public Double getAvailableLotBalance() {
+		return this.availableLotBalance;
 	}
 
 	public void setAvailableLotBalance(Double availableLotBalance) {
@@ -81,7 +82,7 @@ public class LotDetails implements Serializable{
 	}
 
 	public Double getReservedTotal() {
-		return reservedTotal;
+		return this.reservedTotal;
 	}
 
 	public void setReservedTotal(Double reservedTotal) {
@@ -89,7 +90,7 @@ public class LotDetails implements Serializable{
 	}
 
 	public Integer getScaleId() {
-		return scaleId;
+		return this.scaleId;
 	}
 
 	public void setScaleId(Integer scaleId) {
@@ -97,7 +98,7 @@ public class LotDetails implements Serializable{
 	}
 
 	public Integer getLocId() {
-		return locId;
+		return this.locId;
 	}
 
 	public void setLocId(Integer locId) {
@@ -105,7 +106,7 @@ public class LotDetails implements Serializable{
 	}
 
 	public String getStockIds() {
-		return stockIds;
+		return this.stockIds;
 	}
 
 	public void setStockIds(String stockIds) {
@@ -113,32 +114,32 @@ public class LotDetails implements Serializable{
 	}
 
 	@Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("LotReportRow [lotId=");
-        builder.append(lotId);
-        builder.append(", entityIdOfLot=");
-        builder.append(entityIdOfLot);
-        builder.append(", actualLotBalance=");
-        builder.append(actualLotBalance);
-        builder.append(", availableLotBalance=");
-        builder.append(availableLotBalance);
-        builder.append(", reservedTotal=");
-        builder.append(reservedTotal);
-        builder.append(", locationId=");
-        builder.append(locId);
-        builder.append(", locationOfLot=");
-        builder.append(locationOfLot);
-        builder.append(", scaleId=");
-        builder.append(scaleId);
-        builder.append(", scaleOfLot=");
-        builder.append(scaleOfLot);
-        builder.append(", commentOfLot=");
-        builder.append(commentOfLot);
-        builder.append(", stockIds=");
-        builder.append(stockIds);
-        builder.append("]");
-        return builder.toString();
-    }
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("LotReportRow [lotId=");
+		builder.append(this.lotId);
+		builder.append(", entityIdOfLot=");
+		builder.append(this.entityIdOfLot);
+		builder.append(", actualLotBalance=");
+		builder.append(this.actualLotBalance);
+		builder.append(", availableLotBalance=");
+		builder.append(this.availableLotBalance);
+		builder.append(", reservedTotal=");
+		builder.append(this.reservedTotal);
+		builder.append(", locationId=");
+		builder.append(this.locId);
+		builder.append(", locationOfLot=");
+		builder.append(this.locationOfLot);
+		builder.append(", scaleId=");
+		builder.append(this.scaleId);
+		builder.append(", scaleOfLot=");
+		builder.append(this.scaleOfLot);
+		builder.append(", commentOfLot=");
+		builder.append(this.commentOfLot);
+		builder.append(", stockIds=");
+		builder.append(this.stockIds);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

@@ -1,19 +1,19 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.dms;
 
 /**
- * This class is used to store variable list, germplasmId and locationId to Experiment. 
- * 
+ * This class is used to store variable list, germplasmId and locationId to Experiment.
+ *
  */
 public abstract class Values {
 
@@ -25,8 +25,7 @@ public abstract class Values {
 
 	}
 
-	public Values(VariableList variableList, Integer germplasmId,
-			Integer locationId) {
+	public Values(VariableList variableList, Integer germplasmId, Integer locationId) {
 		super();
 		this.variableList = variableList;
 		this.germplasmId = germplasmId;
@@ -34,7 +33,7 @@ public abstract class Values {
 	}
 
 	public VariableList getVariableList() {
-		return variableList != null ? variableList.sort() : null;
+		return this.variableList != null ? this.variableList.sort() : null;
 	}
 
 	public void setVariableList(VariableList variableList) {
@@ -42,7 +41,7 @@ public abstract class Values {
 	}
 
 	public Integer getGermplasmId() {
-		return germplasmId;
+		return this.germplasmId;
 	}
 
 	public void setGermplasmId(Integer germplasmId) {
@@ -50,7 +49,7 @@ public abstract class Values {
 	}
 
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public void setLocationId(Integer locationId) {
@@ -61,67 +60,63 @@ public abstract class Values {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((germplasmId == null) ? 0 : germplasmId.hashCode());
-		result = prime * result
-				+ ((locationId == null) ? 0 : locationId.hashCode());
-		result = prime * result
-				+ ((variableList == null) ? 0 : variableList.hashCode());
+		result = prime * result + (this.germplasmId == null ? 0 : this.germplasmId.hashCode());
+		result = prime * result + (this.locationId == null ? 0 : this.locationId.hashCode());
+		result = prime * result + (this.variableList == null ? 0 : this.variableList.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		Values other = (Values) obj;
-		if (germplasmId == null) {
+		if (this.germplasmId == null) {
 			if (other.germplasmId != null) {
-                return false;
-            }
-		} else if (!germplasmId.equals(other.germplasmId)) {
-            return false;
-        }
-		if (locationId == null) {
+				return false;
+			}
+		} else if (!this.germplasmId.equals(other.germplasmId)) {
+			return false;
+		}
+		if (this.locationId == null) {
 			if (other.locationId != null) {
-                return false;
-            }
-		} else if (!locationId.equals(other.locationId)) {
-            return false;
-        }
-		if (variableList == null) {
+				return false;
+			}
+		} else if (!this.locationId.equals(other.locationId)) {
+			return false;
+		}
+		if (this.variableList == null) {
 			if (other.variableList != null) {
-                return false;
-            }
-		} else if (!variableList.equals(other.variableList)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.variableList.equals(other.variableList)) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getEntityName() + " [variableList=");
-		builder.append(variableList);
+		builder.append(this.getEntityName() + " [variableList=");
+		builder.append(this.variableList);
 		builder.append(", germplasmId=");
-		builder.append(germplasmId);
+		builder.append(this.germplasmId);
 		builder.append(", locationId=");
-		builder.append(locationId);
+		builder.append(this.locationId);
 		builder.append("]");
 		return builder.toString();
 	}
 
-	public String getEntityName(){
+	public String getEntityName() {
 		return "Values";
 	}
-	
-	
+
 }

@@ -1,28 +1,31 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos.oms;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvtermsynonym
- * 
- * A cvterm actually represents a distinct class or concept. A concept can be referred to 
- * by different phrases or names. In addition to the primary name (cvterm.name) there can 
- * be a number of alternative aliases or synonyms. 
- * For example, "T cell" as a synonym for "T lymphocyte".
- * 
+ *
+ * A cvterm actually represents a distinct class or concept. A concept can be referred to by different phrases or names. In addition to the
+ * primary name (cvterm.name) there can be a number of alternative aliases or synonyms. For example, "T cell" as a synonym for
+ * "T lymphocyte".
+ *
  * @author Darla Ani
  *
  */
@@ -31,12 +34,12 @@ import java.io.Serializable;
 public class CVTermSynonym implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@Basic(optional = false)
 	@Column(name = "cvtermsynonym_id")
 	private Integer cvTermSynonymId;
-	
+
 	/**
 	 * Alias or synonym for related CV Term
 	 */
@@ -52,18 +55,17 @@ public class CVTermSynonym implements Serializable {
 
 	@Column(name = "cvterm_id")
 	private Integer cvTermId;
-	
-	
-	public CVTermSynonym(){
-		
+
+	public CVTermSynonym() {
+
 	}
-	
-	public CVTermSynonym(Integer id){
+
+	public CVTermSynonym(Integer id) {
 		this.cvTermSynonymId = id;
 	}
 
 	public Integer getCvTermSynonymId() {
-		return cvTermSynonymId;
+		return this.cvTermSynonymId;
 	}
 
 	public void setCvTermSynonymId(Integer id) {
@@ -71,7 +73,7 @@ public class CVTermSynonym implements Serializable {
 	}
 
 	public String getSynonym() {
-		return synonym;
+		return this.synonym;
 	}
 
 	public void setSynonym(String synonym) {
@@ -79,50 +81,50 @@ public class CVTermSynonym implements Serializable {
 	}
 
 	public Integer getTypeId() {
-		return typeId;
+		return this.typeId;
 	}
 
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 
-    public Integer getCvTermId() {
-        return cvTermId;
-    }
-    
-    public void setCvTermId(Integer cvTermId) {
-        this.cvTermId = cvTermId;
-    }
+	public Integer getCvTermId() {
+		return this.cvTermId;
+	}
 
-    @Override
+	public void setCvTermId(Integer cvTermId) {
+		this.cvTermId = cvTermId;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((cvTermSynonymId == null) ? 0 : cvTermSynonymId.hashCode());
+		result = prime * result + (this.cvTermSynonymId == null ? 0 : this.cvTermSynonymId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
+			return false;
+		}
 		if (!(obj instanceof CVTermSynonym)) {
-            return false;
-        }
-		
+			return false;
+		}
+
 		CVTermSynonym other = (CVTermSynonym) obj;
-		if (cvTermSynonymId == null) {
+		if (this.cvTermSynonymId == null) {
 			if (other.cvTermSynonymId != null) {
-                return false;
-            }
-		} else if (!cvTermSynonymId.equals(other.cvTermSynonymId)) {
-            return false;
-        }
-		
+				return false;
+			}
+		} else if (!this.cvTermSynonymId.equals(other.cvTermSynonymId)) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -130,11 +132,11 @@ public class CVTermSynonym implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CVTermSynonym [cvTermSynonymId=");
-		builder.append(cvTermSynonymId);
+		builder.append(this.cvTermSynonymId);
 		builder.append(", synonym=");
-		builder.append(synonym);
+		builder.append(this.synonym);
 		builder.append(", typeId=");
-		builder.append(typeId);
+		builder.append(this.typeId);
 		builder.append("]");
 		return builder.toString();
 	}

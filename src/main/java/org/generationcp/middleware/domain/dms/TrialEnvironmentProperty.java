@@ -1,8 +1,9 @@
+
 package org.generationcp.middleware.domain.dms;
 
-import org.generationcp.middleware.util.Debug;
-
 import java.util.Map;
+
+import org.generationcp.middleware.util.Debug;
 
 public class TrialEnvironmentProperty {
 
@@ -11,28 +12,28 @@ public class TrialEnvironmentProperty {
 	private String description;
 	private Map<Integer, String> environmentValuesMap;
 	private Integer numberOfEnvironments;
-	
-	public TrialEnvironmentProperty(String name, String description, Map<Integer,String> environmentValuesMap) {
+
+	public TrialEnvironmentProperty(String name, String description, Map<Integer, String> environmentValuesMap) {
 		this.name = name;
 		this.description = description;
 		this.environmentValuesMap = environmentValuesMap;
-		if (environmentValuesMap != null){
+		if (environmentValuesMap != null) {
 			this.numberOfEnvironments = this.environmentValuesMap.size();
 		}
 	}
-	
-	public TrialEnvironmentProperty(Integer id, String name, String description, Map<Integer,String> environmentValuesMap) {
+
+	public TrialEnvironmentProperty(Integer id, String name, String description, Map<Integer, String> environmentValuesMap) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.environmentValuesMap = environmentValuesMap;
-		if (environmentValuesMap != null){
+		if (environmentValuesMap != null) {
 			this.numberOfEnvironments = this.environmentValuesMap.size();
 		}
 	}
-	
+
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Integer id) {
@@ -40,26 +41,31 @@ public class TrialEnvironmentProperty {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public Integer getNumberOfEnvironments() {
-		return numberOfEnvironments;
+		return this.numberOfEnvironments;
 	}
+
 	public void setNumberOfEnvironments(Integer numberOfEnvironments) {
 		this.numberOfEnvironments = numberOfEnvironments;
 	}
-	
+
 	public Map<Integer, String> getEnvironmentValuesMap() {
-		return environmentValuesMap;
+		return this.environmentValuesMap;
 	}
 
 	public void setEnvironmentValuesMap(Map<Integer, String> environmentValuesMap) {
@@ -67,10 +73,11 @@ public class TrialEnvironmentProperty {
 	}
 
 	public void print(int indent) {
-		Debug.println(indent, "TrialEnvironmentProperty[name=" + name + ", description=" + description + ", count=" + numberOfEnvironments + "]");
-		Debug.println(indent+3, "EnvironmentPropertyValues:");
-		for (Map.Entry<Integer, String > entry : environmentValuesMap.entrySet()){
-			Debug.println(indent+6, "Environment=" + entry.getKey() + ", PropertyValue=" + entry.getValue());
+		Debug.println(indent, "TrialEnvironmentProperty[name=" + this.name + ", description=" + this.description + ", count="
+				+ this.numberOfEnvironments + "]");
+		Debug.println(indent + 3, "EnvironmentPropertyValues:");
+		for (Map.Entry<Integer, String> entry : this.environmentValuesMap.entrySet()) {
+			Debug.println(indent + 6, "Environment=" + entry.getKey() + ", PropertyValue=" + entry.getValue());
 		}
 	}
 
@@ -78,47 +85,47 @@ public class TrialEnvironmentProperty {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + (this.id == null ? 0 : this.id.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		TrialEnvironmentProperty other = (TrialEnvironmentProperty) obj;
-		if (id == null) {
+		if (this.id == null) {
 			if (other.id != null) {
-                return false;
-            }
-		} else if (!id.equals(other.id)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.id.equals(other.id)) {
+			return false;
+		}
 		return true;
 	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("TrialEnvironmentProperty [id=");
-        builder.append(id);
-        builder.append(", name=");
-        builder.append(name);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", environmentValuesMap=");
-        builder.append(environmentValuesMap);
-        builder.append(", numberOfEnvironments=");
-        builder.append(numberOfEnvironments);
-        builder.append("]");
-        return builder.toString();
-    }
-	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TrialEnvironmentProperty [id=");
+		builder.append(this.id);
+		builder.append(", name=");
+		builder.append(this.name);
+		builder.append(", description=");
+		builder.append(this.description);
+		builder.append(", environmentValuesMap=");
+		builder.append(this.environmentValuesMap);
+		builder.append(", numberOfEnvironments=");
+		builder.append(this.numberOfEnvironments);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

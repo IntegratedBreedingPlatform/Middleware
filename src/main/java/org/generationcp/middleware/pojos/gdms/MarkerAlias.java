@@ -1,112 +1,115 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
+
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.*;
-import java.io.Serializable;
-
 /**
  * POJO for gdms_marker_alias table.
- * 
- * @author Dennis Billano
- * <b>File Created</b>: March 7, 2013
+ *
+ * @author Dennis Billano <b>File Created</b>: March 7, 2013
  */
 @Entity
 @Table(name = "gdms_marker_alias")
+public class MarkerAlias implements Serializable {
 
-public class MarkerAlias implements Serializable{
+	private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @Column(name = "markeralias_id")
-    private Integer markerAliasId;
-    
-    @Basic(optional = false)
-    @Column(name = "marker_id")
-    private Integer markerId;
+	@Id
+	@Column(name = "markeralias_id")
+	private Integer markerAliasId;
 
-    @Basic(optional = false)
-    @Column(name = "alias")
-    private String alias;
+	@Basic(optional = false)
+	@Column(name = "marker_id")
+	private Integer markerId;
 
-    public MarkerAlias() {
-    }
+	@Basic(optional = false)
+	@Column(name = "alias")
+	private String alias;
 
-    public MarkerAlias(Integer markerAliasId, Integer markerId, String alias) {
-        this.markerAliasId = markerAliasId;
-        this.markerId = markerId;
-        this.alias = alias;
-    }
-    
-    public Integer getMarkerAliasId() {
-        return markerAliasId;
-    }
+	public MarkerAlias() {
+	}
 
-    public void setMarkerAliasId(Integer markerAliasId) {
-        this.markerAliasId = markerAliasId;
-    }
+	public MarkerAlias(Integer markerAliasId, Integer markerId, String alias) {
+		this.markerAliasId = markerAliasId;
+		this.markerId = markerId;
+		this.alias = alias;
+	}
 
-    public Integer getMarkerId() {
-        return markerId;
-    }
+	public Integer getMarkerAliasId() {
+		return this.markerAliasId;
+	}
 
-    public void setMarkerId(Integer markerId) {
-        this.markerId = markerId;
-    }
+	public void setMarkerAliasId(Integer markerAliasId) {
+		this.markerAliasId = markerAliasId;
+	}
 
-    public String getAlias() {
-        return alias;
-    }
+	public Integer getMarkerId() {
+		return this.markerId;
+	}
 
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+	public void setMarkerId(Integer markerId) {
+		this.markerId = markerId;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof MarkerAlias)) {
-            return false;
-        }
+	public String getAlias() {
+		return this.alias;
+	}
 
-        MarkerAlias rhs = (MarkerAlias) obj;
-        return new EqualsBuilder().append(markerAliasId, rhs.markerAliasId).isEquals();
-    }
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(61, 131).append(markerAliasId).toHashCode();
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof MarkerAlias)) {
+			return false;
+		}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("MarkerAlias [markerAliasId=");
-        builder.append(markerAliasId);
-        builder.append(", markerId=");
-        builder.append(markerId);
-        builder.append(", alias=");
-        builder.append(alias);
-        builder.append("]");
-        return builder.toString();
-    }
+		MarkerAlias rhs = (MarkerAlias) obj;
+		return new EqualsBuilder().append(this.markerAliasId, rhs.markerAliasId).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(61, 131).append(this.markerAliasId).toHashCode();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MarkerAlias [markerAliasId=");
+		builder.append(this.markerAliasId);
+		builder.append(", markerId=");
+		builder.append(this.markerId);
+		builder.append(", alias=");
+		builder.append(this.alias);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

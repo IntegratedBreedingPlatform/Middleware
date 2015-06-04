@@ -1,114 +1,116 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
+
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.*;
-import java.io.Serializable;
-
 /**
  * POJO for gdms_qtl table.
- * 
+ *
  * @author Joyce Avestro
- * 
+ *
  */
 @Entity
 @Table(name = "gdms_qtl")
-public class Qtl implements Serializable{
-   
-    
-    private static final long serialVersionUID = 1L;
+public class Qtl implements Serializable {
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "qtl_id")
-    private Integer qtlId;
+	private static final long serialVersionUID = 1L;
 
-    @Basic(optional = false)
-    @Column(name = "qtl_name")
-    private String qtlName;
+	@Id
+	@Basic(optional = false)
+	@Column(name = "qtl_id")
+	private Integer qtlId;
 
-    @Column(name = "dataset_id")
-    private Integer datasetId;
+	@Basic(optional = false)
+	@Column(name = "qtl_name")
+	private String qtlName;
 
-    public Qtl() {
-    }
+	@Column(name = "dataset_id")
+	private Integer datasetId;
 
-    public Qtl(Integer qtlId,
-            String qtlName,
-            Integer datasetId) {
-        
-        this.qtlId = qtlId;
-        this.qtlName = qtlName;
-        this.datasetId = datasetId;
-    }
+	public Qtl() {
+	}
 
-    public Integer getQtlId() {
-        return qtlId;
-    }
+	public Qtl(Integer qtlId, String qtlName, Integer datasetId) {
 
-    public void setQtlId(Integer qtlId) {
-        this.qtlId = qtlId;
-    }
+		this.qtlId = qtlId;
+		this.qtlName = qtlName;
+		this.datasetId = datasetId;
+	}
 
-    public String getQtlName() {
-        return qtlName;
-    }
+	public Integer getQtlId() {
+		return this.qtlId;
+	}
 
-    public void setQtlName(String qtlName) {
-        this.qtlName = qtlName;
-    }
+	public void setQtlId(Integer qtlId) {
+		this.qtlId = qtlId;
+	}
 
-    public Integer getDatasetId() {
-        return datasetId;
-    }
+	public String getQtlName() {
+		return this.qtlName;
+	}
 
-    public void setDatasetId(Integer datasetId) {
-        this.datasetId = datasetId;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof Qtl)) {
-            return false;
-        }
+	public void setQtlName(String qtlName) {
+		this.qtlName = qtlName;
+	}
 
-        Qtl rhs = (Qtl) obj;
-        return new EqualsBuilder().append(qtlId, rhs.qtlId).isEquals();
-    }
+	public Integer getDatasetId() {
+		return this.datasetId;
+	}
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(37, 53).append(qtlId).toHashCode();
-    }
+	public void setDatasetId(Integer datasetId) {
+		this.datasetId = datasetId;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Qtl [qtlId=");
-        builder.append(qtlId);
-        builder.append(", qtlName=");
-        builder.append(qtlName);
-        builder.append(", datasetId=");
-        builder.append(datasetId);
-        builder.append("]");
-        return builder.toString();
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof Qtl)) {
+			return false;
+		}
+
+		Qtl rhs = (Qtl) obj;
+		return new EqualsBuilder().append(this.qtlId, rhs.qtlId).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(37, 53).append(this.qtlId).toHashCode();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Qtl [qtlId=");
+		builder.append(this.qtlId);
+		builder.append(", qtlName=");
+		builder.append(this.qtlName);
+		builder.append(", datasetId=");
+		builder.append(this.datasetId);
+		builder.append("]");
+		return builder.toString();
+	}
 }

@@ -1,62 +1,61 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.dms;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
 /**
  * The Standard Variable with term, property, scale, method, data type, etc.
  *
  */
-public class StandardVariable implements Serializable{
+public class StandardVariable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Term term = new Term();
-	
+	private final Term term = new Term();
+
 	private Term property;
-    
-    private Term scale;
-    
-    private Term method;
-    
-    private Term dataType;
-    
-    private Term storedIn;
-    
-    private Term isA;
-    
-    private PhenotypicType phenotypicType;
-    
-    private VariableConstraints constraints;
-    
-    private List<Enumeration> enumerations;
-    
-    private Map<Integer, Integer> overridenEnumerations;
-    
-    private String cropOntologyId;
-    
-    public StandardVariable() {    	
-    }
-    
-	public StandardVariable(Term property, Term scale, Term method,
-			Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType) {
+
+	private Term scale;
+
+	private Term method;
+
+	private Term dataType;
+
+	private Term storedIn;
+
+	private Term isA;
+
+	private PhenotypicType phenotypicType;
+
+	private VariableConstraints constraints;
+
+	private List<Enumeration> enumerations;
+
+	private Map<Integer, Integer> overridenEnumerations;
+
+	private String cropOntologyId;
+
+	public StandardVariable() {
+	}
+
+	public StandardVariable(Term property, Term scale, Term method, Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType) {
 		this.property = property;
 		this.scale = scale;
 		this.method = method;
@@ -66,45 +65,44 @@ public class StandardVariable implements Serializable{
 		this.phenotypicType = phenotypicType;
 	}
 
-    /* Copy constructor. Used by the copy method */
-    private StandardVariable(StandardVariable stdVar) {
-    	this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(),
-			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getIsA(), 
-			stdVar.getPhenotypicType());
-    	this.setId(0);  
-    	this.setName(stdVar.getName());
-    	this.setDescription(stdVar.getDescription());
-    	this.setCropOntologyId(stdVar.getCropOntologyId());
-    	this.setConstraints(stdVar.getConstraints());
+	/* Copy constructor. Used by the copy method */
+	private StandardVariable(StandardVariable stdVar) {
+		this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(), stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getIsA(),
+				stdVar.getPhenotypicType());
+		this.setId(0);
+		this.setName(stdVar.getName());
+		this.setDescription(stdVar.getDescription());
+		this.setCropOntologyId(stdVar.getCropOntologyId());
+		this.setConstraints(stdVar.getConstraints());
 		this.setEnumerations(stdVar.getEnumerations());
 	}
-    
+
 	public int getId() {
-    	return term.getId();
-    }
-    
+		return this.term.getId();
+	}
+
 	public void setId(int id) {
-		term.setId(id);
+		this.term.setId(id);
 	}
 
 	public String getName() {
-		return term.getName();
+		return this.term.getName();
 	}
 
 	public void setName(String name) {
-		term.setName(name);
+		this.term.setName(name);
 	}
 
 	public String getDescription() {
-		return term.getDefinition();
+		return this.term.getDefinition();
 	}
 
 	public void setDescription(String description) {
-		term.setDefinition(description);
+		this.term.setDefinition(description);
 	}
 
 	public Term getProperty() {
-		return property;
+		return this.property;
 	}
 
 	public void setProperty(Term property) {
@@ -112,7 +110,7 @@ public class StandardVariable implements Serializable{
 	}
 
 	public Term getScale() {
-		return scale;
+		return this.scale;
 	}
 
 	public void setScale(Term scale) {
@@ -120,7 +118,7 @@ public class StandardVariable implements Serializable{
 	}
 
 	public Term getMethod() {
-		return method;
+		return this.method;
 	}
 
 	public void setMethod(Term method) {
@@ -128,7 +126,7 @@ public class StandardVariable implements Serializable{
 	}
 
 	public Term getDataType() {
-		return dataType;
+		return this.dataType;
 	}
 
 	public void setDataType(Term dataType) {
@@ -136,7 +134,7 @@ public class StandardVariable implements Serializable{
 	}
 
 	public Term getStoredIn() {
-		return storedIn;
+		return this.storedIn;
 	}
 
 	public void setStoredIn(Term storedIn) {
@@ -144,7 +142,7 @@ public class StandardVariable implements Serializable{
 	}
 
 	public VariableConstraints getConstraints() {
-		return constraints;
+		return this.constraints;
 	}
 
 	public void setConstraints(VariableConstraints constraints) {
@@ -152,81 +150,80 @@ public class StandardVariable implements Serializable{
 	}
 
 	public List<Enumeration> getEnumerations() {
-		return enumerations;
+		return this.enumerations;
 	}
-	
-    public Enumeration getEnumeration(Integer id){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getId().equals(id)){
-                return enumeration;
-            }
-        }
-        return null;
-    }
-    
-    public Enumeration getEnumeration(String name, String description){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getName().equalsIgnoreCase(name) && enumeration.getDescription().equalsIgnoreCase(description)){
-                return enumeration;
-            }
-        }
-        return null;
-    }
-    
-    public Enumeration getEnumerationByName(String name){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getName().equalsIgnoreCase(name) ){
-                return enumeration;
-            }
-        }
-        return null;
-    }
-    
-    public Enumeration getEnumerationByDescription(String description){
-        if (enumerations == null){
-            return null;
-        }
-        for (Enumeration enumeration : enumerations){
-            if (enumeration.getDescription().equalsIgnoreCase(description)){
-                return enumeration;
-            }
-        }
-        return null;
-    }
 
+	public Enumeration getEnumeration(Integer id) {
+		if (this.enumerations == null) {
+			return null;
+		}
+		for (Enumeration enumeration : this.enumerations) {
+			if (enumeration.getId().equals(id)) {
+				return enumeration;
+			}
+		}
+		return null;
+	}
+
+	public Enumeration getEnumeration(String name, String description) {
+		if (this.enumerations == null) {
+			return null;
+		}
+		for (Enumeration enumeration : this.enumerations) {
+			if (enumeration.getName().equalsIgnoreCase(name) && enumeration.getDescription().equalsIgnoreCase(description)) {
+				return enumeration;
+			}
+		}
+		return null;
+	}
+
+	public Enumeration getEnumerationByName(String name) {
+		if (this.enumerations == null) {
+			return null;
+		}
+		for (Enumeration enumeration : this.enumerations) {
+			if (enumeration.getName().equalsIgnoreCase(name)) {
+				return enumeration;
+			}
+		}
+		return null;
+	}
+
+	public Enumeration getEnumerationByDescription(String description) {
+		if (this.enumerations == null) {
+			return null;
+		}
+		for (Enumeration enumeration : this.enumerations) {
+			if (enumeration.getDescription().equalsIgnoreCase(description)) {
+				return enumeration;
+			}
+		}
+		return null;
+	}
 
 	public void setEnumerations(List<Enumeration> enumerations) {
 		this.enumerations = enumerations;
 	}
-	
+
 	public PhenotypicType getPhenotypicType() {
-		return phenotypicType;
+		return this.phenotypicType;
 	}
 
 	public void setPhenotypicType(PhenotypicType phenotypicType) {
 		this.phenotypicType = phenotypicType;
 	}
 
-    public String getCropOntologyId() {
-        return cropOntologyId;
-    }
-    
-    public void setCropOntologyId(String cropOntologyId) {
-        this.cropOntologyId = cropOntologyId;
-    }
+	public String getCropOntologyId() {
+		return this.cropOntologyId;
+	}
 
-    public Enumeration findEnumerationByName(String name) {
-		if (enumerations != null) {
-			for (Enumeration enumeration : enumerations) {
+	public void setCropOntologyId(String cropOntologyId) {
+		this.cropOntologyId = cropOntologyId;
+	}
+
+	public Enumeration findEnumerationByName(String name) {
+		if (this.enumerations != null) {
+			for (Enumeration enumeration : this.enumerations) {
 				if (enumeration.getName().equals(name)) {
 					return enumeration;
 				}
@@ -234,10 +231,10 @@ public class StandardVariable implements Serializable{
 		}
 		return null;
 	}
-	
+
 	public Enumeration findEnumerationById(int id) {
-		if (enumerations != null) {
-			for (Enumeration enumeration : enumerations) {
+		if (this.enumerations != null) {
+			for (Enumeration enumeration : this.enumerations) {
 				if (enumeration.getId() == id) {
 					return enumeration;
 				}
@@ -245,84 +242,86 @@ public class StandardVariable implements Serializable{
 		}
 		return null;
 	}
-	
+
 	public boolean hasEnumerations() {
-		return enumerations != null && !enumerations.isEmpty();
+		return this.enumerations != null && !this.enumerations.isEmpty();
 	}
-	
+
 	public StandardVariable copy() {
 		return new StandardVariable(this);
 	}
-	
+
 	public void print(int previousIndent) {
 		Debug.println(previousIndent, "Standard Variable: ");
 		int indent = previousIndent + 3;
-		Debug.println(indent, "term: " + term);
-		Debug.println(indent, "property: " + property);
-		Debug.println(indent, "method " + method);
-		Debug.println(indent, "scale: " + scale);
-        Debug.println(indent, "storedIn: " + storedIn);
-        Debug.println(indent, "dataType: " + dataType);
-		Debug.println(indent, "isA: " + isA);
-		Debug.println(indent, "phenotypicType: " + phenotypicType);
-		if (constraints != null) {
-	        Debug.println(indent, "constraints: ");
-			constraints.print(indent + 3);
+		Debug.println(indent, "term: " + this.term);
+		Debug.println(indent, "property: " + this.property);
+		Debug.println(indent, "method " + this.method);
+		Debug.println(indent, "scale: " + this.scale);
+		Debug.println(indent, "storedIn: " + this.storedIn);
+		Debug.println(indent, "dataType: " + this.dataType);
+		Debug.println(indent, "isA: " + this.isA);
+		Debug.println(indent, "phenotypicType: " + this.phenotypicType);
+		if (this.constraints != null) {
+			Debug.println(indent, "constraints: ");
+			this.constraints.print(indent + 3);
 		}
-		if (enumerations != null) {
-			Debug.println(indent, "enumerations: " + enumerations);
+		if (this.enumerations != null) {
+			Debug.println(indent, "enumerations: " + this.enumerations);
 		}
 	}
-	
+
+	@Override
 	public int hashCode() {
-		return term.getId();
+		return this.term.getId();
 	}
-	
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
-            return false;
-        }
+			return false;
+		}
 		if (obj instanceof StandardVariable) {
 			StandardVariable other = (StandardVariable) obj;
-			return other.getId() == getId();
-        }
+			return other.getId() == this.getId();
+		}
 		return false;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("StandardVariable [");
 		builder.append("term=");
-		builder.append(term);
+		builder.append(this.term);
 		builder.append(", property=");
-		builder.append(property);
+		builder.append(this.property);
 		builder.append(", scale=");
-		builder.append(scale);
+		builder.append(this.scale);
 		builder.append(", method=");
-		builder.append(method);
+		builder.append(this.method);
 		builder.append(", dataType=");
-		builder.append(dataType);
+		builder.append(this.dataType);
 		builder.append(", storedIn=");
-		builder.append(storedIn);
+		builder.append(this.storedIn);
 		builder.append(", isA=");
-		builder.append(isA);
+		builder.append(this.isA);
 		builder.append(", phenotypicType=");
-		builder.append(phenotypicType);
+		builder.append(this.phenotypicType);
 		builder.append(", constraints=");
-		builder.append(constraints);
-		if (enumerations != null) {
+		builder.append(this.constraints);
+		if (this.enumerations != null) {
 			builder.append(", enumerations=");
-		    builder.append(enumerations);
+			builder.append(this.enumerations);
 		}
-        builder.append(", cropOntologyId=");
-        builder.append(cropOntologyId);
+		builder.append(", cropOntologyId=");
+		builder.append(this.cropOntologyId);
 		builder.append("]");
 		return builder.toString();
 	}
 
 	public Term getIsA() {
-		return isA;
+		return this.isA;
 	}
 
 	public void setIsA(Term isA) {
@@ -333,7 +332,7 @@ public class StandardVariable implements Serializable{
 	 * @return the overridenEnumerations
 	 */
 	public Map<Integer, Integer> getOverridenEnumerations() {
-		return overridenEnumerations;
+		return this.overridenEnumerations;
 	}
 
 	/**
@@ -344,26 +343,25 @@ public class StandardVariable implements Serializable{
 	}
 
 	public boolean isNumeric() {
-		if(dataType!=null && dataType.getId() == TermId.NUMERIC_VARIABLE.getId()) {
-			return true; 
-		} else if(isNumericCategoricalVariate()) {
+		if (this.dataType != null && this.dataType.getId() == TermId.NUMERIC_VARIABLE.getId()) {
+			return true;
+		} else if (this.isNumericCategoricalVariate()) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean isNumericCategoricalVariate() {
-		if(storedIn!=null && storedIn.getId() == TermId.CATEGORICAL_VARIATE.getId() && 
-			enumerations!=null &&!enumerations.isEmpty()) {
-			for (Enumeration enumeration : enumerations){
-	            if (enumeration.getName()==null || !NumberUtils.isNumber(enumeration.getName().trim())){
-	                return false;
-	            }
-	        }
+		if (this.storedIn != null && this.storedIn.getId() == TermId.CATEGORICAL_VARIATE.getId() && this.enumerations != null
+				&& !this.enumerations.isEmpty()) {
+			for (Enumeration enumeration : this.enumerations) {
+				if (enumeration.getName() == null || !NumberUtils.isNumber(enumeration.getName().trim())) {
+					return false;
+				}
+			}
 			return true;
 		}
 		return false;
 	}
-	
-	
+
 }

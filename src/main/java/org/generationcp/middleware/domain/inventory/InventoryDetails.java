@@ -1,77 +1,76 @@
 /*******************************************************************************
  * Copyright (c) 2014, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.inventory;
+
+import java.io.Serializable;
 
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.util.Util;
 
-import java.io.Serializable;
-
 /**
  * Row in Seed Inventory System that shows the details of ims_lot/transaction.
- * 
+ *
  * @author Joyce Avestro
  *
  */
-public class InventoryDetails implements Comparable<InventoryDetails>, Serializable{
-	
+public class InventoryDetails implements Comparable<InventoryDetails>, Serializable {
+
 	private static final long serialVersionUID = 1L;
 	public static final String BULK_COMPL_Y = "Y";
 	public static final String BULK_COMPL_COMPLETED = "Completed";
 
 	/** The index. */
 	Integer index;
-	
+
 	/** The gid. */
 	Integer gid;
-	
+
 	/** The germplasm name. */
 	String germplasmName;
-	
+
 	/** The lot id. */
 	Integer lotId;
-	
+
 	/** The location id. */
 	Integer locationId;
-	
+
 	/** The location name. */
 	String locationName;
 
 	String locationAbbr;
-	
+
 	/** The user id. */
 	Integer userId;
-	
+
 	/** The user name. */
 	String userName;
-	
+
 	/** The amount. */
 	Double amount;
-	
+
 	/** The source id. */
-	//ims_transaction.source_id
-	Integer sourceId;	
-	
+	// ims_transaction.source_id
+	Integer sourceId;
+
 	/** The source name. */
 	// if list, listnms.listname
-	String sourceName;  
-	
+	String sourceName;
+
 	/** The scale id. */
 	Integer scaleId;
-	
+
 	/** The scale name. */
 	String scaleName;
-	
-	
+
 	String comment;
 
 	// listdata.grpname
@@ -88,27 +87,27 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	/** The ff. fields are from seed inventory import */
 	private String entryCode;
 	private String cross;
-	
+
 	/** The ff. fields are used for export inventory template for stock list */
 	private String duplicate;
 	private String bulkWith;
 	private String bulkCompl;
-	
+
 	/** The ff. fields are used for importing inventory for stock list */
 	private Integer listDataProjectId;
 	private Integer trnId;
-	
+
 	/** This is used for executing bulking instructions */
 	private Integer sourceRecordId;
 	private Integer lotGid;
 	private Integer stockSourceRecordId;
-	
+
 	/**
 	 * Instantiates a new inventory details.
 	 */
 	public InventoryDetails() {
 	}
-	
+
 	/**
 	 * Instantiates a new inventory details.
 	 *
@@ -124,10 +123,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @param scaleId the scale id
 	 * @param scaleName the scale name
 	 */
-	public InventoryDetails(Integer gid, String germplasmName, Integer lotId,
-			Integer locationId, String locationName, Integer userId,
-			Double amount, Integer sourceId, String sourceName,
-			Integer scaleId, String scaleName, String comment) {
+	public InventoryDetails(Integer gid, String germplasmName, Integer lotId, Integer locationId, String locationName, Integer userId,
+			Double amount, Integer sourceId, String sourceName, Integer scaleId, String scaleName, String comment) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.lotId = lotId;
@@ -142,8 +139,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.comment = comment;
 	}
 
-	public InventoryDetails(Integer gid, String germplasmName, Integer locationId,
-			Integer userId, Double amount, Integer sourceId, Integer scaleId, Integer entryId) {
+	public InventoryDetails(Integer gid, String germplasmName, Integer locationId, Integer userId, Double amount, Integer sourceId,
+			Integer scaleId, Integer entryId) {
 		this.gid = gid;
 		this.germplasmName = germplasmName;
 		this.locationId = locationId;
@@ -154,7 +151,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.entryId = entryId;
 	}
 
-	public InventoryDetails(Integer entryId,String desig,Integer gid,String cross,String source,String entryCode,String stockId,Double seedQuantity) {
+	public InventoryDetails(Integer entryId, String desig, Integer gid, String cross, String source, String entryCode, String stockId,
+			Double seedQuantity) {
 		this.entryId = entryId;
 		this.germplasmName = desig;
 		this.gid = gid;
@@ -165,24 +163,20 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.amount = seedQuantity;
 	}
 
-
-
-
 	/**
 	 * Gets the gid.
 	 *
 	 * @return the gid
 	 */
 	public Integer getGid() {
-		if(isBulkingDonor()) {
+		if (this.isBulkingDonor()) {
 			return null;
 		}
-		return gid;
+		return this.gid;
 	}
 
 	public boolean isBulkingDonor() {
-		return isBulkingCompleted() &&
-				!sourceRecordId.equals(stockSourceRecordId);
+		return this.isBulkingCompleted() && !this.sourceRecordId.equals(this.stockSourceRecordId);
 	}
 
 	/**
@@ -200,10 +194,10 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the germplasm name
 	 */
 	public String getGermplasmName() {
-		if(isBulkingDonor()) {
+		if (this.isBulkingDonor()) {
 			return null;
 		}
-		return germplasmName;
+		return this.germplasmName;
 	}
 
 	/**
@@ -221,7 +215,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the lot id
 	 */
 	public Integer getLotId() {
-		return lotId;
+		return this.lotId;
 	}
 
 	/**
@@ -239,7 +233,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the location id
 	 */
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	/**
@@ -257,7 +251,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the location name
 	 */
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	/**
@@ -275,7 +269,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the user id
 	 */
 	public Integer getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	/**
@@ -293,7 +287,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the amount
 	 */
 	public Double getAmount() {
-		return amount;
+		return this.amount;
 	}
 
 	/**
@@ -311,7 +305,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the source id
 	 */
 	public Integer getSourceId() {
-		return sourceId;
+		return this.sourceId;
 	}
 
 	/**
@@ -329,7 +323,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the source name
 	 */
 	public String getSourceName() {
-		return sourceName;
+		return this.sourceName;
 	}
 
 	/**
@@ -347,7 +341,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the scale id
 	 */
 	public Integer getScaleId() {
-		return scaleId;
+		return this.scaleId;
 	}
 
 	/**
@@ -365,7 +359,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the scale name
 	 */
 	public String getScaleName() {
-		return scaleName;
+		return this.scaleName;
 	}
 
 	/**
@@ -383,7 +377,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the index
 	 */
 	public Integer getIndex() {
-		return index;
+		return this.index;
 	}
 
 	/**
@@ -401,7 +395,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	 * @return the user name
 	 */
 	public String getUserName() {
-		return userName;
+		return this.userName;
 	}
 
 	/**
@@ -413,9 +407,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.userName = userName;
 	}
 
-
 	public String getComment() {
-		return comment;
+		return this.comment;
 	}
 
 	public void setComment(String comment) {
@@ -423,7 +416,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getParentage() {
-		return parentage;
+		return this.parentage;
 	}
 
 	public void setParentage(String parentage) {
@@ -431,7 +424,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public Integer getEntryId() {
-		return entryId;
+		return this.entryId;
 	}
 
 	public void setEntryId(Integer entryId) {
@@ -439,7 +432,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getSource() {
-		return source;
+		return this.source;
 	}
 
 	public void setSource(String source) {
@@ -447,7 +440,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getLocationAbbr() {
-		return locationAbbr;
+		return this.locationAbbr;
 	}
 
 	public void setLocationAbbr(String locationAbbr) {
@@ -458,228 +451,219 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
-		result = prime * result + ((comment == null) ? 0 : comment.hashCode());
-		result = prime * result + ((entryId == null) ? 0 : entryId.hashCode());
-		result = prime * result
-				+ ((germplasmName == null) ? 0 : germplasmName.hashCode());
-		result = prime * result + ((gid == null) ? 0 : gid.hashCode());
-		result = prime * result + ((index == null) ? 0 : index.hashCode());
-		result = prime * result
-				+ ((locationId == null) ? 0 : locationId.hashCode());
-		result = prime * result
-				+ ((locationName == null) ? 0 : locationName.hashCode());
-		result = prime * result + ((lotId == null) ? 0 : lotId.hashCode());
-		result = prime * result
-				+ ((parentage == null) ? 0 : parentage.hashCode());
-		result = prime * result + ((scaleId == null) ? 0 : scaleId.hashCode());
-		result = prime * result
-				+ ((scaleName == null) ? 0 : scaleName.hashCode());
-		result = prime * result + ((source == null) ? 0 : source.hashCode());
-		result = prime * result
-				+ ((sourceId == null) ? 0 : sourceId.hashCode());
-		result = prime * result
-				+ ((sourceName == null) ? 0 : sourceName.hashCode());
-		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
-		result = prime * result
-				+ ((userName == null) ? 0 : userName.hashCode());
+		result = prime * result + (this.amount == null ? 0 : this.amount.hashCode());
+		result = prime * result + (this.comment == null ? 0 : this.comment.hashCode());
+		result = prime * result + (this.entryId == null ? 0 : this.entryId.hashCode());
+		result = prime * result + (this.germplasmName == null ? 0 : this.germplasmName.hashCode());
+		result = prime * result + (this.gid == null ? 0 : this.gid.hashCode());
+		result = prime * result + (this.index == null ? 0 : this.index.hashCode());
+		result = prime * result + (this.locationId == null ? 0 : this.locationId.hashCode());
+		result = prime * result + (this.locationName == null ? 0 : this.locationName.hashCode());
+		result = prime * result + (this.lotId == null ? 0 : this.lotId.hashCode());
+		result = prime * result + (this.parentage == null ? 0 : this.parentage.hashCode());
+		result = prime * result + (this.scaleId == null ? 0 : this.scaleId.hashCode());
+		result = prime * result + (this.scaleName == null ? 0 : this.scaleName.hashCode());
+		result = prime * result + (this.source == null ? 0 : this.source.hashCode());
+		result = prime * result + (this.sourceId == null ? 0 : this.sourceId.hashCode());
+		result = prime * result + (this.sourceName == null ? 0 : this.sourceName.hashCode());
+		result = prime * result + (this.userId == null ? 0 : this.userId.hashCode());
+		result = prime * result + (this.userName == null ? 0 : this.userName.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		InventoryDetails other = (InventoryDetails) obj;
-		if (amount == null) {
+		if (this.amount == null) {
 			if (other.amount != null) {
-                return false;
-            }
-		} else if (!amount.equals(other.amount)) {
-            return false;
-        }
-		if (comment == null) {
+				return false;
+			}
+		} else if (!this.amount.equals(other.amount)) {
+			return false;
+		}
+		if (this.comment == null) {
 			if (other.comment != null) {
-                return false;
-            }
-		} else if (!comment.equals(other.comment)) {
-            return false;
-        }
-		if (entryId == null) {
+				return false;
+			}
+		} else if (!this.comment.equals(other.comment)) {
+			return false;
+		}
+		if (this.entryId == null) {
 			if (other.entryId != null) {
-                return false;
-            }
-		} else if (!entryId.equals(other.entryId)) {
-            return false;
-        }
-		if (germplasmName == null) {
+				return false;
+			}
+		} else if (!this.entryId.equals(other.entryId)) {
+			return false;
+		}
+		if (this.germplasmName == null) {
 			if (other.germplasmName != null) {
-                return false;
-            }
-		} else if (!germplasmName.equals(other.germplasmName)) {
-            return false;
-        }
-		if (gid == null) {
+				return false;
+			}
+		} else if (!this.germplasmName.equals(other.germplasmName)) {
+			return false;
+		}
+		if (this.gid == null) {
 			if (other.gid != null) {
-                return false;
-            }
-		} else if (!gid.equals(other.gid)) {
-            return false;
-        }
-		if (index == null) {
+				return false;
+			}
+		} else if (!this.gid.equals(other.gid)) {
+			return false;
+		}
+		if (this.index == null) {
 			if (other.index != null) {
-                return false;
-            }
-		} else if (!index.equals(other.index)) {
-            return false;
-        }
-		if (locationId == null) {
+				return false;
+			}
+		} else if (!this.index.equals(other.index)) {
+			return false;
+		}
+		if (this.locationId == null) {
 			if (other.locationId != null) {
-                return false;
-            }
-		} else if (!locationId.equals(other.locationId)) {
-            return false;
-        }
-		if (locationName == null) {
+				return false;
+			}
+		} else if (!this.locationId.equals(other.locationId)) {
+			return false;
+		}
+		if (this.locationName == null) {
 			if (other.locationName != null) {
-                return false;
-            }
-		} else if (!locationName.equals(other.locationName)) {
-            return false;
-        }
-		if (lotId == null) {
+				return false;
+			}
+		} else if (!this.locationName.equals(other.locationName)) {
+			return false;
+		}
+		if (this.lotId == null) {
 			if (other.lotId != null) {
-                return false;
-            }
-		} else if (!lotId.equals(other.lotId)) {
-            return false;
-        }
-		if (parentage == null) {
+				return false;
+			}
+		} else if (!this.lotId.equals(other.lotId)) {
+			return false;
+		}
+		if (this.parentage == null) {
 			if (other.parentage != null) {
-                return false;
-            }
-		} else if (!parentage.equals(other.parentage)) {
-            return false;
-        }
-		if (scaleId == null) {
+				return false;
+			}
+		} else if (!this.parentage.equals(other.parentage)) {
+			return false;
+		}
+		if (this.scaleId == null) {
 			if (other.scaleId != null) {
-                return false;
-            }
-		} else if (!scaleId.equals(other.scaleId)) {
-            return false;
-        }
-		if (scaleName == null) {
+				return false;
+			}
+		} else if (!this.scaleId.equals(other.scaleId)) {
+			return false;
+		}
+		if (this.scaleName == null) {
 			if (other.scaleName != null) {
-                return false;
-            }
-		} else if (!scaleName.equals(other.scaleName)) {
-            return false;
-        }
-		if (source == null) {
+				return false;
+			}
+		} else if (!this.scaleName.equals(other.scaleName)) {
+			return false;
+		}
+		if (this.source == null) {
 			if (other.source != null) {
-                return false;
-            }
-		} else if (!source.equals(other.source)) {
-            return false;
-        }
-		if (sourceId == null) {
+				return false;
+			}
+		} else if (!this.source.equals(other.source)) {
+			return false;
+		}
+		if (this.sourceId == null) {
 			if (other.sourceId != null) {
-                return false;
-            }
-		} else if (!sourceId.equals(other.sourceId)) {
-            return false;
-        }
-		if (sourceName == null) {
+				return false;
+			}
+		} else if (!this.sourceId.equals(other.sourceId)) {
+			return false;
+		}
+		if (this.sourceName == null) {
 			if (other.sourceName != null) {
-                return false;
-            }
-		} else if (!sourceName.equals(other.sourceName)) {
-            return false;
-        }
-		if (userId == null) {
+				return false;
+			}
+		} else if (!this.sourceName.equals(other.sourceName)) {
+			return false;
+		}
+		if (this.userId == null) {
 			if (other.userId != null) {
-                return false;
-            }
-		} else if (!userId.equals(other.userId)) {
-            return false;
-        }
-		if (userName == null) {
+				return false;
+			}
+		} else if (!this.userId.equals(other.userId)) {
+			return false;
+		}
+		if (this.userName == null) {
 			if (other.userName != null) {
-                return false;
-            }
-		} else if (!userName.equals(other.userName)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.userName.equals(other.userName)) {
+			return false;
+		}
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("InventoryDetails [index=");
-		builder.append(index);
+		builder.append(this.index);
 		builder.append(", gid=");
-		builder.append(gid);
+		builder.append(this.gid);
 		builder.append(", germplasmName=");
-		builder.append(germplasmName);
+		builder.append(this.germplasmName);
 		builder.append(", lotId=");
-		builder.append(lotId);
+		builder.append(this.lotId);
 		builder.append(", locationId=");
-		builder.append(locationId);
+		builder.append(this.locationId);
 		builder.append(", locationName=");
-		builder.append(locationName);
+		builder.append(this.locationName);
 		builder.append(", userId=");
-		builder.append(userId);
+		builder.append(this.userId);
 		builder.append(", userName=");
-		builder.append(userName);
+		builder.append(this.userName);
 		builder.append(", amount=");
-		builder.append(amount);
+		builder.append(this.amount);
 		builder.append(", sourceId=");
-		builder.append(sourceId);
+		builder.append(this.sourceId);
 		builder.append(", sourceName=");
-		builder.append(sourceName);
+		builder.append(this.sourceName);
 		builder.append(", scaleId=");
-		builder.append(scaleId);
+		builder.append(this.scaleId);
 		builder.append(", scaleName=");
-		builder.append(scaleName);
+		builder.append(this.scaleName);
 		builder.append(", comment=");
-		builder.append(comment);
+		builder.append(this.comment);
 		builder.append(", parentage=");
-		builder.append(parentage);
+		builder.append(this.parentage);
 		builder.append(", entryId=");
-		builder.append(entryId);
+		builder.append(this.entryId);
 		builder.append(", source=");
-		builder.append(source);
+		builder.append(this.source);
 		builder.append("]");
 		return builder.toString();
 	}
 
 	@Override
 	public int compareTo(InventoryDetails o) {
-        if (this.gid != null && o != null) {
+		if (this.gid != null && o != null) {
 
-        	return this.entryId.compareTo(o.entryId);
-        }
-        return 0;
+			return this.entryId.compareTo(o.entryId);
+		}
+		return 0;
 	}
 
 	public String getInventoryID() {
-		if(isBulkingRecipient()) {
-			return Util.prependToCSVAndArrange(inventoryID,bulkWith);
+		if (this.isBulkingRecipient()) {
+			return Util.prependToCSVAndArrange(this.inventoryID, this.bulkWith);
 		}
-		return inventoryID;
+		return this.inventoryID;
 	}
 
 	public boolean isBulkingRecipient() {
-		return isBulkingCompleted() &&
-				sourceRecordId.equals(stockSourceRecordId);
+		return this.isBulkingCompleted() && this.sourceRecordId.equals(this.stockSourceRecordId);
 	}
 
 	public void setInventoryID(String inventoryID) {
@@ -687,7 +671,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getEntryCode() {
-		return entryCode;
+		return this.entryCode;
 	}
 
 	public void setEntryCode(String entryCode) {
@@ -695,24 +679,23 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getCross() {
-		return cross;
+		return this.cross;
 	}
 
 	public void setCross(String cross) {
 		this.cross = cross;
 	}
-	
-	
-	public void copyFromGermplasmListData(GermplasmListData datum){
+
+	public void copyFromGermplasmListData(GermplasmListData datum) {
 		this.gid = datum.getGid();
 		this.setGermplasmName(datum.getDesignation());
 		this.setEntryId(datum.getEntryId());
 		this.setParentage(datum.getGroupName());
 		this.setSource(datum.getSeedSource());
 	}
-	
+
 	public String getDuplicate() {
-		return duplicate;
+		return this.duplicate;
 	}
 
 	public void setDuplicate(String duplicate) {
@@ -720,7 +703,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getBulkWith() {
-		return bulkWith;
+		return this.bulkWith;
 	}
 
 	public void setBulkWith(String bulkWith) {
@@ -728,7 +711,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public String getBulkCompl() {
-		return bulkCompl;
+		return this.bulkCompl;
 	}
 
 	public void setBulkCompl(String bulkCompl) {
@@ -736,7 +719,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public Integer getListDataProjectId() {
-		return listDataProjectId;
+		return this.listDataProjectId;
 	}
 
 	public void setListDataProjectId(Integer listDataProjectId) {
@@ -744,7 +727,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public Integer getTrnId() {
-		return trnId;
+		return this.trnId;
 	}
 
 	public void setTrnId(Integer trnId) {
@@ -752,7 +735,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public Integer getSourceRecordId() {
-		return sourceRecordId;
+		return this.sourceRecordId;
 	}
 
 	public void setSourceRecordId(Integer sourceRecordId) {
@@ -760,7 +743,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	}
 
 	public Integer getLotGid() {
-		return lotGid;
+		return this.lotGid;
 	}
 
 	public void setLotGid(Integer lotGid) {
@@ -770,17 +753,17 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void addBulkWith(String bulkWith) {
 		if (this.bulkWith == null) {
 			this.bulkWith = bulkWith;
-		} else if (!this.bulkWith.equals(bulkWith) && ! this.bulkWith.contains(", " + bulkWith)) {
+		} else if (!this.bulkWith.equals(bulkWith) && !this.bulkWith.contains(", " + bulkWith)) {
 			this.bulkWith += ", " + bulkWith;
 		}
 	}
-	
+
 	public boolean isBulkingCompleted() {
-		return BULK_COMPL_COMPLETED.equals(bulkCompl);
+		return InventoryDetails.BULK_COMPL_COMPLETED.equals(this.bulkCompl);
 	}
 
 	public Integer getStockSourceRecordId() {
-		return stockSourceRecordId;
+		return this.stockSourceRecordId;
 	}
 
 	public void setStockSourceRecordId(Integer stockSourceRecordId) {

@@ -1,15 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.dao.oms;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -20,111 +23,110 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * DAO class for {@link CVTermProperty}.
- * 
+ *
  */
 public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 
-    @SuppressWarnings("unchecked")
-    public List<CVTermProperty> getByCvTermId(int cvTermId) throws MiddlewareQueryException {
-        List<CVTermProperty> properties = new ArrayList<>();
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("cvTermId", cvTermId));
-            properties = criteria.list();
-            
-        } catch(HibernateException e) {
-            logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
-        }
-        return properties;
-    }
+	@SuppressWarnings("unchecked")
+	public List<CVTermProperty> getByCvTermId(int cvTermId) throws MiddlewareQueryException {
+		List<CVTermProperty> properties = new ArrayList<>();
+		try {
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("cvTermId", cvTermId));
+			properties = criteria.list();
 
-    public List getByCvTermIds(List<Integer> cvTermIds) throws MiddlewareQueryException {
-        if(cvTermIds.isEmpty()){
-            return new ArrayList();
-        }
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass())
-                    .add(buildInCriterion("cvTermId", cvTermIds));
-            return criteria.list();
-        } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error at getByCvTermIds query on CVTermDao", e);
-        }
-    }
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
+		}
+		return properties;
+	}
 
-    public List getByCvId(Integer cvId) throws MiddlewareQueryException {
-        try {
+	public List getByCvTermIds(List<Integer> cvTermIds) throws MiddlewareQueryException {
+		if (cvTermIds.isEmpty()) {
+			return new ArrayList();
+		}
+		try {
+			Criteria criteria =
+					this.getSession().createCriteria(this.getPersistentClass()).add(GenericDAO.buildInCriterion("cvTermId", cvTermIds));
+			return criteria.list();
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getByCvTermIds query on CVTermDao", e);
+		}
+	}
 
-            Query query = getSession()
-                    .createSQLQuery("select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = " + cvId)
-                    .addEntity(CVTermProperty.class);
+	public List getByCvId(Integer cvId) throws MiddlewareQueryException {
+		try {
 
-            return query.list();
+			Query query =
+					this.getSession()
+							.createSQLQuery(
+									"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
+											+ cvId).addEntity(CVTermProperty.class);
 
-        } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error at getByCvId", e);
-        }
-    }
+			return query.list();
 
-    @SuppressWarnings("unchecked")
-    public List<CVTermProperty> getByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
-        List<CVTermProperty> properties = new ArrayList<>();
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("cvTermId", cvTermId));
-            criteria.add(Restrictions.eq("typeId", typeId));
-            properties = criteria.list();
-            
-        } catch(HibernateException e) {
-            logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
-        }
-        return properties;
-    }
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getByCvId", e);
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    public CVTermProperty getOneByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
-        CVTermProperty property = null;
-        try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("cvTermId", cvTermId));
-            criteria.add(Restrictions.eq("typeId", typeId));
-            List<CVTermProperty> properties = criteria.list();
-            if (properties != null && !properties.isEmpty()) {
-                property = properties.get(0);
-            }
-            
-        } catch(HibernateException e) {
-            logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
-        }
-        return property;
-    }
+	@SuppressWarnings("unchecked")
+	public List<CVTermProperty> getByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
+		List<CVTermProperty> properties = new ArrayList<>();
+		try {
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("cvTermId", cvTermId));
+			criteria.add(Restrictions.eq("typeId", typeId));
+			properties = criteria.list();
 
-    public boolean isTermHasProperties(int termId) throws MiddlewareQueryException {
-        try {
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
+		}
+		return properties;
+	}
 
-            SQLQuery query = getSession().createSQLQuery("SELECT value FROM cvtermprop where cvterm_id = :termId limit 1;");
-            query.setParameter("termId", termId);
-            List list = query.list();
-            return list.size() > 0;
-        } catch (HibernateException e) {
-            logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
-        }
-        return false;
-    }
+	@SuppressWarnings("unchecked")
+	public CVTermProperty getOneByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
+		CVTermProperty property = null;
+		try {
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("cvTermId", cvTermId));
+			criteria.add(Restrictions.eq("typeId", typeId));
+			List<CVTermProperty> properties = criteria.list();
+			if (properties != null && !properties.isEmpty()) {
+				property = properties.get(0);
+			}
 
-    public CVTermProperty save(Integer cvTermId, Integer typeId, String value, Integer rank) throws MiddlewareQueryException{
-        CVTermProperty property = getOneByCvTermAndType(cvTermId, typeId);
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
+		}
+		return property;
+	}
 
-        if(property == null) {
-            return save(new CVTermProperty(getNextId(CVTermProperty.ID_NAME), cvTermId, typeId, value, rank));
-        }
+	public boolean isTermHasProperties(int termId) throws MiddlewareQueryException {
+		try {
 
-        property.setValue(value);
-        property.setRank(rank);
-        return merge(property);
-    }
+			SQLQuery query = this.getSession().createSQLQuery("SELECT value FROM cvtermprop where cvterm_id = :termId limit 1;");
+			query.setParameter("termId", termId);
+			List list = query.list();
+			return list.size() > 0;
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
+		}
+		return false;
+	}
+
+	public CVTermProperty save(Integer cvTermId, Integer typeId, String value, Integer rank) throws MiddlewareQueryException {
+		CVTermProperty property = this.getOneByCvTermAndType(cvTermId, typeId);
+
+		if (property == null) {
+			return this.save(new CVTermProperty(this.getNextId(CVTermProperty.ID_NAME), cvTermId, typeId, value, rank));
+		}
+
+		property.setValue(value);
+		property.setRank(rank);
+		return this.merge(property);
+	}
 }

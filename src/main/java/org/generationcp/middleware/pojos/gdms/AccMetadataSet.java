@@ -1,55 +1,59 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * POJO for acc_metadataset table.
- * 
+ *
  * @author Joyce Avestro
- *  
+ * 
  */
 @Entity
 @Table(name = "gdms_acc_metadataset")
-public class AccMetadataSet implements Serializable{
+public class AccMetadataSet implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @Column(name = "acc_metadataset_id")
-    private Integer accMetadataSetId;
-    
-    @Basic(optional = false)
-    @Column(name = "dataset_id")
-    private Integer datasetId;
+	private static final long serialVersionUID = 1L;
 
-    @Basic(optional = false)
-    @Column(name = "gid")
-    private Integer germplasmId;
+	@Id
+	@Column(name = "acc_metadataset_id")
+	private Integer accMetadataSetId;
 
-    @Basic(optional = false)
-    @Column(name = "nid")
-    private Integer nameId;
-    
-    @Column(name = "acc_sample_id")
-    private Integer accSampleId;
+	@Basic(optional = false)
+	@Column(name = "dataset_id")
+	private Integer datasetId;
 
-    public AccMetadataSet() {
-    }
+	@Basic(optional = false)
+	@Column(name = "gid")
+	private Integer germplasmId;
 
-    public AccMetadataSet(Integer accMetadataSetId, Integer datasetId,
-			Integer germplasmId, Integer nameId, Integer sampleId) {
+	@Basic(optional = false)
+	@Column(name = "nid")
+	private Integer nameId;
+
+	@Column(name = "acc_sample_id")
+	private Integer accSampleId;
+
+	public AccMetadataSet() {
+	}
+
+	public AccMetadataSet(Integer accMetadataSetId, Integer datasetId, Integer germplasmId, Integer nameId, Integer sampleId) {
 		super();
 		this.accMetadataSetId = accMetadataSetId;
 		this.datasetId = datasetId;
@@ -59,7 +63,7 @@ public class AccMetadataSet implements Serializable{
 	}
 
 	public Integer getAccMetadataSetId() {
-		return accMetadataSetId;
+		return this.accMetadataSetId;
 	}
 
 	public void setAccMetadataSetId(Integer accMetadataSetId) {
@@ -67,7 +71,7 @@ public class AccMetadataSet implements Serializable{
 	}
 
 	public Integer getDatasetId() {
-		return datasetId;
+		return this.datasetId;
 	}
 
 	public void setDatasetId(Integer datasetId) {
@@ -75,7 +79,7 @@ public class AccMetadataSet implements Serializable{
 	}
 
 	public Integer getGermplasmId() {
-		return germplasmId;
+		return this.germplasmId;
 	}
 
 	public void setGermplasmId(Integer germplasmId) {
@@ -83,7 +87,7 @@ public class AccMetadataSet implements Serializable{
 	}
 
 	public Integer getNameId() {
-		return nameId;
+		return this.nameId;
 	}
 
 	public void setNameId(Integer nameId) {
@@ -91,7 +95,7 @@ public class AccMetadataSet implements Serializable{
 	}
 
 	public Integer getAccSampleId() {
-		return accSampleId;
+		return this.accSampleId;
 	}
 
 	public void setAccSampleId(Integer accSampleId) {
@@ -102,66 +106,61 @@ public class AccMetadataSet implements Serializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((accMetadataSetId == null) ? 0 : accMetadataSetId.hashCode());
-		result = prime * result
-				+ ((datasetId == null) ? 0 : datasetId.hashCode());
-		result = prime * result
-				+ ((germplasmId == null) ? 0 : germplasmId.hashCode());
-		result = prime * result + ((nameId == null) ? 0 : nameId.hashCode());
-		result = prime * result
-				+ ((accSampleId == null) ? 0 : accSampleId.hashCode());
+		result = prime * result + (this.accMetadataSetId == null ? 0 : this.accMetadataSetId.hashCode());
+		result = prime * result + (this.datasetId == null ? 0 : this.datasetId.hashCode());
+		result = prime * result + (this.germplasmId == null ? 0 : this.germplasmId.hashCode());
+		result = prime * result + (this.nameId == null ? 0 : this.nameId.hashCode());
+		result = prime * result + (this.accSampleId == null ? 0 : this.accSampleId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		AccMetadataSet other = (AccMetadataSet) obj;
-		if (accMetadataSetId == null) {
+		if (this.accMetadataSetId == null) {
 			if (other.accMetadataSetId != null) {
-                return false;
-            }
-		} else if (!accMetadataSetId.equals(other.accMetadataSetId)) {
-            return false;
-        }
-		if (datasetId == null) {
+				return false;
+			}
+		} else if (!this.accMetadataSetId.equals(other.accMetadataSetId)) {
+			return false;
+		}
+		if (this.datasetId == null) {
 			if (other.datasetId != null) {
-                return false;
-            }
-		} else if (!datasetId.equals(other.datasetId)) {
-            return false;
-        }
-		if (germplasmId == null) {
+				return false;
+			}
+		} else if (!this.datasetId.equals(other.datasetId)) {
+			return false;
+		}
+		if (this.germplasmId == null) {
 			if (other.germplasmId != null) {
-                return false;
-            }
-		} else if (!germplasmId.equals(other.germplasmId)) {
-            return false;
-        }
-		if (nameId == null) {
+				return false;
+			}
+		} else if (!this.germplasmId.equals(other.germplasmId)) {
+			return false;
+		}
+		if (this.nameId == null) {
 			if (other.nameId != null) {
-                return false;
-            }
-		} else if (!nameId.equals(other.nameId)) {
-            return false;
-        }
-		if (accSampleId == null) {
+				return false;
+			}
+		} else if (!this.nameId.equals(other.nameId)) {
+			return false;
+		}
+		if (this.accSampleId == null) {
 			if (other.accSampleId != null) {
-                return false;
-            }
-		} else if (!accSampleId.equals(other.accSampleId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.accSampleId.equals(other.accSampleId)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -169,15 +168,15 @@ public class AccMetadataSet implements Serializable{
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("AccMetadataSet [accMetadataSetId=");
-		builder.append(accMetadataSetId);
+		builder.append(this.accMetadataSetId);
 		builder.append(", datasetId=");
-		builder.append(datasetId);
+		builder.append(this.datasetId);
 		builder.append(", germplasmId=");
-		builder.append(germplasmId);
+		builder.append(this.germplasmId);
 		builder.append(", nameId=");
-		builder.append(nameId);
+		builder.append(this.nameId);
 		builder.append(", sampleId=");
-		builder.append(accSampleId);
+		builder.append(this.accSampleId);
 		builder.append("]");
 		return builder.toString();
 	}

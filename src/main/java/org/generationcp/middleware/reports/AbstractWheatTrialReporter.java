@@ -54,9 +54,9 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					params.put("LoCycle", var.getValue());
 					break;
 				case "TRIAL_INSTANCE":
-					if("".equalsIgnoreCase(var.getValue())){
+					if ("".equalsIgnoreCase(var.getValue())) {
 						params.put("occ", Integer.valueOf(0));
-					}else{
+					} else {
 						params.put("occ", Integer.valueOf(var.getValue()));
 					}
 					break;
@@ -108,7 +108,7 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					case "PLOT_NO":
 						entry.setPlot(Integer.valueOf(dataItem.getValue()));
 						break;
-					// TODO: pending mappings
+						// TODO: pending mappings
 					default:
 						entry.setS_ent(-99);
 						entry.setS_tabbr("???");

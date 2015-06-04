@@ -1,132 +1,129 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
 /**
- * The Class MarkerNameElement. Contains the pair germplasm id and marker name. 
- * Used in getting marker names by gid.
- * 
+ * The Class MarkerNameElement. Contains the pair germplasm id and marker name. Used in getting marker names by gid.
+ *
  * @author Joyce Avestro
  *
  */
-public class MarkerNameElement implements Serializable{
-        
-    private static final long serialVersionUID = 1L;
+public class MarkerNameElement implements Serializable {
 
-    private Integer gId;
-    
-    private Integer markerId;
-    
-    private String markerName;
-    
-    MarkerNameElement(){
-    }
-   
-    public MarkerNameElement(Integer gId, String markerName){
-        this.gId = gId;
-        this.markerName = markerName;              
-    }
+	private static final long serialVersionUID = 1L;
 
-    public MarkerNameElement(Integer gId, Integer markerId, String markerName){
-        this.gId = gId;
-        this.markerId = markerId;
-        this.markerName = markerName;              
-    }
+	private Integer gId;
 
-    public Integer getgId() {
-        return gId;
-    }
+	private Integer markerId;
 
-    public void setgId(Integer gId) {
-        this.gId = gId;
-    }
+	private String markerName;
 
-    public Integer getMarkerId() {
-        return markerId;
-    }
+	MarkerNameElement() {
+	}
 
-    public void setMarkerId(Integer markerId) {
-        this.markerId = markerId;
-    }
-   
-    public String getMarkerName() {
-        return markerName;
-    }
+	public MarkerNameElement(Integer gId, String markerName) {
+		this.gId = gId;
+		this.markerName = markerName;
+	}
 
-    public void setMarkerName(String markerName) {
-        this.markerName = markerName;
-    }
-   
-    @Override
+	public MarkerNameElement(Integer gId, Integer markerId, String markerName) {
+		this.gId = gId;
+		this.markerId = markerId;
+		this.markerName = markerName;
+	}
+
+	public Integer getgId() {
+		return this.gId;
+	}
+
+	public void setgId(Integer gId) {
+		this.gId = gId;
+	}
+
+	public Integer getMarkerId() {
+		return this.markerId;
+	}
+
+	public void setMarkerId(Integer markerId) {
+		this.markerId = markerId;
+	}
+
+	public String getMarkerName() {
+		return this.markerName;
+	}
+
+	public void setMarkerName(String markerName) {
+		this.markerName = markerName;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((gId == null) ? 0 : gId.hashCode());
-		result = prime * result
-				+ ((markerId == null) ? 0 : markerId.hashCode());
-		result = prime * result
-				+ ((markerName == null) ? 0 : markerName.hashCode());
+		result = prime * result + (this.gId == null ? 0 : this.gId.hashCode());
+		result = prime * result + (this.markerId == null ? 0 : this.markerId.hashCode());
+		result = prime * result + (this.markerName == null ? 0 : this.markerName.hashCode());
 		return result;
 	}
 
-    @Override
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		MarkerNameElement other = (MarkerNameElement) obj;
-		if (gId == null) {
+		if (this.gId == null) {
 			if (other.gId != null) {
-                return false;
-            }
-		} else if (!gId.equals(other.gId)) {
-            return false;
-        }
-		if (markerId == null) {
+				return false;
+			}
+		} else if (!this.gId.equals(other.gId)) {
+			return false;
+		}
+		if (this.markerId == null) {
 			if (other.markerId != null) {
-                return false;
-            }
-		} else if (!markerId.equals(other.markerId)) {
-            return false;
-        }
-		if (markerName == null) {
+				return false;
+			}
+		} else if (!this.markerId.equals(other.markerId)) {
+			return false;
+		}
+		if (this.markerName == null) {
 			if (other.markerName != null) {
-                return false;
-            }
-		} else if (!markerName.equals(other.markerName)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.markerName.equals(other.markerName)) {
+			return false;
+		}
 		return true;
 	}
 
-    @Override
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("MarkerNameElement [gId=");
-		builder.append(gId);
+		builder.append(this.gId);
 		builder.append(", markerId=");
-		builder.append(markerId);
+		builder.append(this.markerId);
 		builder.append(", markerName=");
-		builder.append(markerName);
+		builder.append(this.markerName);
 		builder.append("]");
 		return builder.toString();
 	}
-    
+
 }

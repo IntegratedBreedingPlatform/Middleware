@@ -1,23 +1,24 @@
-package org.generationcp.middleware.domain.dms;
 
-import org.generationcp.middleware.util.Debug;
+package org.generationcp.middleware.domain.dms;
 
 import java.util.Set;
 
+import org.generationcp.middleware.util.Debug;
+
 public class PhenotypeExceptionDto {
-	
+
 	private String localVariableName;
-	
+
 	private String standardVariableName;
-	
+
 	private Integer standardVariableId;
-	
+
 	private Set<String> validValues;
-	
+
 	private Set<String> invalidValues;
-	
+
 	public String getLocalVariableName() {
-		return localVariableName;
+		return this.localVariableName;
 	}
 
 	public void setLocalVariableName(String localVariableName) {
@@ -25,7 +26,7 @@ public class PhenotypeExceptionDto {
 	}
 
 	public String getStandardVariableName() {
-		return standardVariableName;
+		return this.standardVariableName;
 	}
 
 	public void setStandardVariableName(String standardVariableName) {
@@ -33,7 +34,7 @@ public class PhenotypeExceptionDto {
 	}
 
 	public Integer getStandardVariableId() {
-		return standardVariableId;
+		return this.standardVariableId;
 	}
 
 	public void setStandardVariableId(Integer standardVariableId) {
@@ -41,7 +42,7 @@ public class PhenotypeExceptionDto {
 	}
 
 	public Set<String> getValidValues() {
-		return validValues;
+		return this.validValues;
 	}
 
 	public void setValidValues(Set<String> validValues) {
@@ -49,7 +50,7 @@ public class PhenotypeExceptionDto {
 	}
 
 	public Set<String> getInvalidValues() {
-		return invalidValues;
+		return this.invalidValues;
 	}
 
 	public void setInvalidValues(Set<String> invalidValues) {
@@ -57,63 +58,60 @@ public class PhenotypeExceptionDto {
 	}
 
 	public void print(int indent) {
-		Debug.println(indent, "Phenotype:[localVariableName=" + localVariableName + 
-				", standardVariableName=" + standardVariableName + 
-				", standardVariableId=" + standardVariableId + 
-				", validValues =" + validValues!=null?validValues.toString():null +
-				", invalidValues =" + invalidValues!=null?invalidValues.toString():null + 
-				"]");
+		Debug.println(
+				indent,
+				"Phenotype:[localVariableName=" + this.localVariableName + ", standardVariableName=" + this.standardVariableName
+						+ ", standardVariableId=" + this.standardVariableId + ", validValues =" + this.validValues != null ? this.validValues
+						.toString() : null + ", invalidValues =" + this.invalidValues != null ? this.invalidValues.toString() : null + "]");
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((standardVariableId == null) ? 0 : standardVariableId.hashCode());
+		result = prime * result + (this.standardVariableId == null ? 0 : this.standardVariableId.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
-            return true;
-        }
+			return true;
+		}
 		if (obj == null) {
-            return false;
-        }
-		if (getClass() != obj.getClass()) {
-            return false;
-        }
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
 		PhenotypeExceptionDto other = (PhenotypeExceptionDto) obj;
-		if (standardVariableId == null) {
+		if (this.standardVariableId == null) {
 			if (other.standardVariableId != null) {
-                return false;
-            }
-		} else if (!standardVariableId.equals(other.standardVariableId)) {
-            return false;
-        }
+				return false;
+			}
+		} else if (!this.standardVariableId.equals(other.standardVariableId)) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(invalidValues!=null?invalidValues.toString():null);
+		builder.append(this.invalidValues != null ? this.invalidValues.toString() : null);
 		builder.append(" are not valid values of ");
-		builder.append(localVariableName);
+		builder.append(this.localVariableName);
 		builder.append(" (Standard Variable: ");
-		builder.append(standardVariableName);
+		builder.append(this.standardVariableName);
 		builder.append(") .");
-		if(validValues!=null) {
+		if (this.validValues != null) {
 			builder.append(" Valid values are ");
-			builder.append(validValues.toString());
+			builder.append(this.validValues.toString());
 			builder.append(".");
 		} else {
 			builder.append(" Valid values are not defined. Please update the variable using Manage Ontologies tool.");
 		}
 		return builder.toString();
 	}
-	
-	
 
 }

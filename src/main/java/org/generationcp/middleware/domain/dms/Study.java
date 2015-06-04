@@ -1,36 +1,36 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public
- * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
- * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
+
 package org.generationcp.middleware.domain.dms;
+
+import java.io.Serializable;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
-import java.io.Serializable;
-
-/** 
+/**
  * Contains the details of a study - id, conditions and constants.
  */
 
-public class Study implements Serializable{
+public class Study implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private int id;
-	
+
 	private VariableList conditions;
 
 	private VariableList constants;
-	
-	public Study(){
+
+	public Study() {
 	}
 
 	public Study(int id, VariableList conditions, VariableList constants) {
@@ -40,7 +40,7 @@ public class Study implements Serializable{
 	}
 
 	public int getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(int id) {
@@ -48,148 +48,145 @@ public class Study implements Serializable{
 	}
 
 	public String getName() {
-		return getDisplayValue(TermId.STUDY_NAME);
+		return this.getDisplayValue(TermId.STUDY_NAME);
 	}
 
 	public String getTitle() {
-		return getDisplayValue(TermId.STUDY_TITLE);
+		return this.getDisplayValue(TermId.STUDY_TITLE);
 	}
 
 	public String getObjective() {
-		return getDisplayValue(TermId.STUDY_OBJECTIVE);
+		return this.getDisplayValue(TermId.STUDY_OBJECTIVE);
 	}
-	
+
 	public Integer getPrimaryInvestigator() {
-		return getDisplayValueAsInt(TermId.PI_ID);
+		return this.getDisplayValueAsInt(TermId.PI_ID);
 	}
 
 	public String getType() {
-		return getDisplayValue(TermId.STUDY_TYPE);
+		return this.getDisplayValue(TermId.STUDY_TYPE);
 	}
 
 	public Integer getStartDate() {
-		return getDisplayValueAsInt(TermId.START_DATE);
+		return this.getDisplayValueAsInt(TermId.START_DATE);
 	}
 
 	public Integer getEndDate() {
-		return getDisplayValueAsInt(TermId.END_DATE);
+		return this.getDisplayValueAsInt(TermId.END_DATE);
 	}
 
 	public Integer getUser() {
-		return getDisplayValueAsInt(TermId.STUDY_UID);
+		return this.getDisplayValueAsInt(TermId.STUDY_UID);
 	}
 
 	public Integer getStatus() {
-		return getDisplayValueAsInt(TermId.STUDY_STATUS);
+		return this.getDisplayValueAsInt(TermId.STUDY_STATUS);
 	}
 
 	public Integer getCreationDate() {
-		return getDisplayValueAsInt(TermId.CREATION_DATE);
+		return this.getDisplayValueAsInt(TermId.CREATION_DATE);
 	}
-	
+
 	public String getDisplayValue(TermId termId) {
 		String value = null;
-		Variable variable = conditions.findById(termId);
+		Variable variable = this.conditions.findById(termId);
 		if (variable == null) {
-			variable = constants.findById(termId);
+			variable = this.constants.findById(termId);
 		}
 		if (variable != null) {
 			value = variable.getActualValue();
 		}
 		return value;
 	}
-	
+
 	public Integer getDisplayValueAsInt(TermId termId) {
 		Integer value = null;
-		String strValue = getDisplayValue(termId);
+		String strValue = this.getDisplayValue(termId);
 		if (strValue != null && !"".equals(strValue)) {
 			value = Integer.parseInt(strValue);
 		}
 		return value;
 	}
-	
+
 	public VariableList getConditions() {
-		return conditions.sort();
+		return this.conditions.sort();
 	}
 
 	public void setConditions(VariableList conditions) {
 		this.conditions = conditions;
 	}
 
-
 	public VariableTypeList getConditionVariableTypes() {
-		return conditions.getVariableTypes().sort();
+		return this.conditions.getVariableTypes().sort();
 	}
 
 	public VariableList getConstants() {
-		return constants.sort();
+		return this.constants.sort();
 	}
 
 	public void setConstants(VariableList constants) {
 		this.constants = constants;
 	}
-	
+
 	public VariableTypeList getConstantVariableTypes() {
-		return constants.getVariableTypes().sort();
+		return this.constants.getVariableTypes().sort();
 	}
-	
+
 	public void print(int indent) {
 		Debug.println(indent, "Study: ");
-		Debug.println(indent + 3, "Id: " + getId());
-		Debug.println(indent + 3, "Name: " + getName());
-	    Debug.println(indent + 3, "Title: " + getTitle());
-	    
-	    Debug.println(indent + 3, "Conditions: ");
-	    for (Variable condition : conditions.getVariables()) {
-	    	condition.print(indent + 6);
-	    }
+		Debug.println(indent + 3, "Id: " + this.getId());
+		Debug.println(indent + 3, "Name: " + this.getName());
+		Debug.println(indent + 3, "Title: " + this.getTitle());
 
-	    Debug.println(indent + 3, "Constants: ");
-	    for (Variable constant : constants.getVariables()) {
-	    	constant.print(indent + 6);
-	    }
+		Debug.println(indent + 3, "Conditions: ");
+		for (Variable condition : this.conditions.getVariables()) {
+			condition.print(indent + 6);
+		}
+
+		Debug.println(indent + 3, "Constants: ");
+		for (Variable constant : this.constants.getVariables()) {
+			constant.print(indent + 6);
+		}
 	}
-	
-	@Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((conditions == null) ? 0 : conditions.hashCode());
-        result = prime * result
-                + ((constants == null) ? 0 : constants.hashCode());
-        result = prime * result + id;
-        return result;
-    }
 
 	@Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Study)) {
-            return false;
-        }
-        Study other = (Study) obj;
-        return getId() == other.getId();
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (this.conditions == null ? 0 : this.conditions.hashCode());
+		result = prime * result + (this.constants == null ? 0 : this.constants.hashCode());
+		result = prime * result + this.id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Study)) {
+			return false;
+		}
+		Study other = (Study) obj;
+		return this.getId() == other.getId();
+	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Study [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", conditions=");
-		builder.append(conditions);
+		builder.append(this.conditions);
 		builder.append(", constants=");
-		builder.append(constants);
+		builder.append(this.constants);
 		builder.append("]");
 		return builder.toString();
 	}
 
 	public VariableTypeList getVariableTypesByPhenotypicType(PhenotypicType pheotypicType) {
 		VariableTypeList filteredFactors = new VariableTypeList();
-		VariableTypeList factors = getConditionVariableTypes();
+		VariableTypeList factors = this.getConditionVariableTypes();
 		if (factors != null && factors.getVariableTypes() != null) {
 			for (VariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getPhenotypicType() == pheotypicType) {
