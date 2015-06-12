@@ -548,4 +548,11 @@ public interface GermplasmListManager {
 	List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID) throws MiddlewareQueryException;
 
 	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID) throws MiddlewareQueryException;
+
+	/***
+	 * 
+	 * @param listRef
+	 * @return
+	 */
+	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef) throws MiddlewareQueryException;
 }

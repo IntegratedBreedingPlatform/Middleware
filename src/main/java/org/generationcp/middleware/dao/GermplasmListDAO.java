@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -430,5 +431,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 
 		return 0;
+	}
+
+	public GermplasmList getByListRef(Integer listRef) {
+		Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+		criteria.add(Restrictions.eq("listRef", listRef));
+		return (GermplasmList) criteria.uniqueResult();
 	}
 }
