@@ -779,6 +779,13 @@ public interface GermplasmDataManager {
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType) throws MiddlewareQueryException;
 
 	/**
+	 * Return the UserDefinedField using local field no
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	UserDefinedField getUserDefinedFieldByLocalFieldNo(Integer lfldno) throws MiddlewareQueryException;
+	
+	/**
 	 * Please use LocationDataManager.getCountryById().
 	 * 
 	 * Returns the country record identified by the given id.

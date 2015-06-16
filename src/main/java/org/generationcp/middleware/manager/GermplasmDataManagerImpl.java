@@ -704,6 +704,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException {
 		return this.getUserDefinedFieldDao().getById(id, false);
 	}
+	
+
+	@Override
+	public UserDefinedField getUserDefinedFieldByLocalFieldNo(Integer lfldno) throws MiddlewareQueryException {
+		return this.getUserDefinedFieldDao().getByLocalFieldNo(lfldno);
+	}
 
 	@Override
 	@Deprecated

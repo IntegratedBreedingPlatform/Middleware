@@ -85,4 +85,10 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 		return new HashMap<String, Integer>();
 	}
+
+	public UserDefinedField getByLocalFieldNo(Integer lfldno) {
+		Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+		criteria.add(Restrictions.eq("lfldno", lfldno));
+		return (UserDefinedField) criteria.uniqueResult();
+	}
 }
