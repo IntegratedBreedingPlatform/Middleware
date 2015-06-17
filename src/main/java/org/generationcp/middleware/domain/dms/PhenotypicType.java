@@ -3,7 +3,9 @@ package org.generationcp.middleware.domain.dms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
@@ -30,6 +32,17 @@ public enum PhenotypicType {
 	private List<String> labelList;
 	private String group;
 
+	private static final Map<String, PhenotypicType> byName = new HashMap<>();
+
+	static {
+		for (PhenotypicType e : PhenotypicType.values()) {
+			
+			if (PhenotypicType.byName.put(e.name(), e) != null) {
+				throw new IllegalArgumentException("duplicate name: " + e.toString());
+			}
+		}
+	}
+	
 	private PhenotypicType(List<Integer> typeStorages, List<String> labelList, String group) {
 		this.typeStorages = typeStorages;
 		this.labelList = labelList;
@@ -47,7 +60,10 @@ public enum PhenotypicType {
 	public String getGroup() {
 		return this.group;
 	}
+	public static PhenotypicType getPhenotypicTypeByName(String name) {
 
+		return PhenotypicType.byName.get(name);
+	}
 	public static PhenotypicType getPhenotypicTypeForLabel(String label) {
 
 		return PhenotypicType.getPhenotypicTypeForLabel(label, false);

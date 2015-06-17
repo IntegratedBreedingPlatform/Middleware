@@ -13,6 +13,7 @@ package org.generationcp.middleware.domain.etl;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
@@ -57,6 +58,8 @@ public class MeasurementVariable {
 	private String treatmentLabel;
 
 	private Operation operation;
+	
+	private PhenotypicType role;
 
 	public MeasurementVariable() {
 	}
@@ -73,6 +76,20 @@ public class MeasurementVariable {
 		this.label = label;
 		this.required = false;
 	}
+	
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, PhenotypicType role) {
+		this.name = name;
+		this.description = description;
+		this.scale = scale;
+		this.method = method;
+		this.property = property;
+		this.dataType = dataType;
+		this.value = value;
+		this.label = label;
+		this.required = false;
+		this.role = role;
+	}
 
 	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
 			String value, String label) {
@@ -86,11 +103,25 @@ public class MeasurementVariable {
 		this.minRange = minRange;
 		this.maxRange = maxRange;
 	}
+	
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+		this(name, description, scale, method, property, dataType, value, label, role);
+		this.minRange = minRange;
+		this.maxRange = maxRange;
+	}
 
 	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
 			String value, String label, Double minRange, Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange);
 		this.termId = termId;
+	}
+	
+	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange, role);
+		this.termId = termId;
+		
 	}
 
 	public int getTermId() {
@@ -318,6 +349,16 @@ public class MeasurementVariable {
 
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
+	}
+	
+	
+	public PhenotypicType getRole() {
+		return role;
+	}
+
+	
+	public void setRole(PhenotypicType role) {
+		this.role = role;
 	}
 
 	/**
