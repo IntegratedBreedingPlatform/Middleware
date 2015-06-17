@@ -16,7 +16,8 @@ public enum VariableType {
 			"Administrative details to be tracked per environment."), SELECTION_METHOD(7, "Selection Method",
 			"How material is chosen for advancing to the next generation."), TRAIT(8, "Trait",
 			"Characteristics of a germplasm to be recorded during a study."), TREATMENT_FACTOR(9, "Treatment Factor",
-			"Treatments to be applied to members of a trial.");
+			"Treatments to be applied to members of a trial."), EXPERIMENTAL_DESIGN(10, "Experimental Design",
+			"Design to be applied to experiments.");
 
 	private Integer id;
 	private String name;
