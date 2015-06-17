@@ -31,6 +31,8 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 	private StandardVariable standardVariable;
 
 	private String treatmentLabel;
+	
+	private PhenotypicType role;
 
 	public VariableType() {
 	}
@@ -84,6 +86,14 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
+	}
+
+	public PhenotypicType getRole() {
+		return role;
+	}
+
+	public void setRole(PhenotypicType role) {
+		this.role = role;
 	}
 
 	public void print(int indent) {
