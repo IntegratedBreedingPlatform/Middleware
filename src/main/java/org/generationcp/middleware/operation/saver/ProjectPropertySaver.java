@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 public class ProjectPropertySaver extends Saver {
@@ -148,9 +149,12 @@ public class ProjectPropertySaver extends Saver {
 			List<MeasurementVariable> variables, boolean isConstant) throws MiddlewareQueryException {
 
 		if (variables != null) {
+			
 			int rank = this.getNextRank(study);
 			Set<Integer> geoIds = this.getGeolocationDao().getLocationIds(study.getProjectId());
 			Geolocation geolocation = this.getGeolocationDao().getById(geoIds.iterator().next());
+			Hibernate.initialize(geolocation.getProperties());
+			
 			for (MeasurementVariable variable : variables) {
 				if (variable.getOperation() == Operation.ADD) {
 					this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, geolocation);
