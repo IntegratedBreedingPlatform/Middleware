@@ -39,8 +39,6 @@ public class MeasurementVariable {
 
 	private String label;
 
-	private int storedIn;
-
 	private boolean isFactor;
 
 	private Integer dataTypeId;
@@ -220,8 +218,6 @@ public class MeasurementVariable {
 		builder.append(this.value);
 		builder.append(", label=");
 		builder.append(this.label);
-		builder.append(", storedIn=");
-		builder.append(this.storedIn);
 		builder.append(", isFactor=");
 		builder.append(this.isFactor);
 		builder.append("]");
@@ -247,15 +243,7 @@ public class MeasurementVariable {
 	public void setFactor(boolean isFactor) {
 		this.isFactor = isFactor;
 	}
-
-	public int getStoredIn() {
-		return this.storedIn;
-	}
-
-	public void setStoredIn(int storedIn) {
-		this.storedIn = storedIn;
-	}
-
+	
 	/**
 	 * @return the dataTypeId
 	 */
@@ -386,7 +374,7 @@ public class MeasurementVariable {
 		var.setDataType(this.dataType);
 		var.setValue(this.value);
 		var.setLabel(this.label);
-		var.setStoredIn(this.storedIn);
+		var.setRole(this.role);
 		var.setFactor(this.isFactor);
 		var.setDataTypeId(this.dataTypeId);
 		var.setPossibleValues(this.possibleValues);

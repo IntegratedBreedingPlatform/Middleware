@@ -41,7 +41,6 @@ public class MeasurementVariableTransformer extends Transformer {
 						new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), stdVariable.getDescription(), stdVariable
 								.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
 								.getDataType().getName(), "", label);
-				measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 				measurementVariable.setFactor(isFactor);
 				measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 				measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));
@@ -75,8 +74,7 @@ public class MeasurementVariableTransformer extends Transformer {
 				MeasurementVariable measurementVariable =
 						new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), stdVariable.getDescription(), stdVariable
 								.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
-								.getDataType().getName(), "", label);
-				measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+								.getDataType().getName(), "", label);				
 				measurementVariable.setFactor(isFactor);
 				measurementVariable.setValue(variable.getDisplayValue());
 				measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
@@ -121,7 +119,6 @@ public class MeasurementVariableTransformer extends Transformer {
 					new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), stdVariable.getDescription(), stdVariable
 							.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
 							.getDataType().getName(), "", label);
-			measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 			measurementVariable.setFactor(isFactor);
 			measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 			measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));

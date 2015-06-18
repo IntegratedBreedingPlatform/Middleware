@@ -192,7 +192,6 @@ public class WorkbookBuilder extends Builder {
 										stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
 										maxRange);
-						measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 						measurementVariable.setFactor(true);
 						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
@@ -222,7 +221,6 @@ public class WorkbookBuilder extends Builder {
 									stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 									stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
 									maxRange);
-					measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 					measurementVariable.setFactor(true);
 					measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 					measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
@@ -421,7 +419,6 @@ public class WorkbookBuilder extends Builder {
 										stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
 										maxRange);
-						measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 						measurementVariable.setFactor(true);
 						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
