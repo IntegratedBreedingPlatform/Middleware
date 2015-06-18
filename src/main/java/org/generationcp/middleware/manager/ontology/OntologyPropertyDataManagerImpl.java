@@ -1,15 +1,7 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -28,7 +20,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.google.common.base.Strings;
+import java.util.*;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
@@ -74,16 +66,18 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException {
+		return this.getAllPropertiesWithClass(new String[] {className});
+	}
+
+	@Override public List<Property> getAllPropertiesWithClass(String[] classes) throws MiddlewareException {
 		try {
 
-			SQLQuery query =
-					this.getActiveSession().createSQLQuery(
-							"SELECT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id"
-									+ " inner join cvterm dt on dt.cvterm_id = cvtr.object_id" + " where cvtr.type_id = "
-									+ TermId.IS_A.getId() + " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p.is_obsolete = 0"
-									+ " and dt.name = :className");
+			SQLQuery query = this.getActiveSession().createSQLQuery(
+					"SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id"
+							+ " inner join cvterm dt on dt.cvterm_id = cvtr.object_id" + " where cvtr.type_id = " + TermId.IS_A.getId()
+							+ " and p.cv_id = " + CvId.PROPERTIES.getId() + " and p.is_obsolete = 0" + " and dt.name in (:classes)");
 
-			query.setParameter("className", className);
+			query.setParameterList("classes", classes);
 
 			List propertyIds = query.list();
 
@@ -93,6 +87,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
 		}
 	}
+
+
 
 	/**
 	 * This will fetch list of properties by passing propertyIds This method is private and consumed by other methods
