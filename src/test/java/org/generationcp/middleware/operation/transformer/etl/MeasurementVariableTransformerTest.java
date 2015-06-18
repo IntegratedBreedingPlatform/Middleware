@@ -78,8 +78,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 				measurementVariable.getProperty());
 		Assert.assertEquals("Data Type should be " + stdVariable.getDataType().getName(), stdVariable.getDataType().getName(),
 				measurementVariable.getDataType());
-		Assert.assertEquals("Stored In should be " + stdVariable.getStoredIn().getId(), stdVariable.getStoredIn().getId(),
-				measurementVariable.getStoredIn());
+
 		String label = this.getLabel(stdVariable.getStoredIn().getId(), isInTrialDataset);
 		Assert.assertEquals("Label should be " + label, label, measurementVariable.getLabel());
 		List<ValueReference> possibleValues = this.getPossibleValues(stdVariable.getEnumerations());

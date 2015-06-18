@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -154,7 +155,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		}
 
 		Project program = new Project();
-		program.setProjectName("Draught Resistance in Maize");
+		program.setProjectName("Draught Resistance in Maize"+new Random().nextInt(100));
 		program.setUserId(workbenchUser.getUserid());
 		program.setStartDate(new Date(System.currentTimeMillis()));
 		program.setCropType(cropType);
@@ -232,38 +233,38 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 
 		conditions.add(this.createMeasurementVariable(TermId.BREEDING_METHOD_CODE.getId(), "STUDY_BM_CODE",
 				"Breeding method applied to all plots in a study (CODE)", DataSetupTest.PROP_BREEDING_METHOD, DataSetupTest.APPLIED,
-				"BMETH_CODE", DataSetupTest.CHAR, null, DataSetupTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+				"BMETH_CODE", DataSetupTest.CHAR, null, DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		conditions.add(this.createMeasurementVariable(8080, "STUDY_INSTITUTE", "Study institute - conducted (DBCV)",
 				DataSetupTest.PROP_INSTITUTE, DataSetupTest.CONDUCTED, DataSetupTest.DBCV, DataSetupTest.CHAR, "CIMMYT",
-				DataSetupTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+				DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		conditions.add(this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)",
 				DataSetupTest.PROP_STUDY, DataSetupTest.ASSIGNED, DataSetupTest.DBCV, DataSetupTest.CHAR, studyDetails.getStudyName(),
-				DataSetupTest.STUDY, TermId.STUDY_NAME_STORAGE.getId(), true));
+				DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		conditions.add(this.createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE", "Study title - assigned (text)",
 				DataSetupTest.PROP_STUDY_TITLE, DataSetupTest.ASSIGNED, DataSetupTest.SCALE_TEXT, DataSetupTest.CHAR,
-				studyDetails.getTitle(), DataSetupTest.STUDY, TermId.STUDY_TITLE_STORAGE.getId(), true));
+				studyDetails.getTitle(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		conditions.add(this.createMeasurementVariable(TermId.START_DATE.getId(), "START_DATE", "Start date - assigned (date)",
 				DataSetupTest.PROP_START_DATE, DataSetupTest.ASSIGNED, DataSetupTest.DATE, DataSetupTest.CHAR, studyDetails.getStartDate(),
-				DataSetupTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+				DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		conditions.add(this.createMeasurementVariable(TermId.STUDY_OBJECTIVE.getId(), "STUDY_OBJECTIVE", "Objective - described (text)",
 				DataSetupTest.PROP_OBJECTIVE, DataSetupTest.DESCRIBED, DataSetupTest.SCALE_TEXT, DataSetupTest.CHAR,
-				studyDetails.getObjective(), DataSetupTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+				studyDetails.getObjective(), DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		conditions.add(this.createMeasurementVariable(TermId.END_DATE.getId(), "END_DATE", "End date - assigned (date)",
 				DataSetupTest.PROP_END_DATE, DataSetupTest.ASSIGNED, DataSetupTest.DATE, DataSetupTest.CHAR, studyDetails.getEndDate(),
-				DataSetupTest.STUDY, TermId.STUDY_INFORMATION.getId(), true));
+				DataSetupTest.STUDY, PhenotypicType.STUDY, true));
 
 		workbook.setConditions(conditions);
 
 		// Constants
 		List<MeasurementVariable> constants = new ArrayList<MeasurementVariable>();
 		constants.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter",
-				"pH", DataSetupTest.NUMERIC, "7", DataSetupTest.STUDY, TermId.OBSERVATION_VARIATE.getId(), false));
+				"pH", DataSetupTest.NUMERIC, "7", DataSetupTest.STUDY, PhenotypicType.VARIATE, false));
 		workbook.setConstants(constants);
 
 		// Factors
@@ -271,31 +272,31 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		MeasurementVariable entryFactor =
 				this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO", "Germplasm entry - enumerated (number)",
 						"Germplasm entry", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null,
-						DataSetupTest.ENTRY, TermId.ENTRY_NUMBER_STORAGE.getId(), true);
+						DataSetupTest.ENTRY, PhenotypicType.GERMPLASM, true);
 		factors.add(entryFactor);
 
 		MeasurementVariable designationFactor =
 				this.createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION", "Germplasm designation - assigned (DBCV)",
 						"Germplasm Designation", DataSetupTest.ASSIGNED, DataSetupTest.DBCV, DataSetupTest.CHAR, null, DataSetupTest.DESIG,
-						TermId.ENTRY_DESIGNATION_STORAGE.getId(), true);
+						PhenotypicType.GERMPLASM, true);
 		factors.add(designationFactor);
 
 		MeasurementVariable crossFactor =
 				this.createMeasurementVariable(TermId.CROSS.getId(), "CROSS", "The pedigree string of the germplasm", "Cross history",
 						DataSetupTest.ASSIGNED, DataSetupTest.PEDIGREE_STRING, DataSetupTest.CHAR, null, DataSetupTest.CROSS,
-						TermId.GERMPLASM_ENTRY_STORAGE.getId(), true);
+						PhenotypicType.GERMPLASM, true);
 		factors.add(crossFactor);
 
 		MeasurementVariable gidFactor =
 				this.createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)", "Germplasm id",
 						DataSetupTest.ASSIGNED, DataSetupTest.DBID, DataSetupTest.NUMERIC, null, DataSetupTest.GID,
-						TermId.ENTRY_GID_STORAGE.getId(), true);
+						PhenotypicType.GERMPLASM, true);
 		factors.add(gidFactor);
 
 		MeasurementVariable plotFactor =
 				this.createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO", "Field plot - enumerated (number)", "Field plot",
 						DataSetupTest.ENUMERATED, DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null, DataSetupTest.PLOT,
-						TermId.TRIAL_DESIGN_INFO_STORAGE.getId(), true);
+						PhenotypicType.TRIAL_DESIGN, true);
 		factors.add(plotFactor);
 
 		workbook.setFactors(factors);
@@ -305,7 +306,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		MeasurementVariable variate =
 				this.createMeasurementVariable(18000, "Grain_yield", "Grain yield -dry and weigh (kg/ha)", DataSetupTest.GRAIN_YIELD,
 						DataSetupTest.DRY_AND_WEIGH, DataSetupTest.KG_HA, DataSetupTest.NUMERIC, null, DataSetupTest.PLOT,
-						TermId.OBSERVATION_VARIATE.getId(), false);
+						PhenotypicType.VARIATE, false);
 		variates.add(variate);
 
 		workbook.setVariates(variates);
@@ -397,7 +398,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 	}
 
 	private MeasurementVariable createMeasurementVariable(int termId, String name, String description, String property, String method,
-			String scale, String dataType, String value, String label, int storedIn, boolean isFactor) {
+			String scale, String dataType, String value, String label, PhenotypicType role, boolean isFactor) {
 
 		MeasurementVariable variable = new MeasurementVariable();
 
@@ -410,9 +411,9 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		variable.setDataType(dataType);
 		variable.setValue(value);
 		variable.setLabel(label);
-		variable.setStoredIn(storedIn);
 		variable.setFactor(isFactor);
-
+		variable.setRole(role);
+		
 		return variable;
 	}
 

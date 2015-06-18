@@ -202,7 +202,7 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 		WorkbookBuilderTest.workbookBuilder.populateMeasurementData(measurementVariableList, variableList, measurementDataList);
 		Assert.assertFalse("Measurement data should not be empty", measurementDataList.isEmpty());
 		for (MeasurementData measurementData : measurementDataList) {
-			if (TermId.CATEGORICAL_VARIATE.getId() != measurementData.getMeasurementVariable().getStoredIn()) {
+			if (TermId.CATEGORICAL_VARIABLE.getId() != measurementData.getMeasurementVariable().getDataTypeId()) {
 				Assert.assertNull("Categorical value id should be null", measurementData.getcValueId());
 			} else if (WorkbookBuilderTest.CUSTOM_VARIATE == measurementData.getMeasurementVariable().getTermId()) {
 				Assert.assertNull("Categorical value id should be null", measurementData.getcValueId());

@@ -190,7 +190,7 @@ public class GeolocationSaverTest {
 		for (int i=0;i<5;i++) {
 			EnvironmentVariable variable = EnvironmentVariable.values()[i];
 			geolocationSaver.setGeolocation(geolocation, 
-					variable.getId(), 0, variable.getValue());
+					variable.getId(), variable.getValue());
 			switch(i) {
 				case 0: assertEquals(variable.getValue(),geolocation.getDescription()); break;
 				case 1: assertEquals(variable.getValue(),geolocation.getLatitude().toString()); break;
