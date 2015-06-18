@@ -24,6 +24,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.StringUtil;
 
 public class GeolocationSaver extends Saver {
@@ -58,9 +59,10 @@ public class GeolocationSaver extends Saver {
 					if (var.getPhenotypeId() == null) {
 						this.getPhenotypeSaver().save(row.getExperimentId(), var);
 					} else {
+						
 						this.getPhenotypeSaver().saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(),
-								var.getVariableType().getStandardVariable().getStoredIn().getId(), var.getValue(),
-								this.getPhenotypeDao().getById(var.getPhenotypeId()));
+								var.getValue(),
+								this.getPhenotypeDao().getById(var.getPhenotypeId()), var.getVariableType().getStandardVariable().getDataType().getId());
 					}
 				}
 			}
@@ -206,7 +208,7 @@ public class GeolocationSaver extends Saver {
 		return this.saveGeolocation(variableList, row, isNursery, false);
 	}
 
-	public void setGeolocation(Geolocation geolocation, int termId, int storedInId, String value) {
+	public void setGeolocation(Geolocation geolocation, int termId, String value) {
 		if (TermId.TRIAL_INSTANCE_FACTOR.getId() == termId) {
 			geolocation.setDescription(value);
 

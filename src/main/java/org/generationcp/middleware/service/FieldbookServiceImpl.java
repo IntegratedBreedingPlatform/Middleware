@@ -285,7 +285,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 						for (MeasurementRow row : observations) {
 							for (MeasurementData field : row.getDataList()) {
 								if (factor.getName().equals(field.getLabel())
-										&& factor.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+										&& factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
 									this.getExperimentPropertySaver().saveOrUpdateProperty(
 											this.getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
 								}
@@ -317,12 +317,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 										phenotype = new Phenotype();
 									}
 									if (phenotype != null) {
+										
 										this.getPhenotypeSaver().saveOrUpdate(
 												row.getExperimentId(),
 												variate.getTermId(),
-												variate.getStoredIn(),
 												field.getcValueId() != null && !"".equals(field.getcValueId()) ? field.getcValueId()
-														: field.getValue(), phenotype, field.isCustomCategoricalValue());
+														: field.getValue(), phenotype, field.isCustomCategoricalValue(), variate.getDataTypeId());
 
 										i++;
 										if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
