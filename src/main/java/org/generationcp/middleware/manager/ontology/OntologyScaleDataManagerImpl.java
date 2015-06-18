@@ -196,14 +196,14 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		// Check supplied value as numeric if non null
 		if (Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE)) {
 			if (!Strings.isNullOrEmpty(scale.getMinValue())) {
-				Integer min = StringUtil.parseInt(scale.getMinValue(), null);
+				Float min = StringUtil.parseFloat(scale.getMinValue(), null);
 				if (min == null) {
 					throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_MIN_VALUE_NOT_VALID);
 				}
 			}
 
 			if (!Strings.isNullOrEmpty(scale.getMaxValue())) {
-				Integer max = StringUtil.parseInt(scale.getMaxValue(), null);
+				Float max = StringUtil.parseFloat(scale.getMaxValue(), null);
 				if (max == null) {
 					throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_MAX_VALUE_NOT_VALID);
 				}
@@ -279,14 +279,14 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		// Check supplied value as numeric if non null
 		if (Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE)) {
 			if (!Strings.isNullOrEmpty(scale.getMinValue())) {
-				Integer min = StringUtil.parseInt(scale.getMinValue(), null);
+				Float min = StringUtil.parseFloat(scale.getMinValue(), null);
 				if (min == null) {
 					throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_MIN_VALUE_NOT_VALID);
 				}
 			}
 
 			if (!Strings.isNullOrEmpty(scale.getMaxValue())) {
-				Integer max = StringUtil.parseInt(scale.getMaxValue(), null);
+				Float max = StringUtil.parseFloat(scale.getMaxValue(), null);
 				if (max == null) {
 					throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_MAX_VALUE_NOT_VALID);
 				}
