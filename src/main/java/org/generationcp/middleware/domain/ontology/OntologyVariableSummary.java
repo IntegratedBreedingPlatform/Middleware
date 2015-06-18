@@ -31,6 +31,9 @@ public class OntologyVariableSummary {
 
 	private String maxValue;
 
+	// used to indicate if the variable has a treatment factor pair. Not applicable for non treatment factor variables
+	private Boolean hasPair;
+
 	public OntologyVariableSummary(Integer id, String name, String description) {
 		this.term = new TermSummary(id, name, description);
 	}
@@ -129,6 +132,14 @@ public class OntologyVariableSummary {
 
 	public void setMaxValue(String maxValue) {
 		this.maxValue = maxValue;
+	}
+
+	public Boolean getHasPair() {
+		return hasPair;
+	}
+
+	public void setHasPair(Boolean hasPair) {
+		this.hasPair = hasPair;
 	}
 
 	@Override
