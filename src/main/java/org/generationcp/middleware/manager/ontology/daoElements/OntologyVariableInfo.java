@@ -22,10 +22,24 @@ public class OntologyVariableInfo {
 	private Integer scaleId;
 	private String minValue;
 	private String maxValue;
-	private boolean isFavorite;
+	private Boolean isFavorite;
 
 	public OntologyVariableInfo() {
 		this.term = new Term();
+	}
+
+	public OntologyVariableInfo(String programUuid, String alias, Integer methodId, Integer propertyId, Integer scaleId, String minValue,
+			String maxValue, Boolean isFavorite, Set<VariableType> variableTypes) {
+		this();
+
+		this.programUuid = programUuid;
+		this.alias = alias;
+		this.methodId = methodId;
+		this.propertyId = propertyId;
+		this.scaleId = scaleId;
+		this.minValue = minValue;
+		this.maxValue = maxValue;
+		this.isFavorite = isFavorite;
 	}
 
 	public Term getTerm() {
@@ -124,11 +138,11 @@ public class OntologyVariableInfo {
 		this.maxValue = maxValue;
 	}
 
-	public boolean isFavorite() {
+	public Boolean isFavorite() {
 		return this.isFavorite;
 	}
 
-	public void setIsFavorite(boolean isFavorite) {
+	public void setIsFavorite(Boolean isFavorite) {
 		this.isFavorite = isFavorite;
 	}
 }

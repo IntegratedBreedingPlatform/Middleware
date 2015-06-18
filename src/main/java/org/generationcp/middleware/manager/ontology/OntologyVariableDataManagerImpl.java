@@ -45,6 +45,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.math.BigInteger;
+import java.util.*;
+
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
  */
@@ -71,27 +74,58 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId,
 			Integer scaleId) throws MiddlewareException {
+		return this.getWithFilter(programUuid, favorites, methodId, propertyId, scaleId, null);
+	}
+
+	@Override
+	public List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId,
+			Integer scaleId, VariableType variableType) throws MiddlewareException {
+
+		Set<VariableType> variableTypes = new HashSet<>();
+
+		if (!Objects.equals(variableType, null)) {
+			variableTypes.add(variableType);
+		}
+
+		return this.getWithFilter(
+				new OntologyVariableInfo(programUuid, null, methodId, propertyId, scaleId, null, null, favorites, variableTypes),
+				new HashSet<Integer>());
+	}
+
+	@Override public List<OntologyVariableSummary> getWithFilter(OntologyVariableInfo variableFilterOptions, Set<Integer> filteredVariables)
+			throws MiddlewareException {
 
 		String filterClause = "";
 
-		if (!Objects.equals(methodId, null)) {
+		String includeVariableType =
+				(!variableFilterOptions.getVariableTypes().isEmpty()) ? "left join cvtermprop vtype on vtype.cvterm_id = v.cvterm_id " : "";
+
+		if (!Objects.equals(variableFilterOptions.getMethodId(), null)) {
 			filterClause += " and vmr.mid = :methodId ";
 		}
 
-		if (!Objects.equals(propertyId, null)) {
+		if (!Objects.equals(variableFilterOptions.getPropertyId(), null)) {
 			filterClause += " and vpr.pid = :propertyId ";
 		}
 
-		if (!Objects.equals(scaleId, null)) {
+		if (!Objects.equals(variableFilterOptions.getScaleId(), null)) {
 			filterClause += " and vsr.sid = :scaleId ";
 		}
 
-		if (!Objects.equals(favorites, null)) {
-			if (favorites) {
+		if (!Objects.equals(variableFilterOptions.isFavorite(), null)) {
+			if (variableFilterOptions.isFavorite()) {
 				filterClause += "  and pf.id is not null ";
 			} else {
 				filterClause += "  and pf.id is null ";
 			}
+		}
+
+		if (!filteredVariables.isEmpty()) {
+			filterClause += " and v.cvterm_id not in (:filteredCVTermIds)";
+		}
+
+		if (!variableFilterOptions.getVariableTypes().isEmpty()) {
+			filterClause += " and (vType.value = :variableType OR vType.value is null)";
 		}
 
 		Map<Integer, OntologyVariableSummary> map = new HashMap<>();
@@ -105,6 +139,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 											+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 											+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
 											+ "left join (select dr.subject_id sid, d.cvterm_id did, d.name dn, d.definition dd from cvterm_relationship dr inner join cvterm d on d.cvterm_id = dr.object_id and dr.type_id = 1105) dsr on dsr.sid = vsr.sid "
+											+ includeVariableType
 											+ "left join variable_program_overrides vpo on vpo.cvterm_id = v.cvterm_id "
 											+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES'"
 											+ "    WHERE (v.cv_id = 1040) " + filterClause + " ORDER BY v.cvterm_id").addScalar("vid")
@@ -113,18 +148,26 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 							.addScalar("dn").addScalar("dd").addScalar("alias").addScalar("min_value").addScalar("max_value")
 							.addScalar("fid");
 
-			query.setParameter("programUuid", programUuid);
+			query.setParameter("programUuid", variableFilterOptions.getProgramUuid());
 
-			if (!Objects.equals(methodId, null)) {
-				query.setParameter("methodId", methodId);
+			if (!Objects.equals(variableFilterOptions.getMethodId(), null)) {
+				query.setParameter("methodId", variableFilterOptions.getMethodId());
 			}
 
-			if (!Objects.equals(propertyId, null)) {
-				query.setParameter("propertyId", propertyId);
+			if (!Objects.equals(variableFilterOptions.getPropertyId(), null)) {
+				query.setParameter("propertyId", variableFilterOptions.getPropertyId());
 			}
 
-			if (!Objects.equals(scaleId, null)) {
-				query.setParameter("scaleId", scaleId);
+			if (!Objects.equals(variableFilterOptions.getScaleId(), null)) {
+				query.setParameter("scaleId", variableFilterOptions.getScaleId());
+			}
+
+			if (!variableFilterOptions.getVariableTypes().isEmpty()) {
+				query.setParameter("variableType", variableFilterOptions.getVariableTypes().iterator().next());
+			}
+
+			if (!filteredVariables.isEmpty()) {
+				query.setParameterList("filteredCVTermIds", filteredVariables);
 			}
 
 			List queryResults = query.list();
