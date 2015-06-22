@@ -620,7 +620,28 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private List<MeasurementVariable> buildStudyMeasurementVariables(VariableList variableList, boolean isFactor, boolean isStudy) {
-		return this.getMeasurementVariableTransformer().transform(variableList, isFactor, isStudy);
+		List<MeasurementVariable> measurementVariableLists =  this.getMeasurementVariableTransformer().transform(variableList, isFactor, isStudy);
+		setMeasurementVarRoles(measurementVariableLists, isFactor, isStudy);
+		return measurementVariableLists;
+	}
+	
+	protected void setMeasurementVarRoles(List<MeasurementVariable> measurementVariableLists, boolean isFactor, boolean isStudy){
+		PhenotypicType role = null;
+		if(!isFactor){
+			//is factor == false, then always variate phenotype
+			role = PhenotypicType.VARIATE;
+		}else if(isStudy){
+			//if factor and is study
+			role = PhenotypicType.STUDY;
+		}else if(!isStudy){
+			//if factor and is not study
+			role = PhenotypicType.TRIAL_ENVIRONMENT;
+		}
+		if(role != null){		
+			for(MeasurementVariable var : measurementVariableLists){
+				var.setRole(role);
+			}
+		}
 	}
 
 	private List<TreatmentVariable> buildTreatmentFactors(VariableTypeList variables) {

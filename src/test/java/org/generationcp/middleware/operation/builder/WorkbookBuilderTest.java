@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -291,6 +292,27 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 		// verify if the trial instance is no longer found in the final factors
 		Assert.assertFalse(finalFactors.getVariableTypes().contains(trialInstance));
 
+	}
+	
+	@Test
+	public void testSetMeasurementVarRoles(){
+		List<MeasurementVariable> measurementVariableLists = new ArrayList<MeasurementVariable>();
+		MeasurementVariable measurementVar = new MeasurementVariable();		
+		measurementVariableLists.add(measurementVar);
+		WorkbookBuilderTest.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, false, true);
+		for(MeasurementVariable var : measurementVariableLists){
+			Assert.assertEquals("Should have a phenotype role of variate since its not a factor", var.getRole(), PhenotypicType.VARIATE);
+		}
+		
+		WorkbookBuilderTest.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, true, true);
+		for(MeasurementVariable var : measurementVariableLists){
+			Assert.assertEquals("Should have a phenotype role of STUDY", var.getRole(), PhenotypicType.STUDY);
+		}
+		
+		WorkbookBuilderTest.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, true, false);
+		for(MeasurementVariable var : measurementVariableLists){
+			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
+		}
 	}
 
 	// derived from VariableListTransformer.transformTrialEnvironment (but with no specific role to filter)
