@@ -3,7 +3,6 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -18,13 +17,13 @@ public class VariableTypeListTransformer extends Transformer {
 		super(sessionProviderForLocal);
 	}
 
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate) throws MiddlewareQueryException,
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, String programUUID) throws MiddlewareQueryException,
 			MiddlewareException {
 
-		return this.transform(measurementVariables, isVariate, 1);
+		return this.transform(measurementVariables, isVariate, 1, programUUID);
 	}
 
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, int rank)
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, int rank, String programUUID)
 			throws MiddlewareQueryException, MiddlewareException {
 
 		VariableTypeList variableTypeList = new VariableTypeList();
@@ -33,7 +32,7 @@ public class VariableTypeListTransformer extends Transformer {
 			for (MeasurementVariable measurementVariable : measurementVariables) {
 				StandardVariable standardVariable = null;
 				if (measurementVariable.getTermId() != 0) {// in etl v2, standard variables are already created before saving the study
-					standardVariable = this.getStandardVariableBuilder().create(measurementVariable.getTermId());
+					standardVariable = this.getStandardVariableBuilder().create(measurementVariable.getTermId(),programUUID);
 				} else {
 					standardVariable =
 							this.getStandardVariableBuilder().findOrSave(
@@ -42,10 +41,12 @@ public class VariableTypeListTransformer extends Transformer {
 									measurementVariable.getProperty(),
 									measurementVariable.getScale(),
 									measurementVariable.getMethod(),
-									isVariate ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable
-											.getLabel()), measurementVariable.getDataType());
+									measurementVariable.getRole(),
+									measurementVariable.getDataType(),
+									programUUID);
 				}
-
+				
+				standardVariable.setPhenotypicType(measurementVariable.getRole());
 				measurementVariable.setTermId(standardVariable.getId());
 
 				VariableType variableType =
