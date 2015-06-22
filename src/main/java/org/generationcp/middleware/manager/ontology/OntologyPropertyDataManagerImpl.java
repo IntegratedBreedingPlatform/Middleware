@@ -69,7 +69,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 		return this.getAllPropertiesWithClass(new String[] {className});
 	}
 
-	@Override public List<Property> getAllPropertiesWithClass(String[] classes) throws MiddlewareException {
+	@Override
+	public List<Property> getAllPropertiesWithClass(String[] classes) throws MiddlewareException {
 		try {
 
 			SQLQuery query = this.getActiveSession().createSQLQuery(
@@ -87,8 +88,6 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
 		}
 	}
-
-
 
 	/**
 	 * This will fetch list of properties by passing propertyIds This method is private and consumed by other methods

@@ -10,16 +10,36 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
  * Variable Type of a Variable. Ontology variable can have zero or more variable types associated to it.
  */
 public enum VariableType {
-	ANALYSIS(1, "Analysis", "Variable to be used only in analysis (for example derived variables).", PhenotypicType.VARIATE), TRIAL_CONDITION(2, "Trial Condition",
-			"Observations made of conditions in an individual environment involved in a trial.", PhenotypicType.VARIATE), NURSERY_CONDITION(3, "Nursery Condition",
-			"Observations made of conditions in a nursery.", PhenotypicType.VARIATE), GERMPLASM_DESCRIPTOR(4, "Germplasm Descriptor",
-			"Information to be recorded about each germplasm in a study.", PhenotypicType.GERMPLASM), STUDY_DETAIL(5, "Study Detail",
-			"Administrative details to be tracked per study.", PhenotypicType.STUDY), ENVIRONMENT_DETAIL(6, "Environment Detail",
-			"Administrative details to be tracked per environment.", PhenotypicType.TRIAL_ENVIRONMENT), SELECTION_METHOD(7, "Selection Method",
-			"How material is chosen for advancing to the next generation.", PhenotypicType.VARIATE), TRAIT(8, "Trait",
-			"Characteristics of a germplasm to be recorded during a study.", PhenotypicType.VARIATE), TREATMENT_FACTOR(9, "Treatment Factor",
-			"Treatments to be applied to members of a trial.", PhenotypicType.TRIAL_DESIGN), EXPERIMENTAL_DESIGN(10, "Experimental Design",
-					"Experimental Design Variables", PhenotypicType.TRIAL_DESIGN);
+	ANALYSIS(1, "Analysis",
+			"Variable to be used only in analysis (for example derived variables).",
+			PhenotypicType.VARIATE),
+	TRIAL_CONDITION(2, "Trial Condition",
+			"Observations made of conditions in an individual environment involved in a trial.",
+			PhenotypicType.VARIATE),
+	NURSERY_CONDITION(3, "Nursery Condition",
+			"Observations made of conditions in a nursery.",
+			PhenotypicType.VARIATE),
+	GERMPLASM_DESCRIPTOR(4, "Germplasm Descriptor",
+			"Information to be recorded about each germplasm in a study.",
+			PhenotypicType.GERMPLASM),
+	STUDY_DETAIL(5, "Study Detail",
+			"Administrative details to be tracked per study.",
+			PhenotypicType.STUDY),
+	ENVIRONMENT_DETAIL(6, "Environment Detail",
+			"Administrative details to be tracked per environment.",
+			PhenotypicType.TRIAL_ENVIRONMENT),
+	SELECTION_METHOD(7, "Selection Method",
+			"How material is chosen for advancing to the next generation.",
+			PhenotypicType.VARIATE),
+	TRAIT(8, "Trait",
+			"Characteristics of a germplasm to be recorded during a study.",
+			PhenotypicType.VARIATE),
+	TREATMENT_FACTOR(9, "Treatment Factor",
+			"Treatments to be applied to members of a trial.",
+			PhenotypicType.TRIAL_DESIGN),
+	EXPERIMENTAL_DESIGN(10, "Experimental Design",
+			"Experimental Design Variables",
+			PhenotypicType.TRIAL_DESIGN);
 
 	private Integer id;
 	private String name;
@@ -59,9 +79,11 @@ public enum VariableType {
 	public String getDescription() {
 		return this.description;
 	}
+
 	public PhenotypicType getRole() {
 		return this.role;
 	}
+
 	public static VariableType getById(Integer id) {
 		return VariableType.byId.get(id);
 	}

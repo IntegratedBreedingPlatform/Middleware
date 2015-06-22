@@ -92,13 +92,18 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				new HashSet<Integer>());
 	}
 
-	@Override public List<OntologyVariableSummary> getWithFilter(OntologyVariableInfo variableFilterOptions, Set<Integer> filteredVariables)
+	@Override
+	public List<OntologyVariableSummary> getWithFilter(OntologyVariableInfo variableFilterOptions, Set<Integer> filteredVariables)
 			throws MiddlewareException {
 
 		String filterClause = "";
 
-		String includeVariableType =
-				(!variableFilterOptions.getVariableTypes().isEmpty()) ? "left join cvtermprop vtype on vtype.cvterm_id = v.cvterm_id " : "";
+		String includeVariableType = "";
+
+		if (!variableFilterOptions.getVariableTypes().isEmpty()) {
+			includeVariableType = "left join cvtermprop vtype on vtype.cvterm_id = v.cvterm_id ";
+			filterClause += " and (vType.value in (:variableTypes) OR vType.value is null) ";
+		}
 
 		if (!Objects.equals(variableFilterOptions.getMethodId(), null)) {
 			filterClause += " and vmr.mid = :methodId ";
@@ -114,18 +119,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		if (!Objects.equals(variableFilterOptions.isFavorite(), null)) {
 			if (variableFilterOptions.isFavorite()) {
-				filterClause += "  and pf.id is not null ";
+				filterClause += " and pf.id is not null ";
 			} else {
-				filterClause += "  and pf.id is null ";
+				filterClause += " and pf.id is null ";
 			}
 		}
 
 		if (!filteredVariables.isEmpty()) {
 			filterClause += " and v.cvterm_id not in (:filteredCVTermIds)";
-		}
-
-		if (!variableFilterOptions.getVariableTypes().isEmpty()) {
-			filterClause += " and (vType.value = :variableType OR vType.value is null)";
 		}
 
 		Map<Integer, OntologyVariableSummary> map = new HashMap<>();
@@ -163,7 +164,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			if (!variableFilterOptions.getVariableTypes().isEmpty()) {
-				query.setParameter("variableType", variableFilterOptions.getVariableTypes().iterator().next());
+				query.setParameterList("variableTypes", variableFilterOptions.getVariableTypes());
 			}
 
 			if (!filteredVariables.isEmpty()) {

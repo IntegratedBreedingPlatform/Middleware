@@ -49,6 +49,12 @@ public interface OntologyPropertyDataManager {
 	 */
 	List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException;
 
+	/**
+	 * Get all properties given list of classnames
+	 *
+	 * @return property
+	 * @throws MiddlewareException the middleware query exception
+	 */
 	List<Property> getAllPropertiesWithClass(String[] classes) throws MiddlewareException;
 
 	/**

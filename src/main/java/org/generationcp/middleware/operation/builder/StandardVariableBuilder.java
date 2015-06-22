@@ -142,7 +142,12 @@ public class StandardVariableBuilder extends Builder {
 		standardVariable.setProperty(this.createTerm(cvTermRelationships, TermId.HAS_PROPERTY));
 		standardVariable.setMethod(this.createTerm(cvTermRelationships, TermId.HAS_METHOD));
 		standardVariable.setScale(this.createTerm(cvTermRelationships, TermId.HAS_SCALE));
-		standardVariable.setDataType(this.createTerm(cvTermRelationships, TermId.HAS_TYPE));
+		Term scale = standardVariable.getScale();
+
+		CVTermRelationship scaleCvTermRelationships = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(scale.getId(), TermId.HAS_TYPE.getId());
+		if(scaleCvTermRelationships != null){
+			standardVariable.setDataType(this.createTerm(scaleCvTermRelationships.getObjectId()));
+		}
 		standardVariable.setStoredIn(this.createTerm(cvTermRelationships, TermId.STORED_IN));
 		standardVariable.setIsA(this.createTerm(cvTermRelationships, TermId.IS_A));
 		if (standardVariable.getProperty() != null) {
@@ -343,19 +348,19 @@ public class StandardVariableBuilder extends Builder {
 			switch (phenotypicType) {
 				case STUDY:
 					storedInId = TermId.STUDY_INFO_STORAGE.getId();
-				break;
+					break;
 				case DATASET:
 					storedInId = TermId.DATASET_INFO_STORAGE.getId();
-				break;
+					break;
 				case GERMPLASM:
 					storedInId = TermId.GERMPLASM_ENTRY_STORAGE.getId();
-				break;
+					break;
 				case TRIAL_DESIGN:
 					storedInId = TermId.TRIAL_DESIGN_INFO_STORAGE.getId();
-				break;
+					break;
 				case TRIAL_ENVIRONMENT:
 					storedInId = TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId();
-				break;
+					break;
 				case VARIATE:
 					storedInId = TermId.OBSERVATION_VARIATE.getId();
 					break;
