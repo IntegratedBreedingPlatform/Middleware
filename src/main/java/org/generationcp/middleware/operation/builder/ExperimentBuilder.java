@@ -158,20 +158,21 @@ public class ExperimentBuilder extends Builder {
 				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
 				// in the future, trial constant will no longer be saved at the measurements level
 				if (variableType != null) {
+					Variable var =  null;
 					if (variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());						
+						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());						
 						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
 							var.setValue(phenotype.getValue());
 							var.setCustomValue(true);
 						}
-						var.getVariableType().setRole(PhenotypicType.VARIATE);
+						
 						variates.add(var);
 					} else {
-						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue());
-						var.getVariableType().setRole(PhenotypicType.VARIATE);
+						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue());
 						variates.add(var);
 					}
-					
+					var.getVariableType().setRole(PhenotypicType.VARIATE);
+					var.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.VARIATE);
 				}
 			}
 		}
@@ -205,6 +206,7 @@ public class ExperimentBuilder extends Builder {
 				Variable variable = this.createLocationFactor(experimentModel.getGeoLocation(), variableType);
 				if(variable != null){
 					variable.getVariableType().setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+					variable.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 					factors.add(variable);
 				}
 			
@@ -275,6 +277,7 @@ public class ExperimentBuilder extends Builder {
 				Variable var = this.createGermplasmFactor(stockModel, variableType);
 				if(var != null){
 					var.getVariableType().setRole(PhenotypicType.GERMPLASM);
+					var.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.GERMPLASM);
 					factors.add(var);
 				}				
 			}
@@ -340,6 +343,7 @@ public class ExperimentBuilder extends Builder {
 		variable.setVariableType(variableTypes.findById(property.getTypeId()));
 		variable.setValue(property.getValue());
 		variable.getVariableType().setRole(role);
+		variable.getVariableType().getStandardVariable().setPhenotypicType(role);
 		return variable;
 	}
 
