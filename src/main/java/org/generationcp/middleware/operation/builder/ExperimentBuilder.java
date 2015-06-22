@@ -269,51 +269,35 @@ public class ExperimentBuilder extends Builder {
 				stockModel = this.getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
 			}
 
-			for (VariableType variableType : variableTypes.getVariableTypes()) {
-				if (this.isGermplasmFactor(variableType)) {
-					factors.add(this.createGermplasmFactor(stockModel, variableType));
-				}
+			for (VariableType variableType : variableTypes.getVariableTypes()) {				
+				Variable var = this.createGermplasmFactor(stockModel, variableType);
+				if(var != null){
+					var.getVariableType().setRole(PhenotypicType.GERMPLASM);
+					factors.add(var);
+				}				
 			}
 		}
 	}
-
-	private boolean isGermplasmFactor(VariableType variableType) {
-		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_GID_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_CODE_STORAGE.getId()) {
-			return true;
-		}
-		return false;
-	}
-
 	private Variable createGermplasmFactor(StockModel stockModel, VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
-			return new Variable(variableType, this.findStockValue(variableType.getId(), stockModel.getProperties()));
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
+		
+		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {
 			return new Variable(variableType, stockModel.getUniqueName());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_GID_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.GID.getId()) {
 			return new Variable(variableType, stockModel.getDbxrefId());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.DESIG.getId()) {
 			return new Variable(variableType, stockModel.getName());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_CODE_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.ENTRY_CODE.getId()) {
 			return new Variable(variableType, stockModel.getValue());
 		}
+		String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
+		if (val != null) {
+			return new Variable(variableType, val);
+		}
+		
 		return null;
 	}
 
