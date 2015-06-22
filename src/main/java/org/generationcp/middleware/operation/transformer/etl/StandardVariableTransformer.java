@@ -31,10 +31,14 @@ public class StandardVariableTransformer extends Transformer {
 		standardVariable.setScale(variable.getScale());
 		standardVariable.setMethod(variable.getMethod());
 		DataType dataType = variable.getScale().getDataType();
-		standardVariable.setDataType(new Term(dataType.getId(),dataType.getName(),dataType.getName()));
-		standardVariable.setConstraints(new VariableConstraints(
+		if(dataType!=null) {
+			standardVariable.setDataType(new Term(dataType.getId(),dataType.getName(),dataType.getName()));
+		}
+		if(variable.getMinValue()!=null && variable.getMaxValue()!=null) {
+			standardVariable.setConstraints(new VariableConstraints(
 				0, 0, Double.parseDouble(variable.getMinValue()), 
 				Double.parseDouble(variable.getMaxValue())));
+		}
 		standardVariable.setEnumerations(getValidValues(variable));
 		standardVariable.setCropOntologyId(variable.getProperty().getCropOntologyId());
 		return standardVariable;

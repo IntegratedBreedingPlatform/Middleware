@@ -12,10 +12,16 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -130,9 +136,71 @@ public class TermBuilder extends Builder {
 		return term;
 	}
 
-	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
-		List<Scale> list = new ArrayList<Scale>();
+	public List<org.generationcp.middleware.domain.oms.Scale> getAllInventoryScales() throws MiddlewareQueryException {
+		List<org.generationcp.middleware.domain.oms.Scale> list = 
+				new ArrayList<org.generationcp.middleware.domain.oms.Scale>();
 		list.addAll(this.getCvTermDao().getAllInventoryScales());
 		return list;
+	}
+	
+	public Term findOrSaveProperty(String name, String definition, 
+			String cropOntologyId, Set<String> traitClasses) throws MiddlewareQueryException, MiddlewareException {
+		Term term = this.findTermByName(name, CvId.PROPERTIES);
+		if (term == null) {
+			Property property = new Property();
+			property.setName(name);
+			property.setDefinition(definition);
+			property.setCropOntologyId(cropOntologyId);
+			for(String traitClass : traitClasses) {
+				property.addClass(traitClass);
+			}
+			getOntologyPropertyDataManager().addProperty(property);
+		}
+		return term;
+	}
+	
+	public Set<String> getDefaultTraitClasses() throws MiddlewareQueryException {
+		Set<String> traitClasses = new LinkedHashSet<String>();
+		CVTerm cvTerm = this.getCvTermDao().getById(TermId.GENERAL_TRAIT_CLASS.getId());
+		if (cvTerm != null) {
+			traitClasses.add(cvTerm.getName());
+		} else {
+			cvTerm = this.getCvTermDao().getById(TermId.ONTOLOGY_TRAIT_CLASS.getId());
+			if (cvTerm != null) {
+				traitClasses.add(cvTerm.getName());
+			}
+		}
+		return traitClasses;
+	}
+	
+	public Term findOrSaveScale(String name, String definition, String dataTypeName, String minValue, String maxValue,
+			Map<String, String> categories) throws MiddlewareQueryException, MiddlewareException {
+		Term term = this.findTermByName(name, CvId.SCALES);
+		if (term == null) {
+			Scale scale = new Scale();
+			scale.setName(name);
+			scale.setDefinition(definition);
+			scale.setDataType(DataType.getByName(dataTypeName));
+			scale.setMinValue(minValue);
+			scale.setMaxValue(maxValue);
+			if(categories!=null) {
+				for (String category : categories.keySet()) {
+					scale.addCategory(category, categories.get(category));
+				}
+			}
+			getOntologyScaleDataManager().addScale(scale);
+		}
+		return term;
+	}
+	
+	public Term findOrSaveMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
+		Term term = this.findTermByName(name, CvId.METHODS);
+		if (term == null) {
+			Method method = new Method();
+			method.setName(name);
+			method.setDefinition(definition);
+			getOntologyMethodDataManager().addMethod(method);
+		}
+		return term;
 	}
 }

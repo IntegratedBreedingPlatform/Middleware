@@ -349,7 +349,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Saving favorite
-			if (variableInfo.isFavorite()) {
+			if (variableInfo.isFavorite()!=null && variableInfo.isFavorite()) {
 				ProgramFavorite programFavorite = new ProgramFavorite();
 				programFavorite.setProgramFavoriteId(this.getProgramFavoriteDao().getNextId(ProgramFavorite.ID_NAME));
 				programFavorite.setEntityId(variableInfo.getId());
