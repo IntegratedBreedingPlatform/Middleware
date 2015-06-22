@@ -158,18 +158,20 @@ public class ExperimentBuilder extends Builder {
 				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
 				// in the future, trial constant will no longer be saved at the measurements level
 				if (variableType != null) {
-					if (variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()
-							&& variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
+					if (variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());						
 						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
 							var.setValue(phenotype.getValue());
 							var.setCustomValue(true);
 						}
+						var.getVariableType().setRole(PhenotypicType.VARIATE);
 						variates.add(var);
 					} else {
-						variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
-
+						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue());
+						var.getVariableType().setRole(PhenotypicType.VARIATE);
+						variates.add(var);
 					}
+					
 				}
 			}
 		}
