@@ -91,6 +91,7 @@ public class WorkbookBuilder extends Builder {
 
 		long expCount = this.getStudyDataManager().countExperiments(dataSetId);
 		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		//variable type roles are being set inside getexperiment
 		List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
 
 		VariableList conditionVariables = null, constantVariables = null, trialConstantVariables = null;
@@ -325,7 +326,10 @@ public class WorkbookBuilder extends Builder {
 		VariableTypeList variables = null;
 		if (dataSetId != null) {
 			variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
+			//variable type roles are being set inside getexperiment
+			this.getStudyDataManager().getExperiments(dataSetId, 0, (int) Integer.MAX_VALUE, variables);
 		}
+		
 
 		List<MeasurementVariable> factors = this.buildFactors(variables, !isNursery);
 		List<MeasurementVariable> variates = this.buildVariates(variables);
@@ -650,7 +654,7 @@ public class WorkbookBuilder extends Builder {
 		Map<String, VariableTypeList> treatmentMap = new HashMap<String, VariableTypeList>();
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
 			for (VariableType variable : variables.getFactors().getVariableTypes()) {
-				if (variable.getStandardVariable().getStoredIn().getId() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()
+				if (variable.getRole() == PhenotypicType.TRIAL_DESIGN
 						&& variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
 
 					VariableTypeList list = treatmentMap.get(variable.getTreatmentLabel());
