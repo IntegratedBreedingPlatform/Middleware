@@ -36,6 +36,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
@@ -54,7 +55,7 @@ public interface StudyDataManager {
 	 * @return the study or null if not found
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Study getStudy(int studyId) throws MiddlewareQueryException;
+	Study getStudy(int studyId) throws MiddlewareException;
 
 	/**
 	 * Gets the study.
@@ -64,7 +65,7 @@ public interface StudyDataManager {
 	 * @return the study
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareQueryException;
+	Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareException;
 
 	/**
 	 * Gets the study id by name.
@@ -113,7 +114,7 @@ public interface StudyDataManager {
 	 * @return The DataSet matching the given ID or null if none found
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	DataSet getDataSet(int dataSetId) throws MiddlewareQueryException;
+	DataSet getDataSet(int dataSetId) throws MiddlewareException;
 
 	/**
 	 * Gets the experiments given a dataset ID.
@@ -124,7 +125,7 @@ public interface StudyDataManager {
 	 * @return List of Experiments associated to the dataset ID or empty list if none found
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareQueryException;
+	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareException;
 
 	/**
 	 * Gets the experiments.
@@ -136,7 +137,7 @@ public interface StudyDataManager {
 	 * @return the experiments
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList) throws MiddlewareQueryException;
+	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList) throws MiddlewareException;
 
 	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
@@ -165,7 +166,7 @@ public interface StudyDataManager {
 	 * @return The factors of the study stored in a VariableTypeList
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareQueryException;
+	VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareException;
 
 	/**
 	 * Returns the list of variates for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves from
@@ -175,7 +176,7 @@ public interface StudyDataManager {
 	 * @return The variates of the study stored in a VariableTypeList
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException;
+	VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareException;
 
 	/**
 	 * Adds a study to the local database. Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment. Inserts
@@ -221,7 +222,7 @@ public interface StudyDataManager {
 	 * @param value The value to set
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException;
+	void setExperimentValue(int experimentId, int variableId, String value, String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Adds an experiment row to the dataset.
@@ -287,7 +288,7 @@ public interface StudyDataManager {
 	 * @return The list of datasets matching the dataSetType or empty list if non found.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException;
+	List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareException;
 
 	/**
 	 * Returns the number of experiments matching the given trial environment and variate. Counts from central if the given ID is positive,
@@ -308,7 +309,7 @@ public interface StudyDataManager {
 	 * @return The trial environments
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException;
+	TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareException;
 
 	/**
 	 * Retrieves the stocks belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise retrieves from
@@ -318,7 +319,7 @@ public interface StudyDataManager {
 	 * @return The stocks
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException;
+	Stocks getStocksInDataset(int datasetId) throws MiddlewareException;
 
 	/**
 	 * Returns the number of stocks matching the given dataset ID, trial environment ID and variate ID. Counts from central if the given ID
@@ -354,7 +355,7 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 
-	DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareQueryException;
+	DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareException;
 
 	/**
 	 * Deletes the dataset matching the given ID.
@@ -748,7 +749,7 @@ public interface StudyDataManager {
 	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException;
 
 	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows)
-			throws MiddlewareQueryException;
+			throws MiddlewareException;
 
 	/**
 	 * Updates the rank or order of given variables as they ordered in the given list

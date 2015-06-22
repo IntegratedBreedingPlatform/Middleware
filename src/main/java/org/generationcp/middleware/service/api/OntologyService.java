@@ -49,7 +49,7 @@ public interface OntologyService {
 	 * @return the standard variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException;
+	StandardVariable getStandardVariable(int stdVariableId, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets the standard variables given a list of ids
@@ -58,7 +58,7 @@ public interface OntologyService {
 	 * @return the list of standard variables
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException;
+	List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets standard variable summaries for given a list of ids
@@ -78,7 +78,7 @@ public interface OntologyService {
 	 * @return the standard variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException;
+	StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets the list of standard variables given the name or synonym.
@@ -87,7 +87,7 @@ public interface OntologyService {
 	 * @return the standard variables
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException;
+	List<StandardVariable> getStandardVariables(String nameOrSynonym,String programUUID) throws MiddlewareException;
 
 	/**
 	 * Adds a standard variable.
@@ -95,7 +95,7 @@ public interface OntologyService {
 	 * @param stdVariable the standard variable to add
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
+	void addStandardVariable(StandardVariable stdVariable,String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets the all standard variables.
@@ -104,7 +104,7 @@ public interface OntologyService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	// Review: why do we need such a method? Can load a large portion of the DB.
-	Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
+	Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets all the standard variables matching the given trait class ID.
@@ -113,7 +113,7 @@ public interface OntologyService {
 	 * @return the standard variables by trait class
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException;
+	List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId,String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets all the standard variables matching the given property ID.
@@ -122,7 +122,7 @@ public interface OntologyService {
 	 * @return the standard variables by property
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException;
+	List<StandardVariable> getStandardVariablesByProperty(Integer propertyId, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets all the standard variables matching the given method ID.
@@ -131,7 +131,7 @@ public interface OntologyService {
 	 * @return the standard variables by method
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException;
+	List<StandardVariable> getStandardVariablesByMethod(Integer methodId, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets all the standard variables matching the given scale ID.
@@ -140,7 +140,7 @@ public interface OntologyService {
 	 * @return the standard variables by scale
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException;
+	List<StandardVariable> getStandardVariablesByScale(Integer scaleId, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets the all terms by cv id.

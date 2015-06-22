@@ -11,7 +11,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class StudyValuesTransformer extends Transformer {
@@ -21,7 +21,7 @@ public class StudyValuesTransformer extends Transformer {
 	}
 
 	public StudyValues transform(Integer germplasmId, Integer locationId, StudyDetails studyDetails,
-			List<MeasurementVariable> measurementVariables, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+			List<MeasurementVariable> measurementVariables, VariableTypeList variableTypeList) throws MiddlewareException {
 
 		StudyValues studyValues = new StudyValues();
 		VariableList variableList = new VariableList();

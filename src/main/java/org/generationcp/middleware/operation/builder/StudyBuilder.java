@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -25,7 +26,7 @@ public class StudyBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Study createStudy(int studyId) throws MiddlewareQueryException {
+	public Study createStudy(int studyId) throws MiddlewareException {
 		Study study = null;
 		DmsProject project = this.getDmsProjectDao().getById(studyId);
 		if (project != null) {
@@ -34,7 +35,7 @@ public class StudyBuilder extends Builder {
 		return study;
 	}
 
-	public Study createStudy(int studyId, boolean hasVariabletype) throws MiddlewareQueryException {
+	public Study createStudy(int studyId, boolean hasVariabletype) throws MiddlewareException {
 		Study study = null;
 		DmsProject project = this.getDmsProjectDao().getById(studyId);
 		if (project != null) {
@@ -43,11 +44,13 @@ public class StudyBuilder extends Builder {
 		return study;
 	}
 
-	public Study createStudy(DmsProject project) throws MiddlewareQueryException {
+	public Study createStudy(DmsProject project) throws MiddlewareException {
 		Study study = new Study();
 		study.setId(project.getProjectId());
-
-		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties());
+		study.setProgramUUID(project.getProgramUUID());
+		
+		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties(),
+				project.getProgramUUID());
 		VariableTypeList conditionVariableTypes = variableTypes.getFactors();
 		VariableTypeList constantVariableTypes = variableTypes.getVariates();
 
@@ -59,11 +62,12 @@ public class StudyBuilder extends Builder {
 		return study;
 	}
 
-	public Study createStudy(DmsProject project, boolean hasVariableType) throws MiddlewareQueryException {
+	public Study createStudy(DmsProject project, boolean hasVariableType) throws MiddlewareException {
 		Study study = new Study();
 		study.setId(project.getProjectId());
 
-		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties());
+		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
+				project.getProperties(),project.getProgramUUID());
 		VariableTypeList conditionVariableTypes = variableTypes.getFactors();
 		VariableTypeList constantVariableTypes = variableTypes.getVariates();
 

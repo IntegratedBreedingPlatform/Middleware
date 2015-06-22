@@ -8,7 +8,6 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class VariableTypeListTransformer extends Transformer {
@@ -17,14 +16,14 @@ public class VariableTypeListTransformer extends Transformer {
 		super(sessionProviderForLocal);
 	}
 
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, String programUUID) throws MiddlewareQueryException,
-			MiddlewareException {
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, 
+			boolean isVariate, String programUUID) throws MiddlewareException {
 
 		return this.transform(measurementVariables, isVariate, 1, programUUID);
 	}
 
 	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, int rank, String programUUID)
-			throws MiddlewareQueryException, MiddlewareException {
+			throws MiddlewareException {
 
 		VariableTypeList variableTypeList = new VariableTypeList();
 

@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.dms.Values;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -177,9 +178,9 @@ public class ExperimentModelSaver extends Saver {
 		return experimentStock;
 	}
 
-	public void setExperimentValue(int experimentId, int variableId, Object value) throws MiddlewareQueryException {
+	public void setExperimentValue(int experimentId, int variableId, Object value, String programUUID) throws MiddlewareException {
 		ExperimentModel experiment = this.getExperimentDao().getById(experimentId);
-		StandardVariable stdVariable = this.getStandardVariableBuilder().create(variableId);
+		StandardVariable stdVariable = this.getStandardVariableBuilder().create(variableId,programUUID);
 		if (experiment != null && stdVariable != null) {
 
 			if (stdVariable.getStoredIn().getId() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {

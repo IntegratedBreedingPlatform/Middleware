@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -41,7 +42,7 @@ public class DataSetBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public DataSet build(int dataSetId) throws MiddlewareQueryException {
+	public DataSet build(int dataSetId) throws MiddlewareException {
 		DataSet dataSet = null;
 		DmsProject project = this.getDmsProjectDao().getById(dataSetId);
 		if (project != null) {
@@ -50,19 +51,19 @@ public class DataSetBuilder extends Builder {
 		return dataSet;
 	}
 
-	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareQueryException {
+	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareException {
 		VariableTypeList variableTypeList = new VariableTypeList();
 		DmsProject project = this.getDmsProjectDao().getById(dataSetId);
 		if (project != null) {
 			Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
 			for (VariableInfo variableInfo : variableInfoList) {
-				variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo));
+				variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo,project.getProgramUUID()));
 			}
 		}
 		return variableTypeList.sort();
 	}
 
-	private DataSet createDataSet(DmsProject project) throws MiddlewareQueryException {
+	private DataSet createDataSet(DmsProject project) throws MiddlewareException {
 		DataSet dataSet = new DataSet();
 		dataSet.setId(project.getProjectId());
 		dataSet.setName(project.getName());
@@ -78,12 +79,12 @@ public class DataSetBuilder extends Builder {
 		return this.getGeolocationDao().getLocationIds(projectId);
 	}
 
-	private VariableTypeList getVariableTypes(DmsProject project) throws MiddlewareQueryException {
+	private VariableTypeList getVariableTypes(DmsProject project) throws MiddlewareException {
 		VariableTypeList variableTypes = new VariableTypeList();
 
 		Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
 		for (VariableInfo variableInfo : variableInfoList) {
-			variableTypes.add(this.getVariableTypeBuilder().create(variableInfo));
+			variableTypes.add(this.getVariableTypeBuilder().create(variableInfo,project.getProgramUUID()));
 		}
 		return variableTypes.sort();
 	}
@@ -121,7 +122,7 @@ public class DataSetBuilder extends Builder {
 		return trialDataset;
 	}
 
-	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException {
 		DataSet dataset = this.build(datasetId);
 		List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
 		boolean isMeasurementDataset = this.isMeasurementDataset(dataset);

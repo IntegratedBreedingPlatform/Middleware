@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -34,7 +35,7 @@ public class StockBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {
+	public Stocks getStocksInDataset(int datasetId) throws MiddlewareException {
 		DataSet dataSet = this.getDataSetBuilder().build(datasetId);
 		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 

@@ -46,13 +46,13 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	/* ======================= STANDARD VARIABLE ================================== */
 
 	@Override
-	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariable(stdVariableId);
+	public StandardVariable getStandardVariable(int stdVariableId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariable(stdVariableId,programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(standardVariableIds);
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(standardVariableIds,programUUID);
 	}
 
 	@Override
@@ -61,22 +61,22 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
+	public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId, String programUUID) throws MiddlewareException {
 		OntologyDataManager manager = this.getOntologyDataManager();
 		Integer standardVariableId = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
-		return manager.getStandardVariable(standardVariableId);
+		return manager.getStandardVariable(standardVariableId,programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException {
+	public List<StandardVariable> getStandardVariables(String nameOrSynonym,String programUUID) throws MiddlewareException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
-		standardVariables.addAll(this.getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym));
+		standardVariables.addAll(this.getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym,programUUID));
 		return standardVariables;
 	}
 
 	@Override
-	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
-		this.getOntologyDataManager().addStandardVariable(stdVariable);
+	public void addStandardVariable(StandardVariable stdVariable,String programUUID) throws MiddlewareException {
+		this.getOntologyDataManager().addStandardVariable(stdVariable,programUUID);
 	}
 
 	@Override
@@ -90,28 +90,28 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getAllStandardVariables();
+	public Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getAllStandardVariables(programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(traitClassId, null, null, null);
+	public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId,String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(traitClassId, null, null, null, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(null, propertyId, null, null);
+	public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(null, propertyId, null, null, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(null, null, methodId, null);
+	public List<StandardVariable> getStandardVariablesByMethod(Integer methodId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(null, null, methodId, null, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(null, null, null, scaleId);
+	public List<StandardVariable> getStandardVariablesByScale(Integer scaleId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(null, null, null, scaleId, programUUID);
 	}
 
 	@Override

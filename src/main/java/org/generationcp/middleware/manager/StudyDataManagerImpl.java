@@ -107,12 +107,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Study getStudy(int studyId) throws MiddlewareQueryException {
+	public Study getStudy(int studyId) throws MiddlewareException {
 		return this.getStudyBuilder().createStudy(studyId);
 	}
 
 	@Override
-	public Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareQueryException {
+	public Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareException {
 		return this.getStudyBuilder().createStudy(studyId, hasVariableType);
 	}
 
@@ -142,17 +142,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public DataSet getDataSet(int dataSetId) throws MiddlewareQueryException {
+	public DataSet getDataSet(int dataSetId) throws MiddlewareException {
 		return this.getDataSetBuilder().build(dataSetId);
 	}
 
 	@Override
-	public VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareQueryException {
+	public VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareException {
 		return this.getStudyFactorBuilder().build(studyId);
 	}
 
 	@Override
-	public VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException {
+	public VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareException {
 		return this.getStudyVariateBuilder().build(studyId);
 	}
 
@@ -206,7 +206,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareQueryException {
+	public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareException {
 		this.clearSessions();
 		VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
@@ -214,7 +214,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows)
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		this.clearSessions();
 
 		VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
@@ -226,8 +226,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
-					throws MiddlewareQueryException {
+	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, 
+			VariableTypeList varTypeList)
+					throws MiddlewareException {
 		this.clearSessions();
 		if (varTypeList == null) {
 			return this.getExperiments(dataSetId, start, numOfRows);
@@ -333,7 +334,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+	public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareException {
 
 		List<DmsProject> datasetProjects =
 				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
@@ -371,13 +372,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException {
+	public void setExperimentValue(int experimentId, int variableId, String value, String programUUID) throws MiddlewareQueryException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
 		try {
 			trans = session.beginTransaction();
-			this.getExperimentModelSaver().setExperimentValue(experimentId, variableId, value);
+			this.getExperimentModelSaver().setExperimentValue(experimentId, variableId, value, programUUID);
 			trans.commit();
 
 		} catch (Exception e) {
@@ -387,13 +388,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException {
+	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareException {
 		DmsProject study = this.getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
 		return this.getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
 	}
 
 	@Override
-	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {
+	public Stocks getStocksInDataset(int datasetId) throws MiddlewareException {
 		return this.getStockBuilder().getStocksInDataset(datasetId);
 	}
 
@@ -408,7 +409,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+	public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) throws MiddlewareException {
 		List<DataSet> datasets = this.getDataSetsByType(studyId, dataSetType);
 		if (datasets != null && !datasets.isEmpty()) {
 			return datasets.get(0);

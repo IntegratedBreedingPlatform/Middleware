@@ -44,6 +44,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.ErrorCode;
@@ -66,11 +67,11 @@ public class WorkbookBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Workbook create(int id) throws MiddlewareQueryException {
+	public Workbook create(int id) throws MiddlewareException {
 		return this.create(id, StudyType.N);
 	}
 
-	public Workbook create(int id, StudyType studyType) throws MiddlewareQueryException {
+	public Workbook create(int id, StudyType studyType) throws MiddlewareException {
 		boolean isTrial = studyType == StudyType.T;
 		Workbook workbook = new Workbook();
 
@@ -141,7 +142,8 @@ public class WorkbookBuilder extends Builder {
 
 		for (ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
-				StandardVariable stdVariable = this.getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
+				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
+						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
 				if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
 
 					String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
@@ -249,7 +251,7 @@ public class WorkbookBuilder extends Builder {
 		return workbook;
 	}
 
-	private List<MeasurementRow> getTrialObservations(Workbook workbook, boolean isTrial) throws MiddlewareQueryException {
+	private List<MeasurementRow> getTrialObservations(Workbook workbook, boolean isTrial) throws MiddlewareException {
 		List<MeasurementRow> trialObservations = null;
 		if (!isTrial) {
 			trialObservations =
@@ -278,7 +280,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
+	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareException {
 		Workbook workbook = new Workbook();
 		Study study = this.getStudyBuilder().createStudy(id);
 		Integer dataSetId = null, trialDatasetId = null;
@@ -346,7 +348,8 @@ public class WorkbookBuilder extends Builder {
 		for (ProjectProperty projectProperty : projectProperties) {
 			boolean isConstant = false;
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
-				StandardVariable stdVariable = this.getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()));
+				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
+						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
 						|| PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
 
@@ -800,7 +803,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private VariableList getSingleRowOfEmptyTrialVariables(Workbook workbook, int studyId, int measurementDatasetId)
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		DmsProject trialProject = this.getDataSetBuilder().getTrialDataset(studyId, measurementDatasetId);
 		DataSet dataset = this.getDataSetBuilder().build(trialProject.getProjectId());
 		VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
@@ -812,7 +815,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	private VariableList getTrialConstants(int trialDatasetId) throws MiddlewareQueryException {
+	private VariableList getTrialConstants(int trialDatasetId) throws MiddlewareException {
 		DataSet dataset = this.getDataSetBuilder().build(trialDatasetId);
 		VariableTypeList typeList = dataset.getVariableTypes().getVariates();
 
@@ -824,7 +827,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList,
-			List<MeasurementVariable> variateList) throws MiddlewareQueryException {
+			List<MeasurementVariable> variateList) throws MiddlewareException {
 
 		int totalRows = (int) this.getStudyDataManager().countExperiments(trialDatasetId);
 		List<Experiment> experiments = this.getStudyDataManager().getExperiments(trialDatasetId, 0, totalRows);
@@ -914,7 +917,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	public int getMeasurementDataSetId(int studyId, String studyName) throws MiddlewareQueryException {
+	public int getMeasurementDataSetId(int studyId, String studyName) throws MiddlewareException {
 		List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
 		if (datasetRefList != null) {
 			for (DatasetReference datasetRef : datasetRefList) {
@@ -933,7 +936,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	public int getTrialDataSetId(int studyId, String studyName) throws MiddlewareQueryException {
+	public int getTrialDataSetId(int studyId, String studyName) throws MiddlewareException {
 		List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
 		if (datasetRefList != null) {
 			for (DatasetReference datasetRef : datasetRefList) {

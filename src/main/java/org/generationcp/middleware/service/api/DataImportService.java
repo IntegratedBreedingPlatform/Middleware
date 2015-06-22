@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.util.Message;
@@ -65,7 +66,7 @@ public interface DataImportService {
 	 * @throws WorkbookParserException
 	 * @throws MiddlewareQueryException
 	 */
-	Workbook strictParseWorkbook(File file, String programUUID) throws WorkbookParserException, MiddlewareQueryException;
+	Workbook strictParseWorkbook(File file, String programUUID) throws WorkbookParserException, MiddlewareException;
 
 	/**
 	 * Checks if the name specified is an already existing project name
@@ -96,7 +97,7 @@ public interface DataImportService {
 	 * @return Map<String,List<Message>> - map of errors for each header and global errors
 	 * @throws MiddlewareQueryException
 	 */
-	Map<String, List<Message>> validateProjectOntology(Workbook workbook) throws MiddlewareQueryException;
+	Map<String, List<Message>> validateProjectOntology(Workbook workbook, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Saves the project ontology from the Workbook Tables: project, project_relationship, project_properties
@@ -116,6 +117,6 @@ public interface DataImportService {
 	 */
 	int saveProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException;
 
-	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareQueryException;
+	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
 
 }

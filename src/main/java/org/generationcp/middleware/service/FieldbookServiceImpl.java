@@ -49,6 +49,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -167,7 +168,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Study getStudy(int studyId) throws MiddlewareQueryException {
+	public Study getStudy(int studyId) throws MiddlewareException {
 		// not using the variable type
 		return this.getStudyDataManager().getStudy(studyId, false);
 	}
@@ -214,14 +215,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
+	public Workbook getNurseryDataSet(int id) throws MiddlewareException {
 		Workbook workbook = this.getWorkbookBuilder().create(id, StudyType.N);
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
 
 	@Override
-	public Workbook getTrialDataSet(int id) throws MiddlewareQueryException {
+	public Workbook getTrialDataSet(int id) throws MiddlewareException {
 		Workbook workbook = this.getWorkbookBuilder().create(id, StudyType.T);
 		this.setOrderVariableByRank(workbook);
 		return workbook;
@@ -229,7 +230,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
+	public void saveMeasurementRows(Workbook workbook,String programUUID) throws MiddlewareException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
@@ -248,7 +249,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
 
-			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook);
+			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook,programUUID);
 
 			// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 			Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -268,7 +269,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 			// save trial observations
-			this.getWorkbookSaver().saveTrialObservations(workbook);
+			this.getWorkbookSaver().saveTrialObservations(workbook,programUUID);
 
 			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
@@ -616,21 +617,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getAllStandardVariables();
+	public Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getAllStandardVariables(programUUID);
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariable(id);
+	public StandardVariable getStandardVariable(int id,String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariable(id,programUUID);
 	}
 
 	@Override
-	public List<ValueReference> getAllNurseryTypes() throws MiddlewareQueryException {
+	public List<ValueReference> getAllNurseryTypes(String programUUID) throws MiddlewareException {
 
 		List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
 
-		StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId());
+		StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(
+				TermId.NURSERY_TYPE.getId(),programUUID);
 		List<Enumeration> validValues = stdVar.getEnumerations();
 
 		if (validValues != null) {
@@ -755,7 +757,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
+	public Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareException {
 		return this.getWorkbookBuilder().createStudyVariableSettings(id, isNursery);
 	}
 
@@ -893,7 +895,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareQueryException {
+	public int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareException {
 		return this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 	}
 
@@ -994,7 +996,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList,
-			List<MeasurementVariable> variateList) throws MiddlewareQueryException {
+			List<MeasurementVariable> variateList) throws MiddlewareException {
 		return this.getWorkbookBuilder().buildTrialObservations(trialDatasetId, factorList, variateList);
 	}
 
@@ -1028,13 +1030,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
-			PhenotypicType role) throws MiddlewareQueryException {
+	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(
+			String property, String scale, String method,
+			PhenotypicType role, String programUUID) throws MiddlewareException {
 		MeasurementVariable variable = null;
 		StandardVariable standardVariable = null;
 		Integer id = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
 		if (id != null) {
-			standardVariable = this.getStandardVariableBuilder().create(id);
+			standardVariable = this.getStandardVariableBuilder().create(id,programUUID);
 			return this.getMeasurementVariableTransformer().transform(standardVariable, false);
 		}
 		return variable;
@@ -1047,7 +1050,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException {
 		Workbook workbook = this.getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
 		this.setOrderVariableByRank(workbook, datasetId);
 		return workbook;
@@ -1207,13 +1210,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareQueryException {
+	public void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareException {
 		Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 
 	@Override
-	public boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException {
+	public boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareException {
 		if (workbook != null) {
 			Integer studyId = workbook.getStudyDetails().getId();
 			String studyName = workbook.getStudyDetails().getStudyName();
@@ -1261,8 +1264,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public StandardVariable getStandardVariableByName(String name) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().getByName(name);
+	public StandardVariable getStandardVariableByName(String name, String programUUID) throws MiddlewareException {
+		return this.getStandardVariableBuilder().getByName(name,programUUID);
 	}
 
 }

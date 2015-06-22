@@ -200,9 +200,10 @@ public class GeolocationSaver extends Saver {
 		return geolocation;
 	}
 
-	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery) throws MiddlewareQueryException,
+	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery, String programUUID) throws MiddlewareQueryException,
 			MiddlewareException {
-		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(row.getMeasurementVariables(), false);
+		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(
+				row.getMeasurementVariables(), false, programUUID);
 		VariableList variableList = this.getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
 
 		return this.saveGeolocation(variableList, row, isNursery, false);

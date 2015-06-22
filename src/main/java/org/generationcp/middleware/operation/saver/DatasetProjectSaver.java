@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -37,17 +38,17 @@ public class DatasetProjectSaver extends Saver {
 	}
 
 	public DmsProject addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID)
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		DmsProject datasetProject = new DmsProject();
 		datasetProject.setProjectId(this.getDmsProjectDao().getNextId("projectId"));
 		datasetProject.setName(this.getName(datasetValues));
 		datasetProject.setDescription(this.getDescription(datasetValues));
 		datasetProject.setProgramUUID(programUUID);
 
-		this.addNameVariableTypeIfNecessary(variableTypeList);
-		this.addDescriptionVariableTypeIfNecessary(variableTypeList);
+		this.addNameVariableTypeIfNecessary(variableTypeList,programUUID);
+		this.addDescriptionVariableTypeIfNecessary(variableTypeList,programUUID);
 		if (datasetValues.getType() != null) {
-			VariableType variableType = this.addDataTypeVariableTypeIfNecessary(variableTypeList);
+			VariableType variableType = this.addDataTypeVariableTypeIfNecessary(variableTypeList,programUUID);
 			this.addDataTypeVariableIfNecessary(datasetValues, variableType);
 		}
 
@@ -81,32 +82,32 @@ public class DatasetProjectSaver extends Saver {
 		}
 	}
 
-	private void addNameVariableTypeIfNecessary(VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	private void addNameVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
 		if (variableTypeList.findById(TermId.DATASET_NAME) == null) {
 			variableTypeList.makeRoom(1);
-			variableTypeList.add(new VariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME), 1));
+			variableTypeList.add(new VariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME,programUUID), 1));
 		}
 	}
 
-	private void addDescriptionVariableTypeIfNecessary(VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	private void addDescriptionVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
 		if (variableTypeList.findById(TermId.DATASET_TITLE) == null) {
 			variableTypeList.makeRoom(2);
-			variableTypeList.add(new VariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE), 2));
+			variableTypeList.add(new VariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE,programUUID), 2));
 		}
 	}
 
-	private VariableType addDataTypeVariableTypeIfNecessary(VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	private VariableType addDataTypeVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
 		VariableType variableType = variableTypeList.findById(TermId.DATASET_TYPE);
 		if (variableType == null) {
-			variableType = new VariableType("DATASET_TYPE", "Dataset type", this.getStandardVariable(TermId.DATASET_TYPE), 3);
+			variableType = new VariableType("DATASET_TYPE", "Dataset type", this.getStandardVariable(TermId.DATASET_TYPE,programUUID), 3);
 			variableTypeList.makeRoom(3);
 			variableTypeList.add(variableType);
 		}
 		return variableType;
 	}
 
-	private StandardVariable getStandardVariable(TermId stdVarId) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().create(stdVarId.getId());
+	private StandardVariable getStandardVariable(TermId stdVarId, String programUUID) throws MiddlewareException {
+		return this.getStandardVariableBuilder().create(stdVarId.getId(),programUUID);
 	}
 
 	public void addDatasetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {

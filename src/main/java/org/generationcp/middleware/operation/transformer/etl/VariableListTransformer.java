@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
@@ -223,38 +224,40 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	public VariableList transformStudyDetails(StudyDetails studyDetails, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	public VariableList transformStudyDetails(StudyDetails studyDetails, 
+			VariableTypeList variableTypeList) throws MiddlewareException {
 
 		VariableList variables = new VariableList();
+		String programUUID = studyDetails.getProgramUUID();
 
 		if (studyDetails != null) {
 
 			int rank = 1;
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name",
-							studyDetails.getStudyName(), rank);
+							studyDetails.getStudyName(), rank, programUUID);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TITLE, "STUDY_TITLE", "Study title",
-							studyDetails.getTitle(), rank);
+							studyDetails.getTitle(), rank, programUUID);
 
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective",
-							studyDetails.getObjective(), rank);
+							studyDetails.getObjective(), rank, programUUID);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TYPE, "STUDY_TYPE", "Study type",
-							studyDetails.getStudyType() != null ? Integer.toString(studyDetails.getStudyType().getId()) : null, rank);
+							studyDetails.getStudyType() != null ? Integer.toString(studyDetails.getStudyType().getId()) : null, rank, programUUID);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.START_DATE, "START_DATE", "Start date",
-							studyDetails.getStartDate(), rank);
+							studyDetails.getStartDate(), rank, programUUID);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.END_DATE, "END_DATE", "End date",
-							studyDetails.getEndDate(), rank);
+							studyDetails.getEndDate(), rank, programUUID);
 		}
 		return variables.sort();
 	}
 
 	private int addVariableIfNecessary(VariableList variables, VariableTypeList variableTypeList, TermId termId, String localName,
-			String localDescription, String value, int rank) throws MiddlewareQueryException {
+			String localDescription, String value, int rank, String programUUID) throws MiddlewareException {
 
 		Variable variable = null;
 
@@ -272,7 +275,8 @@ public class VariableListTransformer extends Transformer {
 
 		}
 		if (!found) {
-			StandardVariable standardVariable = this.getStandardVariableBuilder().create(termId.getId());
+			StandardVariable standardVariable = this.getStandardVariableBuilder().create(
+					termId.getId(),programUUID);
 			VariableType variableType = new VariableType(localName, localDescription, standardVariable, rank);
 			variable = new Variable(variableType, value);
 			variables.add(variable);

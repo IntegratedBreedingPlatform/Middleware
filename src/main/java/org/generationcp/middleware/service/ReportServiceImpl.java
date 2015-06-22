@@ -72,7 +72,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 * @param studyId The study Id to which extract information from.
 	 * @return a Map containing information of the study.
 	 */
-	private Map<String, Object> extractFieldbookData(Integer studyId, boolean parentsInfoRequireed) throws MiddlewareQueryException {
+	private Map<String, Object> extractFieldbookData(Integer studyId, boolean parentsInfoRequireed) throws MiddlewareException {
 
 		StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
 		Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);

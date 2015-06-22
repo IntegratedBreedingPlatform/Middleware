@@ -29,6 +29,8 @@ public class Study implements Serializable {
 	private VariableList conditions;
 
 	private VariableList constants;
+	
+	private String programUUID;
 
 	public Study() {
 	}
@@ -196,4 +198,14 @@ public class Study implements Serializable {
 		}
 		return filteredFactors.sort();
 	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
+	}
+	
+	
 }

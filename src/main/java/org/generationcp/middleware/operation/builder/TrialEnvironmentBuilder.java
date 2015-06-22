@@ -30,6 +30,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -42,7 +43,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareQueryException {
+	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareException {
 		DmsProject project = this.getDataSetBuilder().getTrialDataset(studyId, datasetId);
 		DataSet dataSet = this.getDataSetBuilder().build(project.getProjectId());
 		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
