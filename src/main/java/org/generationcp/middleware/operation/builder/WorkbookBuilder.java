@@ -329,7 +329,7 @@ public class WorkbookBuilder extends Builder {
 		if (dataSetId != null) {
 			variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
 			//variable type roles are being set inside getexperiment
-			this.getStudyDataManager().getExperiments(dataSetId, 0, (int) Integer.MAX_VALUE, variables);
+			List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) Integer.MAX_VALUE, variables);
 		}
 		
 
@@ -693,14 +693,10 @@ public class WorkbookBuilder extends Builder {
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
 
 			for (VariableType variable : variables.getFactors().getVariableTypes()) {
-				if (isTrial
-						&& variable.getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
-						|| PhenotypicType.TRIAL_DESIGN.getLabelList().contains(
-								this.getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
-						|| PhenotypicType.GERMPLASM.getLabelList().contains(
-								this.getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))
-						|| PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(
-								this.getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))) {
+				if (isTrial && (
+						PhenotypicType.TRIAL_DESIGN == variable.getRole()
+						|| PhenotypicType.GERMPLASM  == variable.getRole()
+						|| PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole())) {
 
 					factorList.add(variable);
 				}
