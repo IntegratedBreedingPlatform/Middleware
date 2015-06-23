@@ -1,8 +1,7 @@
 
 package org.generationcp.middleware.domain.ontology;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 
@@ -90,6 +89,16 @@ public enum VariableType {
 
 	public static VariableType getByName(String name) {
 		return VariableType.byName.get(name);
+	}
+
+	public static Set<Integer> getVariableTypesIdsByPhenotype(PhenotypicType phenotype) {
+		Set<Integer> variableTypes = new HashSet<>();
+		for (VariableType variableType : VariableType.values()) {
+			if (variableType.getRole().equals(phenotype)) {
+				variableTypes.add(variableType.getId());
+			}
+		}
+		return variableTypes;
 	}
 
 	@Override
