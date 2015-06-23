@@ -137,7 +137,9 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					this.getActiveSession().createSQLQuery(
 							"SELECT r.subject_id, r.type_id, t.cv_id, t.cvterm_id, t.name, t.definition "
 									+ "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
-									+ "where r.subject_id in (select cvterm_id from cvterm where cv_id = " + CvId.SCALES.getId() + ")");
+									+ "where r.subject_id in (:scaleIds)");
+
+			query.setParameterList("scaleIds", scaleIds);
 
 			List result = query.list();
 
@@ -191,23 +193,6 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 		if (Objects.equals(scale.getDataType().getId(), DataType.CATEGORICAL_VARIABLE.getId()) && scale.getCategories().isEmpty()) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_CATEGORIES_SHOULD_NOT_EMPTY);
-		}
-
-		// Check supplied value as numeric if non null
-		if (Objects.equals(scale.getDataType(), DataType.NUMERIC_VARIABLE)) {
-			if (!Strings.isNullOrEmpty(scale.getMinValue())) {
-				Float min = StringUtil.parseFloat(scale.getMinValue(), null);
-				if (min == null) {
-					throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_MIN_VALUE_NOT_VALID);
-				}
-			}
-
-			if (!Strings.isNullOrEmpty(scale.getMaxValue())) {
-				Float max = StringUtil.parseFloat(scale.getMaxValue(), null);
-				if (max == null) {
-					throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_MAX_VALUE_NOT_VALID);
-				}
-			}
 		}
 
 		// Constant CvId
