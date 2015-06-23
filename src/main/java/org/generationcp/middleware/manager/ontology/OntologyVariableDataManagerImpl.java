@@ -2,16 +2,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -44,9 +35,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import java.math.BigInteger;
-import java.util.*;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -225,6 +213,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		});
 
 		return variables;
+	}
+
+	@Override
+	public void processTreatmentFactorHasPairValue(List<OntologyVariableSummary> summaryList, List<Integer> hiddenFields) throws MiddlewareException {
+		for (OntologyVariableSummary ontologyVariableSummary : summaryList) {
+			ontologyVariableSummary.setHasPair(getCvTermDao().hasPossibleTreatmentPairs(ontologyVariableSummary.getTerm().getId(), ontologyVariableSummary.getPropertySummary().getId(), hiddenFields));
+		}
 	}
 
 	@Override

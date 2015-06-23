@@ -12,13 +12,7 @@
 package org.generationcp.middleware.dao.oms;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -26,14 +20,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.PropertyReference;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -1179,6 +1166,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
+	@Deprecated
 	public List<StandardVariableReference> getAllTreatmentFactors(List<Integer> hiddenFields, boolean showOnlyPaired)
 			throws MiddlewareQueryException {
 		List<StandardVariableReference> list = new ArrayList<>();
@@ -1233,12 +1221,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 							.append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ").append(TermId.HAS_SCALE.getId())
 							.append("   AND sr.subject_id = c.cvterm_id ").append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ")
 							.append(TermId.HAS_METHOD.getId()).append("   AND mr.subject_id = c.cvterm_id ")
-							.append(" INNER JOIN cvterm_relationship stin ON stin.type_id = ").append(TermId.STORED_IN.getId())
-							.append("   AND stin.subject_id = c.cvterm_id AND stin.object_id = ")
-							.append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
-							.append(" INNER JOIN cvterm_relationship dtyperel ON dtyperel.type_id = ").append(TermId.HAS_TYPE.getId())
-							.append("   AND dtyperel.subject_id = c.cvterm_id AND dtyperel.object_id = ")
-							.append(TermId.NUMERIC_VARIABLE.getId()).append(" WHERE c.cvterm_id <> ").append(cvTermId)
+							.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE)
+							.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
+							.append(VariableType.TREATMENT_FACTOR.name())
+							.append("' WHERE c.cvterm_id <> ").append(cvTermId)
 							.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());

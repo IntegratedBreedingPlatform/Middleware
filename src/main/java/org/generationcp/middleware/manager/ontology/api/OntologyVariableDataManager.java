@@ -41,6 +41,8 @@ public interface OntologyVariableDataManager {
 	List<OntologyVariableSummary> getWithFilter(OntologyVariableInfo variableFilterOptions, Set<Integer> filteredVariables)
 			throws MiddlewareException;
 
+	void processTreatmentFactorHasPairValue(List<OntologyVariableSummary> summaryList, List<Integer> hiddenFields) throws MiddlewareException;
+
 	/**
 	 * Return variable by Id * @return Variable
 	 * 
