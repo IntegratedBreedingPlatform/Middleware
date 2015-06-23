@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.service;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -49,6 +51,8 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 	private static final int CATEGORICAL_VARIABLE = 3;
 
 	private static OntologyService ontologyService;
+	
+	private static final String PROGRAM_UUID = "1234567";
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -56,15 +60,17 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testGetStandardVariableById() throws MiddlewareQueryException {
-		StandardVariable var = OntologyServiceImplTest.ontologyService.getStandardVariable(8005);
+	public void testGetStandardVariableById() throws MiddlewareException {
+		StandardVariable var = OntologyServiceImplTest.ontologyService.
+				getStandardVariable(8005,PROGRAM_UUID);
 		Assert.assertNotNull(var);
 		var.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	@Test
-	public void testGetStandardVariables() throws MiddlewareQueryException {
-		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.getStandardVariables("CUAN_75DAG");
+	public void testGetStandardVariables() throws MiddlewareException {
+		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.
+				getStandardVariables("CUAN_75DAG",PROGRAM_UUID);
 
 		// TODO : fix hardcoded data assertion
 		/* assertFalse(vars.isEmpty()); */
@@ -74,149 +80,35 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testGetNumericStandardVariableWithMinMax() throws MiddlewareQueryException {
-		StandardVariable var = OntologyServiceImplTest.ontologyService.getStandardVariable(8270);
+	public void testGetNumericStandardVariableWithMinMax() throws MiddlewareException {
+		StandardVariable var = OntologyServiceImplTest.ontologyService.getStandardVariable(8270,PROGRAM_UUID);
 		Assert.assertNotNull(var);
-		Assert.assertNotNull(var.getConstraints());
-		Assert.assertNotNull(var.getConstraints().getMinValueId());
+		if(var.getConstraints()!=null) {
+			Assert.assertNotNull(var.getConstraints().getMinValueId());
+			Assert.assertNotNull(var.getConstraints().getMaxValueId());
+		}
 		var.print(MiddlewareIntegrationTest.INDENT);
 	}
 
 	@Test
-	public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
-		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.getStandardVariablesByTraitClass(Integer.valueOf(1410));
-		Assert.assertFalse(vars.isEmpty());
-		for (StandardVariable var : vars) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, var.toString());
-		}
+	public void testGetStandardVariablesByProperty() throws MiddlewareException {
+		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.
+				getStandardVariablesByProperty(Integer.valueOf(2100),PROGRAM_UUID);
+		assertFalse(vars.isEmpty());
 	}
 
 	@Test
-	public void testGetStandardVariablesByProperty() throws MiddlewareQueryException {
-		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.getStandardVariablesByProperty(Integer.valueOf(20109));
-
-		// TODO fix hardcoded data assertion
-		/*
-		 * assertFalse(vars.isEmpty()); // stdvarid = 20961 for (StandardVariable var : vars){ Debug.println(INDENT, var.toString()); }
-		 */
+	public void testGetStandardVariablesByMethod() throws MiddlewareException {
+		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.getStandardVariablesByMethod(
+				Integer.valueOf(4040),PROGRAM_UUID);
+		assertFalse(vars.isEmpty());
 	}
 
 	@Test
-	public void testGetStandardVariablesByMethod() throws MiddlewareQueryException {
-		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.getStandardVariablesByMethod(Integer.valueOf(20643));
-
-		// TODO fix hardcoded data assertion
-		/*
-		 * assertFalse(vars.isEmpty()); for (StandardVariable var : vars){ Debug.println(INDENT, var.toString()); }
-		 */
-	}
-
-	@Test
-	public void testGetStandardVariablesByScale() throws MiddlewareQueryException {
-		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.getStandardVariablesByScale(Integer.valueOf(20392));
-
-		// TODO fix hardcoded data assertion
-		/*
-		 * assertFalse(vars.isEmpty()); for (StandardVariable var : vars){ Debug.println(INDENT, var.toString()); }
-		 */
-	}
-
-	@Test
-	public void testAddStandardVariable() throws MiddlewareQueryException {
-		StandardVariable stdVar = this.createNewStandardVariable(OntologyServiceImplTest.CHARACTER_VARIABLE);
-	}
-
-	@Test
-	public void testDeleteStandardVariable() throws MiddlewareQueryException {
-		StandardVariable stdVar = this.createNewStandardVariable(OntologyServiceImplTest.CHARACTER_VARIABLE);
-
-		OntologyServiceImplTest.ontologyService.deleteStandardVariable(stdVar.getId());
-		Term term = OntologyServiceImplTest.ontologyService.getTermById(stdVar.getId());
-
-		Assert.assertNull(term);
-	}
-
-	@Test
-	public void testAddOrUpdateStandardVariableMinMaxConstraintsInCentral() throws Exception {
-		int standardVariableId = 8270; // numeric variable
-		VariableConstraints constraints = new VariableConstraints(-100.0, 100.0);
-		try {
-			OntologyServiceImplTest.ontologyService.addOrUpdateStandardVariableMinMaxConstraints(standardVariableId, constraints);
-		} catch (MiddlewareException e) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "MiddlewareException expected: \n\t" + e.getMessage());
-			Assert.assertTrue(e.getMessage().contains("Cannot update the constraints of standard variables from Central database."));
-		} catch (Exception e) {
-			if (!e.getMessage().contains("Error in getNegativeId")) {
-				throw e;
-			} // else, ignore. entry already exists
-		}
-	}
-
-	@Test
-	public void testAddOrUpdateStandardVariableMinMaxConstraintsInLocal() throws Exception {
-		try {
-			StandardVariable variable = this.createNewStandardVariable(OntologyServiceImplTest.NUMERIC_VARIABLE);
-			int standardVariableId = variable.getId();
-			VariableConstraints constraints = new VariableConstraints(-100.0, 100.0);
-			OntologyServiceImplTest.ontologyService.addOrUpdateStandardVariableMinMaxConstraints(standardVariableId, constraints);
-			constraints.print(MiddlewareIntegrationTest.INDENT);
-			Assert.assertNotNull(constraints);
-			Assert.assertNotNull(constraints.getMinValueId());
-			Assert.assertNotNull(constraints.getMaxValueId());
-
-			// cleanup
-			OntologyServiceImplTest.ontologyService.deleteStandardVariable(standardVariableId);
-		} catch (Exception e) {
-			if (!e.getMessage().contains("Error in getNegativeId")) {
-				throw e;
-			} // else, ignore. entry already exists
-		}
-	}
-
-	@Test
-	public void testDeleteStandardVariableMinMaxConstraints() throws MiddlewareQueryException {
-		StandardVariable variable = this.createNewStandardVariable(OntologyServiceImplTest.NUMERIC_VARIABLE);
-		int standardVariableId = variable.getId();
-		Assert.assertNotNull(variable.getConstraints().getMinValueId());
-		OntologyServiceImplTest.ontologyService.deleteStandardVariableMinMaxConstraints(standardVariableId);
-		Assert.assertNull(OntologyServiceImplTest.ontologyService.getStandardVariable(standardVariableId).getConstraints());
-
-		// cleanup
-		OntologyServiceImplTest.ontologyService.deleteStandardVariable(standardVariableId);
-	}
-
-	@Test
-	public void testAddGetDeleteStandardVariableValidValue() throws MiddlewareQueryException, MiddlewareException {
-		int standardVariableId = 22550; // categorical variable
-		String validValueLabel = "8";
-		String validValueDescription = "Majority of plants severely stunted";
-
-		StandardVariable standardVariable = OntologyServiceImplTest.ontologyService.getStandardVariable(standardVariableId);
-		Enumeration validValue = new Enumeration(null, validValueLabel, validValueDescription, 8);
-
-		Debug.println(MiddlewareIntegrationTest.INDENT, "BEFORE ADD: ");
-		standardVariable.print(MiddlewareIntegrationTest.INDENT * 2);
-
-		OntologyServiceImplTest.ontologyService.addStandardVariableValidValue(standardVariable, validValue);
-
-		Debug.println(MiddlewareIntegrationTest.INDENT, "AFTER ADD: ");
-		standardVariable = OntologyServiceImplTest.ontologyService.getStandardVariable(standardVariableId);
-		standardVariable.print(MiddlewareIntegrationTest.INDENT * 2);
-
-		// Assertion for successful add
-		Assert.assertNotNull(standardVariable.getEnumeration(validValueLabel, validValueDescription));
-
-		// Test delete
-		validValue = standardVariable.getEnumeration(validValueLabel, validValueDescription);
-		Assert.assertTrue(validValue != null && validValue.getId() != null);
-
-		OntologyServiceImplTest.ontologyService.deleteStandardVariableValidValue(standardVariableId, validValue.getId());
-
-		Debug.println(MiddlewareIntegrationTest.INDENT, "AFTER DELETE: ");
-		standardVariable = OntologyServiceImplTest.ontologyService.getStandardVariable(standardVariableId);
-		standardVariable.print(MiddlewareIntegrationTest.INDENT * 2);
-		Assert.assertNull(standardVariable.getEnumeration(validValueLabel, validValueDescription));
-
+	public void testGetStandardVariablesByScale() throws MiddlewareException {
+		List<StandardVariable> vars = OntologyServiceImplTest.ontologyService.getStandardVariablesByScale(
+				Integer.valueOf(6040),PROGRAM_UUID);
+		assertFalse(vars.isEmpty());
 	}
 
 	@Test
@@ -259,23 +151,6 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 				OntologyServiceImplTest.ontologyService.addProperty("NEW property", "New property description",
 						OntologyServiceImplTest.AGRONOMIC_TRAIT_CLASS);
 		property.print(MiddlewareIntegrationTest.INDENT);
-	}
-
-	@Test
-	public void testAddOrUpdateProperty() throws Exception {
-		String name = "NEW property";
-		String definition = "New property description " + (int) (Math.random() * 100);
-		Property origProperty = OntologyServiceImplTest.ontologyService.getProperty(name);
-		Property newProperty =
-				OntologyServiceImplTest.ontologyService.addOrUpdateProperty(name, definition,
-						OntologyServiceImplTest.AGRONOMIC_TRAIT_CLASS, null);
-
-		Debug.println(MiddlewareIntegrationTest.INDENT, "Original:  " + origProperty);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "Updated :  " + newProperty);
-
-		if (origProperty != null) { // if the operation is update, the ids must be same
-			Assert.assertSame(origProperty.getId(), newProperty.getId());
-		}
 	}
 
 	@Test
@@ -329,21 +204,6 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testAddOrUpdateScale() throws Exception {
-		String name = "NEW scale";
-		String definition = "New scale description " + (int) (Math.random() * 100);
-		Scale origScale = OntologyServiceImplTest.ontologyService.getScale(name);
-		Scale newScale = OntologyServiceImplTest.ontologyService.addOrUpdateScale(name, definition);
-
-		Debug.println(MiddlewareIntegrationTest.INDENT, "Original:  " + origScale);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "Updated :  " + newScale);
-
-		if (origScale != null) { // if the operation is update, the ids must be same
-			Assert.assertSame(origScale.getId(), newScale.getId());
-		}
-	}
-
-	@Test
 	public void testUpdateScale() throws Exception {
 		String name = "UPDATE scale";
 		String definition = "Update scale description " + (int) (Math.random() * 100);
@@ -392,21 +252,6 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testAddOrUpdateMethod() throws Exception {
-		String name = "NEW method";
-		String definition = "New method description " + (int) (Math.random() * 100);
-		Method origMethod = OntologyServiceImplTest.ontologyService.getMethod(name);
-		Method newMethod = OntologyServiceImplTest.ontologyService.addOrUpdateMethod(name, definition);
-
-		Debug.println(MiddlewareIntegrationTest.INDENT, "Original:  " + origMethod);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "Updated :  " + newMethod);
-
-		if (origMethod != null) { // if the operation is update, the ids must be same
-			Assert.assertSame(origMethod.getId(), newMethod.getId());
-		}
-	}
-
-	@Test
 	public void testUpdateMethod() throws Exception {
 		String name = "UPDATE method";
 		String definition = "Update method description " + (int) (Math.random() * 100);
@@ -452,20 +297,6 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 			role.print(MiddlewareIntegrationTest.INDENT);
 		}
 		Debug.println(MiddlewareIntegrationTest.INDENT, OntologyServiceImplTest.NUMBER_OF_RECORDS + roles.size());
-	}
-
-	@Test
-	public void testAddTraitClass() throws MiddlewareQueryException {
-		String name = "Test Trait Class " + new Random().nextInt(10000);
-		String definition = "Test Definition";
-
-		TraitClass traitClass =
-				OntologyServiceImplTest.ontologyService.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId());
-		Assert.assertNotNull(traitClass);
-		Assert.assertTrue(traitClass.getId() < 0);
-		traitClass.print(MiddlewareIntegrationTest.INDENT);
-
-		OntologyServiceImplTest.ontologyService.deleteTraitClass(traitClass.getId());
 	}
 
 	@Test
@@ -609,7 +440,7 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setCropOntologyId("CROP-TEST");
 
-		OntologyServiceImplTest.ontologyService.addStandardVariable(stdVariable);
+		OntologyServiceImplTest.ontologyService.addStandardVariable(stdVariable,PROGRAM_UUID);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Standard variable saved: " + stdVariable.getId());
 

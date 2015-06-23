@@ -95,7 +95,7 @@ public interface OntologyService {
 	 * @param stdVariable the standard variable to add
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addStandardVariable(StandardVariable stdVariable,String programUUID) throws MiddlewareException;
+	void addStandardVariable(StandardVariable stdVariable,String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the all standard variables.

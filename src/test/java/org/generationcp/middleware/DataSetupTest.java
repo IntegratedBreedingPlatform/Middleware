@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
@@ -109,7 +110,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void setUpBasicTestData() throws MiddlewareQueryException {
+	public void setUpBasicTestData() throws MiddlewareException {
 		String programUUID = this.createWorkbenchProgram();
 		this.createNursery(programUUID);
 	}
@@ -191,7 +192,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		return program.getUniqueID();
 	}
 
-	private void createNursery(String programUUID) throws MiddlewareQueryException {
+	private void createNursery(String programUUID) throws MiddlewareException {
 
 		int randomInt = new Random().nextInt(100);
 

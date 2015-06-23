@@ -4,7 +4,7 @@ package org.generationcp.middleware.service;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.junit.Assert;
@@ -15,13 +15,13 @@ import org.mockito.Mockito;
 public class FieldbookServiceTest {
 
 	@Test
-	public void testSetOrderVariableByRankIfWorkbookIsNull() throws MiddlewareQueryException {
+	public void testSetOrderVariableByRankIfWorkbookIsNull() throws MiddlewareException {
 		FieldbookServiceImpl impl = Mockito.mock(FieldbookServiceImpl.class);
 		Assert.assertFalse("Should return false since the workbook is null", impl.setOrderVariableByRank(null));
 	}
 
 	@Test
-	public void testSetOrderVariableByRankIfWorkbookIsNotNull() throws MiddlewareQueryException {
+	public void testSetOrderVariableByRankIfWorkbookIsNotNull() throws MiddlewareException {
 		FieldbookServiceImpl impl = Mockito.spy(new FieldbookServiceImpl());
 		Mockito.when(impl.getWorkbookBuilder()).thenReturn(Mockito.mock(WorkbookBuilder.class));
 		Mockito.when(impl.getProjectPropertyDao()).thenReturn(Mockito.mock(ProjectPropertyDao.class));
@@ -34,7 +34,7 @@ public class FieldbookServiceTest {
 	}
 
 	@Test
-	public void testGetCompleteDataset() throws MiddlewareQueryException {
+	public void testGetCompleteDataset() throws MiddlewareException {
 		FieldbookServiceImpl impl = Mockito.spy(new FieldbookServiceImpl());
 		Mockito.when(impl.getWorkbookBuilder()).thenReturn(Mockito.mock(WorkbookBuilder.class));
 		Mockito.when(impl.getProjectPropertyDao()).thenReturn(Mockito.mock(ProjectPropertyDao.class));

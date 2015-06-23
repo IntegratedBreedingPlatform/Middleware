@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -52,22 +53,22 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 		return dmsProject;
 	}
 
-	public DmsProject createStudyTestData(String uniqueId) throws MiddlewareQueryException {
+	public DmsProject createStudyTestData(String uniqueId) throws MiddlewareException {
 		String name = "Study Name " + new Random().nextInt(10000);
 		String description = "Study Description";
 
 		VariableTypeList typeList = new VariableTypeList();
 		VariableList variableList = new VariableList();
 
-		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), name, 1);
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), name, 1, uniqueId);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_TITLE.getId(), description, 2);
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), description, 2, uniqueId);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(StudyType.T.getId()), 3);
+		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(StudyType.T.getId()), 3, uniqueId);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
@@ -84,26 +85,26 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 		return dmsProject;
 	}
 
-	public DmsProject createStudyTestDataWithActiveStatus(String uniqueId) throws MiddlewareQueryException {
+	public DmsProject createStudyTestDataWithActiveStatus(String uniqueId) throws MiddlewareException {
 		String name = "Study Name " + new Random().nextInt(10000);
 		String description = "Study Description";
 
 		VariableTypeList typeList = new VariableTypeList();
 		VariableList variableList = new VariableList();
 
-		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), name, 1);
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), name, 1, uniqueId);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_TITLE.getId(), description, 2);
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), description, 2, uniqueId);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(StudyType.T.getId()), 3);
+		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(StudyType.T.getId()), 3, uniqueId);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_STATUS.getId(), String.valueOf(TermId.ACTIVE_STUDY.getId()), 4);
+		variable = this.createVariable(TermId.STUDY_STATUS.getId(), String.valueOf(TermId.ACTIVE_STUDY.getId()), 4, uniqueId);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
@@ -120,8 +121,8 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 		return dmsProject;
 	}
 
-	public Variable createVariable(int termId, String value, int rank) throws MiddlewareQueryException {
-		StandardVariable stVar = this.ontologyManager.getStandardVariable(termId);
+	public Variable createVariable(int termId, String value, int rank, String uniqueId) throws MiddlewareException {
+		StandardVariable stVar = this.ontologyManager.getStandardVariable(termId,uniqueId);
 
 		VariableType vtype = new VariableType();
 		vtype.setStandardVariable(stVar);

@@ -53,9 +53,12 @@ public class DataImportServiceImplTest {
 		Mockito.when(this.workbook.isNursery()).thenReturn(true);
 
 		// tip! do note that spy-ed object still calls the real method, may cause changing internal state as side effect
-		Mockito.when(moleDataImportService.isEntryExists(this.ontology, this.workbook.getFactors())).thenReturn(true);
-		Mockito.when(moleDataImportService.isPlotExists(this.ontology, this.workbook.getFactors())).thenReturn(true);
-		Mockito.when(moleDataImportService.isTrialInstanceNumberExists(this.ontology, this.workbook.getTrialVariables())).thenReturn(true);
+		Mockito.when(moleDataImportService.isEntryExists(
+				this.ontology, this.workbook.getFactors(),PROGRAM_UUID)).thenReturn(true);
+		Mockito.when(moleDataImportService.isPlotExists(
+				this.ontology, this.workbook.getFactors(),PROGRAM_UUID)).thenReturn(true);
+		Mockito.when(moleDataImportService.isTrialInstanceNumberExists(
+				this.ontology, this.workbook.getTrialVariables(),PROGRAM_UUID)).thenReturn(true);
 
 		Mockito.when(this.workbook.getAllVariables()).thenReturn(this.initializeTestMeasurementVariables());
 

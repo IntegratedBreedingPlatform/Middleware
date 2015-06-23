@@ -75,7 +75,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public void addStandardVariable(StandardVariable stdVariable,String programUUID) throws MiddlewareException {
+	public void addStandardVariable(StandardVariable stdVariable,String programUUID) throws MiddlewareQueryException {
 		this.getOntologyDataManager().addStandardVariable(stdVariable,programUUID);
 	}
 

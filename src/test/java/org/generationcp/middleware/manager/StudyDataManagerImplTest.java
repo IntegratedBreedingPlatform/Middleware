@@ -51,6 +51,7 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -569,7 +570,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		VariableType variableType = new VariableType();
 		variableType.setLocalName("Dog");
 		variableType.setLocalDescription("Man's best friend");
-		variableType.setStandardVariable(StudyDataManagerImplTest.ontologyManager.getStandardVariable(8240));
+		variableType.setStandardVariable(StudyDataManagerImplTest.ontologyManager.
+				getStandardVariable(8240,commonTestProject.getUniqueID()));
 		variableType.setRank(99);
 		StudyDataManagerImplTest.manager.addDataSetVariableType(dataSet.getId(), variableType);
 
@@ -604,9 +606,12 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		this.printExperiments("Original", datasetRef.getId());
 		for (Experiment experiment : experiments) {
-			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18000, "666");
-			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18050, "19010");
-			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 8200, "4");
+			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18000, "666",
+					commonTestProject.getUniqueID());
+			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18050, "19010",
+					commonTestProject.getUniqueID());
+			StudyDataManagerImplTest.manager.setExperimentValue(
+					experiment.getId(), 8200, "4",commonTestProject.getUniqueID());
 		}
 		this.printExperiments("Modified", datasetRef.getId());
 	}
@@ -872,7 +877,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	private Variable createVariable(int termId, String value, int rank) throws Exception {
-		StandardVariable stVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(termId);
+		StandardVariable stVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(
+				termId,commonTestProject.getUniqueID());
 
 		VariableType vtype = new VariableType();
 		vtype.setStandardVariable(stVar);
@@ -884,7 +890,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	private VariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
-		StandardVariable stdVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(termId);
+		StandardVariable stdVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(
+				termId,commonTestProject.getUniqueID());
 
 		VariableType vtype = new VariableType();
 		vtype.setLocalName(name);
@@ -1381,7 +1388,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 			Assert.assertEquals("Current Program with programUUID " + StudyDataManagerImplTest.commonTestProject.getUniqueID()
 					+ " should return no children", 0, programStudiesAndFolders.size());
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
 
@@ -1404,7 +1411,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareQueryException {
+	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareException {
 		DmsProject study =
 				StudyTestDataUtil.getInstance().createStudyTestDataWithActiveStatus(
 						StudyDataManagerImplTest.commonTestProject.getUniqueID());

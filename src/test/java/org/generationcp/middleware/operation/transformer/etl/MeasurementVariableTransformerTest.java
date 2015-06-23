@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -104,7 +105,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
 	}
 
-	private VariableTypeList createFactorVariableTypeList() throws MiddlewareQueryException {
+	private VariableTypeList createFactorVariableTypeList() throws MiddlewareException {
 		VariableTypeList varTypeList = new VariableTypeList();
 		StandardVariable trialInstance = this.getStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		StandardVariable entryType = this.getStandardVariable(TermId.CHECK.getId());
@@ -119,8 +120,8 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		return varTypeList;
 	}
 
-	private StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
-		return MeasurementVariableTransformerTest.standardVariableBuilder.create(id);
+	private StandardVariable getStandardVariable(int id) throws MiddlewareException {
+		return MeasurementVariableTransformerTest.standardVariableBuilder.create(id,"1234567");
 	}
 
 	private VariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
@@ -169,7 +170,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		}
 	}
 
-	private VariableTypeList createVariateVariableTypeList() throws MiddlewareQueryException {
+	private VariableTypeList createVariateVariableTypeList() throws MiddlewareException {
 		VariableTypeList varTypeList = new VariableTypeList();
 		StandardVariable asi = this.getStandardVariable(20308);
 		varTypeList.add(new VariableType("ASI", "Determined by (i) measuring the number of days after "
@@ -178,7 +179,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		return varTypeList;
 	}
 
-	private VariableTypeList createTrialConstantVariableTypeList() throws MiddlewareQueryException {
+	private VariableTypeList createTrialConstantVariableTypeList() throws MiddlewareException {
 		VariableTypeList varTypeList = new VariableTypeList();
 		StandardVariable siteSoilPh = this.getStandardVariable(MeasurementVariableTransformerTest.SITE_SOIL_PH);
 		StandardVariable crust = this.getStandardVariable(MeasurementVariableTransformerTest.CRUST);
