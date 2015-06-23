@@ -155,6 +155,7 @@ public class TermBuilder extends Builder {
 				property.addClass(traitClass);
 			}
 			getOntologyPropertyDataManager().addProperty(property);
+			return property;
 		}
 		return term;
 	}
@@ -189,6 +190,7 @@ public class TermBuilder extends Builder {
 				}
 			}
 			getOntologyScaleDataManager().addScale(scale);
+			return scale;
 		}
 		return term;
 	}
@@ -200,6 +202,7 @@ public class TermBuilder extends Builder {
 			method.setName(name);
 			method.setDefinition(definition);
 			getOntologyMethodDataManager().addMethod(method);
+			return method;
 		}
 		return term;
 	}
