@@ -235,7 +235,7 @@ public class StandardVariable implements Serializable {
 	public Enumeration findEnumerationById(int id) {
 		if (this.enumerations != null) {
 			for (Enumeration enumeration : this.enumerations) {
-				if (enumeration.getId() == id) {
+				if (enumeration.getId()!=null && enumeration.getId() == id) {
 					return enumeration;
 				}
 			}

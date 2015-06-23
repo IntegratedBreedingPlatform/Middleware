@@ -142,8 +142,7 @@ public class VariableTypeList implements Serializable {
 	}
 
 	private boolean isVariate(VariableType variableType) {
-		return variableType.getStandardVariable().getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()
-				|| variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId();
+		return variableType.getRole() == PhenotypicType.VARIATE;
 	}
 
 	public VariableTypeList sort() {

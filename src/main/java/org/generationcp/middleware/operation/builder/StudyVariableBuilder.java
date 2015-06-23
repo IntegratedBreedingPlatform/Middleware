@@ -55,30 +55,7 @@ public class StudyVariableBuilder extends Builder {
 	}
 
 	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment) throws MiddlewareQueryException {
-		Variable variable = new Variable();
-		variable.setVariableType(variableType);
-
-		if (this.storedIn(variableType, TermId.STUDY_NAME_STORAGE)) {
-			variable.setValue(project.getName());
-		} else if (this.storedIn(variableType, TermId.STUDY_TITLE_STORAGE)) {
-			variable.setValue(project.getDescription());
-		} else if (this.storedIn(variableType, TermId.STUDY_INFO_STORAGE)) {
-			variable.setValue(this.getPropertyValue(variableType.getId(), project.getProperties()));// revert - it needs to set the
-																									// cvterm_id always
-		} else {
-			if (experiment != null) {
-				Variable factor = experiment.getFactors().findById(variableType.getId());
-				if (factor != null) {
-					variable.setValue(factor.getValue());
-				} else {
-					Variable variate = experiment.getVariates().findById(variableType.getId());
-					if (variate != null) {
-						variable.setValue(variate.getValue());
-					}
-				}
-			}
-		}
-		return variable;
+		return createVariable(variableType,project,experiment,false);
 	}
 
 	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment, boolean hasVariableType)
@@ -90,15 +67,15 @@ public class StudyVariableBuilder extends Builder {
 			return variable;
 		}
 
-		if (this.storedIn(variableType, TermId.STUDY_NAME_STORAGE)) {
+		if (variableType.getId() == TermId.STUDY_NAME.getId()) {
 			variable.setValue(project.getName());
-		} else if (this.storedIn(variableType, TermId.STUDY_TITLE_STORAGE)) {
+		} else if (variableType.getId() == TermId.STUDY_TITLE.getId()) {
 			variable.setValue(project.getDescription());
-		} else if (this.storedIn(variableType, TermId.STUDY_INFO_STORAGE)) {
-			variable.setValue(this.getPropertyValue(variableType.getId(), project.getProperties()));// revert - it needs to set the
-																									// cvterm_id always
 		} else {
-			if (experiment != null) {
+			String projectPropValue = getPropertyValue(variableType.getId(), project.getProperties());
+			if(projectPropValue!=null) {
+				variable.setValue(projectPropValue);
+			} else if (experiment != null) {
 				Variable factor = experiment.getFactors().findById(variableType.getId());
 				if (factor != null) {
 					variable.setValue(factor.getValue());
@@ -111,13 +88,6 @@ public class StudyVariableBuilder extends Builder {
 			}
 		}
 		return variable;
-	}
-
-	private boolean storedIn(VariableType variableType, TermId termId) {
-		if (variableType == null) {
-			return false;
-		}
-		return variableType.getStandardVariable().getStoredIn().getId() == termId.getId();
 	}
 
 	private String getPropertyValue(int id, List<ProjectProperty> properties) {
