@@ -235,29 +235,30 @@ public class VariableListTransformer extends Transformer {
 			int rank = 1;
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_NAME, "STUDY_NAME", "Study name",
-							studyDetails.getStudyName(), rank, programUUID);
+							studyDetails.getStudyName(), rank, programUUID, PhenotypicType.STUDY);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TITLE, "STUDY_TITLE", "Study title",
-							studyDetails.getTitle(), rank, programUUID);
+							studyDetails.getTitle(), rank, programUUID, PhenotypicType.STUDY);
 
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_OBJECTIVE, "STUDY_OBJECTIVE", "Study objective",
-							studyDetails.getObjective(), rank, programUUID);
+							studyDetails.getObjective(), rank, programUUID, PhenotypicType.STUDY);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.STUDY_TYPE, "STUDY_TYPE", "Study type",
-							studyDetails.getStudyType() != null ? Integer.toString(studyDetails.getStudyType().getId()) : null, rank, programUUID);
+							studyDetails.getStudyType() != null ? Integer.toString(studyDetails.getStudyType().getId()) : null, 
+									rank, programUUID, PhenotypicType.STUDY);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.START_DATE, "START_DATE", "Start date",
-							studyDetails.getStartDate(), rank, programUUID);
+							studyDetails.getStartDate(), rank, programUUID, PhenotypicType.STUDY);
 			rank =
 					this.addVariableIfNecessary(variables, variableTypeList, TermId.END_DATE, "END_DATE", "End date",
-							studyDetails.getEndDate(), rank, programUUID);
+							studyDetails.getEndDate(), rank, programUUID, PhenotypicType.STUDY);
 		}
 		return variables.sort();
 	}
 
 	private int addVariableIfNecessary(VariableList variables, VariableTypeList variableTypeList, TermId termId, String localName,
-			String localDescription, String value, int rank, String programUUID) throws MiddlewareException {
+			String localDescription, String value, int rank, String programUUID, PhenotypicType role) throws MiddlewareException {
 
 		Variable variable = null;
 
@@ -277,8 +278,10 @@ public class VariableListTransformer extends Transformer {
 		if (!found) {
 			StandardVariable standardVariable = this.getStandardVariableBuilder().create(
 					termId.getId(),programUUID);
+			standardVariable.setPhenotypicType(role);
 			VariableType variableType = new VariableType(localName, localDescription, standardVariable, rank);
 			variable = new Variable(variableType, value);
+			variableType.setRole(role);
 			variables.add(variable);
 			return rank + 1;
 		}

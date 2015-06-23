@@ -460,7 +460,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			StandardVariable svar =
 					ontology.findStandardVariableByTraitScaleMethodNames(
 							mvar.getProperty(), mvar.getScale(), mvar.getMethod(), programUUID);
-			if (svar != null && svar.getStoredIn() != null && TermId.TRIAL_INSTANCE_STORAGE.getId() == svar.getStoredIn().getId()) {
+			if (svar != null && TermId.TRIAL_INSTANCE_FACTOR.getId() == svar.getId()) {
 				return mvar.getValue();
 			}
 		}
@@ -503,7 +503,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 			if (varId != null) {
 				StandardVariable svar = ontology.getStandardVariable(varId,programUUID);
-				if (svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
+				if (svar!=null && svar.getId() == TermId.ENTRY_NO.getId()) {
 					mvar.setRequired(true);
 					return true;
 				}
@@ -542,7 +542,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					ontology.findStandardVariableByTraitScaleMethodNames(
 							mvar.getProperty(), mvar.getScale(), mvar.getMethod(), programUUID);
 
-			if (svar != null && svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+			if (svar != null && svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				mvar.setRequired(true);
 				return true;
 			}
@@ -695,7 +695,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 						ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
 				if (varId != null) {
 					StandardVariable svar = ontology.getStandardVariable(varId,programUUID);
-					if (svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+					if (svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 						trialInstanceHeader = mvar.getName();
 						break;
 					}

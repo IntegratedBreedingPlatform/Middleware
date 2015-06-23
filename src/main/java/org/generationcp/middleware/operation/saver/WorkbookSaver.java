@@ -500,25 +500,26 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private String getStockFactor(VariableList stockVariables) {
-		Map<String, Variable> variableMap = stockVariables.getVariableMap();
-		if (variableMap != null) {
-			Variable var = variableMap.get(Integer.toString(TermId.ENTRY_NUMBER_STORAGE.getId()));
-			if (var != null) {
-				return var.getValue();
+		if(stockVariables!=null && stockVariables.getVariables()!=null) {
+			for (Variable variable : stockVariables.getVariables()) {
+				if(TermId.ENTRY_NO.getId() == variable.getVariableType().getStandardVariable().getId()) {
+					return variable.getValue();
+				}
 			}
 		}
 		return null;
 	}
 
 	private String getTrialInstanceNumber(VariableList trialVariables) {
-		Map<String, Variable> variableMap = trialVariables.getVariableMap();
-		if (variableMap != null) {
-			Variable var = variableMap.get(Integer.toString(TermId.TRIAL_INSTANCE_STORAGE.getId()));
-			if (var != null) {
-				return var.getValue();
+		if(trialVariables!=null && trialVariables.getVariables()!=null) {
+			for (Variable variable : trialVariables.getVariables()) {
+				if(TermId.TRIAL_INSTANCE_FACTOR.getId() == variable.getVariableType().getStandardVariable().getId()) {
+					return variable.getValue();
+				}
 			}
 		}
 		return null;
+		
 	}
 
 	private String generateTrialDatasetName(String studyName, StudyType studyType) {
@@ -780,7 +781,7 @@ public class WorkbookSaver extends Saver {
 	private boolean isTrialFactorInDataset(VariableTypeList list) {
 
 		for (VariableType var : list.getVariableTypes()) {
-			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == var.getStandardVariable().getStoredIn().getId()) {
+			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == var.getStandardVariable().getId()) {
 				return true;
 			}
 		}
@@ -804,11 +805,7 @@ public class WorkbookSaver extends Saver {
 		if (!this.isTrialFactorInDataset(effectVariables) && trialVariables != null) {
 			int index = 1;
 			for (VariableType var : trialVariables.getVariableTypes()) {
-				if (var.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
-						|| !PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(
-								Integer.valueOf(var.getStandardVariable().getStoredIn().getId()))
-						&& !PhenotypicType.VARIATE.getTypeStorages().contains(
-								Integer.valueOf(var.getStandardVariable().getStoredIn().getId()))) {
+				if (var.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					var.setRank(index);
 					newList.add(var);
 					index++;

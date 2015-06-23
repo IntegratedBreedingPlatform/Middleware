@@ -79,7 +79,11 @@ public class ProjectPropertySaver extends Saver {
 			throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		int index = startIndex;
-		properties.add(new ProjectProperty(index++, project, variableType.getStandardVariable().getStoredIn().getId(), variableType
+		org.generationcp.middleware.domain.oms.VariableType variableTypeEnum = 
+				getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
+						variableType.getRole());
+		int variableTypeId = variableTypeEnum.getId();
+		properties.add(new ProjectProperty(index++, project, variableTypeId, variableType
 				.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(index++, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(),
 				variableType.getRank()));
@@ -97,8 +101,10 @@ public class ProjectPropertySaver extends Saver {
 	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
-				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
-				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId || TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
+				org.generationcp.middleware.domain.oms.VariableType variableTypeEnum = 
+						getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
+						variable.getVariableType().getRole());
+				if (variableTypeEnum == org.generationcp.middleware.domain.oms.VariableType.STUDY_DETAIL) {
 					ProjectProperty property = new ProjectProperty();
 					property.setProjectPropertyId(this.getProjectPropertyDao().getNextId(ProjectPropertySaver.PROJECT_PROPERTY_ID));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
@@ -112,7 +118,10 @@ public class ProjectPropertySaver extends Saver {
 	}
 
 	public void saveVariableType(DmsProject project, VariableType variableType) throws MiddlewareQueryException {
-		this.saveProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(),
+		org.generationcp.middleware.domain.oms.VariableType variableTypeEnum = 
+				getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
+						variableType.getStandardVariable().getPhenotypicType());
+		this.saveProjectProperty(project, variableTypeEnum.getId(), variableType.getLocalName(),
 				variableType.getRank());
 		this.saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank());
 		this.saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(variableType.getStandardVariable().getId()),

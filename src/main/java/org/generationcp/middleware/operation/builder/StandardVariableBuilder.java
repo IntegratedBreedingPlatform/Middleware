@@ -242,9 +242,9 @@ public class StandardVariableBuilder extends Builder {
 		return variableInfo;
 	}
 
-	private VariableType mapPhenotypicTypeToDefaultVariableType(
+	public VariableType mapPhenotypicTypeToDefaultVariableType(
 			PhenotypicType role) {
-		if(PhenotypicType.STUDY == role) {
+		if(PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
 			return VariableType.STUDY_DETAIL;
 		} else if(PhenotypicType.TRIAL_ENVIRONMENT == role) {
 			return VariableType.ENVIRONMENT_DETAIL;
