@@ -33,7 +33,6 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
-import org.generationcp.middleware.util.StringUtil;
 
 public class StandardVariableSaver extends Saver {
 
@@ -262,23 +261,6 @@ public class StandardVariableSaver extends Saver {
 			property.setRank(0);
 			property.setCvTermId(cvTermId);
 			this.getCvTermPropertyDao().merge(property);
-		}
-	}
-
-	private void saveSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
-		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
-			for (NameSynonym nameSynonym : nameSynonyms) {
-				if (!StringUtil.isEmpty(nameSynonym.getName())) {
-					CVTermSynonym cvTermSynonym = new CVTermSynonym();
-
-					cvTermSynonym.setCvTermSynonymId(this.getCvTermSynonymDao().getNextId("cvTermSynonymId"));
-					cvTermSynonym.setSynonym(nameSynonym.getName());
-					cvTermSynonym.setTypeId(nameSynonym.getType().getId());
-					cvTermSynonym.setCvTermId(cvTermId);
-
-					this.getCvTermSynonymDao().save(cvTermSynonym);
-				}
-			}
 		}
 	}
 
