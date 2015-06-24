@@ -8,15 +8,15 @@ import java.util.Map;
  * Variable Type of a Variable. Ontology variable can have zero or more variable types associated to it.
  */
 public enum VariableType {
-	ANALYSIS(1, "Analysis", "Variable to be used only in analysis (for example derived variables)."), TRIAL_CONDITION(2, "Trial Condition",
-			"Observations made of conditions in an individual environment involved in a trial."), NURSERY_CONDITION(3, "Nursery Condition",
-			"Observations made of conditions in a nursery."), GERMPLASM_DESCRIPTOR(4, "Germplasm Descriptor",
-			"Information to be recorded about each germplasm in a study."), STUDY_DETAIL(5, "Study Detail",
-			"Administrative details to be tracked per study."), ENVIRONMENT_DETAIL(6, "Environment Detail",
-			"Administrative details to be tracked per environment."), SELECTION_METHOD(7, "Selection Method",
-			"How material is chosen for advancing to the next generation."), TRAIT(8, "Trait",
-			"Characteristics of a germplasm to be recorded during a study."), TREATMENT_FACTOR(9, "Treatment Factor",
-			"Treatments to be applied to members of a trial."), EXPERIMENTAL_DESIGN(10, "Experimental Design",
+	ANALYSIS(1801, "Analysis", "Variable to be used only in analysis (for example derived variables)."), TRIAL_CONDITION(1802, "Trial Condition",
+			"Observations made of conditions in an individual environment involved in a trial."), NURSERY_CONDITION(1803, "Nursery Condition",
+			"Observations made of conditions in a nursery."), GERMPLASM_DESCRIPTOR(1804, "Germplasm Descriptor",
+			"Information to be recorded about each germplasm in a study."), STUDY_DETAIL(1805, "Study Detail",
+			"Administrative details to be tracked per study."), ENVIRONMENT_DETAIL(1806, "Environment Detail",
+			"Administrative details to be tracked per environment."), SELECTION_METHOD(1807, "Selection Method",
+			"How material is chosen for advancing to the next generation."), TRAIT(1808, "Trait",
+			"Characteristics of a germplasm to be recorded during a study."), TREATMENT_FACTOR(1809, "Treatment Factor",
+			"Treatments to be applied to members of a trial."), EXPERIMENTAL_DESIGN(1810, "Experimental Design",
 			"Design to be applied to experiments.");
 
 	private Integer id;
