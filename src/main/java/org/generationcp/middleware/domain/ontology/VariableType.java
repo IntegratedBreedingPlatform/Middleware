@@ -1,7 +1,10 @@
 
 package org.generationcp.middleware.domain.ontology;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 
@@ -61,7 +64,7 @@ public enum VariableType {
 				throw new IllegalArgumentException("duplicate id: " + e.getId());
 			}
 
-			if (VariableType.byName.put(e.getName(), e) != null) {
+			if (VariableType.byName.put(e.getName().toUpperCase(), e) != null) {
 				throw new IllegalArgumentException("duplicate name: " + e.getName());
 			}
 		}
@@ -88,7 +91,7 @@ public enum VariableType {
 	}
 
 	public static VariableType getByName(String name) {
-		return VariableType.byName.get(name);
+		return VariableType.byName.get(name.toUpperCase());
 	}
 
 	public static Set<Integer> getVariableTypesIdsByPhenotype(PhenotypicType phenotype) {

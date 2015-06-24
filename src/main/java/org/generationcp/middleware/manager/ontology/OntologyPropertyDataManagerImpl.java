@@ -1,8 +1,7 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.util.*;
-
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -21,7 +20,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.google.common.base.Strings;
+import java.util.*;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
@@ -70,18 +69,28 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 		return this.getAllPropertiesWithClass(new String[] {className});
 	}
 
+	@Override
 	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
 		try {
+			String classFilter = !(Objects.equals(classes, null) || classes.length == 0) ? " and dt.name in (:classes) " : "";
+			String variableTypeFilter =
+					!(Objects.equals(variableTypes, null) || variableTypes.length == 0) ? " and c.value in (:variableTypes) " : "";
+
 			SQLQuery query = getActiveSession().createSQLQuery(
                     "SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id " +
                             " inner join cvterm dt on dt.cvterm_id = cvtr.object_id where cvtr.type_id = " + TermId.IS_A.getId() +
-                            " and p.cv_id = 1010 and p.is_obsolete = 0 AND dt.name in (:classes) AND exists " +
-                            " (SELECT 1 from cvtermprop c INNER JOIN cvterm_relationship pvtr on c.cvterm_id = pvtr.subject_id " +
-                            " where c.type_id = " + TermId.VARIABLE_TYPE.getId() + " and pvtr.object_id = p.cvterm_id and c.value in (:variableTypes))"
-            );
+							" and p.cv_id = 1010 and p.is_obsolete = 0 " + classFilter + " and exists " +
+							" (SELECT 1 from cvtermprop c INNER JOIN cvterm_relationship pvtr on c.cvterm_id = pvtr.subject_id " +
+							" where c.type_id = " + TermId.VARIABLE_TYPE.getId() + " and pvtr.object_id = p.cvterm_id" + variableTypeFilter
+							+ ")");
 
-			query.setParameterList("classes", classes);
-			query.setParameterList("variableTypes", variableTypes);
+			if (!classFilter.isEmpty()) {
+				query.setParameterList("classes", classes);
+			}
+
+			if (!variableTypeFilter.isEmpty()) {
+				query.setParameterList("variableTypes", variableTypes);
+			}
 
 			List propertyIds = query.list();
 
