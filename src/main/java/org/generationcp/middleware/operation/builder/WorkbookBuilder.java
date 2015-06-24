@@ -490,8 +490,7 @@ public class WorkbookBuilder extends Builder {
 						found = true;
 						if (isTrial
 								&& variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
-								|| !PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(
-										this.getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
+								|| PhenotypicType.TRIAL_ENVIRONMENT != variable.getVariableType().getRole()) {
 							boolean isEditable =
 									NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true
 											: false;
@@ -568,7 +567,9 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	protected boolean isCategoricalVariate(Variable variable) {
-		if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
+		StandardVariable stdVar = variable.getVariableType().getStandardVariable();
+		if (PhenotypicType.VARIATE == stdVar.getPhenotypicType() && 
+				stdVar.getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 			return true;
 		}
 		return false;

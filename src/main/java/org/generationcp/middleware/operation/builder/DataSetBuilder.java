@@ -132,9 +132,13 @@ public class DataSetBuilder extends Builder {
 		} else {
 			variables = dataset.getVariableTypes();
 		}
-		variables = this.filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
+		
+		//We need to set the role of the variables based on the experiments before filtering them based on role
 		long expCount = this.getStudyDataManager().countExperiments(datasetId);
 		List<Experiment> experiments = this.getStudyDataManager().getExperiments(datasetId, 0, (int) expCount, variables);
+		
+		variables = this.filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
+		
 		List<MeasurementVariable> factorList = this.getMeasurementVariableTransformer().transform(variables.getFactors(), true);
 		List<MeasurementVariable> variateList = this.getMeasurementVariableTransformer().transform(variables.getVariates(), false, true);
 		Workbook workbook = new Workbook();
@@ -158,8 +162,7 @@ public class DataSetBuilder extends Builder {
 						variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isNursery && isMeasurementDataset;
 				boolean isMeasurementDatasetAndIsTrialFactors =
 						isMeasurementDataset
-								&& PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(
-										variable.getStandardVariable().getStoredIn().getId());
+								&& PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole();
 				boolean isTrialAndOcc = !isNursery && variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId();
 				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors
 						|| isTrialAndOcc) {

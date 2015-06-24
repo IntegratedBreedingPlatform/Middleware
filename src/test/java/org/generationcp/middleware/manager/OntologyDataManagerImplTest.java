@@ -161,11 +161,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		this.assertTermDataMatches(details.getScale(), summary.getScale());
 		this.assertTermDataMatches(details.getIsA(), summary.getIsA());
 
-		// TODO: This is deprecated and will be removed from new OM
 		// this.assertTermDataMatches(details.getDataType(), summary.getDataType());
-
-		this.assertTermDataMatches(details.getStoredIn(), summary.getStoredIn());
-
 		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
 	}
 
@@ -187,7 +183,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Assert.assertSame(stdVar.getScale(), stdVar2.getScale());
 		Assert.assertSame(stdVar.getMethod(), stdVar2.getMethod());
 		Assert.assertSame(stdVar.getDataType(), stdVar2.getDataType());
-		Assert.assertSame(stdVar.getStoredIn(), stdVar2.getStoredIn());
 		Assert.assertSame(stdVar.getPhenotypicType(), stdVar2.getPhenotypicType());
 		Assert.assertSame(stdVar.getConstraints(), stdVar2.getConstraints());
 		if (stdVar.getName() != null) {

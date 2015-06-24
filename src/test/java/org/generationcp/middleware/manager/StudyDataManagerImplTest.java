@@ -598,25 +598,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testSetExperimentValue() throws Exception {
-		StudyReference studyRef = this.addTestStudy();
-		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
-		this.addTestExperiments(datasetRef.getId(), 4);
-		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(datasetRef.getId(), 0, 2);
-
-		this.printExperiments("Original", datasetRef.getId());
-		for (Experiment experiment : experiments) {
-			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18000, "666",
-					commonTestProject.getUniqueID());
-			StudyDataManagerImplTest.manager.setExperimentValue(experiment.getId(), 18050, "19010",
-					commonTestProject.getUniqueID());
-			StudyDataManagerImplTest.manager.setExperimentValue(
-					experiment.getId(), 8200, "4",commonTestProject.getUniqueID());
-		}
-		this.printExperiments("Modified", datasetRef.getId());
-	}
-
-	@Test
 	public void testGetTrialEnvironmentsInDataset() throws Exception {
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Test getTrialEnvironmentsInDataset");
 		TrialEnvironments trialEnvironments = StudyDataManagerImplTest.manager.getTrialEnvironmentsInDataset(10085);

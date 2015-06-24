@@ -49,9 +49,8 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		if (plotVariables != null) {
 			for (VariableType var : plotVariables.getVariableTypes()) {
 				if (var.getStandardVariable().getId() != TermId.TRIAL_INSTANCE_FACTOR.getId()
-						&& (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(
-								Integer.valueOf(var.getStandardVariable().getStoredIn().getId())) || PhenotypicType.VARIATE
-								.getTypeStorages().contains(Integer.valueOf(var.getStandardVariable().getStoredIn().getId()))
+						&& (PhenotypicType.TRIAL_ENVIRONMENT == 
+								var.getRole() || PhenotypicType.VARIATE == var.getRole()
 								&& !this.isInOriginalPlotDataset(var.getStandardVariable().getId(), effectVariables))) {
 					return true;
 				}

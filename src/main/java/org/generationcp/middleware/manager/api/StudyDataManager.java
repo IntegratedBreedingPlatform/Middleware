@@ -214,16 +214,7 @@ public interface StudyDataManager {
 	 */
 	void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException;
 
-	/**
-	 * Updates an Experiment to contain the given value.
-	 *
-	 * @param experimentId The ID of the experiment to update
-	 * @param variableId The standard variable ID
-	 * @param value The value to set
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	void setExperimentValue(int experimentId, int variableId, String value, String programUUID) throws MiddlewareQueryException;
-
+	
 	/**
 	 * Adds an experiment row to the dataset.
 	 *

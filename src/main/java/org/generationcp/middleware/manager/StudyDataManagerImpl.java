@@ -371,22 +371,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 	}
 
-	@Override
-	public void setExperimentValue(int experimentId, int variableId, String value, String programUUID) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		try {
-			trans = session.beginTransaction();
-			this.getExperimentModelSaver().setExperimentValue(experimentId, variableId, value, programUUID);
-			trans.commit();
-
-		} catch (Exception e) {
-			this.rollbackTransaction(trans);
-			throw new MiddlewareQueryException("error in addDataSetVariableType " + e.getMessage(), e);
-		}
-	}
-
+	
 	@Override
 	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareException {
 		DmsProject study = this.getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());

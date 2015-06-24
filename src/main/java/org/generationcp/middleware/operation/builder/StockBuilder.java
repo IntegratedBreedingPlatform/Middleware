@@ -71,16 +71,16 @@ public class StockBuilder extends Builder {
 
 	private String getValue(StockModel stockModel, VariableType variableType) {
 		String value = null;
-		int storedInId = variableType.getStandardVariable().getStoredIn().getId();
-		if (storedInId == TermId.ENTRY_NUMBER_STORAGE.getId()) {
+		int id = variableType.getStandardVariable().getId();
+		if (id == TermId.ENTRY_NO.getId()) {
 			value = stockModel.getUniqueName();
-		} else if (storedInId == TermId.ENTRY_GID_STORAGE.getId()) {
+		} else if (id == TermId.GID.getId()) {
 			value = stockModel.getDbxrefId() == null ? null : Integer.toString(stockModel.getDbxrefId());
-		} else if (storedInId == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
+		} else if (id == TermId.DESIG.getId()) {
 			value = stockModel.getName();
-		} else if (storedInId == TermId.ENTRY_CODE_STORAGE.getId()) {
+		} else if (id == TermId.ENTRY_CODE.getId()) {
 			value = stockModel.getValue();
-		} else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+		} else {
 			value = this.getPropertyValue(variableType.getId(), stockModel.getProperties());
 		}
 		return value;

@@ -32,7 +32,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
 			for (VariableType variableType : variableTypeList.getVariableTypes()) {
 				StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				if (!isFactor && isTrial) {
 					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 				}
@@ -67,7 +67,7 @@ public class MeasurementVariableTransformer extends Transformer {
 			for (Variable variable : variableList.getVariables()) {
 				VariableType variableType = variable.getVariableType();
 				StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				// for trial constants
 				if (!isFactor && !isStudy) {
 					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
@@ -95,10 +95,6 @@ public class MeasurementVariableTransformer extends Transformer {
 		return measurementVariables;
 	}
 
-	private String getLabelOfStoredIn(int storedIn) {
-		return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
-	}
-
 	public List<ValueReference> transformPossibleValues(List<Enumeration> enumerations) {
 		List<ValueReference> list = new ArrayList<ValueReference>();
 
@@ -115,7 +111,8 @@ public class MeasurementVariableTransformer extends Transformer {
 		MeasurementVariable measurementVariable = null;
 
 		if (stdVariable != null) {
-			String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+			
+			String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 
 			measurementVariable =
 					new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), stdVariable.getDescription(), stdVariable
@@ -128,8 +125,13 @@ public class MeasurementVariableTransformer extends Transformer {
 				measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
 				measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
 			}
+			measurementVariable.setRole(stdVariable.getPhenotypicType());
 		}
 
 		return measurementVariable;
+	}
+
+	private String getLabelBasedOnRole(PhenotypicType role) {
+		return role.getLabelList().get(0);
 	}
 }

@@ -81,18 +81,18 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	private String getValue(Geolocation location, VariableType variableType) {
 		String value = null;
-		int storedInId = variableType.getStandardVariable().getStoredIn().getId();
-		if (storedInId == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+		int id = variableType.getStandardVariable().getId();
+		if (id == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 			value = location.getDescription();
-		} else if (storedInId == TermId.LATITUDE_STORAGE.getId()) {
+		} else if (id == TermId.LATITUDE.getId()) {
 			value = location.getLatitude() == null ? null : Double.toString(location.getLatitude());
-		} else if (storedInId == TermId.LONGITUDE_STORAGE.getId()) {
+		} else if (id == TermId.LONGITUDE.getId()) {
 			value = location.getLongitude() == null ? null : Double.toString(location.getLongitude());
-		} else if (storedInId == TermId.DATUM_STORAGE.getId()) {
+		} else if (id == TermId.GEODETIC_DATUM.getId()) {
 			value = location.getGeodeticDatum();
-		} else if (storedInId == TermId.ALTITUDE_STORAGE.getId()) {
+		} else if (id == TermId.ALTITUDE.getId()) {
 			value = location.getAltitude() == null ? null : Double.toString(location.getAltitude());
-		} else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		} else {
 			value = this.getPropertyValue(variableType.getId(), location.getProperties());
 		}
 		return value;

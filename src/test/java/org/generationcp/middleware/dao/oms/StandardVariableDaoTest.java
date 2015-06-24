@@ -55,7 +55,6 @@ public class StandardVariableDaoTest extends DataManagerIntegrationTest {
 		this.assertTermDataMatches(details.getScale(), summary.getScale());
 		this.assertTermDataMatches(details.getIsA(), summary.getIsA());
 		this.assertTermDataMatches(details.getDataType(), summary.getDataType());
-		this.assertTermDataMatches(details.getStoredIn(), summary.getStoredIn());
 
 		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
 	}
@@ -109,7 +108,6 @@ public class StandardVariableDaoTest extends DataManagerIntegrationTest {
 		// the view always returns null for isA :(
 		Assert.assertNull(summary.getIsA());
 		Assert.assertEquals(new Integer(details.getDataType().getId()), summary.getDataType().getId());
-		Assert.assertEquals(new Integer(details.getStoredIn().getId()), summary.getStoredIn().getId());
 		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
 
 		// Test done. Cleanup the test data created.

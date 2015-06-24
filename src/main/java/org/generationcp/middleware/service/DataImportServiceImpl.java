@@ -475,7 +475,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 			if (varId != null) {
 				StandardVariable svar = ontology.getStandardVariable(varId,programUUID);
-				if (svar.getStoredIn() != null && svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+				if (svar != null && svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					return row.getMeasurementDataValue(mvar.getName());
 				}
 			}

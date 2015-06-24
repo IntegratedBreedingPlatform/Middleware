@@ -1038,6 +1038,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		Integer id = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
 		if (id != null) {
 			standardVariable = this.getStandardVariableBuilder().create(id,programUUID);
+			standardVariable.setPhenotypicType(role);
 			return this.getMeasurementVariableTransformer().transform(standardVariable, false);
 		}
 		return variable;

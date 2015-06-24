@@ -80,7 +80,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		Assert.assertEquals("Data Type should be " + stdVariable.getDataType().getName(), stdVariable.getDataType().getName(),
 				measurementVariable.getDataType());
 
-		String label = this.getLabel(stdVariable.getStoredIn().getId(), isInTrialDataset);
+		String label = this.getLabel(stdVariable.getPhenotypicType(), isInTrialDataset);
 		Assert.assertEquals("Label should be " + label, label, measurementVariable.getLabel());
 		List<ValueReference> possibleValues = this.getPossibleValues(stdVariable.getEnumerations());
 		Assert.assertEquals("Possible values should be " + possibleValues, possibleValues, measurementVariable.getPossibleValues());
@@ -98,11 +98,11 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		}
 	}
 
-	private String getLabel(int storedIn, boolean isInTrialDataset) {
+	private String getLabel(PhenotypicType role, boolean isInTrialDataset) {
 		if (isInTrialDataset) {
 			return PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 		}
-		return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
+		return role.getLabelList().get(0);
 	}
 
 	private VariableTypeList createFactorVariableTypeList() throws MiddlewareException {
