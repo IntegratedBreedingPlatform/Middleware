@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.builder;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -47,6 +48,10 @@ public class VariableTypeBuilder extends Builder {
 		variableType.setStandardVariable(this.getStandardVariableBuilder().create(
 				variableInfo.getStdVariableId(),programUUID));
 		variableType.setTreatmentLabel(variableInfo.getTreatmentLabel());
+		
+		//Set the default role to STUDY, this will change after calling getExperiment
+		variableType.setRole(PhenotypicType.STUDY);
+		variableType.getStandardVariable().setPhenotypicType(PhenotypicType.STUDY);
 
 		return variableType;
 	}

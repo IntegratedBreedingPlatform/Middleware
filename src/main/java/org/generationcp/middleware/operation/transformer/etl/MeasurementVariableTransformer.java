@@ -100,7 +100,8 @@ public class MeasurementVariableTransformer extends Transformer {
 
 		if (enumerations != null) {
 			for (Enumeration enumeration : enumerations) {
-				list.add(new ValueReference(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
+				int enumerationId = enumeration.getId() == null ? 0 : enumeration.getId();
+				list.add(new ValueReference(enumerationId, enumeration.getName(), enumeration.getDescription()));
 			}
 		}
 
