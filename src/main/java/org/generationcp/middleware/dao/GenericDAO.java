@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 public abstract class GenericDAO<T, ID extends Serializable> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenericDAO.class);
-	private static final Set<Class<?>> WRAPPER_TYPES = GenericDAO.getWrapperTypes();
-
 	private final Class<T> persistentClass;
 	private Session session;
 

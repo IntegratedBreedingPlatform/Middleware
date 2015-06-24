@@ -21,8 +21,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link ProgramFavoriteDao}.
@@ -30,8 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("unchecked")
 public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
-
-	private static final Logger LOG = LoggerFactory.getLogger(ProgramFavoriteDAO.class);
 
 	public List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String programUUID) throws MiddlewareQueryException {
 
