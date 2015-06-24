@@ -144,7 +144,10 @@ public class WorkbookBuilder extends Builder {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
 						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
-				if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
+				
+				VariableType varType = variables.findById(stdVariable.getId());
+				stdVariable.setPhenotypicType(varType.getRole());
+				if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()){
 
 					String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
 
@@ -155,7 +158,8 @@ public class WorkbookBuilder extends Builder {
 					}
 
 					String value = null;
-					if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+					int varId = stdVariable.getId();
+					if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
 						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
 					} else if (!isTrial) {
 						// set trial env for nursery studies
@@ -163,21 +167,20 @@ public class WorkbookBuilder extends Builder {
 						if (locIds != null && !locIds.isEmpty()) {
 							Integer locId = locIds.get(0);
 							Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							int storedInId = stdVariable.getStoredIn().getId();
 							if (geolocation != null) {
-								if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+								if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
 									value = geolocation.getDescription();
 
-								} else if (TermId.LATITUDE_STORAGE.getId() == storedInId && geolocation.getLatitude() != null) {
+								} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
 									value = geolocation.getLatitude().toString();
 
-								} else if (TermId.LONGITUDE_STORAGE.getId() == storedInId && geolocation.getLongitude() != null) {
+								} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
 									value = geolocation.getLongitude().toString();
 
-								} else if (TermId.DATUM_STORAGE.getId() == storedInId && geolocation.getGeodeticDatum() != null) {
+								} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
 									geolocation.setGeodeticDatum(value);
 
-								} else if (TermId.ALTITUDE_STORAGE.getId() == storedInId && geolocation.getAltitude() != null) {
+								} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
 									value = geolocation.getAltitude().toString();
 								}
 							}
@@ -199,15 +202,14 @@ public class WorkbookBuilder extends Builder {
 						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
 								stdVariable.getEnumerations()));
-
+						measurementVariable.setRole(varType.getRole());
 						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 							expDesignVariables.add(measurementVariable);
 						} else {
 							conditions.add(measurementVariable);
 						}
 					}
-				} else if (isTrial && stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()
-						&& WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+				} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 
 					String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
 					String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
@@ -228,7 +230,7 @@ public class WorkbookBuilder extends Builder {
 					measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 					measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
 							stdVariable.getEnumerations()));
-
+					measurementVariable.setRole(varType.getRole());
 					expDesignVariables.add(measurementVariable);
 					this.setValueInCondition(conditions, value, stdVariable.getId());
 				}
@@ -329,7 +331,7 @@ public class WorkbookBuilder extends Builder {
 		if (dataSetId != null) {
 			variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
 			//variable type roles are being set inside getexperiment
-			List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) Integer.MAX_VALUE, variables);
+			this.getStudyDataManager().getExperiments(dataSetId, 0, (int) Integer.MAX_VALUE, variables);
 		}
 		
 
@@ -350,8 +352,12 @@ public class WorkbookBuilder extends Builder {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
 						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
-				if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(stdVariable.getStoredIn().getId())
-						|| PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
+				
+				VariableType varType = variables.findById(stdVariable.getId());
+				stdVariable.setPhenotypicType(varType.getRole());
+				
+				if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()
+						|| PhenotypicType.VARIATE == varType.getRole()) {
 
 					String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
 
@@ -362,12 +368,12 @@ public class WorkbookBuilder extends Builder {
 					}
 
 					String value = null;
-					if (stdVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+					if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
 						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
 						if (value == null) {
 							value = "";
 						}
-					} else if (PhenotypicType.VARIATE.getTypeStorages().contains(stdVariable.getStoredIn().getId())) {
+					} else if (PhenotypicType.VARIATE == varType.getRole()) {
 						// constants, no need to retrieve the value if it's a trial study
 						isConstant = true;
 						if (isNursery) {
@@ -394,21 +400,21 @@ public class WorkbookBuilder extends Builder {
 						if (locIds != null && !locIds.isEmpty()) {
 							Integer locId = locIds.get(0);
 							Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							int storedInId = stdVariable.getStoredIn().getId();
+							int varId = stdVariable.getId();
 							if (geolocation != null) {
-								if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+								if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
 									value = geolocation.getDescription();
 
-								} else if (TermId.LATITUDE_STORAGE.getId() == storedInId && geolocation.getLatitude() != null) {
+								} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
 									value = geolocation.getLatitude().toString();
 
-								} else if (TermId.LONGITUDE_STORAGE.getId() == storedInId && geolocation.getLongitude() != null) {
+								} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
 									value = geolocation.getLongitude().toString();
 
-								} else if (TermId.DATUM_STORAGE.getId() == storedInId && geolocation.getGeodeticDatum() != null) {
+								} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
 									geolocation.setGeodeticDatum(value);
 
-								} else if (TermId.ALTITUDE_STORAGE.getId() == storedInId && geolocation.getAltitude() != null) {
+								} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
 									value = geolocation.getAltitude().toString();
 								}
 							}
@@ -430,7 +436,7 @@ public class WorkbookBuilder extends Builder {
 						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
 								stdVariable.getEnumerations()));
-
+						measurementVariable.setRole(varType.getRole());
 						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 							experimentalDesignVariables.add(measurementVariable);
 						} else if (isConstant) {
