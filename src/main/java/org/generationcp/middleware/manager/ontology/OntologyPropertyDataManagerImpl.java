@@ -1,7 +1,8 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import com.google.common.base.Strings;
+import java.util.*;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -20,7 +21,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.*;
+import com.google.common.base.Strings;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
@@ -67,6 +68,27 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	@Override
 	public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException {
 		return this.getAllPropertiesWithClass(new String[] {className});
+	}
+
+	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
+		try {
+			SQLQuery query = getActiveSession().createSQLQuery(
+                    "SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id " +
+                            " inner join cvterm dt on dt.cvterm_id = cvtr.object_id where cvtr.type_id = " + TermId.IS_A.getId() +
+                            " and p.cv_id = 1010 and p.is_obsolete = 0 AND dt.name in (:classes) AND exists " +
+                            " (SELECT 1 from cvtermprop c INNER JOIN cvterm_relationship pvtr on c.cvterm_id = pvtr.subject_id " +
+                            " where c.type_id = " + TermId.VARIABLE_TYPE.getId() + " and pvtr.object_id = p.cvterm_id and c.value in (:variableTypes))"
+            );
+
+			query.setParameterList("classes", classes);
+			query.setParameterList("variableTypes", variableTypes);
+
+			List propertyIds = query.list();
+
+			return this.getProperties(false, propertyIds);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
+		}
 	}
 
 	@Override

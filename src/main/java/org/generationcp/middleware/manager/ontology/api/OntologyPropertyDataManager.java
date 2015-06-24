@@ -12,11 +12,11 @@
 
 package org.generationcp.middleware.manager.ontology.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-
-import java.util.List;
 
 /**
  * This is the API for retrieving ontology scale data.
@@ -48,6 +48,8 @@ public interface OntologyPropertyDataManager {
 	 * @throws MiddlewareException the middleware query exception
 	 */
 	List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException;
+
+	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException;
 
 	/**
 	 * Get all properties given list of classnames
