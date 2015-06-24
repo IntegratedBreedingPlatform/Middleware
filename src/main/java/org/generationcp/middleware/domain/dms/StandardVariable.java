@@ -14,10 +14,12 @@ package org.generationcp.middleware.domain.dms;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -51,6 +53,8 @@ public class StandardVariable implements Serializable {
 	private Map<Integer, Integer> overridenEnumerations;
 
 	private String cropOntologyId;
+	
+	private Set<VariableType> variableTypes;
 
 	public StandardVariable() {
 	}
@@ -362,6 +366,14 @@ public class StandardVariable implements Serializable {
 			return true;
 		}
 		return false;
+	}
+
+	public void setVariableTypes(Set<VariableType> variableTypes) {
+		this.variableTypes = variableTypes;
+	}
+	
+	public Set<VariableType> getVariableTypes() {
+		return this.variableTypes;
 	}
 
 }
