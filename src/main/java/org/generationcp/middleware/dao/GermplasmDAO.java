@@ -919,7 +919,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		List resultNames = queryNames.list();
 
-		Germplasm g;
 		Name name;
 		Map<Integer, Map<GermplasmNameType, Name>> names = new HashMap<>();
 		int i = 0;

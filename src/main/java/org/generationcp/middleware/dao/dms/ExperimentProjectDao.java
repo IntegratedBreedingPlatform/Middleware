@@ -38,8 +38,7 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			if (experimentIds != null && experimentIds.size() > 0) {
 				boolean first = true;
 				StringBuffer buf = new StringBuffer();
-				for (@SuppressWarnings("unused")
-				Integer id : experimentIds) {
+				for (int i = 0; i < experimentIds.size(); i++) {
 					if (first) {
 						first = false;
 						buf.append("?");
