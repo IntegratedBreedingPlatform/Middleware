@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -85,14 +86,18 @@ public class DatasetProjectSaver extends Saver {
 	private void addNameVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
 		if (variableTypeList.findById(TermId.DATASET_NAME) == null) {
 			variableTypeList.makeRoom(1);
-			variableTypeList.add(new VariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME,programUUID), 1));
+			VariableType dataSetName = new VariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME,programUUID), 1);
+			dataSetName.setRole(PhenotypicType.DATASET);
+			variableTypeList.add(dataSetName);
 		}
 	}
 
 	private void addDescriptionVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
 		if (variableTypeList.findById(TermId.DATASET_TITLE) == null) {
 			variableTypeList.makeRoom(2);
-			variableTypeList.add(new VariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE,programUUID), 2));
+			VariableType dataSetTitle = new VariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE,programUUID), 2);
+			dataSetTitle.setRole(PhenotypicType.DATASET);
+			variableTypeList.add(dataSetTitle);
 		}
 	}
 
@@ -100,6 +105,7 @@ public class DatasetProjectSaver extends Saver {
 		VariableType variableType = variableTypeList.findById(TermId.DATASET_TYPE);
 		if (variableType == null) {
 			variableType = new VariableType("DATASET_TYPE", "Dataset type", this.getStandardVariable(TermId.DATASET_TYPE,programUUID), 3);
+			variableType.setRole(PhenotypicType.DATASET);
 			variableTypeList.makeRoom(3);
 			variableTypeList.add(variableType);
 		}
