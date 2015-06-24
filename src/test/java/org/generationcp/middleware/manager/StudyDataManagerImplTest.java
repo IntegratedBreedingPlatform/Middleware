@@ -156,7 +156,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		filter.setName("FooFoo"); // INVALID: Not a study, should not find any
 		// studies
 		StudyResultSet resultSet = StudyDataManagerImplTest.manager.searchStudies(filter, 10);
-		Assert.assertTrue(resultSet.size() == 0);
+		Assert.assertTrue(resultSet.isEmpty());
 
 		filter.setName("RYT2000WS"); // VALID: is a study
 
@@ -171,7 +171,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		 * to test deleted study, run in mysql: update projectprop set value = 12990 where type_id = 8006 and project_id = (select
 		 * project_id from project where name = 'RYT2000WS') then uncomment the test below
 		 */
-		// Assert.assertTrue(resultSet.size() == 0);
+		// Assert.assertTrue(resultSet.isEmpty());
 	}
 
 	@Test

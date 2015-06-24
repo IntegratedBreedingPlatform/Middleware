@@ -140,7 +140,7 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
 					this.processParentInformation(parentB);
 				}
 
-				if (this.genotypeInfo.get().size() == 0) {
+				if (this.genotypeInfo.get().isEmpty()) {
 					throw new ConformityException("Parent and ancestor data not found. No basis for conformity checking");
 				}
 			}
@@ -150,7 +150,7 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
 
 	protected ConformityGermplasmInput retrieveParentInput(Integer gid) throws MiddlewareQueryException {
 		List<AllelicValueElement> parentAlleleValues = this.genotypicDataManager.getAllelicValuesByGid(gid);
-		if (parentAlleleValues == null || parentAlleleValues.size() == 0) {
+		if (parentAlleleValues == null || parentAlleleValues.isEmpty()) {
 			return null;
 		} else {
 

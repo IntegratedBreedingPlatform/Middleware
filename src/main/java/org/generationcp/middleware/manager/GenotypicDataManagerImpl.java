@@ -872,7 +872,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		java.util.Map<Integer, List<String>> markerMaps = new HashMap<Integer, List<String>>();
 
-		if (markerIds == null || markerIds.size() == 0) {
+		if (markerIds == null || markerIds.isEmpty()) {
 			return markerMaps;
 		}
 

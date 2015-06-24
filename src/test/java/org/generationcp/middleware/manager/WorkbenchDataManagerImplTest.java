@@ -948,7 +948,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 
 		// TODO : Are we expecting any preloaded data here ? There is no such insert query in merger-db scripts.
 		// Reviewer : Naymesh
-		Assert.assertTrue(out.size() == 0);
+		Assert.assertTrue(out.isEmpty());
 
 	}
 

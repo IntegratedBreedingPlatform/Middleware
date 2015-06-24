@@ -172,7 +172,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 	public List<AllelicValueElement> getAlleleValuesByMarkerId(List<Integer> markerIdList) throws MiddlewareQueryException {
 		List<AllelicValueElement> returnVal = new ArrayList<AllelicValueElement>();
 
-		if (markerIdList == null || markerIdList.size() == 0) {
+		if (markerIdList == null || markerIdList.isEmpty()) {
 			return returnVal;
 		}
 
@@ -259,7 +259,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 			throws MiddlewareQueryException {
 		List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
 
-		if (markerIdList.size() == 0 || alleleValueList.size() == 0) {
+		if (markerIdList.isEmpty() || alleleValueList.isEmpty()) {
 			throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
 		}
 		if (markerIdList.size() != alleleValueList.size()) {
@@ -317,7 +317,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 			throws MiddlewareQueryException {
 		List<Integer> values = new ArrayList<Integer>();
 
-		if (markerIdList.size() == 0 || alleleValueList.size() == 0) {
+		if (markerIdList.isEmpty() || alleleValueList.isEmpty()) {
 			throw new MiddlewareQueryException("markerIdList and alleleValueList must not be empty");
 		}
 		if (markerIdList.size() != alleleValueList.size()) {

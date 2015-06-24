@@ -1565,7 +1565,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 
 			// Save if non-existing
-			if (this.getTemplateSettings(templateSetting).size() == 0) {
+			if (this.getTemplateSettings(templateSetting).isEmpty()) {
 				trans = session.beginTransaction();
 				this.updateIsDefaultOfSameProjectAndToolTemplateSetting(templateSetting);
 				this.getTemplateSettingDao().save(templateSetting);
