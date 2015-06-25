@@ -222,7 +222,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 		// Constant CvId
 		property.setVocabularyId(CvId.PROPERTIES.getId());
 
-		List<Term> allClasses = this.getCvTermDao().getAllClasses();
+		List<Term> allClasses = this.getCvTermDao().getTermByCvId(CvId.TRAIT_CLASS.getId());
 
 		Session session = this.getActiveSession();
 		Transaction transaction = null;
@@ -286,7 +286,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 		this.checkTermIsProperty(term);
 
-		List<Term> allClasses = this.getCvTermDao().getAllClasses();
+		List<Term> allClasses = this.getCvTermDao().getTermByCvId(CvId.TRAIT_CLASS.getId());
 
 		Session session = this.getActiveSession();
 		Transaction transaction = null;
