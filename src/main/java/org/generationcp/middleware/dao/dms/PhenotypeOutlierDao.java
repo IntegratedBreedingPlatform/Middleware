@@ -17,8 +17,6 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link PhenotypeOutlier}.
@@ -26,8 +24,6 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("unchecked")
 public class PhenotypeOutlierDao extends GenericDAO<PhenotypeOutlier, Integer> {
-
-	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeOutlierDao.class);
 
 	public PhenotypeOutlier getPhenotypeOutlierByPhenotypeId(Integer phenotypeId) throws MiddlewareQueryException {
 

@@ -314,7 +314,7 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 		for (FieldMapLabel label : this.labels) {
 			reps.add(label.getRep());
 		}
-		if (reps.size() == 0) {
+		if (reps.isEmpty()) {
 			return 1;
 		}
 		return Collections.max(reps);

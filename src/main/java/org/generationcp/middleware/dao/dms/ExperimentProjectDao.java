@@ -35,11 +35,10 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 	@SuppressWarnings("unchecked")
 	public List<Integer> getProjectIdsByExperimentIds(Collection<Integer> experimentIds) throws MiddlewareQueryException {
 		try {
-			if (experimentIds != null && experimentIds.size() > 0) {
+			if (experimentIds != null && !experimentIds.isEmpty()) {
 				boolean first = true;
 				StringBuffer buf = new StringBuffer();
-				for (@SuppressWarnings("unused")
-				Integer id : experimentIds) {
+				for (int i = 0; i < experimentIds.size(); i++) {
 					if (first) {
 						first = false;
 						buf.append("?");

@@ -753,16 +753,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		return this.getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(gids);
 	}
 
-	private List<AllelicValueElement> getForPolyMorphicMarkersRetrieval(String getMethodName, List<Integer> gids, int start, int numOfRows)
-			throws MiddlewareQueryException {
-		List<AllelicValueElement> allelicValueElements =
-				this.getAlleleValuesDao().getCharAlleleValuesForPolymorphicMarkersRetrieval(gids, start, numOfRows);
-
-		// Sort by gid, markerName
-		Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
-		return allelicValueElements;
-	}
-
 	@Override
 	public List<Qtl> getAllQtl(int start, int numOfRows) throws MiddlewareQueryException {
 		return this.getQtlDao().getAll(start, numOfRows);
@@ -828,73 +818,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		return this.getQtlDao().getQtlAndQtlDetailsByQtlIds(qtlIds, start, numOfRows);
 	}
 
-	private List<QtlDetailElement> getQtlDetailElementsFromLocal(List<QtlDetails> qtlDetailsLocal, List<Qtl> qtlLocal)
-			throws MiddlewareQueryException {
-
-		// 2. Get mapId and traitId from QtlDetails
-		Set<Integer> mapIdSet = new HashSet<Integer>();
-		Set<Integer> traitIdSet = new HashSet<Integer>();
-		for (QtlDetails details : qtlDetailsLocal) {
-			mapIdSet.add(details.getMapId());
-			traitIdSet.add(details.getTraitId());
-		}
-		List<Integer> mapIds = new ArrayList<Integer>(mapIdSet);
-		List<Integer> traitIds = new ArrayList<Integer>(traitIdSet);
-
-		// 3. With retrieved gdms_qtl_details.map_id, get maps from gdms_map central and local
-		List<Map> maps = new ArrayList<Map>();
-		if (mapIds != null && mapIds.size() > 0) {
-			maps = this.getMapDao().getMapsByIds(mapIds);
-		}
-		// 4. With retrieved gdms_qtl_details.tid, retrieve from cvterm & cvtermprop - central and local
-
-		List<CVTerm> cvTerms = new ArrayList<CVTerm>();
-		List<CVTermProperty> cvTermProperties = new ArrayList<CVTermProperty>();
-		if (traitIds != null && traitIds.size() > 0) {
-			cvTerms = this.getCvTermDao().getByIds(traitIds);
-			cvTermProperties = this.getCvTermPropertyDao().getByCvTermIds(traitIds);
-		}
-
-		// Construct qtlDetailsElement
-		// qtlDetailsLocal
-		// inner join with qtlLocal - on qtlId
-		// inner join with maps.mapId
-		// inner join with cvTerm.traitId
-		// left join with cvTermProperties
-
-		Set<QtlDetailElement> qtlDetailElementsLocal = new HashSet<QtlDetailElement>();
-
-		for (QtlDetails details : qtlDetailsLocal) {
-			for (Qtl qtl : qtlLocal) {
-				if (details.getQtlId().equals(qtl.getQtlId())) {
-					for (Map map : maps) {
-						if (details.getMapId().equals(map.getMapId())) {
-							QtlDetailElement element = new QtlDetailElement(qtl.getQtlName(), map.getMapName(), details);
-							for (CVTerm term : cvTerms) {
-								if (details.getTraitId().equals(term.getCvTermId())) {
-									element.settRName(term.getName());
-									break;
-								}
-							}
-							for (CVTermProperty property : cvTermProperties) {
-								if (details.getTraitId().equals(property.getCvTermId())) {
-									element.setOntology(property.getValue());
-									break;
-								}
-							}
-							qtlDetailElementsLocal.add(element);
-						}
-					}
-				} else {
-					continue;
-				}
-
-			}
-		}
-
-		return new ArrayList<>(qtlDetailElementsLocal);
-	}
-
 	@Override
 	public long countQtlByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
 		if (qtlIds == null || qtlIds.isEmpty()) {
@@ -949,7 +872,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		java.util.Map<Integer, List<String>> markerMaps = new HashMap<Integer, List<String>>();
 
-		if (markerIds == null || markerIds.size() == 0) {
+		if (markerIds == null || markerIds.isEmpty()) {
 			return markerMaps;
 		}
 
@@ -1296,7 +1219,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveDatasetUser(datasetId, datasetUser);
 
 			// Save QTL data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 				for (QtlDataRow row : rows) {
 					Qtl qtl = row.getQtl();
 					QtlDetails qtlDetails = row.getQtlDetails();
@@ -1577,7 +1500,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
@@ -1641,7 +1564,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
@@ -1699,7 +1622,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<CharValues> charValues = new ArrayList<CharValues>();
@@ -1756,7 +1679,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
@@ -1814,7 +1737,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
@@ -1879,7 +1802,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
@@ -2481,7 +2404,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.saveMarkers(markers);
 
-		if (markerMetadataSets != null && markerMetadataSets.size() > 0) {
+		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
 			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 				markerMetadataSet.setDatasetId(datasetId);
 			}
@@ -2499,7 +2422,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.saveMarkers(markers);
 
-		if (markerMetadataSets != null && markerMetadataSets.size() > 0) {
+		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
 			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 				markerMetadataSet.setDatasetId(datasetId);
 			}

@@ -788,7 +788,7 @@ public interface FieldbookService {
 	 * @return the method by code
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Method getMethodByCode(String code) throws MiddlewareQueryException;
+	Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the method by id.

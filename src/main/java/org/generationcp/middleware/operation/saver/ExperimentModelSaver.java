@@ -131,7 +131,7 @@ public class ExperimentModelSaver extends Saver {
 
 	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors)
 			throws MiddlewareQueryException {
-		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
+		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
 			int id = this.getExperimentPropertyDao().getNextId("ndExperimentpropId");
 			for (Variable variable : factors.getVariables()) {
 				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {

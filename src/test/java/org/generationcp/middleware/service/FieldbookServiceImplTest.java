@@ -11,13 +11,13 @@
 
 package org.generationcp.middleware.service;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
@@ -194,15 +194,15 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
 		FieldbookServiceImplTest.fieldbookService.saveMeasurementRows(createdWorkbook);
 		workbook = FieldbookServiceImplTest.fieldbookService.getTrialDataSet(id);
-		Assert.assertFalse(workbook.equals(createdWorkbook));
+		assertFalse(workbook.equals(createdWorkbook));
 
-		Assert.assertEquals("Expected " + createdWorkbook.getTrialConditions().size() + " of records for trial conditions but got "
+		assertEquals("Expected " + createdWorkbook.getTrialConditions().size() + " of records for trial conditions but got "
 				+ workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions().size(), workbook.getTrialConditions().size());
-		Assert.assertTrue("Expected the same trial conditions retrieved but found a different condition.",
+		assertTrue("Expected the same trial conditions retrieved but found a different condition.",
 				WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConditions(), workbook.getTrialConditions()));
-		Assert.assertEquals("Expected " + createdWorkbook.getTrialConstants().size() + " of records for trial constants but got "
+		assertEquals("Expected " + createdWorkbook.getTrialConstants().size() + " of records for trial constants but got "
 				+ workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants().size(), workbook.getTrialConstants().size());
-		Assert.assertTrue("Expected the same trial constants retrieved but found a different constant.",
+		assertTrue("Expected the same trial constants retrieved but found a different constant.",
 				WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConstants(), workbook.getTrialConstants()));
 
 	}
@@ -228,13 +228,13 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 			for (MeasurementData field : fields) {
 				if (field.getMeasurementVariable().getTermId() == WorkbookTest.CRUST_ID) {
 					String previousCValueId = previousFields.get(dataIndex).getcValueId();
-					Assert.assertEquals("Cvalue id must be the same", previousCValueId, field.getcValueId());
+					assertEquals("Cvalue id must be the same", previousCValueId, field.getcValueId());
 					if (previousCValueId == null) {
 						String previousValue = previousFields.get(dataIndex).getValue();
 						if (null == previousValue || "".equals(previousValue)) {
-							Assert.assertEquals("Value must be empty", "", field.getValue());
+							assertEquals("Value must be empty", "", field.getValue());
 						} else {
-							Assert.assertEquals("Value must be the same", previousValue, field.getValue());
+							assertEquals("Value must be the same", previousValue, field.getValue());
 						}
 					}
 				}
@@ -266,13 +266,13 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 			for (MeasurementData field : fields) {
 				if (field.getMeasurementVariable().getTermId() == WorkbookTest.CRUST_ID) {
 					String previousCValueId = previousFields.get(dataIndex).getcValueId();
-					Assert.assertEquals("Cvalue id must be the same", previousCValueId, field.getcValueId());
+					assertEquals("Cvalue id must be the same", previousCValueId, field.getcValueId());
 					if (previousCValueId == null) {
 						String previousValue = previousFields.get(dataIndex).getValue();
 						if (null == previousValue || "".equals(previousValue)) {
-							Assert.assertEquals("Value must be empty", "", field.getValue());
+							assertEquals("Value must be empty", "", field.getValue());
 						} else {
-							Assert.assertEquals("Value must be the same", previousValue, field.getValue());
+							assertEquals("Value must be the same", previousValue, field.getValue());
 						}
 					}
 				}
@@ -310,15 +310,15 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
 		FieldbookServiceImplTest.fieldbookService.saveMeasurementRows(createdWorkbook);
 		workbook = FieldbookServiceImplTest.fieldbookService.getNurseryDataSet(id);
-		Assert.assertFalse(workbook.equals(createdWorkbook));
+		assertFalse(workbook.equals(createdWorkbook));
 
-		Assert.assertEquals("Expected " + createdWorkbook.getTrialConditions().size() + " of records for trial conditions but got "
+		assertEquals("Expected " + createdWorkbook.getTrialConditions().size() + " of records for trial conditions but got "
 				+ workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions().size(), workbook.getTrialConditions().size());
-		Assert.assertTrue("Expected the same trial conditions retrieved but found a different condition.",
+		assertTrue("Expected the same trial conditions retrieved but found a different condition.",
 				WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConditions(), workbook.getTrialConditions()));
-		Assert.assertEquals("Expected " + createdWorkbook.getTrialConstants().size() + " of records for trial constants but got "
+		assertEquals("Expected " + createdWorkbook.getTrialConstants().size() + " of records for trial constants but got "
 				+ workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants().size(), workbook.getTrialConstants().size());
-		Assert.assertTrue("Expected the same trial constants retrieved but found a different constant.",
+		assertTrue("Expected the same trial constants retrieved but found a different constant.",
 				WorkbookTest.areTrialVariablesSame(createdWorkbook.getTrialConstants(), workbook.getTrialConstants()));
 	}
 
@@ -331,13 +331,13 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 				FieldbookServiceImplTest.fieldbookService.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method,
 						PhenotypicType.GERMPLASM);
 		Debug.println(MiddlewareIntegrationTest.INDENT, termId.toString());
-		Assert.assertEquals((Integer) 8230, termId);
+		assertEquals((Integer) 8230, termId);
 	}
 
 	@Test
 	public void testGetAllBreedingMethods() throws MiddlewareQueryException {
 		List<Method> methods = FieldbookServiceImplTest.fieldbookService.getAllBreedingMethods(false);
-		Assert.assertFalse(methods.isEmpty());
+		assertFalse(methods.isEmpty());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, methods);
 	}
 
@@ -349,7 +349,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
 		Integer listId = FieldbookServiceImplTest.fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
-		Assert.assertTrue(listId != null && listId < 0);
+		assertTrue(listId != null && listId < 0);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Germplasm List Added: ");
 		Debug.println(MiddlewareIntegrationTest.INDENT * 2, germplasmList.toString());
@@ -365,7 +365,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
 		Integer listId = FieldbookServiceImplTest.fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
-		Assert.assertTrue(listId != null && listId < 0);
+		assertTrue(listId != null && listId < 0);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Germplasm List Added: ");
 		Debug.println(MiddlewareIntegrationTest.INDENT * 2, germplasmList.toString());
@@ -381,7 +381,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
 		Integer listId = FieldbookServiceImplTest.fieldbookService.saveGermplasmList(listData, germplasmList);
 
-		Assert.assertTrue(listId != null && listId < 0);
+		assertTrue(listId != null && listId < 0);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Germplasm List Added: ");
 		Debug.println(MiddlewareIntegrationTest.INDENT * 2, germplasmList.toString());
@@ -721,9 +721,9 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 				study2Exists = true;
 			}
 		}
-		Assert.assertFalse("Folder should no longer be found", folderExists);
-		Assert.assertFalse("Study should no longer be found", study1Exists);
-		Assert.assertFalse("Study should no longer be found", study2Exists);
+		assertFalse("Folder should no longer be found", folderExists);
+		assertFalse("Study should no longer be found", study1Exists);
+		assertFalse("Study should no longer be found", study2Exists);
 	}
 
 	@Test
@@ -734,7 +734,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 
 		List<Location> locations = FieldbookServiceImplTest.fieldbookService.getFavoriteLocationByProjectId(locationIds);
 
-		Assert.assertEquals("Expecting to return the same number of Location objects from the input of List of Ids", locationIds.size(),
+		assertEquals("Expecting to return the same number of Location objects from the input of List of Ids", locationIds.size(),
 				locations.size());
 	}
 
@@ -743,7 +743,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 		List<ListDataProject> listDataProjectList = new ArrayList<ListDataProject>();
 		listDataProjectList.add(this.createListDataProjectTest());
 		FieldbookServiceImplTest.fieldbookService.addListDataProjectList(listDataProjectList);
-		Assert.assertNotNull("List 1 should have list data projects", FieldbookServiceImplTest.fieldbookService.getListDataProject(1));
+		assertNotNull("List 1 should have list data projects", FieldbookServiceImplTest.fieldbookService.getListDataProject(1));
 	}
 
 	@Test
@@ -754,7 +754,7 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 		List<StandardVariableReference> standardReferences = new ArrayList<StandardVariableReference>();
 		standardReferences.add(new StandardVariableReference(18140, "GRAIN_NAME"));
 		standardReferences = FieldbookServiceImplTest.fieldbookService.filterStandardVariablesByIsAIds(standardReferences, isAIds);
-		Assert.assertEquals("Should have no items remaining in the list since it was filtered", 0, standardReferences.size());
+		assertEquals("Should have no items remaining in the list since it was filtered", 0, standardReferences.size());
 	}
 
 	private ListDataProject createListDataProjectTest() {
@@ -768,6 +768,18 @@ public class FieldbookServiceImplTest extends DataManagerIntegrationTest {
 		listDataProject.setDesignation("IR 68815-25-PMI 3-UBN 6-B-B");
 		listDataProject.setGroupName("-");
 		return listDataProject;
+	}
+	
+	@Test
+	public void testGetMethodByCode() throws MiddlewareQueryException {
+		String code = "AGB1";
+		String programUUID = null;
+		Method method = fieldbookService.getMethodByCode(code, programUUID);
+		assertNotNull(method);
+		if(method.getUniqueID()!=null) {
+			assertEquals(programUUID,method.getUniqueID());
+		}
+		assertEquals(code,method.getMcode());
 	}
 
 }

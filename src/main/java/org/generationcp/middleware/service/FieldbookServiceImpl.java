@@ -1088,8 +1088,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Method getMethodByCode(String code) throws MiddlewareQueryException {
-		return this.getGermplasmDataManager().getMethodByCode(code);
+	public Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException {
+		return this.getGermplasmDataManager().getMethodByCode(code,programUUID);
 	}
 
 	@Override

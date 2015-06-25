@@ -99,7 +99,7 @@ public class ExperimentBuilder extends Builder {
 
 	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes);
-		if (experiments != null && experiments.size() > 0) {
+		if (experiments != null && !experiments.isEmpty()) {
 			return experiments.get(0);
 		}
 		return null;
@@ -108,7 +108,7 @@ public class ExperimentBuilder extends Builder {
 	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes, boolean hasVariableType)
 			throws MiddlewareQueryException {
 		List<Experiment> experiments = this.build(projectId, type, 0, 1, variableTypes, hasVariableType);
-		if (experiments != null && experiments.size() > 0) {
+		if (experiments != null && !experiments.isEmpty()) {
 			return experiments.get(0);
 		}
 		return null;

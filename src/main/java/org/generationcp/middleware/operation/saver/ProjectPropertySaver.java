@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.saver;
@@ -35,6 +35,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.hibernate.Hibernate;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+
 import org.hibernate.Session;
 
 public class ProjectPropertySaver extends Saver {
@@ -140,7 +142,15 @@ public class ProjectPropertySaver extends Saver {
 			StandardVariable stdvar = new StandardVariable();
 			stdvar.setId(termId.getId());
 			stdvar.setStoredIn(new Term(storedIn, null, null));
-			VariableType variableType = new VariableType(termId.toString(), termId.toString(), stdvar, rank);
+			CVTerm cvTerm = this.getCvTermDao().getById(termId.getId());
+			String localVariableName = termId.toString();
+			String localVariableDescription = termId.toString();
+			if (cvTerm != null) {
+				localVariableName = cvTerm.getName();
+				localVariableDescription = cvTerm.getDefinition();
+			}
+
+			VariableType variableType = new VariableType(localVariableName, localVariableDescription, stdvar, rank);
 			this.saveVariableType(project, variableType);
 		}
 	}

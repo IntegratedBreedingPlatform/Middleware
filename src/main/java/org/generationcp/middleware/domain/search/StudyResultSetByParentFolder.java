@@ -57,7 +57,7 @@ public class StudyResultSetByParentFolder extends Searcher implements StudyResul
 	}
 
 	private boolean isEmpty(List<StudyReference> studyReferences) {
-		return studyReferences == null || studyReferences.size() == 0 || this.index == this.numOfRows;
+		return studyReferences == null || studyReferences.isEmpty() || this.index == this.numOfRows;
 	}
 
 	@Override

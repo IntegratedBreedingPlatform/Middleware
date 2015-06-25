@@ -40,7 +40,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 				@SuppressWarnings("unchecked")
 				List<User> users = criteria.list();
-				return users.size() > 0 ? users.get(0) : null;
+				return !users.isEmpty() ? users.get(0) : null;
 			}
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
@@ -58,7 +58,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 				@SuppressWarnings("unchecked")
 				List<User> users = criteria.list();
-				return users.size() > 0 ? true : false;
+				return !users.isEmpty() ? true : false;
 			}
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
@@ -91,7 +91,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username));
 				@SuppressWarnings("unchecked")
 				List<User> users = criteria.list();
-				return users.size() > 0 ? users.get(0) : null;
+				return !users.isEmpty() ? users.get(0) : null;
 			}
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),

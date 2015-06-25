@@ -88,7 +88,7 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 			}
 
 			// insert to map last column data
-			if (columnValues.size() > 0) {
+			if (!columnValues.isEmpty()) {
 				columnValuesMap.put(lastColumn, columnValues);
 			}
 

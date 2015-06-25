@@ -28,7 +28,7 @@ public class StudyReferenceBuilder extends Builder {
 
 	public List<StudyReference> build(Collection<DmsProject> projects) {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
-		if (projects != null && projects.size() > 0) {
+		if (projects != null && !projects.isEmpty()) {
 			for (DmsProject project : projects) {
 				studyReferences.add(new StudyReference(project.getProjectId(), project.getName(), project.getDescription()));
 			}

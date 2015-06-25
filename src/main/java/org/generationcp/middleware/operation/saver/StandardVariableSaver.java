@@ -33,7 +33,6 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
-import org.generationcp.middleware.util.StringUtil;
 
 public class StandardVariableSaver extends Saver {
 
@@ -265,23 +264,6 @@ public class StandardVariableSaver extends Saver {
 		}
 	}
 
-	private void saveSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
-		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
-			for (NameSynonym nameSynonym : nameSynonyms) {
-				if (!StringUtil.isEmpty(nameSynonym.getName())) {
-					CVTermSynonym cvTermSynonym = new CVTermSynonym();
-
-					cvTermSynonym.setCvTermSynonymId(this.getCvTermSynonymDao().getNextId("cvTermSynonymId"));
-					cvTermSynonym.setSynonym(nameSynonym.getName());
-					cvTermSynonym.setTypeId(nameSynonym.getType().getId());
-					cvTermSynonym.setCvTermId(cvTermId);
-
-					this.getCvTermSynonymDao().save(cvTermSynonym);
-				}
-			}
-		}
-	}
-
 	private void saveEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException {
 		if (enumerations != null && !enumerations.isEmpty()) {
 			for (Enumeration enumeration : enumerations) {
@@ -458,7 +440,7 @@ public class StandardVariableSaver extends Saver {
 	}
 
 	private void deleteSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
-		if (nameSynonyms != null && nameSynonyms.size() > 0) {
+		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
 			List<CVTermSynonym> cvTermSynonyms = this.getCvTermSynonymDao().getByCvTermId(cvTermId);
 			if (cvTermSynonyms != null) {
 				for (CVTermSynonym cvTermSynonym : cvTermSynonyms) {

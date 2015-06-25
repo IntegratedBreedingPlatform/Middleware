@@ -94,7 +94,7 @@ public class ExtendedMarkerInfoDAO extends GenericDAO<ExtendedMarkerInfo, Intege
 	}
 
 	public List<ExtendedMarkerInfo> getByMarkerNames(List<String> markerNames) throws MiddlewareQueryException {
-		if (markerNames == null || markerNames.size() == 0) {
+		if (markerNames == null || markerNames.isEmpty()) {
 			return new ArrayList<ExtendedMarkerInfo>();
 		}
 

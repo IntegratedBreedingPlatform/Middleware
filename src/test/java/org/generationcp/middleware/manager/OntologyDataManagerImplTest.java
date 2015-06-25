@@ -420,7 +420,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 			Assert.assertNotNull(
 					"Application should give a non null list of standard variables for a given header name, even if not present", vars);
-			Assert.assertTrue("Application shouldn't be able to give values for dummy input", vars.size() == 0);
+			Assert.assertTrue("Application shouldn't be able to give values for dummy input", vars.isEmpty());
 		}
 	}
 

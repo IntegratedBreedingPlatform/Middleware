@@ -39,7 +39,7 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByStockIds(Collection<Integer> stockIds) throws MiddlewareQueryException {
 		try {
-			if (stockIds != null && stockIds.size() > 0) {
+			if (stockIds != null && !stockIds.isEmpty()) {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 				criteria.add(Restrictions.in("stockId", stockIds));
 				criteria.setProjection(Projections.property("experimentId"));
@@ -57,7 +57,7 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(Set<Integer> gids) throws MiddlewareQueryException {
 		Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<Integer, Set<Integer>>();
 
-		if (gids.size() == 0) {
+		if (gids.isEmpty()) {
 			return germplasmEnvironments;
 		}
 

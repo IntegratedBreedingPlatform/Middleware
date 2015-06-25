@@ -28,9 +28,6 @@ public enum Season {
 
 	private Integer sortOrder;
 
-	private Season() {
-	}
-
 	private Season(String label, String definition, Integer sortOrder) {
 		this.label = label;
 		this.definition = definition;

@@ -142,7 +142,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	@Override
 	public void setMarkerStatus(Integer generatonID, List<Integer> markerIDs) throws MiddlewareQueryException {
 
-		if (markerIDs == null || markerIDs.size() == 0) {
+		if (markerIDs == null || markerIDs.isEmpty()) {
 			return;
 		}
 
@@ -151,7 +151,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		List<SelectedMarker> markers = this.selectedMarkerDAO.getMarkersByGenerationID(generatonID);
 
-		if (markers != null && markers.size() > 0) {
+		if (markers != null && !markers.isEmpty()) {
 			for (SelectedMarker marker : markers) {
 				markerIDs.remove(marker.getMarkerID());
 			}
@@ -234,7 +234,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	@Override
 	public void setSelectedAccessions(Integer generationID, List<Integer> gids) throws MiddlewareQueryException {
 
-		if (gids == null || gids.size() == 0) {
+		if (gids == null || gids.isEmpty()) {
 			return;
 		}
 
@@ -304,7 +304,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	@Override
 	public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
 
-		if (gids == null || gids.size() == 0) {
+		if (gids == null || gids.isEmpty()) {
 			return;
 		}
 
@@ -329,7 +329,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 		Transaction transaction = session.beginTransaction();
 
 		try {
-			if (existingAccession != null && existingAccession.size() > 0) {
+			if (existingAccession != null && !existingAccession.isEmpty()) {
 				for (SelectedGenotype genotype : existingAccession) {
 
 					switch (genotype.getType()) {

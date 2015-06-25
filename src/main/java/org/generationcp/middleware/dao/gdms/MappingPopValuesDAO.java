@@ -242,7 +242,7 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 	public List<MarkerSampleId> getMarkerSampleIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
 		List<MarkerSampleId> toReturn = new ArrayList<MarkerSampleId>();
 		try {
-			if (gIds != null && gIds.size() > 0) {
+			if (gIds != null && !gIds.isEmpty()) {
 				SQLQuery query = this.getSession().createSQLQuery(MappingPopValuesDAO.GET_MARKER_SAMPLE_IDS_BY_GIDS);
 				query.setParameterList("gids", gIds);
 
