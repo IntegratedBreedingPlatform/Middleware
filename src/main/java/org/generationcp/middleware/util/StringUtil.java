@@ -16,6 +16,8 @@ import java.math.BigInteger;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains utility classes for String formatting, format checking and conversion. For parse methods, the given input String is converted to
@@ -25,6 +27,8 @@ import org.apache.commons.lang3.StringUtils;
  * @author Glenn Marintes
  */
 public abstract class StringUtil {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(StringUtil.class);
 
 	public static int parseInt(String string, int defaultValue) {
 		if (StringUtils.isBlank(string)) {
@@ -358,7 +362,7 @@ public abstract class StringUtil {
 
 			value = String.format(expression, value);
 		 } catch (Exception e) {
-			 e.printStackTrace();
+			 StringUtil.LOG.error("String format was incorrect", e);
 		 }
 		 return value;
 	 }

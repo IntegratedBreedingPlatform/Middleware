@@ -10,12 +10,16 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
 
 public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(SelectedMarkerDAO.class);
 
 	public List<SelectedGenotype> getParentData(Integer generationID) throws MiddlewareQueryException {
 		Criteria crit = this.getSession().createCriteria(this.getPersistentClass());
@@ -50,7 +54,7 @@ public class SelectedGenotypeDAO extends GenericDAO<SelectedGenotype, Integer> {
 			SelectedGenotype genotype = super.saveOrUpdate(entity);
 			return genotype;
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
+			SelectedGenotypeDAO.LOG.error("Saving or updating was not successful", e);
 			throw e;
 		}
 	}

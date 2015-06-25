@@ -30,6 +30,8 @@ import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDynamicReporter extends AbstractReporter {
 
@@ -48,6 +50,8 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	// The left and right margin in pixels
 	private final static int MARGIN = 10;
+	
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractDynamicReporter.class);
 
 	List<String> columnHeaders = null;
 
@@ -71,7 +75,6 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 				// needed to change to input stream since code can not parse if its inside jar file
 				// for MFbNur and MFbTrial
 				InputStream jasperInputStream = this.getTemplateCompileInputStream();
-				// JasperDesign jasperReportDesign = JRXmlLoader.load(jasperFilesPath.replace(".jasper", ".jrxml"));
 				JasperDesign jasperReportDesign = JRXmlLoader.load(jasperInputStream);
 
 				this.addDynamicColumns(jasperReportDesign, this.columnHeaders.size());
@@ -287,7 +290,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 				ex.exportReport();
 
 			} catch (JRException e) {
-				e.printStackTrace();
+				AbstractDynamicReporter.LOG.error("Exporting report in Excel format was not successful", e);
 			}
 		} else {
 			throw new BuildReportException(this.getReportCode());

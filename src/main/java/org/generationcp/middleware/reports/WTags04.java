@@ -17,8 +17,12 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WTags04 extends AbstractReporter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(WTags04.class);
 
 	protected List<List<String>> dataSource = new ArrayList<>();
 	protected Map<String, String> studyMeta = new HashMap<>();
@@ -134,7 +138,7 @@ public class WTags04 extends AbstractReporter {
 			}
 			output.write(sb.toString().getBytes());
 		} catch (IOException e) {
-			e.printStackTrace();
+			WTags04.LOG.error("Unable to write to output stream", e);
 			throw new BuildReportException(this.getReportCode());
 		}
 	}
