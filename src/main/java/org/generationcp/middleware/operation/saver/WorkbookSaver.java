@@ -795,6 +795,7 @@ public class WorkbookSaver extends Saver {
 		info.setLocalDescription("TRIAL_INSTANCE");
 		info.setStdVariableId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		info.setRank(rank);
+		info.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
 		return this.getVariableTypeBuilder().create(info,programUUID);
 	}
 
