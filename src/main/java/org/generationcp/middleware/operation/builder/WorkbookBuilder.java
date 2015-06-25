@@ -146,51 +146,80 @@ public class WorkbookBuilder extends Builder {
 						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
 				
 				VariableType varType = variables.findById(stdVariable.getId());
-				stdVariable.setPhenotypicType(varType.getRole());
-				if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()){
-
-					String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
-
-					Double minRange = null, maxRange = null;
-					if (stdVariable.getConstraints() != null) {
-						minRange = stdVariable.getConstraints().getMinValue();
-						maxRange = stdVariable.getConstraints().getMaxValue();
-					}
-
-					String value = null;
-					int varId = stdVariable.getId();
-					if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
-						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
-					} else if (!isTrial) {
-						// set trial env for nursery studies
-						List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
-						if (locIds != null && !locIds.isEmpty()) {
-							Integer locId = locIds.get(0);
-							Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							if (geolocation != null) {
-								if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
-									value = geolocation.getDescription();
-
-								} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
-									value = geolocation.getLatitude().toString();
-
-								} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
-									value = geolocation.getLongitude().toString();
-
-								} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
-									geolocation.setGeodeticDatum(value);
-
-								} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
-									value = geolocation.getAltitude().toString();
+				if(varType != null){
+					stdVariable.setPhenotypicType(varType.getRole());
+					if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()){
+	
+						String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+	
+						Double minRange = null, maxRange = null;
+						if (stdVariable.getConstraints() != null) {
+							minRange = stdVariable.getConstraints().getMinValue();
+							maxRange = stdVariable.getConstraints().getMaxValue();
+						}
+	
+						String value = null;
+						int varId = stdVariable.getId();
+						if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
+							value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
+						} else if (!isTrial) {
+							// set trial env for nursery studies
+							List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
+							if (locIds != null && !locIds.isEmpty()) {
+								Integer locId = locIds.get(0);
+								Geolocation geolocation = this.getGeolocationDao().getById(locId);
+								if (geolocation != null) {
+									if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
+										value = geolocation.getDescription();
+	
+									} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
+										value = geolocation.getLatitude().toString();
+	
+									} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
+										value = geolocation.getLongitude().toString();
+	
+									} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
+										geolocation.setGeodeticDatum(value);
+	
+									} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
+										value = geolocation.getAltitude().toString();
+									}
 								}
 							}
+							if (value == null) {
+								value = "";
+							}
 						}
-						if (value == null) {
-							value = "";
+	
+						if (value != null) {
+							MeasurementVariable measurementVariable =
+									new MeasurementVariable(
+											stdVariable.getId(),
+											this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
+											stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+											stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
+											maxRange);
+							measurementVariable.setFactor(true);
+							measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+							measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
+									stdVariable.getEnumerations()));
+							measurementVariable.setRole(varType.getRole());
+							if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+								expDesignVariables.add(measurementVariable);
+							} else {
+								conditions.add(measurementVariable);
+							}
 						}
-					}
-
-					if (value != null) {
+					} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+	
+						String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+						String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
+	
+						Double minRange = null, maxRange = null;
+						if (stdVariable.getConstraints() != null) {
+							minRange = stdVariable.getConstraints().getMinValue();
+							maxRange = stdVariable.getConstraints().getMaxValue();
+						}
 						MeasurementVariable measurementVariable =
 								new MeasurementVariable(
 										stdVariable.getId(),
@@ -203,36 +232,9 @@ public class WorkbookBuilder extends Builder {
 						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
 								stdVariable.getEnumerations()));
 						measurementVariable.setRole(varType.getRole());
-						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
-							expDesignVariables.add(measurementVariable);
-						} else {
-							conditions.add(measurementVariable);
-						}
+						expDesignVariables.add(measurementVariable);
+						this.setValueInCondition(conditions, value, stdVariable.getId());
 					}
-				} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
-
-					String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
-					String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
-
-					Double minRange = null, maxRange = null;
-					if (stdVariable.getConstraints() != null) {
-						minRange = stdVariable.getConstraints().getMinValue();
-						maxRange = stdVariable.getConstraints().getMaxValue();
-					}
-					MeasurementVariable measurementVariable =
-							new MeasurementVariable(
-									stdVariable.getId(),
-									this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
-									stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
-									stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
-									maxRange);
-					measurementVariable.setFactor(true);
-					measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-					measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
-							stdVariable.getEnumerations()));
-					measurementVariable.setRole(varType.getRole());
-					expDesignVariables.add(measurementVariable);
-					this.setValueInCondition(conditions, value, stdVariable.getId());
 				}
 			}
 		}

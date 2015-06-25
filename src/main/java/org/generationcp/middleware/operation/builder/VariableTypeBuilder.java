@@ -49,9 +49,8 @@ public class VariableTypeBuilder extends Builder {
 				variableInfo.getStdVariableId(),programUUID));
 		variableType.setTreatmentLabel(variableInfo.getTreatmentLabel());
 		
-		//Set the default role to STUDY, this will change after calling getExperiment
-		variableType.setRole(PhenotypicType.STUDY);
-		variableType.getStandardVariable().setPhenotypicType(PhenotypicType.STUDY);
+		variableType.setRole(variableInfo.getRole());
+		variableType.getStandardVariable().setPhenotypicType(variableInfo.getRole());
 
 		return variableType;
 	}
