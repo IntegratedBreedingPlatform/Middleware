@@ -150,8 +150,6 @@ public class WorkbookBuilder extends Builder {
 					stdVariable.setPhenotypicType(varType.getRole());
 					if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()){
 	
-						String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
-	
 						Double minRange = null, maxRange = null;
 						if (stdVariable.getConstraints() != null) {
 							minRange = stdVariable.getConstraints().getMinValue();
@@ -197,7 +195,7 @@ public class WorkbookBuilder extends Builder {
 											stdVariable.getId(),
 											this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
 											stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
-											stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
+											stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
 											maxRange);
 							measurementVariable.setFactor(true);
 							measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
@@ -212,7 +210,6 @@ public class WorkbookBuilder extends Builder {
 						}
 					} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 	
-						String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
 						String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
 	
 						Double minRange = null, maxRange = null;
@@ -225,7 +222,7 @@ public class WorkbookBuilder extends Builder {
 										stdVariable.getId(),
 										this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
 										stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
-										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
+										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
 										maxRange);
 						measurementVariable.setFactor(true);
 						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
@@ -361,8 +358,6 @@ public class WorkbookBuilder extends Builder {
 				if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()
 						|| PhenotypicType.VARIATE == varType.getRole()) {
 
-					String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
-
 					Double minRange = null, maxRange = null;
 					if (stdVariable.getConstraints() != null) {
 						minRange = stdVariable.getConstraints().getMaxValue();
@@ -432,7 +427,7 @@ public class WorkbookBuilder extends Builder {
 										stdVariable.getId(),
 										this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
 										stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
-										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, label, minRange,
+										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
 										maxRange);
 						measurementVariable.setFactor(true);
 						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());

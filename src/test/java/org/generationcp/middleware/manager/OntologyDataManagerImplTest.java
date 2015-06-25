@@ -130,8 +130,7 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 		myOwnPlantHeight.setIsA(new Term(OntologyDataManagerImplTestConstants.OBJECT_ID, "Agronomic", "Agronomic"));
 		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
-		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
-
+		
 		OntologyDataManagerImplTest.manager.addStandardVariable(myOwnPlantHeight,PROGRAM_UUID);
 
 		// Load details using existing method
@@ -226,7 +225,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		stdVariable.setProperty(OntologyDataManagerImplTest.manager.findTermByName(propertyName, CvId.PROPERTIES));
 		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
-		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
@@ -281,7 +279,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		stdVariable.setScale(scale);
 		stdVariable.setMethod(method);
 
-		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		// added as this is required
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
@@ -515,9 +512,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 
 		Term methodTerm = OntologyDataManagerImplTest.manager.findTermByName("Counting", CvId.METHODS);
 		standardVariable.setMethod(methodTerm);
-
-		Term storedInTerm = OntologyDataManagerImplTest.manager.getTermById(TermId.OBSERVATION_VARIATE.getId());
-		standardVariable.setStoredIn(storedInTerm);
 
 		Term dataType = OntologyDataManagerImplTest.manager.getTermById(TermId.NUMERIC_VARIABLE.getId());
 		standardVariable.setDataType(dataType);
@@ -1074,7 +1068,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		stdVariable.setProperty(OntologyDataManagerImplTest.manager.findTermByName(propertyName, CvId.PROPERTIES));
 		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
-		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
@@ -1220,7 +1213,6 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		standardVariable.setDataType(dataType);
 		standardVariable.setPhenotypicType(PhenotypicType.TRIAL_DESIGN);
 		standardVariable.setIsA(traitClass);
-		standardVariable.setStoredIn(storedIn);
 		standardVariable.setCropOntologyId("CO:1200");
 		OntologyDataManagerImplTest.manager.addStandardVariable(standardVariable,PROGRAM_UUID);
 		Debug.println(MiddlewareIntegrationTest.INDENT, String.valueOf(standardVariable.getId()));

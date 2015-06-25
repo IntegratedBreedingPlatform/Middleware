@@ -148,7 +148,6 @@ public class ProjectPropertySaver extends Saver {
 			int rank = this.getProjectPropertyDao().getNextRank(project.getProjectId());
 			StandardVariable stdvar = new StandardVariable();
 			stdvar.setId(termId.getId());
-			stdvar.setStoredIn(new Term(storedIn, null, null));
 			CVTerm cvTerm = this.getCvTermDao().getById(termId.getId());
 			String localVariableName = termId.toString();
 			String localVariableDescription = termId.toString();

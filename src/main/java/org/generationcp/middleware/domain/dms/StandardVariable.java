@@ -40,8 +40,6 @@ public class StandardVariable implements Serializable {
 
 	private Term dataType;
 
-	private Term storedIn;
-
 	private Term isA;
 
 	private PhenotypicType phenotypicType;
@@ -59,19 +57,18 @@ public class StandardVariable implements Serializable {
 	public StandardVariable() {
 	}
 
-	public StandardVariable(Term property, Term scale, Term method, Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType) {
+	public StandardVariable(Term property, Term scale, Term method, Term dataType, Term isA, PhenotypicType phenotypicType) {
 		this.property = property;
 		this.scale = scale;
 		this.method = method;
 		this.dataType = dataType;
-		this.storedIn = storedIn;
 		this.isA = isA;
 		this.phenotypicType = phenotypicType;
 	}
 
 	/* Copy constructor. Used by the copy method */
 	private StandardVariable(StandardVariable stdVar) {
-		this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(), stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getIsA(),
+		this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(), stdVar.getDataType(), stdVar.getIsA(),
 				stdVar.getPhenotypicType());
 		this.setId(0);
 		this.setName(stdVar.getName());
@@ -135,14 +132,6 @@ public class StandardVariable implements Serializable {
 
 	public void setDataType(Term dataType) {
 		this.dataType = dataType;
-	}
-
-	public Term getStoredIn() {
-		return this.storedIn;
-	}
-
-	public void setStoredIn(Term storedIn) {
-		this.storedIn = storedIn;
 	}
 
 	public VariableConstraints getConstraints() {
@@ -262,7 +251,6 @@ public class StandardVariable implements Serializable {
 		Debug.println(indent, "property: " + this.property);
 		Debug.println(indent, "method " + this.method);
 		Debug.println(indent, "scale: " + this.scale);
-		Debug.println(indent, "storedIn: " + this.storedIn);
 		Debug.println(indent, "dataType: " + this.dataType);
 		Debug.println(indent, "isA: " + this.isA);
 		Debug.println(indent, "phenotypicType: " + this.phenotypicType);
@@ -306,8 +294,6 @@ public class StandardVariable implements Serializable {
 		builder.append(this.method);
 		builder.append(", dataType=");
 		builder.append(this.dataType);
-		builder.append(", storedIn=");
-		builder.append(this.storedIn);
 		builder.append(", isA=");
 		builder.append(this.isA);
 		builder.append(", phenotypicType=");
@@ -356,7 +342,7 @@ public class StandardVariable implements Serializable {
 	}
 
 	public boolean isNumericCategoricalVariate() {
-		if (this.storedIn != null && this.storedIn.getId() == TermId.CATEGORICAL_VARIATE.getId() && this.enumerations != null
+		if (this.dataType != null && this.dataType.getId() == TermId.CATEGORICAL_VARIABLE.getId() && this.enumerations != null
 				&& !this.enumerations.isEmpty()) {
 			for (Enumeration enumeration : this.enumerations) {
 				if (enumeration.getName() == null || !NumberUtils.isNumber(enumeration.getName().trim())) {

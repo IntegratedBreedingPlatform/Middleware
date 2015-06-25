@@ -90,7 +90,6 @@ public class VariableTypeListDataUtil {
 		StandardVariable stdVar = new StandardVariable();
 		stdVar.setId(id);
 		stdVar.setName(name);
-		stdVar.setStoredIn(new Term(storedInId, storedInName, storedInDef));
 		return stdVar;
 	}
 

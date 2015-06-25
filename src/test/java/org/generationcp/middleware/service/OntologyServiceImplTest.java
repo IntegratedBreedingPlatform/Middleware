@@ -417,8 +417,6 @@ public class OntologyServiceImplTest extends DataManagerIntegrationTest {
 		stdVariable.setProperty(OntologyServiceImplTest.ontologyService.findTermByName(propertyName, CvId.PROPERTIES));
 		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
-		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
-
 		switch (dataType) {
 			case NUMERIC_VARIABLE:
 				stdVariable.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));

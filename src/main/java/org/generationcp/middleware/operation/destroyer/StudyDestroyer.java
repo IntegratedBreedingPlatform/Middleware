@@ -54,7 +54,6 @@ public class StudyDestroyer extends Destroyer {
 			VariableTypeList typeList = new VariableTypeList();
 			StandardVariable statusDeletedTerm = new StandardVariable();
 			statusDeletedTerm.setId(TermId.STUDY_STATUS.getId());
-			statusDeletedTerm.setStoredIn(new Term(TermId.STUDY_INFO_STORAGE.getId(), null, null));
 			VariableType type = new VariableType(TermId.STUDY_STATUS.name(), TermId.STUDY_STATUS.name(), statusDeletedTerm, maxRank + 1);
 			typeList.add(type);
 			VariableList varList = new VariableList();

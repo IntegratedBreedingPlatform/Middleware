@@ -81,8 +81,7 @@ public class StandardVariableDaoTest extends DataManagerIntegrationTest {
 
 		myOwnPlantHeight.setIsA(new Term(1340, "Agronomic", "Agronomic"));
 		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
-		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
-
+		
 		StandardVariableDaoTest.manager.addStandardVariable(myOwnPlantHeight,PROGRAM_UUID);
 
 		// Load details using existing method
