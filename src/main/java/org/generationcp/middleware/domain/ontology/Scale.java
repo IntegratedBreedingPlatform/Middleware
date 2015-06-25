@@ -90,7 +90,7 @@ public class Scale extends Term {
 		}
 
 		if (this.categories != null) {
-			Debug.println(indent + 3, "Classes: " + this.getCategories());
+			Debug.println(indent + 3, "Categories: " + this.getCategories());
 		}
 
 		if (this.minValue != null) {
