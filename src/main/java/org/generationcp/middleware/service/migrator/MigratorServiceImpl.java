@@ -23,7 +23,7 @@ public class MigratorServiceImpl extends Service implements MigratorService {
 	public void resetLocalReferenceId(String tableName, String columnName)
 			throws MiddlewareQueryException {
 		String queryString = "UPDATE " + tableName + " SET " + columnName
-				+ " = :" + columnName + " where " + columnName + " < 0";
+				+ " = :" + columnName + " where " + columnName + " != 0";
 		Session session = this.getCurrentSession();
 
 		Query q = session.createSQLQuery(queryString);
