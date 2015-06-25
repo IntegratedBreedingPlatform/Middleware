@@ -1,9 +1,6 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.math.BigInteger;
-import java.util.*;
-
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
@@ -35,6 +32,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -152,7 +152,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			if (!variableFilterOptions.getVariableTypes().isEmpty()) {
-				query.setParameterList("variableTypes", variableFilterOptions.getVariableTypes());
+
+				Set<String> variableTypeNames = new HashSet<>();
+				for (VariableType variableType : variableFilterOptions.getVariableTypes()) {
+					variableTypeNames.add(variableType.getName());
+				}
+
+				query.setParameterList("variableTypes", variableTypeNames);
 			}
 
 			if (!filteredVariables.isEmpty()) {

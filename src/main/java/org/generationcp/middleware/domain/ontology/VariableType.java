@@ -64,7 +64,7 @@ public enum VariableType {
 				throw new IllegalArgumentException("duplicate id: " + e.getId());
 			}
 
-			if (VariableType.byName.put(e.getName().toUpperCase(), e) != null) {
+			if (VariableType.byName.put(e.getName(), e) != null) {
 				throw new IllegalArgumentException("duplicate name: " + e.getName());
 			}
 		}
@@ -91,7 +91,7 @@ public enum VariableType {
 	}
 
 	public static VariableType getByName(String name) {
-		return VariableType.byName.get(name.toUpperCase());
+		return VariableType.byName.get(name);
 	}
 
 	public static Set<Integer> getVariableTypesIdsByPhenotype(PhenotypicType phenotype) {

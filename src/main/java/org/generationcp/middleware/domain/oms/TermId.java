@@ -22,7 +22,7 @@ public enum TermId {
 
 	// CV Term Relationship
 	, HAS_METHOD(1210), HAS_PROPERTY(1200), HAS_SCALE(1220), HAS_TYPE(1105), HAS_VALUE(1190), IS_A(1225), STORED_IN(1044), VARIABLE_TYPE(
-			1041) // TODO Update ID as per final cvterm id assigned officially.
+			1800) // TODO Update ID as per final cvterm id assigned officially.
 
 	// Ontology
 	, IBDB_CLASS(1001), ONTOLOGY_TRAIT_CLASS(1330), ONTOLOGY_RESEARCH_CLASS(1045), GENERAL_TRAIT_CLASS(8580)
