@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.VariableType;
 import org.generationcp.middleware.util.Debug;
 
 /**

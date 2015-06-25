@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.oms.VariableType;
 
 public class OntologyVariableSummary {
 
