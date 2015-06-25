@@ -151,14 +151,13 @@ public class CrossExpansionUtil {
 				break;
 			}
 		}
-		// if (AfterStr.substring(0,1).equals("/")) {
+		
 		if (afterStr.startsWith("/")) {
 			slashLeft = false;
 		}
 		cleanAfter = afterStr;
 		cleanBefore = beforeStr;
 		// Fixing CleanAfter
-		// if (CleanAfter.substring(0,1).equals("*") || CleanAfter.substring(0,1).equals("/")) {
 		if (cleanAfter.startsWith("*") || cleanAfter.startsWith("/")) {
 			cleanAfter = cleanAfter.substring(1, cleanAfter.length());
 		}
@@ -220,12 +219,7 @@ public class CrossExpansionUtil {
 				cimmyWheatUtil.getNstatWeightArray()[tNstatIndx1] = tNstatVal2;
 			}
 		}
-		/*
-		 * if (useFullNames) { if (t_nstatIndx1 >t_nstatIndx2) { nstatArray[t_nstatIndx1] = t_nstatIndx2; nstatArray[t_nstatIndx2] =
-		 * t_nstatIndx1; nstatWeightArray[t_nstatIndx1] = t_nstatVal2; nstatWeightArray[t_nstatIndx2] = t_nstatVal1; } } else { if
-		 * (t_nstatIndx2 >t_nstatIndx1) { nstatArray[t_nstatIndx1] = t_nstatIndx2; nstatArray[t_nstatIndx2] = t_nstatIndx1;
-		 * nstatWeightArray[t_nstatIndx2] = t_nstatVal1; nstatWeightArray[t_nstatIndx1] = t_nstatVal2; } }
-		 */
+
 		for (x = 1; x < cimmyWheatUtil.getNtypeArray().length; x++) {
 			if (cimmyWheatUtil.getNtypeArray()[x] == pNtypeX) {
 				pr = cimmyWheatUtil.getNtypeWeightArray()[x];
