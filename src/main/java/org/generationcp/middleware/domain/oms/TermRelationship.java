@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.domain.oms;
 
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+
 /**
  * Contains the details of term relationship.
  */
