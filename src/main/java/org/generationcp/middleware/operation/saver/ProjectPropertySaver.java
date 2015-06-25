@@ -265,7 +265,7 @@ public class ProjectPropertySaver extends Saver {
 
 		stdvar.setId(variable.getTermId());
 		varType.setRole(variable.getRole());
-
+		stdvar.setPhenotypicType(variable.getRole());
 		varType.setLocalName(variable.getName());
 		varType.setLocalDescription(variable.getDescription());
 		varType.setRank(rank);
