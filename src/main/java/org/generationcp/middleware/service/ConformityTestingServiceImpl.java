@@ -95,7 +95,7 @@ public class ConformityTestingServiceImpl implements ConformityTestingService {
 						}
 					}
 
-					if (errorMarkers.size() > 0) {
+					if (!errorMarkers.isEmpty()) {
 						errorItems.put(conformityGermplasmInput.getGid(), errorMarkers);
 					}
 

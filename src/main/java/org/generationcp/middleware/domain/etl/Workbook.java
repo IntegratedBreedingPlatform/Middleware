@@ -408,7 +408,7 @@ public class Workbook {
 
 	private List<MeasurementVariable> getTrialVariables(List<MeasurementVariable> variables) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
-		if (variables != null && variables.size() > 0) {
+		if (variables != null && !variables.isEmpty()) {
 			for (MeasurementVariable variable : variables) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
@@ -422,7 +422,7 @@ public class Workbook {
 		if (this.trialHeaders == null) {
 			this.trialHeaders = new ArrayList<String>();
 			List<MeasurementVariable> variables = this.getTrialVariables();
-			if (variables != null && variables.size() > 0) {
+			if (variables != null && !variables.isEmpty()) {
 				for (MeasurementVariable variable : variables) {
 					if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
 						this.trialHeaders.add(variable.getName());

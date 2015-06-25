@@ -151,7 +151,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		List<SelectedMarker> markers = this.selectedMarkerDAO.getMarkersByGenerationID(generatonID);
 
-		if (markers != null && markers.size() > 0) {
+		if (markers != null && !markers.isEmpty()) {
 			for (SelectedMarker marker : markers) {
 				markerIDs.remove(marker.getMarkerID());
 			}
@@ -329,7 +329,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 		Transaction transaction = session.beginTransaction();
 
 		try {
-			if (existingAccession != null && existingAccession.size() > 0) {
+			if (existingAccession != null && !existingAccession.isEmpty()) {
 				for (SelectedGenotype genotype : existingAccession) {
 
 					switch (genotype.getType()) {

@@ -139,7 +139,7 @@ public class Debug {
 	 * @param objects the objects to print
 	 */
 	public static void printFormattedObjects(int indent, List<?> objects) {
-		if (objects != null && objects.size() > 0) {
+		if (objects != null && !objects.isEmpty()) {
 			for (Object obj : objects) {
 				Debug.printFormattedObject(indent, obj);
 			}
@@ -172,7 +172,7 @@ public class Debug {
 	 * @param objects the objects to print
 	 */
 	public static void printObjects(int indent, List<?> objects) {
-		if (objects != null && objects.size() > 0) {
+		if (objects != null && !objects.isEmpty()) {
 			for (Object obj : objects) {
 				Debug.printObject(indent, obj);
 			}

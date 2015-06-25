@@ -91,7 +91,7 @@ public class LotAggregateData implements Serializable {
 		builder.append(this.availableBalance);
 		builder.append(", reservedTotal=");
 		builder.append(this.reservedTotal);
-		if (this.reservationMap != null && this.reservationMap.size() > 0) {
+		if (this.reservationMap != null && !this.reservationMap.isEmpty()) {
 			builder.append(", reservationMap={");
 			for (Integer id : this.reservationMap.keySet()) {
 				builder.append("Id:");

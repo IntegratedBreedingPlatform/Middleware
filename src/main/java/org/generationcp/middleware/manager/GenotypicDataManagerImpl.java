@@ -1219,7 +1219,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveDatasetUser(datasetId, datasetUser);
 
 			// Save QTL data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 				for (QtlDataRow row : rows) {
 					Qtl qtl = row.getQtl();
 					QtlDetails qtlDetails = row.getQtlDetails();
@@ -1500,7 +1500,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
@@ -1564,7 +1564,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<AlleleValues> alleleValues = new ArrayList<AlleleValues>();
@@ -1622,7 +1622,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<CharValues> charValues = new ArrayList<CharValues>();
@@ -1679,7 +1679,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
@@ -1737,7 +1737,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
@@ -1802,7 +1802,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
 			// Save data rows
-			if (rows != null && rows.size() > 0) {
+			if (rows != null && !rows.isEmpty()) {
 
 				List<AccMetadataSet> accMetadataSets = new ArrayList<AccMetadataSet>();
 				List<MappingPopValues> mappingPopValues = new ArrayList<MappingPopValues>();
@@ -2404,7 +2404,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.saveMarkers(markers);
 
-		if (markerMetadataSets != null && markerMetadataSets.size() > 0) {
+		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
 			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 				markerMetadataSet.setDatasetId(datasetId);
 			}
@@ -2422,7 +2422,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.saveMarkers(markers);
 
-		if (markerMetadataSets != null && markerMetadataSets.size() > 0) {
+		if (markerMetadataSets != null && !markerMetadataSets.isEmpty()) {
 			for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 				markerMetadataSet.setDatasetId(datasetId);
 			}

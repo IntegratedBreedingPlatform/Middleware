@@ -62,7 +62,7 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 		List<DmsProject> studies = new ArrayList<DmsProject>();
 		if (!StringUtil.isEmpty(countryName)) {
 			List<Country> countries = this.getCountryDao().getByIsoFull(countryName);
-			if (countries != null && countries.size() > 0) {
+			if (countries != null && !countries.isEmpty()) {
 				List<Integer> countryIds = new ArrayList<Integer>();
 				for (Country country : countries) {
 					countryIds.add(country.getCntryid());
@@ -79,7 +79,7 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 		if (season != null && season != Season.GENERAL) {
 			List<Integer> factorIds = this.getSeasonalFactors();
 
-			if (factorIds != null && factorIds.size() > 0) {
+			if (factorIds != null && !factorIds.isEmpty()) {
 				// for each seasonal factor, get the value that matches the season parameter from its list of possible values
 				for (Integer factorId : factorIds) {
 					CVTerm value = this.getDiscreteValueTerm(factorId.toString(), season.getDefinition());
@@ -98,7 +98,7 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 		Set<DmsProject> studies = new HashSet<DmsProject>();
 
 		for (DmsProject project : projects) {
-			if (project.getRelatedTos() != null && project.getRelatedTos().size() > 0) {
+			if (project.getRelatedTos() != null && !project.getRelatedTos().isEmpty()) {
 				if (TermId.IS_STUDY.getId() == project.getRelatedTos().get(0).getTypeId()) {
 					studies.add(project);
 
@@ -117,7 +117,7 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 		List<DmsProject> datasets = new ArrayList<DmsProject>();
 
 		for (DmsProject project : projects) {
-			if (project.getRelatedTos() != null && project.getRelatedTos().size() > 0) {
+			if (project.getRelatedTos() != null && !project.getRelatedTos().isEmpty()) {
 				if (TermId.BELONGS_TO_STUDY.getId() == project.getRelatedTos().get(0).getTypeId()) {
 					datasets.add(project);
 				}
@@ -152,7 +152,7 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 
 	private Set<DmsProject> getProjectsByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		Set<DmsProject> projects = new HashSet<DmsProject>();
-		if (ids != null && ids.size() > 0) {
+		if (ids != null && !ids.isEmpty()) {
 			projects.addAll(this.getDmsProjectDao().getByIds(ids));
 		}
 		return projects;

@@ -78,7 +78,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 				@SuppressWarnings("unchecked")
 				List<Project> projectList = query.list();
 
-				return projectList.size() > 0 ? projectList.get(0) : null;
+				return !projectList.isEmpty() ? projectList.get(0) : null;
 			}
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getLastOpenedProject(userId=" + userId + ") query from Project " + e.getMessage(), e);
@@ -100,7 +100,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			@SuppressWarnings("unchecked")
 			List<Project> projectList = query.list();
 
-			return projectList.size() > 0 ? projectList.get(0) : null;
+			return !projectList.isEmpty() ? projectList.get(0) : null;
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getLastOpenedProjectAnyUser(" + ") query from Project " + e.getMessage(), e);

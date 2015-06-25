@@ -141,7 +141,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo");
 			query.setParameter("projectId", projectId);
 			List<Object[]> list = query.list();
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				datasets = this.createFieldMapDatasetInfo(list);
 			}
 
@@ -229,7 +229,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			List<Object[]> list = query.list();
 
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				fieldmaps = this.createFieldMapLabels(list);
 			}
 
@@ -493,7 +493,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			Query query = this.getSession().createSQLQuery(sql.toString());
 			List<Object[]> list = query.list();
 			List<String> returnData = new ArrayList();
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				for (Object[] row : list) {
 					returnData.add((String) row[1]);
 				}

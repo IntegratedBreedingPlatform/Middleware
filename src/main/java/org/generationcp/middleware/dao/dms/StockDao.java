@@ -189,7 +189,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			List<Object[]> list = query.list();
 
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				for (Object[] row : list) {
 					Integer id = (Integer) row[0];
 					Integer dbxrefId = (Integer) row[1];

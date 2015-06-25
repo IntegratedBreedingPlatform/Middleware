@@ -282,7 +282,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer> {
 				Criteria crit = this.getSession().createCriteria(Dataset.class);
 				crit.add(Restrictions.eq("datasetName", datasetName));
 				List<Object> result = crit.list();
-				if (result.size() > 0) {
+				if (!result.isEmpty()) {
 					return (Dataset) result.get(0);
 				}
 			}

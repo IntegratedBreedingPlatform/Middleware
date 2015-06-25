@@ -103,7 +103,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 
 	private long countStudiesByCountry(Database database) throws MiddlewareQueryException {
-		if (this.locationIds != null && this.locationIds.size() > 0) {
+		if (this.locationIds != null && !this.locationIds.isEmpty()) {
 			return this.getStudySearchDao().countStudiesByLocationIds(this.locationIds);
 		}
 		return 0;

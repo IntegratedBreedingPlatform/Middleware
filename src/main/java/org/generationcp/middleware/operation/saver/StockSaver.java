@@ -47,7 +47,7 @@ public class StockSaver extends Saver {
 	}
 
 	private StockModel createStock(VariableList variableList, StockModel stockModel) throws MiddlewareQueryException {
-		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			int propertyIndex = this.getStockPropertyDao().getNextId("stockPropId");
 			for (Variable variable : variableList.getVariables()) {
 				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();

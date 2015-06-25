@@ -74,7 +74,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(Collection<Integer> geolocationIds) throws MiddlewareQueryException {
 		try {
-			if (geolocationIds != null && geolocationIds.size() > 0) {
+			if (geolocationIds != null && !geolocationIds.isEmpty()) {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 				criteria.add(Restrictions.in("geoLocation.locationId", geolocationIds));
 				criteria.setProjection(Projections.property("ndExperimentId"));

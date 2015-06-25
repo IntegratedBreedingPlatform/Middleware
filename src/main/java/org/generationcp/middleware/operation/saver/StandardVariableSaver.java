@@ -440,7 +440,7 @@ public class StandardVariableSaver extends Saver {
 	}
 
 	private void deleteSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
-		if (nameSynonyms != null && nameSynonyms.size() > 0) {
+		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
 			List<CVTermSynonym> cvTermSynonyms = this.getCvTermSynonymDao().getByCvTermId(cvTermId);
 			if (cvTermSynonyms != null) {
 				for (CVTermSynonym cvTermSynonym : cvTermSynonyms) {

@@ -29,7 +29,7 @@ public class VariableTypeListTransformer extends Transformer {
 
 		VariableTypeList variableTypeList = new VariableTypeList();
 
-		if (measurementVariables != null && measurementVariables.size() > 0) {
+		if (measurementVariables != null && !measurementVariables.isEmpty()) {
 			for (MeasurementVariable measurementVariable : measurementVariables) {
 				StandardVariable standardVariable = null;
 				if (measurementVariable.getTermId() != 0) {// in etl v2, standard variables are already created before saving the study
