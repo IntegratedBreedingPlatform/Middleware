@@ -128,8 +128,8 @@ public class DatabaseSetupUtil {
 		DatabaseSetupUtil.checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, DatabaseSetupUtil.cropConnectionParameters);
 
 		// copy and execute merged/common-migration-410 scripts
-		checkoutURL = DatabaseSetupUtil.prefixDirectory + "/database/merged/common-migration-410";
-		centralCommonGitURL = DatabaseSetupUtil.gitUrl + "/merged/common-migration-410";
+		checkoutURL = DatabaseSetupUtil.prefixDirectory + "/database/merged/upgrade-BMS-36";
+		centralCommonGitURL = DatabaseSetupUtil.gitUrl + "/merged/upgrade-BMS-36";
 		DatabaseSetupUtil.checkoutAndRunIBDBScripts(checkoutURL, centralCommonGitURL, DatabaseSetupUtil.cropConnectionParameters);
 
 		DatabaseSetupUtil.LOG.debug("  >>> Central DB initialized - all scripts from IBDBScripts ran successfully.");
