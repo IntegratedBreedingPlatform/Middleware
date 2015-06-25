@@ -1,6 +1,7 @@
 
-package org.generationcp.middleware.domain.oms;
+package org.generationcp.middleware.manager.ontology.daoElements;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.VariableType;
 
 import java.util.HashSet;

@@ -18,7 +18,7 @@ import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.oms.OntologyVariableInfo;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
