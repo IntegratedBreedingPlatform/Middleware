@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.domain.oms;
+package org.generationcp.middleware.domain.ontology;
 
 import java.util.HashMap;
 import java.util.Map;

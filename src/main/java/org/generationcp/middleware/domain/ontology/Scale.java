@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.util.Debug;
 
 /**

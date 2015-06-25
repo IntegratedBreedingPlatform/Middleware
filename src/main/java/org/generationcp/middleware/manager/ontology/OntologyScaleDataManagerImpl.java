@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.DataType;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermRelationshipId;
