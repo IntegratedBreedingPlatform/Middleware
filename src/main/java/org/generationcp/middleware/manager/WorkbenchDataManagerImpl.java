@@ -1005,7 +1005,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		List<Integer> ids = this.addProjectActivity(list);
 
-		return ids.size() > 0 ? ids.get(0) : null;
+		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
 	@Override
@@ -1240,7 +1240,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public WorkbenchRuntimeData getWorkbenchRuntimeData() throws MiddlewareQueryException {
 		List<WorkbenchRuntimeData> list = this.getWorkbenchRuntimeDataDao().getAll(0, 1);
-		return list.size() > 0 ? list.get(0) : null;
+		return !list.isEmpty() ? list.get(0) : null;
 	}
 
 	@Override
@@ -1421,7 +1421,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 				List<ProjectBackup> result = this.getProjectBackupDao().getProjectBackupByBackupPath(projectBackup.getBackupPath());
 
-				if (result != null && result.size() > 0) {
+				if (result != null && !result.isEmpty()) {
 					result.get(0).setBackupTime(projectBackup.getBackupTime());
 					projectBackup = result.get(0);
 				}
@@ -1570,7 +1570,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 
 			// Save if non-existing
-			if (this.getTemplateSettings(templateSetting).size() == 0) {
+			if (this.getTemplateSettings(templateSetting).isEmpty()) {
 				trans = session.beginTransaction();
 				this.updateIsDefaultOfSameProjectAndToolTemplateSetting(templateSetting);
 				this.getTemplateSettingDao().save(templateSetting);
@@ -1614,7 +1614,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			List<TemplateSetting> sameProjectAndToolSettings = this.getTemplateSettings(templateSettingFilter);
 
-			if (sameProjectAndToolSettings.size() > 0) {
+			if (!sameProjectAndToolSettings.isEmpty()) {
 				for (TemplateSetting setting : sameProjectAndToolSettings) {
 					if (!setting.getTemplateSettingId().equals(templateSetting.getTemplateSettingId()) && setting.isDefault()) {
 						setting.setIsDefault(Boolean.FALSE);

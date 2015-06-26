@@ -592,4 +592,22 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		this.germplasmDataManager = germplasmDataManager;
 	}
 
+	public int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException {
+		Germplasm maleParent = getGermplasmDataManager().getGermplasmByGID(maleParentGID);
+		Germplasm femaleParent = getGermplasmDataManager().getGermplasmByGID(femaleParentGID);
+
+		if (maleParent == null || femaleParent == null) {
+			return NONE;
+		}
+
+		if (femaleParent.getGnpgs() >= 2
+				&& (maleParentGID.equals(femaleParent.getGpid1()) || maleParentGID.equals(femaleParent.getGpid2()))) {
+			return MALE_RECURRENT;
+		} else if (maleParent.getGnpgs() >= 2
+				&& (femaleParentGID.equals(maleParent.getGpid1()) || femaleParentGID.equals(maleParent.getGpid2()))) {
+			return FEMALE_RECURRENT;
+		}
+
+		return NONE;
+	}
 }

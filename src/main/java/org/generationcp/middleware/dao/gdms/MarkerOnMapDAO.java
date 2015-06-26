@@ -55,7 +55,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 			query.setParameter("markerId", markerId);
 			query.setParameter("mapId", mapId);
 			List<MarkerOnMap> result = query.list();
-			if (result != null && result.size() > 0) {
+			if (result != null && !result.isEmpty()) {
 				return result.get(0);
 			}
 
@@ -81,7 +81,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
 			List<Object[]> list = query.list();
 
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				for (Object[] row : list) {
 					Integer markerId = (Integer) row[0];
 					String mapName = (String) row[1];
@@ -116,7 +116,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
 			List<Object[]> list = query.list();
 
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				for (Object[] row : list) {
 					Integer markerOnMapId = (Integer) row[0];
 					Integer mapId2 = (Integer) row[1];
@@ -190,7 +190,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
 			List<Object[]> list = query.list();
 
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				for (Object[] row : list) {
 					Integer markerOnMapId = (Integer) row[0];
 					Integer mapId2 = (Integer) row[1];
@@ -232,7 +232,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
 			List<Object[]> list = query.list();
 
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				for (Object[] row : list) {
 					Integer markerOnMapId = (Integer) row[0];
 					Integer mapId2 = (Integer) row[1];

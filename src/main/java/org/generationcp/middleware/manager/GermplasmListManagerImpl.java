@@ -649,4 +649,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID) throws MiddlewareQueryException {
 		return this.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(listDataProjectListID);
 	}
+	@Override
+	public GermplasmList getGermplasmListByListRef(Integer listRef) throws MiddlewareQueryException {
+		return this.getGermplasmListDAO().getByListRef(listRef);
+	}
+
 }

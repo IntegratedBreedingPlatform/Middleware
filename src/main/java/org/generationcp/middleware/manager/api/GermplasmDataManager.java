@@ -779,6 +779,13 @@ public interface GermplasmDataManager {
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType) throws MiddlewareQueryException;
 
 	/**
+	 * Return the UserDefinedField using local field no
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	UserDefinedField getUserDefinedFieldByLocalFieldNo(Integer lfldno) throws MiddlewareQueryException;
+	
+	/**
 	 * Please use LocationDataManager.getCountryById().
 	 * 
 	 * Returns the country record identified by the given id.
@@ -1171,7 +1178,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Gets the method by name.
 	 *
-	 * @param name the code
+	 * @param code the code
 	 * @return the method by name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -1180,7 +1187,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Gets the method by name.
 	 *
-	 * @param name the code
+	 * @param code the code
 	 * @param programUUID - uniqueID of the current program
 	 * @return the method by name
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -1232,7 +1239,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Saves a favorite method/location
 	 *
-	 * @param favorite to be saved
+	 * @param ProgramFavorite to be saved
 	 * @return none
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -1250,7 +1257,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Deletes a favorite method/location
 	 *
-	 * @param favorite record
+	 * @param code the code
 	 * @return none
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */

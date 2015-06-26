@@ -49,7 +49,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		try {
 
-			if (propertyNames.size() > 0) {
+			if (!propertyNames.isEmpty()) {
 
 				StringBuilder sqlString =
 						new StringBuilder()

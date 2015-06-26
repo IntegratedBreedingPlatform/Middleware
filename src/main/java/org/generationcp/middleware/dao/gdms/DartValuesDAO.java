@@ -86,7 +86,7 @@ public class DartValuesDAO extends GenericDAO<DartValues, Integer> {
 
 		List<DartValues> toReturn = new ArrayList<DartValues>();
 		try {
-			if (markerIds != null && markerIds.size() > 0) {
+			if (markerIds != null && !markerIds.isEmpty()) {
 				SQLQuery query = this.getSession().createSQLQuery("SELECT * " + " FROM gdms_dart_values where marker_id IN (:markerIds) ");
 				query.setParameterList("markerIds", markerIds);
 

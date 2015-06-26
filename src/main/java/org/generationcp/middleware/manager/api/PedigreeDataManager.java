@@ -21,6 +21,9 @@ import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 public interface PedigreeDataManager {
 
 	public static final int MAX_PEDIGREE_LEVEL = 5;
+    public static final int NONE = 0;
+    public static final int MALE_RECURRENT = 1;
+    public static final int FEMALE_RECURRENT = 2;
 
 	/**
 	 * Creates a pedigree tree for the Germplasm identified by the given gid. The tree contains all generative progenitors down to the
@@ -219,4 +222,6 @@ public interface PedigreeDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	List<Germplasm> getPedigreeLine(Integer gid, int locationID) throws MiddlewareQueryException;
+
+    int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException;
 }

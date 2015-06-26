@@ -50,7 +50,7 @@ public class UserInfoDAO extends GenericDAO<UserInfo, Integer> {
 
 			@SuppressWarnings("unchecked")
 			List<UserInfo> userInfoList = criteria.list();
-			return userInfoList.size() > 0 ? userInfoList.get(0) : null;
+			return !userInfoList.isEmpty() ? userInfoList.get(0) : null;
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getUserInfoByToken(token=" + token + ") query from User: " + e.getMessage(), e);
@@ -77,7 +77,7 @@ public class UserInfoDAO extends GenericDAO<UserInfo, Integer> {
 
 			@SuppressWarnings("unchecked")
 			List<UserInfo> userInfoList = criteria.list();
-			return userInfoList.size() > 0 ? userInfoList.get(0) : null;
+			return !userInfoList.isEmpty() ? userInfoList.get(0) : null;
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getUserInfoByUserId(userId=" + userId + ") query from User: " + e.getMessage(), e);
 		}

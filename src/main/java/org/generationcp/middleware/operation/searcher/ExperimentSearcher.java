@@ -58,7 +58,7 @@ public class ExperimentSearcher extends Searcher {
 
 	private Integer getStoredInId(Integer factorId) throws MiddlewareQueryException {
 		List<Integer> termIds = this.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
-		return termIds != null && termIds.size() > 0 ? termIds.get(0) : null;
+		return termIds != null && !termIds.isEmpty() ? termIds.get(0) : null;
 	}
 
 	private List<Integer> findExperimentsByGeolocationFactorValue(Integer factorId, String value) throws MiddlewareQueryException {

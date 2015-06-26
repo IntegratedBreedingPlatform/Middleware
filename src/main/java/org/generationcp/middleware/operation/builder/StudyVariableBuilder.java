@@ -120,10 +120,6 @@ public class StudyVariableBuilder extends Builder {
 		return variableType.getStandardVariable().getStoredIn().getId() == termId.getId();
 	}
 
-	private boolean hasId(VariableType variableType, TermId termId) {
-		return variableType.getId() == termId.getId();
-	}
-
 	private String getPropertyValue(int id, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
 			if (property.getTypeId() == id) {

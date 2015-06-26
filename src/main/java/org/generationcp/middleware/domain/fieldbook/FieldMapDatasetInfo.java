@@ -55,7 +55,7 @@ public class FieldMapDatasetInfo implements Serializable {
 
 	public List<FieldMapTrialInstanceInfo> getTrialInstancesWithFieldMap() {
 		List<FieldMapTrialInstanceInfo> info = new ArrayList<FieldMapTrialInstanceInfo>();
-		if (this.trialInstances != null && this.trialInstances.size() > 0) {
+		if (this.trialInstances != null && !this.trialInstances.isEmpty()) {
 			for (FieldMapTrialInstanceInfo geoloc : this.trialInstances) {
 				if (geoloc.isFieldMapGenerated()) {
 					info.add(geoloc);

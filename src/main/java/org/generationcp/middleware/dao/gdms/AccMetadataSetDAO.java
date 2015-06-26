@@ -339,7 +339,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 
 			List results = query.list();
 
-			if (results.size() > 0) {
+			if (!results.isEmpty()) {
 				return true;
 			}
 		} catch (HibernateException e) {

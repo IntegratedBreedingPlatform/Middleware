@@ -388,7 +388,7 @@ public class QtlDAO extends GenericDAO<Qtl, Integer> {
 
 			List<Object[]> list = query.list();
 
-			if (list != null && list.size() > 0) {
+			if (list != null && !list.isEmpty()) {
 				for (Object[] row : list) {
 					Integer qtlId = (Integer) row[0];
 					String qtlName = (String) row[1];

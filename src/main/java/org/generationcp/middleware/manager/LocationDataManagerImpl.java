@@ -223,7 +223,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException {
 		List<Location> results = new ArrayList<Location>();
 
-		if (ids != null && ids.size() > 0) {
+		if (ids != null && !ids.isEmpty()) {
 			results.addAll(this.getLocationDao().getLocationByIds(ids));
 		}
 
@@ -244,7 +244,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException {
 		List<LocationDetails> results = new ArrayList<LocationDetails>();
 
-		if (ids != null && ids.size() > 0) {
+		if (ids != null && !ids.isEmpty()) {
 			List<Location> locations = this.getLocationDao().getLocationByIds(ids);
 
 			for (Location l : locations) {

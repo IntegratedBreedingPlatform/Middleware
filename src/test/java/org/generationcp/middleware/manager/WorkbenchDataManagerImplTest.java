@@ -460,7 +460,7 @@ public class WorkbenchDataManagerImplTest extends MiddlewareIntegrationTest {
 		Assert.assertNotNull(projectUsers);
 		Assert.assertTrue(!projectUsers.isEmpty());
 
-		if (projectUsers.size() > 0) {
+		if (!projectUsers.isEmpty()) {
 			ProjectUserRole projectUser = projectUsers.get(0); // get the first user of the project
 			User user = WorkbenchDataManagerImplTest.manager.getUserById(projectUser.getUserId());
 			List<Role> roles =
