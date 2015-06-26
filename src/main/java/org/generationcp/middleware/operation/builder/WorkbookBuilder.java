@@ -697,10 +697,9 @@ public class WorkbookBuilder extends Builder {
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
 
 			for (VariableType variable : variables.getFactors().getVariableTypes()) {
-				if (isTrial && (
-						PhenotypicType.TRIAL_DESIGN == variable.getRole()
+				if (PhenotypicType.TRIAL_DESIGN == variable.getRole()
 						|| PhenotypicType.GERMPLASM  == variable.getRole()
-						|| PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole())) {
+						|| PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 
 					factorList.add(variable);
 				}
@@ -858,7 +857,7 @@ public class WorkbookBuilder extends Builder {
 										measurementVariable);
 					}
 
-					if (experiments.size() == 1) {
+					if (experiments.size() == 1 && measurementVariable != null) {
 						measurementVariable.setValue(variable.getValue());
 					}
 					dataList.add(measurementData);
