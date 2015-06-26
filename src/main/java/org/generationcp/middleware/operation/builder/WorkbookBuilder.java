@@ -139,13 +139,14 @@ public class WorkbookBuilder extends Builder {
 				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
 		List<ProjectProperty> projectProperties = this.getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
-
+		
+		Map<Integer, org.generationcp.middleware.domain.oms.VariableType> projectPropRoleMapping = this.generateProjectPropertyRoleMap(projectProperties);
 		for (ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
 						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
 				
-				VariableType varType = variables.findById(stdVariable.getId());
+				org.generationcp.middleware.domain.oms.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
 				if(varType != null){
 					stdVariable.setPhenotypicType(varType.getRole());
 					if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()){
@@ -160,7 +161,8 @@ public class WorkbookBuilder extends Builder {
 						int varId = stdVariable.getId();
 						if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
 							value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
-						} else if (!isTrial) {
+						} 
+						if (value == null) {
 							// set trial env for nursery studies
 							List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
 							if (locIds != null && !locIds.isEmpty()) {
@@ -280,6 +282,26 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 	}
+	
+	private Map<Integer, org.generationcp.middleware.domain.oms.VariableType> generateProjectPropertyRoleMap(List<ProjectProperty> projectProperties){
+		Map<Integer, org.generationcp.middleware.domain.oms.VariableType> projPropRoleMap = new HashMap<Integer, org.generationcp.middleware.domain.oms.VariableType>();
+		for(ProjectProperty projectProp : projectProperties){
+			if (projectProp.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
+				
+				int currentRank = projectProp.getRank();
+				for(ProjectProperty projectPropInside : projectProperties){
+					if(projectPropInside.getRank() == currentRank && 
+							org.generationcp.middleware.domain.oms.VariableType.getById(projectPropInside.getTypeId()) != null){
+						org.generationcp.middleware.domain.oms.VariableType varType = org.generationcp.middleware.domain.oms.VariableType.getById(projectPropInside.getTypeId());
+						projPropRoleMap.put(Integer.parseInt(projectProp.getValue()), varType);
+						break;
+					}
+				}
+				
+			}
+		}
+		return projPropRoleMap;
+	}
 
 	public Workbook createStudyVariableSettings(int id, boolean isNursery) throws MiddlewareException {
 		Workbook workbook = new Workbook();
@@ -345,101 +367,104 @@ public class WorkbookBuilder extends Builder {
 		DmsProject dmsProject = this.getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0);
 		List<MeasurementVariable> experimentalDesignVariables = new ArrayList<MeasurementVariable>();
 		List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties() : new ArrayList<ProjectProperty>();
-
+		Map<Integer, org.generationcp.middleware.domain.oms.VariableType> projectPropRoleMapping = this.generateProjectPropertyRoleMap(projectProperties);
 		for (ProjectProperty projectProperty : projectProperties) {
 			boolean isConstant = false;
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
 						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
-				
-				VariableType varType = variables.findById(stdVariable.getId());
-				stdVariable.setPhenotypicType(varType.getRole());
-				
-				if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()
-						|| PhenotypicType.VARIATE == varType.getRole()) {
-
-					Double minRange = null, maxRange = null;
-					if (stdVariable.getConstraints() != null) {
-						minRange = stdVariable.getConstraints().getMaxValue();
-						maxRange = stdVariable.getConstraints().getMaxValue();
-					}
-
-					String value = null;
-					if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
-						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
-						if (value == null) {
-							value = "";
+				org.generationcp.middleware.domain.oms.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
+				if(varType != null){
+					stdVariable.setPhenotypicType(varType.getRole());
+					
+					if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()
+							|| PhenotypicType.VARIATE == varType.getRole()) {
+	
+						Double minRange = null, maxRange = null;
+						if (stdVariable.getConstraints() != null) {
+							minRange = stdVariable.getConstraints().getMaxValue();
+							maxRange = stdVariable.getConstraints().getMaxValue();
 						}
-					} else if (PhenotypicType.VARIATE == varType.getRole()) {
-						// constants, no need to retrieve the value if it's a trial study
-						isConstant = true;
-						if (isNursery) {
-							List<Phenotype> phenotypes = this.getPhenotypeDao().getByProjectAndType(trialDatasetId, stdVariable.getId());
-							// expects only 1 value for nursery
-							if (phenotypes != null && !phenotypes.isEmpty()) {
-								if (phenotypes.get(0).getcValueId() != null) {
-									// categorical constant
-									Enumeration enumeration = stdVariable.getEnumeration(phenotypes.get(0).getcValueId());
-									value = enumeration.getDescription();
-								} else {
-									value = phenotypes.get(0).getValue();
+	
+						String value = null;
+						if (PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
+							value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
+							if (value == null) {
+								value = "";
+							}
+						} else if (PhenotypicType.VARIATE == varType.getRole()) {
+							// constants, no need to retrieve the value if it's a trial study
+							isConstant = true;
+							if (isNursery) {
+								List<Phenotype> phenotypes = this.getPhenotypeDao().getByProjectAndType(trialDatasetId, stdVariable.getId());
+								// expects only 1 value for nursery
+								if (phenotypes != null && !phenotypes.isEmpty()) {
+									if (phenotypes.get(0).getcValueId() != null) {
+										// categorical constant
+										Enumeration enumeration = stdVariable.getEnumeration(phenotypes.get(0).getcValueId());
+										value = enumeration.getDescription();
+									} else {
+										value = phenotypes.get(0).getValue();
+									}
+								}
+								if (value == null) {
+									value = "";
+								}
+							} else {
+								value = "";
+							}
+						} 
+	
+						if(isNursery && "".equalsIgnoreCase(value)){
+							// set trial env for nursery studies
+							List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
+							if (locIds != null && !locIds.isEmpty()) {
+								Integer locId = locIds.get(0);
+								Geolocation geolocation = this.getGeolocationDao().getById(locId);
+								int varId = stdVariable.getId();
+								if (geolocation != null) {
+									if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
+										value = geolocation.getDescription();
+	
+									} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
+										value = geolocation.getLatitude().toString();
+	
+									} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
+										value = geolocation.getLongitude().toString();
+	
+									} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
+										geolocation.setGeodeticDatum(value);
+	
+									} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
+										value = geolocation.getAltitude().toString();
+									}
 								}
 							}
 							if (value == null) {
 								value = "";
 							}
-						} else {
-							value = "";
 						}
-					} else {
-						// set trial env for nursery studies
-						List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
-						if (locIds != null && !locIds.isEmpty()) {
-							Integer locId = locIds.get(0);
-							Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							int varId = stdVariable.getId();
-							if (geolocation != null) {
-								if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
-									value = geolocation.getDescription();
-
-								} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
-									value = geolocation.getLatitude().toString();
-
-								} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
-									value = geolocation.getLongitude().toString();
-
-								} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
-									geolocation.setGeodeticDatum(value);
-
-								} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
-									value = geolocation.getAltitude().toString();
-								}
+	
+						if (value != null) {
+							MeasurementVariable measurementVariable =
+									new MeasurementVariable(
+											stdVariable.getId(),
+											this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
+											stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+											stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
+											maxRange);
+							measurementVariable.setFactor(true);
+							measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+							measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
+									stdVariable.getEnumerations()));
+							measurementVariable.setRole(varType.getRole());
+							if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+								experimentalDesignVariables.add(measurementVariable);
+							} else if (isConstant) {
+								constants.add(measurementVariable);
+							} else {
+								conditions.add(measurementVariable);
 							}
-						}
-						if (value == null) {
-							value = "";
-						}
-					}
-
-					if (value != null) {
-						MeasurementVariable measurementVariable =
-								new MeasurementVariable(
-										stdVariable.getId(),
-										this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
-										stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
-										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
-										maxRange);
-						measurementVariable.setFactor(true);
-						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
-								stdVariable.getEnumerations()));
-						measurementVariable.setRole(varType.getRole());
-						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
-							experimentalDesignVariables.add(measurementVariable);
-						} else if (isConstant) {
-							constants.add(measurementVariable);
-						} else {
-							conditions.add(measurementVariable);
 						}
 					}
 				}
@@ -794,7 +819,7 @@ public class WorkbookBuilder extends Builder {
 
 	private String getLocalName(int rank, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
-			if (PhenotypicType.getAllTypeStorages().contains(property.getTypeId()) && rank == property.getRank()) {
+			if (org.generationcp.middleware.domain.oms.VariableType.getById(property.getTypeId()) != null && rank == property.getRank()) {
 				return property.getValue();
 			}
 		}
