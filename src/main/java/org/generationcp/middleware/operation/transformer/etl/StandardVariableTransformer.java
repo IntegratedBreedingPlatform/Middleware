@@ -1,18 +1,18 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StandardVariableTransformer extends Transformer {
 
@@ -49,11 +49,11 @@ public class StandardVariableTransformer extends Transformer {
 	}
 
 	private List<Enumeration> getValidValues(Variable variable) {
-		List<Enumeration> validValues = new ArrayList<Enumeration>();
-		Map<String, String> categories = variable.getScale().getCategories();
+		List<Enumeration> validValues = new ArrayList<>();
+		List<TermSummary> categories = variable.getScale().getCategories();
 		int rank = 1;
-		for (String name : categories.keySet()) {
-			validValues.add(new Enumeration(null,name,categories.get(name),rank++));
+		for (TermSummary category : categories) {
+			validValues.add(new Enumeration(null, category.getName(), category.getDefinition(), rank++));
 		}
 		return validValues;
 	}

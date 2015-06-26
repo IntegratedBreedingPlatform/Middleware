@@ -11,36 +11,10 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.etl.TreatmentVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -53,6 +27,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+
+import java.util.*;
 
 public class WorkbookBuilder extends Builder {
 
@@ -139,14 +115,15 @@ public class WorkbookBuilder extends Builder {
 				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
 		List<ProjectProperty> projectProperties = this.getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
-		
-		Map<Integer, org.generationcp.middleware.domain.oms.VariableType> projectPropRoleMapping = this.generateProjectPropertyRoleMap(projectProperties);
+
+		Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
+				this.generateProjectPropertyRoleMap(projectProperties);
 		for (ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
 						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
-				
-				org.generationcp.middleware.domain.oms.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
+
+				org.generationcp.middleware.domain.ontology.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
 				if(varType != null){
 					stdVariable.setPhenotypicType(varType.getRole());
 					if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()){
@@ -282,17 +259,20 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 	}
-	
-	private Map<Integer, org.generationcp.middleware.domain.oms.VariableType> generateProjectPropertyRoleMap(List<ProjectProperty> projectProperties){
-		Map<Integer, org.generationcp.middleware.domain.oms.VariableType> projPropRoleMap = new HashMap<Integer, org.generationcp.middleware.domain.oms.VariableType>();
+
+	private Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> generateProjectPropertyRoleMap(
+			List<ProjectProperty> projectProperties) {
+		Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projPropRoleMap =
+				new HashMap<Integer, org.generationcp.middleware.domain.ontology.VariableType>();
 		for(ProjectProperty projectProp : projectProperties){
 			if (projectProp.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				
 				int currentRank = projectProp.getRank();
 				for(ProjectProperty projectPropInside : projectProperties){
-					if(projectPropInside.getRank() == currentRank && 
-							org.generationcp.middleware.domain.oms.VariableType.getById(projectPropInside.getTypeId()) != null){
-						org.generationcp.middleware.domain.oms.VariableType varType = org.generationcp.middleware.domain.oms.VariableType.getById(projectPropInside.getTypeId());
+					if(projectPropInside.getRank() == currentRank &&
+							org.generationcp.middleware.domain.ontology.VariableType.getById(projectPropInside.getTypeId()) != null) {
+						org.generationcp.middleware.domain.ontology.VariableType varType =
+								org.generationcp.middleware.domain.ontology.VariableType.getById(projectPropInside.getTypeId());
 						projPropRoleMap.put(Integer.parseInt(projectProp.getValue()), varType);
 						break;
 					}
@@ -352,7 +332,7 @@ public class WorkbookBuilder extends Builder {
 		if (dataSetId != null) {
 			variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
 			//variable type roles are being set inside getexperiment
-			this.getStudyDataManager().getExperiments(dataSetId, 0, (int) Integer.MAX_VALUE, variables);
+			this.getStudyDataManager().getExperiments(dataSetId, 0, Integer.MAX_VALUE, variables);
 		}
 		
 
@@ -367,13 +347,14 @@ public class WorkbookBuilder extends Builder {
 		DmsProject dmsProject = this.getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0);
 		List<MeasurementVariable> experimentalDesignVariables = new ArrayList<MeasurementVariable>();
 		List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties() : new ArrayList<ProjectProperty>();
-		Map<Integer, org.generationcp.middleware.domain.oms.VariableType> projectPropRoleMapping = this.generateProjectPropertyRoleMap(projectProperties);
+		Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
+				this.generateProjectPropertyRoleMap(projectProperties);
 		for (ProjectProperty projectProperty : projectProperties) {
 			boolean isConstant = false;
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				StandardVariable stdVariable = this.getStandardVariableBuilder().create(
 						Integer.parseInt(projectProperty.getValue()),study.getProgramUUID());
-				org.generationcp.middleware.domain.oms.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
+				org.generationcp.middleware.domain.ontology.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
 				if(varType != null){
 					stdVariable.setPhenotypicType(varType.getRole());
 					
@@ -596,11 +577,7 @@ public class WorkbookBuilder extends Builder {
 
 	protected boolean isCategoricalVariate(Variable variable) {
 		StandardVariable stdVar = variable.getVariableType().getStandardVariable();
-		if (PhenotypicType.VARIATE == stdVar.getPhenotypicType() && 
-				stdVar.getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-			return true;
-		}
-		return false;
+		return PhenotypicType.VARIATE == stdVar.getPhenotypicType() && stdVar.getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId();
 	}
 
 	private List<ValueReference> getAllBreedingMethods() throws MiddlewareQueryException {
@@ -819,7 +796,8 @@ public class WorkbookBuilder extends Builder {
 
 	private String getLocalName(int rank, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
-			if (org.generationcp.middleware.domain.oms.VariableType.getById(property.getTypeId()) != null && rank == property.getRank()) {
+			if (org.generationcp.middleware.domain.ontology.VariableType.getById(property.getTypeId()) != null && rank == property
+					.getRank()) {
 				return property.getValue();
 			}
 		}

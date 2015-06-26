@@ -11,23 +11,20 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.oms.DataType;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+
+import java.util.*;
 
 public class TermBuilder extends Builder {
 
@@ -102,7 +99,7 @@ public class TermBuilder extends Builder {
 		return terms;
 	}
 
-	public Term findOrSaveTermByName(String name, CvId cv) throws MiddlewareQueryException, MiddlewareException {
+	public Term findOrSaveTermByName(String name, CvId cv) throws MiddlewareException {
 		Term term = this.findTermByName(name, cv);
 		if (term == null) {
 			term = this.getTermSaver().save(name, name, cv);
@@ -143,8 +140,8 @@ public class TermBuilder extends Builder {
 		return list;
 	}
 	
-	public Term findOrSaveProperty(String name, String definition, 
-			String cropOntologyId, Set<String> traitClasses) throws MiddlewareQueryException, MiddlewareException {
+	public Term findOrSaveProperty(String name, String definition, String cropOntologyId, Set<String> traitClasses)
+			throws MiddlewareException {
 		Term term = this.findTermByName(name, CvId.PROPERTIES);
 		if (term == null) {
 			Property property = new Property();
@@ -175,7 +172,7 @@ public class TermBuilder extends Builder {
 	}
 	
 	public Term findOrSaveScale(String name, String definition, String dataTypeName, String minValue, String maxValue,
-			Map<String, String> categories) throws MiddlewareQueryException, MiddlewareException {
+			Map<String, String> categories) throws MiddlewareException {
 		Term term = this.findTermByName(name, CvId.SCALES);
 		if (term == null) {
 			Scale scale = new Scale();
@@ -186,7 +183,7 @@ public class TermBuilder extends Builder {
 			scale.setMaxValue(maxValue);
 			if(categories!=null) {
 				for (String category : categories.keySet()) {
-					scale.addCategory(category, categories.get(category));
+					scale.addCategory(new TermSummary(null, category, categories.get(category)));
 				}
 			}
 			getOntologyScaleDataManager().addScale(scale);
@@ -194,8 +191,8 @@ public class TermBuilder extends Builder {
 		}
 		return term;
 	}
-	
-	public Term findOrSaveMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
+
+	public Term findOrSaveMethod(String name, String definition) throws MiddlewareException {
 		Term term = this.findTermByName(name, CvId.METHODS);
 		if (term == null) {
 			Method method = new Method();

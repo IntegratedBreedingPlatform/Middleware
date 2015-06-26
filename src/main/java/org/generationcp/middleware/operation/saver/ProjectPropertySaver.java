@@ -11,22 +11,9 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -36,6 +23,8 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Session;
+
+import java.util.*;
 
 public class ProjectPropertySaver extends Saver {
 
@@ -79,7 +68,7 @@ public class ProjectPropertySaver extends Saver {
 			throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		int index = startIndex;
-		org.generationcp.middleware.domain.oms.VariableType variableTypeEnum = 
+		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = 
 				getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
 						variableType.getRole());
 		int variableTypeId = variableTypeEnum.getId();
@@ -101,10 +90,10 @@ public class ProjectPropertySaver extends Saver {
 	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
-				org.generationcp.middleware.domain.oms.VariableType variableTypeEnum = 
+				org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = 
 						getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
 						variable.getVariableType().getRole());
-				if (variableTypeEnum == org.generationcp.middleware.domain.oms.VariableType.STUDY_DETAIL) {
+				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
 					ProjectProperty property = new ProjectProperty();
 					property.setProjectPropertyId(this.getProjectPropertyDao().getNextId(ProjectPropertySaver.PROJECT_PROPERTY_ID));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
@@ -118,7 +107,7 @@ public class ProjectPropertySaver extends Saver {
 	}
 
 	public void saveVariableType(DmsProject project, VariableType variableType) throws MiddlewareQueryException {
-		org.generationcp.middleware.domain.oms.VariableType variableTypeEnum = 
+		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = 
 				getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
 						variableType.getStandardVariable().getPhenotypicType());
 		this.saveProjectProperty(project, variableTypeEnum.getId(), variableType.getLocalName(),
@@ -195,12 +184,8 @@ public class ProjectPropertySaver extends Saver {
 		return nextRank;
 	}
 	private boolean isInGeolocation(int termId){
-		if (TermId.TRIAL_INSTANCE_FACTOR.getId() == termId || TermId.LATITUDE.getId() == termId
-			|| TermId.LONGITUDE.getId() == termId || TermId.GEODETIC_DATUM.getId() == termId 
-			|| TermId.ALTITUDE.getId() == termId) {
-			return true;
-		}
-		return false;
+		return TermId.TRIAL_INSTANCE_FACTOR.getId() == termId || TermId.LATITUDE.getId() == termId || TermId.LONGITUDE.getId() == termId
+				|| TermId.GEODETIC_DATUM.getId() == termId || TermId.ALTITUDE.getId() == termId;
 	}
 	private void insertVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, MeasurementVariable variable,
 			int rank, boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {

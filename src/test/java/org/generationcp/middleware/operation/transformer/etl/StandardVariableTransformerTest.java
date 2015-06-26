@@ -1,24 +1,23 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.Map;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
-import org.generationcp.middleware.domain.oms.DataType;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 public class StandardVariableTransformerTest {
 	
@@ -49,11 +48,17 @@ public class StandardVariableTransformerTest {
 		assertEquals(new Double(variable.getMinValue()),svConstraints.getMinValue());
 		assertEquals(new Double(variable.getMaxValue()),svConstraints.getMaxValue());
 		List<Enumeration> validValues = standardVariable.getEnumerations();
-		Map<String, String> categories = variable.getScale().getCategories();
+		List<TermSummary> categories = variable.getScale().getCategories();
 		assertEquals(categories.size(),categories.size());
+
+		Map<String, String> categoryMap = new HashMap<>();
+		for (TermSummary category : categories) {
+			categoryMap.put(category.getName(), category.getDefinition());
+		}
+
 		for (Enumeration enumeration : validValues) {
-			assertTrue(categories.keySet().contains(enumeration.getName()));
-			assertEquals(categories.get(enumeration.getName()),
+			assertTrue(categoryMap.keySet().contains(enumeration.getName()));
+			assertEquals(categoryMap.get(enumeration.getName()),
 					enumeration.getDescription());
 		}
 		assertEquals(variable.getProperty().getCropOntologyId(),
@@ -96,8 +101,8 @@ public class StandardVariableTransformerTest {
 		term.setDefinition("SCALE DEF");
 		Scale scale = new Scale(term);
 		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
-		scale.addCategory("CAT NAME 1", "CAT DESC 1");
-		scale.addCategory("CAT NAME 2", "CAT DESC 2");
+		scale.addCategory(new TermSummary(null, "CAT NAME 1", "CAT DESC 1"));
+		scale.addCategory(new TermSummary(null, "CAT NAME 2", "CAT DESC 2"));
 		return scale;
 	}
 }
