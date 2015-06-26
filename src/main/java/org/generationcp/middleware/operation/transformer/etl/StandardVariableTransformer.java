@@ -53,7 +53,7 @@ public class StandardVariableTransformer extends Transformer {
 		List<TermSummary> categories = variable.getScale().getCategories();
 		int rank = 1;
 		for (TermSummary category : categories) {
-			validValues.add(new Enumeration(null, category.getName(), category.getDefinition(), rank++));
+			validValues.add(new Enumeration(category.getId(), category.getName(), category.getDefinition(), rank++));
 		}
 		return validValues;
 	}
