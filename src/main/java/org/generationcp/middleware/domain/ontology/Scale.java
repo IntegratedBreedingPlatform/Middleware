@@ -11,11 +11,14 @@
 
 package org.generationcp.middleware.domain.ontology;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.util.Debug;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Extends {@link Term}
@@ -28,7 +31,8 @@ public class Scale extends Term {
 	 */
 	private static final long serialVersionUID = -1600344025199591903L;
 	private DataType dataType;
-	private final Map<String, String> categories = new HashMap<>();
+
+	private final List<TermSummary> categories = new ArrayList<>();
 
 	private String minValue;
 	private String maxValue;
@@ -50,8 +54,12 @@ public class Scale extends Term {
 		this.dataType = dataType;
 	}
 
-	public Map<String, String> getCategories() {
-		return this.categories;
+	public List<TermSummary> getCategories() {
+		return categories;
+	}
+
+	public void addCategory(TermSummary category){
+		categories.add(category);
 	}
 
 	public String getMinValue() {
@@ -68,10 +76,6 @@ public class Scale extends Term {
 
 	public void setMaxValue(String maxValue) {
 		this.maxValue = maxValue;
-	}
-
-	public void addCategory(String name, String description) {
-		this.categories.put(name, description);
 	}
 
 	@Override

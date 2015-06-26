@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -80,8 +81,8 @@ public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
 		scale.setName(MiddlewareIntegrationTest.getNewRandomName());
 		scale.setDefinition("");
 		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
-		scale.addCategory("1", "First");
-		scale.addCategory("2", "Second");
+		scale.addCategory(new TermSummary(null, "1", "First"));
+		scale.addCategory(new TermSummary(null, "2", "Second"));
 		ScaleDataManagerImplTest.manager.addScale(scale);
 		Assert.assertNotNull(scale.getId());
 		Assert.assertTrue(scale.getId() > 0);
@@ -99,14 +100,14 @@ public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
 		scale.setName(MiddlewareIntegrationTest.getNewRandomName());
 		scale.setDefinition("");
 		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
-		scale.addCategory("1", "First");
-		scale.addCategory("2", "Second");
+		scale.addCategory(new TermSummary(null, "1", "First"));
+		scale.addCategory(new TermSummary(null, "2", "Second"));
 		ScaleDataManagerImplTest.manager.addScale(scale);
 		Assert.assertNotNull(scale.getId());
 		Assert.assertTrue(scale.getId() > 0);
 
 		// Updating same scale with one more category
-		scale.addCategory("3", "Third");
+		scale.addCategory(new TermSummary(3,"3", "Third"));
 		ScaleDataManagerImplTest.manager.updateScale(scale);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + scale);
@@ -121,8 +122,8 @@ public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testUpdateScale() throws Exception {
 		ScaleDataManagerImplTest.testScale.setDefinition("new definition");
 		ScaleDataManagerImplTest.testScale.setDataType(DataType.CATEGORICAL_VARIABLE);
-		ScaleDataManagerImplTest.testScale.addCategory("1", "First");
-		ScaleDataManagerImplTest.testScale.addCategory("2", "Second");
+		ScaleDataManagerImplTest.testScale.addCategory(new TermSummary(1, "1", "First"));
+		ScaleDataManagerImplTest.testScale.addCategory(new TermSummary(2, "2", "Second"));
 		ScaleDataManagerImplTest.testScale.setMinValue(null);
 		ScaleDataManagerImplTest.testScale.setMaxValue(null);
 		ScaleDataManagerImplTest.manager.updateScale(ScaleDataManagerImplTest.testScale);

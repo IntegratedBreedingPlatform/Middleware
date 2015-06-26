@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -157,7 +158,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				if (Objects.equals(items[1], TermId.HAS_TYPE.getId())) {
 					scale.setDataType(DataType.getById((Integer) items[3]));
 				} else if (Objects.equals(items[1], TermId.HAS_VALUE.getId())) {
-					scale.addCategory((String) items[4], (String) items[5]);
+					scale.addCategory(new TermSummary((Integer) items[3], (String) items[4], (String) items[5]));
 				}
 			}
 
@@ -231,9 +232,12 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				this.getCvDao().save(cv);
 
 				// Saving Categorical data if present
-				for (String c : scale.getCategories().keySet()) {
-					CVTerm category =
-							new CVTerm(this.getCvTermDao().getNextId("cvTermId"), cv.getCvId(), c, scale.getCategories().get(c), null, 0, 0);
+				for(TermSummary c : scale.getCategories()){
+
+					String label = c.getName().trim();
+					String value = c.getDefinition().trim();
+
+					CVTerm category = new CVTerm(this.getCvTermDao().getNextId("cvTermId"), cv.getCvId(), label, value , null, 0, 0);
 					this.getCvTermDao().save(category);
 					this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 				}
@@ -399,14 +403,16 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				}
 
 				// Saving new categorical data if present
-				for (String c : scale.getCategories().keySet()) {
-					String name = c.trim();
-					String desc = scale.getCategories().get(c).trim();
+				for (TermSummary c : scale.getCategories()) {
+
+					String label = c.getName().trim();
+					String value = c.getDefinition().trim();
 
 					CVTerm category = null;
 
 					for (CVTerm ct : categoricalValues) {
-						if (!name.equals(ct.getName())) {
+
+						if (!label.equals(ct.getName())) {
 							continue;
 						}
 						// remove from delete source
@@ -414,7 +420,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 						removableCategoryRelations.remove(ct.getCvTermId());
 
 						// update description of existing category and continue
-						ct.setDefinition(desc);
+						ct.setDefinition(value);
 						this.getCvTermDao().merge(ct);
 						category = ct;
 
@@ -423,7 +429,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 					if (category == null) {
 						Integer nextId = this.getCvTermDao().getNextId("cvTermId");
-						category = new CVTerm(nextId, cvId, c, scale.getCategories().get(c), null, 0, 0);
+						category = new CVTerm(nextId, cvId, label, value, null, 0, 0);
 						this.getCvTermDao().save(category);
 						this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 					}
