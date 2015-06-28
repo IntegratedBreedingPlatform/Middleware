@@ -53,8 +53,8 @@ public class CrossExpansionUtil {
 		int x = 0;
 		int y = 0;
 		int xx = 0;
-		int Lev1 = 0;
-		int Lev2 = 0;
+		int lev1 = 0;
+		int lev2 = 0;
 		String xDel = "";
 		String a = "";
 		String b = "";
@@ -66,12 +66,12 @@ public class CrossExpansionUtil {
 			if (xp1.substring(x - 1, x).equals(xp2.substring(x - 1, x))) {
 				beforeStr = beforeStr + xp1.substring(x - 1, x);
 			} else {
-				Lev1 = 0;
+				lev1 = 0;
 				xx = beforeStr.length() + 1;
 				xDel = beforeStr.substring(beforeStr.length() - 1, beforeStr.length());
 				if (beforeStr.length() > 1 && NumberUtils.isNumber(beforeStr.substring(beforeStr.length() - 1, beforeStr.length()))
 						&& beforeStr.endsWith("*")) {
-					Lev1 = Integer.valueOf(beforeStr.substring(beforeStr.length() - 1, beforeStr.length()));
+					lev1 = Integer.valueOf(beforeStr.substring(beforeStr.length() - 1, beforeStr.length()));
 					xDel = "*";
 				}
 				if ("*".equals(xp1.substring(xx - 1, xx))) {
@@ -84,14 +84,14 @@ public class CrossExpansionUtil {
 							// Exit for
 							break;
 						}
-						Lev1 = Lev1 * 10 + Integer.valueOf(xp1.substring(y - 1, y));
+						lev1 = lev1 * 10 + Integer.valueOf(xp1.substring(y - 1, y));
 						// Take off leading offset in AfterStr if that has now been put in Lev2
 						if (xp1.length() - y < afterStr.length()) {
 							afterStr = afterStr.substring(1, afterStr.length());
 						}
 					}
-					if (Lev1 == 0) {
-						Lev1 = 1;
+					if (lev1 == 0) {
+						lev1 = 1;
 					}
 				}
 				// Exit for
@@ -108,12 +108,12 @@ public class CrossExpansionUtil {
 			if (xp1.substring(x - 1, x).equals(cutStr.substring(x - 1, x))) {
 				afterStr = xp1.substring(x - 1, x) + afterStr;
 			} else {
-				Lev2 = 0;
+				lev2 = 0;
 				xx = beforeStr.length() + 1;
 				if (beforeStr.length() > 1 && NumberUtils.isNumber(beforeStr.substring(beforeStr.length() - 1, beforeStr.length()))
 						&& beforeStr.endsWith("*")) {
 					// This criteria has problems 2012-07-17
-					Lev2 = Integer.valueOf(beforeStr.substring(beforeStr.length() - 1, beforeStr.length()));
+					lev2 = Integer.valueOf(beforeStr.substring(beforeStr.length() - 1, beforeStr.length()));
 					xDel = "*";
 				}
 				if ("*".equals(xp2.substring(beforeStr.length(), beforeStr.length() + 1))) {
@@ -127,15 +127,15 @@ public class CrossExpansionUtil {
 							// Exit for
 							break;
 						}
-						Lev2 = Lev2 * 10 + Integer.valueOf(xp2.substring(y - 1, y));
+						lev2 = lev2 * 10 + Integer.valueOf(xp2.substring(y - 1, y));
 						// Take off leading offset in AfterStr if that has now been put in Lev2
 						if (xp2.length() - y < afterStr.length()) {
 							afterStr = afterStr.substring(1, afterStr.length());
 						}
 					}
 				}
-				if (Lev2 == 0) {
-					Lev2 = 1;
+				if (lev2 == 0) {
+					lev2 = 1;
 					changed = true;
 					while (afterStr.length() > 2 && changed) {
 						changed = false;
@@ -174,14 +174,14 @@ public class CrossExpansionUtil {
 		} catch (Exception e) {
 			System.out.println("Error en GetNewDelimiter " + e);
 		}
-		if (Lev1 > Lev2) {
+		if (lev1 > lev2) {
 			if (slashLeft) {
 				xp1 = xp2 + delimiter + cleanAfter;
 			} else {
 				xp1 = cleanBefore + delimiter + xp2;
 			}
 		}
-		if (Lev2 > Lev1) {
+		if (lev2 > lev1) {
 			if (slashLeft) {
 				xp2 = xp1 + delimiter + cleanAfter;
 			} else {
