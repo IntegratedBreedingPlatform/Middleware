@@ -23,7 +23,7 @@ public enum ToolName {
 	// easier for us to group them here
 
 	// Breeding Planner native app
-	breeding_planner
+	BREEDING_PLANNER
 
 	// BreedingView native app
 	, breeding_view
@@ -35,23 +35,23 @@ public enum ToolName {
 	, optimas
 
 	// BreedingManager webapp
-	, bm_list_manager, bm_list_manager_main, crossing_manager, germplasm_import, list_manager, nursery_template_wizard
+	, BM_LIST_MANAGER, BM_LIST_MANAGER_MAIN, CROSSING_MANAGER, GERMPLASM_IMPORT, LIST_MANAGER, NURSERY_TEMPLATE_WIZARD
 
 	// DatasetImporter webapp
-	, dataset_importer
+	, DATASET_IMPORTER
 
 	// fieldbook web apps
-	, fieldbook_web, nursery_manager_fieldbook_web, trial_manager_fieldbook_web, ontology_browser_fieldbook_web
+	, FIELDBOOK_WEB, NURSERY_MANAGER_FIELDBOOK_WEB, TRIAL_MANAGER_FIELDBOOK_WEB, ONTOLOGY_BROWSER_FIELDBOOK_WEB
 
 	// GDMS webapp
-	, gdms
+	, GDMS
 
 	// GermplasmStudyBrowser webapp
-	, germplasm_browser, germplasm_list_browser, germplasm_headtohead, germplasm_mainheadtohead, query_for_adapted_germplasm, study_browser, study_browser_with_id
+	, GERMPLASM_BROWSER, GERMPLASM_LIST_BROWSER, GERMPLASM_HEADTOHEAD, GERMPLASM_MAINHEADTOHEAD, QUERY_FOR_ADAPTED_GERMPLASM, STUDY_BROWSER, STUDY_BROWSER_WITH_ID
 
 	// ibpwebservice webapp
-	, ibpwebservice
+	, IBPWEBSERVICE
 
 	// not needed anymore?
-	, germplasm_phenotypic
+	, GERMPLASM_PHENOTYPIC
 }
