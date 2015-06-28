@@ -110,8 +110,8 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 						break;
 						// TODO: pending mappings
 					default:
-						entry.setS_ent(-99);
-						entry.setS_tabbr("???");
+						entry.setSEnt(-99);
+						entry.setSTabbr("???");
 						entry.setSlocycle("???");
 
 				}
