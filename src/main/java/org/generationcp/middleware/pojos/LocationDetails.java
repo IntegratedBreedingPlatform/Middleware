@@ -53,11 +53,11 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	@Basic(optional = false)
 	@Column(name = "location_name")
-	private String location_name;
+	private String locationName;
 
 	@Basic(optional = false)
 	@Column(name = "country_full_name")
-	private String country_full_name;
+	private String countryFullName;
 
 	@Basic(optional = false)
 	@Column(name = "cntryid")
@@ -65,11 +65,11 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	@Basic(optional = false)
 	@Column(name = "location_abbreviation")
-	private String location_abbreviation;
+	private String locationAbbreviation;
 
 	@Basic(optional = false)
 	@Column(name = "location_type")
-	private String location_type;
+	private String locationType;
 
 	@Basic(optional = false)
 	@Column(name = "ltype")
@@ -77,7 +77,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	@Basic(optional = false)
 	@Column(name = "location_description")
-	private String location_description;
+	private String locationDescription;
 
 	@Basic(optional = true)
 	@Column(name = "latitude")
@@ -98,15 +98,15 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		this.locid = locid;
 	}
 
-	public LocationDetails(Integer locid, String location_name, String country_full_name, String location_abbreviation,
-			String location_type, String location_description) {
+	public LocationDetails(Integer locid, String locationName, String countryFullName, String locationAbbreviation,
+			String locationType, String locationDescription) {
 		super();
 		this.locid = locid;
-		this.location_name = location_name;
-		this.country_full_name = country_full_name;
-		this.location_abbreviation = location_abbreviation;
-		this.location_type = location_type;
-		this.location_description = location_description;
+		this.locationName = locationName;
+		this.countryFullName = countryFullName;
+		this.locationAbbreviation = locationAbbreviation;
+		this.locationType = locationType;
+		this.locationDescription = locationDescription;
 
 	}
 
@@ -123,44 +123,44 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		this.locid = locid;
 	}
 
-	public String getLocation_name() {
-		return this.location_name;
+	public String getLocationName() {
+		return this.locationName;
 	}
 
-	public void setLocation_name(String location_name) {
-		this.location_name = location_name;
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
 	}
 
-	public String getCountry_full_name() {
-		return this.country_full_name;
+	public String getCountryFullName() {
+		return this.countryFullName;
 	}
 
-	public void setCountry_full_name(String country_full_name) {
-		this.country_full_name = country_full_name;
+	public void setCountryFullName(String countryFullName) {
+		this.countryFullName = countryFullName;
 	}
 
-	public String getLocation_abbreviation() {
-		return this.location_abbreviation;
+	public String getLocationAbbreviation() {
+		return this.locationAbbreviation;
 	}
 
-	public void setLocation_abbreviation(String location_abbreviation) {
-		this.location_abbreviation = location_abbreviation;
+	public void setLocationAbbreviation(String locationAbbreviation) {
+		this.locationAbbreviation = locationAbbreviation;
 	}
 
-	public String getLocation_type() {
-		return this.location_type;
+	public String getLocationType() {
+		return this.locationType;
 	}
 
-	public void setLocation_type(String location_type) {
-		this.location_type = location_type;
+	public void setLocationType(String locationType) {
+		this.locationType = locationType;
 	}
 
-	public String getLocation_description() {
-		return this.location_description;
+	public String getLocationDescription() {
+		return this.locationDescription;
 	}
 
-	public void setLocation_description(String location_description) {
-		this.location_description = location_description;
+	public void setLocationDescription(String locationDescription) {
+		this.locationDescription = locationDescription;
 	}
 
 	public Double getLatitude() {
@@ -209,15 +209,15 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		builder.append("Location [locid=");
 		builder.append(this.locid);
 		builder.append(", location_description=");
-		builder.append(this.location_description);
+		builder.append(this.locationDescription);
 		builder.append(", country_full_name=");
-		builder.append(this.country_full_name);
+		builder.append(this.countryFullName);
 		builder.append(", location_type=");
-		builder.append(this.location_type);
+		builder.append(this.locationType);
 		builder.append(", location_abbreviation=");
-		builder.append(this.location_abbreviation);
+		builder.append(this.locationAbbreviation);
 		builder.append(", location_name=");
-		builder.append(this.location_name);
+		builder.append(this.locationName);
 		builder.append(this.latitude);
 		builder.append(", longitude=");
 		builder.append(this.longitude);
@@ -229,18 +229,18 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	@Override
 	public int compareTo(LocationDetails compareLocation) {
-		String compareName = compareLocation.getLocation_name();
+		String compareName = compareLocation.getLocationName();
 
 		// ascending order
-		return this.location_name.compareTo(compareName);
+		return this.locationName.compareTo(compareName);
 	}
 
 	public static Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
 
 		@Override
 		public int compare(LocationDetails location1, LocationDetails location2) {
-			String locationName1 = location1.getLocation_name().toUpperCase();
-			String locationName2 = location2.getLocation_name().toUpperCase();
+			String locationName1 = location1.getLocationName().toUpperCase();
+			String locationName2 = location2.getLocationName().toUpperCase();
 
 			// ascending order
 			return locationName1.compareTo(locationName2);

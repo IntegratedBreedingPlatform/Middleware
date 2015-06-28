@@ -257,12 +257,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 				LocationDetails ld = new LocationDetails();
 				ld.setCntryid(l.getCntryid());
-				ld.setCountry_full_name(c.getIsofull());
-				ld.setLocation_abbreviation(l.getLabbr());
-				ld.setLocation_name(l.getLname());
+				ld.setCountryFullName(c.getIsofull());
+				ld.setLocationAbbreviation(l.getLabbr());
+				ld.setLocationName(l.getLname());
 				ld.setLtype(l.getLtype());
-				ld.setLocation_type(udf.getFname());
-				ld.setLocation_description(udf.getFdesc());
+				ld.setLocationType(udf.getFname());
+				ld.setLocationDescription(udf.getFdesc());
 
 				results.add(ld);
 			}
