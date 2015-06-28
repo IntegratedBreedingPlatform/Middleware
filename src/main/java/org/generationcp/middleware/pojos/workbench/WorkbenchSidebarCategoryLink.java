@@ -41,6 +41,17 @@ public class WorkbenchSidebarCategoryLink implements Serializable {
 	@Column(name = "sidebar_link_title")
 	private String sidebarLinkTitle;
 
+	public WorkbenchSidebarCategoryLink() {
+	}
+
+	public WorkbenchSidebarCategoryLink(Tool tool, WorkbenchSidebarCategory workbenchSidebarCategory, String sidebarLinkName,
+			String sidebarLinkTitle) {
+		this.tool = tool;
+		this.workbenchSidebarCategory = workbenchSidebarCategory;
+		this.sidebarLinkName = sidebarLinkName;
+		this.sidebarLinkTitle = sidebarLinkTitle;
+	}
+
 	public String getSidebarLinkName() {
 		return this.sidebarLinkName;
 	}
@@ -54,17 +65,6 @@ public class WorkbenchSidebarCategoryLink implements Serializable {
 	}
 
 	public void setSidebarLinkTitle(String sidebarLinkTitle) {
-		this.sidebarLinkTitle = sidebarLinkTitle;
-	}
-
-	public WorkbenchSidebarCategoryLink() {
-	}
-
-	public WorkbenchSidebarCategoryLink(Tool tool, WorkbenchSidebarCategory workbenchSidebarCategory, String sidebarLinkName,
-			String sidebarLinkTitle) {
-		this.tool = tool;
-		this.workbenchSidebarCategory = workbenchSidebarCategory;
-		this.sidebarLinkName = sidebarLinkName;
 		this.sidebarLinkTitle = sidebarLinkTitle;
 	}
 

@@ -15,6 +15,13 @@ public final class ReporterFactory {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ReporterFactory.class);
 
+	private static ReporterFactory factory;
+
+	private static Map<String, Reporter> reportersMap;
+
+	private ReporterFactory() {
+	}
+
 	static {
 		ReporterFactory.reportersMap = new HashMap<>();
 		ReporterFactory.factory = new ReporterFactory();
@@ -51,12 +58,6 @@ public final class ReporterFactory {
 			}
 		}
 
-	}
-
-	private static Map<String, Reporter> reportersMap;
-	private static ReporterFactory factory;
-
-	private ReporterFactory() {
 	}
 
 	/**
