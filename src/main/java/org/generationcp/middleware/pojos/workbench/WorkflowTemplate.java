@@ -38,13 +38,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "workbench_workflow_template")
 public class WorkflowTemplate implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	public static final String MANAGER_NAME = "Manager";
+	public static final String MARS_NAME = "MARS";
+	public static final String MAS_NAME = "MAS";
+	public static final String MABC_NAME = "MABC";
+	public static final String CB_NAME = "CB";
 
-	public final static String MANAGER_NAME = "Manager";
-	public final static String MARS_NAME = "MARS";
-	public final static String MAS_NAME = "MAS";
-	public final static String MABC_NAME = "MABC";
-	public final static String CB_NAME = "CB";
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Basic(optional = false)

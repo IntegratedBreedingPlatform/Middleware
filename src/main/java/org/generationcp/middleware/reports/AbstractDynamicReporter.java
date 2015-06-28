@@ -37,19 +37,19 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	public static final String COL_EXPR_PREFIX = "col";
 	public static final String COL_HEADER_EXPR_PREFIX = "header";
-	private final static int TOTAL_PAGE_WIDTH = 800;
+	private static final int TOTAL_PAGE_WIDTH = 800;
 
 	// The whitespace between columns in pixels
-	private final static int SPACE_BETWEEN_COLS = 0;
+	private static final int SPACE_BETWEEN_COLS = 0;
 
 	// The height in pixels of an element in a row and column
-	private final static int COLUMN_HEIGHT = 12;
+	private static final int COLUMN_HEIGHT = 12;
 
 	// The total height of the column header or detail band
-	private final static int BAND_HEIGHT = 12;
+	private static final int BAND_HEIGHT = 12;
 
 	// The left and right margin in pixels
-	private final static int MARGIN = 10;
+	private static final int MARGIN = 10;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractDynamicReporter.class);
 

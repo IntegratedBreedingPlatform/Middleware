@@ -65,7 +65,7 @@ import org.hibernate.SessionFactory;
  */
 public class MiddlewareServletContextListener implements ServletContextListener {
 
-	public static final String ATTR_WORKBENCH_SESSION_FACTORY = "WORKBENCH_SESSION_FACTORY";
+	public final static String ATTR_WORKBENCH_SESSION_FACTORY = "WORKBENCH_SESSION_FACTORY";
 
 	public final static String PARAM_DATABASE_PROPERTY_FILE = "database_property_file";
 

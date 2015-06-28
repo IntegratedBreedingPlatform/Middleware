@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SessionFactoryUtil {
 
-	private final static Logger LOG = LoggerFactory.getLogger(SessionFactoryUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SessionFactoryUtil.class);
 
 	/**
 	 * The default Hibernate configuration filename.
