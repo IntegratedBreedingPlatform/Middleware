@@ -185,11 +185,14 @@ public class MeasurementVariable {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
+	
 	public String getLabel() {
 		if (this.label == null) {
 			this.label = "";
-		}
+		} 
+		if("".equalsIgnoreCase(this.label) && this.role != null){
+			this.label = this.role.getLabelList().get(0);
+	    }
 		return this.label;
 	}
 
