@@ -6,7 +6,7 @@ import java.util.List;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
-import org.generationcp.middleware.pojos.oms.VariableProgramOverrides;
+import org.generationcp.middleware.pojos.oms.VariableOverrides;
 
 /**
  * This class holds dao elements used for variableInfo. This is to reduce functional complexity
@@ -20,7 +20,7 @@ public class VariableInfoDaoElements {
 	private CVTermRelationship propertyRelation;
 	private CVTermRelationship scaleRelation;
 	private List<CVTermProperty> termProperties;
-	private VariableProgramOverrides variableProgramOverrides;
+	private VariableOverrides variableOverrides;
 
 	public Integer getVariableId() {
 		return this.variableId;
@@ -78,11 +78,11 @@ public class VariableInfoDaoElements {
 		this.termProperties = termProperties;
 	}
 
-	public VariableProgramOverrides getVariableProgramOverrides() {
-		return this.variableProgramOverrides;
+	public VariableOverrides getVariableOverrides() {
+		return this.variableOverrides;
 	}
 
-	public void setVariableProgramOverrides(VariableProgramOverrides variableProgramOverrides) {
-		this.variableProgramOverrides = variableProgramOverrides;
+	public void setVariableOverrides(VariableOverrides variableOverrides) {
+		this.variableOverrides = variableOverrides;
 	}
 }

@@ -37,7 +37,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
-import org.generationcp.middleware.pojos.oms.VariableProgramOverrides;
+import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
@@ -105,7 +105,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 											+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 											+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
 											+ "left join (select dr.subject_id sid, d.cvterm_id did, d.name dn, d.definition dd from cvterm_relationship dr inner join cvterm d on d.cvterm_id = dr.object_id and dr.type_id = 1105) dsr on dsr.sid = vsr.sid "
-											+ "left join variable_program_overrides vpo on vpo.cvterm_id = v.cvterm_id "
+											+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id "
 											+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES'"
 											+ "    WHERE (v.cv_id = 1040) " + filterClause + " ORDER BY v.cvterm_id").addScalar("vid")
 							.addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")
@@ -225,7 +225,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 
 				// Variable alias and expected range
-				VariableProgramOverrides overrides = this.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
+				VariableOverrides overrides = this.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
 
 				if (overrides != null) {
 					variable.setAlias(overrides.getAlias());
@@ -342,7 +342,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		CVTermRelationship propertyRelation = elements.getPropertyRelation();
 		CVTermRelationship scaleRelation = elements.getScaleRelation();
 		List<CVTermProperty> termProperties = elements.getTermProperties();
-		VariableProgramOverrides variableProgramOverrides = elements.getVariableProgramOverrides();
+		VariableOverrides variableOverrides = elements.getVariableOverrides();
 
 		Session session = this.getActiveSession();
 		Transaction transaction = null;
@@ -426,8 +426,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			if (variableInfo.getAlias() != null || variableInfo.getMinValue() != null || variableInfo.getMaxValue() != null) {
 				this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 						variableInfo.getMinValue(), variableInfo.getMaxValue());
-			} else if (variableProgramOverrides != null) {
-				this.getVariableProgramOverridesDao().makeTransient(variableProgramOverrides);
+			} else if (variableOverrides != null) {
+				this.getVariableProgramOverridesDao().makeTransient(variableOverrides);
 			}
 
 			// Updating favorite to true if alias is defined
@@ -491,9 +491,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// delete Variable alias and expected range
-			List<VariableProgramOverrides> variableProgramOverridesList = this.getVariableProgramOverridesDao().getByVariableId(id);
+			List<VariableOverrides> variableOverridesList = this.getVariableProgramOverridesDao().getByVariableId(id);
 
-			for (VariableProgramOverrides overrides : variableProgramOverridesList) {
+			for (VariableOverrides overrides : variableOverridesList) {
 				this.getVariableProgramOverridesDao().makeTransient(overrides);
 			}
 
@@ -570,7 +570,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		// Variable Types from CVTermProperty
 		List<CVTermProperty> termProperties = this.getCvTermPropertyDao().getByCvTermId(elements.getVariableId());
 
-		VariableProgramOverrides variableProgramOverrides =
+		VariableOverrides variableOverrides =
 				this.getVariableProgramOverridesDao().getByVariableAndProgram(elements.getVariableId(), elements.getProgramUuid());
 
 		// Set to elements to send response back to caller.
@@ -579,6 +579,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		elements.setPropertyRelation(propertyRelation);
 		elements.setScaleRelation(scaleRelation);
 		elements.setTermProperties(termProperties);
-		elements.setVariableProgramOverrides(variableProgramOverrides);
+		elements.setVariableOverrides(variableOverrides);
 	}
 }
