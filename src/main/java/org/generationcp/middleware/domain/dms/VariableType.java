@@ -42,6 +42,7 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 		this.localDescription = localDescription;
 		this.standardVariable = standardVariable;
 		this.rank = rank;
+		this.role = standardVariable.getPhenotypicType();
 	}
 
 	public int getId() {

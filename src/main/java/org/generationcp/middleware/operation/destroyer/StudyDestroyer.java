@@ -3,6 +3,7 @@ package org.generationcp.middleware.operation.destroyer;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -54,6 +55,7 @@ public class StudyDestroyer extends Destroyer {
 			VariableTypeList typeList = new VariableTypeList();
 			StandardVariable statusDeletedTerm = new StandardVariable();
 			statusDeletedTerm.setId(TermId.STUDY_STATUS.getId());
+			statusDeletedTerm.setPhenotypicType(PhenotypicType.STUDY);
 			VariableType type = new VariableType(TermId.STUDY_STATUS.name(), TermId.STUDY_STATUS.name(), statusDeletedTerm, maxRank + 1);
 			typeList.add(type);
 			VariableList varList = new VariableList();
