@@ -14,8 +14,10 @@ package org.generationcp.middleware.domain.etl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -287,12 +289,20 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getTrialVariables() {
+		
+		Set<MeasurementVariable> unique = new HashSet<>();
+		
 		if (this.trialVariables == null) {
-			this.trialVariables = this.getConditionsAndConstants(false);
+			unique.addAll(this.getConditionsAndConstants(false));
+			
 			List<MeasurementVariable> trialFactors = this.getTrialFactors();
 			if (trialFactors != null) {
-				this.trialVariables.addAll(trialFactors);
+				
+				unique.addAll(trialFactors);
+
 			}
+			this.trialVariables = new ArrayList<>(unique);
+			
 		}
 		return this.trialVariables;
 	}
