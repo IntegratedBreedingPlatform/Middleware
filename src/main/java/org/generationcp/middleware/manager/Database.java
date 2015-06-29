@@ -15,7 +15,7 @@ package org.generationcp.middleware.manager;
  * For specifying local instance or central instance of IBDB.
  *
  * @author Kevin Manansala
- *
+ * @deprecated
  */
 @Deprecated
 // TODO Remove the enum and all its references. In merged DB world, there is not central/local.

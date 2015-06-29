@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRParameter;
@@ -34,6 +37,8 @@ abstract class AbstractReporter implements Reporter {
 	private boolean isParentsInfoRequired = false;
 	JasperPrint jrPrint;
 
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractReporter.class);
+	
 	@Override
 	public String toString() {
 		return String.format("Report[%s : %s]", this.getReportCode(), this.getClass().getSimpleName());
@@ -164,7 +169,7 @@ abstract class AbstractReporter implements Reporter {
 			try {
 				JasperExportManager.exportReportToPdfStream(this.jrPrint, output);
 			} catch (JRException e) {
-				e.printStackTrace();
+				AbstractReporter.LOG.error("Exporting report to PDF was not successful", e);
 			}
 		} else {
 			throw new BuildReportException(this.getReportCode());

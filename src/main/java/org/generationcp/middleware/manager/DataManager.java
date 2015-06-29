@@ -210,7 +210,8 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @param parameterTypes The types of the parameters to be passed to the method
 	 * @return the List result
 	 * @throws MiddlewareQueryException
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public List getAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
@@ -287,7 +288,8 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @param parameterTypes The types of the parameters passed to the methods
 	 * @return the List result
 	 * @throws MiddlewareQueryException
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public List getFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)

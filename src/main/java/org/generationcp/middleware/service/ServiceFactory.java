@@ -49,7 +49,7 @@ public class ServiceFactory implements Serializable {
 
 	private static final long serialVersionUID = -2846462010022009403L;
 
-	private final static Logger LOG = LoggerFactory.getLogger(ServiceFactory.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ServiceFactory.class);
 
 	private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
 

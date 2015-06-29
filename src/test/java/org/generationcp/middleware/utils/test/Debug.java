@@ -13,12 +13,16 @@ package org.generationcp.middleware.utils.test;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class Debug. Used to print debug information.
  */
 
 public class Debug {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Debug.class);
 
 	private static StringBuffer printIndent(int indent) {
 		StringBuffer sb = new StringBuffer();
@@ -97,9 +101,9 @@ public class Debug {
 			try {
 				Debug.println(indent + 3, field.getName() + " = " + field.get(obj));
 			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				Debug.LOG.error("Illegal argument to print formatted object", e);
 			} catch (IllegalAccessException e) {
-				e.printStackTrace();
+				Debug.LOG.error("Illegal access to print formatted object", e);
 			}
 		}
 	}

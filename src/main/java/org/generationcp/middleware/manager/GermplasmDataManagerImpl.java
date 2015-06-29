@@ -1622,15 +1622,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId) {
 
-		// setWorkingDatabase(Database.LOCAL);
 		GermplasmDAO dao = this.getGermplasmDao();
 		Map<Integer, Map<GermplasmNameType, Name>> namesMap = dao.getGermplasmParentNamesForStudy(studyId);
 		List<Germplasm> germs = dao.getGermplasmParentsForStudy(studyId);
-
-		// setWorkingDatabase(Database.CENTRAL);
-		// dao = getGermplasmDao();
-		// namesMap.putAll(dao.getGermplasmParentNamesForStudy(studyId));
-		// germs.addAll(dao.getGermplasmParentsForStudy(studyId));
 
 		Map<Integer, GermplasmPedigreeTreeNode> germNodes = new HashMap<>();
 

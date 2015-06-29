@@ -46,11 +46,11 @@ public class TrackAccession implements Serializable {
 	public TrackAccession() {
 	}
 
-	public TrackAccession(Integer trackAccId, Integer trackId, Integer nid, Integer acc_sample_id) {
+	public TrackAccession(Integer trackAccId, Integer trackId, Integer nid, Integer accSampleId) {
 		this.trackAccId = trackAccId;
 		this.trackId = trackId;
 		this.nid = nid;
-		this.accSampleId = acc_sample_id;
+		this.accSampleId = accSampleId;
 	}
 
 	public Integer getTrackAccId() {
@@ -77,11 +77,11 @@ public class TrackAccession implements Serializable {
 		this.nid = nid;
 	}
 
-	public Integer getAcc_sample_id() {
+	public Integer getAccSampleId() {
 		return this.accSampleId;
 	}
 
-	public void setAcc_sample_id(Integer acc_sample_id) {
+	public void setAccSampleId(Integer acc_sample_id) {
 		this.accSampleId = acc_sample_id;
 	}
 

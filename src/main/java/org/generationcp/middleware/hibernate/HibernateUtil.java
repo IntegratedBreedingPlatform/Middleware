@@ -37,7 +37,7 @@ public class HibernateUtil implements Serializable {
 
 	private static final long serialVersionUID = -6399030839728425831L;
 
-	private final static Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
 
 	private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
 

@@ -88,7 +88,8 @@ public interface GermplasmDataManager {
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return List of Germplasm POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
 
@@ -149,7 +150,8 @@ public interface GermplasmDataManager {
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return List of Germplasm POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows) throws MiddlewareQueryException;
 
@@ -171,7 +173,8 @@ public interface GermplasmDataManager {
 	 *
 	 * @return All Locations
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getAllLocations() throws MiddlewareQueryException;
 
@@ -184,7 +187,8 @@ public interface GermplasmDataManager {
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return All Locations based on the given start and numOfRows
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException;
 
@@ -195,7 +199,8 @@ public interface GermplasmDataManager {
 	 *
 	 * @return the number of all Locations
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	long countAllLocations() throws MiddlewareQueryException;
 
@@ -208,7 +213,8 @@ public interface GermplasmDataManager {
 	 * @param op - can be EQUAL like LIKE
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
 
@@ -223,7 +229,8 @@ public interface GermplasmDataManager {
 	 * @param op - can be EQUAL like LIKE
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
 
@@ -234,7 +241,8 @@ public interface GermplasmDataManager {
 	 *
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Country> getAllCountry() throws MiddlewareQueryException;
 
@@ -247,7 +255,8 @@ public interface GermplasmDataManager {
 	 * @param op - can be EQUAL like LIKE
 	 * @return Number of Locations
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
 
@@ -260,7 +269,8 @@ public interface GermplasmDataManager {
 	 * @param country - search string for the country of the locations
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
 
@@ -274,7 +284,8 @@ public interface GermplasmDataManager {
 	 * @param type - search string for the locations type
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException;
 
@@ -289,7 +300,8 @@ public interface GermplasmDataManager {
 	 * @param type the type
 	 * @return the locations by name country and type
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type) throws MiddlewareQueryException;
 
@@ -303,7 +315,8 @@ public interface GermplasmDataManager {
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException;
 
@@ -316,7 +329,8 @@ public interface GermplasmDataManager {
 	 * @param country - search string for the country of the locations
 	 * @return Number of Locations
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	long countLocationsByCountry(Country country) throws MiddlewareQueryException;
 
@@ -328,7 +342,8 @@ public interface GermplasmDataManager {
 	 * @param type - search string for the type of the locations
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
 
@@ -342,7 +357,8 @@ public interface GermplasmDataManager {
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException;
 
@@ -354,7 +370,8 @@ public interface GermplasmDataManager {
 	 * @param type - search string for the type of the locations
 	 * @return Number of Locations
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	long countLocationsByType(Integer type) throws MiddlewareQueryException;
 
@@ -793,7 +810,8 @@ public interface GermplasmDataManager {
 	 * @param id - id of the country record
 	 * @return the Country POJO representing the record
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	Country getCountryById(Integer id) throws MiddlewareQueryException;
 
@@ -805,7 +823,8 @@ public interface GermplasmDataManager {
 	 * @param id - id of the location record
 	 * @return the Location POJO representing the record
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	Location getLocationByID(Integer id) throws MiddlewareQueryException;
 
@@ -1023,7 +1042,8 @@ public interface GermplasmDataManager {
 	 *
 	 * @return the all breeding locations
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
 
@@ -1125,7 +1145,8 @@ public interface GermplasmDataManager {
 	 * @param ids Location IDs
 	 * @return the corresponding Locations
 	 * @throws MiddlewareQueryException the middleware query exception
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException;
 

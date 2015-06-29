@@ -418,7 +418,8 @@ public class GermplasmList implements Serializable {
 	 * No local/central lists or -ve vs. +ve IDs in merged DB world.
 	 * 
 	 * @return
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	public boolean isLocalList() {
 		return this.getId() < 0;

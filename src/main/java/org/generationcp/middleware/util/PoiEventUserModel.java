@@ -15,6 +15,8 @@ import java.io.InputStream;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -25,6 +27,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 public class PoiEventUserModel {
 
+	private static final Logger LOG = LoggerFactory.getLogger(PoiEventUserModel.class);
 	int maxLimit = 10000;
 
 	public void areSheetRowsOverMaxLimit(String filename, int sheetIndex) throws Exception {
@@ -46,7 +49,7 @@ public class PoiEventUserModel {
 		try {
 			sheet2 = r.getSheet("rId" + (sheetIndex + 1));
 		} catch (Exception e) {
-			e.printStackTrace();
+			PoiEventUserModel.LOG.error("Sheet could not be retrieved", e);
 		}
 
 		if (sheet2 == null) {

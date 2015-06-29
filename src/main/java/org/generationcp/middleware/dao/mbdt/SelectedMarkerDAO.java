@@ -10,11 +10,15 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
 public class SelectedMarkerDAO extends GenericDAO<SelectedMarker, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(SelectedMarkerDAO.class);
 
 	public List<SelectedMarker> getMarkersByProjectAndDatasetID(Integer projectID, Integer datasetID) throws MiddlewareQueryException {
 		Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -45,7 +49,7 @@ public class SelectedMarkerDAO extends GenericDAO<SelectedMarker, Integer> {
 			session.clear();
 			return marker;
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
+			SelectedMarkerDAO.LOG.error("Saving or updating was not successful", e);
 			transaction.rollback();
 			throw e;
 		}
