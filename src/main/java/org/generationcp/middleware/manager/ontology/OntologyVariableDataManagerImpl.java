@@ -123,7 +123,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			SQLQuery query =
 					this.getActiveSession()
 							.createSQLQuery(
-									"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, dsr.did, dsr.dn, dsr.dd, vpo.alias, vpo.min_value, vpo.max_value, pf.id fid from cvterm v "
+									"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, dsr.did, dsr.dn, dsr.dd, vpo.alias, vpo.exp_min_value, vpo.exp_max_value, pf.id fid from cvterm v "
 											+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
 											+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 											+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
@@ -134,7 +134,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 											+ "    WHERE (v.cv_id = 1040) " + filterClause + " ORDER BY v.cvterm_id").addScalar("vid")
 							.addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")
 							.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("did")
-							.addScalar("dn").addScalar("dd").addScalar("alias").addScalar("min_value").addScalar("max_value")
+							.addScalar("dn").addScalar("dd").addScalar("alias").addScalar("exp_min_value").addScalar("exp_max_value")
 							.addScalar("fid");
 
 			query.setParameter("programUuid", variableFilterOptions.getProgramUuid());
