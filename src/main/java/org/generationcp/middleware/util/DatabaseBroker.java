@@ -80,7 +80,7 @@ import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
-import org.generationcp.middleware.dao.oms.VariableProgramOverridesDao;
+import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
@@ -289,10 +289,10 @@ public class DatabaseBroker {
 		return cvTermPropertyDao;
 	}
 
-	protected final VariableProgramOverridesDao getVariableProgramOverridesDao() {
-		VariableProgramOverridesDao variableProgramOverridesDao = new VariableProgramOverridesDao();
-		variableProgramOverridesDao.setSession(this.getActiveSession());
-		return variableProgramOverridesDao;
+	protected final VariableOverridesDao getVariableProgramOverridesDao() {
+		VariableOverridesDao variableOverridesDao = new VariableOverridesDao();
+		variableOverridesDao.setSession(this.getActiveSession());
+		return variableOverridesDao;
 	}
 
 	protected CvTermSynonymDao getCvTermSynonymDao() {

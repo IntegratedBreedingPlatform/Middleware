@@ -6,8 +6,18 @@ import java.util.Map;
 
 public enum DataType {
 
-	CATEGORICAL_VARIABLE(1130, "Categorical"), NUMERIC_VARIABLE(1110, "Numeric"), DATE_TIME_VARIABLE(1117, "Date"), CHARACTER_VARIABLE(
-			1120, "Character");
+	CATEGORICAL_VARIABLE(1130, "Categorical"),
+	NUMERIC_VARIABLE(1110, "Numeric"),
+	DATE_TIME_VARIABLE(1117, "Date"),
+	CHARACTER_VARIABLE(1120, "Character"),
+
+	//Special Data types
+	PERSON(1131, "Person"),
+	LOCATION(1132, "Location"),
+	STUDY(1133, "Study"),
+	DATASET(1134, "Dataset"),
+	GERMPLASM_LIST(1135, "Germplasm List"),
+	BREEDING_METHOD(1136, "Breeding Method");
 
 	private Integer id;
 	private String name;

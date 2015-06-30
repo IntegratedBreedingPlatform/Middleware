@@ -27,8 +27,8 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity
-@Table(name = "variable_program_overrides", uniqueConstraints = {@UniqueConstraint(columnNames = {"cvterm_id", "program_uuid"})})
-public class VariableProgramOverrides implements Serializable {
+@Table(name = "variable_overrides", uniqueConstraints = {@UniqueConstraint(columnNames = {"cvterm_id", "program_uuid"})})
+public class VariableOverrides implements Serializable {
 
 	private static final long serialVersionUID = -6496723408899540369L;
 	public static final String ID_NAME = "id";
@@ -68,11 +68,11 @@ public class VariableProgramOverrides implements Serializable {
 	@Column(name = "max_value")
 	private String maxValue;
 
-	public VariableProgramOverrides() {
+	public VariableOverrides() {
 
 	}
 
-	public VariableProgramOverrides(Integer id, Integer variableId, String programUuid, String alias, String minValue, String maxValue) {
+	public VariableOverrides(Integer id, Integer variableId, String programUuid, String alias, String minValue, String maxValue) {
 		super();
 
 		this.id = id;
@@ -150,7 +150,7 @@ public class VariableProgramOverrides implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		VariableProgramOverrides other = (VariableProgramOverrides) obj;
+		VariableOverrides other = (VariableOverrides) obj;
 		if (this.id == null) {
 			if (other.id != null) {
 				return false;
@@ -163,7 +163,7 @@ public class VariableProgramOverrides implements Serializable {
 
 	@Override
 	public String toString() {
-		return "VariableProgramOverrides{" + "id=" + this.id + ", variableId=" + this.variableId + ", programUuid='" + this.programUuid
+		return "VariableOverrides{" + "id=" + this.id + ", variableId=" + this.variableId + ", programUuid='" + this.programUuid
 				+ '\'' + ", alias='" + this.alias + '\'' + ", minValue='" + this.minValue + '\'' + ", maxValue='" + this.maxValue + '\''
 				+ '}';
 	}

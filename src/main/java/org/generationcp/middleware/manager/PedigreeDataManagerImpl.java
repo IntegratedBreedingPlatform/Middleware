@@ -535,6 +535,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	 * @param locationID
 	 * @return the given Germplasm list with its parents added to it
 	 * @throws MiddlewareQueryException
+	 * @deprecated
 	 */
 	@Deprecated
 	private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasmsParam, Germplasm currentGermplasm, int locationID)
