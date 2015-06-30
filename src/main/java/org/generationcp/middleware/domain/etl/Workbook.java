@@ -81,6 +81,21 @@ public class Workbook {
 	private List<StandardVariable> expDesignVariables;
 	private boolean hasExistingDataOverwrite;
 	private List<Integer> columnOrderedLists;
+	
+	public Workbook() {
+		this.reset();
+	}
+
+	public Workbook(StudyDetails studyDetails, List<MeasurementVariable> conditions, List<MeasurementVariable> factors,
+			List<MeasurementVariable> constants, List<MeasurementVariable> variates, List<MeasurementRow> observations) {
+		this.studyDetails = studyDetails;
+		this.conditions = conditions;
+		this.factors = factors;
+		this.constants = constants;
+		this.variates = variates;
+		this.observations = observations;
+		this.reset();
+	}
 
 	public void reset() {
 		this.trialHeaders = null;
@@ -96,21 +111,6 @@ public class Workbook {
 		this.trialConstants = null;
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
-	}
-
-	public Workbook() {
-		this.reset();
-	}
-
-	public Workbook(StudyDetails studyDetails, List<MeasurementVariable> conditions, List<MeasurementVariable> factors,
-			List<MeasurementVariable> constants, List<MeasurementVariable> variates, List<MeasurementRow> observations) {
-		this.studyDetails = studyDetails;
-		this.conditions = conditions;
-		this.factors = factors;
-		this.constants = constants;
-		this.variates = variates;
-		this.observations = observations;
-		this.reset();
 	}
 
 	public StudyDetails getStudyDetails() {

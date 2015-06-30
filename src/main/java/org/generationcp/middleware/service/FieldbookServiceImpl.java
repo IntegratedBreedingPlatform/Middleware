@@ -890,6 +890,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public Location getLocationByName(String locationName, Operation op) throws MiddlewareQueryException {
+		List<Location> locations = getLocationDataManager().getLocationsByName(locationName, 0, 1, op);
+		if (locations != null && !locations.isEmpty()){
+			return locations.get(0);
+		}
+		return null;
+	}
+	
+	@Override
 	public Person getPersonById(int id) throws MiddlewareQueryException {
 		return this.getUserDataManager().getPersonById(id);
 	}

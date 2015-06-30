@@ -29,13 +29,13 @@ import javax.persistence.Table;
 @Table(name = "workbench_role")
 public class Role implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	public static final String MANAGER_ROLE_NAME = "Manager";
+	public static final String MARS_ROLE_NAME = "MARS Breeder";
+	public static final String MAS_ROLE_NAME = "MAS Breeder";
+	public static final String MABC_ROLE_NAME = "MABC Breeder";
+	public static final String CB_ROLE_NAME = "CB Breeder";
 
-	public final static String MANAGER_ROLE_NAME = "Manager";
-	public final static String MARS_ROLE_NAME = "MARS Breeder";
-	public final static String MAS_ROLE_NAME = "MAS Breeder";
-	public final static String MABC_ROLE_NAME = "MABC Breeder";
-	public final static String CB_ROLE_NAME = "CB Breeder";
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Basic(optional = false)

@@ -30,8 +30,8 @@ import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager {
 
 	private GermplasmDataManagerImpl germplasmDataManager;
-	private final static ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
-	private final static ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
+	private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
 
 	public PedigreeDataManagerImpl() {
 	}

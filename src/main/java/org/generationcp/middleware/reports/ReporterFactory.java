@@ -8,8 +8,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ReporterFactory {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ReporterFactory.class);
+
+	private static ReporterFactory factory;
+
+	private static Map<String, Reporter> reportersMap;
+
+	private ReporterFactory() {
+	}
 
 	static {
 		ReporterFactory.reportersMap = new HashMap<>();
@@ -19,7 +30,7 @@ public final class ReporterFactory {
 			ReporterFactory.initFactory();
 
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			ReporterFactory.LOG.error("Reporter factory initialisation was not successful", e);
 		}
 	}
 
@@ -47,12 +58,6 @@ public final class ReporterFactory {
 			}
 		}
 
-	}
-
-	private static Map<String, Reporter> reportersMap;
-	private static ReporterFactory factory;
-
-	private ReporterFactory() {
 	}
 
 	/**

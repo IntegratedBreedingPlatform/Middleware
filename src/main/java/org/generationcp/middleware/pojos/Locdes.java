@@ -55,13 +55,6 @@ public class Locdes implements Serializable {
 	@Column(name = "dref")
 	private Integer referenceId;
 
-	public Locdes() {
-	}
-
-	public Integer getLdid() {
-		return this.ldid;
-	}
-
 	public Locdes(Integer ldid, Integer locationId, Integer typeId, Integer userId, String dval, Integer ddate, Integer referenceId) {
 		super();
 		this.ldid = ldid;
@@ -71,6 +64,13 @@ public class Locdes implements Serializable {
 		this.dval = dval;
 		this.ddate = ddate;
 		this.referenceId = referenceId;
+	}
+
+	public Locdes() {
+	}
+
+	public Integer getLdid() {
+		return this.ldid;
 	}
 
 	public void setLdid(Integer ldid) {

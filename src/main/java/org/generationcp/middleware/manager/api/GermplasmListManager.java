@@ -61,7 +61,8 @@ public interface GermplasmListManager {
 	 * 
 	 * @return List of GermplasmList POJOs
 	 * @throws MiddlewareQueryException
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
@@ -95,7 +96,8 @@ public interface GermplasmListManager {
 	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return List of GermplasmList POJOs
 	 * @throws MiddlewareQueryException
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
 			throws MiddlewareQueryException;
@@ -116,7 +118,8 @@ public interface GermplasmListManager {
 	 * @param operation can be Operation.EQUAL or Operation.LIKE
 	 * @param database - can either be Database.CENTRAL or Database.LOCAL
 	 * @return The count of Germplasm lists based on the given name and operation
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	long countGermplasmListByName(String name, Operation operation, Database database) throws MiddlewareQueryException;
 
@@ -260,7 +263,8 @@ public interface GermplasmListManager {
 	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return - List of GermplasmList POJOs
 	 * @throws MiddlewareQueryException
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException;
 
@@ -497,7 +501,8 @@ public interface GermplasmListManager {
 	 * @param searchPublicData flag to indicate whether public (central) data should be searched
 	 * @return - List of germplasm lists
 	 * @throws MiddlewareQueryException
-	 */
+	 * @deprecated
+	*/
 	@Deprecated
 	List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException;
 

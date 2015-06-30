@@ -74,6 +74,15 @@ public class Tool implements Serializable {
 	@Column(name = "path")
 	private String path;
 
+	public Tool() {
+	}
+
+	public Tool(String toolName, String title, String path) {
+		this.toolName = toolName;
+		this.title = title;
+		this.path = path;
+	}
+
 	public String getParameter() {
 		return this.parameter;
 	}
@@ -185,14 +194,5 @@ public class Tool implements Serializable {
 		Tool otherObj = (Tool) obj;
 
 		return new EqualsBuilder().append(this.toolId, otherObj.toolId).isEquals();
-	}
-
-	public Tool() {
-	}
-
-	public Tool(String toolName, String title, String path) {
-		this.toolName = toolName;
-		this.title = title;
-		this.path = path;
 	}
 }

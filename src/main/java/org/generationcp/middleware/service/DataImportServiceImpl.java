@@ -94,7 +94,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 		Map<String, ?> variableMap = null;
-		TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", DataImportServiceImpl.LOG);
+		TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
 		try {
 			trans = session.beginTransaction();
 			boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
@@ -603,7 +603,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public int saveProjectOntology(Workbook workbook, String programUUID) throws MiddlewareQueryException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
-		TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)", DataImportServiceImpl.LOG);
+		TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)");
 		int studyId = 0;
 
 		try {
@@ -627,7 +627,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public int saveProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
-		TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)", DataImportServiceImpl.LOG);
+		TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)");
 
 		try {
 

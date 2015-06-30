@@ -21,6 +21,8 @@ import org.generationcp.middleware.pojos.mbdt.SelectedMarker;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte
@@ -31,6 +33,8 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	private MBDTGenerationDAO generationDAO;
 	private SelectedMarkerDAO selectedMarkerDAO;
 	private SelectedGenotypeDAO selectedGenotypeDAO;
+	
+	private static final Logger LOG = LoggerFactory.getLogger(MBDTDataManagerImpl.class);
 
 	public MBDTDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
@@ -207,7 +211,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 		try {
 			return this.selectedGenotypeDAO.getSelectedAccessions(generationID);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Error accessing selected accessions", e);
 			throw new MiddlewareQueryException(e.getMessage());
 		}
 	}
@@ -226,7 +230,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 		try {
 			return this.selectedGenotypeDAO.getParentData(generationID);
 		} catch (Exception e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Error getting parent data with ID " + generationID, e);
 			throw new MiddlewareQueryException(e.getMessage());
 		}
 	}

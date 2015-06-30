@@ -357,7 +357,7 @@ public class WorkbookSaver extends Saver {
 			Map<Integer, VariableList> trialVariatesMap, boolean isDeleteTrialObservations, String programUUID)
 			throws MiddlewareException {
 
-		TimerWatch watch = new TimerWatch("transform trial environment", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("transform trial environment");
 		if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() == 1) {
 			MeasurementRow trialObs = workbook.getTrialObservations().get(0);
 			for (MeasurementVariable mv : trialMV) {
@@ -431,7 +431,7 @@ public class WorkbookSaver extends Saver {
 					row.setLocationId(geolocationId);
 				} else {
 					TimerWatch watch =
-							new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", WorkbookSaver.LOG);
+							new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations");
 					VariableList geolocation = this.getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
 					if (geolocation != null && !geolocation.isEmpty()) {
 						String trialInstanceNumber = this.getTrialInstanceNumber(geolocation);
@@ -543,7 +543,7 @@ public class WorkbookSaver extends Saver {
 
 	private int createStudyIfNecessary(Workbook workbook, int studyLocationId, boolean saveStudyExperiment, String programUUID)
 			throws Exception {
-		TimerWatch watch = new TimerWatch("find study", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("find study");
 
 		Integer studyId = null;
 		if (workbook.getStudyDetails() != null) {
@@ -577,8 +577,7 @@ public class WorkbookSaver extends Saver {
 
 	private int createTrialDatasetIfNecessary(Workbook workbook, int studyId, List<MeasurementVariable> trialMV,
 			VariableTypeList trialVariables, String programUUID) throws MiddlewareException {
-
-		TimerWatch watch = new TimerWatch("find trial dataset", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("find trial dataset");
 		String trialName = workbook.getStudyDetails().getTrialDatasetName();
 		Integer trialDatasetId = null;
 		if (trialName == null || "".equals(trialName)) {
@@ -628,8 +627,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private void createTrialExperiment(int trialProjectId, int locationId, VariableList trialVariates) throws MiddlewareQueryException {
-
-		TimerWatch watch = new TimerWatch("save trial experiments", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("save trial experiments");
 		ExperimentValues trialDatasetValues = this.createTrialExperimentValues(locationId, trialVariates);
 		this.getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
 		watch.stop();
@@ -637,8 +635,7 @@ public class WorkbookSaver extends Saver {
 
 	private int createMeasurementEffectDatasetIfNecessary(Workbook workbook, int studyId, List<MeasurementVariable> effectMV,
 			VariableTypeList effectVariables, VariableTypeList trialVariables, String programUUID) throws MiddlewareException {
-
-		TimerWatch watch = new TimerWatch("find measurement effect dataset", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("find measurement effect dataset");
 		String datasetName = workbook.getStudyDetails().getMeasurementDatasetName();
 		Integer datasetId = null;
 
@@ -725,8 +722,8 @@ public class WorkbookSaver extends Saver {
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, List<MeasurementRow> observations,
 			List<String> trialHeaders, Map<Integer, VariableList> trialVariatesMap) throws MiddlewareQueryException {
 
-		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)", WorkbookSaver.LOG);
-		TimerWatch rowWatch = new TimerWatch("for each row", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)");
+		TimerWatch rowWatch = new TimerWatch("for each row");
 
 		// observation values start at row 2
 		int i = 2;
@@ -1044,7 +1041,7 @@ public class WorkbookSaver extends Saver {
 	private int createMeansDatasetIfNecessary(Workbook workbook, int studyId, List<MeasurementVariable> effectMV,
 			VariableTypeList effectVariables, VariableTypeList trialVariables, String programUUID) throws MiddlewareException {
 
-		TimerWatch watch = new TimerWatch("find means dataset", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("find means dataset");
 		Integer datasetId = this.getMeansDataset(studyId);
 
 		if (datasetId == null) {
@@ -1083,8 +1080,8 @@ public class WorkbookSaver extends Saver {
 	private void createMeansExperiments(int datasetId, VariableTypeList effectVariables, List<MeasurementRow> observations,
 			List<String> trialHeaders, Map<Integer, VariableList> trialVariatesMap) throws MiddlewareQueryException {
 
-		TimerWatch watch = new TimerWatch("saving means data (total)", WorkbookSaver.LOG);
-		TimerWatch rowWatch = new TimerWatch("for each row", WorkbookSaver.LOG);
+		TimerWatch watch = new TimerWatch("saving means data (total)");
+		TimerWatch rowWatch = new TimerWatch("for each row");
 
 		// observation values start at row 2
 		int i = 2;
