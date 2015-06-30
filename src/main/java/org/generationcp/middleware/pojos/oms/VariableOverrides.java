@@ -59,13 +59,13 @@ public class VariableOverrides implements Serializable {
 	/**
 	 * Variable alias
 	 */
-	@Column(name = "min_value")
+	@Column(name = "exp_min_value")
 	private String minValue;
 
 	/**
 	 * Variable alias
 	 */
-	@Column(name = "max_value")
+	@Column(name = "exp_max_value")
 	private String maxValue;
 
 	public VariableOverrides() {
