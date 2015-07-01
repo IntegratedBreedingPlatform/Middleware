@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
@@ -313,7 +314,6 @@ public class ProjectPropertySaver extends Saver {
 
 	private void updateVariable(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
 		if (project.getProperties() != null) {
-			List<Integer> allTypeStorages = PhenotypicType.getAllTypeStorages();
 			int rank = this.getRank(project, variable.getTermId());
 			for (ProjectProperty property : project.getProperties()) {
 				if (rank == property.getRank()) {
@@ -321,7 +321,7 @@ public class ProjectPropertySaver extends Saver {
 						property.setValue(variable.getDescription());
 					} else if (property.getTypeId().intValue() == variable.getTermId()) {
 						property.setValue(variable.getValue());
-					} else if (allTypeStorages.contains(property.getTypeId().intValue())) {
+					} else if (VariableType.getById(property.getTypeId().intValue()) != null) {
 						property.setValue(variable.getName());
 					}
 					this.getProjectPropertyDao().update(property);
