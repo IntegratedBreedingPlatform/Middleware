@@ -208,13 +208,19 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	private Map<Integer, String> getPossibleValuesMap(int variableId) throws MiddlewareQueryException {
+	protected Map<Integer, String> getPossibleValuesMap(int variableId) throws MiddlewareQueryException {
 		Map<Integer, String> possibleValuesMap = new HashMap<Integer, String>();
-		List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(variableId);
-		for (CVTermRelationship cvTermRelationship : relationships) {
-			if (TermId.HAS_VALUE.getId() == cvTermRelationship.getTypeId()) {
-				possibleValuesMap.put(cvTermRelationship.getObjectId(), this.getCvTermDao().getById(cvTermRelationship.getObjectId())
-						.getName());
+		CVTermRelationship scaleRelationship = 
+				getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(
+						variableId, TermId.HAS_SCALE.getId());
+		if(scaleRelationship!=null) {
+			List<CVTermRelationship> possibleValues = getCvTermRelationshipDao().getBySubjectIdAndTypeId(
+					scaleRelationship.getObjectId(),  TermId.HAS_VALUE.getId());
+			if(possibleValues!=null) {
+				for (CVTermRelationship cvTermRelationship : possibleValues) {
+					possibleValuesMap.put(cvTermRelationship.getObjectId(), 
+							getCvTermDao().getById(cvTermRelationship.getObjectId()).getName());
+				}
 			}
 		}
 		return possibleValuesMap;
