@@ -15,9 +15,9 @@ package org.generationcp.middleware.manager.ontology.api;
 import java.util.List;
 
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 
 /**
  * This is the API for retrieving ontology variable data.
@@ -26,12 +26,12 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 public interface OntologyVariableDataManager {
 
 	/**
-	 * Return All Variables * @return List<OntologyVariableSummary>
-	 * 
-	 * @throws MiddlewareException*
+	 *
+	 * @param variableFilter have filter data that needs to be applied
+	 * @return List<Variable>
+	 * @throws MiddlewareException
 	 */
-	List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId)
-			throws MiddlewareException;
+	List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareException;
 
 	/**
 	 * Return variable by Id * @return Variable
