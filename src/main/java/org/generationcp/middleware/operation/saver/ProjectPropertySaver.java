@@ -132,12 +132,13 @@ public class ProjectPropertySaver extends Saver {
 		project.addProperty(property);
 	}
 
-	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, int storedIn) throws MiddlewareQueryException {
+	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, PhenotypicType role) throws MiddlewareQueryException {
 		ProjectProperty property = this.getProjectPropertyDao().getByStandardVariableId(project, termId.getId());
-		if (property == null) {
+		if (property == null) {			
 			int rank = this.getProjectPropertyDao().getNextRank(project.getProjectId());
 			StandardVariable stdvar = new StandardVariable();
 			stdvar.setId(termId.getId());
+			stdvar.setPhenotypicType(role);
 			CVTerm cvTerm = this.getCvTermDao().getById(termId.getId());
 			String localVariableName = termId.toString();
 			String localVariableDescription = termId.toString();

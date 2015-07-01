@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
@@ -30,10 +31,9 @@ public class ExperimentPropertySaver extends Saver {
 	}
 
 	public void saveOrUpdateProperty(ExperimentModel experiment, TermId propertyType, String value) throws MiddlewareQueryException {
-		int storedIn = TermId.TRIAL_DESIGN_INFO_STORAGE.getId();
 		ExperimentProperty experimentProperty = this.getExperimentProperty(experiment, propertyType.getId());
 		if (experimentProperty == null) {
-			this.getProjectPropertySaver().createProjectPropertyIfNecessary(experiment.getProject(), propertyType, storedIn);
+			this.getProjectPropertySaver().createProjectPropertyIfNecessary(experiment.getProject(), propertyType, PhenotypicType.TRIAL_DESIGN);
 			experimentProperty = new ExperimentProperty();
 			experimentProperty.setNdExperimentpropId(this.getExperimentPropertyDao().getNextId("ndExperimentpropId"));
 			experimentProperty.setTypeId(propertyType.getId());
