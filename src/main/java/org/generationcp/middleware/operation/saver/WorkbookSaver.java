@@ -11,27 +11,7 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -54,6 +34,8 @@ import org.generationcp.middleware.util.TimerWatch;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName
@@ -777,7 +759,7 @@ public class WorkbookSaver extends Saver {
 
 	private boolean isTrialFactorInDataset(VariableTypeList list) {
 
-		for (VariableType var : list.getVariableTypes()) {
+		for (DMSVariableType var : list.getVariableTypes()) {
 			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == var.getStandardVariable().getId()) {
 				return true;
 			}
@@ -786,7 +768,7 @@ public class WorkbookSaver extends Saver {
 
 	}
 
-	private VariableType createOccVariableType(int rank, String programUUID) throws MiddlewareException {
+	private DMSVariableType createOccVariableType(int rank, String programUUID) throws MiddlewareException {
 		VariableInfo info = new VariableInfo();
 		info.setLocalName("TRIAL_INSTANCE");
 		info.setLocalDescription("TRIAL_INSTANCE");
@@ -802,7 +784,7 @@ public class WorkbookSaver extends Saver {
 
 		if (!this.isTrialFactorInDataset(effectVariables) && trialVariables != null) {
 			int index = 1;
-			for (VariableType var : trialVariables.getVariableTypes()) {
+			for (DMSVariableType var : trialVariables.getVariableTypes()) {
 				if (var.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					var.setRank(index);
 					newList.add(var);
@@ -985,25 +967,19 @@ public class WorkbookSaver extends Saver {
 
 	private boolean checkIfHasExistingStudyExperiment(int studyId) throws MiddlewareQueryException {
 		Integer experimentId = this.getExperimentProjectDao().getExperimentIdByProjectId(studyId);
-		if (experimentId != null) {
-			return true;
-		}
-		return false;
+		return experimentId != null;
 	}
 
 	private boolean checkIfHasExistingExperiments(List<Integer> locationIds) throws MiddlewareQueryException {
 		List<Integer> experimentIds = this.getExperimentDao().getExperimentIdsByGeolocationIds(locationIds);
-		if (experimentIds != null && !experimentIds.isEmpty()) {
-			return true;
-		}
-		return false;
+		return experimentIds != null && !experimentIds.isEmpty();
 	}
 
 	private VariableList createDefaultGeolocationVariableList(String programUUID) throws MiddlewareException {
 		VariableList list = new VariableList();
 
-		VariableType variableType =
-				new VariableType(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), PhenotypicType.TRIAL_ENVIRONMENT.getLabelList()
+		DMSVariableType variableType =
+				new DMSVariableType(PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0), PhenotypicType.TRIAL_ENVIRONMENT.getLabelList()
 						.get(0), this.getStandardVariableBuilder().create(TermId.TRIAL_INSTANCE_FACTOR.getId(),programUUID), 1);
 		Variable variable = new Variable(variableType, "1");
 		list.add(variable);
@@ -1066,11 +1042,11 @@ public class WorkbookSaver extends Saver {
 
 		VariableTypeList newList = new VariableTypeList();
 		int rank = 1;
-		for (VariableType var : trialVariables.getVariableTypes()) {
+		for (DMSVariableType var : trialVariables.getVariableTypes()) {
 			var.setRank(rank++);
 			newList.add(var);
 		}
-		for (VariableType var : effectVariables.getVariableTypes()) {
+		for (DMSVariableType var : effectVariables.getVariableTypes()) {
 			var.setRank(rank++);
 			newList.add(var);
 		}

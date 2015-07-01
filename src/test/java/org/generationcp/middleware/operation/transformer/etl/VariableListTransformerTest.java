@@ -11,15 +11,7 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -32,6 +24,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VariableListTransformerTest extends TestOutputFormatter {
 
@@ -164,7 +159,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 		row.setDataList(new ArrayList<MeasurementData>());
 
 		int i = 0;
-		for (VariableType varType : varTypeList.getVariableTypes()) {
+		for (DMSVariableType varType : varTypeList.getVariableTypes()) {
 			MeasurementData data = new MeasurementData(varType.getLocalName(), "value" + i);
 			row.getDataList().add(data);
 			i++;
@@ -176,16 +171,16 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	private VariableTypeList createVariableTypeListTestData() {
 		VariableTypeList list = new VariableTypeList();
 
-		list.add(new VariableType("FACTOR1", "FACTOR 1", this.createVariable(PhenotypicType.GERMPLASM), 1));
-		list.add(new VariableType("FACTOR2", "FACTOR 2", this.createVariable(PhenotypicType.DATASET), 2));
-		list.add(new VariableType("FACTOR3", "FACTOR 3", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 3));
-		list.add(new VariableType("FACTOR4", "FACTOR 4", this.createVariable(PhenotypicType.TRIAL_DESIGN), 4));
-		list.add(new VariableType("FACTOR5", "FACTOR 5", this.createVariable(PhenotypicType.GERMPLASM), 5));
-		list.add(new VariableType("FACTOR6", "FACTOR 6", this.createVariable(PhenotypicType.GERMPLASM), 6));
-		list.add(new VariableType("FACTOR7", "FACTOR 7", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 7));
-		list.add(new VariableType("FACTOR8", "FACTOR 8", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 8));
-		list.add(new VariableType("VARIATE1", "VARIATE 1", this.createVariable(null), 9));
-		list.add(new VariableType("VARIATE2", "VARIATE 2", this.createVariable(null), 10));
+		list.add(new DMSVariableType("FACTOR1", "FACTOR 1", this.createVariable(PhenotypicType.GERMPLASM), 1));
+		list.add(new DMSVariableType("FACTOR2", "FACTOR 2", this.createVariable(PhenotypicType.DATASET), 2));
+		list.add(new DMSVariableType("FACTOR3", "FACTOR 3", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 3));
+		list.add(new DMSVariableType("FACTOR4", "FACTOR 4", this.createVariable(PhenotypicType.TRIAL_DESIGN), 4));
+		list.add(new DMSVariableType("FACTOR5", "FACTOR 5", this.createVariable(PhenotypicType.GERMPLASM), 5));
+		list.add(new DMSVariableType("FACTOR6", "FACTOR 6", this.createVariable(PhenotypicType.GERMPLASM), 6));
+		list.add(new DMSVariableType("FACTOR7", "FACTOR 7", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 7));
+		list.add(new DMSVariableType("FACTOR8", "FACTOR 8", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 8));
+		list.add(new DMSVariableType("VARIATE1", "VARIATE 1", this.createVariable(null), 9));
+		list.add(new DMSVariableType("VARIATE2", "VARIATE 2", this.createVariable(null), 10));
 
 		return list;
 	}
@@ -193,7 +188,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	public List<String> getTrialHeaders(VariableTypeList list) {
 		List<String> trialHeaders = new ArrayList<String>();
 		if (list != null && list.size() > 0) {
-			for (VariableType var : list.getVariableTypes()) {
+			for (DMSVariableType var : list.getVariableTypes()) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.equals(var.getStandardVariable().getPhenotypicType())) {
 					trialHeaders.add(var.getLocalName());
 				}
@@ -205,7 +200,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	private VariableList getStockResult(VariableTypeList varTypeList) {
 		VariableList list = new VariableList();
 		int i = 0;
-		for (VariableType varType : varTypeList.getVariableTypes()) {
+		for (DMSVariableType varType : varTypeList.getVariableTypes()) {
 			if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
 				list.add(new Variable(varType, "value" + i));
 			}
@@ -217,7 +212,7 @@ public class VariableListTransformerTest extends TestOutputFormatter {
 	private VariableList getStockResult2(VariableTypeList varTypeList) {
 		VariableList list = new VariableList();
 		int i = 0;
-		for (VariableType varType : varTypeList.getVariableTypes()) {
+		for (DMSVariableType varType : varTypeList.getVariableTypes()) {
 			if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT) {
 				list.add(new Variable(varType, "value" + i));
 			}

@@ -11,14 +11,14 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the details of a variable type - local name, local description and rank.
  */
-public class VariableType implements Serializable, Comparable<VariableType> {
+public class DMSVariableType implements Serializable, Comparable<DMSVariableType> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -34,10 +34,10 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 	
 	private PhenotypicType role;
 
-	public VariableType() {
+	public DMSVariableType() {
 	}
 
-	public VariableType(String localName, String localDescription, StandardVariable standardVariable, int rank) {
+	public DMSVariableType(String localName, String localDescription, StandardVariable standardVariable, int rank) {
 		this.localName = localName;
 		this.localDescription = localDescription;
 		this.standardVariable = standardVariable;
@@ -116,10 +116,10 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof VariableType)) {
+		if (!(obj instanceof DMSVariableType)) {
 			return false;
 		}
-		VariableType other = (VariableType) obj;
+		DMSVariableType other = (DMSVariableType) obj;
 		return other.getId() == this.getId();
 	}
 
@@ -141,7 +141,7 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 
 	@Override
 	// Sort in ascending order by rank
-	public int compareTo(VariableType compareValue) {
+	public int compareTo(DMSVariableType compareValue) {
 		int compareRank = compareValue.getRank();
 		return Integer.valueOf(this.rank).compareTo(compareRank);
 	}

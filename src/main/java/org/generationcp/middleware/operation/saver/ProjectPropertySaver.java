@@ -21,9 +21,8 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.hibernate.Hibernate;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import java.util.*;
@@ -38,11 +37,11 @@ public class ProjectPropertySaver extends Saver {
 
 	public List<ProjectProperty> create(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		List<VariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
+		List<DMSVariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 
 		if (variableTypes != null && !variableTypes.isEmpty()) {
 			int index = this.getProjectPropertyDao().getNextId(ProjectPropertySaver.PROJECT_PROPERTY_ID);
-			for (VariableType variableType : variableTypes) {
+			for (DMSVariableType variableType : variableTypes) {
 				List<ProjectProperty> list = this.createVariableProperties(index, project, variableType);
 				properties.addAll(list);
 				index = index + list.size();
@@ -66,7 +65,7 @@ public class ProjectPropertySaver extends Saver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(int startIndex, DmsProject project, VariableType variableType)
+	private List<ProjectProperty> createVariableProperties(int startIndex, DmsProject project, DMSVariableType variableType)
 			throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		int index = startIndex;
@@ -108,7 +107,7 @@ public class ProjectPropertySaver extends Saver {
 		}
 	}
 
-	public void saveVariableType(DmsProject project, VariableType variableType) throws MiddlewareQueryException {
+	public void saveVariableType(DmsProject project, DMSVariableType variableType) throws MiddlewareQueryException {
 		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = 
 				getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
 						variableType.getStandardVariable().getPhenotypicType());
@@ -147,7 +146,7 @@ public class ProjectPropertySaver extends Saver {
 				localVariableDescription = cvTerm.getDefinition();
 			}
 
-			VariableType variableType = new VariableType(localVariableName, localVariableDescription, stdvar, rank);
+			DMSVariableType variableType = new DMSVariableType(localVariableName, localVariableDescription, stdvar, rank);
 			this.saveVariableType(project, variableType);
 		}
 	}
@@ -247,8 +246,8 @@ public class ProjectPropertySaver extends Saver {
 		this.saveVariableType(project, this.createVariableType(variable, rank));
 	}
 
-	private VariableType createVariableType(MeasurementVariable variable, int rank) {
-		VariableType varType = new VariableType();
+	private DMSVariableType createVariableType(MeasurementVariable variable, int rank) {
+		DMSVariableType varType = new DMSVariableType();
 		StandardVariable stdvar = new StandardVariable();
 		varType.setStandardVariable(stdvar);
 

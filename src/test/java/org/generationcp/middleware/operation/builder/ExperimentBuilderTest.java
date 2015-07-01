@@ -1,12 +1,9 @@
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -14,9 +11,9 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ExperimentBuilderTest  extends DataManagerIntegrationTest {
@@ -33,7 +30,7 @@ public class ExperimentBuilderTest  extends DataManagerIntegrationTest {
 		int typeId = 1000;
 		ExperimentProperty property = new ExperimentProperty();
 		VariableTypeList variableTypes = new VariableTypeList();
-		VariableType variableType = new VariableType();
+		DMSVariableType variableType = new DMSVariableType();
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(typeId);
 		variableType.setStandardVariable(standardVariable);
@@ -49,8 +46,8 @@ public class ExperimentBuilderTest  extends DataManagerIntegrationTest {
 		Geolocation geoLocation = new Geolocation();
 		String description = "XXX";
 		geoLocation.setDescription(description);
-		VariableType variableType = new VariableType();
-		StandardVariable standardVariable = new StandardVariable();;
+		DMSVariableType variableType = new DMSVariableType();
+		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		variableType.setStandardVariable(standardVariable);
 		Variable variable = builder.createLocationFactor(geoLocation, variableType);
@@ -69,8 +66,8 @@ public class ExperimentBuilderTest  extends DataManagerIntegrationTest {
 		geoLocation.setProperties(properties);
 		String description = "XXX";
 		geoLocation.setDescription(description);
-		VariableType variableType = new VariableType();
-		StandardVariable standardVariable = new StandardVariable();;
+		DMSVariableType variableType = new DMSVariableType();
+		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(typeId);
 		variableType.setStandardVariable(standardVariable);
 		Variable variable = builder.createLocationFactor(geoLocation, variableType);
@@ -88,8 +85,8 @@ public class ExperimentBuilderTest  extends DataManagerIntegrationTest {
 		geoLocation.setProperties(properties);
 		String description = "XXX";
 		geoLocation.setDescription(description);
-		VariableType variableType = new VariableType();
-		StandardVariable standardVariable = new StandardVariable();;
+		DMSVariableType variableType = new DMSVariableType();
+		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(1001);
 		variableType.setStandardVariable(standardVariable);
 		Variable variable = builder.createLocationFactor(geoLocation, variableType);

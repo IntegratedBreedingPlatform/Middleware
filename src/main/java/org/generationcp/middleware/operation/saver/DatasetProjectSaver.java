@@ -11,18 +11,7 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -31,6 +20,11 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.hibernate.Hibernate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DatasetProjectSaver extends Saver {
 
@@ -49,7 +43,7 @@ public class DatasetProjectSaver extends Saver {
 		this.addNameVariableTypeIfNecessary(variableTypeList,programUUID);
 		this.addDescriptionVariableTypeIfNecessary(variableTypeList,programUUID);
 		if (datasetValues.getType() != null) {
-			VariableType variableType = this.addDataTypeVariableTypeIfNecessary(variableTypeList,programUUID);
+			DMSVariableType variableType = this.addDataTypeVariableTypeIfNecessary(variableTypeList, programUUID);
 			this.addDataTypeVariableIfNecessary(datasetValues, variableType);
 		}
 
@@ -75,7 +69,7 @@ public class DatasetProjectSaver extends Saver {
 		return this.getStringValue(datasetValues, TermId.DATASET_TITLE.getId());
 	}
 
-	private void addDataTypeVariableIfNecessary(DatasetValues datasetValues, VariableType variableType) {
+	private void addDataTypeVariableIfNecessary(DatasetValues datasetValues, DMSVariableType variableType) {
 		VariableList variables = datasetValues.getVariables();
 		if (variables == null || variables.findById(TermId.DATASET_TYPE) == null) {
 			Variable variable = new Variable(variableType, datasetValues.getType().getId());
@@ -86,7 +80,8 @@ public class DatasetProjectSaver extends Saver {
 	private void addNameVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
 		if (variableTypeList.findById(TermId.DATASET_NAME) == null) {
 			variableTypeList.makeRoom(1);
-			VariableType dataSetName = new VariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME,programUUID), 1);
+			DMSVariableType dataSetName =
+					new DMSVariableType("DATASET_NAME", "Dataset name", this.getStandardVariable(TermId.DATASET_NAME, programUUID), 1);
 			dataSetName.setRole(PhenotypicType.DATASET);
 			variableTypeList.add(dataSetName);
 		}
@@ -95,16 +90,19 @@ public class DatasetProjectSaver extends Saver {
 	private void addDescriptionVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
 		if (variableTypeList.findById(TermId.DATASET_TITLE) == null) {
 			variableTypeList.makeRoom(2);
-			VariableType dataSetTitle = new VariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE,programUUID), 2);
+			DMSVariableType dataSetTitle =
+					new DMSVariableType("DATASET_TITLE", "Dataset title", this.getStandardVariable(TermId.DATASET_TITLE, programUUID), 2);
 			dataSetTitle.setRole(PhenotypicType.DATASET);
 			variableTypeList.add(dataSetTitle);
 		}
 	}
 
-	private VariableType addDataTypeVariableTypeIfNecessary(VariableTypeList variableTypeList,String programUUID) throws MiddlewareException {
-		VariableType variableType = variableTypeList.findById(TermId.DATASET_TYPE);
+	private DMSVariableType addDataTypeVariableTypeIfNecessary(VariableTypeList variableTypeList, String programUUID)
+			throws MiddlewareException {
+		DMSVariableType variableType = variableTypeList.findById(TermId.DATASET_TYPE);
 		if (variableType == null) {
-			variableType = new VariableType("DATASET_TYPE", "Dataset type", this.getStandardVariable(TermId.DATASET_TYPE,programUUID), 3);
+			variableType =
+					new DMSVariableType("DATASET_TYPE", "Dataset type", this.getStandardVariable(TermId.DATASET_TYPE, programUUID), 3);
 			variableType.setRole(PhenotypicType.DATASET);
 			variableTypeList.makeRoom(3);
 			variableTypeList.add(variableType);
@@ -116,7 +114,7 @@ public class DatasetProjectSaver extends Saver {
 		return this.getStandardVariableBuilder().create(stdVarId.getId(),programUUID);
 	}
 
-	public void addDatasetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
+	public void addDatasetVariableType(int datasetId, DMSVariableType variableType) throws MiddlewareQueryException {
 		DmsProject project = this.getDmsProjectDao().getById(datasetId);
 		if (project != null) {
 			this.getProjectPropertySaver().saveVariableType(project, variableType);
@@ -155,7 +153,7 @@ public class DatasetProjectSaver extends Saver {
 			existingPropertiesMap.put(property.getProjectPropertyId(), property);
 		}
 		VariableTypeList additionalProperties = new VariableTypeList();
-		for (VariableType variableType : variableTypeList.getVariableTypes()) {
+		for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 			if (!existingPropertiesMap.containsKey(variableType.getId())) {
 				additionalProperties.add(variableType);
 			}

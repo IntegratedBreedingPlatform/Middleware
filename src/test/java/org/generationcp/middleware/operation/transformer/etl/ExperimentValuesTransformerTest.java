@@ -11,12 +11,9 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -27,6 +24,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 
@@ -54,10 +54,10 @@ public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(2);
 
-		varTypeList.add(new VariableType("ENTRY", "localDescription1", standardVariable, 1));
-		varTypeList.add(new VariableType("GID", "localDescription2", standardVariable, 1));
-		varTypeList.add(new VariableType("DESIG", "localDescription3", standardVariable, 1));
-		varTypeList.add(new VariableType("CROSS", "localDescription4", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("ENTRY", "localDescription1", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("GID", "localDescription2", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("DESIG", "localDescription3", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("CROSS", "localDescription4", standardVariable, 1));
 
 		return varTypeList;
 	}

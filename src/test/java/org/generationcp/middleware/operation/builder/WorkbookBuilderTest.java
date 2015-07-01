@@ -11,21 +11,9 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.etl.*;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -41,6 +29,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 
@@ -236,14 +227,14 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 
 	private Variable createVariable(MeasurementVariable measurementVariable, String value) throws MiddlewareException {
 		Variable variable = new Variable();
-		VariableType variableType = this.createVariableType(measurementVariable);
+		DMSVariableType variableType = this.createVariableType(measurementVariable);
 		variable.setVariableType(variableType);
 		variable.setValue(value);
 		return variable;
 	}
 
-	private VariableType createVariableType(MeasurementVariable measurementVariable) throws MiddlewareException {
-		VariableType variableType =
+	private DMSVariableType createVariableType(MeasurementVariable measurementVariable) throws MiddlewareException {
+		DMSVariableType variableType =
 				this.transformMeasurementVariable(measurementVariable, this.getStandardVariable(measurementVariable.getTermId()));
 		return variableType;
 	}
@@ -269,8 +260,8 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 		return WorkbookBuilderTest.standardVariableBuilder.create(id,"1234567");
 	}
 
-	private VariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
-		return new VariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
+	private DMSVariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
+		return new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
 	}
 
 	@Test
@@ -288,7 +279,7 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 		VariableList conditions = this.transformMeasurementVariablesToVariableList(workbook.getConditions(), conditionsVariableTypeList);
 		VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(), constantsVariableTypeList);
 		// find the trial instance variable before removing it as a factor
-		VariableType trialInstance = factorsVariableTypeList.findById(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		DMSVariableType trialInstance = factorsVariableTypeList.findById(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		// call the method to test: remove trial instance
 		VariableTypeList finalFactors =
 				WorkbookBuilderTest.workbookBuilder.removeTrialDatasetVariables(factorsVariableTypeList, conditions, constants);
@@ -324,11 +315,11 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 		if (mVarList != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			if (mVarList.size() == variableTypeList.getVariableTypes().size()) {
 
-				List<VariableType> varTypes = variableTypeList.getVariableTypes();
+				List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
 				for (int i = 0, l = mVarList.size(); i < l; i++) {
-					VariableType varTypeFinal = null;
+					DMSVariableType varTypeFinal = null;
 					String value = mVarList.get(i).getValue();
-					for (VariableType varType : varTypes) {
+					for (DMSVariableType varType : varTypes) {
 						if (mVarList.get(i).getTermId() == varType.getId()) {
 							varTypeFinal = varType;
 						}

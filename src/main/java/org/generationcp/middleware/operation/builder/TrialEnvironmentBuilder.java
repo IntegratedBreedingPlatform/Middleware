@@ -11,23 +11,7 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.TrialEnvironment;
-import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -36,6 +20,9 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class TrialEnvironmentBuilder extends Builder {
 
@@ -70,7 +57,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		TrialEnvironments trialEnvironments = new TrialEnvironments();
 		for (Geolocation location : locations) {
 			VariableList variables = new VariableList();
-			for (VariableType variableType : trialEnvironmentVariableTypes.getVariableTypes()) {
+			for (DMSVariableType variableType : trialEnvironmentVariableTypes.getVariableTypes()) {
 				Variable variable = new Variable(variableType, this.getValue(location, variableType));
 				variables.add(variable);
 			}
@@ -79,7 +66,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		return trialEnvironments;
 	}
 
-	private String getValue(Geolocation location, VariableType variableType) {
+	private String getValue(Geolocation location, DMSVariableType variableType) {
 		String value = null;
 		int id = variableType.getStandardVariable().getId();
 		if (id == TermId.TRIAL_INSTANCE_FACTOR.getId()) {

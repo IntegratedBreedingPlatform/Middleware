@@ -11,10 +11,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import org.generationcp.middleware.util.Debug;
 
 /**
  * Contains the details of a dataset.
@@ -108,7 +108,7 @@ public class DataSet {
 
 		VariableTypeList factors = this.getVariableTypes() != null ? this.getVariableTypes().getFactors() : null;
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (VariableType factor : factors.getVariableTypes()) {
+			for (DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getProperty().getId() == propertyId) {
 					filteredFactors.add(factor);
 				}
@@ -123,7 +123,7 @@ public class DataSet {
 
 		VariableTypeList factors = this.getVariableTypes() != null ? this.getVariableTypes().getFactors() : null;
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (VariableType factor : factors.getVariableTypes()) {
+			for (DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getPhenotypicType() == factorType) {
 					filteredFactors.add(factor);
 				}
@@ -185,8 +185,8 @@ public class DataSet {
 		return builder.toString();
 	}
 
-	public VariableType findVariableTypeByLocalName(String localName) {
-		for (VariableType variableType : this.variableTypes.getVariableTypes()) {
+	public DMSVariableType findVariableTypeByLocalName(String localName) {
+		for (DMSVariableType variableType : this.variableTypes.getVariableTypes()) {
 			if (variableType.getLocalName().equals(localName)) {
 				return variableType;
 			}

@@ -11,35 +11,11 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Stocks;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
@@ -66,6 +42,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
@@ -513,7 +494,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		datasetValues.setName("No Datatype dataset" + new Random().nextInt(10000));
 		datasetValues.setDescription("whatever ds");
 
-		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
@@ -567,7 +548,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Original Dataset");
 		dataSet.print(3);
 
-		VariableType variableType = new VariableType();
+		DMSVariableType variableType = new DMSVariableType();
 		variableType.setLocalName("Dog");
 		variableType.setLocalDescription("Man's best friend");
 		variableType.setStandardVariable(StudyDataManagerImplTest.ontologyManager.
@@ -638,7 +619,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		DataSet dataset = StudyDataManagerImplTest.manager.getDataSet(datasetId);
 		VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
 		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
-			for (VariableType factor : factors.getVariableTypes()) {
+			for (DMSVariableType factor : factors.getVariableTypes()) {
 				factor.print(MiddlewareIntegrationTest.INDENT);
 			}
 		} else {
@@ -658,7 +639,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			VariableTypeList factors = dataset.getFactorsByPhenotypicType(phenotypicType);
 
 			if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
-				for (VariableType factor : factors.getVariableTypes()) {
+				for (DMSVariableType factor : factors.getVariableTypes()) {
 					factor.print(MiddlewareIntegrationTest.INDENT);
 				}
 			} else {
@@ -861,7 +842,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		StandardVariable stVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(
 				termId,commonTestProject.getUniqueID());
 
-		VariableType vtype = new VariableType();
+		DMSVariableType vtype = new DMSVariableType();
 		vtype.setStandardVariable(stVar);
 		vtype.setRank(rank);
 		Variable var = new Variable();
@@ -870,11 +851,11 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		return var;
 	}
 
-	private VariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
+	private DMSVariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
 		StandardVariable stdVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(
 				termId,commonTestProject.getUniqueID());
 
-		VariableType vtype = new VariableType();
+		DMSVariableType vtype = new DMSVariableType();
 		vtype.setLocalName(name);
 		vtype.setLocalDescription(description);
 		vtype.setRank(rank);
@@ -883,7 +864,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		return vtype;
 	}
 
-	private void updateVariableType(VariableType type, String name, String description) {
+	private void updateVariableType(DMSVariableType type, String name, String description) {
 		type.setLocalName(name);
 		type.setLocalDescription(description);
 	}
@@ -975,7 +956,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
@@ -997,7 +978,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
@@ -1217,7 +1198,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			return;
 		}
 
-		for (VariableType vType : dataSet.getVariableTypes().getVariates().getVariableTypes()) {
+		for (DMSVariableType vType : dataSet.getVariableTypes().getVariates().getVariableTypes()) {
 			cvTermIds.add(vType.getStandardVariable().getId());
 		}
 

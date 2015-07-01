@@ -11,18 +11,14 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+
+import java.util.List;
 
 public class StudyVariableBuilder extends Builder {
 
@@ -33,7 +29,7 @@ public class StudyVariableBuilder extends Builder {
 	public VariableList create(DmsProject project, Experiment experiment, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		VariableList variables = new VariableList();
 
-		for (VariableType variableType : variableTypes.getVariableTypes()) {
+		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			variables.add(this.createVariable(variableType, project, experiment));
 		}
 
@@ -44,7 +40,7 @@ public class StudyVariableBuilder extends Builder {
 			throws MiddlewareQueryException {
 		VariableList variables = new VariableList();
 
-		for (VariableType variableType : variableTypes.getVariableTypes()) {
+		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			Variable var = this.createVariable(variableType, project, experiment, hasVariabletype);
 			if (var.getVariableType() != null) {
 				variables.add(var);
@@ -54,11 +50,12 @@ public class StudyVariableBuilder extends Builder {
 		return variables.sort();
 	}
 
-	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment) throws MiddlewareQueryException {
+	private Variable createVariable(DMSVariableType variableType, DmsProject project, Experiment experiment)
+			throws MiddlewareQueryException {
 		return createVariable(variableType,project,experiment,false);
 	}
 
-	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment, boolean hasVariableType)
+	private Variable createVariable(DMSVariableType variableType, DmsProject project, Experiment experiment, boolean hasVariableType)
 			throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableType);

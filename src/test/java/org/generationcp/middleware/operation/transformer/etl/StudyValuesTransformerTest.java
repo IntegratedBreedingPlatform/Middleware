@@ -11,16 +11,7 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -30,6 +21,9 @@ import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudyValuesTransformerTest extends TestOutputFormatter {
 
@@ -96,16 +90,16 @@ public class StudyValuesTransformerTest extends TestOutputFormatter {
 	private VariableTypeList createVariableTypeListTestData() {
 		VariableTypeList list = new VariableTypeList();
 
-		list.add(new VariableType("STUDY1", "STUDY 1", this.createVariable(PhenotypicType.STUDY), 1));
-		list.add(new VariableType("STUDY2", "STUDY 2", this.createVariable(PhenotypicType.STUDY), 2));
-		list.add(new VariableType("STUDY3", "STUDY 3", this.createVariable(PhenotypicType.STUDY), 3));
-		list.add(new VariableType("FACTOR4", "FACTOR 4", this.createVariable(PhenotypicType.TRIAL_DESIGN), 4));
-		list.add(new VariableType("FACTOR5", "FACTOR 5", this.createVariable(PhenotypicType.GERMPLASM), 5));
-		list.add(new VariableType("FACTOR6", "FACTOR 6", this.createVariable(PhenotypicType.GERMPLASM), 6));
-		list.add(new VariableType("FACTOR7", "FACTOR 7", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 7));
-		list.add(new VariableType("FACTOR8", "FACTOR 8", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 8));
-		list.add(new VariableType("VARIATE1", "VARIATE 1", this.createVariable(null), 9));
-		list.add(new VariableType("VARIATE2", "VARIATE 2", this.createVariable(null), 10));
+		list.add(new DMSVariableType("STUDY1", "STUDY 1", this.createVariable(PhenotypicType.STUDY), 1));
+		list.add(new DMSVariableType("STUDY2", "STUDY 2", this.createVariable(PhenotypicType.STUDY), 2));
+		list.add(new DMSVariableType("STUDY3", "STUDY 3", this.createVariable(PhenotypicType.STUDY), 3));
+		list.add(new DMSVariableType("FACTOR4", "FACTOR 4", this.createVariable(PhenotypicType.TRIAL_DESIGN), 4));
+		list.add(new DMSVariableType("FACTOR5", "FACTOR 5", this.createVariable(PhenotypicType.GERMPLASM), 5));
+		list.add(new DMSVariableType("FACTOR6", "FACTOR 6", this.createVariable(PhenotypicType.GERMPLASM), 6));
+		list.add(new DMSVariableType("FACTOR7", "FACTOR 7", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 7));
+		list.add(new DMSVariableType("FACTOR8", "FACTOR 8", this.createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 8));
+		list.add(new DMSVariableType("VARIATE1", "VARIATE 1", this.createVariable(null), 9));
+		list.add(new DMSVariableType("VARIATE2", "VARIATE 2", this.createVariable(null), 10));
 
 		return list;
 	}

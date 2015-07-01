@@ -11,31 +11,13 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProject;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.ExperimentStock;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.pojos.dms.*;
+
+import java.util.*;
 
 public class ExperimentBuilder extends Builder {
 	
@@ -153,7 +135,7 @@ public class ExperimentBuilder extends Builder {
 		this.getExperimentDao().refresh(experiment);
 		if (experiment.getPhenotypes() != null) {
 			for (Phenotype phenotype : experiment.getPhenotypes()) {
-				VariableType variableType = variableTypes.findById(phenotype.getObservableId());
+				DMSVariableType variableType = variableTypes.findById(phenotype.getObservableId());
 				// TODO: trial constants are currently being saved in the measurement effect dataset
 				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
 				// in the future, trial constant will no longer be saved at the measurements level
@@ -201,7 +183,7 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private void addLocationFactors(ExperimentModel experimentModel, VariableList factors, VariableTypeList variableTypes) {
-		for (VariableType variableType : variableTypes.getVariableTypes()) {
+		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			
 				Variable variable = this.createLocationFactor(experimentModel.getGeoLocation(), variableType);
 				if(variable != null){
@@ -213,8 +195,7 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	
-	protected Variable createLocationFactor(Geolocation geoLocation, VariableType variableType) {
+	protected Variable createLocationFactor(Geolocation geoLocation, DMSVariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
 		
 		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
@@ -273,7 +254,7 @@ public class ExperimentBuilder extends Builder {
 				stockModel = this.getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
 			}
 
-			for (VariableType variableType : variableTypes.getVariableTypes()) {				
+			for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
 				Variable var = this.createGermplasmFactor(stockModel, variableType);
 				if(var != null){
 					var.getVariableType().setRole(PhenotypicType.GERMPLASM);
@@ -283,7 +264,8 @@ public class ExperimentBuilder extends Builder {
 			}
 		}
 	}
-	private Variable createGermplasmFactor(StockModel stockModel, VariableType variableType) {
+
+	private Variable createGermplasmFactor(StockModel stockModel, DMSVariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
 		
 		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {

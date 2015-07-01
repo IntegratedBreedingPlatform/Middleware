@@ -11,10 +11,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the details of a Variable - type and value.
@@ -23,7 +23,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 
 	private static final long serialVersionUID = 1L;
 
-	private VariableType variableType;
+	private DMSVariableType variableType;
 
 	private String value;
 
@@ -34,7 +34,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 	public Variable() {
 	}
 
-	public Variable(Integer phenotypeId, VariableType variableType, String value) {
+	public Variable(Integer phenotypeId, DMSVariableType variableType, String value) {
 		this.phenotypeId = phenotypeId;
 		this.variableType = variableType;
 		this.value = value;
@@ -43,7 +43,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public Variable(VariableType variableType, String value) {
+	public Variable(DMSVariableType variableType, String value) {
 		this.variableType = variableType;
 		this.value = value;
 		if (variableType == null) {
@@ -51,7 +51,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public Variable(Integer phenotypeId, VariableType variableType, Double value) {
+	public Variable(Integer phenotypeId, DMSVariableType variableType, Double value) {
 		this.phenotypeId = phenotypeId;
 		this.variableType = variableType;
 		if (value != null) {
@@ -62,7 +62,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public Variable(VariableType variableType, Double value) {
+	public Variable(DMSVariableType variableType, Double value) {
 		this.variableType = variableType;
 		if (value != null) {
 			this.value = Double.toString(value);
@@ -72,7 +72,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public Variable(Integer phenotypeId, VariableType variableType, Integer value) {
+	public Variable(Integer phenotypeId, DMSVariableType variableType, Integer value) {
 		this.phenotypeId = phenotypeId;
 		this.variableType = variableType;
 		if (value != null) {
@@ -83,7 +83,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public Variable(VariableType variableType, Integer value) {
+	public Variable(DMSVariableType variableType, Integer value) {
 		this.variableType = variableType;
 		if (value != null) {
 			this.value = Integer.toString(value);
@@ -93,18 +93,18 @@ public class Variable implements Serializable, Comparable<Variable> {
 		}
 	}
 
-	public VariableType getVariableType() {
+	public DMSVariableType getVariableType() {
 		return this.variableType;
 	}
 
-	public void setVariableType(VariableType variableType) {
+	public void setVariableType(DMSVariableType variableType) {
 		this.variableType = variableType;
 		if (variableType == null) {
 			throw new RuntimeException();
 		}
 	}
 
-	public void setVariableType(VariableType variableType, boolean hasVariableType) {
+	public void setVariableType(DMSVariableType variableType, boolean hasVariableType) {
 		this.variableType = variableType;
 		if (hasVariableType) {
 			if (variableType == null) {

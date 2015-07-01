@@ -12,9 +12,9 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
@@ -81,7 +81,7 @@ public class VariableTypeListTransformerTest extends DataManagerIntegrationTest 
 				measurementVariables, isVariate, PROGRAM_UUID);
 		Assert.assertNotNull(variableTypeList);
 		int i = 0;
-		for (VariableType variableType : variableTypeList.getVariableTypes()) {
+		for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 			Assert.assertEquals(measurementVariables.get(i).getName(), variableType.getLocalName());
 			Assert.assertEquals(measurementVariables.get(i).getDescription(), variableType.getLocalDescription());
 			Assert.assertEquals(i + 1, variableType.getRank());

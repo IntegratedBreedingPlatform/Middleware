@@ -11,23 +11,15 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Stock;
-import org.generationcp.middleware.domain.dms.Stocks;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+
+import java.util.Set;
 
 public class StockBuilder extends Builder {
 
@@ -60,7 +52,7 @@ public class StockBuilder extends Builder {
 		Stocks stocks = new Stocks();
 		for (StockModel stockModel : stockModels) {
 			VariableList variables = new VariableList();
-			for (VariableType variableType : stockVariableTypes.getVariableTypes()) {
+			for (DMSVariableType variableType : stockVariableTypes.getVariableTypes()) {
 				Variable variable = new Variable(variableType, this.getValue(stockModel, variableType));
 				variables.add(variable);
 			}
@@ -69,7 +61,7 @@ public class StockBuilder extends Builder {
 		return stocks;
 	}
 
-	private String getValue(StockModel stockModel, VariableType variableType) {
+	private String getValue(StockModel stockModel, DMSVariableType variableType) {
 		String value = null;
 		int id = variableType.getStandardVariable().getId();
 		if (id == TermId.ENTRY_NO.getId()) {

@@ -11,10 +11,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
+
+import java.io.Serializable;
 
 /**
  * Contains the details of a study - id, conditions and constants.
@@ -190,7 +190,7 @@ public class Study implements Serializable {
 		VariableTypeList filteredFactors = new VariableTypeList();
 		VariableTypeList factors = this.getConditionVariableTypes();
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (VariableType factor : factors.getVariableTypes()) {
+			for (DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getPhenotypicType() == pheotypicType) {
 					filteredFactors.add(factor);
 				}

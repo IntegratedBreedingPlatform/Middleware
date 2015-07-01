@@ -1,19 +1,12 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MeasurementVariableTransformer extends Transformer {
 
@@ -30,7 +23,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
-			for (VariableType variableType : variableTypeList.getVariableTypes()) {
+			for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 				StandardVariable stdVariable = variableType.getStandardVariable();
 				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				if (!isFactor && isTrial) {
@@ -65,7 +58,7 @@ public class MeasurementVariableTransformer extends Transformer {
 
 		if (variableList != null && !variableList.isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
-				VariableType variableType = variable.getVariableType();
+				DMSVariableType variableType = variable.getVariableType();
 				StandardVariable stdVariable = variableType.getStandardVariable();
 				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				// for trial constants

@@ -11,14 +11,10 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.domain.oms.TermId;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * List of variable types.
@@ -27,11 +23,11 @@ public class VariableTypeList implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<VariableType> variableTypes = new ArrayList<VariableType>();
-	private final Map<String, VariableType> idVarTypeMap = new HashMap();
-	private final Map<String, VariableType> nameVarTypeMap = new HashMap();
+	private List<DMSVariableType> variableTypes = new ArrayList<DMSVariableType>();
+	private final Map<String, DMSVariableType> idVarTypeMap = new HashMap();
+	private final Map<String, DMSVariableType> nameVarTypeMap = new HashMap();
 
-	public void add(VariableType variableType) {
+	public void add(DMSVariableType variableType) {
 		this.variableTypes.add(variableType);
 
 		this.idVarTypeMap.put(Integer.toString(variableType.getId()), variableType);
@@ -41,7 +37,7 @@ public class VariableTypeList implements Serializable {
 	}
 
 	public void addAll(VariableTypeList variableTypes) {
-		for (VariableType variableType : variableTypes.getVariableTypes()) {
+		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
 			if (this.findByLocalName(variableType.getLocalName()) == null) {
 				this.variableTypes.add(variableType);
 
@@ -54,11 +50,11 @@ public class VariableTypeList implements Serializable {
 		}
 	}
 
-	public VariableType findById(TermId termId) {
+	public DMSVariableType findById(TermId termId) {
 		return this.findById(termId.getId());
 	}
 
-	public VariableType findById(int id) {
+	public DMSVariableType findById(int id) {
 
 		// added for optimization
 		if (this.idVarTypeMap != null && this.idVarTypeMap.get(Integer.toString(id)) != null) {
@@ -66,7 +62,7 @@ public class VariableTypeList implements Serializable {
 		}
 
 		if (this.variableTypes != null) {
-			for (VariableType variableType : this.variableTypes) {
+			for (DMSVariableType variableType : this.variableTypes) {
 				if (variableType.getId() == id) {
 					return variableType;
 				}
@@ -75,7 +71,7 @@ public class VariableTypeList implements Serializable {
 		return null;
 	}
 
-	public VariableType findByLocalName(String localName) {
+	public DMSVariableType findByLocalName(String localName) {
 
 		// added for optimization
 		if (this.nameVarTypeMap != null && this.nameVarTypeMap.get(localName) != null) {
@@ -83,7 +79,7 @@ public class VariableTypeList implements Serializable {
 		}
 
 		if (this.variableTypes != null) {
-			for (VariableType variableType : this.variableTypes) {
+			for (DMSVariableType variableType : this.variableTypes) {
 				if (variableType.getLocalName().equals(localName)) {
 					return variableType;
 				}
@@ -92,11 +88,11 @@ public class VariableTypeList implements Serializable {
 		return null;
 	}
 
-	public List<VariableType> getVariableTypes() {
+	public List<DMSVariableType> getVariableTypes() {
 		return this.variableTypes;
 	}
 
-	public void setVariableTypes(List<VariableType> variableTypes) {
+	public void setVariableTypes(List<DMSVariableType> variableTypes) {
 		this.variableTypes = variableTypes;
 	}
 
@@ -111,7 +107,7 @@ public class VariableTypeList implements Serializable {
 
 	public void print(int indent) {
 		if (this.variableTypes != null) {
-			for (VariableType variableType : this.variableTypes) {
+			for (DMSVariableType variableType : this.variableTypes) {
 				variableType.print(indent);
 			}
 		}
@@ -120,7 +116,7 @@ public class VariableTypeList implements Serializable {
 	public VariableTypeList getFactors() {
 		VariableTypeList factors = new VariableTypeList();
 		if (this.variableTypes != null) {
-			for (VariableType variableType : this.variableTypes) {
+			for (DMSVariableType variableType : this.variableTypes) {
 				if (!this.isVariate(variableType)) {
 					factors.add(variableType);
 				}
@@ -132,7 +128,7 @@ public class VariableTypeList implements Serializable {
 	public VariableTypeList getVariates() {
 		VariableTypeList variates = new VariableTypeList();
 		if (this.variableTypes != null) {
-			for (VariableType variableType : this.variableTypes) {
+			for (DMSVariableType variableType : this.variableTypes) {
 				if (this.isVariate(variableType)) {
 					variates.add(variableType);
 				}
@@ -141,7 +137,7 @@ public class VariableTypeList implements Serializable {
 		return variates.sort();
 	}
 
-	private boolean isVariate(VariableType variableType) {
+	private boolean isVariate(DMSVariableType variableType) {
 		return variableType.getRole() == PhenotypicType.VARIATE;
 	}
 
@@ -151,7 +147,7 @@ public class VariableTypeList implements Serializable {
 	}
 
 	public void makeRoom(int rank) {
-		for (VariableType vtype : this.variableTypes) {
+		for (DMSVariableType vtype : this.variableTypes) {
 			if (vtype.getRank() >= rank) {
 				vtype.setRank(vtype.getRank() + 1);
 			}
@@ -159,7 +155,7 @@ public class VariableTypeList implements Serializable {
 	}
 
 	public void allocateRoom(int size) {
-		for (VariableType vtype : this.variableTypes) {
+		for (DMSVariableType vtype : this.variableTypes) {
 			vtype.setRank(vtype.getRank() + size);
 		}
 	}

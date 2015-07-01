@@ -11,25 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DataSetType;
-import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.DatasetValues;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
-import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.Stocks;
-import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -41,6 +23,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+
+import java.util.List;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets from the CHADO schema.
@@ -212,7 +196,7 @@ public interface StudyDataManager {
 	 * @param variableType the variable type
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException;
+	void addDataSetVariableType(int datasetId, DMSVariableType variableType) throws MiddlewareQueryException;
 
 	
 	/**
@@ -729,7 +713,7 @@ public interface StudyDataManager {
 	 * @return {@link StudyType} of the study. Returns {@code null} if study type can not be determined for the given study.
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
-	public StudyType getStudyType(int studyId) throws MiddlewareQueryException;
+	StudyType getStudyType(int studyId) throws MiddlewareQueryException;
 
 	/**
 	 * Soft-delete all program studies
@@ -737,9 +721,9 @@ public interface StudyDataManager {
 	 * @param programUUID Program UUID of the studies to be deleted
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
-	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException;
+	void deleteProgramStudies(String programUUID) throws MiddlewareQueryException;
 
-	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows)
+	List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows)
 			throws MiddlewareException;
 
 	/**
@@ -748,5 +732,5 @@ public interface StudyDataManager {
 	 * @param datasetId - project Id of
 	 * @param variableIds - list of variable IDs in the order that they will be saved
 	 */
-	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException;
+	void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException;
 }

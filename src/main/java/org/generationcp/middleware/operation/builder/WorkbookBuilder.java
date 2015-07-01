@@ -662,7 +662,7 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 		Map<String, VariableTypeList> treatmentMap = new HashMap<String, VariableTypeList>();
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
-			for (VariableType variable : variables.getFactors().getVariableTypes()) {
+			for (DMSVariableType variable : variables.getFactors().getVariableTypes()) {
 				if (variable.getRole() == PhenotypicType.TRIAL_DESIGN
 						&& variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
 
@@ -698,7 +698,7 @@ public class WorkbookBuilder extends Builder {
 		VariableTypeList factorList = new VariableTypeList();
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
 
-			for (VariableType variable : variables.getFactors().getVariableTypes()) {
+			for (DMSVariableType variable : variables.getFactors().getVariableTypes()) {
 				if (PhenotypicType.TRIAL_DESIGN == variable.getRole()
 						|| PhenotypicType.GERMPLASM  == variable.getRole()
 						|| PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
@@ -746,7 +746,7 @@ public class WorkbookBuilder extends Builder {
 					constantHeaders.add(constant.getName());
 				}
 				filteredVariables = new VariableTypeList();
-				for (VariableType variable : variables.getVariableTypes()) {
+				for (DMSVariableType variable : variables.getVariableTypes()) {
 					if (!constantHeaders.contains(variable.getLocalName())) {
 						filteredVariables.add(variable);
 					}
@@ -766,7 +766,7 @@ public class WorkbookBuilder extends Builder {
 	private VariableList getCompleteVariatesInExperiment(Experiment experiment, VariableTypeList variateTypes) {
 		VariableList vlist = new VariableList();
 
-		for (VariableType vType : variateTypes.getVariableTypes()) {
+		for (DMSVariableType vType : variateTypes.getVariableTypes()) {
 			boolean found = false;
 
 			// added for optimization
@@ -810,7 +810,7 @@ public class WorkbookBuilder extends Builder {
 		DataSet dataset = this.getDataSetBuilder().build(trialProject.getProjectId());
 		VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		VariableList list = new VariableList();
-		for (VariableType type : typeList.getVariableTypes()) {
+		for (DMSVariableType type : typeList.getVariableTypes()) {
 			list.add(new Variable(type, (String) null));
 		}
 		workbook.setTrialDatasetId(dataset.getId());
@@ -822,7 +822,7 @@ public class WorkbookBuilder extends Builder {
 		VariableTypeList typeList = dataset.getVariableTypes().getVariates();
 
 		VariableList list = new VariableList();
-		for (VariableType type : typeList.getVariableTypes()) {
+		for (DMSVariableType type : typeList.getVariableTypes()) {
 			list.add(new Variable(type, (String) null));
 		}
 		return list;
@@ -910,7 +910,7 @@ public class WorkbookBuilder extends Builder {
 
 		VariableTypeList list = new VariableTypeList();
 		if (variables != null) {
-			for (VariableType type : variables.getVariableTypes()) {
+			for (DMSVariableType type : variables.getVariableTypes()) {
 				if (!trialList.contains(type.getId())) {
 					list.add(type);
 				}

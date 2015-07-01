@@ -1,13 +1,6 @@
 package org.generationcp.middleware.operation.saver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -16,6 +9,9 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class StockSaverTest {
 
@@ -39,8 +35,8 @@ public class StockSaverTest {
 		private String name;
 		private PhenotypicType role;
 		private String value;
-		
-		private StockVariable(int id,String name,PhenotypicType role, String value) {
+
+		StockVariable(int id, String name, PhenotypicType role, String value) {
 			this.id = id;
 			this.name = name;
 			this.role = role;
@@ -58,8 +54,8 @@ public class StockSaverTest {
 		public String getValue() {
 			return value;
 		}
-	};
-	
+	}
+
 	@Before
 	public void setUp() throws MiddlewareQueryException {
 		stockSaver = Mockito.spy(new StockSaver(Mockito.mock(HibernateSessionProvider.class)));
@@ -113,9 +109,9 @@ public class StockSaverTest {
 		return variable;
 	}
 
-	private VariableType createVariableType(int standardVariableId, 
+	private DMSVariableType createVariableType(int standardVariableId,
 			String name, String description, int rank, PhenotypicType role) {
-		VariableType variableType = new VariableType();
+		DMSVariableType variableType = new DMSVariableType();
 		variableType.setLocalName(name);
 		variableType.setLocalDescription(description);
 		variableType.setRole(role);

@@ -1,13 +1,6 @@
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.*;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -18,6 +11,9 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -48,8 +44,8 @@ public class GeolocationSaverTest {
 		private String name;
 		private PhenotypicType role;
 		private String value;
-		
-		private EnvironmentVariable(int id,String name,PhenotypicType role, String value) {
+
+		EnvironmentVariable(int id, String name, PhenotypicType role, String value) {
 			this.id = id;
 			this.name = name;
 			this.role = role;
@@ -67,8 +63,8 @@ public class GeolocationSaverTest {
 		public String getValue() {
 			return value;
 		}
-	};
-	
+	}
+
 	@Before
 	public void setUp() throws MiddlewareQueryException {
 		geolocationSaver = Mockito.spy(new GeolocationSaver(Mockito.mock(HibernateSessionProvider.class)));
@@ -167,9 +163,9 @@ public class GeolocationSaverTest {
 		return variable;
 	}
 
-	private VariableType createVariableType(int standardVariableId, 
+	private DMSVariableType createVariableType(int standardVariableId,
 			String name, String description, int rank, PhenotypicType role) {
-		VariableType variableType = new VariableType();
+		DMSVariableType variableType = new DMSVariableType();
 		variableType.setLocalName(name);
 		variableType.setLocalDescription(description);
 		variableType.setRole(role);
