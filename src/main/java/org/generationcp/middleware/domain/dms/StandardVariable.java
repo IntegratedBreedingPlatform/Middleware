@@ -356,6 +356,9 @@ public class StandardVariable implements Serializable {
 
 	public void setVariableTypes(Set<VariableType> variableTypes) {
 		this.variableTypes = variableTypes;
+		if(variableTypes!=null && !variableTypes.isEmpty()) {
+			phenotypicType = variableTypes.iterator().next().getRole();
+		}
 	}
 	
 	public Set<VariableType> getVariableTypes() {
