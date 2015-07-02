@@ -10,7 +10,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.pojos.workbench.CropType.CropEnum;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
+import org.generationcp.middleware.util.Debug;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
@@ -20,6 +23,8 @@ import org.junit.BeforeClass;
 public class DataManagerIntegrationTest extends MiddlewareIntegrationTest {
 
 	protected static ManagerFactory managerFactory;
+
+	long startTime = System.currentTimeMillis();
 
 	static {
 
@@ -41,5 +46,16 @@ public class DataManagerIntegrationTest extends MiddlewareIntegrationTest {
 	@AfterClass
 	public static void tearDownSuper() throws Exception {
 		// common superclss tearDown
+	}
+
+	@Before
+	public void startCase(){
+		startTime = System.currentTimeMillis();
+	}
+
+	@After
+	public void endCase(){
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		Debug.println("Total time to test: " + elapsedTime + " ms");
 	}
 }

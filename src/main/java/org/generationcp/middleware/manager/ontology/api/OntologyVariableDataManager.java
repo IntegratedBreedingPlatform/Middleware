@@ -13,10 +13,10 @@
 package org.generationcp.middleware.manager.ontology.api;
 
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 
 import java.util.List;
 import java.util.Set;
@@ -28,21 +28,14 @@ import java.util.Set;
 public interface OntologyVariableDataManager {
 
 	/**
-	 * Return All Variables * @return List<OntologyVariableSummary>
-	 * 
-	 * @throws MiddlewareException*
+	 *
+	 * @param variableFilter have filter data that needs to be applied
+	 * @return List<Variable>
+	 * @throws MiddlewareException
 	 */
-	List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId, Integer scaleId)
-			throws MiddlewareException;
-
-	List<OntologyVariableSummary> getWithFilter(String programUuid, Boolean favorites, Integer methodId, Integer propertyId,
-			Integer scaleId, VariableType variableType) throws MiddlewareException;
-
-	List<OntologyVariableSummary> getWithFilter(OntologyVariableInfo variableFilterOptions, Set<Integer> filteredVariables)
-			throws MiddlewareException;
+	List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareException;
 
 	void processTreatmentFactorHasPairValue(List<OntologyVariableSummary> summaryList, List<Integer> hiddenFields) throws MiddlewareException;
-
 	/**
 	 * Return variable by Id * @return Variable
 	 * 

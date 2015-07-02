@@ -17,8 +17,8 @@ import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.AfterClass;
@@ -51,20 +52,21 @@ public class VariableDataManagerImplTest extends DataManagerIntegrationTest {
 	private static OntologyVariableInfo testVariableInfo;
 
 	@Test
-	public void testGetAllVariables() throws Exception {
-		List<OntologyVariableSummary> variables =
-				VariableDataManagerImplTest.variableManager.getWithFilter(VariableDataManagerImplTest.testProject.getUniqueID(), null,
-						null, null, null);
-		Assert.assertTrue(variables.size() > 0);
+	public void testGetAllVariablesUsingFilter() throws MiddlewareException {
+		VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setFetchAll(true);
+
+		List<Variable> variables = VariableDataManagerImplTest.variableManager.getWithFilter(variableFilter);
+		Assert.assertTrue(!variables.isEmpty());
 		Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Variables:  " + variables.size());
 	}
 
 	@Test
 	public void testGetVariablesByProperty() throws Exception {
-		List<OntologyVariableSummary> variables =
-				VariableDataManagerImplTest.variableManager.getWithFilter(VariableDataManagerImplTest.testProject.getUniqueID(), null,
-						VariableDataManagerImplTest.testMethod.getId(), VariableDataManagerImplTest.testProperty.getId(),
-						VariableDataManagerImplTest.testScale.getId());
+		VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addPropertyId(VariableDataManagerImplTest.testProperty.getId());
+
+		List<Variable> variables = VariableDataManagerImplTest.variableManager.getWithFilter(variableFilter);
 		Assert.assertTrue(variables.size() == 1);
 	}
 
