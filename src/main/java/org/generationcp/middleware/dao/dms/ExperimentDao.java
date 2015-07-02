@@ -19,6 +19,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.hibernate.Criteria;
@@ -34,20 +35,16 @@ import org.hibernate.criterion.Restrictions;
  */
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
-	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECT = "SELECT count(ep.nd_experiment_id) "
-			+ " FROM nd_experiment_project ep " + " INNER JOIN project p ON p.project_id = ep.project_id "
-			+ " WHERE ((1011 = :storedInId OR 1016 = :storedInId) AND p.name IS NOT NULL) "
-			+ " OR ((1012 = :storedInId OR 1017 = :storedInId) AND p.description IS NOT NULL)";
-
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP = "SELECT count(ep.nd_experiment_id) "
 			+ " FROM nd_experiment_project ep "
-			+ " INNER JOIN projectprop pp ON pp.project_id = ep.project_id AND pp.type_id = :variableId AND pp.value IS NOT NULL";
+			+ " INNER JOIN projectprop pp ON pp.project_id = ep.project_id"
+			+ " AND pp.type_id = 1070 and pp.value = :variableId";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION = "SELECT count(e.nd_experiment_id) "
 			+ " FROM nd_experiment e " + " INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id "
-			+ " WHERE (1021 = :storedInId AND g.description IS NOT NULL) " + " OR (1022 = :storedInId AND g.latitude IS NOT NULL) "
-			+ " OR (1023 = :storedInId AND g.longitude IS NOT NULL) " + " OR (1024 = :storedInId AND g.geodetic_datum IS NOT NULL) "
-			+ " OR (1025 = :storedInId AND g.altitude IS NOT NULL)";
+			+ " WHERE (8170 = :variableId AND g.description IS NOT NULL) " + " OR (8191 = :variableId AND g.latitude IS NOT NULL) "
+			+ " OR (8192 = :variableId AND g.longitude IS NOT NULL) " + " OR (8193 = :storedInId AND g.geodetic_datum IS NOT NULL) "
+			+ " OR (8194 = :storedInId AND g.altitude IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP = "SELECT count(e.nd_experiment_id) "
 			+ " FROM nd_experiment e " + " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
@@ -59,8 +56,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK = "SELECT count(es.nd_experiment_id) "
 			+ " FROM nd_experiment_stock es " + " INNER JOIN stock s ON s.stock_id = es.stock_id "
-			+ " WHERE (1041 = :storedInId AND s.uniquename IS NOT NULL) " + " OR (1042 = :storedInId AND s.dbxref_id IS NOT NULL) "
-			+ " OR (1046 = :storedInId AND s.name IS NOT NULL) " + " OR (1047 = :storedInId AND s.value IS NOT NULL)";
+			+ " WHERE (8230 = :variableId AND s.uniquename IS NOT NULL) " + " OR (8240 = :variableId AND s.dbxref_id IS NOT NULL) "
+			+ " OR (8250 = :variableId AND s.name IS NOT NULL) " + " OR (8300 = :variableId AND s.value IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(es.nd_experiment_id) "
 			+ " FROM nd_experiment_stock es " + " INNER JOIN stockprop sp ON sp.stock_id = es.stock_id "
@@ -68,8 +65,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE = "SELECT count(ep.nd_experiment_id) "
 			+ " FROM nd_experiment_phenotype ep " + " INNER JOIN phenotype p ON p.phenotype_id = ep.phenotype_id "
-			+ " AND p.observable_id = :variableId " + " AND (1043 = :storedInId AND p.value IS NOT NULL "
-			+ " OR 1048 = :storedInId AND p.cvalue_id IS NOT NULL)";
+			+ " AND p.observable_id = :variableId " + " AND (p.value IS NOT NULL "
+			+ " OR p.cvalue_id IS NOT NULL)";
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(Collection<Integer> geolocationIds) throws MiddlewareQueryException {
@@ -106,28 +103,30 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return 0;
 	}
 
-	public long countByObservedVariable(int variableId, int sid) throws MiddlewareQueryException {
+	public long countByObservedVariable(int variableId, int variableTypeId) throws MiddlewareQueryException {
 		try {
 			String sql = null;
-			if (TermId.STUDY_NAME_STORAGE.getId() == sid || TermId.STUDY_TITLE_STORAGE.getId() == sid
-					|| TermId.DATASET_NAME_STORAGE.getId() == sid || TermId.DATASET_TITLE_STORAGE.getId() == sid) {
-				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECT;
-			} else if (TermId.STUDY_INFO_STORAGE.getId() == sid || TermId.DATASET_INFO_STORAGE.getId() == sid) {
+			if (VariableType.STUDY_DETAIL.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP;
-			} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == sid) {
-				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP;
-			} else if (TermId.TRIAL_INSTANCE_STORAGE.getId() == sid || TermId.LATITUDE_STORAGE.getId() == sid
-					|| TermId.LONGITUDE_STORAGE.getId() == sid || TermId.DATUM_STORAGE.getId() == sid
-					|| TermId.ALTITUDE_STORAGE.getId() == sid) {
+			} else if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId || TermId.LATITUDE.getId() == variableId
+					|| TermId.LONGITUDE.getId() == variableId || TermId.GEODETIC_DATUM.getId() == variableId
+					|| TermId.ALTITUDE.getId() == variableId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION;
-			} else if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == sid) {
+			} else if (VariableType.ENVIRONMENT_DETAIL.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP;
+			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId || 
+					VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP;
-			} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == sid) {
-				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
-			} else if (TermId.ENTRY_NUMBER_STORAGE.getId() == sid || TermId.ENTRY_GID_STORAGE.getId() == sid
-					|| TermId.ENTRY_DESIGNATION_STORAGE.getId() == sid || TermId.ENTRY_CODE_STORAGE.getId() == sid) {
+			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId
+					|| TermId.DESIG.getId() == variableId || TermId.ENTRY_CODE.getId() == variableId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK;
-			} else if (TermId.OBSERVATION_VARIATE.getId() == sid || TermId.CATEGORICAL_VARIATE.getId() == sid) {
+			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
+				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
+			} else if (VariableType.TRAIT.getId() == variableTypeId 
+					|| VariableType.ANALYSIS.getId() == variableTypeId
+					|| VariableType.NURSERY_CONDITION.getId() == variableTypeId
+					|| VariableType.SELECTION_METHOD.getId() == variableTypeId
+					|| VariableType.TRIAL_CONDITION.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE;
 			}
 
@@ -136,15 +135,12 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				if (sql.indexOf(":variableId") > -1) {
 					query.setParameter("variableId", variableId);
 				}
-				if (sql.indexOf(":storedInId") > -1) {
-					query.setParameter("storedInId", sid);
-				}
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
 
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					"Error at countByObservationVariable=" + variableId + "," + sid + " query at ExperimentDAO: " + e.getMessage(), e);
+					"Error at countByObservationVariable=" + variableId + "," + variableTypeId + " query at ExperimentDAO: " + e.getMessage(), e);
 		}
 		return 0;
 	}
