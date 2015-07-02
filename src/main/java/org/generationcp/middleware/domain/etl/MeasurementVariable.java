@@ -319,7 +319,8 @@ public class MeasurementVariable {
 		if (this.dataTypeId == null && this.dataType != null) {
 			return this.dataType;
 		} else if (this.dataTypeId == TermId.CHARACTER_VARIABLE.getId() || this.dataTypeId == TermId.TIMESTAMP_VARIABLE.getId()
-				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()) {
+				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
+				|| this.dataTypeId == TermId.GERMPLASM_LIST_DATA_TYPE.getId()) {
 			return "C";
 		} else {
 			return "N";
